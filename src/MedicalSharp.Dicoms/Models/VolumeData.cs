@@ -7,14 +7,14 @@ namespace MedicalSharp.Dicoms.Models
     /// <summary>
     /// 体积数据
     /// </summary>
-    public unsafe class Volume : IDisposable
+    public unsafe class VolumeData : IDisposable
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 无参构造器
         /// </summary>
-        private Volume()
+        private VolumeData()
         {
             //默认值
             this.RescaleSlope = 1.0f;
@@ -27,10 +27,18 @@ namespace MedicalSharp.Dicoms.Models
         /// 创建体积数据构造器
         /// </summary>
         /// <param name="sitkImage">SimpleITK图像</param>
-        public Volume(Image sitkImage)
+        public VolumeData(Image sitkImage)
             : this()
         {
             this.SitkImage = sitkImage;
+        }
+
+        /// <summary>
+        /// 析构器
+        /// </summary>
+        ~VolumeData()
+        {
+            this.SitkImage?.Dispose();
         }
 
         #endregion

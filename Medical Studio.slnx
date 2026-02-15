@@ -7,4 +7,5 @@
   <Project Path="src/MedicalSharp.Controls/MedicalSharp.Controls.csproj" Id="7da7f568-ef23-4c12-b276-a7cd7dfcc6e9" />
   <Project Path="src/MedicalSharp.Dicoms/MedicalSharp.Dicoms.csproj" />
   <Project Path="src/MedicalSharp.Engine/MedicalSharp.Engine.csproj" Id="8b9e6fbb-f0f6-4df5-9f73-1bf0830df6b5" />
+  <Project Path="src/MedicalSharp.Tests/MedicalSharp.Tests.csproj" Id="7e0e98ce-702c-472e-97c7-5da6797aee20" />
 </Solution>
