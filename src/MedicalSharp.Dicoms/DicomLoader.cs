@@ -46,8 +46,6 @@ namespace MedicalSharp.Dicoms
 
             #endregion
 
-            Volume volume = new Volume();
-
             //创建图像系列读取器
             using ImageSeriesReader reader = new ImageSeriesReader();
             reader.SetFileNames(new VectorString(dicomPaths));
@@ -59,10 +57,8 @@ namespace MedicalSharp.Dicoms
             //执行读取
             Image image = reader.Execute();
 
-            //保存SimpleITK图像引用
-            volume.SitkImage = image;
-
-            //提取数据
+            //创建体积数据
+            Volume volume = new Volume(image);
             ExtractData(volume);
 
             return volume;
@@ -137,6 +133,16 @@ namespace MedicalSharp.Dicoms
             volume.RowDirection = new Vector3((float)direction[0], (float)direction[1], (float)direction[2]);
             volume.ColDirection = new Vector3((float)direction[3], (float)direction[4], (float)direction[5]);
             volume.SliceDirection = new Vector3((float)direction[6], (float)direction[7], (float)direction[8]);
+
+            //获取窗宽窗位
+            if (image.HasMetaDataKey(DicomTags.WindowWidth))
+            {
+                volume.WindowWidth = float.Parse(image.GetMetaData(DicomTags.WindowWidth));
+            }
+            if (image.HasMetaDataKey(DicomTags.WindowCenter))
+            {
+                volume.WindowCenter = float.Parse(image.GetMetaData(DicomTags.WindowCenter));
+            }
 
             //转换像素类型为short
             if (image.GetPixelID() != PixelIDValueEnum.sitkInt16)

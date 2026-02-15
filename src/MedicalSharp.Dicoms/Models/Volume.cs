@@ -9,6 +9,34 @@ namespace MedicalSharp.Dicoms.Models
     /// </summary>
     public unsafe class Volume : IDisposable
     {
+        #region # 字段及构造器
+
+        /// <summary>
+        /// 无参构造器
+        /// </summary>
+        private Volume()
+        {
+            //默认值
+            this.RescaleSlope = 1.0f;
+            this.RescaleIntercept = 0.0f;
+            this.WindowWidth = 400;
+            this.WindowCenter = 40;
+        }
+
+        /// <summary>
+        /// 创建体积数据构造器
+        /// </summary>
+        /// <param name="sitkImage">SimpleITK图像</param>
+        public Volume(Image sitkImage)
+            : this()
+        {
+            this.SitkImage = sitkImage;
+        }
+
+        #endregion
+
+        #region # 属性
+
         #region 原始数据 —— short* OriginalData
         /// <summary>
         /// 原始数据
@@ -93,14 +121,32 @@ namespace MedicalSharp.Dicoms.Models
         public Vector3 SliceDirection { get; internal set; }
         #endregion
 
+        #region 窗宽 —— float WindowWidth
+        /// <summary>
+        /// 窗宽
+        /// </summary>
+        public float WindowWidth { get; internal set; }
+        #endregion
+
+        #region 窗位 —— float WindowCenter
+        /// <summary>
+        /// 窗位
+        /// </summary>
+        public float WindowCenter { get; internal set; }
+        #endregion
+
         #region SimpleITK图像 —— Image SitkImage
         /// <summary>
         /// SimpleITK图像
         /// </summary>
-        public Image SitkImage { get; internal set; }
+        public Image SitkImage { get; private set; }
         #endregion
 
+        #endregion
 
+        #region # 方法
+
+        #region 获取体素值 —— short this[int x, int y, int z]
         /// <summary>
         /// 获取体素值
         /// </summary>
@@ -108,25 +154,33 @@ namespace MedicalSharp.Dicoms.Models
         /// <param name="y">Y坐标</param>
         /// <param name="z">Z坐标</param>
         /// <returns>体素值</returns>
-        public short GetVoxel(int x, int y, int z)
+        public short this[int x, int y, int z]
         {
-            if (x < 0 || x >= this.VolumeSize.X || y < 0 || y >= this.VolumeSize.Y || z < 0 || z >= this.VolumeSize.Z)
+            get
             {
-                return 0;
+                if (x < 0 || x >= this.VolumeSize.X || y < 0 || y >= this.VolumeSize.Y || z < 0 || z >= this.VolumeSize.Z)
+                {
+                    return 0;
+                }
+
+                int index = z * (int)this.VolumeSize.X * (int)this.VolumeSize.Y + y * (int)this.VolumeSize.X + x;
+                short voxel = this.OriginalData[index];
+
+                return voxel;
             }
-
-            int index = z * (int)this.VolumeSize.X * (int)this.VolumeSize.Y + y * (int)this.VolumeSize.X + x;
-            short voxel = this.OriginalData[index];
-
-            return voxel;
         }
+        #endregion
 
+        #region 释放资源 —— void Dispose()
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// 释放资源
         /// </summary>
         public void Dispose()
         {
             this.SitkImage?.Dispose();
         }
+        #endregion 
+
+        #endregion
     }
 }

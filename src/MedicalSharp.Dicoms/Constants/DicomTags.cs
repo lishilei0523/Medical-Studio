@@ -44,6 +44,7 @@
         /// </summary>
         public const string PatientWeight = "0010|1030";
 
+
         // ================ 研究模块 (Study Module) ================
 
         /// <summary>
@@ -70,6 +71,7 @@
         /// 研究ID (SH)
         /// </summary>
         public const string StudyID = "0020|0010";
+
 
         // ================ 序列模块 (Series Module) ================
 
@@ -108,6 +110,7 @@
         /// </summary>
         public const string BodyPartExamined = "0018|0015";
 
+
         // ================ 设备模块 (Equipment Module) ================
 
         /// <summary>
@@ -129,6 +132,7 @@
         /// 软件版本 (LO)
         /// </summary>
         public const string SoftwareVersions = "0018|1020";
+
 
         // ================ 图像像素模块 (Image Pixel Module) ================
 
@@ -215,6 +219,7 @@
         /// </summary>
         public const string Exposure = "0018|1152";
 
+
         // ================ MR专用模块 ================
 
         /// <summary>
@@ -247,6 +252,7 @@
         /// </summary>
         public const string SequenceName = "0018|0024";
 
+
         // ================ PET专用模块 ================
 
         /// <summary>
@@ -263,6 +269,7 @@
         /// 放射性核素半衰期 (DS)
         /// </summary>
         public const string RadionuclideHalfLife = "0018|1075";
+
 
         // ================ 图像几何模块 (Image Geometry) ================
 
@@ -296,6 +303,7 @@
         /// </summary>
         public const string SpacingBetweenSlices = "0018|0088";
 
+
         // ================ VOI LUT模块 (关键！你的Shader核心) ================
 
         /// <summary>
@@ -312,6 +320,7 @@
         /// VOI LUT函数 (CS)
         /// </summary>
         public const string VOILUTFunction = "0028|1056";
+
 
         // ================ 模态LUT模块 (Modality LUT) ================
 
