@@ -152,13 +152,13 @@ namespace MedicalSharp.Dicoms
 
             //获取体素原始数据
             volumeData.VoxelsCount = (long)volumeData.VolumeSize.X * (long)volumeData.VolumeSize.Y * (long)volumeData.VolumeSize.Z;
-            volumeData.OriginalData = (short*)image.GetBufferAsVoid().ToPointer();
-            if (volumeData.OriginalData == null)
+            volumeData.OriginalData = image.GetBufferAsInt16();
+            if (volumeData.OriginalData == IntPtr.Zero)
             {
                 throw new InvalidCastException("Failed to get pixel buffer");
             }
 #if DEBUG
-            //Span<short> span = new Span<short>(volumeData.OriginalData, (int)volumeData.VoxelsCount);
+            //Span<short> span = new Span<short>(volumeData.OriginalData.ToPointer(), (int)volumeData.VoxelsCount);
             //short[] voxels = span.ToArray();
             //short minVal = voxels.Min();
             //short maxVal = voxels.Max();

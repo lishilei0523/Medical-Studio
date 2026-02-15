@@ -66,7 +66,7 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 设置过滤器 —— abstract void SetFilter(TextureMinFilter minFilter...
+        #region 设置过滤器 —— override void SetFilter(TextureMinFilter minFilter...
         /// <summary>
         /// 设置过滤器
         /// </summary>
@@ -81,7 +81,7 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 设置包裹模式 —— abstract void SetWrapMode(TextureWrapMode wrapMode)
+        #region 设置包裹模式 —— override void SetWrapMode(TextureWrapMode wrapMode)
         /// <summary>
         /// 设置包裹模式
         /// </summary>
@@ -94,7 +94,7 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 绑定纹理 —— abstract void Bind(int index)
+        #region 绑定纹理 —— override void Bind(int index)
         /// <summary>
         /// 绑定纹理
         /// </summary>
@@ -106,7 +106,7 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 解绑纹理 —— abstract void Unbind()
+        #region 解绑纹理 —— override void Unbind()
         /// <summary>
         /// 解绑纹理
         /// </summary>

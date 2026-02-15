@@ -7,7 +7,7 @@ namespace MedicalSharp.Dicoms.Models
     /// <summary>
     /// 体积数据
     /// </summary>
-    public unsafe class VolumeData : IDisposable
+    public class VolumeData : IDisposable
     {
         #region # 字段及构造器
 
@@ -45,11 +45,11 @@ namespace MedicalSharp.Dicoms.Models
 
         #region # 属性
 
-        #region 原始数据 —— short* OriginalData
+        #region 原始数据 —— IntPtr OriginalData
         /// <summary>
         /// 原始数据
         /// </summary>
-        public short* OriginalData { get; internal set; }
+        public IntPtr OriginalData { get; internal set; }
         #endregion
 
         #region 体素数量 —— long VoxelsCount
@@ -162,7 +162,7 @@ namespace MedicalSharp.Dicoms.Models
         /// <param name="y">Y坐标</param>
         /// <param name="z">Z坐标</param>
         /// <returns>体素值</returns>
-        public short this[int x, int y, int z]
+        public unsafe short this[int x, int y, int z]
         {
             get
             {
@@ -172,7 +172,8 @@ namespace MedicalSharp.Dicoms.Models
                 }
 
                 int index = z * (int)this.VolumeSize.X * (int)this.VolumeSize.Y + y * (int)this.VolumeSize.X + x;
-                short voxel = this.OriginalData[index];
+                short* pointer = (short*)this.OriginalData.ToPointer();
+                short voxel = pointer[index];
 
                 return voxel;
             }

@@ -1,5 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using System;
+using System.ComponentModel.Design;
 
 namespace MedicalSharp.Engine.Resources
 {
@@ -26,7 +27,7 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 纹理Id
         /// </summary>
-        public int Id { get; protected set; }
+        public int Id { get; private set; }
         #endregion
 
         #endregion
@@ -73,7 +74,22 @@ namespace MedicalSharp.Engine.Resources
         {
             GL.DeleteTexture(this.Id);
         }
-        #endregion 
+        #endregion
+
+        #region 检查错误 —— static void CheckError(string operation)
+        /// <summary>
+        /// 检查错误
+        /// </summary>
+        /// <param name="operation">操作</param>
+        protected static void CheckError(string operation)
+        {
+            ErrorCode errorCode = GL.GetError();
+            if (errorCode != ErrorCode.NoError)
+            {
+                throw new CheckoutException($"OpenGL Error in {operation}: {errorCode}");
+            }
+        }
+        #endregion
 
         #endregion
     }
