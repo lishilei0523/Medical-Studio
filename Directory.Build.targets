@@ -1,0 +1,13 @@
+<Project DefaultTargets="Build">
+  <!--Version-->
+  <PropertyGroup>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+  </PropertyGroup>
+
+  <!--NuGet-->
+  <PropertyGroup>
+    <Title>$(AssemblyName)</Title>
+    <Owners>$(Company)</Owners>
+  </PropertyGroup>
+</Project>

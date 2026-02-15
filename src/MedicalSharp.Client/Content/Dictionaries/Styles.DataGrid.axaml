@@ -1,0 +1,61 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sd="https://github.com/lishilei0523/SD.Framework">
+
+  <!--DataGrid默认样式-->
+  <Style Selector="DataGrid">
+    <Setter Property="FontFamily" Value="/Content/Fonts/msyh.ttf#Microsoft YaHei"/>
+    <Setter Property="AutoGenerateColumns" Value="False" />
+    <Setter Property="IsReadOnly" Value="True" />
+    <Setter Property="CanUserSortColumns" Value="False" />
+    <Setter Property="BorderBrush" Value="LightGray" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+    <Setter Property="RowHeaderWidth" Value="30" />
+    <Setter Property="HeadersVisibility" Value="All" />
+    <Setter Property="GridLinesVisibility" Value="All" />
+    <Setter Property="Background" Value="{DynamicResource SolidBackgroundFillColorBaseBrush}" />
+    <Setter Property="HorizontalGridLinesBrush" Value="LightGray" />
+    <Setter Property="VerticalGridLinesBrush" Value="LightGray" />
+    <Setter Property="sd:DataGridAttacher.DisplayRowNumber" Value="True" />
+  </Style>
+  <!--DataGrid行头默认样式-->
+  <Style Selector="DataGridRowHeader">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="AreSeparatorsVisible" Value="True" />
+    <Setter Property="SeparatorBrush" Value="LightGray" />
+  </Style>
+  <!--DataGrid列头默认样式-->
+  <Style Selector="DataGridColumnHeader">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="MinHeight" Value="28" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="SeparatorBrush" Value="LightGray" />
+  </Style>
+  <!--DataGrid行默认样式-->
+  <Style Selector="DataGridRow">
+    <Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="#EAF2FF" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:selected">
+      <Style Selector="^ /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="#FFE48D" />
+        <Setter Property="Opacity" Value="1" />
+      </Style>
+      <Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
+        <Setter Property="Fill" Value="#FFE48D" />
+        <Setter Property="Opacity" Value="1" />
+      </Style>
+    </Style>
+  </Style>
+  <!--DataGrid行交叉颜色样式-->
+  <Style Selector="DataGridRow:nth-child(odd)">
+    <Setter Property="Background" Value="White"/>
+  </Style>
+  <!--DataGrid单元格默认样式-->
+  <Style Selector="DataGridCell">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="MinHeight" Value="28" />
+  </Style>
+</Styles>

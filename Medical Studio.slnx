@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/00 - Global/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+  </Folder>
+  <Project Path="src/MedicalSharp.Client/MedicalSharp.Client.csproj" />
+  <Project Path="src/MedicalSharp.Controls/MedicalSharp.Controls.csproj" Id="7da7f568-ef23-4c12-b276-a7cd7dfcc6e9" />
+  <Project Path="src/MedicalSharp.Engine/MedicalSharp.Engine.csproj" Id="8b9e6fbb-f0f6-4df5-9f73-1bf0830df6b5" />
+</Solution>

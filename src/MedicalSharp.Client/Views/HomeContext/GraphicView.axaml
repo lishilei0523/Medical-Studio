@@ -1,0 +1,19 @@
+﻿<fa:AppWindow x:Class="MedicalSharp.Client.Views.HomeContext.GraphicView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  mc:Ignorable="d"
+			  Title="OpenGL"
+			  Width="1440" Height="900"
+			  WindowStartupLocation="CenterScreen">
+
+	<Grid>
+		<sd:MedicalViewport />
+		<Button Content="Snapshot" IsVisible="True"
+				VerticalAlignment="Bottom" HorizontalAlignment="Right"
+				Click="SnapshotClick" />
+	</Grid>
+</fa:AppWindow>
