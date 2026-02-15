@@ -1,9 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Input;
 using Avalonia.OpenGL;
-using Avalonia.OpenGL.Controls;
-using Avalonia.Rendering;
-using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Base;
 using MedicalSharp.Engine.Extensions;
 using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
@@ -17,7 +15,7 @@ namespace MedicalSharp.Controls.Viewports
     /// <summary>
     /// 医学影像视口
     /// </summary>
-    public unsafe class MedicalViewport : OpenGlControlBase, ICustomHitTest
+    public unsafe class MedicalViewport : OpenTKViewport
     {
         private int _vertexShader;
         private int _fragmentShader;
@@ -51,17 +49,9 @@ namespace MedicalSharp.Controls.Viewports
             this.PointerPressed += this.OnPointerPressed;
         }
 
-
-        public bool HitTest(Point point)
-        {
-            return true;
-        }
-
         protected override void OnOpenGlInit(GlInterface glInterface)
         {
-            //加载OpenTK绑定
-            AvaloniaBindingsContext bindingsContext = new AvaloniaBindingsContext(glInterface);
-            GL.LoadBindings(bindingsContext);
+            base.OnOpenGlInit(glInterface);
 
             //Shader部分
             this._vertexShader = GL.CreateShader(ShaderType.VertexShader);
