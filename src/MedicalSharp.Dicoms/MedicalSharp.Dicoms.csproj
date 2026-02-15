@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="SimpleITKCSharpManaged">
+      <HintPath Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(SolutionDir)\runtimes\win-x64\SimpleITKCSharpManaged.dll</HintPath>
+      <HintPath Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(SolutionDir)\runtimes\linux-x64\SimpleITKCSharpManaged.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

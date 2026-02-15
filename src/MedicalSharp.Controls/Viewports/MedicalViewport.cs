@@ -4,7 +4,8 @@ using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
 using MedicalSharp.Controls.Extensions;
-using MedicalSharp.Engine.Models;
+using MedicalSharp.Engine.Extensions;
+using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -64,7 +65,7 @@ namespace MedicalSharp.Controls.Viewports
 
             //Shader部分
             this._vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            string vertexShaderSource = File.ReadAllText("Content/Shaders/wireframe.vert");
+            string vertexShaderSource = File.ReadAllText("Shaders/GLSLs/wireframe.vert").RemoveComments();
             GL.ShaderSource(this._vertexShader, vertexShaderSource);
             GL.CompileShader(this._vertexShader);
 
@@ -76,7 +77,7 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             this._fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            string fragmentShaderSource = File.ReadAllText("Content/Shaders/wireframe.frag");
+            string fragmentShaderSource = File.ReadAllText("Shaders/GLSLs/wireframe.frag").RemoveComments();
             GL.ShaderSource(this._fragmentShader, fragmentShaderSource);
             GL.CompileShader(this._fragmentShader);
 

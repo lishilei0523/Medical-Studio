@@ -5,18 +5,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Content\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <PackageReference Include="OpenTK.Graphics" Version="4.9.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTK.Graphics" Version="4.9.4" />
+    <None Update="Shaders\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Geometries\" />
     <Folder Include="Renderers\" />
     <Folder Include="Enums\" />
+    <Folder Include="Builders\" />
   </ItemGroup>
 </Project>
