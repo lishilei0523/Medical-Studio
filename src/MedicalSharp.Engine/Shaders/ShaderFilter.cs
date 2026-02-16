@@ -1,18 +1,18 @@
 ﻿using System.Text;
 
-namespace MedicalSharp.Engine.Extensions
+namespace MedicalSharp.Engine.Shaders
 {
     /// <summary>
-    /// 文本扩展
+    /// Shader过滤器
     /// </summary>
-    public static class TextExtension
+    internal static class ShaderFilter
     {
         /// <summary>
-        /// 过滤注释
+        /// 删除注释
         /// </summary>
         /// <param name="code">代码</param>
-        /// <returns>过滤注释后代码</returns>
-        public static string RemoveComments(this string code)
+        /// <returns>删除注释后代码</returns>
+        internal static string RemoveComments(this string code)
         {
             if (string.IsNullOrWhiteSpace(code))
             {

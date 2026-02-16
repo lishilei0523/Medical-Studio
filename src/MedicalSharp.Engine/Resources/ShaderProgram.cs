@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Engine.Extensions;
+﻿using MedicalSharp.Engine.Shaders;
 using Microsoft.CSharp.RuntimeBinder;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -68,7 +68,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="sourceText">Shader源文本</param>
         public void SetVertexShaderSource(string sourceText)
         {
-            this.VertexShaderSource = sourceText;
+            this.VertexShaderSource = sourceText.RemoveComments();
         }
         #endregion
 
@@ -79,7 +79,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="sourceText">Shader源文本</param>
         public void SetFragmentShaderSource(string sourceText)
         {
-            this.FragmentShaderSource = sourceText;
+            this.FragmentShaderSource = sourceText.RemoveComments();
         }
         #endregion
 
