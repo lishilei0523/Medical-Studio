@@ -316,25 +316,25 @@ namespace MedicalSharp.Engine.Cameras
         {
             switch (this._planeType)
             {
-                case MPRPlaneType.Axial: // 横断面 - 从上往下看
-                    this._cameraPosition = new Vector3(0, 1000, 0); // 位于Y轴正方向
-                    this._lookDirection = new Vector3(0, -1, 0);    // 看向Y轴负方向
-                    this._upDirection = new Vector3(0, 0, 1);       // Z轴向上
-                    this._rightDirection = new Vector3(1, 0, 0);    // X轴向右
+                case MPRPlaneType.Axial:    //横断面 - 从上往下看
+                    this._cameraPosition = new Vector3(0, 1000, 0); //位于Y轴正方向
+                    this._lookDirection = new Vector3(0, -1, 0);    //看向Y轴负方向
+                    this._upDirection = new Vector3(0, 0, 1);       //Z轴向上
+                    this._rightDirection = new Vector3(1, 0, 0);    //X轴向右
                     break;
 
-                case MPRPlaneType.Coronal: // 冠状面 - 从前向后看
-                    this._cameraPosition = new Vector3(0, 0, 1000); // 位于Z轴正方向
-                    this._lookDirection = new Vector3(0, 0, -1);    // 看向Z轴负方向
-                    this._upDirection = new Vector3(0, 1, 0);       // Y轴向上
-                    this._rightDirection = new Vector3(1, 0, 0);    // X轴向右
+                case MPRPlaneType.Coronal:  //冠状面 - 从前向后看
+                    this._cameraPosition = new Vector3(0, 0, 1000); //位于Z轴正方向
+                    this._lookDirection = new Vector3(0, 0, -1);    //看向Z轴负方向
+                    this._upDirection = new Vector3(0, 1, 0);       //Y轴向上
+                    this._rightDirection = new Vector3(1, 0, 0);    //X轴向右
                     break;
 
-                case MPRPlaneType.Sagittal: // 矢状面 - 从左向右看
-                    this._cameraPosition = new Vector3(-1000, 0, 0); // 位于X轴负方向
-                    this._lookDirection = new Vector3(1, 0, 0);      // 看向X轴正方向
-                    this._upDirection = new Vector3(0, 1, 0);        // Y轴向上
-                    this._rightDirection = new Vector3(0, 0, 1);     // Z轴向右
+                case MPRPlaneType.Sagittal: //矢状面 - 从左向右看
+                    this._cameraPosition = new Vector3(-1000, 0, 0); //位于X轴负方向
+                    this._lookDirection = new Vector3(1, 0, 0);      //看向X轴正方向
+                    this._upDirection = new Vector3(0, 1, 0);        //Y轴向上
+                    this._rightDirection = new Vector3(0, 0, 1);     //Z轴向右
                     break;
             }
         }
