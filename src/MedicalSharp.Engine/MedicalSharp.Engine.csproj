@@ -16,7 +16,5 @@
 
   <ItemGroup>
     <Folder Include="Renderers\" />
-    <Folder Include="Enums\" />
-    <Folder Include="Builders\" />
   </ItemGroup>
 </Project>
