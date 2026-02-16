@@ -3,7 +3,7 @@
     /// <summary>
     /// MPR平面
     /// </summary>
-    public enum MPRPlane : byte
+    public enum MPRPlaneType : byte
     {
         /// <summary>
         /// 横断面
@@ -21,11 +21,6 @@
         /// 矢状面
         /// </summary>
         /// <remarks>YZ平面</remarks>
-        Sagittal = 2,
-
-        /// <summary>
-        /// 斜切面
-        /// </summary>
-        Oblique = 3
+        Sagittal = 2
     }
 }
