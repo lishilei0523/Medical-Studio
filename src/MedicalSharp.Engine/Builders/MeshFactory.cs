@@ -1,5 +1,4 @@
-﻿using MedicalSharp.Engine.Resources;
-using MedicalSharp.Engine.ValueTypes;
+﻿using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -348,15 +347,15 @@ namespace MedicalSharp.Engine.Builders
             return new MeshGeometry(primitiveType, finalVertices, finalIndices);
         }
 
-        ///<summary>
-        ///创建边界立方体
-        ///</summary>
-        ///<param name="width">宽度</param>
-        ///<param name="height">高度</param>
-        ///<param name="depth">深度</param>
-        ///<param name="primitiveType">图元类型</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        /// <summary>
+        /// 创建边界立方体
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreateBoundingBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, PrimitiveType primitiveType = PrimitiveType.Lines, Vector4 color = default)
         {
             if (color == default)
@@ -368,45 +367,162 @@ namespace MedicalSharp.Engine.Builders
             float halfH = height * 0.5f;
             float halfD = depth * 0.5f;
 
-            Vector3[] vertices =
-            [
-                new(-halfW, -halfH, halfD),     //0
-                new(halfW, -halfH, halfD),      //1
-                new(halfW, halfH, halfD),       //2
-                new(-halfW, halfH, halfD),      //3
-                new(-halfW, -halfH, -halfD),    //4
-                new(-halfW, halfH, -halfD),     //5
-                new(halfW, halfH, -halfD),      //6
-                new(halfW, -halfH, -halfD)      //7
-            ];
-
-            uint[][] edges = new uint[][]
-            {
-                [0, 1], [1, 2], [2, 3], [3, 0], //前
-                [4, 5], [5, 6], [6, 7], [7, 4], //后
-                [0, 4], [1, 7], [2, 6], [3, 5]  //连接
-            };
-
-            List<Vertex> finalVertices = [];
-            for (int i = 0; i < 8; i++)
-            {
-                finalVertices.Add(new Vertex
-                {
-                    Position = vertices[i],
-                    Color = color,
-                    TextureCoord = Vector2.Zero,
-                    Normal = Vector3.Zero
-                });
-            }
-
+            List<Vertex> vertices = [];
             List<uint> indices = [];
-            for (int i = 0; i < 12; i++)
+
+            if (primitiveType == PrimitiveType.Lines)
             {
-                indices.Add(edges[i][0]);
-                indices.Add(edges[i][1]);
+                //线框模式 - 8个顶点，12条边（24个索引）
+                Vector3[] cornerVertices =
+                [
+                    // 前平面
+                    new Vector3(-halfW, -halfH, halfD), // 0: 左下前
+                    new Vector3(halfW, -halfH, halfD), // 1: 右下前
+                    new Vector3(halfW, halfH, halfD), // 2: 右上前
+                    new Vector3(-halfW, halfH, halfD), // 3: 左上前
+
+                    // 后平面
+                    new Vector3(-halfW, -halfH, -halfD), // 4: 左下后
+                    new Vector3(-halfW, halfH, -halfD), // 5: 左上后
+                    new Vector3(halfW, halfH, -halfD), // 6: 右上后
+                    new Vector3(halfW, -halfH, -halfD) // 7: 右下后
+                ];
+
+                //12条边（每边2个点）
+                uint[][] edges = new uint[][]
+                {
+                    // 前平面
+                    [0, 1], // 下边
+                    [1, 2], // 右边
+                    [2, 3], // 上边
+                    [3, 0], // 左边
+
+                    // 后平面
+                    [4, 5], // 左边
+                    [5, 6], // 上边
+                    [6, 7], // 右边
+                    [7, 4], // 下边
+
+                    // 连接前后面
+                    [0, 4], // 左下
+                    [1, 7], // 右下
+                    [2, 6], // 右上
+                    [3, 5] // 左上
+                };
+
+                //创建顶点（法线设为0，因为线框不需要光照计算）
+                for (int i = 0; i < 8; i++)
+                {
+                    vertices.Add(new Vertex
+                    {
+                        Position = cornerVertices[i],
+                        Color = color,
+                        TextureCoord = Vector2.Zero,
+                        Normal = Vector3.Zero
+                    });
+                }
+
+                //创建索引
+                for (int i = 0; i < 12; i++)
+                {
+                    indices.Add(edges[i][0]);
+                    indices.Add(edges[i][1]);
+                }
+            }
+            else
+            {
+                //Triangles模式 - 24个顶点（每个面4个独立顶点），36个索引
+                //定义6个面的24个顶点
+                Vector3[][] faceVertices = new Vector3[][]
+                {
+                    //前面 (z = +halfD)
+                    [
+                        new Vector3(-halfW, -halfH, halfD),     //0
+                        new Vector3(halfW, -halfH, halfD),      //1
+                        new Vector3(halfW, halfH, halfD),       //2
+                        new Vector3(-halfW, halfH, halfD)       //3
+                    ],
+                    //后面 (z = -halfD)
+                    [
+                        new Vector3(halfW, -halfH, -halfD),     //4
+                        new Vector3(-halfW, -halfH, -halfD),    //5
+                        new Vector3(-halfW, halfH, -halfD),     //6
+                        new Vector3(halfW, halfH, -halfD)       //7
+                    ],
+                    //右面 (x = +halfW)
+                    [
+                        new Vector3(halfW, -halfH, halfD),      //8
+                        new Vector3(halfW, -halfH, -halfD),     //9
+                        new Vector3(halfW, halfH, -halfD),      //10
+                        new Vector3(halfW, halfH, halfD)        //11
+                    ],
+                    //左面 (x = -halfW)
+                    [
+                        new Vector3(-halfW, -halfH, -halfD),    //12
+                        new Vector3(-halfW, -halfH, halfD),     //13
+                        new Vector3(-halfW, halfH, halfD),      //14
+                        new Vector3(-halfW, halfH, -halfD)      //15
+                    ],
+                    //上面 (y = +halfH)
+                    [
+                        new Vector3(-halfW, halfH, halfD),      //16
+                        new Vector3(halfW, halfH, halfD),       //17
+                        new Vector3(halfW, halfH, -halfD),      //18
+                        new Vector3(-halfW, halfH, -halfD)      //19
+                    ],
+                    //下面 (y = -halfH)
+                    [
+                        new Vector3(-halfW, -halfH, -halfD),    //20
+                        new Vector3(halfW, -halfH, -halfD),     //21
+                        new Vector3(halfW, -halfH, halfD),      //22
+                        new Vector3(-halfW, -halfH, halfD)      //23
+                    ]
+                };
+
+                //每个面的法线
+                Vector3[] faceNormals =
+                [
+                    new Vector3(0, 0, 1),   //前面
+                    new Vector3(0, 0, -1),  //后面
+                    new Vector3(1, 0, 0),   //右面
+                    new Vector3(-1, 0, 0),  //左面
+                    new Vector3(0, 1, 0),   //上面
+                    new Vector3(0, -1, 0)   //下面
+                ];
+
+                //创建24个顶点（每个面4个）
+                for (int face = 0; face < 6; face++)
+                {
+                    for (int vert = 0; vert < 4; vert++)
+                    {
+                        vertices.Add(new Vertex
+                        {
+                            Position = faceVertices[face][vert],
+                            Color = color,
+                            TextureCoord = Vector2.Zero,
+                            Normal = faceNormals[face]
+                        });
+                    }
+                }
+
+                //创建36个索引（每个面2个三角形，6个面 × 6个索引 = 36）
+                for (int face = 0; face < 6; face++)
+                {
+                    uint baseIndex = (uint)(face * 4);
+
+                    //第一个三角形: 0-1-2
+                    indices.Add(baseIndex + 0);
+                    indices.Add(baseIndex + 1);
+                    indices.Add(baseIndex + 2);
+
+                    //第二个三角形: 0-2-3
+                    indices.Add(baseIndex + 0);
+                    indices.Add(baseIndex + 2);
+                    indices.Add(baseIndex + 3);
+                }
             }
 
-            return new MeshGeometry(primitiveType, finalVertices, indices);
+            return new MeshGeometry(primitiveType, vertices, indices);
         }
 
         ///<summary>

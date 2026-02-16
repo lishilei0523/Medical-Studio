@@ -1,11 +1,10 @@
-﻿using MedicalSharp.Engine.ValueTypes;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace MedicalSharp.Engine.Resources
+namespace MedicalSharp.Engine.ValueTypes
 {
     /// <summary>
     /// 网格几何

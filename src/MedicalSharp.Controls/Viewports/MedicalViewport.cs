@@ -2,13 +2,11 @@
 using Avalonia.Input;
 using Avalonia.OpenGL;
 using MedicalSharp.Controls.Base;
-using MedicalSharp.Engine.Shaders;
+using MedicalSharp.Engine.Resources;
 using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using System;
 using System.Diagnostics;
-using System.IO;
 
 namespace MedicalSharp.Controls.Viewports
 {
@@ -54,37 +52,11 @@ namespace MedicalSharp.Controls.Viewports
             base.OnOpenGlInit(glInterface);
 
             //Shader部分
-            this._vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            string vertexShaderSource = File.ReadAllText("Shaders/GLSLs/wireframe.vert").RemoveComments();
-            GL.ShaderSource(this._vertexShader, vertexShaderSource);
-            GL.CompileShader(this._vertexShader);
-
-            GL.GetShader(this._vertexShader, ShaderParameter.CompileStatus, out int success);
-            if (success < 1)
-            {
-                GL.GetShaderInfoLog(this._vertexShader, 512, null, out string logInfo);
-                Console.WriteLine(logInfo);
-            }
-
-            this._fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            string fragmentShaderSource = File.ReadAllText("Shaders/GLSLs/wireframe.frag").RemoveComments();
-            GL.ShaderSource(this._fragmentShader, fragmentShaderSource);
-            GL.CompileShader(this._fragmentShader);
-
-            GL.GetShader(this._fragmentShader, ShaderParameter.CompileStatus, out int success2);
-            if (success2 < 1)
-            {
-                GL.GetShaderInfoLog(this._fragmentShader, 512, null, out string logInfo);
-                Console.WriteLine(logInfo);
-            }
-
-            this._shaderProgram = GL.CreateProgram();
-            GL.AttachShader(this._shaderProgram, this._vertexShader);
-            GL.AttachShader(this._shaderProgram, this._fragmentShader);
-            GL.LinkProgram(this._shaderProgram);
-
-            GL.DeleteShader(this._vertexShader);
-            GL.DeleteShader(this._fragmentShader);
+            ShaderProgram program = new ShaderProgram();
+            program.ReadVertexShaderFromFile("Shaders/GLSLs/wireframe.vert");
+            program.ReadFragmentShaderFromFile("Shaders/GLSLs/wireframe.frag");
+            program.Build();
+            this._shaderProgram = program.Id;
 
             //数据部分
             this._vertexArrayObject = GL.GenVertexArray();

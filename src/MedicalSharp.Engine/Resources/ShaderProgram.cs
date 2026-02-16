@@ -19,7 +19,7 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public ShaderProgram()
         {
-            this.ProgramId = GL.CreateProgram();
+            this.Id = GL.CreateProgram();
         }
 
         /// <summary>
@@ -27,12 +27,19 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         ~ShaderProgram()
         {
-            GL.DeleteProgram(this.ProgramId);
+            GL.DeleteProgram(this.Id);
         }
 
         #endregion
 
         #region # 属性
+
+        #region Shader程序Id —— int Id
+        /// <summary>
+        /// Shader程序Id
+        /// </summary>
+        public int Id { get; private set; }
+        #endregion
 
         #region 顶点Shader源文本 —— string VertexShaderSource
         /// <summary>
@@ -46,13 +53,6 @@ namespace MedicalSharp.Engine.Resources
         /// 片元Shader源文本
         /// </summary>
         public string FragmentShaderSource { get; private set; }
-        #endregion
-
-        #region Shader程序Id —— int ProgramId
-        /// <summary>
-        /// Shader程序Id
-        /// </summary>
-        public int ProgramId { get; private set; }
         #endregion
 
         #endregion
@@ -115,14 +115,14 @@ namespace MedicalSharp.Engine.Resources
             int fragmentShaderId = CompileShader(this.FragmentShaderSource, ShaderType.FragmentShader);
 
             //链接Shader程序 
-            GL.AttachShader(this.ProgramId, vertexShaderId);
-            GL.AttachShader(this.ProgramId, fragmentShaderId);
-            GL.LinkProgram(this.ProgramId);
+            GL.AttachShader(this.Id, vertexShaderId);
+            GL.AttachShader(this.Id, fragmentShaderId);
+            GL.LinkProgram(this.Id);
 
-            GL.GetProgram(this.ProgramId, GetProgramParameterName.LinkStatus, out int success);
+            GL.GetProgram(this.Id, GetProgramParameterName.LinkStatus, out int success);
             if (success <= 0)
             {
-                GL.GetShaderInfoLog(this.ProgramId, out string logInfo);
+                GL.GetShaderInfoLog(this.Id, out string logInfo);
                 throw new RuntimeBinderInternalCompilerException(logInfo);
             }
 
@@ -138,7 +138,7 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Use()
         {
-            GL.UseProgram(this.ProgramId);
+            GL.UseProgram(this.Id);
         }
         #endregion
 
@@ -150,7 +150,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="value">值</param>
         public void SetUniformBoolean(string key, bool value)
         {
-            int uniformId = GL.GetUniformLocation(this.ProgramId, key);
+            int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform1(uniformId, Convert.ToInt16(value));
         }
         #endregion
@@ -163,7 +163,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="value">值</param>
         public void SetUniformInt(string key, int value)
         {
-            int uniformId = GL.GetUniformLocation(this.ProgramId, key);
+            int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform1(uniformId, value);
         }
         #endregion
@@ -176,7 +176,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="value">值</param>
         public void SetUniformFloat(string key, float value)
         {
-            int uniformId = GL.GetUniformLocation(this.ProgramId, key);
+            int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform1(uniformId, value);
         }
         #endregion
@@ -189,7 +189,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="value">值</param>
         public void SetUniformVector2(string key, ref readonly Vector2 value)
         {
-            int uniformId = GL.GetUniformLocation(this.ProgramId, key);
+            int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform2(uniformId, value);
         }
         #endregion
@@ -202,7 +202,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="value">值</param>
         public void SetUniformVector3(string key, ref readonly Vector3 value)
         {
-            int uniformId = GL.GetUniformLocation(this.ProgramId, key);
+            int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform3(uniformId, value);
         }
         #endregion
@@ -215,7 +215,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="value">值</param>
         public void SetUniformVector4(string key, ref readonly Vector4 value)
         {
-            int uniformId = GL.GetUniformLocation(this.ProgramId, key);
+            int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform4(uniformId, value);
         }
         #endregion
@@ -228,7 +228,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="value">值</param>
         public void SetUniformMatrix(string key, Matrix4 value)
         {
-            int uniformId = GL.GetUniformLocation(this.ProgramId, key);
+            int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.UniformMatrix4(uniformId, false, ref value);
         }
         #endregion
@@ -239,7 +239,7 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Dispose()
         {
-            GL.DeleteProgram(this.ProgramId);
+            GL.DeleteProgram(this.Id);
         }
         #endregion
 
