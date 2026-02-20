@@ -5,7 +5,7 @@ namespace MedicalSharp.Engine.Cameras
     /// <summary>
     /// 轨道正交相机
     /// </summary>
-    public class OrbitOrthographicCamera : OrbitCamera
+    public class OrbitOrthoCamera : OrbitCamera
     {
         #region # 字段及构造器
 
@@ -18,7 +18,7 @@ namespace MedicalSharp.Engine.Cameras
         /// <param name="pitch">俯仰角-RX（角度）</param>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
-        public OrbitOrthographicCamera(Vector3 targetPosition = default, float distance = 5.0f, float yaw = 0.0f, float pitch = 0.0f, float nearPlaneDistance = -100.0f, float farPlaneDistance = 100.0f)
+        public OrbitOrthoCamera(Vector3 targetPosition = default, float distance = 5.0f, float yaw = 0.0f, float pitch = 0.0f, float nearPlaneDistance = -100.0f, float farPlaneDistance = 100.0f)
             : base(targetPosition, distance, yaw, pitch, nearPlaneDistance, farPlaneDistance)
         {
 
