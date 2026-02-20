@@ -7,6 +7,7 @@ namespace MedicalSharp.Engine.Shaders
     /// </summary>
     internal static class ShaderFilter
     {
+        #region # 删除注释 —— static string RemoveComments(this string code)
         /// <summary>
         /// 删除注释
         /// </summary>
@@ -101,5 +102,6 @@ namespace MedicalSharp.Engine.Shaders
 
             return result.ToString();
         }
+        #endregion
     }
 }
