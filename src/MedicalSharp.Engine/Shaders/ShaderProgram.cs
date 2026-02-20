@@ -1,11 +1,10 @@
-﻿using MedicalSharp.Engine.Shaders;
-using Microsoft.CSharp.RuntimeBinder;
+﻿using Microsoft.CSharp.RuntimeBinder;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.IO;
 
-namespace MedicalSharp.Engine.Resources
+namespace MedicalSharp.Engine.Shaders
 {
     /// <summary>
     /// Shader程序

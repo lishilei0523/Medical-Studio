@@ -2,7 +2,7 @@
 using Avalonia.Input;
 using Avalonia.OpenGL;
 using MedicalSharp.Controls.Base;
-using MedicalSharp.Engine.Resources;
+using MedicalSharp.Engine.Shaders;
 using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;

@@ -40,9 +40,8 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 创建顶点缓冲区构造器
         /// </summary>
-        /// <param name="primitiveType">图元类型</param>
         /// <param name="meshGeometry">网格几何</param>
-        public VertexBuffer(PrimitiveType primitiveType, MeshGeometry meshGeometry)
+        public VertexBuffer(MeshGeometry meshGeometry)
             : this()
         {
             #region # 验证
@@ -54,7 +53,6 @@ namespace MedicalSharp.Engine.Resources
 
             #endregion
 
-            this.PrimitiveType = primitiveType;
             this.MeshGeometry = meshGeometry;
         }
 
@@ -69,13 +67,6 @@ namespace MedicalSharp.Engine.Resources
         #endregion
 
         #region # 属性
-
-        #region 图元类型 —— PrimitiveType PrimitiveType
-        /// <summary>
-        /// 图元类型
-        /// </summary>
-        public PrimitiveType PrimitiveType { get; private set; }
-        #endregion
 
         #region 网格几何 —— MeshGeometry MeshGeometry
         /// <summary>
@@ -158,21 +149,22 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 绘制 —— void Draw()
+        #region 绘制 —— void Draw(PrimitiveType primitiveType)
         /// <summary>
         /// 绘制
         /// </summary>
-        public void Draw()
+        /// <param name="primitiveType">图元类型</param>
+        public void Draw(PrimitiveType primitiveType)
         {
             this.Bind();
 
             if (this.MeshGeometry.Indices.Length > 0)
             {
-                GL.DrawElements(this.PrimitiveType, this.MeshGeometry.Indices.Length, DrawElementsType.UnsignedInt, 0);
+                GL.DrawElements(primitiveType, this.MeshGeometry.Indices.Length, DrawElementsType.UnsignedInt, 0);
             }
             else
             {
-                GL.DrawArrays(this.PrimitiveType, 0, this.MeshGeometry.Vertices.Length);
+                GL.DrawArrays(primitiveType, 0, this.MeshGeometry.Vertices.Length);
             }
 
             this.Unbind();
