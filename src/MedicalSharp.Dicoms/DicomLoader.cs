@@ -1,9 +1,9 @@
 ﻿using itk.simple;
-using MedicalSharp.Dicoms.Constants;
 using MedicalSharp.Dicoms.Models;
 using MedicalSharp.Dicoms.ValueTypes;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 
@@ -24,6 +24,19 @@ namespace MedicalSharp.Dicoms
         /// <returns>体积数据</returns>
         public static VolumeData LoadSeries(string dicomFolder)
         {
+            #region # 验证
+
+            if (string.IsNullOrWhiteSpace(dicomFolder))
+            {
+                throw new ArgumentOutOfRangeException(nameof(dicomFolder), "文件夹不可为空！");
+            }
+            if (!Directory.Exists(dicomFolder))
+            {
+                throw new ArgumentOutOfRangeException(nameof(dicomFolder), "文件夹不存在！");
+            }
+
+            #endregion
+
             using VectorString dicomPaths = ImageSeriesReader.GetGDCMSeriesFileNames(dicomFolder);
 
             return LoadSeries(dicomPaths.ToList());
@@ -40,16 +53,17 @@ namespace MedicalSharp.Dicoms
         {
             #region # 验证
 
-            if (!dicomPaths.Any())
+            if (dicomPaths == null || !dicomPaths.Any())
             {
                 throw new ArgumentOutOfRangeException(nameof(dicomPaths), "文件路径不可为空！");
             }
 
             #endregion
 
-            //创建图像系列读取器
+            //创建图像序列读取器
             using ImageSeriesReader reader = new ImageSeriesReader();
-            reader.SetFileNames(new VectorString(dicomPaths));
+            using VectorString dicomPathsV = new VectorString(dicomPaths);
+            reader.SetFileNames(dicomPathsV);
 
             //读取元数据但不立即加载像素数据
             reader.LoadPrivateTagsOn();
