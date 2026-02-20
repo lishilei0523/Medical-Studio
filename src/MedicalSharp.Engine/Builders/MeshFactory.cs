@@ -7,17 +7,18 @@ using System.Linq;
 
 namespace MedicalSharp.Engine.Builders
 {
-    ///<summary>
-    ///Mesh工厂
-    ///</summary>
+    /// <summary>
+    /// Mesh工厂
+    /// </summary>
     public static class MeshFactory
     {
-        ///<summary>
-        ///创建点
-        ///</summary>
-        ///<param name="position">位置</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        #region # 创建点 —— static MeshGeometry CreatePoint(Vector3 position...
+        /// <summary>
+        /// 创建点
+        /// </summary>
+        /// <param name="position">位置</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreatePoint(Vector3 position, Vector4 color = default)
         {
             if (color == default)
@@ -38,13 +39,15 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(PrimitiveType.Points, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建点集
-        ///</summary>
-        ///<param name="positions">位置列表</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        #region # 创建点集 —— static MeshGeometry CreatePoints(ICollection<Vector3> positions...
+        /// <summary>
+        /// 创建点集
+        /// </summary>
+        /// <param name="positions">位置列表</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreatePoints(ICollection<Vector3> positions, Vector4 color = default)
         {
             if (color == default)
@@ -70,14 +73,16 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(PrimitiveType.Points, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建线
-        ///</summary>
-        ///<param name="start">起点</param>
-        ///<param name="end">终点</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        #region # 创建线 —— static MeshGeometry CreateLine(Vector3 start, Vector3 end...
+        /// <summary>
+        /// 创建线
+        /// </summary>
+        /// <param name="start">起点</param>
+        /// <param name="end">终点</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreateLine(Vector3 start, Vector3 end, Vector4 color = default)
         {
             if (color == default)
@@ -107,14 +112,16 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(PrimitiveType.Lines, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建折线
-        ///</summary>
-        ///<param name="positions">位置列表</param>
-        ///<param name="closed">是否闭合</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        #region # 创建折线 —— static MeshGeometry CreatePolyline(ICollection<Vector3> positions...
+        /// <summary>
+        /// 创建折线
+        /// </summary>
+        /// <param name="positions">位置列表</param>
+        /// <param name="closed">是否闭合</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreatePolyline(ICollection<Vector3> positions, bool closed = false, Vector4 color = default)
         {
             if (color == default)
@@ -155,16 +162,18 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(PrimitiveType.Lines, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建三角形
-        ///</summary>
-        ///<param name="pointA">顶点A</param>
-        ///<param name="pointB">顶点B</param>
-        ///<param name="pointC">顶点C</param>
-        ///<param name="primitiveType">图元类型</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        #region # 创建三角形 —— static MeshGeometry CreateTriangle(Vector3 pointA, Vector3 pointB...
+        /// <summary>
+        /// 创建三角形
+        /// </summary>
+        /// <param name="pointA">顶点A</param>
+        /// <param name="pointB">顶点B</param>
+        /// <param name="pointC">顶点C</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreateTriangle(Vector3 pointA, Vector3 pointB, Vector3 pointC, PrimitiveType primitiveType = PrimitiveType.Triangles, Vector4 color = default)
         {
             if (color == default)
@@ -201,17 +210,19 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(primitiveType, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建四边形
-        ///</summary>
-        ///<param name="pointA">顶点A</param>
-        ///<param name="pointB">顶点B</param>
-        ///<param name="pointC">顶点C</param>
-        ///<param name="pointD">顶点D</param>
-        ///<param name="primitiveType">图元类型</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        #region # 创建四边形 —— static MeshGeometry CreateQuadrangle(Vector3 pointA, Vector3 pointB...
+        /// <summary>
+        /// 创建四边形
+        /// </summary>
+        /// <param name="pointA">顶点A</param>
+        /// <param name="pointB">顶点B</param>
+        /// <param name="pointC">顶点C</param>
+        /// <param name="pointD">顶点D</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreateQuadrangle(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 pointD, PrimitiveType primitiveType = PrimitiveType.Triangles, Vector4 color = default)
         {
             if (color == default)
@@ -255,17 +266,18 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(primitiveType, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建立方体
-        ///</summary>
-        ///<param name="width">宽度</param>
-        ///<param name="height">高度</param>
-        ///<param name="depth">深度</param>
-        ///<param name="primitiveType">图元类型</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
-        public static MeshGeometry CreateBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, PrimitiveType primitiveType = PrimitiveType.Triangles, Vector4 color = default)
+        #region # 创建立方体 —— static MeshGeometry CreateBox(float width = 1.0f, float height = 1.0f...
+        /// <summary>
+        /// 创建立方体
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreateBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector4 color = default)
         {
             if (color == default)
             {
@@ -344,9 +356,11 @@ namespace MedicalSharp.Engine.Builders
                 }
             }
 
-            return new MeshGeometry(primitiveType, finalVertices, finalIndices);
+            return new MeshGeometry(PrimitiveType.Triangles, finalVertices, finalIndices);
         }
+        #endregion
 
+        #region # 创建边界立方体 —— static MeshGeometry CreateBoundingBox(float width = 1.0f, float height = 1.0f...
         /// <summary>
         /// 创建边界立方体
         /// </summary>
@@ -524,16 +538,18 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(primitiveType, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建球体
-        ///</summary>
-        ///<param name="radius">半径</param>
-        ///<param name="segments">经线数量</param>
-        ///<param name="rings">纬线数量</param>
-        ///<param name="primitiveType">图元类型</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        #region # 创建球体 —— static MeshGeometry CreateSphere(float radius = 1.0f, int segments = 32...
+        /// <summary>
+        /// 创建球体
+        /// </summary>
+        /// <param name="radius">半径</param>
+        /// <param name="segments">经线数量</param>
+        /// <param name="rings">纬线数量</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreateSphere(float radius = 1.0f, int segments = 32, int rings = 16, PrimitiveType primitiveType = PrimitiveType.Triangles, Vector4 color = default)
         {
             if (color == default)
@@ -591,20 +607,20 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(primitiveType, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建平面
-        ///</summary>
-        ///<param name="width">宽度</param>
-        ///<param name="height">高度</param>
-        ///<param name="widthSegments">宽度细分数量</param>
-        ///<param name="heightSegments">高度细分数量</param>
-        ///<param name="primitiveType">图元类型</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
-        public static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f,
-            int widthSegments = 1, int heightSegments = 1,
-            PrimitiveType primitiveType = PrimitiveType.Triangles, Vector4 color = default)
+        #region # 创建平面 —— static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f...
+        /// <summary>
+        /// 创建平面
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="widthSegments">宽度细分数量</param>
+        /// <param name="heightSegments">高度细分数量</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f, int widthSegments = 1, int heightSegments = 1, PrimitiveType primitiveType = PrimitiveType.Triangles, Vector4 color = default)
         {
             if (color == default)
             {
@@ -658,18 +674,19 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(primitiveType, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建圆柱体
-        ///</summary>
-        ///<param name="radius">半径</param>
-        ///<param name="height">高度</param>
-        ///<param name="segments">细分数量</param>
-        ///<param name="withCaps">是否封闭</param>
-        ///<param name="primitiveType">图元类型</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
-        public static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f, int segments = 32, bool withCaps = true, PrimitiveType primitiveType = PrimitiveType.Triangles, Vector4 color = default)
+        #region # 创建圆柱体 —— static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f...
+        /// <summary>
+        /// 创建圆柱体
+        /// </summary>
+        /// <param name="radius">半径</param>
+        /// <param name="height">高度</param>
+        /// <param name="segments">细分数量</param>
+        /// <param name="withCaps">是否封闭</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f, int segments = 32, bool withCaps = true, Vector4 color = default)
         {
             if (color == default)
             {
@@ -752,17 +769,19 @@ namespace MedicalSharp.Engine.Builders
                 }
             }
 
-            MeshGeometry meshGeometry = new(primitiveType, vertices, indices);
+            MeshGeometry meshGeometry = new(PrimitiveType.Triangles, vertices, indices);
             CalculateNormals(meshGeometry);
 
             return meshGeometry;
         }
+        #endregion
 
-        ///<summary>
-        ///创建坐标轴
-        ///</summary>
-        ///<param name="length">长度</param>
-        ///<returns>网格模型</returns>
+        #region # 创建坐标轴 —— static MeshGeometry CreateAxes(float length = 1.0f)
+        /// <summary>
+        /// 创建坐标轴
+        /// </summary>
+        /// <param name="length">长度</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreateAxes(float length = 1.0f)
         {
             List<Vertex> vertices =
@@ -815,14 +834,16 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(PrimitiveType.Lines, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建网格
-        ///</summary>
-        ///<param name="size">尺寸</param>
-        ///<param name="divisions">分隔数量</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        #region # 创建网格 —— static MeshGeometry CreateGrid(float size = 10.0f, int divisions = 10...
+        /// <summary>
+        /// 创建网格
+        /// </summary>
+        /// <param name="size">尺寸</param>
+        /// <param name="divisions">分隔数量</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreateGrid(float size = 10.0f, int divisions = 10, Vector4 color = default)
         {
             if (color == default)
@@ -882,13 +903,15 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(PrimitiveType.Lines, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///创建线框
-        ///</summary>
-        ///<param name="meshGeometry">网格模型</param>
-        ///<param name="color">颜色</param>
-        ///<returns>网格模型</returns>
+        #region # 创建线框 —— static MeshGeometry CreateWireframe(MeshGeometry meshGeometry...
+        /// <summary>
+        /// 创建线框
+        /// </summary>
+        /// <param name="meshGeometry">网格模型</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry CreateWireframe(MeshGeometry meshGeometry, Vector4 color = default)
         {
             if (color == default)
@@ -949,11 +972,13 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(PrimitiveType.Lines, vertices, indices);
         }
+        #endregion
 
-        ///<summary>
-        ///计算法向量
-        ///</summary>
-        ///<param name="meshGeometry">网格模型</param>
+        #region # 计算法向量 —— static void CalculateNormals(MeshGeometry meshGeometry)
+        /// <summary>
+        /// 计算法向量
+        /// </summary>
+        /// <param name="meshGeometry">网格模型</param>
         public static void CalculateNormals(MeshGeometry meshGeometry)
         {
             if (meshGeometry.PrimitiveType != PrimitiveType.Triangles)
@@ -1004,13 +1029,15 @@ namespace MedicalSharp.Engine.Builders
                 meshGeometry.Vertices[i] = vertices[i];
             }
         }
+        #endregion
 
-        ///<summary>
-        ///合并网格模型
-        ///</summary>
-        ///<param name="meshGeometry1">网格模型1</param>
-        ///<param name="meshGeometry2">网格模型2</param>
-        ///<returns>网格模型</returns>
+        #region # 合并网格模型 —— static MeshGeometry Combine(MeshGeometry meshGeometry1, MeshGeometry meshGeometry2)
+        /// <summary>
+        /// 合并网格模型
+        /// </summary>
+        /// <param name="meshGeometry1">网格模型1</param>
+        /// <param name="meshGeometry2">网格模型2</param>
+        /// <returns>网格模型</returns>
         public static MeshGeometry Combine(MeshGeometry meshGeometry1, MeshGeometry meshGeometry2)
         {
             if (meshGeometry1.PrimitiveType != meshGeometry2.PrimitiveType)
@@ -1031,7 +1058,9 @@ namespace MedicalSharp.Engine.Builders
 
             return new MeshGeometry(meshGeometry1.PrimitiveType, vertices, indices);
         }
+        #endregion
 
+        #region # 变换网格模型 —— static void Transform(MeshGeometry meshGeometry, Matrix4 transform)
         ///<summary>
         ///变换网格模型
         ///</summary>
@@ -1053,5 +1082,6 @@ namespace MedicalSharp.Engine.Builders
                 meshGeometry.Vertices[i] = vertices[i];
             }
         }
+        #endregion
     }
 }
