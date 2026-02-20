@@ -2,12 +2,12 @@
 using OpenTK;
 using System;
 
-namespace MedicalSharp.Controls.Extensions
+namespace MedicalSharp.Controls.Base
 {
     /// <summary>
     /// Avalonia-OpenTK函数绑定上下文
     /// </summary>
-    public class AvaloniaBindingsContext : IBindingsContext
+    internal class AvaloniaBindingsContext : IBindingsContext
     {
         /// <summary>
         /// Avalonia OpenGL接口
@@ -18,7 +18,7 @@ namespace MedicalSharp.Controls.Extensions
         /// 默认构造器
         /// </summary>
         /// <param name="glInterface">Avalonia OpenGL接口</param>
-        public AvaloniaBindingsContext(GlInterface glInterface)
+        internal AvaloniaBindingsContext(GlInterface glInterface)
         {
             this._glInterface = glInterface;
         }

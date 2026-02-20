@@ -2,7 +2,6 @@
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
-using MedicalSharp.Controls.Extensions;
 using OpenTK.Graphics.OpenGL4;
 
 namespace MedicalSharp.Controls.Base
