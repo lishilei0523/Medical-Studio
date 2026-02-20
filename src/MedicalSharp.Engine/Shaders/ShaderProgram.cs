@@ -180,39 +180,39 @@ namespace MedicalSharp.Engine.Shaders
         }
         #endregion
 
-        #region 设置Uniform二维向量 —— void SetUniformVector2(string key, ref readonly Vector2 value)
+        #region 设置Uniform二维向量 —— void SetUniformVector2(string key, in Vector2 value)
         /// <summary>
         /// 设置Uniform二维向量
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="value">值</param>
-        public void SetUniformVector2(string key, ref readonly Vector2 value)
+        public void SetUniformVector2(string key, in Vector2 value)
         {
             int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform2(uniformId, value);
         }
         #endregion
 
-        #region 设置Uniform三维向量 —— void SetUniformVector3(string key, ref readonly Vector3 value)
+        #region 设置Uniform三维向量 —— void SetUniformVector3(string key, in Vector3 value)
         /// <summary>
         /// 设置Uniform三维向量
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="value">值</param>
-        public void SetUniformVector3(string key, ref readonly Vector3 value)
+        public void SetUniformVector3(string key, in Vector3 value)
         {
             int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform3(uniformId, value);
         }
         #endregion
 
-        #region 设置Uniform四维向量 —— void SetUniformVector4(string key, ref readonly Vector4 value)
+        #region 设置Uniform四维向量 —— void SetUniformVector4(string key, in Vector4 value)
         /// <summary>
         /// 设置Uniform四维向量
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="value">值</param>
-        public void SetUniformVector4(string key, ref readonly Vector4 value)
+        public void SetUniformVector4(string key, in Vector4 value)
         {
             int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform4(uniformId, value);
