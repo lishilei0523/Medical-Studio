@@ -15,17 +15,22 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// VAO
         /// </summary>
-        private readonly int _vao;
+        private int _vao;
 
         /// <summary>
         /// VBO
         /// </summary>
-        private readonly int _vbo;
+        private int _vbo;
 
         /// <summary>
         /// EBO
         /// </summary>
-        private readonly int _ebo;
+        private int _ebo;
+
+        /// <summary>
+        /// 是否已初始化
+        /// </summary>
+        private bool _initialized;
 
         /// <summary>
         /// 无参构造器
@@ -35,6 +40,7 @@ namespace MedicalSharp.Engine.Resources
             this._vao = GL.GenVertexArray();
             this._vbo = GL.GenBuffer();
             this._ebo = GL.GenBuffer();
+            this._initialized = false;
         }
 
         /// <summary>
@@ -85,6 +91,15 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public unsafe void Setup()
         {
+            #region # 验证
+
+            if (this._initialized)
+            {
+                throw new InvalidOperationException("已初始化，不可重复操作！");
+            }
+
+            #endregion
+
             this.Bind();
 
             //上传顶点到VBO
@@ -114,6 +129,8 @@ namespace MedicalSharp.Engine.Resources
 
             //解绑
             this.Unbind();
+
+            this._initialized = true;
         }
         #endregion
 
@@ -125,9 +142,9 @@ namespace MedicalSharp.Engine.Resources
         {
             #region # 验证
 
-            if (meshGeometry == null)
+            if (!this._initialized)
             {
-                throw new ArgumentNullException(nameof(meshGeometry), "网格几何不可为空！");
+                throw new InvalidOperationException("未初始化，不可更新！");
             }
 
             #endregion
@@ -156,6 +173,15 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="primitiveType">图元类型</param>
         public void Draw(PrimitiveType primitiveType)
         {
+            #region # 验证
+
+            if (!this._initialized)
+            {
+                throw new InvalidOperationException("未初始化，不可绘制！");
+            }
+
+            #endregion
+
             this.Bind();
 
             if (this.MeshGeometry.Indices.Length > 0)
@@ -213,14 +239,17 @@ namespace MedicalSharp.Engine.Resources
             if (this._vao != 0)
             {
                 GL.DeleteVertexArray(this._vao);
+                this._vao = 0;
             }
             if (this._vbo != 0)
             {
                 GL.DeleteBuffer(this._vbo);
+                this._vbo = 0;
             }
             if (this._ebo != 0)
             {
                 GL.DeleteBuffer(this._ebo);
+                this._ebo = 0;
             }
         }
         #endregion  

@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="OpenTK.Graphics" Version="4.9.4" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <None Update="Shaders\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

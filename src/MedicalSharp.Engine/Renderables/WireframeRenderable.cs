@@ -120,6 +120,9 @@ namespace MedicalSharp.Engine.Renderables
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
             this.VertexBuffer.Draw(PrimitiveType.Lines);
+
+            //取消使用
+            program.Unuse();
         }
         #endregion
 

@@ -26,7 +26,7 @@ namespace MedicalSharp.Engine.Shaders
         /// </summary>
         ~ShaderProgram()
         {
-            GL.DeleteProgram(this.Id);
+            this.Dispose();
         }
 
         #endregion
@@ -138,6 +138,16 @@ namespace MedicalSharp.Engine.Shaders
         public void Use()
         {
             GL.UseProgram(this.Id);
+        }
+        #endregion
+
+        #region 取消使用程序 —— void Unuse()
+        /// <summary>
+        /// 取消使用程序
+        /// </summary>
+        public void Unuse()
+        {
+            GL.UseProgram(0);
         }
         #endregion
 
