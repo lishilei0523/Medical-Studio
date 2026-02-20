@@ -17,8 +17,8 @@ namespace MedicalSharp.Tests.TestCases
         [TestMethod]
         public void TestLoadSeries()
         {
-            //string dicomFolder = @"F:\Files\DICOMs\Standard";
-            string dicomFolder = @"F:\Files\DICOMs\HE_00003969\1.2.876877.204130127066024003.20231130161143.2484.004";
+            string dicomFolder = @"F:\Files\DICOMs\CT";
+            //string dicomFolder = @"F:\Files\DICOMs\HE_00003969\1.2.876877.204130127066024003.20231130161143.2484.004";
 
             for (int i = 0; i < 10; i++)
             {

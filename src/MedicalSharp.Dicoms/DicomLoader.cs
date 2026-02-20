@@ -1,6 +1,7 @@
 ﻿using itk.simple;
 using MedicalSharp.Dicoms.Constants;
 using MedicalSharp.Dicoms.Models;
+using MedicalSharp.Dicoms.ValueTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +24,9 @@ namespace MedicalSharp.Dicoms
         /// <returns>体积数据</returns>
         public static VolumeData LoadSeries(string dicomFolder)
         {
-            VectorString filePaths = ImageSeriesReader.GetGDCMSeriesFileNames(dicomFolder);
+            using VectorString dicomPaths = ImageSeriesReader.GetGDCMSeriesFileNames(dicomFolder);
 
-            return LoadSeries(filePaths);
+            return LoadSeries(dicomPaths.ToList());
         }
         #endregion
 
@@ -93,27 +94,27 @@ namespace MedicalSharp.Dicoms
                 throw new ArgumentOutOfRangeException(nameof(volumeData), "Image is not 3D");
             }
 
-            volumeData.VolumeSize = new Vector3(size[0], size[1], size[2]);
+            volumeData.VoxelSize = new Size3I((int)size[0], (int)size[1], (int)size[2]);
 
             //获取像素间距
             VectorDouble spacing = image.GetSpacing();
-            volumeData.Spacing = new Vector3((float)spacing[0], (float)spacing[1], (float)spacing[2]);
+            volumeData.Spacing = new Size3F((float)spacing[0], (float)spacing[1], (float)spacing[2]);
 
             //计算实际尺寸
-            volumeData.ActualSize = new Vector3
-            {
-                X = volumeData.VolumeSize.X * volumeData.Spacing.X,
-                Y = volumeData.VolumeSize.Y * volumeData.Spacing.Y,
-                Z = volumeData.VolumeSize.Z * volumeData.Spacing.Z
-            };
+            volumeData.ActualSize = new Size3F
+            (
+                volumeData.VoxelSize.Width * volumeData.Spacing.Width,
+                volumeData.VoxelSize.Height * volumeData.Spacing.Height,
+                volumeData.VoxelSize.Depth * volumeData.Spacing.Depth
+            );
 
             //计算缩放
-            float maxSide = Math.Max(volumeData.ActualSize.X, Math.Max(volumeData.ActualSize.Y, volumeData.ActualSize.Z));
+            float maxSide = Math.Max(volumeData.ActualSize.Width, Math.Max(volumeData.ActualSize.Height, volumeData.ActualSize.Depth));
             volumeData.VolumeScale = new Vector3
             {
-                X = volumeData.ActualSize.X / maxSide,
-                Y = volumeData.ActualSize.Y / maxSide,
-                Z = volumeData.ActualSize.Z / maxSide
+                X = volumeData.ActualSize.Width / maxSide,
+                Y = volumeData.ActualSize.Height / maxSide,
+                Z = volumeData.ActualSize.Depth / maxSide
             };
 
             //获取斜率和截距
@@ -151,7 +152,7 @@ namespace MedicalSharp.Dicoms
             }
 
             //获取体素原始数据
-            volumeData.VoxelsCount = (long)volumeData.VolumeSize.X * (long)volumeData.VolumeSize.Y * (long)volumeData.VolumeSize.Z;
+            volumeData.VoxelsCount = (long)volumeData.VoxelSize.Width * volumeData.VoxelSize.Height * volumeData.VoxelSize.Depth;
             volumeData.OriginalData = image.GetBufferAsInt16();
             if (volumeData.OriginalData == IntPtr.Zero)
             {

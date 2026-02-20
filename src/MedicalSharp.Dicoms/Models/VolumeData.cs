@@ -1,4 +1,5 @@
 ﻿using itk.simple;
+using MedicalSharp.Dicoms.ValueTypes;
 using System;
 using System.Numerics;
 
@@ -7,7 +8,7 @@ namespace MedicalSharp.Dicoms.Models
     /// <summary>
     /// 体积数据
     /// </summary>
-    public class VolumeData : IDisposable
+    public sealed class VolumeData : IDisposable
     {
         #region # 字段及构造器
 
@@ -27,7 +28,7 @@ namespace MedicalSharp.Dicoms.Models
         /// 创建体积数据构造器
         /// </summary>
         /// <param name="sitkImage">SimpleITK图像</param>
-        public VolumeData(Image sitkImage)
+        internal VolumeData(Image sitkImage)
             : this()
         {
             this.SitkImage = sitkImage;
@@ -59,25 +60,25 @@ namespace MedicalSharp.Dicoms.Models
         public long VoxelsCount { get; internal set; }
         #endregion
 
-        #region 体积尺寸 —— Vector3 VolumeSize
+        #region 体素尺寸 —— Size3I VoxelSize
         /// <summary>
-        /// 体积尺寸
+        /// 体素尺寸
         /// </summary>
-        public Vector3 VolumeSize { get; internal set; }
+        public Size3I VoxelSize { get; internal set; }
         #endregion
 
-        #region 间距尺寸 —— Vector3 Spacing
+        #region 间距尺寸 —— Size3F Spacing
         /// <summary>
         /// 间距尺寸
         /// </summary>
-        public Vector3 Spacing { get; internal set; }
+        public Size3F Spacing { get; internal set; }
         #endregion
 
-        #region 实际尺寸 —— Vector3 ActualSize
+        #region 实际尺寸 —— Size3F ActualSize
         /// <summary>
         /// 实际尺寸
         /// </summary>
-        public Vector3 ActualSize { get; internal set; }
+        public Size3F ActualSize { get; internal set; }
         #endregion
 
         #region 体积缩放 —— Vector3 VolumeScale
@@ -166,12 +167,12 @@ namespace MedicalSharp.Dicoms.Models
         {
             get
             {
-                if (x < 0 || x >= this.VolumeSize.X || y < 0 || y >= this.VolumeSize.Y || z < 0 || z >= this.VolumeSize.Z)
+                if (x < 0 || x >= this.VoxelSize.Width || y < 0 || y >= this.VoxelSize.Height || z < 0 || z >= this.VoxelSize.Depth)
                 {
                     return 0;
                 }
 
-                int index = z * (int)this.VolumeSize.X * (int)this.VolumeSize.Y + y * (int)this.VolumeSize.X + x;
+                int index = z * this.VoxelSize.Width * this.VoxelSize.Height + y * this.VoxelSize.Width + x;
                 short* pointer = (short*)this.OriginalData.ToPointer();
                 short voxel = pointer[index];
 
