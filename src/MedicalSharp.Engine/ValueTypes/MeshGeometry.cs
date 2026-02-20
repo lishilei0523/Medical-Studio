@@ -1,5 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,9 +23,8 @@ namespace MedicalSharp.Engine.ValueTypes
         /// <summary>
         /// 创建网格几何构造器
         /// </summary>
-        /// <param name="primitiveType">图元类型</param>
         /// <param name="vertices">顶点列表</param>
-        public MeshGeometry(PrimitiveType primitiveType, ICollection<Vertex> vertices)
+        public MeshGeometry(ICollection<Vertex> vertices)
             : this()
         {
             if (vertices == null || !vertices.Any())
@@ -34,17 +32,15 @@ namespace MedicalSharp.Engine.ValueTypes
                 throw new ArgumentNullException(nameof(vertices), "顶点列表不可为空！");
             }
 
-            this.PrimitiveType = primitiveType;
             this.Vertices = [.. vertices];
         }
 
         /// <summary>
         /// 创建网格几何构造器
         /// </summary>
-        /// <param name="primitiveType">图元类型</param>
         /// <param name="vertices">顶点列表</param>
         /// <param name="indices">顶点索引列表</param>
-        public MeshGeometry(PrimitiveType primitiveType, ICollection<Vertex> vertices, ICollection<uint> indices)
+        public MeshGeometry(ICollection<Vertex> vertices, ICollection<uint> indices)
             : this()
         {
             if (vertices == null || !vertices.Any())
@@ -56,7 +52,6 @@ namespace MedicalSharp.Engine.ValueTypes
                 throw new ArgumentNullException(nameof(indices), "顶点索引列表不可为空！");
             }
 
-            this.PrimitiveType = primitiveType;
             this.Vertices = [.. vertices];
             this.Indices = [.. indices];
         }
@@ -64,13 +59,6 @@ namespace MedicalSharp.Engine.ValueTypes
         #endregion
 
         #region # 属性
-
-        #region 图元类型 —— PrimitiveType PrimitiveType
-        /// <summary>
-        /// 图元类型
-        /// </summary>
-        public PrimitiveType PrimitiveType { get; private set; }
-        #endregion
 
         #region 顶点列表 —— Vertex[] Vertices
         /// <summary>
@@ -115,7 +103,8 @@ namespace MedicalSharp.Engine.ValueTypes
         {
             if (indices == null || !indices.Any())
             {
-                throw new ArgumentNullException(nameof(indices), "顶点索引列表不可为空！");
+                this.Indices = [];
+                return;
             }
 
             this.Indices = [.. indices];
