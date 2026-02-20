@@ -48,12 +48,14 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 方法
 
-        #region 更新纹理 —— void Update(IntPtr data)
+        #region 更新纹理 —— void Update(PixelFormat pixelFormat, PixelType pixelType...
         /// <summary>
         /// 更新纹理
         /// </summary>
+        /// <param name="pixelFormat">像素格式</param>
+        /// <param name="pixelType">像素类型</param>
         /// <param name="data">纹理数据</param>
-        public void Update(IntPtr data)
+        public void Update(PixelFormat pixelFormat, PixelType pixelType, IntPtr data)
         {
             if (base.Id == 0 || data == IntPtr.Zero)
             {
@@ -61,7 +63,7 @@ namespace MedicalSharp.Engine.Resources
             }
 
             GL.BindTexture(TextureTarget.Texture1D, base.Id);
-            GL.TexSubImage1D(TextureTarget.Texture1D, 0, 0, this.Width, PixelFormat.Rgba, PixelType.Float, data);
+            GL.TexSubImage1D(TextureTarget.Texture1D, 0, 0, this.Width, pixelFormat, pixelType, data);
             GL.BindTexture(TextureTarget.Texture1D, 0);
         }
         #endregion
