@@ -1,9 +1,9 @@
 ﻿namespace MedicalSharp.Dicoms.Models
 {
     /// <summary>
-    /// 体积信息
+    /// 患者信息
     /// </summary>
-    public class VolumeInfo
+    public class PatientInfo
     {
 
     }

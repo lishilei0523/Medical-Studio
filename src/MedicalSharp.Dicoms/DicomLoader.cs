@@ -68,12 +68,12 @@ namespace MedicalSharp.Dicoms
 
         //Private
 
-        #region # 提取数据 —— static unsafe void ExtractData(VolumeData volumeData)
+        #region # 提取数据 —— static void ExtractData(VolumeData volumeData)
         /// <summary>
         /// 提取数据
         /// </summary>
         /// <param name="volumeData">体积数据</param>
-        private static unsafe void ExtractData(VolumeData volumeData)
+        private static void ExtractData(VolumeData volumeData)
         {
             #region # 验证
 
@@ -158,14 +158,16 @@ namespace MedicalSharp.Dicoms
                 throw new InvalidCastException("Failed to get pixel buffer");
             }
 #if DEBUG
-            //Span<short> span = new Span<short>(volumeData.OriginalData.ToPointer(), (int)volumeData.VoxelsCount);
-            //short[] voxels = span.ToArray();
-            //short minVal = voxels.Min();
-            //short maxVal = voxels.Max();
-            //System.Diagnostics.Trace.WriteLine($"Loaded {volumeData.VoxelsCount} voxels, min={minVal}, max={maxVal}");
+            unsafe
+            {
+                //Span<short> span = new Span<short>(volumeData.OriginalData.ToPointer(), (int)volumeData.VoxelsCount);
+                //short[] voxels = span.ToArray();
+                //short minVal = voxels.Min();
+                //short maxVal = voxels.Max();
+                //System.Diagnostics.Trace.WriteLine($"Loaded {volumeData.VoxelsCount} voxels, min={minVal}, max={maxVal}");
+            }
 #endif
         }
         #endregion
-
     }
 }

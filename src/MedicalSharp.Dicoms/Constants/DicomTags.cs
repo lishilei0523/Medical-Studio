@@ -1,13 +1,13 @@
-﻿namespace MedicalSharp.Dicoms.Constants
-{
-    using System.Globalization;
+﻿using System.Globalization;
 
+namespace MedicalSharp.Dicoms.Constants
+{
     /// <summary>
     /// DICOM标准常量
     /// </summary>
     public static class DicomTags
     {
-        // ================ 患者模块 (Patient Module) ================
+        #region # 患者模块 (Patient Module)
 
         /// <summary>
         /// 患者姓名 (PN)
@@ -44,8 +44,9 @@
         /// </summary>
         public const string PatientWeight = "0010|1030";
 
+        #endregion
 
-        // ================ 研究模块 (Study Module) ================
+        #region # 研究模块 (Study Module)
 
         /// <summary>
         /// 研究实例UID (UI)
@@ -72,8 +73,9 @@
         /// </summary>
         public const string StudyID = "0020|0010";
 
+        #endregion
 
-        // ================ 序列模块 (Series Module) ================
+        #region # 序列模块 (Series Module)
 
         /// <summary>
         /// 序列实例UID (UI)
@@ -110,8 +112,9 @@
         /// </summary>
         public const string BodyPartExamined = "0018|0015";
 
+        #endregion
 
-        // ================ 设备模块 (Equipment Module) ================
+        #region # 设备模块 (Equipment Module)
 
         /// <summary>
         /// 设备制造商 (LO)
@@ -133,8 +136,9 @@
         /// </summary>
         public const string SoftwareVersions = "0018|1020";
 
+        #endregion
 
-        // ================ 图像像素模块 (Image Pixel Module) ================
+        #region # 图像像素模块 (Image Pixel Module)
 
         /// <summary>
         /// 每个像素的样本数 (US)
@@ -181,8 +185,9 @@
         /// </summary>
         public const string PixelData = "7fe0|0010";
 
+        #endregion
 
-        // ================ CT专用模块 ================
+        #region # CT专用模块
 
         /// <summary>
         /// 管电压 (DS)
@@ -219,8 +224,9 @@
         /// </summary>
         public const string Exposure = "0018|1152";
 
+        #endregion
 
-        // ================ MR专用模块 ================
+        #region # MR专用模块
 
         /// <summary>
         /// 磁场强度 (DS)
@@ -252,8 +258,9 @@
         /// </summary>
         public const string SequenceName = "0018|0024";
 
+        #endregion
 
-        // ================ PET专用模块 ================
+        #region # PET专用模块
 
         /// <summary>
         /// 放射性药物 (LO)
@@ -270,8 +277,9 @@
         /// </summary>
         public const string RadionuclideHalfLife = "0018|1075";
 
+        #endregion
 
-        // ================ 图像几何模块 (Image Geometry) ================
+        #region # 图像几何模块 (Image Geometry)
 
         /// <summary>
         /// 像素间距 (DS[2])
@@ -303,8 +311,9 @@
         /// </summary>
         public const string SpacingBetweenSlices = "0018|0088";
 
+        #endregion
 
-        // ================ VOI LUT模块 (关键！你的Shader核心) ================
+        #region # VOI LUT模块 (Shader核心)
 
         /// <summary>
         /// 窗位 (DS[1-n])
@@ -321,8 +330,9 @@
         /// </summary>
         public const string VOILUTFunction = "0028|1056";
 
+        #endregion
 
-        // ================ 模态LUT模块 (Modality LUT) ================
+        #region # 模态LUT模块 (Modality LUT)
 
         /// <summary>
         /// 缩放截距 (DS)
@@ -359,8 +369,9 @@
         /// </summary>
         public const string ModalityLUTData = "0028|3006";
 
+        #endregion
 
-        // ================ 显示LUT模块 (Presentation LUT) ================
+        #region # 显示LUT模块 (Presentation LUT)
 
         /// <summary>
         /// 显示LUT序列 (SQ)
@@ -377,8 +388,9 @@
         /// </summary>
         public const string PresentationLUTData = "2050|0014";
 
+        #endregion
 
-        // ================ 叠加层模块 (Overlay) ================
+        #region # 叠加层模块 (Overlay)
 
         /// <summary>
         /// 叠加层行数 (US)
@@ -405,8 +417,9 @@
         /// </summary>
         public const string OverlayData = "6000|3000";
 
+        #endregion
 
-        // ================ 曲线/标注模块 ================
+        #region # 曲线/标注模块
 
         /// <summary>
         /// 图形标注序列 (SQ)
@@ -428,8 +441,9 @@
         /// </summary>
         public const string GraphicObjectSequence = "0070|0009";
 
+        #endregion
 
-        // ================ 辅助函数 ================
+        #region # 辅助方法
 
         /// <summary>
         /// 格式化Tag用于显示
@@ -527,5 +541,7 @@
                 return false;
             }
         }
+
+        #endregion
     }
 }
