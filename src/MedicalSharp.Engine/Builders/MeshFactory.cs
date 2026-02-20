@@ -273,9 +273,10 @@ namespace MedicalSharp.Engine.Builders
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
         /// <param name="depth">深度</param>
+        /// <param name="center">中心点位置</param>
         /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector4 color = default)
+        public static MeshGeometry CreateBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector3 center = default, Vector4 color = default)
         {
             if (color == default)
             {
@@ -286,17 +287,17 @@ namespace MedicalSharp.Engine.Builders
             float halfH = height * 0.5f;
             float halfD = depth * 0.5f;
 
-            //8个顶点
+            //8个顶点（相对于中心点）
             Vector3[] vertices =
             [
-                new(-halfW, -halfH, halfD),     //0
-                new(halfW, -halfH, halfD),      //1
-                new(halfW, halfH, halfD),       //2
-                new(-halfW, halfH, halfD),      //3
-                new(-halfW, -halfH, -halfD),    //4
-                new(-halfW, halfH, -halfD),     //5
-                new(halfW, halfH, -halfD),      //6
-                new(halfW, -halfH, -halfD)      //7
+                new(center.X - halfW, center.Y - halfH, center.Z + halfD), //0
+                new(center.X + halfW, center.Y - halfH, center.Z + halfD), //1
+                new(center.X + halfW, center.Y + halfH, center.Z + halfD), //2
+                new(center.X - halfW, center.Y + halfH, center.Z + halfD), //3
+                new(center.X - halfW, center.Y - halfH, center.Z - halfD), //4
+                new(center.X - halfW, center.Y + halfH, center.Z - halfD), //5
+                new(center.X + halfW, center.Y + halfH, center.Z - halfD), //6
+                new(center.X + halfW, center.Y - halfH, center.Z - halfD)  //7
             ];
 
             //每个面的顶点索引
@@ -365,10 +366,11 @@ namespace MedicalSharp.Engine.Builders
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
         /// <param name="depth">深度</param>
+        /// <param name="center">中心点位置</param>
         /// <param name="primitiveType">图元类型</param>
         /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateBoundingBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, PrimitiveType primitiveType = PrimitiveType.Lines, Vector4 color = default)
+        public static MeshGeometry CreateBoundingBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector3 center = default, PrimitiveType primitiveType = PrimitiveType.Lines, Vector4 color = default)
         {
             if (color == default)
             {
@@ -387,17 +389,17 @@ namespace MedicalSharp.Engine.Builders
                 //线框模式 - 8个顶点，12条边（24个索引）
                 Vector3[] cornerVertices =
                 [
-                    // 前平面
-                    new Vector3(-halfW, -halfH, halfD),     //0: 左下前
-                    new Vector3(halfW, -halfH, halfD),      //1: 右下前
-                    new Vector3(halfW, halfH, halfD),       //2: 右上前
-                    new Vector3(-halfW, halfH, halfD),      //3: 左上前
+                    //前平面
+                    new Vector3(center.X - halfW, center.Y - halfH, center.Z + halfD), //0: 左下前
+                    new Vector3(center.X + halfW, center.Y - halfH, center.Z + halfD), //1: 右下前
+                    new Vector3(center.X + halfW, center.Y + halfH, center.Z + halfD), //2: 右上前
+                    new Vector3(center.X - halfW, center.Y + halfH, center.Z + halfD), //3: 左上前
 
-                    // 后平面
-                    new Vector3(-halfW, -halfH, -halfD),    //4: 左下后
-                    new Vector3(-halfW, halfH, -halfD),     //5: 左上后
-                    new Vector3(halfW, halfH, -halfD),      //6: 右上后
-                    new Vector3(halfW, -halfH, -halfD)      //7: 右下后
+                    //后平面
+                    new Vector3(center.X - halfW, center.Y - halfH, center.Z - halfD), //4: 左下后
+                    new Vector3(center.X - halfW, center.Y + halfH, center.Z - halfD), //5: 左上后
+                    new Vector3(center.X + halfW, center.Y + halfH, center.Z - halfD), //6: 右上后
+                    new Vector3(center.X + halfW, center.Y - halfH, center.Z - halfD)  //7: 右下后
                 ];
 
                 //12条边（每边2个点）
@@ -444,62 +446,62 @@ namespace MedicalSharp.Engine.Builders
             else
             {
                 //Triangles模式 - 24个顶点（每个面4个独立顶点），36个索引
-                //定义6个面的24个顶点
+                //定义6个面的24个顶点（相对于中心点）
                 Vector3[][] faceVertices = new Vector3[][]
                 {
-                    //前面 (z = +halfD)
+                    //前面 (z = center.Z + halfD)
                     [
-                        new Vector3(-halfW, -halfH, halfD),     //0
-                        new Vector3(halfW, -halfH, halfD),      //1
-                        new Vector3(halfW, halfH, halfD),       //2
-                        new Vector3(-halfW, halfH, halfD)       //3
+                        new Vector3(center.X - halfW, center.Y - halfH, center.Z + halfD), //0
+                        new Vector3(center.X + halfW, center.Y - halfH, center.Z + halfD), //1
+                        new Vector3(center.X + halfW, center.Y + halfH, center.Z + halfD), //2
+                        new Vector3(center.X - halfW, center.Y + halfH, center.Z + halfD)  //3
                     ],
-                    //后面 (z = -halfD)
+                    //后面 (z = center.Z - halfD)
                     [
-                        new Vector3(halfW, -halfH, -halfD),     //4
-                        new Vector3(-halfW, -halfH, -halfD),    //5
-                        new Vector3(-halfW, halfH, -halfD),     //6
-                        new Vector3(halfW, halfH, -halfD)       //7
+                        new Vector3(center.X + halfW, center.Y - halfH, center.Z - halfD), //4
+                        new Vector3(center.X - halfW, center.Y - halfH, center.Z - halfD), //5
+                        new Vector3(center.X - halfW, center.Y + halfH, center.Z - halfD), //6
+                        new Vector3(center.X + halfW, center.Y + halfH, center.Z - halfD)  //7
                     ],
-                    //右面 (x = +halfW)
+                    //右面 (x = center.X + halfW)
                     [
-                        new Vector3(halfW, -halfH, halfD),      //8
-                        new Vector3(halfW, -halfH, -halfD),     //9
-                        new Vector3(halfW, halfH, -halfD),      //10
-                        new Vector3(halfW, halfH, halfD)        //11
+                        new Vector3(center.X + halfW, center.Y - halfH, center.Z + halfD), //8
+                        new Vector3(center.X + halfW, center.Y - halfH, center.Z - halfD), //9
+                        new Vector3(center.X + halfW, center.Y + halfH, center.Z - halfD), //10
+                        new Vector3(center.X + halfW, center.Y + halfH, center.Z + halfD)  //11
                     ],
-                    //左面 (x = -halfW)
+                    //左面 (x = center.X - halfW)
                     [
-                        new Vector3(-halfW, -halfH, -halfD),    //12
-                        new Vector3(-halfW, -halfH, halfD),     //13
-                        new Vector3(-halfW, halfH, halfD),      //14
-                        new Vector3(-halfW, halfH, -halfD)      //15
+                        new Vector3(center.X - halfW, center.Y - halfH, center.Z - halfD), //12
+                        new Vector3(center.X - halfW, center.Y - halfH, center.Z + halfD), //13
+                        new Vector3(center.X - halfW, center.Y + halfH, center.Z + halfD), //14
+                        new Vector3(center.X - halfW, center.Y + halfH, center.Z - halfD)  //15
                     ],
-                    //上面 (y = +halfH)
+                    //上面 (y = center.Y + halfH)
                     [
-                        new Vector3(-halfW, halfH, halfD),      //16
-                        new Vector3(halfW, halfH, halfD),       //17
-                        new Vector3(halfW, halfH, -halfD),      //18
-                        new Vector3(-halfW, halfH, -halfD)      //19
+                        new Vector3(center.X - halfW, center.Y + halfH, center.Z + halfD), //16
+                        new Vector3(center.X + halfW, center.Y + halfH, center.Z + halfD), //17
+                        new Vector3(center.X + halfW, center.Y + halfH, center.Z - halfD), //18
+                        new Vector3(center.X - halfW, center.Y + halfH, center.Z - halfD)  //19
                     ],
-                    //下面 (y = -halfH)
+                    //下面 (y = center.Y - halfH)
                     [
-                        new Vector3(-halfW, -halfH, -halfD),    //20
-                        new Vector3(halfW, -halfH, -halfD),     //21
-                        new Vector3(halfW, -halfH, halfD),      //22
-                        new Vector3(-halfW, -halfH, halfD)      //23
+                        new Vector3(center.X - halfW, center.Y - halfH, center.Z - halfD), //20
+                        new Vector3(center.X + halfW, center.Y - halfH, center.Z - halfD), //21
+                        new Vector3(center.X + halfW, center.Y - halfH, center.Z + halfD), //22
+                        new Vector3(center.X - halfW, center.Y - halfH, center.Z + halfD)  //23
                     ]
                 };
 
                 //每个面的法线
                 Vector3[] faceNormals =
                 [
-                    new Vector3(0, 0, 1),   //前面
-                    new Vector3(0, 0, -1),  //后面
-                    new Vector3(1, 0, 0),   //右面
-                    new Vector3(-1, 0, 0),  //左面
-                    new Vector3(0, 1, 0),   //上面
-                    new Vector3(0, -1, 0)   //下面
+                    new Vector3(0, 0, 1),  //前面
+                    new Vector3(0, 0, -1), //后面
+                    new Vector3(1, 0, 0),  //右面
+                    new Vector3(-1, 0, 0), //左面
+                    new Vector3(0, 1, 0),  //上面
+                    new Vector3(0, -1, 0)  //下面
                 ];
 
                 //创建24个顶点（每个面4个）
@@ -543,11 +545,12 @@ namespace MedicalSharp.Engine.Builders
         /// 创建球体
         /// </summary>
         /// <param name="radius">半径</param>
+        /// <param name="center">中心点位置</param>
         /// <param name="segments">经线数量</param>
         /// <param name="rings">纬线数量</param>
         /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateSphere(float radius = 1.0f, int segments = 32, int rings = 16, Vector4 color = default)
+        public static MeshGeometry CreateSphere(float radius = 1.0f, Vector3 center = default, int segments = 32, int rings = 16, Vector4 color = default)
         {
             if (color == default)
             {
@@ -567,12 +570,16 @@ namespace MedicalSharp.Engine.Builders
                     float u = j / (float)segments;
                     float theta = u * 2.0f * MathHelper.Pi;
 
+                    //计算相对于原点的位置
                     float x = radius * (float)Math.Sin(phi) * (float)Math.Cos(theta);
                     float y = radius * (float)Math.Cos(phi);
                     float z = radius * (float)Math.Sin(phi) * (float)Math.Sin(theta);
 
-                    Vector3 position = new(x, y, z);
-                    Vector3 normal = Vector3.Normalize(position);
+                    //应用中心点偏移
+                    Vector3 position = new(center.X + x, center.Y + y, center.Z + z);
+
+                    //法线方向保持不变（从球心指向表面）
+                    Vector3 normal = Vector3.Normalize(new Vector3(x, y, z));
                     Vector2 texCoord = new(u, v);
 
                     vertices.Add(new Vertex
