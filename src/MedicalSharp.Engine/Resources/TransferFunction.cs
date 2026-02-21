@@ -57,24 +57,24 @@ namespace MedicalSharp.Engine.Resources
 
         //Public
 
-        #region 添加控制点 —— void AddControlPoint(TFControlPoint controlPoint)
+        #region 添加控制点 —— void AddControlPoint(in TFControlPoint controlPoint)
         /// <summary>
         /// 添加控制点
         /// </summary>
         /// <param name="controlPoint">控制点</param>
-        public void AddControlPoint(TFControlPoint controlPoint)
+        public void AddControlPoint(in TFControlPoint controlPoint)
         {
             this._controlPoints.Add(controlPoint);
             this.UpdateTexture();
         }
         #endregion
 
-        #region 删除控制点 —— void RemoveControlPoint(TFControlPoint controlPoint)
+        #region 删除控制点 —— void RemoveControlPoint(in TFControlPoint controlPoint)
         /// <summary>
         /// 删除控制点
         /// </summary>
         /// <param name="controlPoint">控制点</param>
-        public void RemoveControlPoint(TFControlPoint controlPoint)
+        public void RemoveControlPoint(in TFControlPoint controlPoint)
         {
             this._controlPoints.Remove(controlPoint);
             this.UpdateTexture();

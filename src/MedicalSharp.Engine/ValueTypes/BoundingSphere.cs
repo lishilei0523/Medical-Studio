@@ -1,11 +1,13 @@
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using System;
+using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Engine.ValueTypes
 {
     /// <summary>
     /// 包围球
     /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
     public struct BoundingSphere : IEquatable<BoundingSphere>
     {
         /// <summary>

@@ -1,11 +1,13 @@
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using System;
+using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Engine.ValueTypes
 {
     /// <summary>
     /// 包围盒
     /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
     public struct BoundingBox : IEquatable<BoundingBox>
     {
         private Vector3 _minimum;

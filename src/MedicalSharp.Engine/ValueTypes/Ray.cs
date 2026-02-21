@@ -1,11 +1,13 @@
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using System;
+using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Engine.ValueTypes
 {
     /// <summary>
     /// 射线
     /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
     public struct Ray : IEquatable<Ray>
     {
         /// <summary>
