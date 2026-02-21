@@ -1,7 +1,4 @@
 ﻿using MedicalSharp.Engine.Resources;
-using MedicalSharp.Engine.Shaders;
-using MedicalSharp.Engine.ValueTypes;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 
@@ -90,39 +87,6 @@ namespace MedicalSharp.Engine.Renderables
             this.Stroke = stroke;
             this.StrokeThickness = strokeThickness;
             this.Fill = fill;
-        }
-        #endregion
-
-        #region 渲染 —— override void Render(ShaderProgram program, RenderContext context)
-        /// <summary>
-        /// 渲染
-        /// </summary>
-        /// <param name="program">Shader程序</param>
-        /// <param name="context">渲染上下文</param>
-        public override void Render(ShaderProgram program, RenderContext context)
-        {
-            //开启Shader程序
-            program.Use();
-
-            //设置MVP矩阵、相机位置/方向
-            program.SetUniformMatrix("u_ProjectionMatrix", context.ProjectionMatrix);
-            program.SetUniformMatrix("u_ViewMatrix", context.ViewMatrix);
-            program.SetUniformMatrix("u_ModelMatrix", this.ModelMatrix);
-            program.SetUniformVector3("u_CameraPosition", context.CameraPosition);
-
-            //绘制填充模型	
-            GL.DepthMask(false);//禁用深度写入、让透明面可以互相混合
-            program.SetUniformVector4("u_Color", this.Fill);
-            this.VertexBuffer.Draw(PrimitiveType.Triangles);
-            GL.DepthMask(true);//恢复状态
-
-            //绘制线框模型
-            GL.LineWidth(this.StrokeThickness);
-            program.SetUniformVector4("u_Color", this.Stroke);
-            this.VertexBuffer.Draw(PrimitiveType.Lines);
-
-            //取消使用
-            program.Unuse();
         }
         #endregion
 

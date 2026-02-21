@@ -1,7 +1,7 @@
 ﻿using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Shaders;
-using MedicalSharp.Engine.ValueTypes;
+using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
 
@@ -159,11 +159,33 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
-            RenderContext context = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            //开启Shader程序
+            this.Program.Use();
+
+            //设置投影矩阵、视图矩阵、相机位置
+            this.Program.SetUniformMatrix("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
+            this.Program.SetUniformMatrix("u_ViewMatrix", this.Camera.ViewMatrix);
+            this.Program.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
+
             foreach (WireframeRenderable renderable in this._renderables)
             {
-                renderable.Render(this.Program, context);
+                //设置模型矩阵
+                this.Program.SetUniformMatrix("u_ModelMatrix", renderable.ModelMatrix);
+
+                //绘制填充模型	
+                GL.DepthMask(false);//禁用深度写入、让透明面可以互相混合
+                this.Program.SetUniformVector4("u_Color", renderable.Fill);
+                renderable.VertexBuffer.Draw(PrimitiveType.Triangles);
+                GL.DepthMask(true);//恢复状态
+
+                //绘制线框模型
+                GL.LineWidth(renderable.StrokeThickness);
+                this.Program.SetUniformVector4("u_Color", renderable.Stroke);
+                renderable.VertexBuffer.Draw(PrimitiveType.Lines);
             }
+
+            //取消使用
+            this.Program.Unuse();
         }
         #endregion
 

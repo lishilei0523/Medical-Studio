@@ -1,5 +1,4 @@
 ﻿using MedicalSharp.Engine.Resources;
-using MedicalSharp.Engine.Shaders;
 using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Mathematics;
 using System;
@@ -45,18 +44,6 @@ namespace MedicalSharp.Engine.Renderables
         /// 传输函数
         /// </summary>
         public TransferFunction TransferFunction { get; private set; }
-        #endregion
-
-        #region 渲染 —— override void Render(ShaderProgram program, RenderContext context)
-        /// <summary>
-        /// 渲染
-        /// </summary>
-        /// <param name="program">Shader程序</param>
-        /// <param name="context">渲染上下文</param>
-        public override void Render(ShaderProgram program, RenderContext context)
-        {
-
-        }
         #endregion
 
         #region 释放资源 —— void Dispose()
