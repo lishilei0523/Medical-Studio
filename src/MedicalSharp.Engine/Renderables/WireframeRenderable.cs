@@ -31,14 +31,6 @@ namespace MedicalSharp.Engine.Renderables
             this.VertexBuffer = vertexBuffer;
         }
 
-        /// <summary>
-        /// 析构器
-        /// </summary>
-        ~WireframeRenderable()
-        {
-            this.Dispose();
-        }
-
         #endregion
 
         #region # 属性

@@ -46,6 +46,8 @@ namespace MedicalSharp.Engine.Resources
 
         #endregion
 
+        #region # 方法
+
         #region 从体数据创建纹理 —— void CreateFromVolume(int width, int height...
         /// <summary>
         /// 从体数据创建纹理
@@ -148,6 +150,8 @@ namespace MedicalSharp.Engine.Resources
         {
             GL.BindTexture(TextureTarget.Texture3D, 0);
         }
+        #endregion 
+
         #endregion
     }
 }

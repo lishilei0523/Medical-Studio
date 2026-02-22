@@ -1,29 +1,41 @@
 ﻿using MedicalSharp.Engine.Resources;
-using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Mathematics;
-using System;
-using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Engine.Renderables
 {
     /// <summary>
     /// 体积渲染对象
     /// </summary>
-    public class VolumeRenderable : Renderable, IDisposable
+    public class VolumeRenderable : Renderable
     {
-        /// <summary>
-        /// 单位立方体
-        /// </summary>
-        private readonly VertexBuffer _unitCube;
+        #region # 字段及构造器
 
         /// <summary>
-        /// 
+        /// 创建体积渲染对象构造器
         /// </summary>
-        public VolumeRenderable()
+        /// <param name="texture3D">3D纹理</param>
+        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="rescaleSlope">斜率</param>
+        /// <param name="rescaleIntercept">截距</param>
+        /// <param name="origin">图像原点</param>
+        /// <param name="rowDirection">行向量</param>
+        /// <param name="colDirection">列向量</param>
+        /// <param name="sliceDirection">切面向量</param>
+        public VolumeRenderable(Texture3D texture3D, Vector3 volumeScale, float rescaleSlope, float rescaleIntercept, Vector3 origin, Vector3 rowDirection, Vector3 colDirection, Vector3 sliceDirection)
         {
-            this._unitCube = CreateUnitCube();
+            this.Texture3D = texture3D;
+            this.VolumeScale = volumeScale;
+            this.RescaleSlope = rescaleSlope;
+            this.RescaleIntercept = rescaleIntercept;
+            this.Origin = origin;
+            this.RowDirection = rowDirection;
+            this.ColDirection = colDirection;
+            this.SliceDirection = sliceDirection;
         }
 
+        #endregion
+
+        #region # 属性
 
         #region 3D纹理 —— Texture3D Texture3D
         /// <summary>
@@ -32,102 +44,55 @@ namespace MedicalSharp.Engine.Renderables
         public Texture3D Texture3D { get; private set; }
         #endregion
 
-        #region 窗宽窗位 —— WindowLevel WindowLevel
+        #region 体积缩放 —— Vector3 VolumeScale
         /// <summary>
-        /// 窗宽窗位
+        /// 体积缩放
         /// </summary>
-        public WindowLevel WindowLevel { get; private set; }
+        public Vector3 VolumeScale { get; private set; }
         #endregion
 
-        #region 传输函数 —— TransferFunction TransferFunction
+        #region 斜率 —— float RescaleSlope
         /// <summary>
-        /// 传输函数
+        /// 斜率
         /// </summary>
-        public TransferFunction TransferFunction { get; private set; }
+        public float RescaleSlope { get; private set; }
         #endregion
 
-        #region 释放资源 —— void Dispose()
+        #region 截距 —— float RescaleIntercept
         /// <summary>
-        /// 释放资源
+        /// 截距
         /// </summary>
-        public void Dispose()
-        {
-            this._unitCube.Dispose();
-        }
+        public float RescaleIntercept { get; private set; }
         #endregion
 
-
-        //Private
-
-        #region 创建单位立方体 —— static VertexBuffer CreateUnitCube()
+        #region 图像原点 —— Vector3 Origin
         /// <summary>
-        /// 创建单位立方体
+        /// 图像原点
         /// </summary>
-        private static VertexBuffer CreateUnitCube()
-        {
-            Vertex[] vertices =
-            [
-                new Vertex { Position = new Vector3(-0.5f, -0.5f, 0.5f) },
-                new Vertex { Position = new Vector3(0.5f, -0.5f, 0.5f) },
-                new Vertex { Position = new Vector3(0.5f, 0.5f, 0.5f) },
-                new Vertex { Position = new Vector3(-0.5f, 0.5f, 0.5f) },
-                new Vertex { Position = new Vector3(-0.5f, -0.5f, -0.5f) },
-                new Vertex { Position = new Vector3(0.5f, -0.5f, -0.5f) },
-                new Vertex { Position = new Vector3(0.5f, 0.5f, -0.5f) },
-                new Vertex { Position = new Vector3(-0.5f, 0.5f, -0.5f) }
-            ];
-            uint[] indices =
-            [
-                0,1,2, 2,3,0, 1,5,6, 6,2,1,
-                5,4,7, 7,6,5, 4,0,3, 3,7,4,
-                3,2,6, 6,7,3, 4,5,1, 1,0,4
-            ];
-
-            MeshGeometry geometry = new MeshGeometry(vertices, indices);
-            VertexBuffer vertexBuffer = new VertexBuffer(geometry);
-
-            return vertexBuffer;
-        }
+        public Vector3 Origin { get; private set; }
         #endregion
 
-
+        #region 行向量 —— Vector3 RowDirection
         /// <summary>
-        /// 采样设置
+        /// 行向量
         /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
-        public struct SamplingOptions
-        {
-            /// <summary>
-            /// 步长
-            /// </summary>
-            public int StepSize;
+        public Vector3 RowDirection { get; private set; }
+        #endregion
 
-            /// <summary>
-            /// 最大步数
-            /// </summary>
-            public int MaxStepsCount;
-
-            /// <summary>
-            /// 透明度阈值
-            /// </summary>
-            public float OpacityThreshold;
-        }
-
+        #region 列向量 —— Vector3 ColDirection
         /// <summary>
-        /// 材质设置
+        /// 列向量
         /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MaterialOptions
-        {
-            /// <summary>
-            /// 亮度
-            /// </summary>
-            public float Brightness;
+        public Vector3 ColDirection { get; private set; }
+        #endregion
 
-            /// <summary>
-            /// 密度缩放
-            /// </summary>
-            public float DensityScale;
-        }
+        #region 切面向量 —— Vector3 SliceDirection
+        /// <summary>
+        /// 切面向量
+        /// </summary>
+        public Vector3 SliceDirection { get; private set; }
+        #endregion 
+
+        #endregion
     }
 }
