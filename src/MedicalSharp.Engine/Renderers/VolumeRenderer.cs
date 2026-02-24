@@ -262,8 +262,8 @@ namespace MedicalSharp.Engine.Renderers
         private void InitShaderProgram()
         {
             base.Program = new ShaderProgram();
-            base.Program.ReadVertexShaderFromFile("Shaders/GLSLs/volume.vert");
-            base.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/volume.frag");
+            base.Program.ReadVertexShaderFromFile("Shaders/GLSLs/raycast.vert");
+            base.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/raycast.frag");
             base.Program.Build();
         }
         #endregion 
