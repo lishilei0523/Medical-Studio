@@ -1,6 +1,7 @@
 ﻿using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Shaders;
+using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace MedicalSharp.Engine.Renderers
     /// <summary>
     /// 线框渲染器
     /// </summary>
-    public class WireframeRenderer : IDisposable
+    public class WireframeRenderer : Renderer
     {
         #region # 字段及构造器
 
@@ -24,18 +25,8 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         /// <param name="camera">相机</param>
         public WireframeRenderer(Camera camera)
+            : base(camera)
         {
-            #region # 验证
-
-            if (camera == null)
-            {
-                throw new ArgumentNullException(nameof(camera), "相机不可为空！");
-            }
-
-            #endregion
-
-            this.Camera = camera;
-
             //默认值
             this._renderables = new HashSet<WireframeRenderable>();
             this.InitShaderProgram();
@@ -47,23 +38,8 @@ namespace MedicalSharp.Engine.Renderers
         /// <param name="camera">相机</param>
         /// <param name="program">Shader程序</param>
         public WireframeRenderer(Camera camera, ShaderProgram program)
+            : base(camera, program)
         {
-            #region # 验证
-
-            if (camera == null)
-            {
-                throw new ArgumentNullException(nameof(camera), "相机不可为空！");
-            }
-            if (program == null)
-            {
-                throw new ArgumentNullException(nameof(program), "Shader程序不可为空！");
-            }
-
-            #endregion
-
-            this.Camera = camera;
-            this.Program = program;
-
             //默认值
             this._renderables = new HashSet<WireframeRenderable>();
         }
@@ -71,20 +47,6 @@ namespace MedicalSharp.Engine.Renderers
         #endregion
 
         #region # 属性
-
-        #region Shader程序 —— ShaderProgram Program
-        /// <summary>
-        /// Shader程序
-        /// </summary>
-        public ShaderProgram Program { get; private set; }
-        #endregion
-
-        #region 相机 —— Camera Camera
-        /// <summary>
-        /// 相机
-        /// </summary>
-        public Camera Camera { get; private set; }
-        #endregion
 
         #region 只读属性 - 渲染对象列表 —— IReadOnlySet<WireframeRenderable> Renderables
         /// <summary>
@@ -134,13 +96,13 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 渲染帧 —— void RenderFrame(float viewportWidth, float viewportHeight)
+        #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight)
         /// <summary>
         /// 渲染帧
         /// </summary>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        public void RenderFrame(float viewportWidth, float viewportHeight)
+        public override void RenderFrame(float viewportWidth, float viewportHeight)
         {
             #region # 验证
 
@@ -158,6 +120,9 @@ namespace MedicalSharp.Engine.Renderers
             }
 
             #endregion
+
+            //渲染上下文
+            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             //开启Shader程序
             this.Program.Use();
@@ -182,6 +147,9 @@ namespace MedicalSharp.Engine.Renderers
                 GL.LineWidth(renderable.StrokeThickness);
                 this.Program.SetUniformVector4("u_Color", renderable.Stroke);
                 renderable.VertexBuffer.Draw(PrimitiveType.Lines);
+
+                //触发渲染事件
+                renderable.OnRender(this.Program, renderContext);
             }
 
             //取消使用
@@ -193,15 +161,16 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 释放资源
         /// </summary>
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
+
             foreach (WireframeRenderable renderable in this._renderables)
             {
                 renderable.Dispose();
             }
 
             this._renderables.Clear();
-            this.Program.Dispose();
         }
         #endregion
 
@@ -214,10 +183,10 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         private void InitShaderProgram()
         {
-            this.Program = new ShaderProgram();
-            this.Program.ReadVertexShaderFromFile("Shaders/GLSLs/wireframe.vert");
-            this.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/wireframe.frag");
-            this.Program.Build();
+            base.Program = new ShaderProgram();
+            base.Program.ReadVertexShaderFromFile("Shaders/GLSLs/wireframe.vert");
+            base.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/wireframe.frag");
+            base.Program.Build();
         }
         #endregion 
 

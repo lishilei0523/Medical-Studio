@@ -1,4 +1,6 @@
 ﻿using MedicalSharp.Engine.Resources;
+using MedicalSharp.Engine.Shaders;
+using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Mathematics;
 using System;
 
@@ -56,6 +58,18 @@ namespace MedicalSharp.Engine.Renderables
             }
 
             this.Transform = transform;
+        }
+        #endregion
+
+        #region 渲染事件 —— internal virtual void OnRender(ShaderProgram program...
+        /// <summary>
+        /// 渲染事件
+        /// </summary>
+        /// <param name="program">Shader程序</param>
+        /// <param name="renderContext">渲染上下文</param>
+        protected internal virtual void OnRender(ShaderProgram program, RenderContext renderContext)
+        {
+
         }
         #endregion
 
