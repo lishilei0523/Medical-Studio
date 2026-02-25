@@ -121,6 +121,9 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
+            //设置相机视口尺寸
+            this.Camera.SetViewportSize(viewportWidth, viewportHeight);
+
             //渲染上下文
             RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 

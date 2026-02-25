@@ -3,6 +3,7 @@ using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Engine.Shaders;
 using MedicalSharp.Engine.ValueTypes;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 
@@ -235,7 +236,56 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
-            //TODO 实现
+            //设置相机视口尺寸
+            this.Camera.SetViewportSize(viewportWidth, viewportHeight);
+
+            //渲染上下文
+            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+
+            //开启Shader程序
+            this.Program.Use();
+
+            //处理缩放
+            Matrix4 volumeScaleMatrix = Matrix4.CreateScale(this.Renderable.VolumeScale);
+
+            //设置MVP矩阵、相机位置、缩放
+            this.Program.SetUniformMatrix("u_ProjectionMatrix", renderContext.ProjectionMatrix);
+            this.Program.SetUniformMatrix("u_ViewMatrix", renderContext.ViewMatrix);
+            this.Program.SetUniformMatrix("u_ModelMatrix", this.Renderable.ModelMatrix * volumeScaleMatrix);
+            this.Program.SetUniformVector3("u_CameraPosition", renderContext.CameraPosition);
+            this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
+
+            this.Program.SetUniformFloat("u_RescaleSlope", this.Renderable.RescaleSlope);
+            this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
+
+            //绑定纹理
+            this.Renderable.Texture3D.Bind(0);
+            this.TransferFunction.Texture1D.Bind(1);
+
+            this.Program.SetUniformInt("u_VolumeTexture", 0);
+            this.Program.SetUniformInt("u_TransferFunction", 1);
+
+            //设置渲染参数
+            this.Program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
+            this.Program.SetUniformFloat("u_WindowWidth", this.WindowWidth);
+            this.Program.SetUniformFloat("u_StepSize", this.StepSize);
+            this.Program.SetUniformFloat("u_Brightness", this.Brightness);
+            this.Program.SetUniformFloat("u_DensityScale", this.DensityScale);
+            this.Program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
+            this.Program.SetUniformFloat("u_OpacityThreshold", this.OpacityThreshold);
+
+            //绘制模型
+            this._unitCube.Draw(PrimitiveType.Triangles);
+
+            //解绑纹理
+            this.Renderable.Texture3D.Unbind();
+            this.TransferFunction.Texture1D.Unbind();
+
+            //取消使用
+            this.Program.Unuse();
+
+            //触发渲染事件
+            this.Renderable.OnRender(this.Program, renderContext);
         }
         #endregion
 
