@@ -6,8 +6,10 @@
 
   <ItemGroup>
     <Reference Include="SimpleITKCSharpManaged">
-      <HintPath Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(SolutionDir)\runtimes\win-x64\SimpleITKCSharpManaged.dll</HintPath>
-      <HintPath Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(SolutionDir)\runtimes\linux-x64\SimpleITKCSharpManaged.dll</HintPath>
+      <HintPath Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+        $(SolutionDir)\runtimes\win-x64\SimpleITK\dll\SimpleITKCSharpManaged.dll</HintPath>
+      <HintPath Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+        $(SolutionDir)\runtimes\linux-x64\SimpleITK\lib\SimpleITKCSharpManaged.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
