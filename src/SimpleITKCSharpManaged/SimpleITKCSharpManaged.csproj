@@ -11,4 +11,8 @@
     <Copyright>Copyright NumFOCUS, Apache License, Version 2.0</Copyright>
     <Description>SimpleITK_CSharp C# anycpu wrapper 2.5.3-g31617, compiled with Mono 6.8.0, using ITK 5.4.5</Description>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <BaseOutputPath>bin</BaseOutputPath>
+  </PropertyGroup>
 </Project>
