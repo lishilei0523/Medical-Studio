@@ -1,9 +1,9 @@
 ﻿namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
-    /// 立方体3D元素
+    /// 球体3D元素
     /// </summary>
-    public class BoxVisual3D : Visual3D
+    public class SphereVisual3D : Visual3D
     {
 
     }

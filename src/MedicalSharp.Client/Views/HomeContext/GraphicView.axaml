@@ -11,7 +11,7 @@
 			  WindowStartupLocation="CenterScreen">
 
 	<Grid>
-		<sd:MedicalViewport />
+		<sd:MedicalViewport Background="LightGray" />
 		<Button Content="Snapshot" IsVisible="True"
 				VerticalAlignment="Bottom" HorizontalAlignment="Right"
 				Click="SnapshotClick" />

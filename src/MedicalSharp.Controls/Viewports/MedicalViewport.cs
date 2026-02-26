@@ -45,6 +45,9 @@ namespace MedicalSharp.Controls.Viewports
             ];
 
             this.PointerPressed += this.OnPointerPressed;
+            this.PointerWheelChanged += this.OnPointerWheel;
+            this.KeyDown += this.OnKeyDown;
+            this.KeyUp += this.OnKeyUp;
         }
 
         protected override void OnOpenGlInit(GlInterface glInterface)
@@ -74,17 +77,8 @@ namespace MedicalSharp.Controls.Viewports
             GL.EnableVertexAttribArray(0);
         }
 
-        protected override void OnOpenGlRender(GlInterface _, int frameBufferId)
+        protected override void OnOpenTKRender(PixelSize viewportSize)
         {
-            PixelSize size = new PixelSize((int)this.Bounds.Width, (int)this.Bounds.Height);
-            GL.Viewport(0, 0, size.Width, size.Height);
-
-            //设置背景色
-            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-            //清理颜色及深度缓存
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
             //开启深度测试
             GL.Enable(EnableCap.DepthTest);
 
@@ -102,7 +96,7 @@ namespace MedicalSharp.Controls.Viewports
             Vector3 targetPosition = cameraPosition + lookDirection;
             Vector3 upDirection = new Vector3(0.0f, 1.0f, 0.0f);
             float fieldOfView = MathHelper.DegreesToRadians(30.0f);
-            float aspect = size.Width * 1.0f / size.Height;  //窗口宽高比，应为动态设置
+            float aspect = viewportSize.Width * 1.0f / viewportSize.Height;  //窗口宽高比，应为动态设置
             float nearPlaneDistance = 0.125f;
             float farPlaneDistance = ushort.MaxValue;
             Matrix4 viewMatrix = Matrix4.LookAt(cameraPosition, targetPosition, upDirection);
@@ -122,6 +116,7 @@ namespace MedicalSharp.Controls.Viewports
 
             GL.DrawElements(PrimitiveType.Triangles, this._indices.Length, DrawElementsType.UnsignedShort, 0);
         }
+
 
         protected override void OnOpenGlDeinit(GlInterface _)
         {
@@ -144,6 +139,22 @@ namespace MedicalSharp.Controls.Viewports
         {
             Point position = eventArgs.GetPosition(this);
             Trace.WriteLine(position);
+        }
+
+        private void OnPointerWheel(object sender, PointerWheelEventArgs eventArgs)
+        {
+            Trace.WriteLine($"Delta X: {eventArgs.Delta.X}");
+            Trace.WriteLine($"Delta Y: {eventArgs.Delta.Y}");
+        }
+
+        private void OnKeyDown(object sender, KeyEventArgs eventArgs)
+        {
+            Trace.WriteLine($"Key down: {eventArgs.Key}");
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs eventArgs)
+        {
+            Trace.WriteLine($"Key up: {eventArgs.Key}");
         }
     }
 }

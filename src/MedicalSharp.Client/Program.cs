@@ -9,7 +9,7 @@ namespace MedicalSharp.Client
         [STAThread]
         static void Main(string[] args)
         {
-            AppBuilder appBuilder = Program.BuildAvaloniaApp();
+            AppBuilder appBuilder = BuildAvaloniaApp();
             appBuilder.StartWithClassicDesktopLifetime(args, ShutdownMode.OnLastWindowClose);
         }
 
