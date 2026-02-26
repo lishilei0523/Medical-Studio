@@ -42,7 +42,6 @@ namespace MedicalSharp.Controls.Inputs
         #region # 方法
 
         #region 鼠标按下事件 —— virtual void OnMouseDown(MouseButton button, Point position)
-
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -55,7 +54,6 @@ namespace MedicalSharp.Controls.Inputs
         #endregion
 
         #region 鼠标松开事件 —— virtual void OnMouseUp(MouseButton button, Point position)
-
         /// <summary>
         /// 鼠标松开事件
         /// </summary>

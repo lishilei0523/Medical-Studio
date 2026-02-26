@@ -8,6 +8,8 @@ namespace MedicalSharp.Controls.Viewports
     /// </summary>
     public class WireframeViewport : OpenTKViewport
     {
+        //TODO 实现
+
         #region OpenTK渲染事件 —— override void OnOpenTKRender(PixelSize viewportSize)
         /// <summary>
         /// OpenTK渲染事件

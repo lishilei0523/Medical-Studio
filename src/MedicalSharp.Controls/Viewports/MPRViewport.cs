@@ -4,9 +4,9 @@ using MedicalSharp.Controls.Base;
 namespace MedicalSharp.Controls.Viewports
 {
     /// <summary>
-    /// 体积渲染视口
+    /// MPR渲染视口
     /// </summary>
-    public class VolumeViewport : OpenTKViewport
+    public class MPRViewport : OpenTKViewport
     {
         //TODO 实现
 
