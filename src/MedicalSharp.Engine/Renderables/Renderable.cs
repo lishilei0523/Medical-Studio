@@ -61,7 +61,7 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 渲染事件 —— internal virtual void OnRender(ShaderProgram program...
+        #region 渲染事件 —— virtual void OnRender(ShaderProgram program...
         /// <summary>
         /// 渲染事件
         /// </summary>

@@ -3,7 +3,9 @@ using Avalonia.Media;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
+using MedicalSharp.Controls.Extensions;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 
 namespace MedicalSharp.Controls.Base
 {
@@ -111,11 +113,8 @@ namespace MedicalSharp.Controls.Base
             GL.Viewport(0, 0, size.Width, size.Height);
 
             //设置背景色
-            float r = this.Background.R * 1.0f / 255.0f;
-            float g = this.Background.G * 1.0f / 255.0f;
-            float b = this.Background.B * 1.0f / 255.0f;
-            float a = this.Background.A * 1.0f / 255.0f;
-            GL.ClearColor(r, g, b, a);
+            Vector4 background = this.Background.ToVector4();
+            GL.ClearColor(background.X, background.Y, background.Z, background.W);
 
             //清理颜色及深度缓存
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);

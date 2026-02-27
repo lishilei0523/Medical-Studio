@@ -24,22 +24,31 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 创建线框渲染对象构造器
         /// </summary>
-        /// <param name="vertexBuffer">顶点缓冲区</param>
-        public WireframeRenderable(VertexBuffer vertexBuffer)
+        /// <param name="strokeBuffer">线框顶点缓冲区</param>
+        /// <param name="fillBuffer">填充顶点缓冲区</param>
+        public WireframeRenderable(VertexBuffer strokeBuffer, VertexBuffer fillBuffer)
             : this()
         {
-            this.VertexBuffer = vertexBuffer;
+            this.StrokeBuffer = strokeBuffer;
+            this.FillBuffer = fillBuffer;
         }
 
         #endregion
 
         #region # 属性
 
-        #region 顶点缓冲区 —— VertexBuffer VertexBuffer
+        #region 线框顶点缓冲区 —— VertexBuffer StrokeBuffer
         /// <summary>
-        /// 顶点缓冲区
+        /// 线框顶点缓冲区
         /// </summary>
-        public VertexBuffer VertexBuffer { get; private set; }
+        public VertexBuffer StrokeBuffer { get; private set; }
+        #endregion
+
+        #region 填充顶点缓冲区 —— VertexBuffer FillBuffer
+        /// <summary>
+        /// 填充顶点缓冲区
+        /// </summary>
+        public VertexBuffer FillBuffer { get; private set; }
         #endregion
 
         #region 线框颜色 —— Vector4 Stroke
@@ -88,7 +97,8 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         public void Dispose()
         {
-            this.VertexBuffer?.Dispose();
+            this.StrokeBuffer?.Dispose();
+            this.FillBuffer?.Dispose();
         }
         #endregion 
 

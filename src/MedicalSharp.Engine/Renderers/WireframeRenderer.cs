@@ -143,13 +143,13 @@ namespace MedicalSharp.Engine.Renderers
                 //绘制填充模型	
                 GL.DepthMask(false);//禁用深度写入、让透明面可以互相混合
                 this.Program.SetUniformVector4("u_Color", renderable.Fill);
-                renderable.VertexBuffer.Draw(PrimitiveType.Triangles);
+                renderable.FillBuffer.Draw(PrimitiveType.Triangles);
                 GL.DepthMask(true);//恢复状态
 
                 //绘制线框模型
                 GL.LineWidth(renderable.StrokeThickness);
                 this.Program.SetUniformVector4("u_Color", renderable.Stroke);
-                renderable.VertexBuffer.Draw(PrimitiveType.Lines);
+                renderable.StrokeBuffer.Draw(PrimitiveType.Lines);
 
                 //触发渲染事件
                 renderable.OnRender(this.Program, renderContext);
