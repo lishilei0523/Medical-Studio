@@ -97,6 +97,19 @@ namespace MedicalSharp.Controls.Base
             //加载OpenTK绑定
             AvaloniaBindingsContext bindingsContext = new AvaloniaBindingsContext(glInterface);
             GL.LoadBindings(bindingsContext);
+
+            this.OnOpenTKInit();
+        }
+        #endregion
+
+        #region OpenGL卸载事件 —— override void OnOpenGlDeinit(GlInterface glInterface)
+        /// <summary>
+        /// OpenGL卸载事件
+        /// </summary>
+        protected override void OnOpenGlDeinit(GlInterface glInterface)
+        {
+            base.OnOpenGlDeinit(glInterface);
+            this.OnOpenTKDeinit();
         }
         #endregion
 
@@ -121,6 +134,26 @@ namespace MedicalSharp.Controls.Base
 
             //OpenTK渲染
             this.OnOpenTKRender(size);
+        }
+        #endregion
+
+        #region OpenTK初始化事件 —— virtual void OnOpenTKInit()
+        /// <summary>
+        /// OpenTK初始化事件
+        /// </summary>
+        protected virtual void OnOpenTKInit()
+        {
+
+        }
+        #endregion
+
+        #region OpenTK卸载事件 —— virtual void OnOpenTKDeinit()
+        /// <summary>
+        /// OpenTK卸载事件
+        /// </summary>
+        protected virtual void OnOpenTKDeinit()
+        {
+
         }
         #endregion
 

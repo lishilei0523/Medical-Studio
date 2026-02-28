@@ -55,6 +55,13 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 属性
 
+        #region 线框渲染对象 —— abstract WireframeRenderable Renderable
+        /// <summary>
+        /// 线框渲染对象
+        /// </summary>
+        public abstract WireframeRenderable Renderable { get; }
+        #endregion
+
         #region 依赖属性 - 线框颜色 —— Color Stroke
         /// <summary>
         /// 依赖属性 - 线框颜色
@@ -88,16 +95,6 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 只读属性 - 线框渲染对象 —— WireframeRenderable Renderable
-        /// <summary>
-        /// 只读属性 - 线框渲染对象
-        /// </summary>
-        public WireframeRenderable Renderable
-        {
-            get => this._renderable;
-        }
-        #endregion
-
         #endregion
 
         #region # 方法
@@ -108,7 +105,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         protected override void OnUnloaded(RoutedEventArgs eventArgs)
         {
-            this._renderable?.Dispose();
+            this.Renderable?.Dispose();
             this._renderable = null;
         }
         #endregion 

@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.Interactivity;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Builders;
@@ -52,6 +51,32 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 属性
 
+        #region 线框渲染对象 —— abstract WireframeRenderable Renderable
+        /// <summary>
+        /// 线框渲染对象
+        /// </summary>
+        public override WireframeRenderable Renderable
+        {
+            get
+            {
+                if (this._renderable == null)
+                {
+                    MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Lines);
+                    MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Triangles);
+                    VertexBuffer strokeBuffer = new VertexBuffer(strokeMesh);
+                    VertexBuffer fillBuffer = new VertexBuffer(fillMesh);
+                    strokeBuffer.Setup();
+                    fillBuffer.Setup();
+
+                    this._renderable = new WireframeRenderable(strokeBuffer, fillBuffer);
+                    this._renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                }
+
+                return this._renderable;
+            }
+        }
+        #endregion
+
         #region 依赖属性 - 宽度 —— float Width
         /// <summary>
         /// 依赖属性 - 宽度
@@ -93,25 +118,6 @@ namespace MedicalSharp.Controls.Visuals
         {
             get => this.GetValue(CenterProperty);
             set => this.SetValue(CenterProperty, value);
-        }
-        #endregion
-
-        #endregion
-
-        #region # 方法
-
-        #region 元素加载事件 —— override void OnLoaded(RoutedEventArgs eventArgs)
-        /// <summary>
-        /// 元素加载事件
-        /// </summary>
-        protected override void OnLoaded(RoutedEventArgs eventArgs)
-        {
-            MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Lines);
-            MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Triangles);
-            VertexBuffer strokeBuffer = new VertexBuffer(strokeMesh);
-            VertexBuffer fillBuffer = new VertexBuffer(fillMesh);
-            this._renderable = new WireframeRenderable(strokeBuffer, fillBuffer);
-            this._renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
         }
         #endregion
 
