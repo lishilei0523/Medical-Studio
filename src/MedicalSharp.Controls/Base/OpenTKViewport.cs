@@ -1,9 +1,12 @@
 ﻿using Avalonia;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Inputs;
+using MedicalSharp.Engine.Cameras;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -22,11 +25,23 @@ namespace MedicalSharp.Controls.Base
         public static readonly StyledProperty<Color> BackgroundProperty;
 
         /// <summary>
+        /// 相机依赖属性
+        /// </summary>
+        public static readonly StyledProperty<Camera> CameraProperty;
+
+        /// <summary>
+        /// 输入管理器依赖属性
+        /// </summary>
+        public static readonly StyledProperty<InputManager> InputManagerProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static OpenTKViewport()
         {
             BackgroundProperty = AvaloniaProperty.Register<OpenTKViewport, Color>(nameof(Background), Colors.Black);
+            CameraProperty = AvaloniaProperty.Register<OpenTKViewport, Camera>(nameof(Camera));
+            InputManagerProperty = AvaloniaProperty.Register<OpenTKViewport, InputManager>(nameof(InputManager));
         }
 
 
@@ -59,6 +74,28 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
+        #region 依赖属性 - 相机 —— Camera Camera
+        /// <summary>
+        /// 依赖属性 - 相机
+        /// </summary>
+        public Camera Camera
+        {
+            get => this.GetValue(CameraProperty);
+            set => this.SetValue(CameraProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 输入管理器 —— InputManager InputManager
+        /// <summary>
+        /// 依赖属性 - 输入管理器
+        /// </summary>
+        public InputManager InputManager
+        {
+            get => this.GetValue(InputManagerProperty);
+            set => this.SetValue(InputManagerProperty, value);
+        }
+        #endregion
+
         #region 只读属性 - FBO —— int FrameBufferId
         /// <summary>
         /// 只读属性 - FBO
@@ -85,12 +122,12 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region OpenGL初始化事件 —— override void OnOpenGlInit(GlInterface glInterface)
+        #region OpenGL初始化事件 —— sealed override void OnOpenGlInit(GlInterface glInterface)
         /// <summary>
         /// OpenGL初始化事件
         /// </summary>
         /// <param name="glInterface">OpenGL接口</param>
-        protected override void OnOpenGlInit(GlInterface glInterface)
+        protected sealed override void OnOpenGlInit(GlInterface glInterface)
         {
             base.OnOpenGlInit(glInterface);
 
@@ -102,22 +139,22 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region OpenGL卸载事件 —— override void OnOpenGlDeinit(GlInterface glInterface)
+        #region OpenGL卸载事件 —— sealed override void OnOpenGlDeinit(GlInterface glInterface)
         /// <summary>
         /// OpenGL卸载事件
         /// </summary>
-        protected override void OnOpenGlDeinit(GlInterface glInterface)
+        protected sealed override void OnOpenGlDeinit(GlInterface glInterface)
         {
             base.OnOpenGlDeinit(glInterface);
             this.OnOpenTKDeinit();
         }
         #endregion
 
-        #region OpenGL渲染事件 —— override void OnOpenGlRender(GlInterface glInterface, int frameBufferId)
+        #region OpenGL渲染事件 —— sealed override void OnOpenGlRender(GlInterface glInterface, int frameBufferId)
         /// <summary>
         /// OpenGL渲染事件
         /// </summary>
-        protected override void OnOpenGlRender(GlInterface glInterface, int frameBufferId)
+        protected sealed override void OnOpenGlRender(GlInterface glInterface, int frameBufferId)
         {
             this._frameBufferId = frameBufferId;
 
@@ -164,6 +201,120 @@ namespace MedicalSharp.Controls.Base
         /// <param name="viewportSize">视口尺寸</param>
         protected abstract void OnOpenTKRender(PixelSize viewportSize);
         #endregion 
+
+        #region 指针按下事件 —— override void OnPointerPressed(PointerPressedEventArgs eventArgs)
+        /// <summary>
+        /// 指针按下事件
+        /// </summary>
+        protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
+        {
+            base.OnPointerPressed(eventArgs);
+
+            MouseButton mouseButton = MouseButton.Left;
+            if (eventArgs.Properties.IsLeftButtonPressed)
+            {
+                mouseButton = MouseButton.Left;
+            }
+            if (eventArgs.Properties.IsMiddleButtonPressed)
+            {
+                mouseButton = MouseButton.Middle;
+            }
+            if (eventArgs.Properties.IsRightButtonPressed)
+            {
+                mouseButton = MouseButton.Right;
+            }
+
+            this.InputManager.OnMouseDown(this, mouseButton, eventArgs.GetPosition(this));
+        }
+        #endregion
+
+        #region 指针松开事件 —— override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
+        /// <summary>
+        /// 指针松开事件
+        /// </summary>
+        protected override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
+        {
+            base.OnPointerReleased(eventArgs);
+
+            MouseButton mouseButton = MouseButton.Left;
+            if (eventArgs.Properties.IsLeftButtonPressed)
+            {
+                mouseButton = MouseButton.Left;
+            }
+            if (eventArgs.Properties.IsMiddleButtonPressed)
+            {
+                mouseButton = MouseButton.Middle;
+            }
+            if (eventArgs.Properties.IsRightButtonPressed)
+            {
+                mouseButton = MouseButton.Right;
+            }
+
+            this.InputManager.OnMouseUp(this, mouseButton, eventArgs.GetPosition(this));
+        }
+        #endregion
+
+        #region 指针移动事件 —— override void OnPointerReleased(PointerEventArgs eventArgs)
+        /// <summary>
+        /// 指针移动事件
+        /// </summary>
+        protected override void OnPointerMoved(PointerEventArgs eventArgs)
+        {
+            base.OnPointerMoved(eventArgs);
+
+            MouseButton mouseButton = MouseButton.Left;
+            if (eventArgs.Properties.IsLeftButtonPressed)
+            {
+                mouseButton = MouseButton.Left;
+            }
+            if (eventArgs.Properties.IsMiddleButtonPressed)
+            {
+                mouseButton = MouseButton.Middle;
+            }
+            if (eventArgs.Properties.IsRightButtonPressed)
+            {
+                mouseButton = MouseButton.Right;
+            }
+
+            this.InputManager.OnMouseMove(this, mouseButton, eventArgs.GetPosition(this));
+        }
+        #endregion
+
+        #region 指针滚轮事件 —— override void OnPointerReleased(PointerWheelEventArgs eventArgs)
+        /// <summary>
+        /// 指针滚轮事件
+        /// </summary>
+        protected override void OnPointerWheelChanged(PointerWheelEventArgs eventArgs)
+        {
+            base.OnPointerWheelChanged(eventArgs);
+
+            this.InputManager.OnMouseWheel(this, eventArgs.Delta.X, eventArgs.Delta.Y);
+        }
+        #endregion
+
+        #region 键盘按下事件 —— override void OnKeyDown(KeyEventArgs eventArgs)
+        /// <summary>
+        /// 键盘按下事件
+        /// </summary>
+        protected override void OnKeyDown(KeyEventArgs eventArgs)
+        {
+            base.OnKeyDown(eventArgs);
+
+            this.InputManager.OnKeyDown(this, eventArgs.Key);
+        }
+        #endregion
+
+        #region 键盘松开事件 —— override void OnKeyUp(KeyEventArgs eventArgs)
+        /// <summary>
+        /// 键盘松开事件
+        /// </summary>
+        protected override void OnKeyUp(KeyEventArgs eventArgs)
+        {
+            base.OnKeyUp(eventArgs);
+
+            this.InputManager.OnKeyUp(this, eventArgs.Key);
+        }
+        #endregion
 
         #endregion
     }

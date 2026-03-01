@@ -1,12 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
-using Avalonia.Input;
 using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
-using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Controls.Visuals;
-using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderers;
+using OpenTK.Graphics.OpenGL4;
 
 namespace MedicalSharp.Controls.Viewports
 {
@@ -16,26 +14,6 @@ namespace MedicalSharp.Controls.Viewports
     public class WireframeViewport : OpenTKViewport
     {
         #region # 字段及构造器
-
-        /// <summary>
-        /// 轨道相机依赖属性
-        /// </summary>
-        public static readonly StyledProperty<OrbitCamera> CameraProperty;
-
-        /// <summary>
-        /// 输入管理器依赖属性
-        /// </summary>
-        public static readonly StyledProperty<InputManager> InputManagerProperty;
-
-        /// <summary>
-        /// 静态构造器
-        /// </summary>
-        static WireframeViewport()
-        {
-            CameraProperty = AvaloniaProperty.Register<OpenTKViewport, OrbitCamera>(nameof(Camera));
-            InputManagerProperty = AvaloniaProperty.Register<OpenTKViewport, InputManager>(nameof(InputManager));
-        }
-
 
         /// <summary>
         /// 线框渲染器
@@ -60,28 +38,6 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         [Content]
         public AvaloniaList<Visual3D> Children { get; private set; }
-        #endregion
-
-        #region 依赖属性 - 轨道相机 —— OrbitCamera Camera
-        /// <summary>
-        /// 依赖属性 - 轨道相机
-        /// </summary>
-        public OrbitCamera Camera
-        {
-            get => this.GetValue(CameraProperty);
-            set => this.SetValue(CameraProperty, value);
-        }
-        #endregion
-
-        #region 依赖属性 - 输入管理器 —— InputManager InputManager
-        /// <summary>
-        /// 依赖属性 - 输入管理器
-        /// </summary>
-        public InputManager InputManager
-        {
-            get => this.GetValue(InputManagerProperty);
-            set => this.SetValue(InputManagerProperty, value);
-        }
         #endregion
 
         #region 只读属性 - 线框渲染器 —— WireframeRenderer Renderer
@@ -122,6 +78,12 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="viewportSize">视口尺寸</param>
         protected override void OnOpenTKRender(PixelSize viewportSize)
         {
+            //开启深度测试
+            GL.Enable(EnableCap.DepthTest);
+
+            //禁用面剔除
+            GL.Disable(EnableCap.CullFace);
+
             this._renderer.RenderFrame(viewportSize.Width, viewportSize.Height);
         }
         #endregion
@@ -133,108 +95,6 @@ namespace MedicalSharp.Controls.Viewports
         protected override void OnOpenTKDeinit()
         {
             this._renderer?.Dispose();
-        }
-        #endregion
-
-        #region 指针按下事件 —— override void OnPointerPressed(PointerPressedEventArgs eventArgs)
-        /// <summary>
-        /// 指针按下事件
-        /// </summary>
-        protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
-        {
-            base.OnPointerPressed(eventArgs);
-
-            MouseButton mouseButton = MouseButton.Left;
-            if (eventArgs.Properties.IsLeftButtonPressed)
-            {
-                mouseButton = MouseButton.Left;
-            }
-            if (eventArgs.Properties.IsMiddleButtonPressed)
-            {
-                mouseButton = MouseButton.Middle;
-            }
-            if (eventArgs.Properties.IsRightButtonPressed)
-            {
-                mouseButton = MouseButton.Right;
-            }
-
-            this.InputManager.OnMouseDown(this, mouseButton, eventArgs.GetPosition(this));
-        }
-        #endregion
-
-        #region 指针松开事件 —— override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
-        /// <summary>
-        /// 指针松开事件
-        /// </summary>
-        protected override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
-        {
-            base.OnPointerReleased(eventArgs);
-
-            MouseButton mouseButton = MouseButton.Left;
-            if (eventArgs.Properties.IsLeftButtonPressed)
-            {
-                mouseButton = MouseButton.Left;
-            }
-            if (eventArgs.Properties.IsMiddleButtonPressed)
-            {
-                mouseButton = MouseButton.Middle;
-            }
-            if (eventArgs.Properties.IsRightButtonPressed)
-            {
-                mouseButton = MouseButton.Right;
-            }
-
-            this.InputManager.OnMouseUp(this, mouseButton, eventArgs.GetPosition(this));
-        }
-        #endregion
-
-        #region 指针移动事件 —— override void OnPointerReleased(PointerEventArgs eventArgs)
-        /// <summary>
-        /// 指针移动事件
-        /// </summary>
-        protected override void OnPointerMoved(PointerEventArgs eventArgs)
-        {
-            base.OnPointerMoved(eventArgs);
-
-            MouseButton mouseButton = MouseButton.Left;
-            if (eventArgs.Properties.IsLeftButtonPressed)
-            {
-                mouseButton = MouseButton.Left;
-            }
-            if (eventArgs.Properties.IsMiddleButtonPressed)
-            {
-                mouseButton = MouseButton.Middle;
-            }
-            if (eventArgs.Properties.IsRightButtonPressed)
-            {
-                mouseButton = MouseButton.Right;
-            }
-
-            this.InputManager.OnMouseMove(this, mouseButton, eventArgs.GetPosition(this));
-        }
-        #endregion
-
-        #region 指针滚轮事件 —— override void OnPointerReleased(PointerWheelEventArgs eventArgs)
-        /// <summary>
-        /// 指针滚轮事件
-        /// </summary>
-        protected override void OnPointerWheelChanged(PointerWheelEventArgs eventArgs)
-        {
-            base.OnPointerWheelChanged(eventArgs);
-
-            this.InputManager.OnMouseWheel(this, eventArgs.Delta.X, eventArgs.Delta.Y);
-        }
-        #endregion
-
-        #region 键盘按下事件 —— override void OnKeyDown(KeyEventArgs eventArgs)
-        /// <summary>
-        /// 键盘按下事件
-        /// </summary>
-        protected override void OnKeyDown(KeyEventArgs eventArgs)
-        {
-            base.OnKeyDown(eventArgs);
-
-            this.InputManager.OnKeyDown(this, eventArgs.Key);
         }
         #endregion
 
