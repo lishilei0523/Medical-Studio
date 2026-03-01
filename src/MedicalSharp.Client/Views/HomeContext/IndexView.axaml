@@ -1,4 +1,4 @@
-﻿<fa:AppWindow x:Class="MedicalSharp.Client.Views.HomeContext.GraphicView"
+﻿<fa:AppWindow x:Class="MedicalSharp.Client.Views.HomeContext.IndexView"
 			  xmlns="https://github.com/avaloniaui"
 			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,7 @@
 			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
 			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			  mc:Ignorable="d"
-			  Title="OpenGL"
+			  Title="Medical Studio"
 			  Width="1440" Height="900"
 			  WindowStartupLocation="CenterScreen">
 

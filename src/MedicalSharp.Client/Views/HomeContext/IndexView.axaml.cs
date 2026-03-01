@@ -3,11 +3,11 @@
 namespace MedicalSharp.Client.Views.HomeContext
 {
     /// <summary>
-    /// 导航视图
+    /// 首页视图
     /// </summary>
-    public partial class NavigationView : AppWindow
+    public partial class IndexView : AppWindow
     {
-        public NavigationView()
+        public IndexView()
         {
             this.InitializeComponent();
         }

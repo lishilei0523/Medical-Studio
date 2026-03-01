@@ -39,7 +39,7 @@ namespace MedicalSharp.Client
         /// </summary>
         protected override async void OnStartup(object sender, ControlledApplicationLifetimeStartupEventArgs eventArgs)
         {
-            await base.DisplayRootViewFor<NavigationViewModel>();
+            await base.DisplayRootViewFor<IndexViewModel>();
         }
         #endregion
 

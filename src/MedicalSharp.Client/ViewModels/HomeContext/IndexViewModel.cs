@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace MedicalSharp.Client.ViewModels.HomeContext
 {
     /// <summary>
-    /// OpenGL视图模型
+    /// 首页视图模型
     /// </summary>
-    public class GraphicViewModel : Screen
+    public class IndexViewModel : Screen
     {
         #region # 字段及构造器
 
@@ -23,7 +23,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public GraphicViewModel(IWindowManager windowManager)
+        public IndexViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
         }
