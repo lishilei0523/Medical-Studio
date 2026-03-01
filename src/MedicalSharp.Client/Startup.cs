@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.HomeContext;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,17 +18,16 @@ namespace MedicalSharp.Client
     /// </summary>
     public class Startup : BootstrapperBase
     {
-        #region # 构造器
+        #region # 字段及构造器
 
-        #region 00.无参构造器
         /// <summary>
-        /// 无参构造器
+        /// 默认构造器
         /// </summary>
         public Startup()
         {
             GlobalExceptionAspect.UnhandledTaskException += this.OnUnhandledException;
+            Dispatcher.UIThread.UnhandledException += this.OnUnhandledException;
         }
-        #endregion
 
         #endregion
 
@@ -51,6 +51,16 @@ namespace MedicalSharp.Client
         {
             //TODO 异常处理
             return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 应用程序异常事件 —— void OnUnhandledException(object sender..
+        /// <summary>
+        /// 应用程序异常事件
+        /// </summary>
+        private void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs eventArgs)
+        {
+            eventArgs.Handled = true;
         }
         #endregion
 
