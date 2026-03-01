@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Input;
+using MedicalSharp.Controls.Base;
 using MedicalSharp.Engine.Cameras;
 
 namespace MedicalSharp.Controls.Inputs
@@ -35,7 +36,7 @@ namespace MedicalSharp.Controls.Inputs
         /// </summary>
         public OrbitCamera Camera
         {
-            get => this.Camera;
+            get => this._camera;
         }
         #endregion
 
@@ -43,13 +44,14 @@ namespace MedicalSharp.Controls.Inputs
 
         #region # 方法
 
-        #region 鼠标移动事件 —— override void OnMouseMove(MouseButton button, Point position)
+        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport, MouseButton button...
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
+        /// <param name="viewport">OpenTK视口</param>
         /// <param name="button">鼠标按键</param>
         /// <param name="position">鼠标位置</param>
-        public override void OnMouseMove(MouseButton button, Point position)
+        public override void OnMouseMove(OpenTKViewport viewport, MouseButton button, Point position)
         {
             if (this._mousePosition2D.HasValue)
             {
@@ -58,66 +60,79 @@ namespace MedicalSharp.Controls.Inputs
                 if (button == MouseButton.Middle)
                 {
                     this._camera.Pan(deltaX / 50.0f, deltaY / 50.0f);
+                    viewport.RequestNextFrameRendering();
                 }
                 if (button == MouseButton.Right)
                 {
                     this._camera.Rotate(deltaX, -deltaY);
+                    viewport.RequestNextFrameRendering();
                 }
             }
             this._mousePosition2D = position;
         }
         #endregion
 
-        #region 鼠标滚轮事件 —— override void OnMouseWheel(double offsetX, double offsetY)
+        #region 鼠标滚轮事件 —— override void OnMouseWheel(OpenTKViewport viewport, double offsetX...
         /// <summary>
         /// 鼠标滚轮事件
         /// </summary>
+        /// <param name="viewport">OpenTK视口</param>
         /// <param name="offsetX">X轴偏移量</param>
         /// <param name="offsetY">Y轴偏移量</param>
-        public override void OnMouseWheel(double offsetX, double offsetY)
+        public override void OnMouseWheel(OpenTKViewport viewport, double offsetX, double offsetY)
         {
             this._camera.Zoom((float)offsetY);
+            viewport.RequestNextFrameRendering();
         }
         #endregion 
 
-        #region 键盘按下事件 —— override void OnKeyDown(Key key)
+        #region 键盘按下事件 —— override void OnKeyDown(OpenTKViewport viewport, Key key)
         /// <summary>
         /// 键盘按下事件
         /// </summary>
+        /// <param name="viewport">OpenTK视口</param>
         /// <param name="key">键</param>
-        public override void OnKeyDown(Key key)
+        public override void OnKeyDown(OpenTKViewport viewport, Key key)
         {
             if (key == Key.W)
             {
                 this._camera.Zoom(0.1f);
+                viewport.RequestNextFrameRendering();
             }
             if (key == Key.S)
             {
                 this._camera.Zoom(-0.1f);
+                viewport.RequestNextFrameRendering();
             }
             if (key == Key.A)
             {
                 this._camera.Pan(-0.5f, 0);
+                viewport.RequestNextFrameRendering();
             }
             if (key == Key.D)
             {
                 this._camera.Pan(0.5f, 0);
+                viewport.RequestNextFrameRendering();
             }
             if (key == Key.Up)
             {
                 this._camera.Rotate(0, 3);
+                viewport.RequestNextFrameRendering();
             }
             if (key == Key.Down)
             {
                 this._camera.Rotate(0, -3);
+                viewport.RequestNextFrameRendering();
             }
             if (key == Key.Left)
             {
                 this._camera.Rotate(-3, 0);
+                viewport.RequestNextFrameRendering();
             }
             if (key == Key.Right)
             {
                 this._camera.Rotate(3, 0);
+                viewport.RequestNextFrameRendering();
             }
         }
         #endregion

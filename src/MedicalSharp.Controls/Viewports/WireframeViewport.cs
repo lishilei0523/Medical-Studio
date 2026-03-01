@@ -1,7 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Inputs;
@@ -36,6 +35,7 @@ namespace MedicalSharp.Controls.Viewports
             CameraProperty = AvaloniaProperty.Register<OpenTKViewport, OrbitCamera>(nameof(Camera));
             InputManagerProperty = AvaloniaProperty.Register<OpenTKViewport, InputManager>(nameof(InputManager));
         }
+
 
         /// <summary>
         /// 线框渲染器
@@ -98,16 +98,6 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
-        #region 元素卸载事件 —— void OnUnloaded(RoutedEventArgs eventArgs)
-        /// <summary>
-        /// 元素卸载事件
-        /// </summary>
-        protected override void OnUnloaded(RoutedEventArgs eventArgs)
-        {
-            this._renderer?.Dispose();
-        }
-        #endregion
-
         #region OpenTK初始化事件 —— override void OnOpenTKInit()
         /// <summary>
         /// OpenTK初始化事件
@@ -136,6 +126,16 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
+        #region OpenTK卸载事件 —— override void OnOpenTKDeinit()
+        /// <summary>
+        /// OpenTK卸载事件
+        /// </summary>
+        protected override void OnOpenTKDeinit()
+        {
+            this._renderer?.Dispose();
+        }
+        #endregion
+
         #region 指针按下事件 —— override void OnPointerPressed(PointerPressedEventArgs eventArgs)
         /// <summary>
         /// 指针按下事件
@@ -158,7 +158,7 @@ namespace MedicalSharp.Controls.Viewports
                 mouseButton = MouseButton.Right;
             }
 
-            this.InputManager.OnMouseDown(mouseButton, eventArgs.GetPosition(this));
+            this.InputManager.OnMouseDown(this, mouseButton, eventArgs.GetPosition(this));
         }
         #endregion
 
@@ -184,11 +184,11 @@ namespace MedicalSharp.Controls.Viewports
                 mouseButton = MouseButton.Right;
             }
 
-            this.InputManager.OnMouseUp(mouseButton, eventArgs.GetPosition(this));
+            this.InputManager.OnMouseUp(this, mouseButton, eventArgs.GetPosition(this));
         }
         #endregion
 
-        #region 指针移动事件 —— override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
+        #region 指针移动事件 —— override void OnPointerReleased(PointerEventArgs eventArgs)
         /// <summary>
         /// 指针移动事件
         /// </summary>
@@ -210,11 +210,11 @@ namespace MedicalSharp.Controls.Viewports
                 mouseButton = MouseButton.Right;
             }
 
-            this.InputManager.OnMouseMove(mouseButton, eventArgs.GetPosition(this));
+            this.InputManager.OnMouseMove(this, mouseButton, eventArgs.GetPosition(this));
         }
         #endregion
 
-        #region 指针滚轮事件 —— override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
+        #region 指针滚轮事件 —— override void OnPointerReleased(PointerWheelEventArgs eventArgs)
         /// <summary>
         /// 指针滚轮事件
         /// </summary>
@@ -222,7 +222,19 @@ namespace MedicalSharp.Controls.Viewports
         {
             base.OnPointerWheelChanged(eventArgs);
 
-            this.InputManager.OnMouseWheel(eventArgs.Delta.X, eventArgs.Delta.Y);
+            this.InputManager.OnMouseWheel(this, eventArgs.Delta.X, eventArgs.Delta.Y);
+        }
+        #endregion
+
+        #region 键盘按下事件 —— override void OnKeyDown(KeyEventArgs eventArgs)
+        /// <summary>
+        /// 键盘按下事件
+        /// </summary>
+        protected override void OnKeyDown(KeyEventArgs eventArgs)
+        {
+            base.OnKeyDown(eventArgs);
+
+            this.InputManager.OnKeyDown(this, eventArgs.Key);
         }
         #endregion
 
