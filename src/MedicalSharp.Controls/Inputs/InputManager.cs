@@ -65,13 +65,13 @@ namespace MedicalSharp.Controls.Inputs
         }
         #endregion
 
-        #region 鼠标移动事件 —— virtual void OnMouseMove(PointerUpdateKind kind, Point position)
+        #region 鼠标移动事件 —— virtual void OnMouseMove(MouseButton button, Point position)
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
-        /// <param name="kind">指针更新类型</param>
+        /// <param name="button">鼠标按键</param>
         /// <param name="position">鼠标位置</param>
-        public virtual void OnMouseMove(PointerUpdateKind kind, Point position)
+        public virtual void OnMouseMove(MouseButton button, Point position)
         {
 
         }

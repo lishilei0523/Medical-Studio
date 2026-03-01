@@ -43,23 +43,23 @@ namespace MedicalSharp.Controls.Inputs
 
         #region # 方法
 
-        #region 鼠标移动事件 —— override void OnMouseMove(PointerUpdateKind kind, Point position)
+        #region 鼠标移动事件 —— override void OnMouseMove(MouseButton button, Point position)
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
-        /// <param name="kind">指针更新类型</param>
+        /// <param name="button">鼠标按键</param>
         /// <param name="position">鼠标位置</param>
-        public override void OnMouseMove(PointerUpdateKind kind, Point position)
+        public override void OnMouseMove(MouseButton button, Point position)
         {
             if (this._mousePosition2D.HasValue)
             {
                 float deltaX = (float)(position.X - this._mousePosition2D.Value.X);
                 float deltaY = (float)(position.Y - this._mousePosition2D.Value.Y);
-                if (kind == PointerUpdateKind.MiddleButtonPressed)
+                if (button == MouseButton.Middle)
                 {
                     this._camera.Pan(deltaX / 50.0f, deltaY / 50.0f);
                 }
-                if (kind == PointerUpdateKind.RightButtonPressed)
+                if (button == MouseButton.Right)
                 {
                     this._camera.Rotate(deltaX, -deltaY);
                 }

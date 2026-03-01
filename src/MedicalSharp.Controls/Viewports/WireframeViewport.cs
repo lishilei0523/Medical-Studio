@@ -145,17 +145,17 @@ namespace MedicalSharp.Controls.Viewports
             base.OnPointerPressed(eventArgs);
 
             MouseButton mouseButton = MouseButton.Left;
-            switch (eventArgs.Properties.PointerUpdateKind)
+            if (eventArgs.Properties.IsLeftButtonPressed)
             {
-                case PointerUpdateKind.LeftButtonPressed:
-                    mouseButton = MouseButton.Left;
-                    break;
-                case PointerUpdateKind.MiddleButtonPressed:
-                    mouseButton = MouseButton.Middle;
-                    break;
-                case PointerUpdateKind.RightButtonPressed:
-                    mouseButton = MouseButton.Right;
-                    break;
+                mouseButton = MouseButton.Left;
+            }
+            if (eventArgs.Properties.IsMiddleButtonPressed)
+            {
+                mouseButton = MouseButton.Middle;
+            }
+            if (eventArgs.Properties.IsRightButtonPressed)
+            {
+                mouseButton = MouseButton.Right;
             }
 
             this.InputManager.OnMouseDown(mouseButton, eventArgs.GetPosition(this));
@@ -171,17 +171,17 @@ namespace MedicalSharp.Controls.Viewports
             base.OnPointerReleased(eventArgs);
 
             MouseButton mouseButton = MouseButton.Left;
-            switch (eventArgs.Properties.PointerUpdateKind)
+            if (eventArgs.Properties.IsLeftButtonPressed)
             {
-                case PointerUpdateKind.LeftButtonPressed:
-                    mouseButton = MouseButton.Left;
-                    break;
-                case PointerUpdateKind.MiddleButtonPressed:
-                    mouseButton = MouseButton.Middle;
-                    break;
-                case PointerUpdateKind.RightButtonPressed:
-                    mouseButton = MouseButton.Right;
-                    break;
+                mouseButton = MouseButton.Left;
+            }
+            if (eventArgs.Properties.IsMiddleButtonPressed)
+            {
+                mouseButton = MouseButton.Middle;
+            }
+            if (eventArgs.Properties.IsRightButtonPressed)
+            {
+                mouseButton = MouseButton.Right;
             }
 
             this.InputManager.OnMouseUp(mouseButton, eventArgs.GetPosition(this));
@@ -196,7 +196,21 @@ namespace MedicalSharp.Controls.Viewports
         {
             base.OnPointerMoved(eventArgs);
 
-            this.InputManager.OnMouseMove(eventArgs.Properties.PointerUpdateKind, eventArgs.GetPosition(this));
+            MouseButton mouseButton = MouseButton.Left;
+            if (eventArgs.Properties.IsLeftButtonPressed)
+            {
+                mouseButton = MouseButton.Left;
+            }
+            if (eventArgs.Properties.IsMiddleButtonPressed)
+            {
+                mouseButton = MouseButton.Middle;
+            }
+            if (eventArgs.Properties.IsRightButtonPressed)
+            {
+                mouseButton = MouseButton.Right;
+            }
+
+            this.InputManager.OnMouseMove(mouseButton, eventArgs.GetPosition(this));
         }
         #endregion
 
