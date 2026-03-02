@@ -19,9 +19,9 @@ namespace MedicalSharp.Client
             appBuilder.UsePlatformDetect();
             appBuilder.With(new Win32PlatformOptions
             {
-                RenderingMode = [Win32RenderingMode.Wgl],
+                RenderingMode = [Win32RenderingMode.Wgl]
             });
-            appBuilder.With(new X11PlatformOptions()
+            appBuilder.With(new X11PlatformOptions
             {
                 RenderingMode = [X11RenderingMode.Glx, X11RenderingMode.Egl, X11RenderingMode.Vulkan]
             });
