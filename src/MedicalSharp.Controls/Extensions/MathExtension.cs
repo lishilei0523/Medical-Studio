@@ -59,5 +59,25 @@ namespace MedicalSharp.Controls.Extensions
             return new Color(a, r, g, b);
         }
         #endregion
+
+        #region # System.Numerics三维向量转GLM三维向量 —— static Vector3 ToGlmVector3(this in Vector3 vector3)
+        /// <summary>
+        /// System.Numerics三维向量转GLM三维向量
+        /// </summary>
+        public static Vector3 ToGlmVector3(this in System.Numerics.Vector3 vector3)
+        {
+            return new Vector3(vector3.X, vector3.Y, vector3.Z);
+        }
+        #endregion
+
+        #region # GLM三维向量转System.Numerics三维向量 —— Vector3 ToSystemVector3(this in Vector3 vector3)
+        /// <summary>
+        /// GLM三维向量转System.Numerics三维向量
+        /// </summary>
+        public static System.Numerics.Vector3 ToSystemVector3(this in Vector3 vector3)
+        {
+            return new System.Numerics.Vector3(vector3.X, vector3.Y, vector3.Z);
+        }
+        #endregion
     }
 }

@@ -27,19 +27,19 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         public WireframeViewport()
         {
-            this.Children = new AvaloniaList<Visual3D>();
+            this.Children = new AvaloniaList<BoundingVisual3D>();
         }
 
         #endregion
 
         #region # 属性
 
-        #region 子元素列表 —— AvaloniaList<Visual3D> Children
+        #region 子元素列表 —— AvaloniaList<BoundingVisual3D> Children
         /// <summary>
         /// 子元素列表
         /// </summary>
         [Content]
-        public AvaloniaList<Visual3D> Children { get; private set; }
+        public AvaloniaList<BoundingVisual3D> Children { get; private set; }
         #endregion
 
         #region 只读属性 - 线框渲染器 —— WireframeRenderer Renderer
@@ -69,12 +69,9 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             this._renderer = new WireframeRenderer(this.Camera);
-            foreach (Visual3D visual3D in this.Children)
+            foreach (BoundingVisual3D visual3D in this.Children)
             {
-                if (visual3D is BoundingBoxVisual3D boundingBoxVisual3D)
-                {
-                    this._renderer.AppendItem(boundingBoxVisual3D.Renderable);
-                }
+                this._renderer.AppendItem(visual3D.Renderable);
             }
         }
         #endregion
