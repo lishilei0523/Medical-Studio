@@ -2,7 +2,9 @@
 using Avalonia.Collections;
 using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
+using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderers;
 using OpenTK.Graphics.OpenGL4;
 
@@ -60,6 +62,12 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         protected override void OnOpenTKInit()
         {
+            //InputManger默认值
+            if (this.InputManager == null && this.Camera is OrbitCamera orbitCamera)
+            {
+                this.InputManager = new OrbitInputManager(orbitCamera);
+            }
+
             this._renderer = new WireframeRenderer(this.Camera);
             foreach (Visual3D visual3D in this.Children)
             {

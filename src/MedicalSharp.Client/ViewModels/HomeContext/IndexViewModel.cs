@@ -1,5 +1,4 @@
 ﻿using Caliburn.Micro;
-using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Engine.Cameras;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
@@ -40,14 +39,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public OrbitCamera Camera { get; set; }
         #endregion
 
-        #region 输入管理器 —— InputManager InputManager
-        /// <summary>
-        /// 输入管理器
-        /// </summary>
-        [DependencyProperty]
-        public InputManager InputManager { get; set; }
-        #endregion
-
         #endregion
 
         #region # 方法
@@ -62,12 +53,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             const float distance = 7.0f;
             const float yaw = 45.0f;
             const float pitch = -45.0f;
-            const float nearPlaneDistance = 0.125f;
-            const float farPlaneDistance = 65535;
-            const float fieldOfView = 30.0f;
-
-            this.Camera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch, nearPlaneDistance, farPlaneDistance, fieldOfView);
-            this.InputManager = new OrbitInputManager(this.Camera);
+            this.Camera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
 
             return base.OnInitializedAsync(cancellationToken);
         }

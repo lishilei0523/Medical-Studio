@@ -118,7 +118,8 @@ namespace MedicalSharp.Controls.Base
         /// <returns>是否命中</returns>
         public bool HitTest(Point point)
         {
-            return true;
+            return point.X >= 0 && point.X <= this.Bounds.Width &&
+                   point.Y >= 0 && point.Y <= this.Bounds.Height;
         }
         #endregion
 
