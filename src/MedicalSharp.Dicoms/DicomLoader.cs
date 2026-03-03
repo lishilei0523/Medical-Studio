@@ -16,6 +16,17 @@ namespace MedicalSharp.Dicoms
     {
         //Public
 
+        #region # 初始化 —— static void Initialize()
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        public static void Initialize()
+        {
+            ImageSeriesReader reader = new ImageSeriesReader();
+            reader.Dispose();
+        }
+        #endregion
+
         #region # 加载DICOM序列 —— static VolumeData LoadSeries(string dicomFolder)
         /// <summary>
         /// 加载DICOM序列

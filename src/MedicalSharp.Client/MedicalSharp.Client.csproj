@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MedicalSharp.Controls\MedicalSharp.Controls.csproj" />
+    <ProjectReference Include="..\MedicalSharp.Dicoms\MedicalSharp.Dicoms.csproj" />
     <ProjectReference Include="..\MedicalSharp.Engine\MedicalSharp.Engine.csproj" />
   </ItemGroup>
 </Project>

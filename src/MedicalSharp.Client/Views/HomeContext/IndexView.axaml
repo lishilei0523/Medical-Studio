@@ -11,50 +11,52 @@
 			  Width="1440" Height="900"
 			  WindowStartupLocation="CenterScreen">
 
-	<Grid>
-		<Grid.RowDefinitions>
-			<!--Header-->
-			<RowDefinition Height="Auto" />
-			<!--Body-->
-			<RowDefinition Height="*" />
-			<!--Footer-->
-			<RowDefinition Height="25" />
-		</Grid.RowDefinitions>
-		<Grid Grid.Row="0">
-			<Menu>
-				<MenuItem Header="文件(_F)">
-					<MenuItem Header="打开(_O)" />
-					<MenuItem Header="关闭(_C)" />
-					<MenuItem Header="保存(_S)" />
-					<MenuItem Header="另存为(_A)" />
-				</MenuItem>
-			</Menu>
-		</Grid>
-		<Grid Grid.Row="1">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition />
-				<ColumnDefinition />
-			</Grid.ColumnDefinitions>
-			<Grid Grid.Column="0">
-				<sd:WireframeViewport Background="LightGray"
-									  Camera="{Binding Camera}">
-					<sd:BoundingBoxVisual3D Width="2" Height="1" Depth="3" Center="1,0,0" Stroke="DeepSkyBlue" />
-					<sd:BoundingBoxVisual3D Width="1" Height="2" Depth="3" Center="-1,0,0" Stroke="Red" />
-				</sd:WireframeViewport>
+	<sd:BusyMask IsBusy="{Binding IsBusy}">
+		<Grid>
+			<Grid.RowDefinitions>
+				<!--Header-->
+				<RowDefinition Height="Auto" />
+				<!--Body-->
+				<RowDefinition Height="*" />
+				<!--Footer-->
+				<RowDefinition Height="25" />
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0">
+				<Menu>
+					<MenuItem Header="文件(_F)">
+						<MenuItem Header="打开(_O)" Command="{Binding OpenSeriesCommand}" />
+						<MenuItem Header="关闭(_C)" cm:Message.Attach="CloseSeries()" />
+						<MenuItem Header="保存(_S)" cm:Message.Attach="SaveImage()" />
+						<MenuItem Header="另存为(_A)" cm:Message.Attach="SaveAsImage()" />
+					</MenuItem>
+				</Menu>
 			</Grid>
-			<Grid Grid.Column="1">
-				<Grid.RowDefinitions>
-					<RowDefinition />
-					<RowDefinition />
-					<RowDefinition />
-				</Grid.RowDefinitions>
-				<Grid Grid.Row="0" Background="Red"></Grid>
-				<Grid Grid.Row="1" Background="Green"></Grid>
-				<Grid Grid.Row="2" Background="Blue"></Grid>
+			<Grid Grid.Row="1">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+				<Grid Grid.Column="0">
+					<sd:WireframeViewport Background="LightGray"
+										  Camera="{Binding Camera}">
+						<sd:BoundingBoxVisual3D Width="2" Height="1" Depth="3" Center="1,0,0" Stroke="DeepSkyBlue" />
+						<sd:BoundingBoxVisual3D Width="1" Height="2" Depth="3" Center="-1,0,0" Stroke="Red" />
+					</sd:WireframeViewport>
+				</Grid>
+				<Grid Grid.Column="1">
+					<Grid.RowDefinitions>
+						<RowDefinition />
+						<RowDefinition />
+						<RowDefinition />
+					</Grid.RowDefinitions>
+					<Grid Grid.Row="0" Background="Red"></Grid>
+					<Grid Grid.Row="1" Background="Green"></Grid>
+					<Grid Grid.Row="2" Background="Blue"></Grid>
+				</Grid>
 			</Grid>
-		</Grid>
-		<Grid Grid.Row="2" Background="Green">
+			<Grid Grid.Row="2" Background="Green">
 
+			</Grid>
 		</Grid>
-	</Grid>
+	</sd:BusyMask>
 </fa:AppWindow>

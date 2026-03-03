@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.HomeContext;
+using MedicalSharp.Dicoms;
 using Microsoft.Extensions.DependencyInjection;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.IOC.Core.Mediators;
@@ -92,6 +93,9 @@ namespace MedicalSharp.Client
 
                 ResolveMediator.Build();
             }
+
+            //初始化SimpleITK
+            DicomLoader.Initialize();
         }
         #endregion
 
