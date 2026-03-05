@@ -87,11 +87,11 @@ namespace MedicalSharp.Engine.Renderers
         public float DensityScale { get; private set; }
         #endregion
 
-        #region 步长 —— int StepSize
+        #region 步长 —— float StepSize
         /// <summary>
         /// 步长
         /// </summary>
-        public int StepSize { get; private set; }
+        public float StepSize { get; private set; }
         #endregion
 
         #region 最大步数 —— int MaxStepsCount
@@ -152,14 +152,14 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 设置采样选项 —— void SetSamplingOptions(int stepSize, int maxStepsCount...
+        #region 设置采样选项 —— void SetSamplingOptions(float stepSize, int maxStepsCount...
         /// <summary>
         /// 设置采样选项
         /// </summary>
         /// <param name="stepSize">步长</param>
         /// <param name="maxStepsCount">最大步数</param>
         /// <param name="opacityThreshold">透明度阈值</param>
-        public void SetSamplingOptions(int stepSize, int maxStepsCount, float opacityThreshold)
+        public void SetSamplingOptions(float stepSize, int maxStepsCount, float opacityThreshold)
         {
             this.StepSize = stepSize;
             this.MaxStepsCount = maxStepsCount;
