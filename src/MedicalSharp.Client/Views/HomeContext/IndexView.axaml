@@ -37,7 +37,10 @@
 					<ColumnDefinition />
 				</Grid.ColumnDefinitions>
 				<Grid Grid.Column="0">
-					<sd:VolumeViewport Background="Black" Camera="{Binding Camera}" VolumeData="{Binding VolumeData}">
+					<sd:VolumeViewport Background="Black" 
+                                       Camera="{Binding Camera}" 
+                                       VolumeData="{Binding VolumeData}"
+                                       TFControlPoints="{Binding TFControlPoints}">
 
 					</sd:VolumeViewport>
 				</Grid>

@@ -1,9 +1,11 @@
-﻿using Avalonia.Platform.Storage;
+﻿using Avalonia.Collections;
+using Avalonia.Platform.Storage;
 using Caliburn.Micro;
 using MedicalSharp.Dicoms;
 using MedicalSharp.Dicoms.Models;
 using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
@@ -41,13 +43,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
         #region # 属性
 
-        #region 体积数据 —— VolumeData VolumeData
-        /// <summary>
-        /// 体积数据
-        /// </summary>
-        [DependencyProperty]
-        public VolumeData VolumeData { get; set; }
-        #endregion
+        //通知属性
 
         #region 轨道相机 —— OrbitCamera Camera
         /// <summary>
@@ -56,6 +52,25 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         [DependencyProperty]
         public OrbitCamera Camera { get; set; }
         #endregion
+
+        #region 体积数据 —— VolumeData VolumeData
+        /// <summary>
+        /// 体积数据
+        /// </summary>
+        [DependencyProperty]
+        public VolumeData VolumeData { get; set; }
+        #endregion
+
+        #region 传输函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        /// <summary>
+        /// 传输函数控制点列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
+        #endregion
+
+
+        //命令
 
         #region 打开序列命令 —— ICommand OpenSeriesCommand
         /// <summary>
@@ -81,6 +96,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             const float yaw = 45.0f;
             const float pitch = -45.0f;
             this.Camera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
+            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.GrayControlPoints);
 
             return base.OnInitializedAsync(cancellationToken);
         }
