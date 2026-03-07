@@ -13,7 +13,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 创建体积渲染对象构造器
         /// </summary>
-        /// <param name="texture3D">3D纹理</param>
+        /// <param name="volumeTexture">体积纹理</param>
         /// <param name="volumeScale">体积缩放</param>
         /// <param name="rescaleSlope">斜率</param>
         /// <param name="rescaleIntercept">截距</param>
@@ -21,9 +21,9 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="rowDirection">行向量</param>
         /// <param name="colDirection">列向量</param>
         /// <param name="sliceDirection">切面向量</param>
-        public VolumeRenderable(Texture3D texture3D, Vector3 volumeScale, float rescaleSlope, float rescaleIntercept, Vector3 origin, Vector3 rowDirection, Vector3 colDirection, Vector3 sliceDirection)
+        public VolumeRenderable(Texture3D volumeTexture, Vector3 volumeScale, float rescaleSlope, float rescaleIntercept, Vector3 origin, Vector3 rowDirection, Vector3 colDirection, Vector3 sliceDirection)
         {
-            this.Texture3D = texture3D;
+            this.VolumeTexture = volumeTexture;
             this.VolumeScale = volumeScale;
             this.RescaleSlope = rescaleSlope;
             this.RescaleIntercept = rescaleIntercept;
@@ -37,11 +37,11 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 属性
 
-        #region 3D纹理 —— Texture3D Texture3D
+        #region 体积纹理 —— Texture3D VolumeTexture
         /// <summary>
-        /// 3D纹理
+        /// 体积纹理
         /// </summary>
-        public Texture3D Texture3D { get; private set; }
+        public Texture3D VolumeTexture { get; private set; }
         #endregion
 
         #region 体积缩放 —— Vector3 VolumeScale

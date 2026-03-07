@@ -245,8 +245,8 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
 
             //绑定纹理
-            this.Renderable.Texture3D.Bind(0);
-            this.TransferFunction.Texture1D.Bind(1);
+            this.Renderable.VolumeTexture.Bind(0);
+            this.TransferFunction.Texture.Bind(1);
 
             this.Program.SetUniformInt("u_VolumeTexture", 0);
             this.Program.SetUniformInt("u_TransferFunction", 1);
@@ -264,8 +264,8 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube.Draw(PrimitiveType.Triangles);
 
             //解绑纹理
-            this.Renderable.Texture3D.Unbind();
-            this.TransferFunction.Texture1D.Unbind();
+            this.Renderable.VolumeTexture.Unbind();
+            this.TransferFunction.Texture.Unbind();
 
             //取消使用
             this.Program.Unuse();

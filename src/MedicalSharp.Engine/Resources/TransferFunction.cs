@@ -30,25 +30,24 @@ namespace MedicalSharp.Engine.Resources
         private readonly IList<TFControlPoint> _controlPoints;
 
         /// <summary>
-        /// 创建传输含税构造器
+        /// 创建传输函数构造器
         /// </summary>
         internal TransferFunction()
         {
             this._textureData = new Vector4[TextureWidth];
             this._controlPoints = new List<TFControlPoint>();
-            this.Texture1D = new Texture1D(TextureWidth, PixelInternalFormat.Rgba32f);
+            this.Texture = new Texture1D(TextureWidth, PixelInternalFormat.Rgba32f);
         }
 
         #endregion
 
         #region # 属性
 
-        #region 1D纹理 —— Texture1D Texture1D
+        #region 传输函数纹理 —— Texture1D Texture
         /// <summary>
-        /// 1D纹理
+        /// 传输函数纹理
         /// </summary>
-        internal Texture1D Texture1D { get; private set; }
-
+        internal Texture1D Texture { get; private set; }
         #endregion
 
         #endregion
@@ -126,7 +125,7 @@ namespace MedicalSharp.Engine.Resources
         public void Dispose()
         {
             this._controlPoints.Clear();
-            this.Texture1D?.Dispose();
+            this.Texture?.Dispose();
         }
         #endregion
 
@@ -152,7 +151,7 @@ namespace MedicalSharp.Engine.Resources
 
             fixed (void* pointer = this._textureData)
             {
-                this.Texture1D.Update(PixelFormat.Rgba, PixelType.Float, new IntPtr(pointer));
+                this.Texture.Update(PixelFormat.Rgba, PixelType.Float, new IntPtr(pointer));
             }
         }
         #endregion
