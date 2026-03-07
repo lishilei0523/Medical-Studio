@@ -6,7 +6,7 @@ namespace MedicalSharp.Engine.Builders
     /// <summary>
     /// 颜色工厂
     /// </summary>
-    public static class Colors
+    public static class ColorFactory
     {
         /// <summary>
         /// 红色

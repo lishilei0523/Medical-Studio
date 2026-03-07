@@ -45,9 +45,9 @@ namespace MedicalSharp.Controls.Extensions
         }
         #endregion
 
-        #region # Color转Vector4 —— static Color ToColor(this Vector4 vector4)
+        #region # Vector4转Color —— static Color ToColor(this Vector4 vector4)
         /// <summary>
-        /// Color转Vector4
+        /// Vector4转Color
         /// </summary>
         public static Color ToColor(this Vector4 vector4)
         {
