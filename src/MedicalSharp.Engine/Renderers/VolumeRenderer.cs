@@ -28,6 +28,7 @@ namespace MedicalSharp.Engine.Renderers
         {
             //默认值
             this._unitCube = CreateUnitCube();
+            this.TransferFunction = new TransferFunction();
             this.InitShaderProgram();
         }
 
@@ -40,6 +41,7 @@ namespace MedicalSharp.Engine.Renderers
         {
             //默认值
             this._unitCube = CreateUnitCube();
+            this.TransferFunction = new TransferFunction();
             this.InitShaderProgram();
         }
 
@@ -53,6 +55,7 @@ namespace MedicalSharp.Engine.Renderers
         {
             //默认值
             this._unitCube = CreateUnitCube();
+            this.TransferFunction = new TransferFunction();
         }
 
         #endregion
@@ -112,7 +115,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 传输函数
         /// </summary>
-        public TransferFunction TransferFunction { get; private set; }
+        public TransferFunction TransferFunction { get; }
         #endregion
 
         #region 体积渲染对象 —— VolumeRenderable Renderable
@@ -164,30 +167,6 @@ namespace MedicalSharp.Engine.Renderers
             this.StepSize = stepSize;
             this.MaxStepsCount = maxStepsCount;
             this.OpacityThreshold = opacityThreshold;
-        }
-        #endregion
-
-        #region 设置传输函数 —— void SetTransterFunction(TransferFunction transferFunction)
-        /// <summary>
-        /// 设置传输函数
-        /// </summary>
-        /// <param name="transferFunction">传输函数</param>
-        public void SetTransterFunction(TransferFunction transferFunction)
-        {
-            #region # 验证
-
-            if (transferFunction == null)
-            {
-                throw new ArgumentNullException(nameof(transferFunction), "传输函数不可为空！");
-            }
-            if (this.TransferFunction != null)
-            {
-                throw new InvalidOperationException("传输函数已设置，请尝试调整！");
-            }
-
-            #endregion
-
-            this.TransferFunction = transferFunction;
         }
         #endregion
 
@@ -328,26 +307,7 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         private static VertexBuffer CreateUnitCube()
         {
-            Vertex[] vertices =
-            [
-                new Vertex { Position = new Vector3(-0.5f, -0.5f, 0.5f) },
-                new Vertex { Position = new Vector3(0.5f, -0.5f, 0.5f) },
-                new Vertex { Position = new Vector3(0.5f, 0.5f, 0.5f) },
-                new Vertex { Position = new Vector3(-0.5f, 0.5f, 0.5f) },
-                new Vertex { Position = new Vector3(-0.5f, -0.5f, -0.5f) },
-                new Vertex { Position = new Vector3(0.5f, -0.5f, -0.5f) },
-                new Vertex { Position = new Vector3(0.5f, 0.5f, -0.5f) },
-                new Vertex { Position = new Vector3(-0.5f, 0.5f, -0.5f) }
-            ];
-            uint[] indices =
-            [
-                0,1,2, 2,3,0, 1,5,6, 6,2,1,
-                5,4,7, 7,6,5, 4,0,3, 3,7,4,
-                3,2,6, 6,7,3, 4,5,1, 1,0,4
-            ];
-
-            MeshGeometry geometry = new MeshGeometry(vertices, indices);
-            VertexBuffer vertexBuffer = new VertexBuffer(geometry);
+            VertexBuffer vertexBuffer = new VertexBuffer(ResourceManager.UnitCube);
             vertexBuffer.Setup();
 
             return vertexBuffer;

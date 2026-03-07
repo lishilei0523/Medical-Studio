@@ -32,7 +32,7 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 创建传输含税构造器
         /// </summary>
-        public TransferFunction()
+        internal TransferFunction()
         {
             this._textureData = new Vector4[TextureWidth];
             this._controlPoints = new List<TFControlPoint>();
@@ -56,6 +56,33 @@ namespace MedicalSharp.Engine.Resources
         #region # 方法
 
         //Public
+
+        #region 从控制点集初始化 —— void InitFromControlPoints(IEnumerable<TFControlPoint>...
+        /// <summary>
+        /// 从控制点集初始化
+        /// </summary>
+        /// <param name="controlPoints">控制点集</param>
+        public void InitFromControlPoints(IEnumerable<TFControlPoint> controlPoints)
+        {
+            #region # 验证
+
+            controlPoints = controlPoints?.ToArray() ?? [];
+            if (controlPoints == null || !controlPoints.Any())
+            {
+                throw new ArgumentNullException(nameof(controlPoints), "控制点集不可为空！");
+            }
+
+            #endregion
+
+            this._controlPoints.Clear();
+            foreach (TFControlPoint controlPoint in controlPoints)
+            {
+                this._controlPoints.Add(controlPoint);
+            }
+
+            this.UpdateTexture();
+        }
+        #endregion
 
         #region 添加控制点 —— void AddControlPoint(in TFControlPoint controlPoint)
         /// <summary>
@@ -88,74 +115,6 @@ namespace MedicalSharp.Engine.Resources
         public void ClearControlPoints()
         {
             this._controlPoints.Clear();
-            this.UpdateTexture();
-        }
-        #endregion
-
-        #region 初始化灰度预设 —— void InitializeGrayPreset()
-        /// <summary>
-        /// 初始化灰度预设
-        /// </summary>
-        public void InitializeGrayPreset()
-        {
-            this._controlPoints.Clear();
-            this._controlPoints.Add(new TFControlPoint(0.0f, new Vector4(0.0f, 0.0f, 0.0f, 0.0f)));
-            this._controlPoints.Add(new TFControlPoint(1.0f, new Vector4(1.0f, 1.0f, 1.0f, 1.0f)));
-
-            this.UpdateTexture();
-        }
-        #endregion
-
-        #region 初始化彩虹预设 —— void InitializeRainbowPreset()
-        /// <summary>
-        /// 初始化彩虹预设
-        /// </summary>
-        public void InitializeRainbowPreset()
-        {
-            this._controlPoints.Clear();
-            this._controlPoints.Add(new TFControlPoint(0.0f, new Vector4(0.0f, 0.0f, 0.5f, 0.0f)));
-            this._controlPoints.Add(new TFControlPoint(0.25f, new Vector4(0.0f, 0.5f, 1.0f, 0.3f)));
-            this._controlPoints.Add(new TFControlPoint(0.5f, new Vector4(0.0f, 1.0f, 0.5f, 0.6f)));
-            this._controlPoints.Add(new TFControlPoint(0.75f, new Vector4(1.0f, 1.0f, 0.0f, 0.8f)));
-            this._controlPoints.Add(new TFControlPoint(1.0f, new Vector4(1.0f, 0.0f, 0.0f, 1.0f)));
-
-            this.UpdateTexture();
-        }
-        #endregion
-
-        #region 初始化骨骼预设 —— void InitializeBonePreset()
-        /// <summary>
-        /// 初始化骨骼预设
-        /// </summary>
-        public void InitializeBonePreset()
-        {
-            this._controlPoints.Clear();
-
-            //完全透明背景（空气/背景）
-            this._controlPoints.Add(new TFControlPoint(0.00f, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)));
-            this._controlPoints.Add(new TFControlPoint(0.30f, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)));   //保持透明到30%
-
-            //软组织：极低透明度（几乎透明）
-            this._controlPoints.Add(new TFControlPoint(0.35f, new Vector4(0.3f, 0.3f, 0.3f, 0.005f)));  //0.5%透明度
-            this._controlPoints.Add(new TFControlPoint(0.40f, new Vector4(0.4f, 0.4f, 0.4f, 0.008f)));  //0.8%透明度
-            this._controlPoints.Add(new TFControlPoint(0.45f, new Vector4(0.5f, 0.5f, 0.5f, 0.010f)));  //1.0%透明度
-
-            //骨骼开始：陡峭变化
-            this._controlPoints.Add(new TFControlPoint(0.48f, new Vector4(0.7f, 0.6f, 0.5f, 0.02f)));   //过渡开始
-            this._controlPoints.Add(new TFControlPoint(0.50f, new Vector4(0.8f, 0.7f, 0.6f, 0.50f)));   //快速变不透明！
-            this._controlPoints.Add(new TFControlPoint(0.52f, new Vector4(0.9f, 0.8f, 0.7f, 0.85f)));   //非常不透明
-
-            //标准骨骼：高不透明度
-            this._controlPoints.Add(new TFControlPoint(0.55f, new Vector4(1.0f, 0.9f, 0.8f, 0.92f)));
-            this._controlPoints.Add(new TFControlPoint(0.60f, new Vector4(1.0f, 0.95f, 0.85f, 0.95f)));
-            this._controlPoints.Add(new TFControlPoint(0.65f, new Vector4(1.0f, 0.97f, 0.90f, 0.97f)));
-
-            //高密度骨骼：完全不透明
-            this._controlPoints.Add(new TFControlPoint(0.70f, new Vector4(1.0f, 0.98f, 0.93f, 0.98f)));
-            this._controlPoints.Add(new TFControlPoint(0.80f, new Vector4(1.0f, 1.0f, 0.96f, 0.99f)));
-            this._controlPoints.Add(new TFControlPoint(0.90f, new Vector4(1.0f, 1.0f, 0.98f, 0.995f)));
-            this._controlPoints.Add(new TFControlPoint(1.00f, new Vector4(1.0f, 1.0f, 1.0f, 1.000f)));
-
             this.UpdateTexture();
         }
         #endregion

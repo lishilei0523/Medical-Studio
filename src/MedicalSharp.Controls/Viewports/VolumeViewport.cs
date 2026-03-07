@@ -246,15 +246,13 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             //TODO 传输函数控制点依赖属性设计
-            TransferFunction transferFunction = new TransferFunction();
-            transferFunction.InitializeGrayPreset();
 
             //初始化体积渲染器
             this._volumeRenderer = new VolumeRenderer(this.Camera);
             this._volumeRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._volumeRenderer.SetMaterialOptions(this.Brightness, this.DensityScale);
             this._volumeRenderer.SetSamplingOptions(this.StepSize, this.MaxStepsCount, this.OpacityThreshold);
-            this._volumeRenderer.SetTransterFunction(transferFunction);
+            this._volumeRenderer.TransferFunction.InitFromControlPoints(ResourceManager.GrayControlPoints);
 
             //初始化线框渲染器
             this._wireframeRenderer = new WireframeRenderer(this.Camera);
