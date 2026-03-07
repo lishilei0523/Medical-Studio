@@ -109,11 +109,11 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             if (folders.Any())
             {
                 string dicomFolder = folders[0].Path.AbsolutePath;
-                VolumeData volumeData = await Task.Run(() => DicomLoader.LoadSeries(dicomFolder));
+                VolumeData volumeData = await Task.Run(() => DicomManager.LoadSeries(dicomFolder));
                 if (this.VolumeData != null)
                 {
+                    DicomManager.RemoveVolumeData(this.VolumeData.Id);
                     ResourceManager.RemoveTexture3D(this.VolumeData.Id);
-                    this.VolumeData.Dispose();
                 }
 
                 this.VolumeData = volumeData;

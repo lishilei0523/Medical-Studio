@@ -95,7 +95,7 @@ namespace MedicalSharp.Client
             }
 
             //初始化SimpleITK
-            DicomLoader.Initialize();
+            DicomManager.Initialize();
         }
         #endregion
 

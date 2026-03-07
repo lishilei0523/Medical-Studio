@@ -1,6 +1,5 @@
 ﻿using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Mathematics;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -16,7 +15,7 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 3D纹理字典
         /// </summary>
-        private static readonly IDictionary<Guid, Texture3D> _Texture3Ds;
+        private static readonly IDictionary<string, Texture3D> _Texture3Ds;
 
         /// <summary>
         /// 单位立方体
@@ -43,7 +42,7 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         static ResourceManager()
         {
-            _Texture3Ds = new ConcurrentDictionary<Guid, Texture3D>();
+            _Texture3Ds = new ConcurrentDictionary<string, Texture3D>();
             _UnitCube = GetUnitCube();
             _GrayControlPoints = GetGrayControlPoints();
             _RainbowControlPoints = GetRainbowControlPoints();
@@ -54,11 +53,11 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 属性
 
-        #region 只读属性 - 3D纹理字典 —— static IReadOnlyDictionary<Guid, Texture3D> Texture3Ds
+        #region 只读属性 - 3D纹理字典 —— static IReadOnlyDictionary<string, Texture3D> Texture3Ds
         /// <summary>
         /// 只读属性 - 3D纹理字典
         /// </summary>
-        public static IReadOnlyDictionary<Guid, Texture3D> Texture3Ds
+        public static IReadOnlyDictionary<string, Texture3D> Texture3Ds
         {
             get => _Texture3Ds.AsReadOnly();
         }
@@ -110,24 +109,24 @@ namespace MedicalSharp.Engine.Resources
 
         //Public
 
-        #region 添加3D纹理 —— static void AddTexture3D(Guid id, Texture3D texture3D)
+        #region 添加3D纹理 —— static void AddTexture3D(string id, Texture3D texture3D)
         /// <summary>
         /// 添加3D纹理
         /// </summary>
         /// <param name="id">标识Id</param>
         /// <param name="texture3D">3D纹理</param>
-        public static void AddTexture3D(Guid id, Texture3D texture3D)
+        public static void AddTexture3D(string id, Texture3D texture3D)
         {
             _Texture3Ds.Add(id, texture3D);
         }
         #endregion
 
-        #region 删除3D纹理 —— static void RemoveTexture3D(Guid id)
+        #region 删除3D纹理 —— static void RemoveTexture3D(string id)
         /// <summary>
         /// 删除3D纹理
         /// </summary>
         /// <param name="id">标识Id</param>
-        public static void RemoveTexture3D(Guid id)
+        public static void RemoveTexture3D(string id)
         {
             if (_Texture3Ds.Remove(id, out Texture3D texture3D))
             {

@@ -25,7 +25,7 @@ namespace MedicalSharp.Tests.TestCases
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                VolumeData volumeData = DicomLoader.LoadSeries(dicomFolder);
+                VolumeData volumeData = DicomManager.LoadSeries(dicomFolder);
 
                 stopwatch.Stop();
                 Trace.WriteLine(stopwatch.Elapsed);
