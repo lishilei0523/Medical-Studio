@@ -9,6 +9,8 @@ using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Engine.Cameras;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using System;
+using System.Reflection;
 
 namespace MedicalSharp.Controls.Base
 {
@@ -44,6 +46,11 @@ namespace MedicalSharp.Controls.Base
             InputManagerProperty = AvaloniaProperty.Register<OpenTKViewport, InputManager>(nameof(InputManager));
         }
 
+
+        /// <summary>
+        /// OpenGL上下文
+        /// </summary>
+        private IGlContext _glContext;
 
         /// <summary>
         /// FBO
@@ -96,6 +103,16 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
+        #region 只读属性 - OpenGL上下文 —— IGlContext GlContext
+        /// <summary>
+        /// 只读属性 - OpenGL上下文
+        /// </summary>
+        public IGlContext GlContext
+        {
+            get => this._glContext;
+        }
+        #endregion
+
         #region 只读属性 - FBO —— int FrameBufferId
         /// <summary>
         /// 只读属性 - FBO
@@ -131,6 +148,14 @@ namespace MedicalSharp.Controls.Base
         protected sealed override void OnOpenGlInit(GlInterface glInterface)
         {
             base.OnOpenGlInit(glInterface);
+
+            //获取OpenGL上下文
+            Type controlType = typeof(OpenGlControlBase);
+            FieldInfo resField = controlType.GetField("_resources", BindingFlags.NonPublic | BindingFlags.Instance);
+            object fieldValue = resField!.GetValue(this);
+            Type resType = fieldValue!.GetType();
+            PropertyInfo contextProperty = resType.GetProperty("Context");
+            this._glContext = (IGlContext)contextProperty!.GetValue(fieldValue);
 
             //加载OpenTK绑定
             AvaloniaBindingsContext bindingsContext = new AvaloniaBindingsContext(glInterface);

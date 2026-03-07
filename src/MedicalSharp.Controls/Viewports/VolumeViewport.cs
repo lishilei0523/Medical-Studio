@@ -2,11 +2,14 @@
 using Avalonia.Collections;
 using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Dicoms.Models;
 using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
+using MedicalSharp.Engine.Resources;
 using OpenTK.Graphics.OpenGL4;
 
 namespace MedicalSharp.Controls.Viewports
@@ -54,9 +57,9 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<float> OpacityThresholdProperty;
 
         /// <summary>
-        /// 体积渲染对象依赖属性
+        /// 体积数据依赖属性
         /// </summary>
-        public static readonly StyledProperty<VolumeRenderable> RenderableProperty;
+        public static readonly StyledProperty<VolumeData> VolumeDataProperty;
 
         /// <summary>
         /// 静态构造器
@@ -70,7 +73,7 @@ namespace MedicalSharp.Controls.Viewports
             StepSizeProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(StepSize), 0.0012f);
             MaxStepsCountProperty = AvaloniaProperty.Register<VolumeViewport, int>(nameof(MaxStepsCount), 1000);
             OpacityThresholdProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(OpacityThreshold), 0.99f);
-            RenderableProperty = AvaloniaProperty.Register<VolumeViewport, VolumeRenderable>(nameof(Renderable));
+            VolumeDataProperty = AvaloniaProperty.Register<VolumeViewport, VolumeData>(nameof(VolumeData));
 
             //属性改变事件
             WindowWidthProperty.Changed.AddClassHandler<VolumeViewport, float>(OnWindowWidthChanged);
@@ -80,8 +83,13 @@ namespace MedicalSharp.Controls.Viewports
             StepSizeProperty.Changed.AddClassHandler<VolumeViewport, float>(OnStepSizeChanged);
             MaxStepsCountProperty.Changed.AddClassHandler<VolumeViewport, int>(OnMaxStepsCountChanged);
             OpacityThresholdProperty.Changed.AddClassHandler<VolumeViewport, float>(OnOpacityThresholdChanged);
+            VolumeDataProperty.Changed.AddClassHandler<VolumeViewport, VolumeData>(OnVolumeDataChanged);
         }
 
+        /// <summary>
+        /// 体积渲染对象
+        /// </summary>
+        private VolumeRenderable _volumeRenderable;
 
         /// <summary>
         /// 体积渲染器
@@ -190,14 +198,14 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 体积渲染对象 —— VolumeRenderable Renderable
+        #region 依赖属性 - 体积数据 —— VolumeData VolumeData
         /// <summary>
-        /// 依赖属性 - 体积渲染对象
+        /// 依赖属性 - 体积数据
         /// </summary>
-        public VolumeRenderable Renderable
+        public VolumeData VolumeData
         {
-            get => this.GetValue(RenderableProperty);
-            set => this.SetValue(RenderableProperty, value);
+            get => this.GetValue(VolumeDataProperty);
+            set => this.SetValue(VolumeDataProperty, value);
         }
         #endregion
 
@@ -238,7 +246,10 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             //初始化体积渲染器
+            TransferFunction transferFunction = new TransferFunction();
+            transferFunction.InitializeGrayPreset();
             this._volumeRenderer = new VolumeRenderer(this.Camera);
+            this._volumeRenderer.SetTransterFunction(transferFunction);
 
             //初始化线框渲染器
             this._wireframeRenderer = new WireframeRenderer(this.Camera);
@@ -259,13 +270,25 @@ namespace MedicalSharp.Controls.Viewports
             //开启深度测试
             GL.Enable(EnableCap.DepthTest);
 
+            //启用混合
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
             //禁用面剔除
             GL.Disable(EnableCap.CullFace);
 
-            this._volumeRenderer.SetRenderable(this.Renderable);
-            this._volumeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+            if (this._volumeRenderable != null)
+            {
+                this.GlContext.MakeCurrent();
 
-            this._wireframeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+                this._volumeRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
+                this._volumeRenderer.SetMaterialOptions(this.Brightness, this.DensityScale);
+                this._volumeRenderer.SetSamplingOptions(this.StepSize, this.MaxStepsCount, this.OpacityThreshold);
+                this._volumeRenderer.SetRenderable(this._volumeRenderable);
+                this._volumeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+            }
+
+            //this._wireframeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
         }
         #endregion
 
@@ -347,6 +370,41 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnOpacityThresholdChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._volumeRenderer?.SetSamplingOptions(viewport.StepSize, viewport.MaxStepsCount, eventArgs.NewValue.Value);
+        }
+        #endregion
+
+        #region 体积数据改变事件 —— static void OnVolumeDataChanged(VolumeViewport viewport...
+        /// <summary>
+        /// 体积数据改变事件
+        /// </summary>
+        private static void OnVolumeDataChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<VolumeData> eventArgs)
+        {
+            #region # 验证
+
+            if (!eventArgs.NewValue.HasValue)
+            {
+                return;
+            }
+
+            #endregion
+
+            VolumeData volumeData = eventArgs.NewValue.Value;
+
+            if (!ResourceManager.Texture3Ds.ContainsKey(volumeData.Id))
+            {
+                viewport.GlContext.MakeCurrent();
+                Texture3D texture3D = new Texture3D();
+                texture3D.CreateFromVolume(volumeData.VoxelSize.Width, volumeData.VoxelSize.Height, volumeData.VoxelSize.Depth, volumeData.OriginalData);
+                viewport._volumeRenderable = new VolumeRenderable(texture3D, volumeData.VolumeScale.ToGlmVector3(), volumeData.RescaleSlope, volumeData.RescaleIntercept, volumeData.Origin.ToGlmVector3(), volumeData.RowDirection.ToGlmVector3(), volumeData.ColDirection.ToGlmVector3(), volumeData.SliceDirection.ToGlmVector3());
+
+                ResourceManager.AddTexture3D(volumeData.Id, texture3D);
+            }
+            else
+            {
+                Texture3D texture3D = ResourceManager.Texture3Ds[volumeData.Id];
+                viewport._volumeRenderable = new VolumeRenderable(texture3D, volumeData.VolumeScale.ToGlmVector3(), volumeData.RescaleSlope, volumeData.RescaleIntercept, volumeData.Origin.ToGlmVector3(), volumeData.RowDirection.ToGlmVector3(), volumeData.ColDirection.ToGlmVector3(), volumeData.SliceDirection.ToGlmVector3());
+            }
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 

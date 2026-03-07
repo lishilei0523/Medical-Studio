@@ -77,26 +77,26 @@ namespace MedicalSharp.Engine.Resources
 
             this.Width = width;
             this.Height = height;
-            this.Depth = height;
+            this.Depth = depth;
 
             //绑定纹理
-            GL.BindTexture(TextureTarget.ProxyTexture3D, base.Id);
+            GL.BindTexture(TextureTarget.Texture3D, base.Id);
 
             //设置默认纹理参数
-            GL.TexParameter(TextureTarget.ProxyTexture3D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-            GL.TexParameter(TextureTarget.ProxyTexture3D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-            GL.TexParameter(TextureTarget.ProxyTexture3D, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
-            GL.TexParameter(TextureTarget.ProxyTexture3D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
-            GL.TexParameter(TextureTarget.ProxyTexture3D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
             //分配纹理显存
-            GL.TexImage3D(TextureTarget.ProxyTexture3D, 0, PixelInternalFormat.R16Snorm, this.Width, this.Height, this.Depth, 0, PixelFormat.Red, PixelType.Short, originalData);
+            GL.TexImage3D(TextureTarget.Texture3D, 0, PixelInternalFormat.R16Snorm, this.Width, this.Height, this.Depth, 0, PixelFormat.Red, PixelType.Short, originalData);
 
             //检查错误
             CheckError("GL.TexImage3D");
 
             //解绑纹理
-            GL.BindTexture(TextureTarget.ProxyTexture3D, 0);
+            GL.BindTexture(TextureTarget.Texture3D, 0);
         }
         #endregion
 

@@ -18,6 +18,7 @@ namespace MedicalSharp.Dicoms.Models
         private VolumeData()
         {
             //默认值
+            this.Id = Guid.NewGuid();
             this.RescaleSlope = 1.0f;
             this.RescaleIntercept = 0.0f;
             this.WindowWidth = 400;
@@ -45,6 +46,13 @@ namespace MedicalSharp.Dicoms.Models
         #endregion
 
         #region # 属性
+
+        #region 标识Id —— Guid Id
+        /// <summary>
+        /// 标识Id
+        /// </summary>
+        public Guid Id { get; private set; }
+        #endregion
 
         #region 原始数据 —— IntPtr OriginalData
         /// <summary>

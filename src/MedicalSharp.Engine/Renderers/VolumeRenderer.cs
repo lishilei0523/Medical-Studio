@@ -344,6 +344,7 @@ namespace MedicalSharp.Engine.Renderers
 
             MeshGeometry geometry = new MeshGeometry(vertices, indices);
             VertexBuffer vertexBuffer = new VertexBuffer(geometry);
+            vertexBuffer.Setup();
 
             return vertexBuffer;
         }

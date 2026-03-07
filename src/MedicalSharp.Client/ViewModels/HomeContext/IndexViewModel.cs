@@ -45,14 +45,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 体积数据
         /// </summary>
+        [DependencyProperty]
         public VolumeData VolumeData { get; set; }
-        #endregion
-
-        #region 3D纹理 —— Texture3D Texture3D
-        /// <summary>
-        /// 3D纹理
-        /// </summary>
-        public Texture3D Texture3D { get; set; }
         #endregion
 
         #region 轨道相机 —— OrbitCamera Camera
@@ -117,8 +111,12 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 string dicomFolder = folders[0].Path.AbsolutePath;
                 VolumeData volumeData = await Task.Run(() => DicomLoader.LoadSeries(dicomFolder));
-                this.Texture3D = new Texture3D();
-                this.Texture3D.CreateFromVolume(volumeData.VoxelSize.Width, volumeData.VoxelSize.Height, volumeData.VoxelSize.Depth, volumeData.OriginalData);
+                if (this.VolumeData != null)
+                {
+                    ResourceManager.RemoveTexture3D(this.VolumeData.Id);
+                    this.VolumeData.Dispose();
+                }
+
                 this.VolumeData = volumeData;
             }
 
