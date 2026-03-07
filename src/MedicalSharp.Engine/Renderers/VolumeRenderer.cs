@@ -204,6 +204,10 @@ namespace MedicalSharp.Engine.Renderers
             {
                 throw new ArgumentNullException(nameof(renderable), "体积渲染对象不可为空！");
             }
+            if (renderable == this.Renderable)
+            {
+                return;
+            }
 
             #endregion
 

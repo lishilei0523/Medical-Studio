@@ -37,11 +37,6 @@
 					<ColumnDefinition />
 				</Grid.ColumnDefinitions>
 				<Grid Grid.Column="0">
-					<!--<sd:WireframeViewport Background="LightGray"
-					Camera="{Binding Camera}">
-					<sd:BoundingBoxVisual3D Width="2" Height="1" Depth="3" Center="1,0,0" Stroke="DeepSkyBlue" />
-					<sd:BoundingBoxVisual3D Width="1" Height="2" Depth="3" Center="-1,0,0" Stroke="Red" />
-					</sd:WireframeViewport>-->
 					<sd:VolumeViewport Background="Black" Camera="{Binding Camera}" VolumeData="{Binding VolumeData}">
 
 					</sd:VolumeViewport>

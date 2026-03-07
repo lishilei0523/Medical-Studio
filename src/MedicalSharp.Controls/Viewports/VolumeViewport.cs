@@ -245,10 +245,15 @@ namespace MedicalSharp.Controls.Viewports
                 this.InputManager = new OrbitInputManager(orbitCamera);
             }
 
-            //初始化体积渲染器
+            //TODO 传输函数控制点依赖属性设计
             TransferFunction transferFunction = new TransferFunction();
             transferFunction.InitializeGrayPreset();
+
+            //初始化体积渲染器
             this._volumeRenderer = new VolumeRenderer(this.Camera);
+            this._volumeRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
+            this._volumeRenderer.SetMaterialOptions(this.Brightness, this.DensityScale);
+            this._volumeRenderer.SetSamplingOptions(this.StepSize, this.MaxStepsCount, this.OpacityThreshold);
             this._volumeRenderer.SetTransterFunction(transferFunction);
 
             //初始化线框渲染器
@@ -279,11 +284,6 @@ namespace MedicalSharp.Controls.Viewports
 
             if (this._volumeRenderable != null)
             {
-                this.GlContext.MakeCurrent();
-
-                this._volumeRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
-                this._volumeRenderer.SetMaterialOptions(this.Brightness, this.DensityScale);
-                this._volumeRenderer.SetSamplingOptions(this.StepSize, this.MaxStepsCount, this.OpacityThreshold);
                 this._volumeRenderer.SetRenderable(this._volumeRenderable);
                 this._volumeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
             }
@@ -383,13 +383,13 @@ namespace MedicalSharp.Controls.Viewports
 
             if (!eventArgs.NewValue.HasValue)
             {
+                //TODO 卸载数据，黑屏处理，停止渲染
                 return;
             }
 
             #endregion
 
             VolumeData volumeData = eventArgs.NewValue.Value;
-
             if (!ResourceManager.Texture3Ds.ContainsKey(volumeData.Id))
             {
                 viewport.GlContext.MakeCurrent();

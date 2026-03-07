@@ -93,7 +93,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 打开序列
         /// </summary>
-        /// <returns></returns>
         public async Task OpenSeries()
         {
             this.Busy();
