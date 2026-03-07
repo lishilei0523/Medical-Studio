@@ -27,7 +27,8 @@ namespace MedicalSharp.Engine.Renderers
         public VolumeRenderer()
         {
             //默认值
-            this._unitCube = CreateUnitCube();
+            this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
+            this._unitCube.Setup();
             this.TransferFunction = new TransferFunction();
             this.InitShaderProgram();
         }
@@ -40,7 +41,8 @@ namespace MedicalSharp.Engine.Renderers
             : base(camera)
         {
             //默认值
-            this._unitCube = CreateUnitCube();
+            this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
+            this._unitCube.Setup();
             this.TransferFunction = new TransferFunction();
             this.InitShaderProgram();
         }
@@ -54,7 +56,8 @@ namespace MedicalSharp.Engine.Renderers
             : base(camera, program)
         {
             //默认值
-            this._unitCube = CreateUnitCube();
+            this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
+            this._unitCube.Setup();
             this.TransferFunction = new TransferFunction();
         }
 
@@ -298,19 +301,6 @@ namespace MedicalSharp.Engine.Renderers
             base.Program.ReadVertexShaderFromFile("Shaders/GLSLs/raycast.vert");
             base.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/raycast.frag");
             base.Program.Build();
-        }
-        #endregion 
-
-        #region 创建单位立方体 —— static VertexBuffer CreateUnitCube()
-        /// <summary>
-        /// 创建单位立方体
-        /// </summary>
-        private static VertexBuffer CreateUnitCube()
-        {
-            VertexBuffer vertexBuffer = new VertexBuffer(ResourceManager.UnitCube);
-            vertexBuffer.Setup();
-
-            return vertexBuffer;
         }
         #endregion 
 

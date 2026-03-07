@@ -57,7 +57,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="data">纹理数据</param>
         public void Update(PixelFormat pixelFormat, PixelType pixelType, IntPtr data)
         {
-            if (base.Id == 0 || data == IntPtr.Zero)
+            if (data == IntPtr.Zero)
             {
                 return;
             }

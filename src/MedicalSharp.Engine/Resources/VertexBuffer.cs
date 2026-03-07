@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Engine.ValueTypes;
+using Microsoft.CSharp.RuntimeBinder;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Runtime.InteropServices;
@@ -37,9 +38,30 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         private VertexBuffer()
         {
-            this._vao = GL.GenVertexArray();
-            this._vbo = GL.GenBuffer();
-            this._ebo = GL.GenBuffer();
+            int vao = GL.GenVertexArray();
+            int vbo = GL.GenBuffer();
+            int ebo = GL.GenBuffer();
+
+            #region # 验证
+
+            if (vao == 0)
+            {
+                throw new RuntimeBinderException("创建VAO失败！");
+            }
+            if (vbo == 0)
+            {
+                throw new RuntimeBinderException("创建VBO失败！");
+            }
+            if (ebo == 0)
+            {
+                throw new RuntimeBinderException("创建EBO失败！");
+            }
+
+            #endregion
+
+            this._vao = vao;
+            this._vbo = vbo;
+            this._ebo = ebo;
             this._initialized = false;
         }
 

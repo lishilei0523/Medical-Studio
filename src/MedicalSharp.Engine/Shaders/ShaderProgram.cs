@@ -18,7 +18,18 @@ namespace MedicalSharp.Engine.Shaders
         /// </summary>
         public ShaderProgram()
         {
-            this.Id = GL.CreateProgram();
+            int programId = GL.CreateProgram();
+
+            #region # 验证
+
+            if (programId == 0)
+            {
+                throw new RuntimeBinderException("创建Shader程序失败！");
+            }
+
+            #endregion
+
+            this.Id = programId;
         }
 
         /// <summary>

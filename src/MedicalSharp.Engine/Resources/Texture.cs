@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using Microsoft.CSharp.RuntimeBinder;
+using OpenTK.Graphics.OpenGL4;
 using System;
 using System.ComponentModel.Design;
 
@@ -16,7 +17,18 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         protected Texture()
         {
-            this.Id = GL.GenTexture();
+            int textureId = GL.GenTexture();
+
+            #region # 验证
+
+            if (textureId == 0)
+            {
+                throw new RuntimeBinderException("创建纹理失败！");
+            }
+
+            #endregion
+
+            this.Id = textureId;
         }
 
         #endregion

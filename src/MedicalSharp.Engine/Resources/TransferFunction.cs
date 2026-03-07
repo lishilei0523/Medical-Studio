@@ -47,7 +47,7 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 1D纹理
         /// </summary>
-        public Texture1D Texture1D { get; private set; }
+        internal Texture1D Texture1D { get; private set; }
 
         #endregion
 
