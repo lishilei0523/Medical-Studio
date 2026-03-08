@@ -1,5 +1,5 @@
 #version 330 core
-layout(location = 0) in vec3 aPosition;
+layout(location = 0) in vec3 aPos;
 
 out vec3 vWorldPos;
 out vec3 vTexCoord;
@@ -15,7 +15,7 @@ uniform int u_PlaneType;  //0=axial, 1=coronal, 2=sagittal
 void main() 
 {
     //创建切片平面（根据平面类型调整位置）
-    vec3 slicePosition = aPosition;
+    vec3 slicePosition = aPos;
     
     //轴向面
     if (u_PlaneType == 0)
@@ -37,7 +37,7 @@ void main()
     vWorldPos = worldPos.xyz;
     
     //纹理坐标（从局部空间转换）
-    vTexCoord = aPosition + 0.5;
+    vTexCoord = aPos + 0.5;
     
     gl_Position = u_ProjectionMatrix * u_ViewMatrix * worldPos;
 }
