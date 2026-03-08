@@ -23,6 +23,11 @@ namespace MedicalSharp.Engine.Resources
         private static readonly MeshGeometry _UnitCube;
 
         /// <summary>
+        /// 单位平面
+        /// </summary>
+        private static readonly MeshGeometry _UnitPlane;
+
+        /// <summary>
         /// 灰度控制点集
         /// </summary>
         private static readonly TFControlPoint[] _GrayControlPoints;
@@ -44,6 +49,7 @@ namespace MedicalSharp.Engine.Resources
         {
             _Texture3Ds = new ConcurrentDictionary<string, Texture3D>();
             _UnitCube = GetUnitCube();
+            _UnitPlane = GetUnitPlane();
             _GrayControlPoints = GetGrayControlPoints();
             _RainbowControlPoints = GetRainbowControlPoints();
             _BoneControlPoints = GetBoneControlPoints();
@@ -70,6 +76,16 @@ namespace MedicalSharp.Engine.Resources
         public static MeshGeometry UnitCube
         {
             get => _UnitCube;
+        }
+        #endregion 
+
+        #region 只读属性 - 单位平面 —— static MeshGeometry UnitPlane
+        /// <summary>
+        /// 只读属性 - 单位平面
+        /// </summary>
+        public static MeshGeometry UnitPlane
+        {
+            get => _UnitPlane;
         }
         #endregion 
 
@@ -161,6 +177,55 @@ namespace MedicalSharp.Engine.Resources
                 0,1,2, 2,3,0, 1,5,6, 6,2,1,
                 5,4,7, 7,6,5, 4,0,3, 3,7,4,
                 3,2,6, 6,7,3, 4,5,1, 1,0,4
+            ];
+
+            MeshGeometry geometry = new MeshGeometry(vertices, indices);
+
+            return geometry;
+        }
+        #endregion
+
+        #region 获取单位平面 —— static MeshGeometry GetUnitPlane()
+        /// <summary>
+        /// 获取单位平面
+        /// </summary>
+        /// <returns>网格几何</returns>
+        private static MeshGeometry GetUnitPlane()
+        {
+            //单位平面的顶点（包含纹理坐标）
+            Vertex[] vertices =
+            [
+                //位置(-0.5, -0.5, 0), 纹理坐标(0,0)
+                new Vertex
+                {
+                    Position = new Vector3(-0.5f, -0.5f, 0),
+                    TextureCoord = new Vector2(0, 0)
+                },
+                //位置(0.5, -0.5, 0), 纹理坐标(1,0)
+                new Vertex
+                {
+                    Position = new Vector3(0.5f, -0.5f, 0),
+                    TextureCoord = new Vector2(1, 0)
+                },
+                //位置(0.5, 0.5, 0), 纹理坐标(1,1)
+                new Vertex
+                {
+                    Position = new Vector3(0.5f, 0.5f, 0),
+                    TextureCoord = new Vector2(1, 1)
+                },
+                //位置(-0.5, 0.5, 0), 纹理坐标(0,1)
+                new Vertex
+                {
+                    Position = new Vector3(-0.5f, 0.5f, 0),
+                    TextureCoord = new Vector2(0, 1)
+                }
+            ];
+
+            //索引（两个三角形构成一个平面）
+            uint[] indices =
+            [
+                0, 1, 2,  //第一个三角形
+                2, 3, 0   //第二个三角形
             ];
 
             MeshGeometry geometry = new MeshGeometry(vertices, indices);
