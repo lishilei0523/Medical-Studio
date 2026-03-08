@@ -1,7 +1,7 @@
 ﻿namespace MedicalSharp.Engine.ValueTypes
 {
     /// <summary>
-    /// MPR平面
+    /// MPR平面类型
     /// </summary>
     public enum MPRPlaneType : byte
     {
@@ -21,6 +21,11 @@
         /// 矢状面
         /// </summary>
         /// <remarks>YZ平面</remarks>
-        Sagittal = 2
+        Sagittal = 2,
+
+        /// <summary>
+        /// 斜切面
+        /// </summary>
+        Oblique = 3
     }
 }
