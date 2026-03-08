@@ -2,7 +2,6 @@
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Engine.Shaders;
-using MedicalSharp.Engine.ValueTypes;
 using System;
 
 namespace MedicalSharp.Engine.Renderers
@@ -27,7 +26,6 @@ namespace MedicalSharp.Engine.Renderers
             //默认值
             this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
             this._unitPlane.Setup();
-            this.InterpolationMode = InterpolationMode.Linear;
             this.TransferFunction = new TransferFunction();
             this.InitShaderProgram();
         }
@@ -42,7 +40,6 @@ namespace MedicalSharp.Engine.Renderers
             //默认值
             this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
             this._unitPlane.Setup();
-            this.InterpolationMode = InterpolationMode.Linear;
             this.TransferFunction = new TransferFunction();
             this.InitShaderProgram();
         }
@@ -58,7 +55,6 @@ namespace MedicalSharp.Engine.Renderers
             //默认值
             this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
             this._unitPlane.Setup();
-            this.InterpolationMode = InterpolationMode.Linear;
             this.TransferFunction = new TransferFunction();
         }
 
@@ -99,13 +95,6 @@ namespace MedicalSharp.Engine.Renderers
         /// 反转灰度
         /// </summary>
         public bool InvertGrayscale { get; private set; }
-        #endregion
-
-        #region 插值模式 —— InterpolationMode InterpolationMode
-        /// <summary>
-        /// 插值模式
-        /// </summary>
-        public InterpolationMode InterpolationMode { get; private set; }
         #endregion
 
         #region 传输函数 —— TransferFunction TransferFunction
@@ -153,17 +142,6 @@ namespace MedicalSharp.Engine.Renderers
             this.Brightness = brightness;
             this.Contrast = contrast;
             this.InvertGrayscale = invertGrayscale;
-        }
-        #endregion
-
-        #region 设置插值模式 —— void SetInterpolationMode(InterpolationMode interpolationMode)
-        /// <summary>
-        /// 设置插值模式
-        /// </summary>
-        /// <param name="interpolationMode">插值模式</param>
-        public void SetInterpolationMode(InterpolationMode interpolationMode)
-        {
-            this.InterpolationMode = interpolationMode;
         }
         #endregion
 
