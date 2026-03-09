@@ -2,6 +2,9 @@
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Engine.Shaders;
+using MedicalSharp.Engine.ValueTypes;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using System;
 
 namespace MedicalSharp.Engine.Renderers
@@ -21,20 +24,8 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 创建MPR渲染器构造器
         /// </summary>
-        public MPRRenderer()
-        {
-            //默认值
-            this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
-            this._unitPlane.Setup();
-            this.TransferFunction = new TransferFunction();
-            this.InitShaderProgram();
-        }
-
-        /// <summary>
-        /// 创建MPR渲染器构造器
-        /// </summary>
         /// <param name="camera">相机</param>
-        public MPRRenderer(Camera camera)
+        public MPRRenderer(MPRCamera camera)
             : base(camera)
         {
             //默认值
@@ -49,7 +40,7 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         /// <param name="camera">相机</param>
         /// <param name="program">Shader程序</param>
-        public MPRRenderer(Camera camera, ShaderProgram program)
+        public MPRRenderer(MPRCamera camera, ShaderProgram program)
             : base(camera, program)
         {
             //默认值
@@ -109,13 +100,46 @@ namespace MedicalSharp.Engine.Renderers
         /// 体积渲染对象
         /// </summary>
         public VolumeRenderable Renderable { get; private set; }
-        #endregion 
+        #endregion
+
+        #region 只读属性 - MPR相机 —— MPRCamera MPRCamera
+        /// <summary>
+        /// 只读属性 - MPR相机
+        /// </summary>
+        public MPRCamera MPRCamera
+        {
+            get
+            {
+                if (base.Camera == null)
+                {
+                    return null;
+                }
+
+                return (MPRCamera)base.Camera;
+            }
+        }
+        #endregion
 
         #endregion
 
         #region # 方法
 
         //Public
+
+        #region 设置相机 —— void SetCamera(MPRCamera camera)
+        /// <summary>
+        /// 设置相机
+        /// </summary>
+        public void SetCamera(MPRCamera camera)
+        {
+            base.SetCamera(camera);
+
+            if (this.Renderable != null)
+            {
+                this.UpdateCameraFromRenderable();
+            }
+        }
+        #endregion
 
         #region 设置窗宽窗位 —— void SetWindowLevel(float windowWidth, float windowCenter)
         /// <summary>
@@ -166,6 +190,11 @@ namespace MedicalSharp.Engine.Renderers
             #endregion
 
             this.Renderable = renderable;
+
+            if (this.MPRCamera != null)
+            {
+                this.UpdateCameraFromRenderable();
+            }
         }
         #endregion
 
@@ -177,7 +206,69 @@ namespace MedicalSharp.Engine.Renderers
         /// <param name="viewportHeight">视口高度</param>
         public override void RenderFrame(float viewportWidth, float viewportHeight)
         {
-            //TODO 实现
+            #region 验证
+
+            if (viewportWidth <= 0 || viewportHeight <= 0)
+            {
+                return;
+            }
+            if (this.Program == null)
+            {
+                throw new InvalidOperationException("Shader程序不可为空！");
+            }
+            if (this.Camera == null)
+            {
+                throw new InvalidOperationException("相机不可为空！");
+            }
+
+            #endregion
+
+            //设置相机视口
+            this.Camera.SetViewportSize(viewportWidth, viewportHeight);
+
+            //使用Shader
+            this.Program.Use();
+
+            //设置Uniform变量
+            this.Program.SetUniformMatrix("u_ModelMatrix", this.GetPlaneModelMatrix());
+            this.Program.SetUniformMatrix("u_ViewMatrix", this.Camera.ViewMatrix);
+            this.Program.SetUniformMatrix("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
+
+            this.Program.SetUniformVector3("u_TextureSize", this.Renderable.VoxelSize);
+            this.Program.SetUniformFloat("u_SliceIndex", this.MPRCamera.SliceIndex);
+            this.Program.SetUniformInt("u_PlaneType", (int)this.MPRCamera.PlaneType);
+
+            this.Program.SetUniformFloat("u_WindowWidth", this.WindowWidth);
+            this.Program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
+            this.Program.SetUniformFloat("u_Brightness", this.Brightness);
+            this.Program.SetUniformFloat("u_Contrast", this.Contrast);
+            this.Program.SetUniformBoolean("u_InvertGrayscale", this.InvertGrayscale);
+
+            this.Program.SetUniformFloat("u_RescaleSlope", this.Renderable.RescaleSlope);
+            this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
+
+            this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
+
+            //绑定纹理
+            this.Renderable.VolumeTexture.Bind(0);
+            this.Program.SetUniformInt("u_VolumeTexture", 0);
+
+            //设置纹理参数
+            this.SetTextureParameters();
+
+            //绘制平面
+            this._unitPlane.Draw(PrimitiveType.Triangles);
+
+            //解绑纹理
+            this.Renderable.VolumeTexture.Unbind();
+
+            //取消使用Shader
+            this.Program.Unuse();
+
+            // 触发渲染事件
+            RenderContext context = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+
+            this.Renderable.OnRender(this.Program, context);
         }
         #endregion
 
@@ -208,7 +299,123 @@ namespace MedicalSharp.Engine.Renderers
             base.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/mpr.frag");
             base.Program.Build();
         }
-        #endregion  
+        #endregion
+
+        #region 根据渲染对象更新相机参数 —— void UpdateCameraFromRenderable()
+        /// <summary>
+        /// 根据渲染对象更新相机参数
+        /// </summary>
+        private void UpdateCameraFromRenderable()
+        {
+            #region # 验证
+
+            if (this.Renderable?.VolumeTexture == null || this.MPRCamera == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            //设置目标位置为图像原点
+            this.MPRCamera.TargetPosition = this.Renderable.Origin;
+
+            //根据平面类型设置最大切片数
+            int maxSliceCount = this.MPRCamera.PlaneType switch
+            {
+                MPRPlaneType.Axial => this.Renderable.VolumeTexture.Depth,
+                MPRPlaneType.Coronal => this.Renderable.VolumeTexture.Height,
+                MPRPlaneType.Sagittal => this.Renderable.VolumeTexture.Width,
+                _ => 100
+            };
+
+            this.MPRCamera.MaxSliceCount = maxSliceCount;
+
+            //设置切片间距为体素间距
+            float sliceSpacing = this.MPRCamera.PlaneType switch
+            {
+                MPRPlaneType.Axial => this.Renderable.Spacing.Z,
+                MPRPlaneType.Coronal => this.Renderable.Spacing.Y,
+                MPRPlaneType.Sagittal => this.Renderable.Spacing.X,
+                _ => 1.0f
+            };
+
+            this.MPRCamera.SliceSpacing = sliceSpacing;
+            this.MPRCamera.SliceIndex = maxSliceCount / 2;
+        }
+        #endregion
+
+        #region 设置纹理参数 —— void SetTextureParameters()
+        /// <summary>
+        /// 设置纹理参数
+        /// </summary>
+        private void SetTextureParameters()
+        {
+            #region # 验证
+
+            if (this.Renderable?.VolumeTexture == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            //设置包裹模式
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToBorder);
+
+            //使用线性插值获得平滑切片
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+            //设置边框颜色
+            float[] borderColor = [0.0f, 0.0f, 0.0f, 0.0f];
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureBorderColor, borderColor);
+        }
+        #endregion
+
+        #region 获取平面模型矩阵 —— Matrix4 GetPlaneModelMatrix()
+        /// <summary>
+        /// 获取平面模型矩阵
+        /// </summary>
+        private Matrix4 GetPlaneModelMatrix()
+        {
+            #region # 验证
+
+            if (this.Renderable?.VolumeTexture == null)
+            {
+                return Matrix4.Identity;
+            }
+
+            #endregion
+
+            //构建方向矩阵
+            Matrix4 orientationMatrix = new Matrix4(
+                new Vector4(this.Renderable.RowDirection, 0),
+                new Vector4(this.Renderable.ColDirection, 0),
+                new Vector4(this.Renderable.SliceDirection, 0),
+                new Vector4(0, 0, 0, 1)
+            );
+
+            //根据平面类型构建缩放和旋转
+            Matrix4 planeTransform = this.MPRCamera.PlaneType switch
+            {
+                MPRPlaneType.Axial =>       //XY平面
+                    Matrix4.CreateScale(this.Renderable.VolumeScale.X, this.Renderable.VolumeScale.Y, 1),
+                MPRPlaneType.Coronal =>     //XZ平面
+                    Matrix4.CreateRotationX(MathHelper.DegreesToRadians(90.0f)) *
+                    Matrix4.CreateScale(this.Renderable.VolumeScale.X, this.Renderable.VolumeScale.Z, 1),
+                MPRPlaneType.Sagittal =>    //YZ平面
+                    Matrix4.CreateRotationY(MathHelper.DegreesToRadians(90.0f)) *
+                    Matrix4.CreateRotationX(MathHelper.DegreesToRadians(90.0f)) *
+                    Matrix4.CreateScale(this.Renderable.VolumeScale.Y, this.Renderable.VolumeScale.Z, 1),
+                _ => Matrix4.Identity
+            };
+
+            //组合变换：方向 * 平面变换 * 平移
+            return orientationMatrix * planeTransform * Matrix4.CreateTranslation(this.Renderable.Origin);
+        }
+        #endregion
 
         #endregion
     }

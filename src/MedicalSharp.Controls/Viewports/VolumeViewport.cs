@@ -475,7 +475,7 @@ namespace MedicalSharp.Controls.Viewports
                 viewport.GlContext.MakeCurrent();
                 Texture3D volumeTexture = new Texture3D();
                 volumeTexture.CreateFromVolume(volumeData.VoxelSize.Width, volumeData.VoxelSize.Height, volumeData.VoxelSize.Depth, volumeData.OriginalData);
-                viewport._volumeRenderable = new VolumeRenderable(volumeTexture, volumeData.VolumeScale.ToGlmVector3(), volumeData.RescaleSlope, volumeData.RescaleIntercept, volumeData.Origin.ToGlmVector3(), volumeData.RowDirection.ToGlmVector3(), volumeData.ColDirection.ToGlmVector3(), volumeData.SliceDirection.ToGlmVector3());
+                viewport._volumeRenderable = new VolumeRenderable(volumeTexture, volumeData.VoxelSize.ToGlmVector3(), volumeData.Spacing.ToGlmVector3(), volumeData.ActualSize.ToGlmVector3(), volumeData.VolumeScale.ToGlmVector3(), volumeData.RescaleSlope, volumeData.RescaleIntercept, volumeData.Origin.ToGlmVector3(), volumeData.RowDirection.ToGlmVector3(), volumeData.ColDirection.ToGlmVector3(), volumeData.SliceDirection.ToGlmVector3());
                 viewport.WindowWidth = volumeData.WindowWidth;
                 viewport.WindowCenter = volumeData.WindowCenter;
 
@@ -484,7 +484,7 @@ namespace MedicalSharp.Controls.Viewports
             else
             {
                 Texture3D volumeTexture = ResourceManager.Texture3Ds[volumeData.Id];
-                viewport._volumeRenderable = new VolumeRenderable(volumeTexture, volumeData.VolumeScale.ToGlmVector3(), volumeData.RescaleSlope, volumeData.RescaleIntercept, volumeData.Origin.ToGlmVector3(), volumeData.RowDirection.ToGlmVector3(), volumeData.ColDirection.ToGlmVector3(), volumeData.SliceDirection.ToGlmVector3());
+                viewport._volumeRenderable = new VolumeRenderable(volumeTexture, volumeData.VoxelSize.ToGlmVector3(), volumeData.Spacing.ToGlmVector3(), volumeData.ActualSize.ToGlmVector3(), volumeData.VolumeScale.ToGlmVector3(), volumeData.RescaleSlope, volumeData.RescaleIntercept, volumeData.Origin.ToGlmVector3(), volumeData.RowDirection.ToGlmVector3(), volumeData.ColDirection.ToGlmVector3(), volumeData.SliceDirection.ToGlmVector3());
                 viewport.WindowWidth = volumeData.WindowWidth;
                 viewport.WindowCenter = volumeData.WindowCenter;
             }

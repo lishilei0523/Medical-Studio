@@ -42,36 +42,6 @@ namespace MedicalSharp.Engine.Cameras
         private Matrix4 _projectionMatrix;
 
         /// <summary>
-        /// 平面类型
-        /// </summary>
-        private MPRPlaneType _planeType;
-
-        /// <summary>
-        /// 切片索引
-        /// </summary>
-        private int _sliceIndex;
-
-        /// <summary>
-        /// 最大切片数
-        /// </summary>
-        private int _maxSliceCount;
-
-        /// <summary>
-        /// 切片间距
-        /// </summary>
-        private float _sliceSpacing;
-
-        /// <summary>
-        /// 视口缩放比例
-        /// </summary>
-        private float _zoomFactor;
-
-        /// <summary>
-        /// 平移偏移量
-        /// </summary>
-        private Vector2 _panOffset;
-
-        /// <summary>
         /// 创建MPR相机构造器
         /// </summary>
         /// <param name="planeType">平面类型</param>
@@ -80,6 +50,7 @@ namespace MedicalSharp.Engine.Cameras
         public MPRCamera(MPRPlaneType planeType = MPRPlaneType.Axial, float nearPlaneDistance = -1000.0f, float farPlaneDistance = 1000.0f)
             : base(nearPlaneDistance, farPlaneDistance)
         {
+            this._targetPosition = Vector3.Zero;
             this._planeType = planeType;
             this._sliceIndex = 0;
             this._maxSliceCount = 100;
@@ -137,7 +108,35 @@ namespace MedicalSharp.Engine.Cameras
         public override Matrix4 ViewMatrix => this._viewMatrix;
         #endregion
 
+        #region 目标位置 —— Vector3 TargetPosition
+        /// <summary>
+        /// 目标位置
+        /// </summary>
+        private Vector3 _targetPosition;
+
+        /// <summary>
+        /// 目标位置
+        /// </summary>
+        public Vector3 TargetPosition
+        {
+            get => this._targetPosition;
+            set
+            {
+                if (this._targetPosition != value)
+                {
+                    this._targetPosition = value;
+                    this.UpdateViewMatrix();
+                }
+            }
+        }
+        #endregion
+
         #region 平面类型 —— MPRPlaneType PlaneType
+        /// <summary>
+        /// 平面类型
+        /// </summary>
+        private MPRPlaneType _planeType;
+
         /// <summary>
         /// 平面类型
         /// </summary>
@@ -160,6 +159,11 @@ namespace MedicalSharp.Engine.Cameras
         /// <summary>
         /// 切片索引
         /// </summary>
+        private int _sliceIndex;
+
+        /// <summary>
+        /// 切片索引
+        /// </summary>
         public int SliceIndex
         {
             get => this._sliceIndex;
@@ -169,13 +173,18 @@ namespace MedicalSharp.Engine.Cameras
                 if (this._sliceIndex != newIndex)
                 {
                     this._sliceIndex = newIndex;
-                    this.UpdateMatrices();
+                    this.UpdateViewMatrix();
                 }
             }
         }
         #endregion
 
         #region 最大切片数 —— int MaxSliceCount
+        /// <summary>
+        /// 最大切片数
+        /// </summary>
+        private int _maxSliceCount;
+
         /// <summary>
         /// 最大切片数
         /// </summary>
@@ -188,13 +197,18 @@ namespace MedicalSharp.Engine.Cameras
                 {
                     this._maxSliceCount = value;
                     this._sliceIndex = MathHelper.Clamp(this._sliceIndex, 0, this._maxSliceCount - 1);
-                    this.UpdateMatrices();
+                    this.UpdateViewMatrix();
                 }
             }
         }
         #endregion
 
         #region 切片间距 —— float SliceSpacing
+        /// <summary>
+        /// 切片间距
+        /// </summary>
+        private float _sliceSpacing;
+
         /// <summary>
         /// 切片间距
         /// </summary>
@@ -206,13 +220,18 @@ namespace MedicalSharp.Engine.Cameras
                 if (!this._sliceSpacing.Equals(value) && value > 0)
                 {
                     this._sliceSpacing = value;
-                    this.UpdateMatrices();
+                    this.UpdateViewMatrix();
                 }
             }
         }
         #endregion
 
         #region 缩放因子 —— float ZoomFactor
+        /// <summary>
+        /// 缩放因子
+        /// </summary>
+        private float _zoomFactor;
+
         /// <summary>
         /// 缩放因子
         /// </summary>
@@ -231,6 +250,11 @@ namespace MedicalSharp.Engine.Cameras
         #endregion
 
         #region 平移偏移量 —— Vector2 PanOffset
+        /// <summary>
+        /// 平移偏移量
+        /// </summary>
+        private Vector2 _panOffset;
+
         /// <summary>
         /// 平移偏移量
         /// </summary>
@@ -275,7 +299,7 @@ namespace MedicalSharp.Engine.Cameras
         public void Zoom(float delta)
         {
             this._zoomFactor *= (1.0f + delta * 0.1f);
-            this._zoomFactor = Math.Max(0.1f, this._zoomFactor);
+            this._zoomFactor = Math.Max(0.1f, Math.Min(10.0f, this._zoomFactor));
             this.UpdateProjectionMatrix();
         }
         #endregion
@@ -287,19 +311,26 @@ namespace MedicalSharp.Engine.Cameras
         /// <param name="delta">平移增量</param>
         public void Pan(Vector2 delta)
         {
-            this._panOffset += delta * (2.0f / this._zoomFactor);
+            // 将屏幕空间平移转换为世界空间
+            float aspect = this._viewportWidth / this._viewportHeight;
+            float worldSize = 10.0f / this._zoomFactor; // 基础世界大小
+
+            Vector2 worldDelta = new Vector2(delta.X * worldSize * aspect, delta.Y * worldSize);
+
+            this._panOffset += worldDelta;
             this.UpdateProjectionMatrix();
         }
         #endregion
 
-        #region 重置相机位置 —— void Reset()
+        #region 重置相机 —— void Reset()
         /// <summary>
-        /// 重置相机位置
+        /// 重置相机
         /// </summary>
         public void Reset()
         {
             this._zoomFactor = 1.0f;
             this._panOffset = Vector2.Zero;
+            this._targetPosition = Vector3.Zero;
             this._sliceIndex = this._maxSliceCount / 2;
             this.UpdateMatrices();
         }
@@ -317,21 +348,21 @@ namespace MedicalSharp.Engine.Cameras
             switch (this._planeType)
             {
                 case MPRPlaneType.Axial:    //横断面 - 从上往下看
-                    this._cameraPosition = new Vector3(0, 1000, 0); //位于Y轴正方向
+                    this._cameraPosition = new Vector3(0, 10, 0);   //位于Y轴正方向
                     this._lookDirection = new Vector3(0, -1, 0);    //看向Y轴负方向
                     this._upDirection = new Vector3(0, 0, 1);       //Z轴向上
                     this._rightDirection = new Vector3(1, 0, 0);    //X轴向右
                     break;
 
                 case MPRPlaneType.Coronal:  //冠状面 - 从前向后看
-                    this._cameraPosition = new Vector3(0, 0, 1000); //位于Z轴正方向
+                    this._cameraPosition = new Vector3(0, 0, 10);   //位于Z轴正方向
                     this._lookDirection = new Vector3(0, 0, -1);    //看向Z轴负方向
                     this._upDirection = new Vector3(0, 1, 0);       //Y轴向上
                     this._rightDirection = new Vector3(1, 0, 0);    //X轴向右
                     break;
 
                 case MPRPlaneType.Sagittal: //矢状面 - 从左向右看
-                    this._cameraPosition = new Vector3(-1000, 0, 0); //位于X轴负方向
+                    this._cameraPosition = new Vector3(-10, 0, 0);   //位于X轴负方向
                     this._lookDirection = new Vector3(1, 0, 0);      //看向X轴正方向
                     this._upDirection = new Vector3(0, 1, 0);        //Y轴向上
                     this._rightDirection = new Vector3(0, 0, 1);     //Z轴向右
@@ -371,19 +402,20 @@ namespace MedicalSharp.Engine.Cameras
         /// </summary>
         private void UpdateViewMatrix()
         {
-            //根据切片索引计算相机位置偏移
-            float sliceOffset = this._sliceIndex * this._sliceSpacing;
-
-            Vector3 targetPosition = this._planeType switch
+            //根据切片索引计算目标点偏移
+            Vector3 sliceOffset = this._planeType switch
             {
-                MPRPlaneType.Axial => new Vector3(0, sliceOffset, 0),
-                MPRPlaneType.Coronal => new Vector3(0, 0, sliceOffset),
-                MPRPlaneType.Sagittal => new Vector3(sliceOffset, 0, 0),
+                MPRPlaneType.Axial => new Vector3(0, 0, this._sliceIndex * this._sliceSpacing),
+                MPRPlaneType.Coronal => new Vector3(0, this._sliceIndex * this._sliceSpacing, 0),
+                MPRPlaneType.Sagittal => new Vector3(this._sliceIndex * this._sliceSpacing, 0, 0),
                 _ => Vector3.Zero
             };
 
-            //计算视图矩阵（相机看向目标点）
-            this._viewMatrix = Matrix4.LookAt(this._cameraPosition + targetPosition, targetPosition, this._upDirection);
+            //目标点 = 中心点 + 切片偏移
+            Vector3 targetPosition = this._targetPosition + sliceOffset;
+
+            //计算视图矩阵（相机始终看向目标点）
+            this._viewMatrix = Matrix4.LookAt(this._cameraPosition + sliceOffset, targetPosition, this._upDirection);
         }
         #endregion
 
