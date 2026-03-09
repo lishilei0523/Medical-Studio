@@ -265,7 +265,7 @@ namespace MedicalSharp.Engine.Renderers
             //取消使用Shader
             this.Program.Unuse();
 
-            // 触发渲染事件
+            //触发渲染事件
             RenderContext context = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             this.Renderable.OnRender(this.Program, context);
