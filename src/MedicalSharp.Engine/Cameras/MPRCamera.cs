@@ -57,6 +57,7 @@ namespace MedicalSharp.Engine.Cameras
             this._sliceSpacing = 1.0f;
             this._zoomFactor = 1.0f;
             this._panOffset = Vector2.Zero;
+            this._volumeActualSize = Vector3.One;
 
             this.UpdateCameraVectors();
             this.UpdateMatrices();
@@ -272,6 +273,26 @@ namespace MedicalSharp.Engine.Cameras
         }
         #endregion
 
+        #region 体积实际尺寸 —— Vector3 VolumeActualSize
+        /// <summary>
+        /// 体积实际尺寸
+        /// </summary>
+        private Vector3 _volumeActualSize;
+
+        /// <summary>
+        /// 体积实际尺寸
+        /// </summary>
+        public Vector3 VolumeActualSize
+        {
+            get => this._volumeActualSize;
+            set
+            {
+                this._volumeActualSize = value;
+                this.UpdateProjectionMatrix();
+            }
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -313,7 +334,7 @@ namespace MedicalSharp.Engine.Cameras
         {
             // 将屏幕空间平移转换为世界空间
             float aspect = this._viewportWidth / this._viewportHeight;
-            float worldSize = 10.0f / this._zoomFactor; // 基础世界大小
+            float worldSize = this.GetWorldSize(); // 基础世界大小
 
             Vector2 worldDelta = new Vector2(delta.X * worldSize * aspect, delta.Y * worldSize);
 
@@ -385,7 +406,7 @@ namespace MedicalSharp.Engine.Cameras
 
             //计算正交投影范围
             float aspect = this._viewportWidth / this._viewportHeight;
-            float size = 256.0f / this._zoomFactor; //基础大小除以缩放因子
+            float size = this.GetWorldSize() / this._zoomFactor; //基础大小除以缩放因子
 
             float left = -size * aspect + this._panOffset.X;
             float right = size * aspect + this._panOffset.X;
@@ -427,6 +448,25 @@ namespace MedicalSharp.Engine.Cameras
         {
             this.UpdateViewMatrix();
             this.UpdateProjectionMatrix();
+        }
+        #endregion
+
+        #region 获取视口世界尺寸 —— float GetWorldSize()
+        /// <summary>
+        /// 获取视口世界尺寸
+        /// </summary>
+        private float GetWorldSize()
+        {
+            //根据当前平面的实际尺寸计算合适的视口大小
+            float maxSize = this._planeType switch
+            {
+                MPRPlaneType.Axial => Math.Max(this._volumeActualSize.X, this._volumeActualSize.Y),
+                MPRPlaneType.Coronal => Math.Max(this._volumeActualSize.X, this._volumeActualSize.Z),
+                MPRPlaneType.Sagittal => Math.Max(this._volumeActualSize.Y, this._volumeActualSize.Z),
+                _ => 10.0f
+            };
+
+            return maxSize * 0.6f; //留出一些边距
         }
         #endregion
 
