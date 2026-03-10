@@ -248,6 +248,8 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
 
             this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
+            this.Program.SetUniformVector3("u_VoxelSize", this.Renderable.VoxelSize);
+            this.Program.SetUniformVector3("u_Spacing", this.Renderable.Spacing);
 
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);
@@ -316,11 +318,14 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
+            //设置体积实际尺寸
+            this.MPRCamera.VolumeActualSize = this.Renderable.ActualSize;
+
             //设置目标位置为图像原点
             this.MPRCamera.TargetPosition = this.Renderable.Origin;
 
             //根据平面类型设置最大切片数
-            int maxSliceCount = this.MPRCamera.PlaneType switch
+            int maxSlicesCount = this.MPRCamera.PlaneType switch
             {
                 MPRPlaneType.Axial => this.Renderable.VolumeTexture.Depth,
                 MPRPlaneType.Coronal => this.Renderable.VolumeTexture.Height,
@@ -328,7 +333,7 @@ namespace MedicalSharp.Engine.Renderers
                 _ => 100
             };
 
-            this.MPRCamera.MaxSliceCount = maxSliceCount;
+            this.MPRCamera.MaxSliceCount = maxSlicesCount;
 
             //设置切片间距为体素间距
             float sliceSpacing = this.MPRCamera.PlaneType switch
@@ -340,7 +345,7 @@ namespace MedicalSharp.Engine.Renderers
             };
 
             this.MPRCamera.SliceSpacing = sliceSpacing;
-            this.MPRCamera.SliceIndex = maxSliceCount / 2;
+            this.MPRCamera.SliceIndex = maxSlicesCount / 2;
         }
         #endregion
 
