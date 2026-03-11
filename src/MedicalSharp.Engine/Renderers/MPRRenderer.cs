@@ -81,13 +81,6 @@ namespace MedicalSharp.Engine.Renderers
         public float Contrast { get; private set; }
         #endregion
 
-        #region 反转灰度 —— bool InvertGrayscale
-        /// <summary>
-        /// 反转灰度
-        /// </summary>
-        public bool InvertGrayscale { get; private set; }
-        #endregion
-
         #region 传输函数 —— TransferFunction TransferFunction
         /// <summary>
         /// 传输函数
@@ -154,18 +147,16 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 设置材质选项 —— void SetMaterialOptions(float brightness, float contrast...
+        #region 设置材质选项 —— void SetMaterialOptions(float brightness, float contrast)
         /// <summary>
         /// 设置材质选项
         /// </summary>
         /// <param name="brightness">亮度</param>
         /// <param name="contrast">对比度</param>
-        /// <param name="invertGrayscale">反转灰度</param>
-        public void SetMaterialOptions(float brightness, float contrast, bool invertGrayscale = false)
+        public void SetMaterialOptions(float brightness, float contrast)
         {
             this.Brightness = brightness;
             this.Contrast = contrast;
-            this.InvertGrayscale = invertGrayscale;
         }
         #endregion
 
@@ -234,15 +225,13 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformMatrix("u_ViewMatrix", this.Camera.ViewMatrix);
             this.Program.SetUniformMatrix("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
 
-            this.Program.SetUniformVector3("u_TextureSize", this.Renderable.VoxelSize);
-            this.Program.SetUniformFloat("u_SliceIndex", this.MPRCamera.SliceIndex);
             this.Program.SetUniformInt("u_PlaneType", (int)this.MPRCamera.PlaneType);
+            this.Program.SetUniformFloat("u_SliceIndex", this.MPRCamera.SliceIndex);
 
             this.Program.SetUniformFloat("u_WindowWidth", this.WindowWidth);
             this.Program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
             this.Program.SetUniformFloat("u_Brightness", this.Brightness);
             this.Program.SetUniformFloat("u_Contrast", this.Contrast);
-            this.Program.SetUniformBoolean("u_InvertGrayscale", this.InvertGrayscale);
 
             this.Program.SetUniformFloat("u_RescaleSlope", this.Renderable.RescaleSlope);
             this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
