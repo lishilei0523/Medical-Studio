@@ -332,9 +332,9 @@ namespace MedicalSharp.Engine.Cameras
         /// <param name="delta">平移增量</param>
         public void Pan(Vector2 delta)
         {
-            // 将屏幕空间平移转换为世界空间
+            //将屏幕空间平移转换为世界空间
             float aspect = this._viewportWidth / this._viewportHeight;
-            float worldSize = this.GetWorldSize(); // 基础世界大小
+            float worldSize = this.GetWorldSize(); //基础世界大小
 
             Vector2 worldDelta = new Vector2(delta.X * worldSize * aspect, delta.Y * worldSize);
 
