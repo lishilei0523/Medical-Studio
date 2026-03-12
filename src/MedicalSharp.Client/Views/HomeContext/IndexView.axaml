@@ -37,10 +37,10 @@
 					<ColumnDefinition />
 				</Grid.ColumnDefinitions>
 				<Grid Grid.Column="0">
-					<sd:VolumeViewport Background="Black" 
-                                       Camera="{Binding Camera}" 
-                                       VolumeData="{Binding VolumeData}"
-                                       TFControlPoints="{Binding TFControlPoints}">
+					<sd:VolumeViewport Background="Black"
+									   Camera="{Binding OrbitCamera}"
+									   VolumeData="{Binding VolumeData}"
+									   TFControlPoints="{Binding TFControlPoints}">
 
 					</sd:VolumeViewport>
 				</Grid>
@@ -50,9 +50,27 @@
 						<RowDefinition />
 						<RowDefinition />
 					</Grid.RowDefinitions>
-					<Grid Grid.Row="0" Background="Red"></Grid>
-					<Grid Grid.Row="1" Background="Green"></Grid>
-					<Grid Grid.Row="2" Background="Blue"></Grid>
+					<Grid Grid.Row="0">
+						<sd:MPRViewport Background="Red"
+										Camera="{Binding AxialCamera}"
+										VolumeData="{Binding VolumeData}">
+
+						</sd:MPRViewport>
+					</Grid>
+					<Grid Grid.Row="1">
+						<sd:MPRViewport Background="Green"
+										Camera="{Binding CoronalCamera}"
+										VolumeData="{Binding VolumeData}">
+
+						</sd:MPRViewport>
+					</Grid>
+					<Grid Grid.Row="2">
+						<sd:MPRViewport Background="Blue"
+										Camera="{Binding SagittalCamera}"
+										VolumeData="{Binding VolumeData}">
+
+						</sd:MPRViewport>
+					</Grid>
 				</Grid>
 			</Grid>
 			<Grid Grid.Row="2" Background="Green">

@@ -34,7 +34,7 @@ namespace MedicalSharp.Engine.Cameras
         /// </summary>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
-        protected Camera(float nearPlaneDistance = -10.0f, float farPlaneDistance = 10.0f)
+        protected Camera(float nearPlaneDistance = -1.0f, float farPlaneDistance = 1.0f)
         {
             this._viewportWidth = 0;
             this._viewportHeight = 0;

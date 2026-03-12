@@ -308,6 +308,7 @@ namespace MedicalSharp.Engine.Cameras
         public override void SetViewportSize(float width, float height)
         {
             base.SetViewportSize(width, height);
+            this.UpdateCameraVectors();
             this.UpdateProjectionMatrix();
         }
         #endregion
@@ -369,21 +370,21 @@ namespace MedicalSharp.Engine.Cameras
             switch (this._planeType)
             {
                 case MPRPlaneType.Axial:    //横断面 - 从上往下看
-                    this._cameraPosition = new Vector3(0, 10, 0);   //位于Y轴正方向
+                    this._cameraPosition = new Vector3(0, 1, 0);   //位于Y轴正方向
                     this._lookDirection = new Vector3(0, -1, 0);    //看向Y轴负方向
                     this._upDirection = new Vector3(0, 0, 1);       //Z轴向上
                     this._rightDirection = new Vector3(1, 0, 0);    //X轴向右
                     break;
 
                 case MPRPlaneType.Coronal:  //冠状面 - 从前向后看
-                    this._cameraPosition = new Vector3(0, 0, 10);   //位于Z轴正方向
+                    this._cameraPosition = new Vector3(0, 0, 1);   //位于Z轴正方向
                     this._lookDirection = new Vector3(0, 0, -1);    //看向Z轴负方向
                     this._upDirection = new Vector3(0, 1, 0);       //Y轴向上
                     this._rightDirection = new Vector3(1, 0, 0);    //X轴向右
                     break;
 
                 case MPRPlaneType.Sagittal: //矢状面 - 从左向右看
-                    this._cameraPosition = new Vector3(-10, 0, 0);   //位于X轴负方向
+                    this._cameraPosition = new Vector3(-1, 0, 0);   //位于X轴负方向
                     this._lookDirection = new Vector3(1, 0, 0);      //看向X轴正方向
                     this._upDirection = new Vector3(0, 1, 0);        //Y轴向上
                     this._rightDirection = new Vector3(0, 0, 1);     //Z轴向右
@@ -408,10 +409,10 @@ namespace MedicalSharp.Engine.Cameras
             float aspect = this._viewportWidth / this._viewportHeight;
             float size = this.GetWorldSize() / this._zoomFactor; //基础大小除以缩放因子
 
-            float left = -size * aspect + this._panOffset.X;
-            float right = size * aspect + this._panOffset.X;
-            float bottom = -size + this._panOffset.Y;
-            float top = size + this._panOffset.Y;
+            float left = -0.5f * aspect + this._panOffset.X;
+            float right = 0.5f * aspect + this._panOffset.X;
+            float bottom = -0.5f + this._panOffset.Y;
+            float top = 0.5f + this._panOffset.Y;
 
             this._projectionMatrix = Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this._nearPlaneDistance, this._farPlaneDistance);
         }
@@ -433,7 +434,7 @@ namespace MedicalSharp.Engine.Cameras
             };
 
             //目标点 = 中心点 + 切片偏移
-            Vector3 targetPosition = this._targetPosition + sliceOffset;
+            Vector3 targetPosition = this._targetPosition;//+ sliceOffset;
 
             //计算视图矩阵（相机始终看向目标点）
             this._viewMatrix = Matrix4.LookAt(this._cameraPosition + sliceOffset, targetPosition, this._upDirection);

@@ -245,7 +245,7 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformInt("u_VolumeTexture", 0);
 
             //设置纹理参数
-            this.SetTextureParameters();
+            //this.SetTextureParameters();
 
             //绘制平面
             this._unitPlane.Draw(PrimitiveType.Triangles);
@@ -311,7 +311,7 @@ namespace MedicalSharp.Engine.Renderers
             this.MPRCamera.VolumeActualSize = this.Renderable.ActualSize;
 
             //设置目标位置为图像原点
-            this.MPRCamera.TargetPosition = this.Renderable.Origin;
+            //this.MPRCamera.TargetPosition = this.Renderable.Origin;
 
             //根据平面类型设置最大切片数
             int maxSlicesCount = this.MPRCamera.PlaneType switch
@@ -397,17 +397,18 @@ namespace MedicalSharp.Engine.Renderers
                 MPRPlaneType.Axial =>       //XY平面
                     Matrix4.CreateScale(this.Renderable.VolumeScale.X, this.Renderable.VolumeScale.Y, 1),
                 MPRPlaneType.Coronal =>     //XZ平面
-                    Matrix4.CreateRotationX(MathHelper.DegreesToRadians(90.0f)) *
-                    Matrix4.CreateScale(this.Renderable.VolumeScale.X, this.Renderable.VolumeScale.Z, 1),
+                    Matrix4.CreateScale(this.Renderable.VolumeScale.X, this.Renderable.VolumeScale.Z, 1) *
+                    Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-90.0f)),
                 MPRPlaneType.Sagittal =>    //YZ平面
-                    Matrix4.CreateRotationY(MathHelper.DegreesToRadians(90.0f)) *
-                    Matrix4.CreateRotationX(MathHelper.DegreesToRadians(90.0f)) *
-                    Matrix4.CreateScale(this.Renderable.VolumeScale.Y, this.Renderable.VolumeScale.Z, 1),
+                    Matrix4.CreateScale(this.Renderable.VolumeScale.Y, this.Renderable.VolumeScale.Z, 1) *
+                    Matrix4.CreateRotationY(MathHelper.DegreesToRadians(90.0f))
+                    //Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-90.0f)) *
+                    ,
                 _ => Matrix4.Identity
             };
 
             //组合变换：方向 * 平面变换 * 平移
-            return orientationMatrix * planeTransform * Matrix4.CreateTranslation(this.Renderable.Origin);
+            return orientationMatrix * planeTransform;//* Matrix4.CreateTranslation(this.Renderable.Origin);
         }
         #endregion
 

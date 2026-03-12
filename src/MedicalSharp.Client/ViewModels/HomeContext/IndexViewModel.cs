@@ -45,12 +45,36 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
         //通知属性
 
-        #region 轨道相机 —— OrbitCamera Camera
+        #region 轨道相机 —— OrbitCamera OrbitCamera
         /// <summary>
         /// 轨道相机
         /// </summary>
         [DependencyProperty]
-        public OrbitCamera Camera { get; set; }
+        public OrbitCamera OrbitCamera { get; set; }
+        #endregion
+
+        #region MPR横断位相机 —— MPRCamera AxialCamera
+        /// <summary>
+        /// MPR横断位相机
+        /// </summary>
+        [DependencyProperty]
+        public MPRCamera AxialCamera { get; set; }
+        #endregion
+
+        #region MPR冠状位相机 —— MPRCamera CoronalCamera
+        /// <summary>
+        /// MPR冠状位相机
+        /// </summary>
+        [DependencyProperty]
+        public MPRCamera CoronalCamera { get; set; }
+        #endregion
+
+        #region MPR矢状位相机 —— MPRCamera SagittalCamera
+        /// <summary>
+        /// MPR矢状位相机
+        /// </summary>
+        [DependencyProperty]
+        public MPRCamera SagittalCamera { get; set; }
         #endregion
 
         #region 体积数据 —— VolumeData VolumeData
@@ -95,7 +119,10 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             const float distance = 7.0f;
             const float yaw = 45.0f;
             const float pitch = -45.0f;
-            this.Camera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
+            this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
+            this.AxialCamera = new MPRCamera(MPRPlaneType.Axial);
+            this.CoronalCamera = new MPRCamera(MPRPlaneType.Coronal);
+            this.SagittalCamera = new MPRCamera(MPRPlaneType.Sagittal);
             this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.GrayControlPoints);
 
             return base.OnInitializedAsync(cancellationToken);
