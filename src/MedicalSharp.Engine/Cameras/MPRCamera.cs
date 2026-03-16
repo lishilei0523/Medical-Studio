@@ -47,7 +47,7 @@ namespace MedicalSharp.Engine.Cameras
         /// <param name="planeType">平面类型</param>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
-        public MPRCamera(MPRPlaneType planeType = MPRPlaneType.Axial, float nearPlaneDistance = -1000.0f, float farPlaneDistance = 1000.0f)
+        public MPRCamera(MPRPlaneType planeType = MPRPlaneType.Axial, float nearPlaneDistance = short.MinValue, float farPlaneDistance = short.MaxValue)
             : base(nearPlaneDistance, farPlaneDistance)
         {
             this._targetPosition = Vector3.Zero;
@@ -313,9 +313,9 @@ namespace MedicalSharp.Engine.Cameras
         }
         #endregion
 
-        #region 缩放 —— void Zoom(float delta)
+        #region 缩放相机 —— void Zoom(float delta)
         /// <summary>
-        /// 缩放
+        /// 缩放相机
         /// </summary>
         /// <param name="delta">缩放增量（正数放大，负数缩小）</param>
         public void Zoom(float delta)
@@ -326,20 +326,24 @@ namespace MedicalSharp.Engine.Cameras
         }
         #endregion
 
-        #region 平移 —— void Pan(Vector2 delta)
+        #region 平移相机 —— void Pan(float deltaX, float deltaY)
         /// <summary>
-        /// 平移
+        /// 平移相机
         /// </summary>
-        /// <param name="delta">平移增量</param>
-        public void Pan(Vector2 delta)
+        /// <param name="deltaX">水平平移量</param>
+        /// <param name="deltaY">垂直平移量</param>
+        public void Pan(float deltaX, float deltaY)
         {
-            //将屏幕空间平移转换为世界空间
-            float aspect = this._viewportWidth / this._viewportHeight;
-            float worldSize = this.GetWorldSize(); //基础世界大小
+            //将鼠标移动归一化到 [-1, 1] 范围
+            float normalizedDx = deltaX / this._viewportWidth * 2.0f;
+            float normalizedDy = deltaY / this._viewportHeight * 2.0f;
 
-            Vector2 worldDelta = new Vector2(delta.X * worldSize * aspect, delta.Y * worldSize);
+            //考虑缩放因子
+            float panSpeed = 0.5f * 100 / this._zoomFactor;  //0.5 是半宽
 
-            this._panOffset += worldDelta;
+            this._panOffset.X -= normalizedDx * panSpeed;
+            this._panOffset.Y += normalizedDy * panSpeed;  //Y轴方向反转
+
             this.UpdateProjectionMatrix();
         }
         #endregion
@@ -407,12 +411,24 @@ namespace MedicalSharp.Engine.Cameras
 
             //计算正交投影范围
             float aspect = this._viewportWidth / this._viewportHeight;
-            float size = this.GetWorldSize() / this._zoomFactor; //基础大小除以缩放因子
-
-            float left = -0.5f * aspect + this._panOffset.X;
-            float right = 0.5f * aspect + this._panOffset.X;
-            float bottom = -0.5f + this._panOffset.Y;
-            float top = 0.5f + this._panOffset.Y;
+            float halfSideSize = 0.5f / this._zoomFactor;
+            float left, right, bottom, top;
+            if (aspect >= 1.0f)
+            {
+                //横屏
+                left = -halfSideSize * aspect + this._panOffset.X;
+                right = halfSideSize * aspect + this._panOffset.X;
+                bottom = -halfSideSize + this._panOffset.Y;
+                top = halfSideSize + this._panOffset.Y;
+            }
+            else
+            {
+                //竖屏
+                left = -halfSideSize + this._panOffset.X;
+                right = halfSideSize + this._panOffset.X;
+                bottom = -halfSideSize / aspect + this._panOffset.Y;
+                top = halfSideSize / aspect + this._panOffset.Y;
+            }
 
             this._projectionMatrix = Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this._nearPlaneDistance, this._farPlaneDistance);
         }
@@ -433,11 +449,8 @@ namespace MedicalSharp.Engine.Cameras
                 _ => Vector3.Zero
             };
 
-            //目标点 = 中心点 + 切片偏移
-            Vector3 targetPosition = this._targetPosition;//+ sliceOffset;
-
             //计算视图矩阵（相机始终看向目标点）
-            this._viewMatrix = Matrix4.LookAt(this._cameraPosition + sliceOffset, targetPosition, this._upDirection);
+            this._viewMatrix = Matrix4.LookAt(this._cameraPosition + sliceOffset, this._targetPosition, this._upDirection);
         }
         #endregion
 
@@ -449,25 +462,6 @@ namespace MedicalSharp.Engine.Cameras
         {
             this.UpdateViewMatrix();
             this.UpdateProjectionMatrix();
-        }
-        #endregion
-
-        #region 获取视口世界尺寸 —— float GetWorldSize()
-        /// <summary>
-        /// 获取视口世界尺寸
-        /// </summary>
-        private float GetWorldSize()
-        {
-            //根据当前平面的实际尺寸计算合适的视口大小
-            float maxSize = this._planeType switch
-            {
-                MPRPlaneType.Axial => Math.Max(this._volumeActualSize.X, this._volumeActualSize.Y),
-                MPRPlaneType.Coronal => Math.Max(this._volumeActualSize.X, this._volumeActualSize.Z),
-                MPRPlaneType.Sagittal => Math.Max(this._volumeActualSize.Y, this._volumeActualSize.Z),
-                _ => 10.0f
-            };
-
-            return maxSize * 0.6f; //留出一些边距
         }
         #endregion
 
