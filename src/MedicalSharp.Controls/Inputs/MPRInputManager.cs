@@ -59,12 +59,12 @@ namespace MedicalSharp.Controls.Inputs
                 float deltaY = (float)(position.Y - this._mousePosition2D.Value.Y);
                 if (button == MouseButton.Middle)
                 {
-                    this._camera.Pan(deltaX / 50.0f, deltaY / 50.0f);
+                    this._camera.Pan(deltaX, deltaY);
                     viewport.RequestNextFrameRendering();
                 }
                 if (button == MouseButton.Right)
                 {
-                    this._camera.Zoom(deltaX + deltaY);
+                    this._camera.Zoom(-deltaY);
                     viewport.RequestNextFrameRendering();
                 }
             }

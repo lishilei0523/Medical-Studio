@@ -339,10 +339,10 @@ namespace MedicalSharp.Engine.Cameras
             float normalizedDy = deltaY / this._viewportHeight * 2.0f;
 
             //考虑缩放因子
-            float panSpeed = 0.5f * 100 / this._zoomFactor;  //0.5 是半宽
+            float panSpeed = 1f / this._zoomFactor;
 
             this._panOffset.X -= normalizedDx * panSpeed;
-            this._panOffset.Y += normalizedDy * panSpeed;  //Y轴方向反转
+            this._panOffset.Y += normalizedDy * panSpeed;
 
             this.UpdateProjectionMatrix();
         }
