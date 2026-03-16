@@ -170,10 +170,10 @@ namespace MedicalSharp.Engine.Cameras
             get => this._sliceIndex;
             set
             {
-                int newIndex = MathHelper.Clamp(value, 0, this._maxSliceCount - 1);
-                if (this._sliceIndex != newIndex)
+                int sliceIndex = Math.Clamp(value, 1, this._maxSliceCount - 1);
+                if (this._sliceIndex != sliceIndex)
                 {
-                    this._sliceIndex = newIndex;
+                    this._sliceIndex = sliceIndex;
                     this.UpdateViewMatrix();
                 }
             }
