@@ -51,21 +51,21 @@
 						<RowDefinition />
 					</Grid.RowDefinitions>
 					<Grid Grid.Row="0">
-						<sd:MPRViewport Background="Red"
+						<sd:MPRViewport Background="Black"
 										Camera="{Binding AxialCamera}"
 										VolumeData="{Binding VolumeData}">
 
 						</sd:MPRViewport>
 					</Grid>
 					<Grid Grid.Row="1">
-						<sd:MPRViewport Background="Green"
+						<sd:MPRViewport Background="Black"
 										Camera="{Binding CoronalCamera}"
 										VolumeData="{Binding VolumeData}">
 
 						</sd:MPRViewport>
 					</Grid>
 					<Grid Grid.Row="2">
-						<sd:MPRViewport Background="Blue"
+						<sd:MPRViewport Background="Black"
 										Camera="{Binding SagittalCamera}"
 										VolumeData="{Binding VolumeData}">
 
