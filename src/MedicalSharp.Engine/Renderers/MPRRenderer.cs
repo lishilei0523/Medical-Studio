@@ -402,13 +402,12 @@ namespace MedicalSharp.Engine.Renderers
                 MPRPlaneType.Sagittal =>    //YZ平面
                     Matrix4.CreateScale(this.Renderable.VolumeScale.Y, this.Renderable.VolumeScale.Z, 1) *
                     Matrix4.CreateRotationY(MathHelper.DegreesToRadians(90.0f))
-                    //Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-90.0f)) *
                     ,
                 _ => Matrix4.Identity
             };
 
-            //组合变换：方向 * 平面变换 * 平移
-            return orientationMatrix * planeTransform;//* Matrix4.CreateTranslation(this.Renderable.Origin);
+            //组合变换：方向 * 平面变换
+            return orientationMatrix * planeTransform;
         }
         #endregion
 
