@@ -121,8 +121,8 @@ namespace MedicalSharp.Engine.Shaders
         /// </summary>
         public void Build()
         {
-            int vertexShaderId = CompileShader(this.VertexShaderSource, ShaderType.VertexShader);
-            int fragmentShaderId = CompileShader(this.FragmentShaderSource, ShaderType.FragmentShader);
+            int vertexShaderId = ShaderManager.CompileShader(this.VertexShaderSource, ShaderType.VertexShader);
+            int fragmentShaderId = ShaderManager.CompileShader(this.FragmentShaderSource, ShaderType.FragmentShader);
 
             //链接Shader程序 
             GL.AttachShader(this.Id, vertexShaderId);
@@ -262,33 +262,6 @@ namespace MedicalSharp.Engine.Shaders
             GL.DeleteProgram(this.Id);
         }
         #endregion
-
-
-        //Private
-
-        #region 编译Shader —— static int CompileShader(string shaderSource, ShaderType shaderType)
-        /// <summary>
-        /// 编译Shader
-        /// </summary>
-        /// <param name="shaderSource">Shader源文本</param>
-        /// <param name="shaderType">Shader类型</param>
-        /// <returns>ShaderId</returns>
-        private static int CompileShader(string shaderSource, ShaderType shaderType)
-        {
-            int shaderId = GL.CreateShader(shaderType);
-            GL.ShaderSource(shaderId, shaderSource);
-            GL.CompileShader(shaderId);
-
-            GL.GetShader(shaderId, ShaderParameter.CompileStatus, out int success);
-            if (success <= 0)
-            {
-                GL.GetShaderInfoLog(shaderId, out string logInfo);
-                throw new RuntimeBinderInternalCompilerException(logInfo);
-            }
-
-            return shaderId;
-        }
-        #endregion 
 
         #endregion
     }

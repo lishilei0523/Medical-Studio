@@ -2,6 +2,7 @@
 using Microsoft.CSharp.RuntimeBinder;
 using OpenTK.Graphics.OpenGL4;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Engine.Resources
@@ -133,19 +134,19 @@ namespace MedicalSharp.Engine.Resources
                 GL.BufferData(BufferTarget.ElementArrayBuffer, this.MeshGeometry.Indices.Length * sizeof(uint), this.MeshGeometry.Indices, BufferUsageHint.DynamicDraw);
             }
 
-            //位置属性 (location = 0)
+            //位置(location = 0)
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Position)).ToInt32());
             GL.EnableVertexAttribArray(0);
 
-            //颜色属性 (location = 1)
+            //颜色(location = 1)
             GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Color)).ToInt32());
             GL.EnableVertexAttribArray(1);
 
-            //纹理坐标属性 (location = 2)
+            //纹理坐标(location = 2)
             GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.TextureCoord)).ToInt32());
             GL.EnableVertexAttribArray(2);
 
-            //法向量属性
+            //法向量(location = 3)
             GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Normal)).ToInt32());
             GL.EnableVertexAttribArray(3);
 
@@ -206,7 +207,7 @@ namespace MedicalSharp.Engine.Resources
 
             this.Bind();
 
-            if (this.MeshGeometry.Indices.Length > 0)
+            if (this.MeshGeometry.Indices.Any())
             {
                 GL.DrawElements(primitiveType, this.MeshGeometry.Indices.Length, DrawElementsType.UnsignedInt, 0);
             }

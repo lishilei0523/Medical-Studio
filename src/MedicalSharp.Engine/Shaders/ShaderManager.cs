@@ -1,12 +1,38 @@
-﻿using System.Text;
+﻿using Microsoft.CSharp.RuntimeBinder;
+using OpenTK.Graphics.OpenGL4;
+using System.Text;
 
 namespace MedicalSharp.Engine.Shaders
 {
     /// <summary>
-    /// Shader过滤器
+    /// Shader管理器
     /// </summary>
-    internal static class ShaderFilter
+    public static class ShaderManager
     {
+        #region # 编译Shader —— static int CompileShader(string shaderSource...
+        /// <summary>
+        /// 编译Shader
+        /// </summary>
+        /// <param name="shaderSource">Shader源文本</param>
+        /// <param name="shaderType">Shader类型</param>
+        /// <returns>ShaderId</returns>
+        public static int CompileShader(string shaderSource, ShaderType shaderType)
+        {
+            int shaderId = GL.CreateShader(shaderType);
+            GL.ShaderSource(shaderId, shaderSource);
+            GL.CompileShader(shaderId);
+
+            GL.GetShader(shaderId, ShaderParameter.CompileStatus, out int success);
+            if (success <= 0)
+            {
+                GL.GetShaderInfoLog(shaderId, out string logInfo);
+                throw new RuntimeBinderInternalCompilerException(logInfo);
+            }
+
+            return shaderId;
+        }
+        #endregion 
+
         #region # 删除注释 —— static string RemoveComments(this string code)
         /// <summary>
         /// 删除注释
