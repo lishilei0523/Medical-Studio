@@ -403,7 +403,7 @@ namespace MedicalSharp.Controls.Viewports
                 {
                     viewport._volumeRenderer?.TransferFunction.RemoveControlPoint(controlPoint);
                 }
-                eventArgs.NewValue.Value.CollectionChanged -= viewport.OnTFControlPointsItemChanged;
+                eventArgs.OldValue.Value.CollectionChanged -= viewport.OnTFControlPointsItemChanged;
             }
             if (eventArgs.NewValue.Value != null)
             {
@@ -461,7 +461,7 @@ namespace MedicalSharp.Controls.Viewports
         {
             #region # 验证
 
-            if (!eventArgs.NewValue.HasValue)
+            if (eventArgs.NewValue == null)
             {
                 //TODO 卸载数据，黑屏处理，停止渲染
                 return;

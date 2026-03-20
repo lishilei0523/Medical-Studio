@@ -275,7 +275,7 @@ namespace MedicalSharp.Controls.Viewports
         {
             #region # 验证
 
-            if (!eventArgs.NewValue.HasValue)
+            if (eventArgs.NewValue == null)
             {
                 //TODO 卸载数据，黑屏处理，停止渲染
                 return;
