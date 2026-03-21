@@ -55,11 +55,58 @@ namespace MedicalSharp.Engine.ValueTypes
         {
             get => this._direction;
         }
-        #endregion 
+        #endregion
 
         #endregion
 
         #region # 方法
+
+        //Static
+
+        #region 反投影创建射线 —— static Ray UnProject(Vector2 mousePosition, Vector3 cameraPosition...
+        /// <summary>
+        /// 反投影创建射线
+        /// </summary>
+        /// <param name="mousePosition">鼠标位置</param>
+        /// <param name="cameraPosition">相机位置</param>
+        /// <param name="viewportSize">视口尺寸</param>
+        /// <param name="projectionMatrix">投影矩阵</param>
+        /// <param name="viewMatrix">视图矩阵</param>
+        /// <returns>射线</returns>
+        public static Ray UnProject(Vector2 mousePosition, Vector3 cameraPosition, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix)
+        {
+            //将屏幕坐标转换到NDC（标准化设备坐标）
+            float ndcX = (2.0f * mousePosition.X) / viewportSize.X - 1.0f;
+            float ndcY = 1.0f - (2.0f * mousePosition.Y) / viewportSize.Y;
+
+            //创建近平面和远平面上的点
+            Vector4 rayStartNDC = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
+            Vector4 rayEndNDC = new Vector4(ndcX, ndcY, 1.0f, 1.0f);
+
+            //转换到相机空间
+            Matrix4 invProjection = Matrix4.Invert(projectionMatrix);
+            Vector4 rayStartCamera = rayStartNDC * invProjection;
+            Vector4 rayEndCamera = rayEndNDC * invProjection;
+
+            //透视除法
+            rayStartCamera /= rayStartCamera.W;
+            rayEndCamera /= rayEndCamera.W;
+
+            //转换到世界空间
+            Matrix4 invView = Matrix4.Invert(viewMatrix);
+            Vector3 rayStartWorld = Vector3.TransformPosition(rayStartCamera.Xyz, invView);
+            Vector3 rayEndWorld = Vector3.TransformPosition(rayEndCamera.Xyz, invView);
+
+            //计算方向
+            Vector3 direction = Vector3.Normalize(rayEndWorld - rayStartWorld);
+
+            //创建射线（使用相机位置作为起点）
+            return new Ray(cameraPosition, direction);
+        }
+        #endregion
+
+
+        //Public
 
         #region 获取射线上的点 —— Vector3 GetPoint(float distance)
         /// <summary>
@@ -236,6 +283,43 @@ namespace MedicalSharp.Engine.ValueTypes
         }
         #endregion
 
+        #region 检查是否与平面相交 —— bool IntersectsPlane(Vector3 planePoint, Vector3 planeNormal...
+        /// <summary>
+        /// 检查是否与平面相交
+        /// </summary>
+        /// <param name="planePoint">平面上的一点</param>
+        /// <param name="planeNormal">平面法向量</param>
+        /// <param name="intersectionPoint">交点坐标</param>
+        /// <returns>是否相交</returns>
+        public bool IntersectsPlane(Vector3 planePoint, Vector3 planeNormal, out Vector3 intersectionPoint)
+        {
+            intersectionPoint = Vector3.Zero;
+
+            //计算平面方程常数项：Ax + By + Cz + D = 0，其中 D = -(N · P0)
+            float planeDistance = -Vector3.Dot(planeNormal, planePoint);
+
+            float denominator = Vector3.Dot(planeNormal, this._direction);
+
+            //射线方向与平面平行，不相交
+            if (Math.Abs(denominator) < float.Epsilon)
+            {
+                return false;
+            }
+
+            //计算交点参数t
+            float t = (planeDistance - Vector3.Dot(planeNormal, this._position)) / denominator;
+
+            //射线方向为正向且 t >= 0 才有交点
+            if (t >= 0)
+            {
+                intersectionPoint = this._position + this._direction * t;
+                return true;
+            }
+
+            return false;
+        }
+        #endregion
+
         #region 检查是否与另一条射线相等 —— bool Equals(Ray other)
         /// <summary>
         /// 检查是否与另一条射线相等
@@ -313,6 +397,9 @@ namespace MedicalSharp.Engine.ValueTypes
             return ray;
         }
         #endregion
+
+
+        //IEquatable
 
         #region 是否相等 —— override bool Equals(object obj)
         /// <summary>

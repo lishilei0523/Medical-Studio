@@ -144,7 +144,7 @@ namespace MedicalSharp.Engine.ValueTypes
         /// </summary>
         public bool Contains(Vector3 point)
         {
-            return Vector3.DistanceSquared(this.Center, point) <= this.Radius * this.Radius;
+            return Vector3.DistanceSquared(this._center, point) <= this._radius * this._radius;
         }
         #endregion
 
@@ -154,8 +154,8 @@ namespace MedicalSharp.Engine.ValueTypes
         /// </summary>
         public bool Contains(BoundingSphere other)
         {
-            float distance = Vector3.Distance(this.Center, other.Center);
-            return distance + other.Radius <= this.Radius;
+            float distance = Vector3.Distance(this._center, other._center);
+            return distance + other._radius <= this._radius;
         }
         #endregion
 
@@ -165,8 +165,8 @@ namespace MedicalSharp.Engine.ValueTypes
         /// </summary>
         public bool Intersects(BoundingSphere other)
         {
-            float distance = Vector3.Distance(this.Center, other.Center);
-            return distance <= this.Radius + other.Radius;
+            float distance = Vector3.Distance(this._center, other._center);
+            return distance <= this._radius + other._radius;
         }
         #endregion
 
@@ -178,13 +178,13 @@ namespace MedicalSharp.Engine.ValueTypes
         {
             //找到球心到盒子的最近点
             Vector3 closestPoint = new Vector3(
-                Math.Max(box.Minimum.X, Math.Min(this.Center.X, box.Maximum.X)),
-                Math.Max(box.Minimum.Y, Math.Min(this.Center.Y, box.Maximum.Y)),
-                Math.Max(box.Minimum.Z, Math.Min(this.Center.Z, box.Maximum.Z))
+                Math.Max(box.Minimum.X, Math.Min(this._center.X, box.Maximum.X)),
+                Math.Max(box.Minimum.Y, Math.Min(this._center.Y, box.Maximum.Y)),
+                Math.Max(box.Minimum.Z, Math.Min(this._center.Z, box.Maximum.Z))
             );
 
-            float distanceSquared = Vector3.DistanceSquared(this.Center, closestPoint);
-            return distanceSquared <= this.Radius * this.Radius;
+            float distanceSquared = Vector3.DistanceSquared(this._center, closestPoint);
+            return distanceSquared <= this._radius * this._radius;
         }
         #endregion
 
@@ -204,7 +204,7 @@ namespace MedicalSharp.Engine.ValueTypes
         /// </summary>
         public bool Equals(BoundingSphere other)
         {
-            return this.Center.Equals(other.Center) && this.Radius.Equals(other.Radius);
+            return this._center.Equals(other._center) && this._radius.Equals(other._radius);
         }
         #endregion
 
@@ -214,22 +214,22 @@ namespace MedicalSharp.Engine.ValueTypes
         /// </summary>
         public BoundingSphere Union(BoundingSphere other)
         {
-            Vector3 direction = other.Center - this.Center;
+            Vector3 direction = other._center - this._center;
             float distance = direction.Length;
 
-            if (distance + other.Radius <= this.Radius)
+            if (distance + other._radius <= this._radius)
             {
                 return this;
             }
 
-            if (distance + this.Radius <= other.Radius)
+            if (distance + this._radius <= other._radius)
             {
                 return other;
             }
 
             //计算新的中心
-            float newRadius = (distance + this.Radius + other.Radius) * 0.5f;
-            Vector3 newCenter = this.Center + direction * ((newRadius - this.Radius) / distance);
+            float newRadius = (distance + this._radius + other._radius) * 0.5f;
+            Vector3 newCenter = this._center + direction * ((newRadius - this._radius) / distance);
 
             return new BoundingSphere(newCenter, newRadius);
         }
@@ -241,12 +241,12 @@ namespace MedicalSharp.Engine.ValueTypes
         /// </summary>
         public void Expand(Vector3 point)
         {
-            Vector3 direction = point - this.Center;
+            Vector3 direction = point - this._center;
             float distance = direction.Length;
 
-            if (distance > this.Radius)
+            if (distance > this._radius)
             {
-                float half = (distance - this.Radius) * 0.5f;
+                float half = (distance - this._radius) * 0.5f;
                 this._radius += half;
                 this._center += direction * (half / distance);
             }
@@ -259,8 +259,8 @@ namespace MedicalSharp.Engine.ValueTypes
         /// </summary>
         public BoundingBox ToBoundingBox()
         {
-            Vector3 extent = new Vector3(this.Radius);
-            return new BoundingBox(this.Center - extent, this.Center + extent);
+            Vector3 extent = new Vector3(this._radius);
+            return new BoundingBox(this._center - extent, this._center + extent);
         }
         #endregion
 
@@ -283,7 +283,7 @@ namespace MedicalSharp.Engine.ValueTypes
         /// </summary>
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.Center, this.Radius);
+            return HashCode.Combine(this._center, this._radius);
         }
         #endregion
 
