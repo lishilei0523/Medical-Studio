@@ -8,9 +8,14 @@ namespace MedicalSharp.Engine.Resources
     /// <summary>
     /// 像素缓冲区
     /// </summary>
-    public class PixelBuffer
+    public class PixelBuffer : IDisposable
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 栅栏同步对象
+        /// </summary>
+        private IntPtr _fenceSync;
 
         /// <summary>
         /// 创建像素缓冲区构造器
@@ -23,6 +28,8 @@ namespace MedicalSharp.Engine.Resources
             this.Width = width;
             this.Height = height;
             this.PixelFormat = pixelFormat;
+            this.BufferSize = this.CalculateBufferSize(width, height, pixelFormat);
+
             int pixelBufferId = GL.GenBuffer();
 
             #region # 验证
@@ -37,23 +44,6 @@ namespace MedicalSharp.Engine.Resources
             this.Id = pixelBufferId;
 
             //分配显存
-            if (pixelFormat == PixelFormat.Red)
-            {
-                this.BufferSize = width * height;
-            }
-            else if (pixelFormat == PixelFormat.Rgb)
-            {
-                this.BufferSize = width * height * 3;
-            }
-            else if (pixelFormat == PixelFormat.Rgba)
-            {
-                this.BufferSize = width * height * 4;
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(pixelFormat), $"不支持的像素格式: {pixelFormat}");
-            }
-
             this.Bind();
             GL.BufferData(BufferTarget.PixelPackBuffer, this.BufferSize, IntPtr.Zero, BufferUsageHint.StreamRead);
             this.Unbind();
@@ -98,12 +88,35 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 缓冲区尺寸
         /// </summary>
+        /// <remarks>单位: 字节</remarks>
         public int BufferSize { get; private set; }
+        #endregion
+
+        #region 只读属性 - 数据是否就绪 —— bool IsDataReady
+        /// <summary>
+        /// 只读属性 - 数据是否就绪
+        /// </summary>
+        public bool IsDataReady
+        {
+            get
+            {
+                if (this._fenceSync == IntPtr.Zero)
+                {
+                    return false;
+                }
+
+                WaitSyncStatus status = GL.ClientWaitSync(this._fenceSync, ClientWaitSyncFlags.None, 0);
+
+                return status == WaitSyncStatus.AlreadySignaled || status == WaitSyncStatus.ConditionSatisfied;
+            }
+        }
         #endregion
 
         #endregion
 
         #region # 方法
+
+        //Public
 
         #region 绑定像素缓冲区 —— void Bind()
         /// <summary>
@@ -125,18 +138,36 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 读取帧缓冲区 —— void ReadFrameBuffer(FrameBuffer frameBuffer)
+        #region 读取帧缓冲区 —— void ReadFrameBuffer(FrameBuffer frameBuffer...
         /// <summary>
         /// 读取帧缓冲区
         /// </summary>
-        public void ReadFrameBuffer(FrameBuffer frameBuffer)
+        /// <param name="frameBuffer">帧缓冲区</param>
+        /// <param name="useFence">是否使用栅栏同步</param>
+        public void ReadFrameBuffer(FrameBuffer frameBuffer, bool useFence = true)
         {
             frameBuffer.Bind();
+
             this.Bind();
 
             GL.ReadPixels(0, 0, this.Width, this.Height, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
 
+            //确保PBO写入完成（可选）
+            GL.MemoryBarrier(MemoryBarrierFlags.PixelBufferBarrierBit);
+
+            //创建栅栏标记读取完成（推荐，用于非阻塞检查）
+            if (useFence)
+            {
+                if (this._fenceSync != IntPtr.Zero)
+                {
+                    GL.DeleteSync(this._fenceSync);
+                }
+
+                this._fenceSync = GL.FenceSync(SyncCondition.SyncGpuCommandsComplete, WaitSyncFlags.None);
+            }
+
             this.Unbind();
+
             frameBuffer.Unbind();
         }
         #endregion
@@ -145,12 +176,28 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 读取2D纹理
         /// </summary>
-        public void ReadTexture2D(Texture2D texture)
+        /// <param name="texture">2D纹理</param>
+        /// <param name="useFence">是否使用栅栏同步</param>
+        public void ReadTexture2D(Texture2D texture, bool useFence = true)
         {
             texture.Bind();
             this.Bind();
 
             GL.GetTexImage(TextureTarget.Texture2D, 0, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
+
+            //确保PBO写入完成
+            GL.MemoryBarrier(MemoryBarrierFlags.PixelBufferBarrierBit);
+
+            //创建栅栏标记读取完成
+            if (useFence)
+            {
+                if (this._fenceSync != IntPtr.Zero)
+                {
+                    GL.DeleteSync(this._fenceSync);
+                }
+
+                this._fenceSync = GL.FenceSync(SyncCondition.SyncGpuCommandsComplete, WaitSyncFlags.None);
+            }
 
             this.Unbind();
             texture.Unbind();
@@ -161,27 +208,56 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 获取CPU数据
         /// </summary>
+        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
         /// <remarks>会在数据传输完成时返回</remarks>
-        public byte[] GetCpuBuffer()
+        public byte[] GetCpuBuffer(long timeoutNanoseconds = -1)
         {
-            this.Bind();
-
-            //映射内存（如果数据未就绪，这里会阻塞）
-            IntPtr gpuPointer = GL.MapBuffer(BufferTarget.PixelPackBuffer, BufferAccess.ReadOnly);
-            if (gpuPointer == IntPtr.Zero)
+            //如果有栅栏，先等待数据就绪
+            if (this._fenceSync != 0)
             {
-                this.Unbind();
-                return null;
+                ClientWaitSyncFlags flags = ClientWaitSyncFlags.SyncFlushCommandsBit;
+                ulong timeout = timeoutNanoseconds < 0 ? ulong.MaxValue : (ulong)timeoutNanoseconds;
+
+                WaitSyncStatus status = GL.ClientWaitSync(this._fenceSync, flags, timeout);
+                if (status == WaitSyncStatus.TimeoutExpired)
+                {
+                    return null;  //超时
+                }
+                if (status != WaitSyncStatus.AlreadySignaled &&
+                    status != WaitSyncStatus.ConditionSatisfied)
+                {
+                    return null;  //错误
+                }
+
+                //清理栅栏
+                GL.DeleteSync(this._fenceSync);
+                this._fenceSync = IntPtr.Zero;
             }
 
-            //复制到托管数组
-            byte[] buffer = new byte[this.BufferSize];
-            Marshal.Copy(gpuPointer, buffer, 0, this.BufferSize);
+            this.Bind();
 
-            //取消映射
-            GL.UnmapBuffer(BufferTarget.PixelPackBuffer);
+            byte[] buffer;
+            try
+            {
+                //映射内存（如果数据未就绪，这里会阻塞）
+                IntPtr gpuPointer = GL.MapBuffer(BufferTarget.PixelPackBuffer, BufferAccess.ReadOnly);
+                if (gpuPointer == IntPtr.Zero)
+                {
+                    this.Unbind();
+                    return null;
+                }
 
-            this.Unbind();
+                //复制到托管数组
+                buffer = new byte[this.BufferSize];
+                Marshal.Copy(gpuPointer, buffer, 0, this.BufferSize);
+            }
+            finally
+            {
+                //取消映射
+                GL.UnmapBuffer(BufferTarget.PixelPackBuffer);
+
+                this.Unbind();
+            }
 
             return buffer;
         }
@@ -194,8 +270,32 @@ namespace MedicalSharp.Engine.Resources
         public void Dispose()
         {
             GL.DeleteBuffer(this.Id);
+            if (this._fenceSync != IntPtr.Zero)
+            {
+                GL.DeleteSync(this._fenceSync);
+                this._fenceSync = IntPtr.Zero;
+            }
         }
-        #endregion 
+        #endregion
+
+
+        //Private
+
+        #region 计算缓冲区尺寸 —— int CalculateBufferSize(int width, int height...
+        /// <summary>
+        /// 计算缓冲区尺寸
+        /// </summary>
+        private int CalculateBufferSize(int width, int height, PixelFormat pixelFormat)
+        {
+            return pixelFormat switch
+            {
+                PixelFormat.Red => width * height,
+                PixelFormat.Rgb => width * height * 3,
+                PixelFormat.Rgba => width * height * 4,
+                _ => throw new ArgumentOutOfRangeException(nameof(pixelFormat), $"不支持的像素格式: {pixelFormat}")
+            };
+        }
+        #endregion
 
         #endregion
     }
