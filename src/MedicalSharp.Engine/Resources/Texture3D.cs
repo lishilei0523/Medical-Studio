@@ -82,15 +82,15 @@ namespace MedicalSharp.Engine.Resources
             //绑定纹理
             GL.BindTexture(TextureTarget.Texture3D, base.Id);
 
+            //上传纹理至显存
+            GL.TexImage3D(TextureTarget.Texture3D, 0, PixelInternalFormat.R16Snorm, this.Width, this.Height, this.Depth, 0, PixelFormat.Red, PixelType.Short, originalData);
+
             //设置默认纹理参数
             GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
-            //分配纹理显存
-            GL.TexImage3D(TextureTarget.Texture3D, 0, PixelInternalFormat.R16Snorm, this.Width, this.Height, this.Depth, 0, PixelFormat.Red, PixelType.Short, originalData);
 
             //检查错误
             CheckError("GL.TexImage3D");
@@ -138,6 +138,16 @@ namespace MedicalSharp.Engine.Resources
         public override void Bind(int index)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + index);
+            GL.BindTexture(TextureTarget.Texture3D, base.Id);
+        }
+        #endregion
+
+        #region 绑定纹理 —— override void Bind()
+        /// <summary>
+        /// 绑定纹理
+        /// </summary>
+        public override void Bind()
+        {
             GL.BindTexture(TextureTarget.Texture3D, base.Id);
         }
         #endregion

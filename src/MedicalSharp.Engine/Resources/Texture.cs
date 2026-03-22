@@ -71,6 +71,13 @@ namespace MedicalSharp.Engine.Resources
         public abstract void Bind(int index);
         #endregion
 
+        #region 绑定纹理 —— abstract void Bind()
+        /// <summary>
+        /// 绑定纹理
+        /// </summary>
+        public abstract void Bind();
+        #endregion
+
         #region 解绑纹理 —— abstract void Unbind()
         /// <summary>
         /// 解绑纹理

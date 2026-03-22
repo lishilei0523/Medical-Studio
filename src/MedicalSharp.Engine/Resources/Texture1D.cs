@@ -20,14 +20,16 @@ namespace MedicalSharp.Engine.Resources
         {
             this.Width = width;
 
-            //绑定纹理、设置参数
+            //绑定纹理
             GL.BindTexture(TextureTarget.Texture1D, base.Id);
-            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
             //上传纹理至显存
             GL.TexImage1D(TextureTarget.Texture1D, 0, pixelInternalFormat, this.Width, 0, PixelFormat.Rgba, PixelType.Float, IntPtr.Zero);
+
+            //设置参数
+            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
             //解绑
             GL.BindTexture(TextureTarget.Texture1D, 0);
@@ -104,6 +106,16 @@ namespace MedicalSharp.Engine.Resources
         public override void Bind(int index)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + index);
+            GL.BindTexture(TextureTarget.Texture1D, base.Id);
+        }
+        #endregion
+
+        #region 绑定纹理 —— override void Bind()
+        /// <summary>
+        /// 绑定纹理
+        /// </summary>
+        public override void Bind()
+        {
             GL.BindTexture(TextureTarget.Texture1D, base.Id);
         }
         #endregion
