@@ -10,6 +10,8 @@ namespace MedicalSharp.Client.Views.HomeContext
         public IndexView()
         {
             this.InitializeComponent();
+            this.TitleBar.ExtendsContentIntoTitleBar = true;
+            this.TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
         }
     }
 }

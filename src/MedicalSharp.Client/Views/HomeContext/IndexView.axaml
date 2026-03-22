@@ -24,14 +24,31 @@
 			</Grid.RowDefinitions>
 			<!--Header-->
 			<Grid Grid.Row="0">
-				<Menu>
-					<MenuItem Header="文件(_F)">
-						<MenuItem Header="打开(_O)" Command="{Binding OpenSeriesCommand}" />
-						<MenuItem Header="关闭(_C)" cm:Message.Attach="CloseSeries()" />
-						<MenuItem Header="保存(_S)" cm:Message.Attach="SaveImage()" />
-						<MenuItem Header="另存为(_A)" cm:Message.Attach="SaveAsImage()" />
-					</MenuItem>
-				</Menu>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+					<Image Grid.Column="0"
+                           Source="/favicon.ico"
+                           Width="24" Height="24" Margin="10,0,5,0"
+						   IsHitTestVisible="False"
+						   RenderOptions.BitmapInterpolationMode="HighQuality">
+						<Image.IsVisible>
+							<OnPlatform Default="False">
+								<On Options="Windows" Content="True" />
+							</OnPlatform>
+						</Image.IsVisible>
+					</Image>
+					<Menu Grid.Column="1">
+						<MenuItem Header="文件(_F)">
+							<MenuItem Header="打开(_O)" Command="{Binding OpenSeriesCommand}" />
+							<MenuItem Header="关闭(_C)" cm:Message.Attach="CloseSeries()" />
+							<MenuItem Header="保存(_S)" cm:Message.Attach="SaveImage()" />
+							<MenuItem Header="另存为(_A)" cm:Message.Attach="SaveAsImage()" />
+						</MenuItem>
+					</Menu>
+				</Grid>
 			</Grid>
 			<!--Body-->
 			<Grid Grid.Row="1">
