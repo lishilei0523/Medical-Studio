@@ -7,8 +7,6 @@
 			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			  xmlns:cm="http://caliburnmicro.com"
 			  mc:Ignorable="d"
-			  Title="Medical Studio"
-			  Icon="/favicon.ico"
 			  Width="1440" Height="900"
 			  WindowStartupLocation="CenterScreen">
 
