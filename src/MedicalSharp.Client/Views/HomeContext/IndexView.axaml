@@ -32,11 +32,6 @@
                            Width="24" Height="24" Margin="10,0,5,0"
 						   IsHitTestVisible="False"
 						   RenderOptions.BitmapInterpolationMode="HighQuality">
-						<Image.IsVisible>
-							<OnPlatform Default="False">
-								<On Options="Windows" Content="True" />
-							</OnPlatform>
-						</Image.IsVisible>
 					</Image>
 					<Menu Grid.Column="1">
 						<MenuItem Header="文件(_F)">

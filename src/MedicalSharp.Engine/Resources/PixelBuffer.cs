@@ -1,7 +1,6 @@
 ﻿using Microsoft.CSharp.RuntimeBinder;
 using OpenTK.Graphics.OpenGL4;
 using System;
-using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Engine.Resources
 {
@@ -10,14 +9,17 @@ namespace MedicalSharp.Engine.Resources
     /// </summary>
     public abstract class PixelBuffer : IDisposable
     {
-        //TODO 重构
-
         #region # 字段及构造器
+
+        /// <summary>
+        /// 是否已释放
+        /// </summary>
+        protected bool _disposed;
 
         /// <summary>
         /// 栅栏同步对象
         /// </summary>
-        private IntPtr _fenceSync;
+        protected IntPtr _fenceSync;
 
         /// <summary>
         /// 创建像素缓冲区构造器
@@ -25,33 +27,16 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
         /// <param name="pixelFormat">像素格式</param>
-        public PixelBuffer(int width, int height, PixelFormat pixelFormat = PixelFormat.Rgba)
+        protected PixelBuffer(int width, int height, PixelFormat pixelFormat = PixelFormat.Rgba)
         {
             this.Width = width;
             this.Height = height;
             this.PixelFormat = pixelFormat;
             this.BufferSize = this.CalculateBufferSize(width, height, pixelFormat);
 
-            int pixelBufferId = GL.GenBuffer();
-
-            #region # 验证
-
-            if (pixelBufferId == 0)
-            {
-                throw new RuntimeBinderException("创建像素缓冲区失败！");
-            }
-
-            #endregion
-
-            this.Id = pixelBufferId;
-
-            //分配显存
-            this.Bind();
-            GL.BufferData(BufferTarget.PixelPackBuffer, this.BufferSize, IntPtr.Zero, BufferUsageHint.StreamRead);
-            this.Unbind();
-
             //设置对齐方式（重要！）
             GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
+            GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
         }
 
         #endregion
@@ -114,6 +99,20 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 只读属性 - 缓冲区目标 —— abstract BufferTarget BufferTarget
+        /// <summary>
+        /// 只读属性 - 缓冲区目标
+        /// </summary>
+        protected abstract BufferTarget BufferTarget { get; }
+        #endregion
+
+        #region 只读属性 - 缓冲区用途 —— abstract BufferUsageHint BufferUsage
+        /// <summary>
+        /// 只读属性 - 缓冲区用途
+        /// </summary>
+        protected abstract BufferUsageHint BufferUsage { get; }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -140,154 +139,112 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 读取帧缓冲区 —— void ReadFrameBuffer(FrameBuffer frameBuffer...
-        /// <summary>
-        /// 读取帧缓冲区
-        /// </summary>
-        /// <param name="frameBuffer">帧缓冲区</param>
-        /// <param name="useFence">是否使用栅栏同步</param>
-        public void ReadFrameBuffer(FrameBuffer frameBuffer, bool useFence = true)
-        {
-            frameBuffer.Bind();
-
-            this.Bind();
-
-            GL.ReadPixels(0, 0, this.Width, this.Height, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
-
-            //确保PBO写入完成（可选）
-            GL.MemoryBarrier(MemoryBarrierFlags.PixelBufferBarrierBit);
-
-            //创建栅栏标记读取完成（推荐，用于非阻塞检查）
-            if (useFence)
-            {
-                if (this._fenceSync != IntPtr.Zero)
-                {
-                    GL.DeleteSync(this._fenceSync);
-                }
-
-                this._fenceSync = GL.FenceSync(SyncCondition.SyncGpuCommandsComplete, WaitSyncFlags.None);
-            }
-
-            this.Unbind();
-
-            frameBuffer.Unbind();
-        }
-        #endregion
-
-        #region 读取2D纹理 —— void ReadTexture2D(Texture2D texture)
-        /// <summary>
-        /// 读取2D纹理
-        /// </summary>
-        /// <param name="texture">2D纹理</param>
-        /// <param name="useFence">是否使用栅栏同步</param>
-        public void ReadTexture2D(Texture2D texture, bool useFence = true)
-        {
-            texture.Bind();
-            this.Bind();
-
-            GL.GetTexImage(TextureTarget.Texture2D, 0, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
-
-            //确保PBO写入完成
-            GL.MemoryBarrier(MemoryBarrierFlags.PixelBufferBarrierBit);
-
-            //创建栅栏标记读取完成
-            if (useFence)
-            {
-                if (this._fenceSync != IntPtr.Zero)
-                {
-                    GL.DeleteSync(this._fenceSync);
-                }
-
-                this._fenceSync = GL.FenceSync(SyncCondition.SyncGpuCommandsComplete, WaitSyncFlags.None);
-            }
-
-            this.Unbind();
-            texture.Unbind();
-        }
-        #endregion
-
-        #region 获取CPU数据 —— byte[] GetCpuBuffer()
-        /// <summary>
-        /// 获取CPU数据
-        /// </summary>
-        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
-        /// <remarks>会在数据传输完成时返回</remarks>
-        public byte[] GetCpuBuffer(long timeoutNanoseconds = -1)
-        {
-            //如果有栅栏，先等待数据就绪
-            if (this._fenceSync != 0)
-            {
-                ClientWaitSyncFlags flags = ClientWaitSyncFlags.SyncFlushCommandsBit;
-                ulong timeout = timeoutNanoseconds < 0 ? ulong.MaxValue : (ulong)timeoutNanoseconds;
-
-                WaitSyncStatus status = GL.ClientWaitSync(this._fenceSync, flags, timeout);
-                if (status == WaitSyncStatus.TimeoutExpired)
-                {
-                    return null;  //超时
-                }
-                if (status != WaitSyncStatus.AlreadySignaled &&
-                    status != WaitSyncStatus.ConditionSatisfied)
-                {
-                    return null;  //错误
-                }
-
-                //清理栅栏
-                GL.DeleteSync(this._fenceSync);
-                this._fenceSync = IntPtr.Zero;
-            }
-
-            this.Bind();
-
-            byte[] buffer;
-            try
-            {
-                //映射内存（如果数据未就绪，这里会阻塞）
-                IntPtr gpuPointer = GL.MapBuffer(BufferTarget.PixelPackBuffer, BufferAccess.ReadOnly);
-                if (gpuPointer == IntPtr.Zero)
-                {
-                    this.Unbind();
-                    return null;
-                }
-
-                //复制到托管数组
-                buffer = new byte[this.BufferSize];
-                Marshal.Copy(gpuPointer, buffer, 0, this.BufferSize);
-            }
-            finally
-            {
-                //取消映射
-                GL.UnmapBuffer(BufferTarget.PixelPackBuffer);
-
-                this.Unbind();
-            }
-
-            return buffer;
-        }
-        #endregion
-
-        #region 释放资源 —— void Dispose()
+        #region 释放资源 —— virtual void Dispose()
         /// <summary>
         /// 释放资源
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
-            GL.DeleteBuffer(this.Id);
+            if (this._disposed)
+            {
+                return;
+            }
+
+            if (this.Id != 0)
+            {
+                GL.DeleteBuffer(this.Id);
+                this.Id = 0;
+            }
             if (this._fenceSync != IntPtr.Zero)
             {
                 GL.DeleteSync(this._fenceSync);
                 this._fenceSync = IntPtr.Zero;
             }
+
+            this._disposed = true;
         }
         #endregion
 
 
-        //Private
+        //protected
+
+        #region 创建缓冲区 —— void CreateBuffer()
+        /// <summary>
+        /// 创建缓冲区
+        /// </summary>
+        protected void CreateBuffer()
+        {
+            this.Id = GL.GenBuffer();
+
+            #region # 验证
+
+            if (this.Id == 0)
+            {
+                throw new RuntimeBinderException($"创建像素缓冲区失败！");
+            }
+
+            #endregion
+
+            this.Bind();
+            GL.BufferData(this.BufferTarget, this.BufferSize, IntPtr.Zero, this.BufferUsage);
+            this.Unbind();
+        }
+        #endregion
+
+        #region 创建栅栏 —— void CreateFence()
+        /// <summary>
+        /// 创建栅栏
+        /// </summary>
+        protected void CreateFence()
+        {
+            if (this._fenceSync != IntPtr.Zero)
+            {
+                GL.DeleteSync(this._fenceSync);
+            }
+
+            this._fenceSync = GL.FenceSync(SyncCondition.SyncGpuCommandsComplete, WaitSyncFlags.None);
+        }
+        #endregion
+
+        #region 等待栅栏 —— void WaitForFence(long timeoutNanoseconds)
+        /// <summary>
+        /// 等待栅栏
+        /// </summary>
+        /// <param name="timeoutNanoseconds">超时时间(纳秒)</param>
+        protected void WaitForFence(long timeoutNanoseconds)
+        {
+            #region # 验证
+
+            if (this._fenceSync == IntPtr.Zero)
+            {
+                return;
+            }
+
+            #endregion
+
+            ClientWaitSyncFlags flags = ClientWaitSyncFlags.SyncFlushCommandsBit;
+            ulong timeout = timeoutNanoseconds < 0 ? ulong.MaxValue : (ulong)timeoutNanoseconds;
+
+            WaitSyncStatus status = GL.ClientWaitSync(this._fenceSync, flags, timeout);
+            if (status == WaitSyncStatus.TimeoutExpired)
+            {
+                throw new TimeoutException("操作超时");
+            }
+            if (status != WaitSyncStatus.AlreadySignaled && status != WaitSyncStatus.ConditionSatisfied)
+            {
+                throw new InvalidOperationException("同步错误");
+            }
+
+            GL.DeleteSync(this._fenceSync);
+            this._fenceSync = IntPtr.Zero;
+        }
+        #endregion
 
         #region 计算缓冲区尺寸 —— int CalculateBufferSize(int width, int height...
         /// <summary>
         /// 计算缓冲区尺寸
         /// </summary>
-        private int CalculateBufferSize(int width, int height, PixelFormat pixelFormat)
+        protected int CalculateBufferSize(int width, int height, PixelFormat pixelFormat)
         {
             return pixelFormat switch
             {

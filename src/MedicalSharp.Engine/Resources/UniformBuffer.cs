@@ -292,10 +292,10 @@ namespace MedicalSharp.Engine.Resources
                 {
                     unsafe
                     {
-                        byte* p = (byte*)ptr;
+                        byte* p = (byte*)ptr.ToPointer();
                         for (int i = 0; i < this.BufferSize; i++)
                         {
-                            p![i] = 0;
+                            p[i] = 0;
                         }
                     }
                 }
