@@ -8,8 +8,10 @@ namespace MedicalSharp.Engine.Resources
     /// <summary>
     /// 像素缓冲区
     /// </summary>
-    public class PixelBuffer : IDisposable
+    public abstract class PixelBuffer : IDisposable
     {
+        //TODO 重构
+
         #region # 字段及构造器
 
         /// <summary>

@@ -226,18 +226,9 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Bind()
         {
-            if (this._vao != 0)
-            {
-                GL.BindVertexArray(this._vao);
-            }
-            if (this._vbo != 0)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, this._vbo);
-            }
-            if (this._ebo != 0)
-            {
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, this._ebo);
-            }
+            GL.BindVertexArray(this._vao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, this._vbo);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this._ebo);
         }
         #endregion
 
@@ -259,21 +250,12 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Dispose()
         {
-            if (this._vao != 0)
-            {
-                GL.DeleteVertexArray(this._vao);
-                this._vao = 0;
-            }
-            if (this._vbo != 0)
-            {
-                GL.DeleteBuffer(this._vbo);
-                this._vbo = 0;
-            }
-            if (this._ebo != 0)
-            {
-                GL.DeleteBuffer(this._ebo);
-                this._ebo = 0;
-            }
+            GL.DeleteVertexArray(this._vao);
+            GL.DeleteBuffer(this._vbo);
+            GL.DeleteBuffer(this._ebo);
+            this._vao = 0;
+            this._vbo = 0;
+            this._ebo = 0;
         }
         #endregion  
 
