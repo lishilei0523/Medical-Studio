@@ -13,9 +13,12 @@ namespace MedicalSharp.Engine.Resources
         #region # 字段及构造器
 
         /// <summary>
-        /// 无参构造器
+        /// 创建纹理构造器
         /// </summary>
-        protected Texture()
+        /// <param name="pixelInternalFormat">像素内部格式</param>
+        /// <param name="pixelFormat">像素格式</param>
+        /// <param name="pixelType">像素类型</param>
+        protected Texture(PixelInternalFormat pixelInternalFormat, PixelFormat pixelFormat, PixelType pixelType)
         {
             int textureId = GL.GenTexture();
 
@@ -29,6 +32,9 @@ namespace MedicalSharp.Engine.Resources
             #endregion
 
             this.Id = textureId;
+            this.PixelInternalFormat = pixelInternalFormat;
+            this.PixelFormat = pixelFormat;
+            this.PixelType = pixelType;
         }
 
         #endregion
@@ -42,26 +48,51 @@ namespace MedicalSharp.Engine.Resources
         public int Id { get; private set; }
         #endregion
 
+        #region 像素内部格式 —— PixelInternalFormat PixelInternalFormat
+        /// <summary>
+        /// 像素内部格式
+        /// </summary>
+        public PixelInternalFormat PixelInternalFormat { get; private set; }
+        #endregion
+
+        #region 像素格式 —— PixelFormat PixelFormat
+        /// <summary>
+        /// 像素格式
+        /// </summary>
+        public PixelFormat PixelFormat { get; private set; }
+        #endregion
+
+        #region 像素类型 —— PixelType PixelType
+        /// <summary>
+        /// 像素类型
+        /// </summary>
+        public PixelType PixelType { get; private set; }
+        #endregion
+
+        #region 最小值过滤器 —— TextureMinFilter MinFilter
+        /// <summary>
+        /// 最小值过滤器
+        /// </summary>
+        public TextureMinFilter MinFilter { get; private set; }
+        #endregion
+
+        #region 最大值过滤器 —— TextureMagFilter MagFilter
+        /// <summary>
+        /// 最大值过滤器
+        /// </summary>
+        public TextureMagFilter MagFilter { get; private set; }
+        #endregion
+
+        #region 包裹模式 —— TextureWrapMode WrapMode
+        /// <summary>
+        /// 包裹模式
+        /// </summary>
+        public TextureWrapMode WrapMode { get; private set; }
+        #endregion
+
         #endregion
 
         #region # 方法
-
-        #region 设置过滤器 —— abstract void SetFilter(TextureMinFilter minFilter...
-        /// <summary>
-        /// 设置过滤器
-        /// </summary>
-        /// <param name="minFilter">最小值过滤器</param>
-        /// <param name="magFilter">最大值过滤器</param>
-        public abstract void SetFilter(TextureMinFilter minFilter, TextureMagFilter magFilter);
-        #endregion
-
-        #region 设置包裹模式 —— abstract void SetWrapMode(TextureWrapMode wrapMode)
-        /// <summary>
-        /// 设置包裹模式
-        /// </summary>
-        /// <param name="wrapMode">包裹模式</param>
-        public abstract void SetWrapMode(TextureWrapMode wrapMode);
-        #endregion
 
         #region 绑定纹理 —— abstract void Bind(int index)
         /// <summary>
@@ -85,13 +116,56 @@ namespace MedicalSharp.Engine.Resources
         public abstract void Unbind();
         #endregion
 
+        #region 分配内存 —— abstract void AllocateMemory()
+        /// <summary>
+        /// 分配内存
+        /// </summary>
+        public abstract void AllocateMemory();
+        #endregion
+
+        #region 分配内存 —— abstract void AllocateMemory(IntPtr pixels)
+        /// <summary>
+        /// 分配内存
+        /// </summary>
+        /// <param name="pixels">像素数据</param>
+        public abstract void AllocateMemory(IntPtr pixels);
+        #endregion
+
+        #region 设置过滤器 —— virtual void SetFilter(TextureMinFilter minFilter...
+        /// <summary>
+        /// 设置过滤器
+        /// </summary>
+        /// <param name="minFilter">最小值过滤器</param>
+        /// <param name="magFilter">最大值过滤器</param>
+        public virtual void SetFilter(TextureMinFilter minFilter, TextureMagFilter magFilter)
+        {
+            this.MinFilter = minFilter;
+            this.MagFilter = magFilter;
+        }
+        #endregion
+
+        #region 设置包裹模式 —— virtual void SetWrapMode(TextureWrapMode wrapMode)
+        /// <summary>
+        /// 设置包裹模式
+        /// </summary>
+        /// <param name="wrapMode">包裹模式</param>
+        public virtual void SetWrapMode(TextureWrapMode wrapMode)
+        {
+            this.WrapMode = wrapMode;
+        }
+        #endregion
+
         #region 释放资源 —— void Dispose()
         /// <summary>
         /// 释放资源
         /// </summary>
         public void Dispose()
         {
-            GL.DeleteTexture(this.Id);
+            if (this.Id != 0)
+            {
+                GL.DeleteTexture(this.Id);
+                this.Id = 0;
+            }
         }
         #endregion
 

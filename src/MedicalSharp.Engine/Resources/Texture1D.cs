@@ -15,24 +15,28 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         /// <param name="width">宽度</param>
         /// <param name="pixelInternalFormat">像素内部格式</param>
-        public Texture1D(int width, PixelInternalFormat pixelInternalFormat = PixelInternalFormat.Rgba32f)
-            : base()
+        /// <param name="pixelFormat">像素格式</param>
+        /// <param name="pixelType">像素类型</param>
+        public Texture1D(int width, PixelInternalFormat pixelInternalFormat = PixelInternalFormat.Rgba32f, PixelFormat pixelFormat = PixelFormat.Rgba, PixelType pixelType = PixelType.Float)
+            : base(pixelInternalFormat, pixelFormat, pixelType)
         {
+            #region # 验证
+
+            if (width <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(width), "宽度必须大于0！");
+            }
+
+            #endregion
+
             this.Width = width;
 
-            //绑定纹理
-            GL.BindTexture(TextureTarget.Texture1D, base.Id);
-
-            //上传纹理至显存
-            GL.TexImage1D(TextureTarget.Texture1D, 0, pixelInternalFormat, this.Width, 0, PixelFormat.Rgba, PixelType.Float, IntPtr.Zero);
+            //分配显存
+            this.AllocateMemory();
 
             //设置参数
-            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
-            //解绑
-            GL.BindTexture(TextureTarget.Texture1D, 0);
+            this.SetFilter(TextureMinFilter.Linear, TextureMagFilter.Linear);
+            this.SetWrapMode(TextureWrapMode.ClampToEdge);
         }
 
         #endregion
@@ -59,42 +63,20 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="data">纹理数据</param>
         public void Update(PixelFormat pixelFormat, PixelType pixelType, IntPtr data)
         {
+            #region # 验证
+
             if (data == IntPtr.Zero)
             {
                 return;
             }
 
-            GL.BindTexture(TextureTarget.Texture1D, base.Id);
+            #endregion
+
+            this.Bind();
+
             GL.TexSubImage1D(TextureTarget.Texture1D, 0, 0, this.Width, pixelFormat, pixelType, data);
-            GL.BindTexture(TextureTarget.Texture1D, 0);
-        }
-        #endregion
 
-        #region 设置过滤器 —— override void SetFilter(TextureMinFilter minFilter...
-        /// <summary>
-        /// 设置过滤器
-        /// </summary>
-        /// <param name="minFilter">最小值过滤器</param>
-        /// <param name="magFilter">最大值过滤器</param>
-        public override void SetFilter(TextureMinFilter minFilter, TextureMagFilter magFilter)
-        {
-            GL.BindTexture(TextureTarget.Texture1D, base.Id);
-            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMinFilter, (int)minFilter);
-            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMagFilter, (int)magFilter);
-            GL.BindTexture(TextureTarget.Texture1D, 0);
-        }
-        #endregion
-
-        #region 设置包裹模式 —— override void SetWrapMode(TextureWrapMode wrapMode)
-        /// <summary>
-        /// 设置包裹模式
-        /// </summary>
-        /// <param name="wrapMode">包裹模式</param>
-        public override void SetWrapMode(TextureWrapMode wrapMode)
-        {
-            GL.BindTexture(TextureTarget.Texture1D, base.Id);
-            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureWrapS, (int)wrapMode);
-            GL.BindTexture(TextureTarget.Texture1D, 0);
+            this.Unbind();
         }
         #endregion
 
@@ -127,6 +109,67 @@ namespace MedicalSharp.Engine.Resources
         public override void Unbind()
         {
             GL.BindTexture(TextureTarget.Texture1D, 0);
+        }
+        #endregion
+
+        #region 分配内存 —— override void AllocateMemory()
+        /// <summary>
+        /// 分配内存
+        /// </summary>
+        public override void AllocateMemory()
+        {
+            this.Bind();
+
+            GL.TexImage1D(TextureTarget.Texture1D, 0, this.PixelInternalFormat, this.Width, 0, this.PixelFormat, this.PixelType, IntPtr.Zero);
+
+            this.Unbind();
+        }
+        #endregion
+
+        #region 分配内存 —— override void AllocateMemory(IntPtr pixels)
+        /// <summary>
+        /// 分配内存
+        /// </summary>
+        /// <param name="pixels">像素数据</param>
+        public override void AllocateMemory(IntPtr pixels)
+        {
+            this.Bind();
+
+            GL.TexImage1D(TextureTarget.Texture1D, 0, this.PixelInternalFormat, this.Width, 0, this.PixelFormat, this.PixelType, pixels);
+
+            this.Unbind();
+        }
+        #endregion
+
+        #region 设置过滤器 —— override void SetFilter(TextureMinFilter minFilter...
+        /// <summary>
+        /// 设置过滤器
+        /// </summary>
+        /// <param name="minFilter">最小值过滤器</param>
+        /// <param name="magFilter">最大值过滤器</param>
+        public override void SetFilter(TextureMinFilter minFilter, TextureMagFilter magFilter)
+        {
+            this.Bind();
+
+            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMinFilter, (int)minFilter);
+            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureMagFilter, (int)magFilter);
+
+            this.Unbind();
+        }
+        #endregion
+
+        #region 设置包裹模式 —— override void SetWrapMode(TextureWrapMode wrapMode)
+        /// <summary>
+        /// 设置包裹模式
+        /// </summary>
+        /// <param name="wrapMode">包裹模式</param>
+        public override void SetWrapMode(TextureWrapMode wrapMode)
+        {
+            this.Bind();
+
+            GL.TexParameter(TextureTarget.Texture1D, TextureParameterName.TextureWrapS, (int)wrapMode);
+
+            this.Unbind();
         }
         #endregion
 
