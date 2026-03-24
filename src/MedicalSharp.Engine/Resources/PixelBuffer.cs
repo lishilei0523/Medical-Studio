@@ -27,12 +27,15 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
         /// <param name="pixelFormat">像素格式</param>
-        protected PixelBuffer(int width, int height, PixelFormat pixelFormat = PixelFormat.Rgba)
+        /// <param name="pixelType">像素类型</param>
+        protected PixelBuffer(int width, int height, PixelFormat pixelFormat, PixelType pixelType)
         {
             this.Width = width;
             this.Height = height;
             this.PixelFormat = pixelFormat;
-            this.BufferSize = this.CalculateBufferSize(width, height, pixelFormat);
+            this.PixelType = pixelType;
+            this.BytesPerPixel = this.CalculateBytesPerPixel(pixelFormat, pixelType);
+            this.BufferSize = width * height * this.BytesPerPixel;
 
             //设置对齐方式（重要！）
             GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
@@ -47,7 +50,7 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 像素缓冲区Id
         /// </summary>
-        public int Id { get; private set; }
+        public int Id { get; protected set; }
         #endregion
 
         #region 宽度 —— int Width
@@ -69,6 +72,20 @@ namespace MedicalSharp.Engine.Resources
         /// 像素格式
         /// </summary>
         public PixelFormat PixelFormat { get; private set; }
+        #endregion
+
+        #region 像素类型 —— PixelType PixelType
+        /// <summary>
+        /// 像素类型
+        /// </summary>
+        public PixelType PixelType { get; private set; }
+        #endregion
+
+        #region 像素字节数 —— int BytesPerPixel
+        /// <summary>
+        /// 像素字节数
+        /// </summary>
+        public int BytesPerPixel { get; private set; }
         #endregion
 
         #region 缓冲区尺寸 —— int BufferSize
@@ -240,19 +257,37 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 计算缓冲区尺寸 —— int CalculateBufferSize(int width, int height...
+        #region 计算像素字节数 —— int CalculateBytesPerPixel(PixelFormat pixelFormat...
         /// <summary>
-        /// 计算缓冲区尺寸
+        /// 计算像素字节数
         /// </summary>
-        protected int CalculateBufferSize(int width, int height, PixelFormat pixelFormat)
+        /// <param name="pixelFormat">像素格式</param>
+        /// <param name="pixelType">像素类型</param>
+        /// <returns>像素字节数</returns>
+        protected int CalculateBytesPerPixel(PixelFormat pixelFormat, PixelType pixelType)
         {
-            return pixelFormat switch
+            int components = pixelFormat switch
             {
-                PixelFormat.Red => width * height,
-                PixelFormat.Rgb => width * height * 3,
-                PixelFormat.Rgba => width * height * 4,
-                _ => throw new ArgumentOutOfRangeException(nameof(pixelFormat), $"不支持的像素格式: {pixelFormat}")
+                PixelFormat.Red => 1,
+                PixelFormat.Rgb => 3,
+                PixelFormat.Rgba => 4,
+                _ => 4
             };
+
+            int typeSize = pixelType switch
+            {
+                PixelType.UnsignedByte => 1,
+                PixelType.Byte => 1,
+                PixelType.UnsignedShort => 2,
+                PixelType.Short => 2,
+                PixelType.UnsignedInt => 4,
+                PixelType.Int => 4,
+                PixelType.Float => 4,
+                PixelType.HalfFloat => 2,
+                _ => 4
+            };
+
+            return components * typeSize;
         }
         #endregion
 

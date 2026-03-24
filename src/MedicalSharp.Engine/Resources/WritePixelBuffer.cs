@@ -8,10 +8,8 @@ namespace MedicalSharp.Engine.Resources
     /// 像素缓冲区(写)
     /// </summary>
     /// <remarks>CPU -> GPU</remarks>
-    public class WritePixelBuffer : PixelBuffer
+    public abstract class WritePixelBuffer : PixelBuffer
     {
-        //TODO 重构，支持多种像素类型
-
         #region # 字段及构造器
 
         /// <summary>
@@ -21,11 +19,10 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="height">高度</param>
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
-        public WritePixelBuffer(int width, int height, PixelFormat pixelFormat = PixelFormat.Rgba,
-            PixelType pixelType = PixelType.UnsignedByte)
-            : base(width, height, pixelFormat)
+        protected WritePixelBuffer(int width, int height, PixelFormat pixelFormat, PixelType pixelType)
+            : base(width, height, pixelFormat, pixelType)
         {
-            base.CreateBuffer();
+
         }
 
         #endregion
@@ -56,10 +53,11 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 方法
 
+        #region 上传byte数组 —— virtual void UploadData(byte[] data)
         /// <summary>
-        /// 上传数据到 PBO
+        /// 上传byte数组
         /// </summary>
-        public void UploadData(byte[] data)
+        public virtual void UploadData(byte[] data)
         {
             #region # 验证
 
@@ -85,19 +83,25 @@ namespace MedicalSharp.Engine.Resources
 
             this.Unbind();
         }
+        #endregion
 
+        #region 上传short数组 —— virtual void UploadData(short[] data)
         /// <summary>
-        /// 上传结构体数据到PBO
+        /// 上传short数组
         /// </summary>
-        public unsafe void UploadData<T>(T data) where T : unmanaged
+        public virtual void UploadData(short[] data)
         {
-            int size = sizeof(T);
-
             #region # 验证
 
-            if (size != this.BufferSize)
+            if (data == null)
             {
-                throw new ArgumentOutOfRangeException($"数据尺寸\"{size}\"与缓冲区尺寸\"{this.BufferSize}\"不匹配");
+                throw new ArgumentNullException(nameof(data), "数据不可为空！");
+            }
+
+            int byteSize = data.Length * sizeof(short);
+            if (byteSize != this.BufferSize)
+            {
+                throw new ArgumentOutOfRangeException($"数据尺寸\"{byteSize}\"与缓冲区尺寸\"{this.BufferSize}\"不匹配");
             }
 
             #endregion
@@ -107,75 +111,81 @@ namespace MedicalSharp.Engine.Resources
             IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
             if (ptr != IntPtr.Zero)
             {
-                Marshal.StructureToPtr(data, ptr, false);
+                Marshal.Copy(data, 0, ptr, data.Length);
                 GL.UnmapBuffer(this.BufferTarget);
             }
 
             this.Unbind();
         }
+        #endregion
 
+        #region 上传int数组 —— virtual void UploadData(int[] data)
         /// <summary>
-        /// 上传数据到2D纹理
+        /// 上传int数组
         /// </summary>
-        public void UploadToTexture(Texture2D texture, bool useFence = true)
+        public virtual void UploadData(int[] data)
         {
-            texture.Bind();
-            this.Bind();
+            #region # 验证
 
-            //从PBO传输到纹理（GPU异步执行）
-            GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, this.Width, this.Height, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
-
-            if (useFence)
+            if (data == null)
             {
-                this.CreateFence();
+                throw new ArgumentNullException(nameof(data), "数据不可为空！");
             }
 
-            this.Unbind();
-            texture.Unbind();
-        }
-
-        /// <summary>
-        /// 上传数据到3D纹理
-        /// </summary>
-        public void UploadToTexture(Texture3D texture, int depth, bool useFence = true)
-        {
-            texture.Bind();
-            this.Bind();
-
-            GL.TexSubImage3D(TextureTarget.Texture3D, 0, 0, 0, 0, this.Width, this.Height, depth, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
-
-            if (useFence)
+            int byteSize = data.Length * sizeof(int);
+            if (byteSize != this.BufferSize)
             {
-                this.CreateFence();
+                throw new ArgumentOutOfRangeException($"数据尺寸\"{byteSize}\"与缓冲区尺寸\"{this.BufferSize}\"不匹配");
             }
 
-            this.Unbind();
-            texture.Unbind();
-        }
+            #endregion
 
-        /// <summary>
-        /// 清空缓冲区
-        /// </summary>
-        public void Clear()
-        {
             this.Bind();
 
             IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
             if (ptr != IntPtr.Zero)
             {
-                unsafe
-                {
-                    byte* p = (byte*)ptr.ToPointer();
-                    for (int i = 0; i < this.BufferSize; i++)
-                    {
-                        p[i] = 0;
-                    }
-                }
+                Marshal.Copy(data, 0, ptr, data.Length);
                 GL.UnmapBuffer(this.BufferTarget);
             }
 
             this.Unbind();
         }
+        #endregion
+
+        #region 上传float数组 —— virtual void UploadData(float[] data)
+        /// <summary>
+        /// 上传float数组
+        /// </summary>
+        public virtual void UploadData(float[] data)
+        {
+            #region # 验证
+
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data), "数据不可为空！");
+            }
+
+            int byteSize = data.Length * sizeof(float);
+            if (byteSize != this.BufferSize)
+            {
+                throw new ArgumentOutOfRangeException($"数据尺寸\"{byteSize}\"与缓冲区尺寸\"{this.BufferSize}\"不匹配");
+            }
+
+            #endregion
+
+            this.Bind();
+
+            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
+            if (ptr != IntPtr.Zero)
+            {
+                Marshal.Copy(data, 0, ptr, data.Length);
+                GL.UnmapBuffer(this.BufferTarget);
+            }
+
+            this.Unbind();
+        }
+        #endregion
 
         #endregion
     }

@@ -19,7 +19,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="height">高度</param>
         /// <param name="pixelFormat">像素格式</param>
         public ReadPixelBuffer(int width, int height, PixelFormat pixelFormat = PixelFormat.Rgba)
-            : base(width, height, pixelFormat)
+            : base(width, height, pixelFormat, PixelType.UnsignedByte)
         {
             base.CreateBuffer();
         }
@@ -118,16 +118,19 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 读取3D纹理 —— void ReadTexture3D(Texture3D texture, int level...
+        #region 读取3D纹理 —— void ReadTexture3D(Texture3D texture, int sliceIndex...
         /// <summary>
         /// 读取3D纹理
         /// </summary>
-        public void ReadTexture3D(Texture3D texture, int level = 0, bool useFence = true)
+        /// <param name="texture">3D纹理</param>
+        /// <param name="sliceIndex">切片索引</param>
+        /// <param name="useFence">是否使用栅栏</param>
+        public void ReadTexture3D(Texture3D texture, int sliceIndex = 0, bool useFence = true)
         {
             texture.Bind();
             this.Bind();
 
-            GL.GetTexImage(TextureTarget.Texture3D, level, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.GetTexImage(TextureTarget.Texture3D, sliceIndex, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
 
             //确保PBO写入完成
             GL.MemoryBarrier(MemoryBarrierFlags.PixelBufferBarrierBit);
@@ -158,11 +161,11 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 非阻塞获取CPU数据 —— bool TryGetData(out byte[] data)
+        #region 非阻塞获取CPU数据 —— bool TryGetCpuData(out byte[] data)
         /// <summary>
         /// 非阻塞获取CPU数据
         /// </summary>
-        public bool TryGetData(out byte[] data)
+        public bool TryGetCpuData(out byte[] data)
         {
             data = null;
 
