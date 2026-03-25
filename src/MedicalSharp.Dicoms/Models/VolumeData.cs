@@ -13,6 +13,11 @@ namespace MedicalSharp.Dicoms.Models
         #region # 字段及构造器
 
         /// <summary>
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
         /// 无参构造器
         /// </summary>
         private VolumeData()
@@ -33,14 +38,6 @@ namespace MedicalSharp.Dicoms.Models
             : this()
         {
             this.SitkImage = sitkImage;
-        }
-
-        /// <summary>
-        /// 析构器
-        /// </summary>
-        ~VolumeData()
-        {
-            this.SitkImage?.Dispose();
         }
 
         #endregion
@@ -195,7 +192,13 @@ namespace MedicalSharp.Dicoms.Models
         /// </summary>
         public void Dispose()
         {
+            if (this._disposed)
+            {
+                return;
+            }
+
             this.SitkImage?.Dispose();
+            this._disposed = true;
         }
         #endregion 
 

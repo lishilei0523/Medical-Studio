@@ -13,6 +13,11 @@ namespace MedicalSharp.Engine.Resources
         #region # 字段及构造器
 
         /// <summary>
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
         /// 创建纹理构造器
         /// </summary>
         /// <param name="pixelInternalFormat">像素内部格式</param>
@@ -131,6 +136,14 @@ namespace MedicalSharp.Engine.Resources
         public abstract void AllocateMemory(IntPtr pixels);
         #endregion
 
+        #region 更新纹理 —— void Update(IntPtr pixels)
+        /// <summary>
+        /// 更新纹理
+        /// </summary>
+        /// <param name="pixels">像素数据</param>
+        public abstract void Update(IntPtr pixels);
+        #endregion
+
         #region 设置过滤器 —— virtual void SetFilter(TextureMinFilter minFilter...
         /// <summary>
         /// 设置过滤器
@@ -161,11 +174,18 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Dispose()
         {
+            if (this._disposed)
+            {
+                return;
+            }
+
             if (this.Id != 0)
             {
                 GL.DeleteTexture(this.Id);
                 this.Id = 0;
             }
+
+            this._disposed = true;
         }
         #endregion
 

@@ -30,12 +30,17 @@ namespace MedicalSharp.Engine.Resources
         private int _ebo;
 
         /// <summary>
-        /// 是否已初始化
+        /// 初始化标识
         /// </summary>
         private bool _initialized;
 
         /// <summary>
-        /// 无参构造器
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
+        /// 默认构造器
         /// </summary>
         private VertexBuffer()
         {
@@ -83,14 +88,6 @@ namespace MedicalSharp.Engine.Resources
             #endregion
 
             this.MeshGeometry = meshGeometry;
-        }
-
-        /// <summary>
-        /// 析构器
-        /// </summary>
-        ~VertexBuffer()
-        {
-            this.Dispose();
         }
 
         #endregion
@@ -250,12 +247,18 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Dispose()
         {
+            if (this._disposed)
+            {
+                return;
+            }
+
             GL.DeleteVertexArray(this._vao);
             GL.DeleteBuffer(this._vbo);
             GL.DeleteBuffer(this._ebo);
             this._vao = 0;
             this._vbo = 0;
             this._ebo = 0;
+            this._disposed = true;
         }
         #endregion  
 

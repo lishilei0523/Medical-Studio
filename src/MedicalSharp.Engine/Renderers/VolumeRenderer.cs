@@ -235,9 +235,9 @@ namespace MedicalSharp.Engine.Renderers
             Matrix4 volumeScaleMatrix = Matrix4.CreateScale(this.Renderable.VolumeScale);
 
             //设置MVP矩阵、相机位置、缩放
-            this.Program.SetUniformMatrix("u_ProjectionMatrix", renderContext.ProjectionMatrix);
-            this.Program.SetUniformMatrix("u_ViewMatrix", renderContext.ViewMatrix);
-            this.Program.SetUniformMatrix("u_ModelMatrix", this.Renderable.ModelMatrix * volumeScaleMatrix);
+            this.Program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
+            this.Program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
+            this.Program.SetUniformMatrix4("u_ModelMatrix", this.Renderable.ModelMatrix * volumeScaleMatrix);
             this.Program.SetUniformVector3("u_CameraPosition", renderContext.CameraPosition);
             this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
 

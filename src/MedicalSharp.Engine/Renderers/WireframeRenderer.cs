@@ -131,14 +131,14 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.Use();
 
             //设置投影矩阵、视图矩阵、相机位置
-            this.Program.SetUniformMatrix("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
-            this.Program.SetUniformMatrix("u_ViewMatrix", this.Camera.ViewMatrix);
+            this.Program.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
+            this.Program.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
             this.Program.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
 
             foreach (WireframeRenderable renderable in this._renderables)
             {
                 //设置模型矩阵
-                this.Program.SetUniformMatrix("u_ModelMatrix", renderable.ModelMatrix);
+                this.Program.SetUniformMatrix4("u_ModelMatrix", renderable.ModelMatrix);
 
                 //绘制填充模型	
                 GL.DepthMask(false);//禁用深度写入、让透明面可以互相混合

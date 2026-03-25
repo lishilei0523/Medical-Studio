@@ -54,32 +54,6 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 方法
 
-        #region 更新纹理 —— void Update(PixelFormat pixelFormat, PixelType pixelType...
-        /// <summary>
-        /// 更新纹理
-        /// </summary>
-        /// <param name="pixelFormat">像素格式</param>
-        /// <param name="pixelType">像素类型</param>
-        /// <param name="data">纹理数据</param>
-        public void Update(PixelFormat pixelFormat, PixelType pixelType, IntPtr data)
-        {
-            #region # 验证
-
-            if (data == IntPtr.Zero)
-            {
-                return;
-            }
-
-            #endregion
-
-            this.Bind();
-
-            GL.TexSubImage1D(TextureTarget.Texture1D, 0, 0, this.Width, pixelFormat, pixelType, data);
-
-            this.Unbind();
-        }
-        #endregion
-
         #region 绑定纹理 —— override void Bind(int index)
         /// <summary>
         /// 绑定纹理
@@ -136,6 +110,30 @@ namespace MedicalSharp.Engine.Resources
             this.Bind();
 
             GL.TexImage1D(TextureTarget.Texture1D, 0, this.PixelInternalFormat, this.Width, 0, this.PixelFormat, this.PixelType, pixels);
+
+            this.Unbind();
+        }
+        #endregion
+
+        #region 更新纹理 —— override void Update(IntPtr pixels)
+        /// <summary>
+        /// 更新纹理
+        /// </summary>
+        /// <param name="pixels">像素数据</param>
+        public override void Update(IntPtr pixels)
+        {
+            #region # 验证
+
+            if (pixels == IntPtr.Zero)
+            {
+                return;
+            }
+
+            #endregion
+
+            this.Bind();
+
+            GL.TexSubImage1D(TextureTarget.Texture1D, 0, 0, this.Width, this.PixelFormat, this.PixelType, pixels);
 
             this.Unbind();
         }

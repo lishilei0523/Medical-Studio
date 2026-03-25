@@ -182,6 +182,89 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 更新纹理 —— override void Update(IntPtr pixels)
+        /// <summary>
+        /// 更新纹理
+        /// </summary>
+        /// <param name="pixels">像素数据</param>
+        public override void Update(IntPtr pixels)
+        {
+            #region # 验证
+
+            if (pixels == IntPtr.Zero)
+            {
+                return;
+            }
+
+            #endregion
+
+            this.Bind();
+
+            GL.TexSubImage3D(TextureTarget.Texture3D, 0, 0, 0, 0, this.Width, this.Height, this.Depth, this.PixelFormat, this.PixelType, pixels);
+
+            this.Unbind();
+        }
+        #endregion
+
+        #region 更新纹理切片 —— void UpdateSlice(int sliceIndex, IntPtr pixels)
+        /// <summary>
+        /// 更新纹理切片
+        /// </summary>
+        /// <param name="sliceIndex">切片索引</param>
+        /// <param name="pixels">像素数据</param>
+        public void UpdateSlice(int sliceIndex, IntPtr pixels)
+        {
+            #region # 验证
+
+            if (pixels == IntPtr.Zero)
+            {
+                return;
+            }
+            if (sliceIndex < 0 || sliceIndex >= this.Depth)
+            {
+                throw new ArgumentOutOfRangeException(nameof(sliceIndex), $"切片索引超出范围[0,{this.Depth - 1}]！");
+            }
+
+            #endregion
+
+            this.Bind();
+
+            GL.TexSubImage3D(TextureTarget.Texture3D, 0, 0, 0, sliceIndex, this.Width, this.Height, 1, this.PixelFormat, this.PixelType, pixels);
+
+            this.Unbind();
+        }
+        #endregion
+
+        #region 更新纹理范围 —— void UpdateRange(int sliceIndex, int slicesCount...
+        /// <summary>
+        /// 更新纹理范围
+        /// </summary>
+        /// <param name="sliceIndex">切片索引</param>
+        /// <param name="slicesCount">切片数量</param>
+        /// <param name="pixels">像素数据</param>
+        public void UpdateRange(int sliceIndex, int slicesCount, IntPtr pixels)
+        {
+            #region # 验证
+
+            if (pixels == IntPtr.Zero)
+            {
+                return;
+            }
+            if (sliceIndex < 0 || sliceIndex + slicesCount > this.Depth)
+            {
+                throw new InvalidOperationException($"切片索引+切片数量超出范围[0,{this.Depth - 1}]！");
+            }
+
+            #endregion
+
+            this.Bind();
+
+            GL.TexSubImage3D(TextureTarget.Texture3D, 0, 0, 0, sliceIndex, this.Width, this.Height, slicesCount, this.PixelFormat, this.PixelType, pixels);
+
+            this.Unbind();
+        }
+        #endregion
+
         #region 设置过滤器 —— override void SetFilter(TextureMinFilter minFilter...
         /// <summary>
         /// 设置过滤器

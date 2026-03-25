@@ -33,26 +33,22 @@ namespace MedicalSharp.Engine.Resources
 
             #endregion
 
-            this.BufferSize = bufferSize;
-            this.Usage = usage;
-
-            int uniformBufferId = GL.GenBuffer();
+            this.Id = GL.GenBuffer();
 
             #region # 验证
 
-            if (uniformBufferId == 0)
+            if (this.Id == 0)
             {
                 throw new RuntimeBinderException("创建统一缓冲区失败！");
             }
 
             #endregion
 
-            this.Id = uniformBufferId;
+            this.BufferSize = bufferSize;
+            this.Usage = usage;
 
             //分配显存
-            this.Bind();
-            GL.BufferData(BufferTarget.UniformBuffer, this.BufferSize, IntPtr.Zero, this.Usage);
-            this.Unbind();
+            this.AllocateMemory();
         }
 
         /// <summary>
@@ -78,16 +74,16 @@ namespace MedicalSharp.Engine.Resources
         public int Id { get; private set; }
         #endregion
 
-        #region 统一缓冲区尺寸 —— int BufferSize
+        #region 缓冲区尺寸 —— int BufferSize
         /// <summary>
-        /// 统一缓冲区尺寸
+        /// 缓冲区尺寸
         /// </summary>
         public int BufferSize { get; private set; }
         #endregion
 
-        #region 统一缓冲区模式 —— BufferUsageHint Usage
+        #region 缓冲区模式 —— BufferUsageHint Usage
         /// <summary>
-        /// 统一缓冲区模式
+        /// 缓冲区模式
         /// </summary>
         public BufferUsageHint Usage { get; private set; }
         #endregion
@@ -137,6 +133,20 @@ namespace MedicalSharp.Engine.Resources
         public void Unbind()
         {
             GL.BindBuffer(BufferTarget.UniformBuffer, 0);
+        }
+        #endregion
+
+        #region 分配内存 —— void AllocateMemory()
+        /// <summary>
+        /// 分配内存
+        /// </summary>
+        public void AllocateMemory()
+        {
+            this.Bind();
+
+            GL.BufferData(BufferTarget.UniformBuffer, this.BufferSize, IntPtr.Zero, this.Usage);
+
+            this.Unbind();
         }
         #endregion
 
@@ -232,7 +242,7 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 映射更新统一缓冲区 —— void MapAndUpdate<T>(T data, int offset = 0)
+        #region 映射更新统一缓冲区 —— void MapAndUpdate<T>(T data, int offset)
         /// <summary>
         /// 映射更新统一缓冲区
         /// </summary>

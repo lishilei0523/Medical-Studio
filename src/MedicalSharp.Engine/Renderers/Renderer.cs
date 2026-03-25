@@ -12,6 +12,11 @@ namespace MedicalSharp.Engine.Renderers
         #region # 字段及构造器
 
         /// <summary>
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
         /// 无参构造器
         /// </summary>
         protected Renderer()
@@ -135,7 +140,13 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         public virtual void Dispose()
         {
+            if (this._disposed)
+            {
+                return;
+            }
+
             this.Program?.Dispose();
+            this._disposed = true;
         }
         #endregion 
 

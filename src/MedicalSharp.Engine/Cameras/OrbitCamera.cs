@@ -71,7 +71,7 @@ namespace MedicalSharp.Engine.Cameras
         private float _zoomSpeed;
 
         /// <summary>
-        /// 构造函数
+        /// 创建轨道相机构造器
         /// </summary>
         /// <param name="targetPosition">目标位置</param>
         /// <param name="distance">相机到目标的距离</param>

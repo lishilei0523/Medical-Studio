@@ -221,9 +221,9 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.Use();
 
             //设置Uniform变量
-            this.Program.SetUniformMatrix("u_ModelMatrix", this.GetPlaneModelMatrix());
-            this.Program.SetUniformMatrix("u_ViewMatrix", this.Camera.ViewMatrix);
-            this.Program.SetUniformMatrix("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
+            this.Program.SetUniformMatrix4("u_ModelMatrix", this.GetPlaneModelMatrix());
+            this.Program.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
+            this.Program.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
 
             this.Program.SetUniformInt("u_PlaneType", (int)this.MPRCamera.PlaneType);
             this.Program.SetUniformFloat("u_SliceIndex", this.MPRCamera.SliceIndex);

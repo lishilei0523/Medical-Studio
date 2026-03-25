@@ -20,6 +20,11 @@ namespace MedicalSharp.Engine.Resources
         private const int TextureWidth = 256;
 
         /// <summary>
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
         /// 纹理数据
         /// </summary>
         private readonly Vector4[] _textureData;
@@ -36,7 +41,7 @@ namespace MedicalSharp.Engine.Resources
         {
             this._textureData = new Vector4[TextureWidth];
             this._controlPoints = new List<TFControlPoint>();
-            this.Texture = new Texture1D(TextureWidth, PixelInternalFormat.Rgba32f);
+            this.Texture = new Texture1D(TextureWidth, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float);
         }
 
         #endregion
@@ -124,8 +129,14 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Dispose()
         {
+            if (this._disposed)
+            {
+                return;
+            }
+
             this._controlPoints.Clear();
             this.Texture?.Dispose();
+            this._disposed = true;
         }
         #endregion
 
@@ -151,7 +162,7 @@ namespace MedicalSharp.Engine.Resources
 
             fixed (void* pointer = this._textureData)
             {
-                this.Texture.Update(PixelFormat.Rgba, PixelType.Float, new IntPtr(pointer));
+                this.Texture.Update(new IntPtr(pointer));
             }
         }
         #endregion

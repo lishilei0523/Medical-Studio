@@ -89,9 +89,9 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion 
 
-        #region 只读属性 - 灰度控制点集 —— static IReadOnlyList<TFControlPoint> GrayControlPoints
+        #region 只读属性 - 灰度控制点列表 —— static IReadOnlyList<TFControlPoint> GrayControlPoints
         /// <summary>
-        /// 只读属性 - 灰度控制点集
+        /// 只读属性 - 灰度控制点列表
         /// </summary>
         public static IReadOnlyList<TFControlPoint> GrayControlPoints
         {
@@ -99,9 +99,9 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion 
 
-        #region 只读属性 - 彩虹控制点集 —— static IReadOnlyList<TFControlPoint> RainbowControlPoints
+        #region 只读属性 - 彩虹控制点列表 —— static IReadOnlyList<TFControlPoint> RainbowControlPoints
         /// <summary>
-        /// 只读属性 - 彩虹控制点集
+        /// 只读属性 - 彩虹控制点列表
         /// </summary>
         public static IReadOnlyList<TFControlPoint> RainbowControlPoints
         {
@@ -109,9 +109,9 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion 
 
-        #region 只读属性 - 骨骼控制点集 —— static IReadOnlyList<TFControlPoint> BoneControlPoints
+        #region 只读属性 - 骨骼控制点列表 —— static IReadOnlyList<TFControlPoint> BoneControlPoints
         /// <summary>
-        /// 只读属性 - 骨骼控制点集
+        /// 只读属性 - 骨骼控制点列表
         /// </summary>
         public static IReadOnlyList<TFControlPoint> BoneControlPoints
         {
@@ -234,11 +234,11 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 获取灰度控制点集 —— static TFControlPoint[] GetGrayControlPoints()
+        #region 获取灰度控制点列表 —— static TFControlPoint[] GetGrayControlPoints()
         /// <summary>
-        /// 获取灰度控制点集
+        /// 获取灰度控制点列表
         /// </summary>
-        /// <returns>灰度控制点集</returns>
+        /// <returns>控制点列表</returns>
         private static TFControlPoint[] GetGrayControlPoints()
         {
             TFControlPoint[] controlPoints =
@@ -251,11 +251,11 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 获取彩虹控制点集 —— static TFControlPoint[] GetRainbowControlPoints()
+        #region 获取彩虹控制点列表 —— static TFControlPoint[] GetRainbowControlPoints()
         /// <summary>
-        /// 获取彩虹控制点集
+        /// 获取彩虹控制点列表
         /// </summary>
-        /// <returns>彩虹控制点集</returns>
+        /// <returns>控制点列表</returns>
         private static TFControlPoint[] GetRainbowControlPoints()
         {
             TFControlPoint[] controlPoints =
@@ -271,11 +271,11 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 获取骨骼控制点集 —— static TFControlPoint[] GetBoneControlPoints()
+        #region 获取骨骼控制点列表 —— static TFControlPoint[] GetBoneControlPoints()
         /// <summary>
-        /// 获取骨骼控制点集
+        /// 获取骨骼控制点列表
         /// </summary>
-        /// <returns>骨骼控制点集</returns>
+        /// <returns>控制点列表</returns>
         private static TFControlPoint[] GetBoneControlPoints()
         {
             TFControlPoint[] controlPoints =

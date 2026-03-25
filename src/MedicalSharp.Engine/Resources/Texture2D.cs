@@ -128,6 +128,30 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 更新纹理 —— override void Update(IntPtr pixels)
+        /// <summary>
+        /// 更新纹理
+        /// </summary>
+        /// <param name="pixels">像素数据</param>
+        public override void Update(IntPtr pixels)
+        {
+            #region # 验证
+
+            if (pixels == IntPtr.Zero)
+            {
+                return;
+            }
+
+            #endregion
+
+            this.Bind();
+
+            GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, this.Width, this.Height, this.PixelFormat, this.PixelType, pixels);
+
+            this.Unbind();
+        }
+        #endregion
+
         #region 设置过滤器 —— override void SetFilter(TextureMinFilter minFilter...
         /// <summary>
         /// 设置过滤器

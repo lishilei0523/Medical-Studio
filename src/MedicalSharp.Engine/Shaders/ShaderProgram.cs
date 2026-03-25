@@ -14,30 +14,25 @@ namespace MedicalSharp.Engine.Shaders
         #region # 字段及构造器
 
         /// <summary>
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
         /// 创建Shader程序构造器
         /// </summary>
         public ShaderProgram()
         {
-            int programId = GL.CreateProgram();
+            this.Id = GL.CreateProgram();
 
             #region # 验证
 
-            if (programId == 0)
+            if (this.Id == 0)
             {
                 throw new RuntimeBinderException("创建Shader程序失败！");
             }
 
             #endregion
-
-            this.Id = programId;
-        }
-
-        /// <summary>
-        /// 析构器
-        /// </summary>
-        ~ShaderProgram()
-        {
-            this.Dispose();
         }
 
         #endregion
@@ -171,7 +166,7 @@ namespace MedicalSharp.Engine.Shaders
         public void SetUniformBoolean(string key, bool value)
         {
             int uniformId = GL.GetUniformLocation(this.Id, key);
-            GL.Uniform1(uniformId, Convert.ToInt16(value));
+            GL.Uniform1(uniformId, Convert.ToByte(value));
         }
         #endregion
 
@@ -195,6 +190,19 @@ namespace MedicalSharp.Engine.Shaders
         /// <param name="key">键</param>
         /// <param name="value">值</param>
         public void SetUniformFloat(string key, float value)
+        {
+            int uniformId = GL.GetUniformLocation(this.Id, key);
+            GL.Uniform1(uniformId, value);
+        }
+        #endregion
+
+        #region 设置Uniform数值 —— void SetUniformDouble(string key, double value)
+        /// <summary>
+        /// 设置Uniform数值
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
+        public void SetUniformDouble(string key, double value)
         {
             int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform1(uniformId, value);
@@ -240,13 +248,13 @@ namespace MedicalSharp.Engine.Shaders
         }
         #endregion
 
-        #region 设置Uniform矩阵 —— void SetUniformMatrix(string key, Matrix4 value)
+        #region 设置Uniform矩阵 —— void SetUniformMatrix4(string key, Matrix4 value)
         /// <summary>
         /// 设置Uniform矩阵
         /// </summary>
         /// <param name="key">键</param>
         /// <param name="value">值</param>
-        public void SetUniformMatrix(string key, Matrix4 value)
+        public void SetUniformMatrix4(string key, Matrix4 value)
         {
             int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.UniformMatrix4(uniformId, false, ref value);
@@ -259,7 +267,13 @@ namespace MedicalSharp.Engine.Shaders
         /// </summary>
         public void Dispose()
         {
+            if (this._disposed)
+            {
+                return;
+            }
+
             GL.DeleteProgram(this.Id);
+            this._disposed = true;
         }
         #endregion
 
