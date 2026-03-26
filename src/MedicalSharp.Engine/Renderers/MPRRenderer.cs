@@ -307,9 +307,6 @@ namespace MedicalSharp.Engine.Renderers
             //设置体积实际尺寸
             this.MPRCamera.VolumeActualSize = this.Renderable.ActualSize;
 
-            //设置目标位置为图像原点
-            //this.MPRCamera.TargetPosition = this.Renderable.Origin;
-
             //根据平面类型设置最大切片数
             int maxSlicesCount = this.MPRCamera.PlaneType switch
             {
