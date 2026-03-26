@@ -152,7 +152,7 @@ namespace MedicalSharp.Engine.Renderers
                 renderable.StrokeBuffer.Draw(PrimitiveType.Lines);
 
                 //触发渲染事件
-                renderable.OnRender(this.Program, renderContext);
+                renderable.OnRender(renderContext);
             }
 
             //取消使用

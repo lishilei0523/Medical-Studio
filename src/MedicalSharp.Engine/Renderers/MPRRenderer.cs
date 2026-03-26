@@ -244,9 +244,6 @@ namespace MedicalSharp.Engine.Renderers
             this.Renderable.VolumeTexture.Bind(0);
             this.Program.SetUniformInt("u_VolumeTexture", 0);
 
-            //设置纹理参数
-            //this.SetTextureParameters();
-
             //绘制平面
             this._unitPlane.Draw(PrimitiveType.Triangles);
 
@@ -259,7 +256,7 @@ namespace MedicalSharp.Engine.Renderers
             //触发渲染事件
             RenderContext context = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
-            this.Renderable.OnRender(this.Program, context);
+            this.Renderable.OnRender(context);
         }
         #endregion
 
@@ -335,36 +332,6 @@ namespace MedicalSharp.Engine.Renderers
 
             this.MPRCamera.SliceSpacing = sliceSpacing;
             this.MPRCamera.SliceIndex = maxSlicesCount / 2;
-        }
-        #endregion
-
-        #region 设置纹理参数 —— void SetTextureParameters()
-        /// <summary>
-        /// 设置纹理参数
-        /// </summary>
-        private void SetTextureParameters()
-        {
-            #region # 验证
-
-            if (this.Renderable?.VolumeTexture == null)
-            {
-                return;
-            }
-
-            #endregion
-
-            //设置包裹模式
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder);
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder);
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToBorder);
-
-            //使用线性插值获得平滑切片
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
-            //设置边框颜色
-            float[] borderColor = [0.0f, 0.0f, 0.0f, 0.0f];
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureBorderColor, borderColor);
         }
         #endregion
 

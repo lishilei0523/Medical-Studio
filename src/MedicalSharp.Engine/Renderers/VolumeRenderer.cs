@@ -271,7 +271,7 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.Unuse();
 
             //触发渲染事件
-            this.Renderable.OnRender(this.Program, renderContext);
+            this.Renderable.OnRender(renderContext);
         }
         #endregion
 

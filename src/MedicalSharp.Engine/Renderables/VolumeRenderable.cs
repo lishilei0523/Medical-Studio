@@ -1,5 +1,8 @@
 ﻿using MedicalSharp.Engine.Resources;
+using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Mathematics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Engine.Renderables
 {
@@ -118,7 +121,26 @@ namespace MedicalSharp.Engine.Renderables
         /// 切面向量
         /// </summary>
         public Vector3 SliceDirection { get; private set; }
-        #endregion 
+        #endregion
+
+        #endregion
+
+        #region # 方法
+
+        #region 计算局部包围盒 —— override BoundingBox CalculateLocalBoundingBox()
+        /// <summary>
+        /// 计算局部包围盒
+        /// </summary>
+        protected override BoundingBox CalculateLocalBoundingBox()
+        {
+            Matrix4 scaleMatrix = Matrix4.CreateScale(this.VolumeScale);
+            IEnumerable<Vector3> originalPositions = ResourceManager.UnitCube.Vertices.Select(x => x.Position);
+            IEnumerable<Vector3> localPositions = originalPositions.Select(position => Vector3.TransformPosition(position, scaleMatrix));
+            BoundingBox boundingBox = BoundingBox.FromPoints([.. localPositions]);
+
+            return boundingBox;
+        }
+        #endregion
 
         #endregion
     }

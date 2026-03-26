@@ -1,6 +1,9 @@
 ﻿using MedicalSharp.Engine.Resources;
+using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Engine.Renderables
 {
@@ -76,6 +79,8 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 方法
 
+        //Public
+
         #region 设置颜色 —— void SetColor(Vector4 stroke, float strokeThickness...
         /// <summary>
         /// 设置颜色
@@ -101,6 +106,22 @@ namespace MedicalSharp.Engine.Renderables
             this.FillBuffer?.Dispose();
         }
         #endregion 
+
+
+        //Protected
+
+        #region 计算局部包围盒 —— override BoundingBox CalculateLocalBoundingBox()
+        /// <summary>
+        /// 计算局部包围盒
+        /// </summary>
+        protected override BoundingBox CalculateLocalBoundingBox()
+        {
+            IEnumerable<Vector3> localPositions = this.StrokeBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
+            BoundingBox boundingBox = BoundingBox.FromPoints([.. localPositions]);
+
+            return boundingBox;
+        }
+        #endregion
 
         #endregion
     }
