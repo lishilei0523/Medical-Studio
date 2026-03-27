@@ -25,9 +25,9 @@
     <PackageReference Include="Caliburn.Micro.Platform.Core" Version="5.0.181-beta" />
     <PackageReference Include="Caliburn.Micro.Avalonia" Version="5.0.258-beta" />
     <PackageReference Include="MrAdvice" Version="2.20.5" />
-    <PackageReference Include="SD.IOC.Core" Version="3.0.0" />
-    <PackageReference Include="SD.IOC.Extension.NetCore" Version="3.0.0" />
-    <PackageReference Include="SD.Infrastructure" Version="4.0.0" />
+    <PackageReference Include="SD.IOC.Core" Version="3.0.1" />
+    <PackageReference Include="SD.IOC.Extension.NetCore" Version="3.0.1" />
+    <PackageReference Include="SD.Infrastructure" Version="4.0.1" />
     <PackageReference Include="SD.Infrastructure.Avalonia" Version="1.0.1" />
     <PackageReference Include="SD.Infrastructure.Avalonia.Caliburn" Version="1.0.1" />
     <PackageReference Include="SimpleITK.Runtimes.win-x64" Version="2.5.3" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
