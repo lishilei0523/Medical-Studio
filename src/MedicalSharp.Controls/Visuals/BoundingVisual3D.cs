@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using MedicalSharp.Controls.Base;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Renderables;
 
 namespace MedicalSharp.Controls.Visuals
@@ -33,34 +33,19 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         static BoundingVisual3D()
         {
-            StrokeProperty = AvaloniaProperty.Register<OpenTKViewport, Color>(nameof(Stroke), Colors.Red);
-            StrokeThicknessProperty = AvaloniaProperty.Register<OpenTKViewport, float>(nameof(StrokeThickness), 1.0f);
-            FillProperty = AvaloniaProperty.Register<OpenTKViewport, Color>(nameof(Fill), Colors.Transparent);
-        }
+            StrokeProperty = AvaloniaProperty.Register<BoundingVisual3D, Color>(nameof(Stroke), Colors.Red);
+            StrokeThicknessProperty = AvaloniaProperty.Register<BoundingVisual3D, float>(nameof(StrokeThickness), 1.0f);
+            FillProperty = AvaloniaProperty.Register<BoundingVisual3D, Color>(nameof(Fill), Colors.Transparent);
 
-        /// <summary>
-        /// 线框渲染对象
-        /// </summary>
-        protected WireframeRenderable _renderable;
-
-        /// <summary>
-        /// 实例构造器
-        /// </summary>
-        protected BoundingVisual3D()
-        {
-            this._renderable = null;
+            //属性改变事件
+            StrokeProperty.Changed.AddClassHandler<BoundingVisual3D, Color>(OnStrokeChanged);
+            StrokeThicknessProperty.Changed.AddClassHandler<BoundingVisual3D, float>(OnStrokeThicknessChanged);
+            FillProperty.Changed.AddClassHandler<BoundingVisual3D, Color>(OnFillChanged);
         }
 
         #endregion
 
         #region # 属性
-
-        #region 线框渲染对象 —— abstract WireframeRenderable Renderable
-        /// <summary>
-        /// 线框渲染对象
-        /// </summary>
-        public abstract WireframeRenderable Renderable { get; }
-        #endregion
 
         #region 依赖属性 - 线框颜色 —— Color Stroke
         /// <summary>
@@ -95,6 +80,13 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 只读属性 - 线框渲染对象 —— abstract WireframeRenderable Renderable
+        /// <summary>
+        /// 只读属性 - 线框渲染对象
+        /// </summary>
+        public abstract WireframeRenderable Renderable { get; }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -106,9 +98,38 @@ namespace MedicalSharp.Controls.Visuals
         protected override void OnUnloaded(RoutedEventArgs eventArgs)
         {
             this.Renderable?.Dispose();
-            this._renderable = null;
         }
         #endregion 
+
+        #region 线框颜色改变事件 —— static void OnStrokeChanged(BoundingVisual3D visual3D...
+        /// <summary>
+        /// 线框颜色改变事件
+        /// </summary>
+        private static void OnStrokeChanged(BoundingVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Color> eventArgs)
+        {
+            visual3D.Renderable.SetColor(eventArgs.NewValue.Value.ToVector4(), visual3D.StrokeThickness, visual3D.Fill.ToVector4());
+        }
+        #endregion
+
+        #region 线框粗细改变事件 —— static void OnStrokeThicknessChanged(BoundingVisual3D visual3D...
+        /// <summary>
+        /// 线框粗细改变事件
+        /// </summary>
+        private static void OnStrokeThicknessChanged(BoundingVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        {
+            visual3D.Renderable.SetColor(visual3D.Stroke.ToVector4(), eventArgs.NewValue.Value, visual3D.Fill.ToVector4());
+        }
+        #endregion
+
+        #region 填充颜色改变事件 —— static void OnFillChanged(BoundingVisual3D visual3D...
+        /// <summary>
+        /// 填充颜色改变事件
+        /// </summary>
+        private static void OnFillChanged(BoundingVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Color> eventArgs)
+        {
+            visual3D.Renderable.SetColor(visual3D.Stroke.ToVector4(), visual3D.StrokeThickness, eventArgs.NewValue.Value.ToVector4());
+        }
+        #endregion
 
         #endregion
     }

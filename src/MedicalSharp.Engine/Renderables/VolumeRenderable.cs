@@ -127,11 +127,11 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 方法
 
-        #region 计算局部包围盒 —— override BoundingBox CalculateLocalBoundingBox()
+        #region 计算包围盒 —— override BoundingBox CalculateBoundingBox()
         /// <summary>
-        /// 计算局部包围盒
+        /// 计算包围盒
         /// </summary>
-        protected override BoundingBox CalculateLocalBoundingBox()
+        protected override BoundingBox CalculateBoundingBox()
         {
             Matrix4 scaleMatrix = Matrix4.CreateScale(this.VolumeScale);
             IEnumerable<Vector3> originalPositions = ResourceManager.UnitCube.Vertices.Select(x => x.Position);

@@ -1,9 +1,7 @@
 ﻿using Avalonia;
-using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Builders;
 using MedicalSharp.Engine.Renderables;
-using MedicalSharp.Engine.Resources;
 using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
 
@@ -32,7 +30,7 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<float> DepthProperty;
 
         /// <summary>
-        /// 中心点位置依赖属性
+        /// 中心位置依赖属性
         /// </summary>
         public static readonly StyledProperty<Vector3D> CenterProperty;
 
@@ -41,41 +39,35 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         static BoundingBoxVisual3D()
         {
-            WidthProperty = AvaloniaProperty.Register<OpenTKViewport, float>(nameof(Width), 1.0f);
-            HeightProperty = AvaloniaProperty.Register<OpenTKViewport, float>(nameof(Height), 1.0f);
-            DepthProperty = AvaloniaProperty.Register<OpenTKViewport, float>(nameof(Depth), 1.0f);
-            CenterProperty = AvaloniaProperty.Register<OpenTKViewport, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+            WidthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Width), 1.0f);
+            HeightProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Height), 1.0f);
+            DepthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Depth), 1.0f);
+            CenterProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+
+            //属性改变事件
+            WidthProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnWidthChanged);
+            HeightProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnHeightChanged);
+            DepthProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnDepthChanged);
+            CenterProperty.Changed.AddClassHandler<BoundingBoxVisual3D, Vector3D>(OnCenterChanged);
+        }
+
+
+        /// <summary>
+        /// 线框渲染对象
+        /// </summary>
+        private WireframeRenderable _renderable;
+
+        /// <summary>
+        /// 默认构造器
+        /// </summary>
+        public BoundingBoxVisual3D()
+        {
+            this._renderable = null;
         }
 
         #endregion
 
         #region # 属性
-
-        #region 线框渲染对象 —— abstract WireframeRenderable Renderable
-        /// <summary>
-        /// 线框渲染对象
-        /// </summary>
-        public override WireframeRenderable Renderable
-        {
-            get
-            {
-                if (this._renderable == null)
-                {
-                    MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Lines);
-                    MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Triangles);
-                    VertexBuffer strokeBuffer = new VertexBuffer(strokeMesh);
-                    VertexBuffer fillBuffer = new VertexBuffer(fillMesh);
-                    strokeBuffer.Setup();
-                    fillBuffer.Setup();
-
-                    this._renderable = new WireframeRenderable(strokeBuffer, fillBuffer);
-                    this._renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-                }
-
-                return this._renderable;
-            }
-        }
-        #endregion
 
         #region 依赖属性 - 宽度 —— float Width
         /// <summary>
@@ -110,14 +102,94 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 依赖属性 - 中心点位置 —— Vector3D Center
+        #region 依赖属性 - 中心位置 —— Vector3D Center
         /// <summary>
-        /// 依赖属性 - 中心点位置
+        /// 依赖属性 - 中心位置
         /// </summary>
         public Vector3D Center
         {
             get => this.GetValue(CenterProperty);
             set => this.SetValue(CenterProperty, value);
+        }
+        #endregion
+
+        #region 只读属性 - 线框渲染对象 —— override WireframeRenderable Renderable
+        /// <summary>
+        /// 只读属性 - 线框渲染对象
+        /// </summary>
+        public override WireframeRenderable Renderable
+        {
+            get
+            {
+                if (this._renderable == null)
+                {
+                    MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Lines);
+                    MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Triangles);
+                    this._renderable = new WireframeRenderable(strokeMesh, fillMesh);
+                    this._renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                }
+
+                return this._renderable;
+            }
+        }
+        #endregion
+
+        #endregion
+
+        #region # 方法
+
+        #region 更新渲染对象 —— void UpdateRenderable()
+        /// <summary>
+        /// 更新渲染对象
+        /// </summary>
+        private void UpdateRenderable()
+        {
+            if (this._renderable != null)
+            {
+                MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Triangles);
+                this._renderable.Update(strokeMesh, fillMesh);
+            }
+        }
+        #endregion
+
+        #region 宽度改变事件 —— static void OnWidthChanged(BoundingBoxVisual3D visual3D...
+        /// <summary>
+        /// 宽度改变事件
+        /// </summary>
+        private static void OnWidthChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        {
+            visual3D.UpdateRenderable();
+        }
+        #endregion
+
+        #region 高度改变事件 —— static void OnHeightChanged(BoundingBoxVisual3D visual3D...
+        /// <summary>
+        /// 高度改变事件
+        /// </summary>
+        private static void OnHeightChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        {
+            visual3D.UpdateRenderable();
+        }
+        #endregion
+
+        #region 深度改变事件 —— static void OnDepthChanged(BoundingBoxVisual3D visual3D...
+        /// <summary>
+        /// 深度改变事件
+        /// </summary>
+        private static void OnDepthChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        {
+            visual3D.UpdateRenderable();
+        }
+        #endregion
+
+        #region 中心位置改变事件 —— static void OnCenterChanged(BoundingBoxVisual3D visual3D...
+        /// <summary>
+        /// 中心位置改变事件
+        /// </summary>
+        private static void OnCenterChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
+        {
+            visual3D.UpdateRenderable();
         }
         #endregion
 

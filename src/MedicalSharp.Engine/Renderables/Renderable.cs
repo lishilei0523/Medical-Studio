@@ -72,7 +72,7 @@ namespace MedicalSharp.Engine.Renderables
             {
                 if (this._boundingsDirty || !this._boundingBox.HasValue)
                 {
-                    this._boundingBox = this.CalculateLocalBoundingBox();
+                    this._boundingBox = this.CalculateBoundingBox();
                     this._boundingsDirty = false;
                 }
 
@@ -92,7 +92,7 @@ namespace MedicalSharp.Engine.Renderables
             {
                 if (this._boundingsDirty || !this._boundingSphere.HasValue)
                 {
-                    this._boundingSphere = this.CalculateLocalBoundingSphere();
+                    this._boundingSphere = this.CalculateBoundingSphere();
                 }
 
                 return this._boundingSphere.Value;
@@ -135,18 +135,18 @@ namespace MedicalSharp.Engine.Renderables
 
         //Protected
 
-        #region 计算局部包围盒 —— abstract BoundingBox CalculateLocalBoundingBox()
+        #region 计算包围盒 —— abstract BoundingBox CalculateBoundingBox()
         /// <summary>
-        /// 计算局部包围盒
+        /// 计算包围盒
         /// </summary>
-        protected abstract BoundingBox CalculateLocalBoundingBox();
+        protected abstract BoundingBox CalculateBoundingBox();
         #endregion
 
-        #region 计算局部包围球 —— virtual BoundingSphere CalculateLocalBoundingSphere()
+        #region 计算包围球 —— virtual BoundingSphere CalculateBoundingSphere()
         /// <summary>
-        /// 计算局部包围球
+        /// 计算包围球
         /// </summary>
-        protected virtual BoundingSphere CalculateLocalBoundingSphere()
+        protected virtual BoundingSphere CalculateBoundingSphere()
         {
             //默认从包围盒生成包围球
             return this.BoundingBox.ToBoundingSphere();

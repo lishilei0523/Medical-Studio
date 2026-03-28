@@ -15,9 +15,14 @@ namespace MedicalSharp.Engine.Renderables
         #region # 字段及构造器
 
         /// <summary>
-        /// 三角形是否脏
+        /// 线框顶点缓冲区
         /// </summary>
-        private bool _trianglesDirty;
+        private VertexBuffer _strokeBuffer;
+
+        /// <summary>
+        /// 填充顶点缓冲区
+        /// </summary>
+        private VertexBuffer _fillBuffer;
 
         /// <summary>
         /// 三角形列表
@@ -29,7 +34,6 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         private WireframeRenderable()
         {
-            this._trianglesDirty = true;
             this._triangles = new List<Triangle>();
             this.Stroke = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
             this.StrokeThickness = 1.0f;
@@ -39,26 +43,28 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 创建线框渲染对象构造器
         /// </summary>
-        /// <param name="strokeBuffer">线框顶点缓冲区</param>
-        /// <param name="fillBuffer">填充顶点缓冲区</param>
-        public WireframeRenderable(VertexBuffer strokeBuffer, VertexBuffer fillBuffer)
+        /// <param name="strokeMesh">线框网格</param>
+        /// <param name="fillMesh">填充网格</param>
+        public WireframeRenderable(MeshGeometry strokeMesh, MeshGeometry fillMesh)
             : this()
         {
             #region # 验证
 
-            if (strokeBuffer == null)
+            if (strokeMesh == null)
             {
-                throw new ArgumentNullException(nameof(strokeBuffer), "线框顶点缓冲区不可为空！");
+                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
             }
-            if (fillBuffer == null)
+            if (fillMesh == null)
             {
-                throw new ArgumentNullException(nameof(fillBuffer), "填充顶点缓冲区不可为空！");
+                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
             }
 
             #endregion
 
-            this.StrokeBuffer = strokeBuffer;
-            this.FillBuffer = fillBuffer;
+            this._strokeBuffer = new VertexBuffer(strokeMesh);
+            this._fillBuffer = new VertexBuffer(fillMesh);
+            this._strokeBuffer.Setup();
+            this._fillBuffer.Setup();
 
             //提取三角形面数据
             this.ExtractTriangles();
@@ -67,20 +73,6 @@ namespace MedicalSharp.Engine.Renderables
         #endregion
 
         #region # 属性
-
-        #region 线框顶点缓冲区 —— VertexBuffer StrokeBuffer
-        /// <summary>
-        /// 线框顶点缓冲区
-        /// </summary>
-        public VertexBuffer StrokeBuffer { get; private set; }
-        #endregion
-
-        #region 填充顶点缓冲区 —— VertexBuffer FillBuffer
-        /// <summary>
-        /// 填充顶点缓冲区
-        /// </summary>
-        public VertexBuffer FillBuffer { get; private set; }
-        #endregion
 
         #region 线框颜色 —— Vector4 Stroke
         /// <summary>
@@ -103,6 +95,26 @@ namespace MedicalSharp.Engine.Renderables
         public Vector4 Fill { get; private set; }
         #endregion
 
+        #region 只读属性 - 线框顶点缓冲区 —— VertexBuffer StrokeBuffer
+        /// <summary>
+        /// 只读属性 - 线框顶点缓冲区
+        /// </summary>
+        internal VertexBuffer StrokeBuffer
+        {
+            get => this._strokeBuffer;
+        }
+        #endregion
+
+        #region 只读属性 - 填充顶点缓冲区 —— VertexBuffer FillBuffer
+        /// <summary>
+        /// 只读属性 - 填充顶点缓冲区
+        /// </summary>
+        internal VertexBuffer FillBuffer
+        {
+            get => this._fillBuffer;
+        }
+        #endregion
+
         #region 只读属性 - 三角形列表 —— IReadOnlyList<Triangle> Triangles
         /// <summary>
         /// 只读属性 - 三角形列表
@@ -118,6 +130,44 @@ namespace MedicalSharp.Engine.Renderables
         #region # 方法
 
         //Public
+
+        #region 更新线框渲染对象 —— void Update(MeshGeometry strokeMesh, MeshGeometry fillMesh)
+        /// <summary>
+        /// 更新线框渲染对象
+        /// </summary>
+        /// <param name="strokeMesh">线框网格</param>
+        /// <param name="fillMesh">填充网格</param>
+        public void Update(MeshGeometry strokeMesh, MeshGeometry fillMesh)
+        {
+            #region # 验证
+
+            if (strokeMesh == null)
+            {
+                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
+            }
+            if (fillMesh == null)
+            {
+                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
+            }
+
+            #endregion
+
+            //先释放旧的
+            this._strokeBuffer.Dispose();
+            this._fillBuffer.Dispose();
+
+            this._strokeBuffer = new VertexBuffer(strokeMesh);
+            this._fillBuffer = new VertexBuffer(fillMesh);
+            this._strokeBuffer.Setup();
+            this._fillBuffer.Setup();
+
+            //提取三角形面数据
+            this.ExtractTriangles();
+
+            //标记包围盒/包围球为脏
+            this.InvalidateBoundings();
+        }
+        #endregion
 
         #region 设置颜色 —— void SetColor(Vector4 stroke, float strokeThickness...
         /// <summary>
@@ -206,22 +256,22 @@ namespace MedicalSharp.Engine.Renderables
         public void Dispose()
         {
             this._triangles.Clear();
-            this.StrokeBuffer?.Dispose();
-            this.FillBuffer?.Dispose();
+            this._strokeBuffer.Dispose();
+            this._fillBuffer.Dispose();
         }
         #endregion
 
 
         //Protected
 
-        #region 计算局部包围盒 —— override BoundingBox CalculateLocalBoundingBox()
+        #region 计算包围盒 —— override BoundingBox CalculateBoundingBox()
         /// <summary>
-        /// 计算局部包围盒
+        /// 计算包围盒
         /// </summary>
-        protected override BoundingBox CalculateLocalBoundingBox()
+        protected override BoundingBox CalculateBoundingBox()
         {
-            IEnumerable<Vector3> localPositions = this.StrokeBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
-            BoundingBox boundingBox = BoundingBox.FromPoints([.. localPositions]);
+            IEnumerable<Vector3> positions = this.StrokeBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
+            BoundingBox boundingBox = BoundingBox.FromPoints([.. positions]);
 
             return boundingBox;
         }
@@ -265,20 +315,6 @@ namespace MedicalSharp.Engine.Renderables
                     this._triangles.Add(new Triangle(pointA, pointB, pointC));
                 }
             }
-
-            this._trianglesDirty = false;
-        }
-        #endregion
-
-        #region 标记三角形面为脏 —— void InvalidateTriangles()
-        /// <summary>
-        /// 标记三角形面为脏
-        /// </summary>
-        /// <remarks>当对象几何改变时调用</remarks>
-        protected void InvalidateTriangles()
-        {
-            this._trianglesDirty = true;
-            this._triangles.Clear();
         }
         #endregion
 
