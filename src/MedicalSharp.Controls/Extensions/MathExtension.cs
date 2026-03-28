@@ -61,6 +61,36 @@ namespace MedicalSharp.Controls.Extensions
         }
         #endregion
 
+        #region # Point转Vector2 —— static Vector2 ToVector2(this Point point)
+        /// <summary>
+        /// Point转Vector2
+        /// </summary>
+        public static Vector2 ToVector2(this Point point)
+        {
+            return new Vector2((float)point.X, (float)point.Y);
+        }
+        #endregion
+
+        #region # Vector2转Point —— static Point ToPoint(this Vector2 vector2)
+        /// <summary>
+        /// Vector2转Point
+        /// </summary>
+        public static Point ToPoint(this Vector2 vector2)
+        {
+            return new Point(vector2.X, vector2.Y);
+        }
+        #endregion
+
+        #region # PixelSize转Vector2 —— static Vector2 ToVector2(this PixelSize pixelSize)
+        /// <summary>
+        /// PixelSize转Vector2
+        /// </summary>
+        public static Vector2 ToVector2(this PixelSize pixelSize)
+        {
+            return new Vector2(pixelSize.Width, pixelSize.Height);
+        }
+        #endregion
+
         #region # Size3I转GLM三维向量 —— static Vector3 ToGlmVector3(this in Size3I size)
         /// <summary>
         /// Size3I转GLM三维向量

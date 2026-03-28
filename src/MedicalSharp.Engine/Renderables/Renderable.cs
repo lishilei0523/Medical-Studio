@@ -28,9 +28,9 @@ namespace MedicalSharp.Engine.Renderables
         private BoundingSphere? _boundingSphere;
 
         /// <summary>
-        /// 体积标记是否脏
+        /// 包围盒/包围球是否脏
         /// </summary>
-        protected bool _isBoundingVolumesDirty;
+        protected bool _boundingsDirty;
 
         /// <summary>
         /// 创建渲染对象构造器
@@ -70,24 +70,14 @@ namespace MedicalSharp.Engine.Renderables
         {
             get
             {
-                if (this._isBoundingVolumesDirty || !this._boundingBox.HasValue)
+                if (this._boundingsDirty || !this._boundingBox.HasValue)
                 {
                     this._boundingBox = this.CalculateLocalBoundingBox();
-                    this._isBoundingVolumesDirty = false;
+                    this._boundingsDirty = false;
                 }
 
                 return this._boundingBox.Value;
             }
-        }
-        #endregion
-
-        #region 只读属性 - 世界包围盒 —— BoundingBox WorldBoundingBox
-        /// <summary>
-        /// 只读属性 - 世界包围盒
-        /// </summary>
-        public BoundingBox WorldBoundingBox
-        {
-            get => this.CalculateWorldBoundingBox();
         }
         #endregion
 
@@ -100,23 +90,13 @@ namespace MedicalSharp.Engine.Renderables
         {
             get
             {
-                if (this._isBoundingVolumesDirty || !this._boundingSphere.HasValue)
+                if (this._boundingsDirty || !this._boundingSphere.HasValue)
                 {
                     this._boundingSphere = this.CalculateLocalBoundingSphere();
                 }
 
                 return this._boundingSphere.Value;
             }
-        }
-        #endregion
-
-        #region 只读属性 - 世界包围球 —— BoundingSphere WorldBoundingSphere
-        /// <summary>
-        /// 只读属性 - 世界包围球
-        /// </summary>
-        public BoundingSphere WorldBoundingSphere
-        {
-            get => this.CalculateWolrdBoundingSphere();
         }
         #endregion
 
@@ -155,14 +135,14 @@ namespace MedicalSharp.Engine.Renderables
 
         //Protected
 
-        #region 计算局部包围盒 —— BoundingBox CalculateLocalBoundingBox()
+        #region 计算局部包围盒 —— abstract BoundingBox CalculateLocalBoundingBox()
         /// <summary>
         /// 计算局部包围盒
         /// </summary>
         protected abstract BoundingBox CalculateLocalBoundingBox();
         #endregion
 
-        #region 计算局部包围球 —— BoundingSphere CalculateLocalBoundingSphere()
+        #region 计算局部包围球 —— virtual BoundingSphere CalculateLocalBoundingSphere()
         /// <summary>
         /// 计算局部包围球
         /// </summary>
@@ -170,42 +150,6 @@ namespace MedicalSharp.Engine.Renderables
         {
             //默认从包围盒生成包围球
             return this.BoundingBox.ToBoundingSphere();
-        }
-        #endregion
-
-        #region 计算世界包围盒 —— BoundingBox CalculateWorldBoundingBox()
-        /// <summary>
-        /// 计算世界包围盒
-        /// </summary>
-        protected BoundingBox CalculateWorldBoundingBox()
-        {
-            //变换所有8个角点到世界空间
-            Vector3[] worldCorners = new Vector3[8];
-            for (int i = 0; i < 8; i++)
-            {
-                worldCorners[i] = Vector3.TransformPosition(this.BoundingBox.Corners[i], this.ModelMatrix);
-            }
-
-            //从世界空间角点重新计算包围盒
-            return BoundingBox.FromPoints(worldCorners);
-        }
-        #endregion
-
-        #region 计算世界包围球 —— BoundingSphere CalculateWolrdBoundingSphere()
-        /// <summary>
-        /// 计算世界包围球
-        /// </summary>
-        protected BoundingSphere CalculateWolrdBoundingSphere()
-        {
-            //变换球心到世界空间
-            Vector3 worldCenter = Vector3.TransformPosition(this.BoundingSphere.Center, this.ModelMatrix);
-
-            //计算世界空间半径（考虑非均匀缩放）
-            Vector3 scale = this.Transform.Matrix.ExtractScale();
-            float maxScale = Math.Max(Math.Max(scale.X, scale.Y), scale.Z);
-            float worldRadius = this.BoundingSphere.Radius * maxScale;
-
-            return new BoundingSphere(worldCenter, worldRadius);
         }
         #endregion
 
@@ -221,14 +165,18 @@ namespace MedicalSharp.Engine.Renderables
         {
             distance = 0f;
 
+            //将射线变换到局部空间
+            Matrix4 worldToLocal = Matrix4.Invert(this.ModelMatrix);
+            Ray localRay = ray.Transform(worldToLocal);
+
             //先快速检测包围球
-            if (!this.WorldBoundingSphere.Intersects(ray, out float sphereDistance))
+            if (!this.BoundingSphere.Intersects(localRay, out float sphereDistance))
             {
                 return false;
             }
 
             //再检测包围盒（更精确）
-            if (!this.WorldBoundingBox.Intersects(ray, out float boxDistance))
+            if (!this.BoundingBox.Intersects(localRay, out float boxDistance))
             {
                 return false;
             }
@@ -239,14 +187,14 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 使体积标记脏 —— void InvalidateBoundingVolumes()
+        #region 标记包围盒/包围球为脏 —— void InvalidateBoundings()
         /// <summary>
-        /// 使体积标记脏
+        /// 标记包围盒/包围球为脏
         /// </summary>
         /// <remarks>当对象几何改变时调用</remarks>
-        protected void InvalidateBoundingVolumes()
+        protected void InvalidateBoundings()
         {
-            this._isBoundingVolumesDirty = true;
+            this._boundingsDirty = true;
             this._boundingBox = null;
             this._boundingSphere = null;
         }

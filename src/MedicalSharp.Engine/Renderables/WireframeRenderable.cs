@@ -152,7 +152,7 @@ namespace MedicalSharp.Engine.Renderables
             hitTriangleIndex = -1;
 
             //快速剔除：先检测包围盒
-            if (!this.WorldBoundingBox.Intersects(ray, out float boxDistance))
+            if (!this.BoundingBox.Intersects(ray, out float boxDistance))
             {
                 return false;
             }
@@ -267,6 +267,18 @@ namespace MedicalSharp.Engine.Renderables
             }
 
             this._trianglesDirty = false;
+        }
+        #endregion
+
+        #region 标记三角形面为脏 —— void InvalidateTriangles()
+        /// <summary>
+        /// 标记三角形面为脏
+        /// </summary>
+        /// <remarks>当对象几何改变时调用</remarks>
+        protected void InvalidateTriangles()
+        {
+            this._trianglesDirty = true;
+            this._triangles.Clear();
         }
         #endregion
 

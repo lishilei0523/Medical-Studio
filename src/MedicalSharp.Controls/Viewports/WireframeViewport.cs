@@ -1,12 +1,17 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
+using Avalonia.Input;
 using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderers;
+using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+using System.Diagnostics;
 
 namespace MedicalSharp.Controls.Viewports
 {
@@ -100,6 +105,31 @@ namespace MedicalSharp.Controls.Viewports
         protected override void OnOpenTKDeinit()
         {
             this._renderer?.Dispose();
+        }
+        #endregion
+
+        #region 指针按下事件 —— override void OnPointerPressed(PointerPressedEventArgs eventArgs)
+        /// <summary>
+        /// 指针按下事件
+        /// </summary>
+        protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
+        {
+            base.OnPointerPressed(eventArgs);
+
+            if (eventArgs.Properties.IsLeftButtonPressed)
+            {
+                Point mousePosition = eventArgs.GetPosition(this);
+                Ray ray = Ray.UnProject(mousePosition.ToVector2(), this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+                foreach (BoundingVisual3D boundingVisual3D in this.Children)
+                {
+                    bool intersects = boundingVisual3D.Renderable.IntersectsRay(ray, out float distance);
+                    if (intersects)
+                    {
+                        boundingVisual3D.Renderable.IntersectsRay(ray, out distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex);
+                        Trace.WriteLine(hitPoint);
+                    }
+                }
+            }
         }
         #endregion
 

@@ -58,6 +58,11 @@ namespace MedicalSharp.Controls.Base
         private int _frameBufferId;
 
         /// <summary>
+        /// 视口尺寸
+        /// </summary>
+        protected PixelSize _viewportSize;
+
+        /// <summary>
         /// 默认构造器
         /// </summary>
         protected OpenTKViewport()
@@ -185,8 +190,8 @@ namespace MedicalSharp.Controls.Base
             this._frameBufferId = frameBufferId;
 
             //设置视口尺寸
-            PixelSize size = new PixelSize((int)this.Bounds.Width, (int)this.Bounds.Height);
-            GL.Viewport(0, 0, size.Width, size.Height);
+            this._viewportSize = new PixelSize((int)this.Bounds.Width, (int)this.Bounds.Height);
+            GL.Viewport(0, 0, this._viewportSize.Width, this._viewportSize.Height);
 
             //设置背景色
             Vector4 background = this.Background.ToVector4();
@@ -196,7 +201,7 @@ namespace MedicalSharp.Controls.Base
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             //OpenTK渲染
-            this.OnOpenTKRender(size);
+            this.OnOpenTKRender(this._viewportSize);
         }
         #endregion
 
