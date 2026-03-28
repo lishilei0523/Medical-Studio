@@ -56,7 +56,8 @@
 					<sd:VolumeViewport Background="Black"
 									   Camera="{Binding OrbitCamera}"
 									   VolumeData="{Binding VolumeData}"
-									   TFControlPoints="{Binding TFControlPoints}">
+									   TFControlPoints="{Binding TFControlPoints}"
+                                       cm:Message.Attach="[Event PointerPressed] = [Action OnVolumeViewportPointerPressed($source, $eventArgs)];">
 
 					</sd:VolumeViewport>
 				</sd:GroupBox>

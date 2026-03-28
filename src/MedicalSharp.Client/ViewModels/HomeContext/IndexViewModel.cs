@@ -1,6 +1,11 @@
-﻿using Avalonia.Collections;
+﻿using Avalonia;
+using Avalonia.Collections;
+using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Caliburn.Micro;
+using IconPacks.Avalonia.MaterialDesign;
+using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Dicoms;
 using MedicalSharp.Dicoms.Models;
 using MedicalSharp.Engine.Cameras;
@@ -11,8 +16,11 @@ using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.Caliburn.Extensions;
 using SD.Infrastructure.Avalonia.Commands;
+using SD.Infrastructure.Avalonia.CustomControls;
+using SD.Infrastructure.Avalonia.Enums;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -163,6 +171,34 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             }
 
             this.Idle();
+        }
+        #endregion
+
+        //Actions
+
+        #region VR视口鼠标按下事件 —— void OnVolumeViewportPointerPressed(WireframeViewport viewport...
+        /// <summary>
+        /// VR视口鼠标按下事件
+        /// </summary>
+        public void OnVolumeViewportPointerPressed(VolumeViewport viewport, PointerPressedEventArgs eventArgs)
+        {
+            if (eventArgs.Properties.IsLeftButtonPressed)
+            {
+                Point mousePos2D = eventArgs.GetPosition(viewport);
+                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3i? voxelPostion, out short? voxelValue);
+                if (success)
+                {
+                    StringBuilder builder = new StringBuilder();
+                    builder.AppendLine($"点击2D坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
+                    builder.AppendLine($"点击体素坐标: X:{voxelPostion.Value.X}, Y:{voxelPostion.Value.Y}, Z:{voxelPostion.Value.Z}");
+                    builder.AppendLine($"点击体素HU值: {voxelValue}");
+                    MessageBox.Show(builder.ToString(), "成功", MessageBoxButton.OK, PackIconMaterialDesignKind.Info);
+                }
+                else
+                {
+                    MessageBox.Show("获取失败！", "错误", MessageBoxButton.OK, PackIconMaterialDesignKind.Error);
+                }
+            }
         }
         #endregion
 

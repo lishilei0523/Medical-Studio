@@ -17,6 +17,16 @@ namespace MedicalSharp.Engine.Renderers
         #region # 字段及构造器
 
         /// <summary>
+        /// 拾取帧缓冲区
+        /// </summary>
+        private FrameBuffer _pickFrameBuffer;
+
+        /// <summary>
+        /// 拾取Shader程序
+        /// </summary>
+        private ShaderProgram _pickProgram;
+
+        /// <summary>
         /// 单位立方体
         /// </summary>
         private readonly VertexBuffer _unitCube;
@@ -275,6 +285,70 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
+        #region 拾取体素 —— Vector3i? PickVoxel(Ray ray, float viewportWidth, float viewportHeight)
+        /// <summary>
+        /// 拾取体素
+        /// </summary>
+        /// <param name="ray">射线（世界空间）</param>
+        /// <param name="viewportWidth">视口宽度</param>
+        /// <param name="viewportHeight">视口高度</param>
+        /// <returns>体素坐标，未命中返回null</returns>
+        public Vector3i? PickVoxel(Ray ray, float viewportWidth, float viewportHeight)
+        {
+            #region # 验证
+
+            if (this.Renderable == null)
+            {
+                return null;
+            }
+            if (this.Camera == null)
+            {
+                return null;
+            }
+            if (this._pickProgram == null)
+            {
+                return null;
+            }
+
+            #endregion
+
+            //使用1/4分辨率加速
+            int pickWidth = Math.Max(1, (int)viewportWidth / 4);
+            int pickHeight = Math.Max(1, (int)viewportHeight / 4);
+
+            //确保拾取FBO存在
+            this.InitPickFrameBuffer(pickWidth, pickHeight);
+
+            //渲染到拾取FBO
+            this.RenderPickFrameBuffer(ray, pickWidth, pickHeight);
+
+            //读取中心像素
+            int textureCoordX = pickWidth / 2;
+            int textureCoordY = pickHeight / 2;
+
+            float[] pixel = new float[4];
+            this._pickFrameBuffer.Bind();
+            GL.ReadPixels(textureCoordX, textureCoordY, 1, 1, PixelFormat.Rgba, PixelType.Float, pixel);
+            this._pickFrameBuffer.Unbind();
+
+            //过滤纹理坐标
+            if (pixel[0] < 0.001f && pixel[1] < 0.001f && pixel[2] < 0.001f)
+            {
+                return null;
+            }
+
+            //转换体素坐标
+            int voxelX = (int)Math.Ceiling(pixel[0] * this.Renderable.VolumeTexture.Width);
+            int voxelY = (int)Math.Ceiling(pixel[1] * this.Renderable.VolumeTexture.Height);
+            int voxelZ = (int)Math.Ceiling(pixel[2] * this.Renderable.VolumeTexture.Depth);
+            voxelX = Math.Clamp(voxelX, 0, this.Renderable.VolumeTexture.Width - 1);
+            voxelY = Math.Clamp(voxelY, 0, this.Renderable.VolumeTexture.Height - 1);
+            voxelZ = Math.Clamp(voxelZ, 0, this.Renderable.VolumeTexture.Depth - 1);
+
+            return new Vector3i(voxelX, voxelY, voxelZ);
+        }
+        #endregion
+
         #region 释放资源 —— void Dispose()
         /// <summary>
         /// 释放资源
@@ -283,6 +357,8 @@ namespace MedicalSharp.Engine.Renderers
         {
             base.Dispose();
 
+            this._pickFrameBuffer.Dispose();
+            this._pickProgram.Dispose();
             this._unitCube.Dispose();
             this.TransferFunction.Dispose();
         }
@@ -301,8 +377,119 @@ namespace MedicalSharp.Engine.Renderers
             base.Program.ReadVertexShaderFromFile("Shaders/GLSLs/raycast.vert");
             base.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/raycast.frag");
             base.Program.Build();
+
+            this._pickProgram = new ShaderProgram();
+            this._pickProgram.ReadVertexShaderFromFile("Shaders/GLSLs/raycast.vert");
+            this._pickProgram.ReadFragmentShaderFromFile("Shaders/GLSLs/raycast_pick.frag");
+            this._pickProgram.Build();
         }
-        #endregion 
+        #endregion
+
+        #region 渲染拾取帧缓冲区 —— void RenderPickFrameBuffer(Ray ray, int viewportWidth...
+        /// <summary>
+        /// 渲染拾取帧缓冲区
+        /// </summary>
+        /// <param name="ray">射线（世界空间）</param>
+        /// <param name="viewportWidth">视口宽度</param>
+        /// <param name="viewportHeight">视口高度</param>
+        private void RenderPickFrameBuffer(Ray ray, int viewportWidth, int viewportHeight)
+        {
+            #region # 验证
+
+            if (this._pickProgram == null)
+            {
+                return;
+            }
+            if (this.Renderable == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            //绑定拾取FBO
+            this._pickFrameBuffer.Bind();
+            GL.Viewport(0, 0, viewportWidth, viewportHeight);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            //使用拾取Shader
+            this._pickProgram.Use();
+
+            //设置矩阵
+            Matrix4 volumeScaleMatrix = Matrix4.CreateScale(this.Renderable.VolumeScale);
+            Matrix4 modelMatrix = this.Renderable.ModelMatrix * volumeScaleMatrix;
+
+            this._pickProgram.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
+            this._pickProgram.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
+            this._pickProgram.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
+
+            //传入射线参数
+            this._pickProgram.SetUniformVector3("u_RayOrigin", ray.Position);
+            this._pickProgram.SetUniformVector3("u_RayDirection", ray.Direction);
+
+            //相机参数
+            this._pickProgram.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
+            this._pickProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
+
+            //DICOM参数
+            this._pickProgram.SetUniformFloat("u_RescaleSlope", this.Renderable.RescaleSlope);
+            this._pickProgram.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
+
+            //窗宽窗位（与渲染一致）
+            this._pickProgram.SetUniformFloat("u_WindowCenter", this.WindowCenter);
+            this._pickProgram.SetUniformFloat("u_WindowWidth", this.WindowWidth);
+
+            //材质参数（与渲染一致）
+            this._pickProgram.SetUniformFloat("u_Brightness", this.Brightness);
+            this._pickProgram.SetUniformFloat("u_DensityScale", this.DensityScale);
+
+            //采样参数（与渲染一致）
+            this._pickProgram.SetUniformFloat("u_StepSize", this.StepSize);
+            this._pickProgram.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
+            this._pickProgram.SetUniformFloat("u_OpacityThreshold", this.OpacityThreshold);
+
+            //绑定纹理
+            this.Renderable.VolumeTexture.Bind(0);
+            this.TransferFunction.Texture.Bind(1);
+            this._pickProgram.SetUniformInt("u_VolumeTexture", 0);
+            this._pickProgram.SetUniformInt("u_TransferFunction", 1);
+
+            //绘制
+            this._unitCube.Draw(PrimitiveType.Triangles);
+
+            //解绑纹理
+            this.Renderable.VolumeTexture.Unbind();
+            this.TransferFunction.Texture.Unbind();
+
+            //取消使用
+            this._pickProgram.Unuse();
+        }
+        #endregion
+
+        #region 初始化拾取帧缓冲区 —— void InitPickFrameBuffer(int viewportWidth...
+        /// <summary>
+        /// 初始化拾取帧缓冲区
+        /// </summary>
+        /// <param name="viewportWidth">视口宽度</param>
+        /// <param name="viewportHeight">视口高度</param>
+        private void InitPickFrameBuffer(int viewportWidth, int viewportHeight)
+        {
+            if (this._pickFrameBuffer == null)
+            {
+                this._pickFrameBuffer = FrameBuffer.CreateWithDepthBuffer(viewportWidth, viewportHeight);
+            }
+            else
+            {
+                if (this._pickFrameBuffer.Width == viewportWidth && this._pickFrameBuffer.Height == viewportHeight)
+                {
+                    return;
+                }
+
+                this._pickFrameBuffer.Dispose();
+                this._pickFrameBuffer = FrameBuffer.CreateWithDepthBuffer(viewportWidth, viewportHeight);
+            }
+        }
+        #endregion
 
         #endregion
     }
