@@ -41,7 +41,9 @@
 			</Grid>
 			<!--Body-->
 			<Grid Grid.Row="1">
-				<sd:WireframeViewport Background="Black" Camera="{Binding OrbitCamera}">
+				<sd:WireframeViewport Background="Black" 
+                                      Camera="{Binding OrbitCamera}"
+                                      cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
 					<sd:BoundingBoxVisual3D />
 					<sd:BoundingSphereVisual3D Radius="1" Center="-2,0,0" />
 				</sd:WireframeViewport>

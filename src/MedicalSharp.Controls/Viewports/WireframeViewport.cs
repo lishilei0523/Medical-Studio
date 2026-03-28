@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
-using Avalonia.Input;
 using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
@@ -11,7 +10,8 @@ using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Controls.Viewports
 {
@@ -61,6 +61,69 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
+        #region 查找最近元素 —— bool FindNearest(Vector2 position, out Vector3 point...
+        /// <summary>
+        /// 查找最近元素
+        /// </summary>
+        /// <param name="position">2D位置</param>
+        /// <param name="point">3D位置</param>
+        /// <param name="normal">法向量</param>
+        /// <param name="visual3D">边界3D元素</param>
+        /// <returns>是否成功</returns>
+        public bool FindNearest(Vector2 position, out Vector3 point, out Vector3 normal, out BoundingVisual3D visual3D)
+        {
+            Ray ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+
+            //快速检测
+            IList<(float, BoundingVisual3D)> hitResults = new List<(float, BoundingVisual3D)>();
+            foreach (BoundingVisual3D boundingVisual3D in this.Children)
+            {
+                bool intersects = boundingVisual3D.Renderable.IntersectsRay(ray, out float distance);
+                if (intersects)
+                {
+                    hitResults.Add((distance, boundingVisual3D));
+                }
+            }
+
+            //详细检测
+            if (hitResults.Any())
+            {
+                (float, BoundingVisual3D) hitResult = hitResults.MinBy(x => x.Item1);
+                bool intersects = hitResult.Item2.Renderable.IntersectsRay(ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex);
+                if (intersects)
+                {
+                    point = hitPoint;
+                    normal = hitNormal;
+                    visual3D = hitResult.Item2;
+                    return true;
+                }
+            }
+
+            point = Vector3.Zero;
+            normal = Vector3.Zero;
+            visual3D = null;
+
+            return false;
+        }
+        #endregion
+
+        #region 查找最近位置 —— Vector3? FindNearestPoint(Vector2 position)
+        /// <summary>
+        /// 查找最近位置
+        /// </summary>
+        /// <param name="position">2D位置</param>
+        /// <returns>3D位置</returns>
+        public Vector3? FindNearestPoint(Vector2 position)
+        {
+            if (this.FindNearest(position, out Vector3 point, out _, out _))
+            {
+                return point;
+            }
+
+            return null;
+        }
+        #endregion
+
         #region OpenTK初始化事件 —— override void OnOpenTKInit()
         /// <summary>
         /// OpenTK初始化事件
@@ -105,31 +168,6 @@ namespace MedicalSharp.Controls.Viewports
         protected override void OnOpenTKDeinit()
         {
             this._renderer?.Dispose();
-        }
-        #endregion
-
-        #region 指针按下事件 —— override void OnPointerPressed(PointerPressedEventArgs eventArgs)
-        /// <summary>
-        /// 指针按下事件
-        /// </summary>
-        protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
-        {
-            base.OnPointerPressed(eventArgs);
-
-            if (eventArgs.Properties.IsLeftButtonPressed)
-            {
-                Point mousePosition = eventArgs.GetPosition(this);
-                Ray ray = Ray.UnProject(mousePosition.ToVector2(), this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
-                foreach (BoundingVisual3D boundingVisual3D in this.Children)
-                {
-                    bool intersects = boundingVisual3D.Renderable.IntersectsRay(ray, out float distance);
-                    if (intersects)
-                    {
-                        boundingVisual3D.Renderable.IntersectsRay(ray, out distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex);
-                        Trace.WriteLine(hitPoint);
-                    }
-                }
-            }
         }
         #endregion
 

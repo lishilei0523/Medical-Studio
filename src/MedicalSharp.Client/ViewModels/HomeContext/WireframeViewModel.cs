@@ -1,8 +1,17 @@
-﻿using Caliburn.Micro;
+﻿using Avalonia;
+using Avalonia.Input;
+using Caliburn.Micro;
+using IconPacks.Avalonia.MaterialDesign;
+using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Viewports;
+using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Engine.Cameras;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
+using SD.Infrastructure.Avalonia.CustomControls;
+using SD.Infrastructure.Avalonia.Enums;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,6 +70,37 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
 
             return base.OnInitializedAsync(cancellationToken);
+        }
+        #endregion
+
+
+        //Actions
+
+        #region 视口鼠标按下事件 —— void OnViewportPointerPressed(WireframeViewport viewport...
+        /// <summary>
+        /// 视口鼠标按下事件
+        /// </summary>
+        public void OnViewportPointerPressed(WireframeViewport viewport, PointerPressedEventArgs eventArgs)
+        {
+            if (eventArgs.Properties.IsLeftButtonPressed)
+            {
+                Point mousePos2D = eventArgs.GetPosition(viewport);
+                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out BoundingVisual3D element);
+
+                if (success)
+                {
+                    StringBuilder builder = new StringBuilder();
+                    builder.AppendLine($"点击对象: {element?.GetType().Name}");
+                    builder.AppendLine($"点击2D坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
+                    builder.AppendLine($"点击3D坐标: X:{mousePos3D.X}, Y:{mousePos3D.Y}, Z:{mousePos3D.Z}");
+                    builder.AppendLine($"法向量: X:{normal.X}, Y:{normal.Y}, Z:{normal.Z}");
+                    MessageBox.Show(builder.ToString(), "成功", MessageBoxButton.OK, PackIconMaterialDesignKind.Info);
+                }
+                else
+                {
+                    MessageBox.Show("获取失败！", "错误", MessageBoxButton.OK, PackIconMaterialDesignKind.Error);
+                }
+            }
         }
         #endregion
 
