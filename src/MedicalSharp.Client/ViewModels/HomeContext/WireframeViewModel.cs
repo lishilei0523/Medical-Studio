@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Input;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
@@ -41,14 +42,28 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
         #region # 属性
 
-        //通知属性
-
         #region 轨道相机 —— OrbitCamera OrbitCamera
         /// <summary>
         /// 轨道相机
         /// </summary>
         [DependencyProperty]
         public OrbitCamera OrbitCamera { get; set; }
+        #endregion
+
+        #region 边界球体3D元素 —— BoundingSphereVisual3D BoundingSphere
+        /// <summary>
+        /// 边界球体3D元素
+        /// </summary>
+        [DependencyProperty]
+        public BoundingSphereVisual3D BoundingSphere { get; set; }
+        #endregion
+
+        #region 边界3D元素列表 —— AvaloniaList<BoundingVisual3D> BoundingVisuals
+        /// <summary>
+        /// 边界3D元素列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<BoundingVisual3D> BoundingVisuals { get; set; }
         #endregion
 
         #endregion
@@ -68,6 +83,19 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             const float yaw = 45.0f;
             const float pitch = -45.0f;
             this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
+
+            this.BoundingSphere = new BoundingSphereVisual3D
+            {
+                Radius = 1,
+                Center = new Vector3D(-2, 0, 0)
+            };
+            this.BoundingVisuals =
+            [
+                new BoundingBoxVisual3D
+                {
+                    Center = new Vector3D(2,0,0)
+                }
+            ];
 
             return base.OnInitializedAsync(cancellationToken);
         }

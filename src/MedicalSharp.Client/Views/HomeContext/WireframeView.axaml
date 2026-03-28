@@ -41,11 +41,12 @@
 			</Grid>
 			<!--Body-->
 			<Grid Grid.Row="1">
-				<sd:WireframeViewport Background="Black" 
-                                      Camera="{Binding OrbitCamera}"
-                                      cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
+				<sd:WireframeViewport Background="Black"
+									  Camera="{Binding OrbitCamera}"
+									  cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
 					<sd:BoundingBoxVisual3D />
-					<sd:BoundingSphereVisual3D Radius="1" Center="-2,0,0" />
+					<sd:BoundingItemPresenter Content="{Binding BoundingSphere}" />
+					<sd:BoundingItemsPresenter ItemsSource="{Binding BoundingVisuals}" />
 				</sd:WireframeViewport>
 			</Grid>
 			<!--Footer-->

@@ -96,6 +96,16 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
+        #region 清空渲染对象 —— void ClearItems()
+        /// <summary>
+        /// 清空渲染对象
+        /// </summary>
+        public void ClearItems()
+        {
+            this._renderables.Clear();
+        }
+        #endregion
+
         #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight)
         /// <summary>
         /// 渲染帧

@@ -11,6 +11,7 @@ using MedicalSharp.Engine.ValueTypes;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace MedicalSharp.Controls.Viewports
@@ -28,23 +29,30 @@ namespace MedicalSharp.Controls.Viewports
         private WireframeRenderer _renderer;
 
         /// <summary>
+        /// 边界3D元素列表
+        /// </summary>
+        private readonly IList<BoundingVisual3D> _boundingVisual3Ds;
+
+        /// <summary>
         /// 默认构造器
         /// </summary>
         public WireframeViewport()
         {
-            this.Children = new AvaloniaList<BoundingVisual3D>();
+            this._boundingVisual3Ds = new List<BoundingVisual3D>();
+            this.Children = new AvaloniaList<Visual3D>();
+            this.Children.CollectionChanged += this.OnChildrenItemsChanged;
         }
 
         #endregion
 
         #region # 属性
 
-        #region 子元素列表 —— AvaloniaList<BoundingVisual3D> Children
+        #region 子元素列表 —— AvaloniaList<Visual3D> Children
         /// <summary>
         /// 子元素列表
         /// </summary>
         [Content]
-        public AvaloniaList<BoundingVisual3D> Children { get; private set; }
+        public AvaloniaList<Visual3D> Children { get; private set; }
         #endregion
 
         #region 只读属性 - 线框渲染器 —— WireframeRenderer Renderer
@@ -76,7 +84,7 @@ namespace MedicalSharp.Controls.Viewports
 
             //快速检测
             IList<(float, BoundingVisual3D)> hitResults = new List<(float, BoundingVisual3D)>();
-            foreach (BoundingVisual3D boundingVisual3D in this.Children)
+            foreach (BoundingVisual3D boundingVisual3D in this._boundingVisual3Ds)
             {
                 bool intersects = boundingVisual3D.Renderable.IntersectsRay(ray, out float distance);
                 if (intersects)
@@ -124,6 +132,21 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
+        #region 附加可视化树事件 —— override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs...
+        /// <summary>
+        /// 附加可视化树事件
+        /// </summary>>
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs eventArgs)
+        {
+            base.OnAttachedToVisualTree(eventArgs);
+
+            foreach (Visual3D visual3D in this.Children)
+            {
+                visual3D.DataContext = this.DataContext;
+            }
+        }
+        #endregion
+
         #region OpenTK初始化事件 —— override void OnOpenTKInit()
         /// <summary>
         /// OpenTK初始化事件
@@ -137,10 +160,6 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             this._renderer = new WireframeRenderer(this.Camera);
-            foreach (BoundingVisual3D visual3D in this.Children)
-            {
-                this._renderer.AppendItem(visual3D.Renderable);
-            }
         }
         #endregion
 
@@ -157,6 +176,33 @@ namespace MedicalSharp.Controls.Viewports
             //禁用面剔除
             GL.Disable(EnableCap.CullFace);
 
+            //清空渲染对象
+            this._boundingVisual3Ds.Clear();
+            this._renderer.ClearItems();
+
+            //填充渲染对象
+            foreach (Visual3D visual3D in this.Children)
+            {
+                if (visual3D is BoundingVisual3D boundingVisual3D)
+                {
+                    this._boundingVisual3Ds.Add(boundingVisual3D);
+                    this._renderer.AppendItem(boundingVisual3D.Renderable);
+                }
+                if (visual3D is BoundingItemPresenter itemPresenter)
+                {
+                    this._boundingVisual3Ds.Add(itemPresenter.Content);
+                    this._renderer.AppendItem(itemPresenter.Content.Renderable);
+                }
+                if (visual3D is BoundingItemsPresenter itemsPresenter)
+                {
+                    foreach (BoundingVisual3D item in itemsPresenter.ItemsSource)
+                    {
+                        this._boundingVisual3Ds.Add(item);
+                        this._renderer.AppendItem(item.Renderable);
+                    }
+                }
+            }
+
             this._renderer.RenderFrame(viewportSize.Width, viewportSize.Height);
         }
         #endregion
@@ -167,7 +213,35 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         protected override void OnOpenTKDeinit()
         {
-            this._renderer?.Dispose();
+            this._renderer.Dispose();
+        }
+        #endregion
+
+        #region 子元素列表元素改变事件 —— void OnChildrenItemsChanged(object sender...
+        /// <summary>
+        /// 子元素列表元素改变事件
+        /// </summary>
+        private void OnChildrenItemsChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+        {
+            if (eventArgs.Action == NotifyCollectionChangedAction.Add)
+            {
+                Visual3D visual3D = this.Children[eventArgs.NewStartingIndex];
+                visual3D.DataContext = this.DataContext;
+                if (visual3D is BoundingItemsPresenter itemsPresenter)
+                {
+                    itemsPresenter.ItemsSource.CollectionChanged += this.OnItemsPresenterItemsChanged;
+                }
+            }
+        }
+        #endregion
+
+        #region 边界3D元素列表容器元素改变事件 —— void OnItemsPresenterItemsChanged(object sender...
+        /// <summary>
+        /// 边界3D元素列表容器元素改变事件
+        /// </summary>
+        private void OnItemsPresenterItemsChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+        {
+            this.RequestNextFrameRendering();
         }
         #endregion
 
