@@ -357,7 +357,7 @@ namespace MedicalSharp.Engine.Renderers
         {
             base.Dispose();
 
-            this._pickFrameBuffer.Dispose();
+            this._pickFrameBuffer?.Dispose();
             this._pickProgram.Dispose();
             this._unitCube.Dispose();
             this.TransferFunction.Dispose();

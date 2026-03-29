@@ -265,6 +265,8 @@ namespace MedicalSharp.Controls.Viewports
         /// <returns>是否成功</returns>
         public bool FindNearest(Vector2 position, out Vector3i? voxelPosition, out short? voxelValue)
         {
+            this.GlContext.MakeCurrent();
+
             voxelPosition = null;
             voxelValue = null;
 

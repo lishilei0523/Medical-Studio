@@ -80,6 +80,8 @@ namespace MedicalSharp.Controls.Viewports
         /// <returns>是否成功</returns>
         public bool FindNearest(Vector2 position, out Vector3 point, out Vector3 normal, out BoundingVisual3D visual3D)
         {
+            this.GlContext.MakeCurrent();
+
             Ray ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             //快速检测

@@ -75,6 +75,46 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public ICommand CloseSeriesCommand => new RelayCommand(_ => this.CloseSeries());
         #endregion
 
+        #region 布局13命令 —— ICommand Layout13Command
+        /// <summary>
+        /// 布局13命令
+        /// </summary>
+        public ICommand Layout13Command => new RelayCommand(_ =>
+        {
+            #region # 验证
+
+            if (this.LayoutViewModel is Layout13ViewModel)
+            {
+                return;
+            }
+
+            #endregion
+
+            this.LayoutViewModel = ResolveMediator.Resolve<Layout13ViewModel>();
+            this.LayoutViewModel.SetVolumeData(this.VolumeData);
+        });
+        #endregion
+
+        #region 布局22命令 —— ICommand Layout22Command
+        /// <summary>
+        /// 布局22命令
+        /// </summary>
+        public ICommand Layout22Command => new RelayCommand(_ =>
+        {
+            #region # 验证
+
+            if (this.LayoutViewModel is Layout22ViewModel)
+            {
+                return;
+            }
+
+            #endregion
+
+            this.LayoutViewModel = ResolveMediator.Resolve<Layout22ViewModel>();
+            this.LayoutViewModel.SetVolumeData(this.VolumeData);
+        });
+        #endregion
+
         #endregion
 
         #region # 方法
