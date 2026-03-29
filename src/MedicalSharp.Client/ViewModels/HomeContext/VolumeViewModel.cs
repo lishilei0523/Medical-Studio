@@ -38,6 +38,13 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public VolumeViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
+
+            Vector3 targetPosition = new Vector3(0.0f);
+            const float distance = 7.0f;
+            const float yaw = 45.0f;
+            const float pitch = -45.0f;
+            this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
+            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.GrayControlPoints);
         }
 
         #endregion
@@ -80,13 +87,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
-            Vector3 targetPosition = new Vector3(0.0f);
-            const float distance = 7.0f;
-            const float yaw = 45.0f;
-            const float pitch = -45.0f;
-            this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
-            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.GrayControlPoints);
-
             return base.OnInitializedAsync(cancellationToken);
         }
         #endregion

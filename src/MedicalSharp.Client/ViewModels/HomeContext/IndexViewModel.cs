@@ -1,26 +1,15 @@
-﻿using Avalonia;
-using Avalonia.Collections;
-using Avalonia.Input;
-using Avalonia.Platform.Storage;
+﻿using Avalonia.Platform.Storage;
 using Caliburn.Micro;
-using IconPacks.Avalonia.MaterialDesign;
-using MedicalSharp.Controls.Extensions;
-using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Dicoms;
 using MedicalSharp.Dicoms.Models;
-using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Resources;
-using MedicalSharp.Engine.ValueTypes;
-using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.Caliburn.Extensions;
 using SD.Infrastructure.Avalonia.Commands;
-using SD.Infrastructure.Avalonia.CustomControls;
-using SD.Infrastructure.Avalonia.Enums;
+using SD.IOC.Core.Mediators;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -53,52 +42,43 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
         //通知属性
 
-        #region 轨道相机 —— OrbitCamera OrbitCamera
-        /// <summary>
-        /// 轨道相机
-        /// </summary>
-        [DependencyProperty]
-        public OrbitCamera OrbitCamera { get; set; }
-        #endregion
-
-        #region MPR横断位相机 —— MPRCamera AxialCamera
-        /// <summary>
-        /// MPR横断位相机
-        /// </summary>
-        [DependencyProperty]
-        public MPRCamera AxialCamera { get; set; }
-        #endregion
-
-        #region MPR冠状位相机 —— MPRCamera CoronalCamera
-        /// <summary>
-        /// MPR冠状位相机
-        /// </summary>
-        [DependencyProperty]
-        public MPRCamera CoronalCamera { get; set; }
-        #endregion
-
-        #region MPR矢状位相机 —— MPRCamera SagittalCamera
-        /// <summary>
-        /// MPR矢状位相机
-        /// </summary>
-        [DependencyProperty]
-        public MPRCamera SagittalCamera { get; set; }
-        #endregion
-
         #region 体积数据 —— VolumeData VolumeData
         /// <summary>
         /// 体积数据
         /// </summary>
-        [DependencyProperty]
         public VolumeData VolumeData { get; set; }
         #endregion
 
-        #region 传输函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        #region 体积渲染视图模型 —— VolumeViewModel VolumeViewModel
         /// <summary>
-        /// 传输函数控制点列表
+        /// 体积渲染视图模型
         /// </summary>
         [DependencyProperty]
-        public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
+        public VolumeViewModel VolumeViewModel { get; set; }
+        #endregion
+
+        #region MPR横断位视图模型 —— MprAxialViewModel MprAxialViewModel
+        /// <summary>
+        /// MPR横断位视图模型
+        /// </summary>
+        [DependencyProperty]
+        public MprAxialViewModel MprAxialViewModel { get; set; }
+        #endregion
+
+        #region MPR冠状位视图模型 —— MprCoronalViewModel MprCoronalViewModel
+        /// <summary>
+        /// MPR冠状位视图模型
+        /// </summary>
+        [DependencyProperty]
+        public MprCoronalViewModel MprCoronalViewModel { get; set; }
+        #endregion
+
+        #region MPR矢状位视图模型 —— MprSagittalViewModel MprSagittalViewModel
+        /// <summary>
+        /// MPR矢状位视图模型
+        /// </summary>
+        [DependencyProperty]
+        public MprSagittalViewModel MprSagittalViewModel { get; set; }
         #endregion
 
 
@@ -123,15 +103,10 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
-            Vector3 targetPosition = new Vector3(0.0f);
-            const float distance = 7.0f;
-            const float yaw = 45.0f;
-            const float pitch = -45.0f;
-            this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
-            this.AxialCamera = new MPRCamera(MPRPlaneType.Axial);
-            this.CoronalCamera = new MPRCamera(MPRPlaneType.Coronal);
-            this.SagittalCamera = new MPRCamera(MPRPlaneType.Sagittal);
-            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.GrayControlPoints);
+            this.VolumeViewModel = ResolveMediator.Resolve<VolumeViewModel>();
+            this.MprAxialViewModel = ResolveMediator.Resolve<MprAxialViewModel>();
+            this.MprCoronalViewModel = ResolveMediator.Resolve<MprCoronalViewModel>();
+            this.MprSagittalViewModel = ResolveMediator.Resolve<MprSagittalViewModel>();
 
             return base.OnInitializedAsync(cancellationToken);
         }
@@ -168,37 +143,13 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 }
 
                 this.VolumeData = volumeData;
+                this.VolumeViewModel.VolumeData = this.VolumeData;
+                this.MprAxialViewModel.VolumeData = this.VolumeData;
+                this.MprCoronalViewModel.VolumeData = this.VolumeData;
+                this.MprSagittalViewModel.VolumeData = this.VolumeData;
             }
 
             this.Idle();
-        }
-        #endregion
-
-        //Actions
-
-        #region VR视口鼠标按下事件 —— void OnVolumeViewportPointerPressed(WireframeViewport viewport...
-        /// <summary>
-        /// VR视口鼠标按下事件
-        /// </summary>
-        public void OnVolumeViewportPointerPressed(VolumeViewport viewport, PointerPressedEventArgs eventArgs)
-        {
-            if (eventArgs.Properties.IsLeftButtonPressed)
-            {
-                Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3i? voxelPostion, out short? voxelValue);
-                if (success)
-                {
-                    StringBuilder builder = new StringBuilder();
-                    builder.AppendLine($"点击2D坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
-                    builder.AppendLine($"点击体素坐标: X:{voxelPostion.Value.X}, Y:{voxelPostion.Value.Y}, Z:{voxelPostion.Value.Z}");
-                    builder.AppendLine($"点击体素HU值: {voxelValue}");
-                    MessageBox.Show(builder.ToString(), "成功", MessageBoxButton.OK, PackIconMaterialDesignKind.Info);
-                }
-                else
-                {
-                    MessageBox.Show("获取失败！", "错误", MessageBoxButton.OK, PackIconMaterialDesignKind.Error);
-                }
-            }
         }
         #endregion
 

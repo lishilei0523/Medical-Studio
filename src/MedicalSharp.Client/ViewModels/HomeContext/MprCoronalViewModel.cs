@@ -27,6 +27,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public MprCoronalViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
+            this.CoronalCamera = new MPRCamera(MPRPlaneType.Coronal);
         }
 
         #endregion
@@ -61,7 +62,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
-            this.CoronalCamera = new MPRCamera(MPRPlaneType.Coronal);
 
             return base.OnInitializedAsync(cancellationToken);
         }

@@ -27,6 +27,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public MprAxialViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
+            this.AxialCamera = new MPRCamera(MPRPlaneType.Axial);
         }
 
         #endregion
@@ -61,8 +62,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
-            this.AxialCamera = new MPRCamera(MPRPlaneType.Axial);
-
             return base.OnInitializedAsync(cancellationToken);
         }
         #endregion

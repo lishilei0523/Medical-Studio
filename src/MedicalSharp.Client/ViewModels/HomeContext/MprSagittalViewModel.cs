@@ -27,6 +27,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public MprSagittalViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
+            this.SagittalCamera = new MPRCamera(MPRPlaneType.Sagittal);
         }
 
         #endregion
@@ -61,8 +62,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
-            this.SagittalCamera = new MPRCamera(MPRPlaneType.Sagittal);
-
             return base.OnInitializedAsync(cancellationToken);
         }
         #endregion
