@@ -1,16 +1,16 @@
 using Avalonia.Controls;
 
-namespace MedicalSharp.Client.Views.HomeContext
+namespace MedicalSharp.Client.Views.VolumeContext
 {
     /// <summary>
-    /// MPR冠状位渲染视图
+    /// MPR矢状位渲染视图
     /// </summary>
-    public partial class MprCoronalView : UserControl
+    public partial class MprSagittalView : UserControl
     {
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public MprCoronalView()
+        public MprSagittalView()
         {
             this.InitializeComponent();
         }

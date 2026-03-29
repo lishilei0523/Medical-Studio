@@ -7,12 +7,12 @@ using SD.Infrastructure.Avalonia.Caliburn.Base;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MedicalSharp.Client.ViewModels.HomeContext
+namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
     /// <summary>
-    /// MPR矢状位视图模型
+    /// MPR横断位视图模型
     /// </summary>
-    public class MprSagittalViewModel : ScreenBase
+    public class MprAxialViewModel : ScreenBase
     {
         #region # 字段及构造器
 
@@ -24,22 +24,22 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public MprSagittalViewModel(IWindowManager windowManager)
+        public MprAxialViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
-            this.SagittalCamera = new MPRCamera(MPRPlaneType.Sagittal);
+            this.AxialCamera = new MPRCamera(MPRPlaneType.Axial);
         }
 
         #endregion
 
         #region # 属性
 
-        #region MPR矢状位相机 —— MPRCamera SagittalCamera
+        #region MPR横断位相机 —— MPRCamera AxialCamera
         /// <summary>
-        /// MPR矢状位相机
+        /// MPR横断位相机
         /// </summary>
         [DependencyProperty]
-        public MPRCamera SagittalCamera { get; set; }
+        public MPRCamera AxialCamera { get; set; }
         #endregion
 
         #region 体积数据 —— VolumeData VolumeData

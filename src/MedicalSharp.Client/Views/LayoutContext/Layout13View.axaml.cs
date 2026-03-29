@@ -1,16 +1,16 @@
 using Avalonia.Controls;
 
-namespace MedicalSharp.Client.Views.HomeContext
+namespace MedicalSharp.Client.Views.LayoutContext
 {
     /// <summary>
-    /// MPR横断位渲染视图
+    /// 13布局视图
     /// </summary>
-    public partial class MprAxialView : UserControl
+    public partial class Layout13View : UserControl
     {
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public MprAxialView()
+        public Layout13View()
         {
             this.InitializeComponent();
         }

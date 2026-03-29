@@ -7,7 +7,7 @@ using SD.Infrastructure.Avalonia.Caliburn.Base;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MedicalSharp.Client.ViewModels.HomeContext
+namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
     /// <summary>
     /// MPR冠状位视图模型

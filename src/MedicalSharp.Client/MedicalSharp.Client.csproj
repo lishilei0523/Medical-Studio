@@ -39,4 +39,10 @@
     <ProjectReference Include="..\MedicalSharp.Dicoms\MedicalSharp.Dicoms.csproj" />
     <ProjectReference Include="..\MedicalSharp.Engine\MedicalSharp.Engine.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\LayoutContext\Layout13View.axaml.cs">
+      <DependentUpon>Layout13View.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

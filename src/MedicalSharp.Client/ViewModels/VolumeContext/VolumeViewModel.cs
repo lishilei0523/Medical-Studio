@@ -18,7 +18,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MedicalSharp.Client.ViewModels.HomeContext
+namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
     /// <summary>
     /// 体积渲染视图模型
@@ -100,7 +100,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public void OnVolumeViewportPointerPressed(VolumeViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            if (eventArgs.Properties.IsLeftButtonPressed)
+            if (this.VolumeData != null && eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
                 bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3i? voxelPostion, out short? voxelValue);

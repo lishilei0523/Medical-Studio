@@ -1,4 +1,4 @@
-<UserControl x:Class="MedicalSharp.Client.Views.HomeContext.MprAxialView"
+<UserControl x:Class="MedicalSharp.Client.Views.VolumeContext.MprSagittalView"
 			 xmlns="https://github.com/avaloniaui"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,7 +8,7 @@
 			 mc:Ignorable="d">
 
     <sd:MPRViewport Background="Black"
-                    Camera="{Binding AxialCamera}"
+                    Camera="{Binding SagittalCamera}"
                     VolumeData="{Binding VolumeData}">
 
     </sd:MPRViewport>
