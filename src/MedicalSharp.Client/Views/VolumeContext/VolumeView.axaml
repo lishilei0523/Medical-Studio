@@ -5,13 +5,28 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:cm="http://caliburnmicro.com"
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			 xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
 			 mc:Ignorable="d">
 
-	<sd:VolumeViewport Background="Black"
-					   Camera="{Binding OrbitCamera}"
-					   VolumeData="{Binding VolumeData}"
-					   TFControlPoints="{Binding TFControlPoints}"
-					   cm:Message.Attach="[Event PointerPressed] = [Action OnVolumeViewportPointerPressed($source, $eventArgs)];">
+	<sd:GroupBox>
+		<!--Header-->
+		<sd:GroupBox.Header>
+			<Grid>
+				<TextBlock Text="VR" />
+				<Button cm:Message.Attach="LookVolumeView()" Classes="Transparent-Panel">
+					<WrapPanel>
+						<iconPacks:PackIconMaterialDesign Kind="ZoomOutMap" />
+						<TextBlock Text="查看" Margin="2,0,0,0" />
+					</WrapPanel>
+				</Button>
+			</Grid>
+		</sd:GroupBox.Header>
+		<sd:VolumeViewport Background="Black"
+						   Camera="{Binding OrbitCamera}"
+						   VolumeData="{Binding VolumeData}"
+						   TFControlPoints="{Binding TFControlPoints}"
+						   cm:Message.Attach="[Event PointerPressed] = [Action OnVolumeViewportPointerPressed($source, $eventArgs)];">
 
-	</sd:VolumeViewport>
+		</sd:VolumeViewport>
+	</sd:GroupBox>
 </UserControl>

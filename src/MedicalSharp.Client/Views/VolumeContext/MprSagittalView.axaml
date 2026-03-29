@@ -7,9 +7,11 @@
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			 mc:Ignorable="d">
 
-    <sd:MPRViewport Background="Black"
-                    Camera="{Binding SagittalCamera}"
-                    VolumeData="{Binding VolumeData}">
+	<sd:GroupBox Header="MPR-Sagittal">
+        <sd:MPRViewport Background="Black"
+                        Camera="{Binding SagittalCamera}"
+                        VolumeData="{Binding VolumeData}">
 
-    </sd:MPRViewport>
+        </sd:MPRViewport>
+    </sd:GroupBox>
 </UserControl>

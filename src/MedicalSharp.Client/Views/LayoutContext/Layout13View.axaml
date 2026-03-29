@@ -4,7 +4,6 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:cm="http://caliburnmicro.com"
-			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			 mc:Ignorable="d">
 
 	<Grid>
@@ -12,24 +11,24 @@
 			<ColumnDefinition />
 			<ColumnDefinition />
 		</Grid.ColumnDefinitions>
-		<sd:GroupBox Grid.Column="0" Header="VR" Margin="0,0,2,0">
+		<Grid Grid.Column="0" Margin="0,0,2,0">
 			<ContentControl cm:View.Model="{Binding VolumeViewModel}" />
-		</sd:GroupBox>
+		</Grid>
 		<Grid Grid.Column="1" Margin="2,0,0,0">
 			<Grid.RowDefinitions>
 				<RowDefinition />
 				<RowDefinition />
 				<RowDefinition />
 			</Grid.RowDefinitions>
-			<sd:GroupBox Grid.Row="0" Header="MPR-Axial" Margin="0,0,0,2">
+			<Grid Grid.Row="0" Margin="0,0,0,2">
 				<ContentControl cm:View.Model="{Binding MprAxialViewModel}" />
-			</sd:GroupBox>
-			<sd:GroupBox Grid.Row="1" Header="MPR-Coronal" Margin="0,2,0,2">
+			</Grid>
+			<Grid Grid.Row="1" Margin="0,2,0,2">
 				<ContentControl cm:View.Model="{Binding MprCoronalViewModel}" />
-			</sd:GroupBox>
-			<sd:GroupBox Grid.Row="2" Header="MPR-Sagittal" Margin="0,2,0,0">
+			</Grid>
+			<Grid Grid.Row="2" Margin="0,2,0,0">
 				<ContentControl cm:View.Model="{Binding MprSagittalViewModel}" />
-			</sd:GroupBox>
+			</Grid>
 		</Grid>
 	</Grid>
 </UserControl>

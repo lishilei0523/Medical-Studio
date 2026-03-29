@@ -94,6 +94,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
         //Actions
 
+        #region 查看体积渲染视图 —— async Task LookVolumeView()
+        /// <summary>
+        /// 查看体积渲染视图
+        /// </summary>
+        public async Task LookVolumeView()
+        {
+            //ContainerViewModel viewModel = ResolveMediator.Resolve<ContainerViewModel>();
+            //viewModel.Title = "VR";
+            //viewModel.Content = this;
+
+            //await this._windowManager.ShowWindowAsync(viewModel);
+        }
+        #endregion
+
         #region VR视口鼠标按下事件 —— void OnVolumeViewportPointerPressed(WireframeViewport viewport...
         /// <summary>
         /// VR视口鼠标按下事件
