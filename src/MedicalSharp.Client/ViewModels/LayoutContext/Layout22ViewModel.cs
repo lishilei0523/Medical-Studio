@@ -1,9 +1,9 @@
 ﻿namespace MedicalSharp.Client.ViewModels.LayoutContext
 {
     /// <summary>
-    /// 13布局视图模型
+    /// 22布局视图模型
     /// </summary>
-    public class Layout13ViewModel : LayoutViewModel
+    public class Layout22ViewModel : LayoutViewModel
     {
 
     }

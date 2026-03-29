@@ -36,7 +36,7 @@
 					<Menu Grid.Column="1">
 						<MenuItem Header="文件(_F)">
 							<MenuItem Header="打开(_O)" Command="{Binding OpenSeriesCommand}" />
-							<MenuItem Header="关闭(_C)" cm:Message.Attach="CloseSeries()" />
+							<MenuItem Header="关闭(_C)" Command="{Binding CloseSeriesCommand}" />
 							<MenuItem Header="保存(_S)" cm:Message.Attach="SaveImage()" />
 							<MenuItem Header="另存为(_A)" cm:Message.Attach="SaveAsImage()" />
 						</MenuItem>
@@ -59,31 +59,7 @@
 				</sd:GroupBox>
 				<!--Viewer Pannel-->
 				<Grid Grid.Column="1" Margin="2,0,2,4">
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition />
-							<ColumnDefinition />
-						</Grid.ColumnDefinitions>
-                        <sd:GroupBox Grid.Column="0" Header="VR" Margin="0,0,2,0">
-							<ContentControl cm:View.Model="{Binding VolumeViewModel}" />
-						</sd:GroupBox>
-						<Grid Grid.Column="1" Margin="2,0,0,0">
-							<Grid.RowDefinitions>
-								<RowDefinition />
-								<RowDefinition />
-								<RowDefinition />
-							</Grid.RowDefinitions>
-							<sd:GroupBox Grid.Row="0" Header="MPR-Axial" Margin="0,0,0,2">
-								<ContentControl cm:View.Model="{Binding MprAxialViewModel}" />
-							</sd:GroupBox>
-							<sd:GroupBox Grid.Row="1" Header="MPR-Coronal" Margin="0,2,0,2">
-								<ContentControl cm:View.Model="{Binding MprCoronalViewModel}" />
-							</sd:GroupBox>
-							<sd:GroupBox Grid.Row="2" Header="MPR-Sagittal" Margin="0,2,0,0">
-								<ContentControl cm:View.Model="{Binding MprSagittalViewModel}" />
-							</sd:GroupBox>
-						</Grid>
-					</Grid>
+					<ContentControl cm:View.Model="{Binding LayoutViewModel}" />
 				</Grid>
 				<!--Right Pannel-->
 				<sd:GroupBox Grid.Column="2" Header="属性" Margin="2,0,4,4">

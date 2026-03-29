@@ -1,6 +1,6 @@
 ﻿using Avalonia.Platform.Storage;
 using Caliburn.Micro;
-using MedicalSharp.Client.ViewModels.VolumeContext;
+using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Dicoms;
 using MedicalSharp.Dicoms.Models;
 using MedicalSharp.Engine.Resources;
@@ -11,7 +11,6 @@ using SD.Infrastructure.Avalonia.Commands;
 using SD.IOC.Core.Mediators;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -35,6 +34,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public IndexViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
+            this.LayoutViewModel = ResolveMediator.Resolve<Layout22ViewModel>();
         }
 
         #endregion
@@ -50,36 +50,12 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public VolumeData VolumeData { get; set; }
         #endregion
 
-        #region 体积渲染视图模型 —— VolumeViewModel VolumeViewModel
+        #region 布局视图模型 —— LayoutViewModel LayoutViewModel
         /// <summary>
-        /// 体积渲染视图模型
+        /// 布局视图模型
         /// </summary>
         [DependencyProperty]
-        public VolumeViewModel VolumeViewModel { get; set; }
-        #endregion
-
-        #region MPR横断位视图模型 —— MprAxialViewModel MprAxialViewModel
-        /// <summary>
-        /// MPR横断位视图模型
-        /// </summary>
-        [DependencyProperty]
-        public MprAxialViewModel MprAxialViewModel { get; set; }
-        #endregion
-
-        #region MPR冠状位视图模型 —— MprCoronalViewModel MprCoronalViewModel
-        /// <summary>
-        /// MPR冠状位视图模型
-        /// </summary>
-        [DependencyProperty]
-        public MprCoronalViewModel MprCoronalViewModel { get; set; }
-        #endregion
-
-        #region MPR矢状位视图模型 —— MprSagittalViewModel MprSagittalViewModel
-        /// <summary>
-        /// MPR矢状位视图模型
-        /// </summary>
-        [DependencyProperty]
-        public MprSagittalViewModel MprSagittalViewModel { get; set; }
+        public LayoutViewModel LayoutViewModel { get; set; }
         #endregion
 
 
@@ -92,29 +68,16 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public ICommand OpenSeriesCommand => new AsyncRelayCommand(_ => this.OpenSeries());
         #endregion
 
+        #region 关闭序列命令 —— ICommand CloseSeriesCommand
+        /// <summary>
+        /// 关闭序列命令
+        /// </summary>
+        public ICommand CloseSeriesCommand => new RelayCommand(_ => this.CloseSeries());
+        #endregion
+
         #endregion
 
         #region # 方法
-
-        //Initializations
-
-        #region 初始化 —— override Task OnInitializedAsync(CancellationToken...
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override Task OnInitializedAsync(CancellationToken cancellationToken)
-        {
-            this.VolumeViewModel = ResolveMediator.Resolve<VolumeViewModel>();
-            this.MprAxialViewModel = ResolveMediator.Resolve<MprAxialViewModel>();
-            this.MprCoronalViewModel = ResolveMediator.Resolve<MprCoronalViewModel>();
-            this.MprSagittalViewModel = ResolveMediator.Resolve<MprSagittalViewModel>();
-
-            return base.OnInitializedAsync(cancellationToken);
-        }
-        #endregion
-
-
-        //Actions
 
         #region 打开序列 —— async Task OpenSeries()
         /// <summary>
@@ -144,13 +107,31 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 }
 
                 this.VolumeData = volumeData;
-                this.VolumeViewModel.VolumeData = this.VolumeData;
-                this.MprAxialViewModel.VolumeData = this.VolumeData;
-                this.MprCoronalViewModel.VolumeData = this.VolumeData;
-                this.MprSagittalViewModel.VolumeData = this.VolumeData;
+                this.LayoutViewModel.SetVolumeData(volumeData);
             }
 
             this.Idle();
+        }
+        #endregion
+
+        #region 关闭序列 —— void CloseSeries()
+        /// <summary>
+        /// 关闭序列
+        /// </summary>
+        public void CloseSeries()
+        {
+            #region # 验证
+
+            if (this.VolumeData == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            DicomManager.RemoveVolumeData(this.VolumeData.Id);
+            ResourceManager.RemoveTexture3D(this.VolumeData.Id);
+            this.LayoutViewModel.ClearVolumeData();
         }
         #endregion
 

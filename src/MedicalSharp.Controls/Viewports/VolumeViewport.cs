@@ -315,23 +315,21 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="viewportSize">视口尺寸</param>
         protected override void OnOpenTKRender(PixelSize viewportSize)
         {
-            //开启深度测试
-            GL.Enable(EnableCap.DepthTest);
-
-            //启用混合
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
-            //禁用面剔除
-            GL.Disable(EnableCap.CullFace);
-
             if (this._volumeRenderable != null)
             {
+                //开启深度测试
+                GL.Enable(EnableCap.DepthTest);
+
+                //启用混合
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+                //禁用面剔除
+                GL.Disable(EnableCap.CullFace);
+
                 this._volumeRenderer.SetRenderable(this._volumeRenderable);
                 this._volumeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
             }
-
-            //this._wireframeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
         }
         #endregion
 
@@ -487,9 +485,10 @@ namespace MedicalSharp.Controls.Viewports
         {
             #region # 验证
 
-            if (eventArgs.NewValue == null)
+            if (eventArgs.NewValue.Value == null)
             {
-                //TODO 卸载数据，黑屏处理，停止渲染
+                viewport._volumeRenderable = null;
+                viewport.RequestNextFrameRendering();
                 return;
             }
 
