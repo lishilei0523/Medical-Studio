@@ -24,6 +24,20 @@ namespace MedicalSharp.Engine.Cameras
 
         }
 
+        /// <summary>
+        /// 创建轨道正交相机构造器
+        /// </summary>
+        /// <param name="cameraPosition">相机位置</param>
+        /// <param name="targetPosition">目标位置</param>
+        /// <param name="upDirection">相机上方向</param>
+        /// <param name="nearPlaneDistance">近平面距离</param>
+        /// <param name="farPlaneDistance">远平面距离</param>
+        public OrbitOrthoCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 upDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535)
+            : base(cameraPosition, targetPosition, upDirection, nearPlaneDistance, farPlaneDistance)
+        {
+
+        }
+
         #endregion
 
         #region # 属性

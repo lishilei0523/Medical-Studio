@@ -103,6 +103,72 @@ namespace MedicalSharp.Engine.Cameras
             this.UpdateViewMatrix();
         }
 
+        /// <summary>
+        /// 创建轨道相机构造器
+        /// </summary>
+        /// <param name="cameraPosition">相机位置</param>
+        /// <param name="targetPosition">目标位置</param>
+        /// <param name="upDirection">相机上方向</param>
+        /// <param name="nearPlaneDistance">近平面距离</param>
+        /// <param name="farPlaneDistance">远平面距离</param>
+        protected OrbitCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 upDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f)
+            : base(nearPlaneDistance, farPlaneDistance)
+        {
+            //参数验证
+            if (upDirection.LengthSquared < float.Epsilon)
+            {
+                throw new ArgumentException("上方向向量不能为零", nameof(upDirection));
+            }
+
+            //初始化默认值
+            this._minDistance = 0.1f;
+            this._maxDistance = 100.0f;
+            this._minPitch = -89.0f;
+            this._maxPitch = 89.0f;
+            this._moveSpeed = 2.0f;
+            this._rotateSpeed = 0.1f;
+            this._zoomSpeed = 0.5f;
+
+            //设置相机位置和目标位置
+            this._cameraPosition = cameraPosition;
+            this._targetPosition = targetPosition;
+
+            //计算视角方向
+            Vector3 lookDirectionRaw = this._targetPosition - this._cameraPosition;
+            float distance = lookDirectionRaw.Length;
+
+            if (distance < float.Epsilon)
+            {
+                throw new InvalidOperationException("相机位置和目标位置重合，无法计算视角方向");
+            }
+
+            this._lookDirection = Vector3.Normalize(lookDirectionRaw);
+            this._distance = MathHelper.Clamp(distance, this._minDistance, this._maxDistance);
+
+            //计算正交的相机坐标系
+            Vector3 upRaw = Vector3.Normalize(upDirection);
+            float dot = Vector3.Dot(upRaw, this._lookDirection);
+            if (Math.Abs(dot) > 0.9999f)
+            {
+                throw new InvalidOperationException("上方向向量与视角方向平行，无法构建相机坐标系");
+            }
+
+            this._rightDirection = Vector3.Normalize(Vector3.Cross(upRaw, this._lookDirection));
+            this._upDirection = Vector3.Normalize(Vector3.Cross(this._lookDirection, this._rightDirection));
+
+            //计算偏航角和俯仰角
+            this._yaw = MathHelper.RadiansToDegrees((float)Math.Atan2(this._lookDirection.Z, this._lookDirection.X));
+            this._pitch = MathHelper.RadiansToDegrees((float)Math.Asin(MathHelper.Clamp(this._lookDirection.Y, -1.0f, 1.0f)));
+
+            if (this._yaw < 0)
+            {
+                this._yaw += 360.0f;
+            }
+            this._pitch = Math.Clamp(this._pitch, this._minPitch, this._maxPitch);
+
+            this.UpdateViewMatrix();
+        }
+
         #endregion
 
         #region # 属性

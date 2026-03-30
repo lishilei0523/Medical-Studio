@@ -39,11 +39,16 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             this._windowManager = windowManager;
 
+            //Vector3 targetPosition = new Vector3(0.0f);
+            //const float distance = 7.0f;
+            //const float yaw = 45.0f;
+            //const float pitch = -45.0f;
+            //this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
+
+            Vector3 cameraPosition = new Vector3(0, 0, 4);
             Vector3 targetPosition = new Vector3(0.0f);
-            const float distance = 7.0f;
-            const float yaw = 45.0f;
-            const float pitch = -45.0f;
-            this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
+            Vector3 upDirection = new Vector3(0, 1, 0);
+            this.OrbitCamera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
             this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.GrayControlPoints);
         }
 

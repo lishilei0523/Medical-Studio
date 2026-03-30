@@ -25,6 +25,21 @@ namespace MedicalSharp.Engine.Cameras
             this.FieldOfView = fieldOfView;
         }
 
+        /// <summary>
+        /// 创建轨道透视相机构造器
+        /// </summary>
+        /// <param name="cameraPosition">相机位置</param>
+        /// <param name="targetPosition">目标位置</param>
+        /// <param name="upDirection">相机上方向</param>
+        /// <param name="nearPlaneDistance">近平面距离</param>
+        /// <param name="farPlaneDistance">远平面距离</param>
+        /// <param name="fieldOfView">视野角度（度）</param>
+        public OrbitPerspectiveCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 upDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f, float fieldOfView = 30.0f)
+            : base(cameraPosition, targetPosition, upDirection, nearPlaneDistance, farPlaneDistance)
+        {
+            this.FieldOfView = fieldOfView;
+        }
+
         #endregion
 
         #region # 属性
