@@ -16,11 +16,12 @@ namespace MedicalSharp.Engine.Cameras
         /// <param name="distance">相机到目标的距离</param>
         /// <param name="yaw">偏航角-RY（角度）</param>
         /// <param name="pitch">俯仰角-RX（角度）</param>
+        /// <param name="worldUpDirection">世界坐标系上方向</param>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
         /// <param name="fieldOfView">视野角度（度）</param>
-        public OrbitPerspectiveCamera(Vector3 targetPosition = default, float distance = 5.0f, float yaw = 0.0f, float pitch = 0.0f, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f, float fieldOfView = 30.0f)
-            : base(targetPosition, distance, yaw, pitch, nearPlaneDistance, farPlaneDistance)
+        public OrbitPerspectiveCamera(Vector3 targetPosition = default, float distance = 5.0f, float yaw = 0.0f, float pitch = 0.0f, Vector3 worldUpDirection = default, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f, float fieldOfView = 30.0f)
+            : base(targetPosition, distance, yaw, pitch, worldUpDirection, nearPlaneDistance, farPlaneDistance)
         {
             this.FieldOfView = fieldOfView;
         }
@@ -30,12 +31,12 @@ namespace MedicalSharp.Engine.Cameras
         /// </summary>
         /// <param name="cameraPosition">相机位置</param>
         /// <param name="targetPosition">目标位置</param>
-        /// <param name="upDirection">相机上方向</param>
+        /// <param name="worldUpDirection">世界坐标系上方向</param>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
         /// <param name="fieldOfView">视野角度（度）</param>
-        public OrbitPerspectiveCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 upDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f, float fieldOfView = 30.0f)
-            : base(cameraPosition, targetPosition, upDirection, nearPlaneDistance, farPlaneDistance)
+        public OrbitPerspectiveCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 worldUpDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f, float fieldOfView = 30.0f)
+            : base(cameraPosition, targetPosition, worldUpDirection, nearPlaneDistance, farPlaneDistance)
         {
             this.FieldOfView = fieldOfView;
         }

@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using MedicalSharp.Engine.ValueTypes;
+using OpenTK.Mathematics;
 using System;
 
 namespace MedicalSharp.Engine.Cameras
@@ -71,26 +72,29 @@ namespace MedicalSharp.Engine.Cameras
         private float _zoomSpeed;
 
         /// <summary>
+        /// 世界坐标系上方向
+        /// </summary>
+        private Vector3 _worldUpDirection;
+
+        /// <summary>
+        /// 当前坐标系类型
+        /// </summary>
+        private CoordinateSystem _coordinateSystem;
+
+        /// <summary>
         /// 创建轨道相机构造器
         /// </summary>
         /// <param name="targetPosition">目标位置</param>
         /// <param name="distance">相机到目标的距离</param>
         /// <param name="yaw">偏航角-RY（角度）</param>
         /// <param name="pitch">俯仰角-RX（角度）</param>
+        /// <param name="worldUpDirection">世界坐标系上方向</param>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
-        protected OrbitCamera(Vector3 targetPosition = default, float distance = 5.0f, float yaw = 0.0f, float pitch = 0.0f, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f)
+        protected OrbitCamera(Vector3 targetPosition = default, float distance = 5.0f, float yaw = 0.0f, float pitch = 0.0f, Vector3 worldUpDirection = default, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f)
             : base(nearPlaneDistance, farPlaneDistance)
         {
-            this._cameraPosition = Vector3.Zero;
-            this._targetPosition = targetPosition == default ? Vector3.Zero : targetPosition;
-            this._lookDirection = new Vector3(0.0f, 0.0f, -1.0f);
-            this._upDirection = new Vector3(0.0f, 1.0f, 0.0f);
-            this._rightDirection = new Vector3(1.0f, 0.0f, 0.0f);
-            this._viewMatrix = Matrix4.Identity;
-            this._distance = distance;
-            this._yaw = yaw;
-            this._pitch = pitch;
+            //默认值
             this._minDistance = 0.1f;
             this._maxDistance = 100.0f;
             this._minPitch = -89.0f;
@@ -99,6 +103,23 @@ namespace MedicalSharp.Engine.Cameras
             this._rotateSpeed = 0.1f;
             this._zoomSpeed = 0.5f;
 
+            //设置世界坐标系上方向（默认 Y-up）
+            Vector3 up = worldUpDirection == default
+                ? new Vector3(0, 1, 0)
+                : Vector3.Normalize(worldUpDirection);
+            this.SetWorldUpDirectionInternal(up);
+
+            // 设置相机参数
+            this._targetPosition = targetPosition == default ? Vector3.Zero : targetPosition;
+            this._distance = MathHelper.Clamp(distance, this._minDistance, this._maxDistance);
+            this._yaw = yaw;
+            this._pitch = MathHelper.Clamp(pitch, this._minPitch, this._maxPitch);
+
+            // 根据角度计算方向
+            this._lookDirection = CalculateDirectionFromAngles(this._yaw, this._pitch);
+            this._cameraPosition = this._targetPosition - this._lookDirection * this._distance;
+
+            //更新相机坐标系
             this.UpdateCameraVectors();
             this.UpdateViewMatrix();
         }
@@ -108,16 +129,16 @@ namespace MedicalSharp.Engine.Cameras
         /// </summary>
         /// <param name="cameraPosition">相机位置</param>
         /// <param name="targetPosition">目标位置</param>
-        /// <param name="upDirection">相机上方向</param>
+        /// <param name="worldUpDirection">世界坐标系上方向</param>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
-        protected OrbitCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 upDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f)
+        protected OrbitCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 worldUpDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f)
             : base(nearPlaneDistance, farPlaneDistance)
         {
             //参数验证
-            if (upDirection.LengthSquared < float.Epsilon)
+            if (worldUpDirection.LengthSquared < float.Epsilon)
             {
-                throw new ArgumentException("上方向向量不能为零", nameof(upDirection));
+                throw new ArgumentException("世界坐标系上方向向量不能为零", nameof(worldUpDirection));
             }
 
             //初始化默认值
@@ -129,6 +150,9 @@ namespace MedicalSharp.Engine.Cameras
             this._rotateSpeed = 0.1f;
             this._zoomSpeed = 0.5f;
 
+            //设置世界坐标系上方向
+            this.SetWorldUpDirectionInternal(Vector3.Normalize(worldUpDirection));
+
             //设置相机位置和目标位置
             this._cameraPosition = cameraPosition;
             this._targetPosition = targetPosition;
@@ -136,7 +160,6 @@ namespace MedicalSharp.Engine.Cameras
             //计算视角方向
             Vector3 lookDirectionRaw = this._targetPosition - this._cameraPosition;
             float distance = lookDirectionRaw.Length;
-
             if (distance < float.Epsilon)
             {
                 throw new InvalidOperationException("相机位置和目标位置重合，无法计算视角方向");
@@ -145,27 +168,11 @@ namespace MedicalSharp.Engine.Cameras
             this._lookDirection = Vector3.Normalize(lookDirectionRaw);
             this._distance = MathHelper.Clamp(distance, this._minDistance, this._maxDistance);
 
-            //计算正交的相机坐标系
-            Vector3 upRaw = Vector3.Normalize(upDirection);
-            float dot = Vector3.Dot(upRaw, this._lookDirection);
-            if (Math.Abs(dot) > 0.9999f)
-            {
-                throw new InvalidOperationException("上方向向量与视角方向平行，无法构建相机坐标系");
-            }
+            //从方向计算角度
+            this.CalculateAnglesFromDirection(this._lookDirection);
 
-            this._rightDirection = Vector3.Normalize(Vector3.Cross(upRaw, this._lookDirection));
-            this._upDirection = Vector3.Normalize(Vector3.Cross(this._lookDirection, this._rightDirection));
-
-            //计算偏航角和俯仰角
-            this._yaw = MathHelper.RadiansToDegrees((float)Math.Atan2(this._lookDirection.Z, this._lookDirection.X));
-            this._pitch = MathHelper.RadiansToDegrees((float)Math.Asin(MathHelper.Clamp(this._lookDirection.Y, -1.0f, 1.0f)));
-
-            if (this._yaw < 0)
-            {
-                this._yaw += 360.0f;
-            }
-            this._pitch = Math.Clamp(this._pitch, this._minPitch, this._maxPitch);
-
+            //更新相机坐标系
+            this.UpdateCameraVectors();
             this.UpdateViewMatrix();
         }
 
@@ -274,6 +281,20 @@ namespace MedicalSharp.Engine.Cameras
         public float Pitch => this._pitch;
         #endregion
 
+        #region 世界坐标系上方向 —— Vector3 WorldUpDirection
+        /// <summary>
+        /// 世界坐标系上方向
+        /// </summary>
+        public Vector3 WorldUpDirection => this._worldUpDirection;
+        #endregion
+
+        #region 当前坐标系类型 —— CoordinateSystem CoordinateSystem
+        /// <summary>
+        /// 当前坐标系类型
+        /// </summary>
+        public CoordinateSystem CoordinateSystem => this._coordinateSystem;
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -338,7 +359,7 @@ namespace MedicalSharp.Engine.Cameras
         {
             this._minDistance = minDistance;
             this._maxDistance = maxDistance;
-            this._distance = MathHelper.Clamp(this._distance, this._minDistance, this._maxDistance);
+            this._distance = Math.Clamp(this._distance, this._minDistance, this._maxDistance);
             this.UpdateCameraVectors();
             this.UpdateViewMatrix();
         }
@@ -354,11 +375,52 @@ namespace MedicalSharp.Engine.Cameras
         {
             this._minPitch = minPitch;
             this._maxPitch = maxPitch;
-            this._pitch = MathHelper.Clamp(this._pitch, this._minPitch, this._maxPitch);
+            this._pitch = Math.Clamp(this._pitch, this._minPitch, this._maxPitch);
             this.UpdateCameraVectors();
             this.UpdateViewMatrix();
         }
         #endregion
+
+        /// <summary>
+        /// 设置世界坐标系上方向（支持 X-up、Y-up、Z-up）
+        /// </summary>
+        public void SetWorldUpDirection(Vector3 worldUp)
+        {
+            if (worldUp.LengthSquared < float.Epsilon)
+            {
+                return;
+            }
+
+            Vector3 newWorldUp = Vector3.Normalize(worldUp);
+
+            // 检查是否方向改变
+            bool isSameDirection = Math.Abs(Vector3.Dot(this._worldUpDirection, newWorldUp)) > 0.9999f;
+
+            this.SetWorldUpDirectionInternal(newWorldUp);
+
+            // 坐标系改变时重新计算角度
+            if (!isSameDirection)
+            {
+                this.CalculateAnglesFromDirection(this._lookDirection);
+            }
+
+            this.UpdateCameraVectors();
+            this.UpdateViewMatrix();
+        }
+
+        /// <summary>
+        /// 设置坐标系类型
+        /// </summary>
+        public void SetCoordinateSystem(CoordinateSystem system)
+        {
+            Vector3 up = system switch
+            {
+                CoordinateSystem.XUp => new Vector3(1, 0, 0),
+                CoordinateSystem.ZUp => new Vector3(0, 0, 1),
+                _ => new Vector3(0, 1, 0)
+            };
+            this.SetWorldUpDirection(up);
+        }
 
         #region 旋转相机 —— void Rotate(float deltaYaw, float deltaPitch)
         /// <summary>
@@ -372,7 +434,7 @@ namespace MedicalSharp.Engine.Cameras
             this._pitch += deltaPitch * this._rotateSpeed;
 
             // 限制俯仰角范围
-            this._pitch = MathHelper.Clamp(this._pitch, this._minPitch, this._maxPitch);
+            this._pitch = Math.Clamp(this._pitch, this._minPitch, this._maxPitch);
 
             // 规范化偏航角到[0, 360]范围
             if (this._yaw > 360.0f)
@@ -448,21 +510,22 @@ namespace MedicalSharp.Engine.Cameras
         /// </summary>
         private void UpdateCameraVectors()
         {
-            // 角度转弧度
-            float yawRad = MathHelper.DegreesToRadians(this._yaw);
-            float pitchRad = MathHelper.DegreesToRadians(this._pitch);
+            //从角度计算视线方向
+            this._lookDirection = CalculateDirectionFromAngles(this._yaw, this._pitch);
 
-            // 计算相机方向
-            this._lookDirection.X = (float)(Math.Cos(yawRad) * Math.Cos(pitchRad));
-            this._lookDirection.Y = (float)Math.Sin(pitchRad);
-            this._lookDirection.Z = (float)(Math.Sin(yawRad) * Math.Cos(pitchRad));
-            this._lookDirection = Vector3.Normalize(this._lookDirection);
-
-            // 计算相机位置（沿着方向向量向后移动指定距离）
+            //计算相机位置
             this._cameraPosition = this._targetPosition - this._lookDirection * this._distance;
 
-            // 重新计算右向量和上向量
-            this._rightDirection = Vector3.Normalize(Vector3.Cross(this._lookDirection, Vector3.UnitY));
+            //计算右方向和上方向
+            float dot = Math.Abs(Vector3.Dot(this._worldUpDirection, this._lookDirection));
+
+            //当视线与世界上方向平行时，选择备选方向
+            Vector3 upReference = dot > 0.9999f ? GetAlternativeUpDirection() : this._worldUpDirection;
+
+            //计算右方向：look × up
+            this._rightDirection = Vector3.Normalize(Vector3.Cross(this._lookDirection, upReference));
+
+            //计算真正的上方向：right × look
             this._upDirection = Vector3.Normalize(Vector3.Cross(this._rightDirection, this._lookDirection));
         }
         #endregion
@@ -476,6 +539,125 @@ namespace MedicalSharp.Engine.Cameras
             this._viewMatrix = Matrix4.LookAt(this._cameraPosition, this._targetPosition, this._upDirection);
         }
         #endregion
+
+        #region 设置世界坐标系上方向 —— 
+        /// <summary>
+        /// 设置世界坐标系上方向
+        /// </summary>
+        /// <param name="worldUpDirection">世界坐标系上方向</param>
+        private void SetWorldUpDirectionInternal(Vector3 worldUpDirection)
+        {
+            this._worldUpDirection = worldUpDirection;
+
+            //使用点积判断方向，避免浮点精度问题
+            if (Math.Abs(Vector3.Dot(worldUpDirection, new Vector3(1, 0, 0))) > 0.9999f)
+            {
+                this._coordinateSystem = CoordinateSystem.XUp;
+            }
+            else if (Math.Abs(Vector3.Dot(worldUpDirection, new Vector3(0, 0, 1))) > 0.9999f)
+            {
+                this._coordinateSystem = CoordinateSystem.ZUp;
+            }
+            else
+            {
+                this._coordinateSystem = CoordinateSystem.YUp;
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// 从方向向量计算偏航角和俯仰角（根据世界坐标系上方向）
+        /// </summary>
+        private void CalculateAnglesFromDirection(Vector3 direction)
+        {
+            direction = Vector3.Normalize(direction);
+
+            switch (this._coordinateSystem)
+            {
+                case CoordinateSystem.YUp:
+                    // Y-up: 偏航角绕 Y 轴，俯仰角绕 X 轴
+                    this._yaw = MathHelper.RadiansToDegrees((float)Math.Atan2(direction.Z, direction.X));
+                    this._pitch = MathHelper.RadiansToDegrees((float)Math.Asin(MathHelper.Clamp(direction.Y, -1.0f, 1.0f)));
+                    break;
+
+                case CoordinateSystem.ZUp:
+                    // Z-up: 偏航角绕 Z 轴，俯仰角绕 X 轴
+                    this._yaw = MathHelper.RadiansToDegrees((float)Math.Atan2(direction.Y, direction.X));
+                    float xyLength = (float)Math.Sqrt(direction.X * direction.X + direction.Y * direction.Y);
+                    this._pitch = MathHelper.RadiansToDegrees((float)Math.Atan2(direction.Z, xyLength));
+                    break;
+
+                case CoordinateSystem.XUp:
+                    // X-up: 偏航角绕 X 轴，俯仰角绕 Y 轴
+                    this._yaw = MathHelper.RadiansToDegrees((float)Math.Atan2(direction.Z, direction.Y));
+                    float yzLength = (float)Math.Sqrt(direction.Y * direction.Y + direction.Z * direction.Z);
+                    this._pitch = MathHelper.RadiansToDegrees((float)Math.Atan2(direction.X, yzLength));
+                    break;
+            }
+
+            // 规范化偏航角到 [0, 360)
+            if (this._yaw < 0) this._yaw += 360.0f;
+
+            // 限制俯仰角
+            this._pitch = Math.Clamp(this._pitch, this._minPitch, this._maxPitch);
+        }
+
+        /// <summary>
+        /// 从偏航角和俯仰角计算方向向量（根据世界坐标系上方向）
+        /// </summary>
+        private Vector3 CalculateDirectionFromAngles(float yaw, float pitch)
+        {
+            float yawRad = MathHelper.DegreesToRadians(yaw);
+            float pitchRad = MathHelper.DegreesToRadians(pitch);
+            float cosPitch = (float)Math.Cos(pitchRad);
+            float sinPitch = (float)Math.Sin(pitchRad);
+            float cosYaw = (float)Math.Cos(yawRad);
+            float sinYaw = (float)Math.Sin(yawRad);
+
+            switch (this._coordinateSystem)
+            {
+                case CoordinateSystem.YUp:
+                    // Y-up: 方向向量 = (cos(yaw)*cos(pitch), sin(pitch), sin(yaw)*cos(pitch))
+                    return new Vector3(
+                        cosYaw * cosPitch,
+                        sinPitch,
+                        sinYaw * cosPitch
+                    ).Normalized();
+
+                case CoordinateSystem.ZUp:
+                    // Z-up: 方向向量 = (cos(yaw)*cos(pitch), sin(yaw)*cos(pitch), sin(pitch))
+                    return new Vector3(
+                        cosYaw * cosPitch,
+                        -sinYaw * cosPitch,
+                        sinPitch
+                    ).Normalized();
+
+                case CoordinateSystem.XUp:
+
+                    // X-up: 方向向量 = (sin(pitch), cos(yaw)*cos(pitch), sin(yaw)*cos(pitch))
+                    return new Vector3(
+                        -sinPitch,          // X = sin(pitch)
+                        cosPitch * cosYaw, // Y = cos(pitch)*cosYaw
+                        cosPitch * sinYaw  // Z = cos(pitch)*sinYaw
+                    ).Normalized();
+
+                default:
+                    return Vector3.UnitZ;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前坐标系下的备选上方向（当视线与世界上方向平行时使用）
+        /// </summary>
+        private Vector3 GetAlternativeUpDirection()
+        {
+            return this._coordinateSystem switch
+            {
+                CoordinateSystem.XUp => Vector3.UnitY,
+                CoordinateSystem.ZUp => Vector3.UnitY,
+                _ => Vector3.UnitZ
+            };
+        }
 
         #endregion
     }

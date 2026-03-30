@@ -45,9 +45,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             //const float pitch = -45.0f;
             //this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
 
-            Vector3 cameraPosition = new Vector3(0, 0, 4);
+            //X-Up
+            //Vector3 cameraPosition = new Vector3(0, 4, 0);
+            //Vector3 targetPosition = new Vector3(0.0f);
+            //Vector3 upDirection = new Vector3(1, 0, 0);
+
+            //Y-Up
+            //Vector3 cameraPosition = new Vector3(0, 0, 4);
+            //Vector3 targetPosition = new Vector3(0.0f);
+            //Vector3 upDirection = new Vector3(0, 1, 0);
+
+            //Z-Up
+            Vector3 cameraPosition = new Vector3(0, 4, 0);
             Vector3 targetPosition = new Vector3(0.0f);
-            Vector3 upDirection = new Vector3(0, 1, 0);
+            Vector3 upDirection = new Vector3(0, 0, 1);
             this.OrbitCamera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
             this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.GrayControlPoints);
         }
