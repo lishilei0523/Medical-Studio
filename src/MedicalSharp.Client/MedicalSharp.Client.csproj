@@ -30,8 +30,8 @@
     <PackageReference Include="SD.Infrastructure" Version="4.0.1" />
     <PackageReference Include="SD.Infrastructure.Avalonia" Version="1.0.1" />
     <PackageReference Include="SD.Infrastructure.Avalonia.Caliburn" Version="1.0.1" />
-    <PackageReference Include="SimpleITK.Runtimes.win-x64" Version="2.5.3" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
-    <PackageReference Include="SimpleITK.Runtimes.linux-x64" Version="2.5.3" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
+    <PackageReference Include="SimpleITK.Runtimes.win-x64" Version="2.5.3.2" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
+    <PackageReference Include="SimpleITK.Runtimes.linux-x64" Version="2.5.3.2" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
   </ItemGroup>
 
   <ItemGroup>
