@@ -181,7 +181,6 @@ namespace MedicalSharp.Engine.Renderers
             #endregion
 
             this.Renderable = renderable;
-
             if (this.MPRCamera != null)
             {
                 this.UpdateCameraFromRenderable();
@@ -304,19 +303,17 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
-            //设置体积实际尺寸
-            this.MPRCamera.VolumeActualSize = this.Renderable.ActualSize;
-
             //根据平面类型设置最大切片数
             int maxSlicesCount = this.MPRCamera.PlaneType switch
             {
                 MPRPlaneType.Axial => this.Renderable.VolumeTexture.Depth,
                 MPRPlaneType.Coronal => this.Renderable.VolumeTexture.Height,
                 MPRPlaneType.Sagittal => this.Renderable.VolumeTexture.Width,
+                //MPRPlaneType.Oblique => //TODO 实现斜切最大切片数
                 _ => 100
             };
-
             this.MPRCamera.MaxSliceCount = maxSlicesCount;
+            this.MPRCamera.SliceIndex = maxSlicesCount / 2;
 
             //设置切片间距为体素间距
             float sliceSpacing = this.MPRCamera.PlaneType switch
@@ -324,11 +321,10 @@ namespace MedicalSharp.Engine.Renderers
                 MPRPlaneType.Axial => this.Renderable.Spacing.Z,
                 MPRPlaneType.Coronal => this.Renderable.Spacing.Y,
                 MPRPlaneType.Sagittal => this.Renderable.Spacing.X,
+                //MPRPlaneType.Oblique => //TODO 实现斜切体素间距
                 _ => 1.0f
             };
-
             this.MPRCamera.SliceSpacing = sliceSpacing;
-            this.MPRCamera.SliceIndex = maxSlicesCount / 2;
         }
         #endregion
 
@@ -338,6 +334,7 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         private Matrix4 GetPlaneModelMatrix()
         {
+            //TODO 考虑斜切
             #region # 验证
 
             if (this.Renderable?.VolumeTexture == null)
@@ -348,7 +345,7 @@ namespace MedicalSharp.Engine.Renderers
             #endregion
 
             //构建方向矩阵
-            Matrix4 orientationMatrix = new Matrix4(
+            Matrix4 directionMatrix = new Matrix4(
                 new Vector4(this.Renderable.RowDirection, 0),
                 new Vector4(this.Renderable.ColDirection, 0),
                 new Vector4(this.Renderable.SliceDirection, 0),
@@ -360,18 +357,20 @@ namespace MedicalSharp.Engine.Renderers
             {
                 MPRPlaneType.Axial =>       //XY平面
                     Matrix4.CreateScale(this.Renderable.VolumeScale.X, this.Renderable.VolumeScale.Y, 1),
+
                 MPRPlaneType.Coronal =>     //XZ平面
                     Matrix4.CreateScale(this.Renderable.VolumeScale.X, this.Renderable.VolumeScale.Z, 1) *
                     Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-90.0f)),
+
                 MPRPlaneType.Sagittal =>    //YZ平面
                     Matrix4.CreateScale(this.Renderable.VolumeScale.Y, this.Renderable.VolumeScale.Z, 1) *
-                    Matrix4.CreateRotationY(MathHelper.DegreesToRadians(90.0f))
-                    ,
+                    Matrix4.CreateRotationY(MathHelper.DegreesToRadians(90.0f)),
+
                 _ => Matrix4.Identity
             };
 
             //组合变换：方向 * 平面变换
-            return orientationMatrix * planeTransform;
+            return directionMatrix * planeTransform;
         }
         #endregion
 

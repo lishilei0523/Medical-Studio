@@ -57,7 +57,6 @@ namespace MedicalSharp.Engine.Cameras
             this._sliceSpacing = 1.0f;
             this._zoomFactor = 1.0f;
             this._panOffset = Vector2.Zero;
-            this._volumeActualSize = Vector3.One;
 
             this.UpdateCameraVectors();
             this.UpdateMatrices();
@@ -144,13 +143,37 @@ namespace MedicalSharp.Engine.Cameras
         public MPRPlaneType PlaneType
         {
             get => this._planeType;
-            set
+            internal set
             {
                 if (this._planeType != value)
                 {
                     this._planeType = value;
                     this.UpdateCameraVectors();
                     this.UpdateMatrices();
+                }
+            }
+        }
+        #endregion
+
+        #region 最大切片数 —— int MaxSliceCount
+        /// <summary>
+        /// 最大切片数
+        /// </summary>
+        private int _maxSliceCount;
+
+        /// <summary>
+        /// 最大切片数
+        /// </summary>
+        public int MaxSliceCount
+        {
+            get => this._maxSliceCount;
+            internal set
+            {
+                if (this._maxSliceCount != value && value > 0)
+                {
+                    this._maxSliceCount = value;
+                    this._sliceIndex = MathHelper.Clamp(this._sliceIndex, 0, this._maxSliceCount - 1);
+                    this.UpdateViewMatrix();
                 }
             }
         }
@@ -180,30 +203,6 @@ namespace MedicalSharp.Engine.Cameras
         }
         #endregion
 
-        #region 最大切片数 —— int MaxSliceCount
-        /// <summary>
-        /// 最大切片数
-        /// </summary>
-        private int _maxSliceCount;
-
-        /// <summary>
-        /// 最大切片数
-        /// </summary>
-        public int MaxSliceCount
-        {
-            get => this._maxSliceCount;
-            set
-            {
-                if (this._maxSliceCount != value && value > 0)
-                {
-                    this._maxSliceCount = value;
-                    this._sliceIndex = MathHelper.Clamp(this._sliceIndex, 0, this._maxSliceCount - 1);
-                    this.UpdateViewMatrix();
-                }
-            }
-        }
-        #endregion
-
         #region 切片间距 —— float SliceSpacing
         /// <summary>
         /// 切片间距
@@ -216,7 +215,7 @@ namespace MedicalSharp.Engine.Cameras
         public float SliceSpacing
         {
             get => this._sliceSpacing;
-            set
+            internal set
             {
                 if (!this._sliceSpacing.Equals(value) && value > 0)
                 {
@@ -273,26 +272,6 @@ namespace MedicalSharp.Engine.Cameras
         }
         #endregion
 
-        #region 体积实际尺寸 —— Vector3 VolumeActualSize
-        /// <summary>
-        /// 体积实际尺寸
-        /// </summary>
-        private Vector3 _volumeActualSize;
-
-        /// <summary>
-        /// 体积实际尺寸
-        /// </summary>
-        public Vector3 VolumeActualSize
-        {
-            get => this._volumeActualSize;
-            set
-            {
-                this._volumeActualSize = value;
-                this.UpdateProjectionMatrix();
-            }
-        }
-        #endregion
-
         #endregion
 
         #region # 方法
@@ -317,7 +296,8 @@ namespace MedicalSharp.Engine.Cameras
         /// <summary>
         /// 缩放相机
         /// </summary>
-        /// <param name="delta">缩放增量（正数放大，负数缩小）</param>
+        /// <param name="delta">缩放增量</param>
+        /// <remarks>正数放大，负数缩小</remarks>
         public void Zoom(float delta)
         {
             this._zoomFactor *= (1.0f + delta * 0.1f);
@@ -334,15 +314,15 @@ namespace MedicalSharp.Engine.Cameras
         /// <param name="deltaY">垂直平移量</param>
         public void Pan(float deltaX, float deltaY)
         {
-            //将鼠标移动归一化到 [-1, 1] 范围
-            float normalizedDx = deltaX / this._viewportWidth * 2.0f;
-            float normalizedDy = deltaY / this._viewportHeight * 2.0f;
+            //将鼠标移动归一化到[-1, 1]范围
+            float normalizedDeltaX = deltaX / this._viewportWidth * 2.0f;
+            float normalizedDeltaY = deltaY / this._viewportHeight * 2.0f;
 
             //考虑缩放因子
-            float panSpeed = 1f / this._zoomFactor;
+            float panSpeed = 1.0f / this._zoomFactor;
 
-            this._panOffset.X -= normalizedDx * panSpeed;
-            this._panOffset.Y += normalizedDy * panSpeed;
+            this._panOffset.X -= normalizedDeltaX * panSpeed;
+            this._panOffset.Y += normalizedDeltaY * panSpeed;
 
             this.UpdateProjectionMatrix();
         }
@@ -375,23 +355,30 @@ namespace MedicalSharp.Engine.Cameras
             {
                 case MPRPlaneType.Axial:    //横断面 - 从上往下看
                     this._cameraPosition = new Vector3(0, 1, 0);   //位于Y轴正方向
-                    this._lookDirection = new Vector3(0, -1, 0);    //看向Y轴负方向
-                    this._upDirection = new Vector3(0, 0, 1);       //Z轴向上
-                    this._rightDirection = new Vector3(1, 0, 0);    //X轴向右
+                    this._lookDirection = new Vector3(0, -1, 0);   //看向Y轴负方向
+                    this._upDirection = new Vector3(0, 0, 1);      //Z轴向上
+                    this._rightDirection = new Vector3(1, 0, 0);   //X轴向右
                     break;
 
                 case MPRPlaneType.Coronal:  //冠状面 - 从前向后看
                     this._cameraPosition = new Vector3(0, 0, 1);   //位于Z轴正方向
-                    this._lookDirection = new Vector3(0, 0, -1);    //看向Z轴负方向
-                    this._upDirection = new Vector3(0, 1, 0);       //Y轴向上
-                    this._rightDirection = new Vector3(1, 0, 0);    //X轴向右
+                    this._lookDirection = new Vector3(0, 0, -1);   //看向Z轴负方向
+                    this._upDirection = new Vector3(0, 1, 0);      //Y轴向上
+                    this._rightDirection = new Vector3(1, 0, 0);   //X轴向右
                     break;
 
-                case MPRPlaneType.Sagittal: //矢状面 - 从左向右看
+                case MPRPlaneType.Sagittal: //矢状面 - 从右向左看
                     this._cameraPosition = new Vector3(-1, 0, 0);   //位于X轴负方向
-                    this._lookDirection = new Vector3(1, 0, 0);      //看向X轴正方向
-                    this._upDirection = new Vector3(0, 1, 0);        //Y轴向上
-                    this._rightDirection = new Vector3(0, 0, 1);     //Z轴向右
+                    this._lookDirection = new Vector3(1, 0, 0);     //看向X轴正方向
+                    this._upDirection = new Vector3(0, 1, 0);       //Y轴向上
+                    this._rightDirection = new Vector3(0, 0, 1);    //Z轴向右
+                    break;
+
+                case MPRPlaneType.Oblique:  //TODO 斜切面
+                    //this._cameraPosition = new Vector3(-1, 0, 0);   //位于X轴负方向
+                    //this._lookDirection = new Vector3(1, 0, 0);     //看向X轴正方向
+                    //this._upDirection = new Vector3(0, 1, 0);       //Y轴向上
+                    //this._rightDirection = new Vector3(0, 0, 1);    //Z轴向右
                     break;
             }
         }
@@ -403,27 +390,32 @@ namespace MedicalSharp.Engine.Cameras
         /// </summary>
         private void UpdateProjectionMatrix()
         {
+            #region # 验证
+
             if (this._viewportWidth <= 0 || this._viewportHeight <= 0)
             {
                 this._projectionMatrix = Matrix4.Identity;
                 return;
             }
 
+            #endregion
+
             //计算正交投影范围
             float aspect = this._viewportWidth / this._viewportHeight;
             float halfSideSize = 0.5f / this._zoomFactor;
             float left, right, bottom, top;
+
+            //横屏
             if (aspect >= 1.0f)
             {
-                //横屏
                 left = -halfSideSize * aspect + this._panOffset.X;
                 right = halfSideSize * aspect + this._panOffset.X;
                 bottom = -halfSideSize + this._panOffset.Y;
                 top = halfSideSize + this._panOffset.Y;
             }
+            //竖屏
             else
             {
-                //竖屏
                 left = -halfSideSize + this._panOffset.X;
                 right = halfSideSize + this._panOffset.X;
                 bottom = -halfSideSize / aspect + this._panOffset.Y;
@@ -446,6 +438,7 @@ namespace MedicalSharp.Engine.Cameras
                 MPRPlaneType.Axial => new Vector3(0, 0, this._sliceIndex * this._sliceSpacing),
                 MPRPlaneType.Coronal => new Vector3(0, this._sliceIndex * this._sliceSpacing, 0),
                 MPRPlaneType.Sagittal => new Vector3(this._sliceIndex * this._sliceSpacing, 0, 0),
+                //MPRPlaneType.Oblique => TODO 考虑斜切
                 _ => Vector3.Zero
             };
 
