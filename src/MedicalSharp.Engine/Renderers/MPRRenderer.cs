@@ -236,7 +236,7 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
 
             this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
-            this.Program.SetUniformVector3("u_VoxelSize", this.Renderable.VoxelSize);
+            this.Program.SetUniformVector3("u_VolumeSize", this.Renderable.VolumeSize);
             this.Program.SetUniformVector3("u_Spacing", this.Renderable.Spacing);
 
             //绑定纹理

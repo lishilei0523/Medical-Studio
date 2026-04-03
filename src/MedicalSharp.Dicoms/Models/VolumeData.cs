@@ -65,25 +65,25 @@ namespace MedicalSharp.Dicoms.Models
         public long VoxelsCount { get; internal set; }
         #endregion
 
-        #region 体素尺寸 —— Size3I VoxelSize
+        #region 体积尺寸 —— Size3I VolumeSize
         /// <summary>
-        /// 体素尺寸
+        /// 体积尺寸
         /// </summary>
-        public Size3I VoxelSize { get; internal set; }
+        public Size3I VolumeSize { get; internal set; }
         #endregion
 
-        #region 间距尺寸 —— Size3F Spacing
+        #region 间距 —— Size3F Spacing
         /// <summary>
-        /// 间距尺寸
+        /// 间距
         /// </summary>
         public Size3F Spacing { get; internal set; }
         #endregion
 
-        #region 实际尺寸 —— Size3F ActualSize
+        #region 物理尺寸 —— Size3F PhysicalSize
         /// <summary>
-        /// 实际尺寸
+        /// 物理尺寸
         /// </summary>
-        public Size3F ActualSize { get; internal set; }
+        public Size3F PhysicalSize { get; internal set; }
         #endregion
 
         #region 体积缩放 —— Vector3 VolumeScale
@@ -172,12 +172,12 @@ namespace MedicalSharp.Dicoms.Models
         {
             get
             {
-                if (x < 0 || x >= this.VoxelSize.Width || y < 0 || y >= this.VoxelSize.Height || z < 0 || z >= this.VoxelSize.Depth)
+                if (x < 0 || x >= this.VolumeSize.Width || y < 0 || y >= this.VolumeSize.Height || z < 0 || z >= this.VolumeSize.Depth)
                 {
                     return 0;
                 }
 
-                int index = z * this.VoxelSize.Width * this.VoxelSize.Height + y * this.VoxelSize.Width + x;
+                int index = z * this.VolumeSize.Width * this.VolumeSize.Height + y * this.VolumeSize.Width + x;
                 short* pointer = (short*)this.OriginalData.ToPointer();
                 short voxel = pointer[index];
 

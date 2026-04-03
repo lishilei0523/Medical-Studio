@@ -22,7 +22,7 @@ uniform float u_RescaleIntercept;
 
 //体积参数
 uniform vec3 u_VolumeScale;            //体积缩放
-uniform vec3 u_VoxelSize;              //体素尺寸
+uniform vec3 u_VolumeSize;              //体积尺寸
 uniform vec3 u_Spacing;                //间距
 
 //常量
@@ -60,16 +60,16 @@ float getNormalizedSliceIndex()
     switch (u_PlaneType)
     {
         case 0: //Axial - 沿Z轴切片
-            maxIndex = u_VoxelSize.z - 1.0;
+            maxIndex = u_VolumeSize.z - 1.0;
             break;
         case 1: //Coronal - 沿Y轴切片
-            maxIndex = u_VoxelSize.y - 1.0;
+            maxIndex = u_VolumeSize.y - 1.0;
             break;
         case 2: //Sagittal - 沿X轴切片
-            maxIndex = u_VoxelSize.x - 1.0;
+            maxIndex = u_VolumeSize.x - 1.0;
             break;
         default:
-            maxIndex = u_VoxelSize.z - 1.0;
+            maxIndex = u_VolumeSize.z - 1.0;
             break;
     }
 

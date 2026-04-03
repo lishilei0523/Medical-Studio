@@ -170,27 +170,27 @@ namespace MedicalSharp.Dicoms
                 throw new ArgumentOutOfRangeException(nameof(volumeData), "Image is not 3D");
             }
 
-            volumeData.VoxelSize = new Size3I((int)size[0], (int)size[1], (int)size[2]);
+            volumeData.VolumeSize = new Size3I((int)size[0], (int)size[1], (int)size[2]);
 
             //获取像素间距
             VectorDouble spacing = image.GetSpacing();
             volumeData.Spacing = new Size3F((float)spacing[0], (float)spacing[1], (float)spacing[2]);
 
             //计算实际尺寸
-            volumeData.ActualSize = new Size3F
+            volumeData.PhysicalSize = new Size3F
             (
-                volumeData.VoxelSize.Width * volumeData.Spacing.Width,
-                volumeData.VoxelSize.Height * volumeData.Spacing.Height,
-                volumeData.VoxelSize.Depth * volumeData.Spacing.Depth
+                volumeData.VolumeSize.Width * volumeData.Spacing.Width,
+                volumeData.VolumeSize.Height * volumeData.Spacing.Height,
+                volumeData.VolumeSize.Depth * volumeData.Spacing.Depth
             );
 
             //计算缩放
-            float maxSide = Math.Max(volumeData.ActualSize.Width, Math.Max(volumeData.ActualSize.Height, volumeData.ActualSize.Depth));
+            float maxSide = Math.Max(volumeData.PhysicalSize.Width, Math.Max(volumeData.PhysicalSize.Height, volumeData.PhysicalSize.Depth));
             volumeData.VolumeScale = new Vector3
             {
-                X = volumeData.ActualSize.Width / maxSide,
-                Y = volumeData.ActualSize.Height / maxSide,
-                Z = volumeData.ActualSize.Depth / maxSide
+                X = volumeData.PhysicalSize.Width / maxSide,
+                Y = volumeData.PhysicalSize.Height / maxSide,
+                Z = volumeData.PhysicalSize.Depth / maxSide
             };
 
             //获取斜率和截距
@@ -228,7 +228,7 @@ namespace MedicalSharp.Dicoms
             }
 
             //获取体素原始数据
-            volumeData.VoxelsCount = (long)volumeData.VoxelSize.Width * volumeData.VoxelSize.Height * volumeData.VoxelSize.Depth;
+            volumeData.VoxelsCount = (long)volumeData.VolumeSize.Width * volumeData.VolumeSize.Height * volumeData.VolumeSize.Depth;
             volumeData.OriginalData = image.GetBufferAsInt16();
             if (volumeData.OriginalData == IntPtr.Zero)
             {
