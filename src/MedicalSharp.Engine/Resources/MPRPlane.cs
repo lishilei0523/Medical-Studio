@@ -22,9 +22,9 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="center">平面中心</param>
         /// <param name="uAxis">U轴方向（水平）</param>
         /// <param name="vAxis">V轴方向（垂直）</param>
-        /// <param name="minSlicePosition"></param>
-        /// <param name="maxSlicePosition"></param>
-        /// <param name="planeType"></param>
+        /// <param name="minSlicePosition">最小切片位置</param>
+        /// <param name="maxSlicePosition">最大切片位置</param>
+        /// <param name="planeType">MPR平面类型</param>
         private MPRPlane(Vector3 center, Vector3 uAxis, Vector3 vAxis, float minSlicePosition, float maxSlicePosition, MPRPlaneType planeType)
         {
             this.Center = center;
@@ -38,7 +38,7 @@ namespace MedicalSharp.Engine.Resources
             this._slicePosition = (minSlicePosition + maxSlicePosition) / 2;
             this.SlicesCount = Math.Max(2, (int)((maxSlicePosition - minSlicePosition) / 1.0f) + 1);
 
-            //重新正交化确保坐标轴正交
+            //正交化确保坐标轴正交
             this.Orthonormalize();
         }
 
@@ -122,8 +122,8 @@ namespace MedicalSharp.Engine.Resources
             {
                 int sliceIndex = Math.Clamp(value, 0, this.SlicesCount - 1);
                 float t = sliceIndex * 1.0f / (this.SlicesCount - 1);
-                float newPosition = this.MinSlicePosition + t * (this.MaxSlicePosition - this.MinSlicePosition);
-                this.SlicePosition = newPosition;
+                float slicePosition = this.MinSlicePosition + t * (this.MaxSlicePosition - this.MinSlicePosition);
+                this.SlicePosition = slicePosition;
             }
         }
         #endregion
@@ -308,11 +308,6 @@ namespace MedicalSharp.Engine.Resources
         #endregion
 
 
-
-        #endregion
-
-        #region 公共方法
-
         //Public
 
         #region 获取平面模型矩阵 —— Matrix4 GetModelMatrix(Vector3 volumeScale)
@@ -384,12 +379,13 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 旋转平面 —— void Rotate(float pitch, float yaw, float roll)
         /// <summary>
         /// 旋转平面
         /// </summary>
-        /// <param name="pitch"></param>
-        /// <param name="yaw"></param>
-        /// <param name="roll"></param>
+        /// <param name="pitch">俯仰角</param>
+        /// <param name="yaw">偏航角</param>
+        /// <param name="roll">翻滚角</param>
         public void Rotate(float pitch, float yaw, float roll = 0)
         {
             float pitchRad = MathHelper.DegreesToRadians(pitch);
@@ -409,7 +405,9 @@ namespace MedicalSharp.Engine.Resources
             this.PlaneType = MPRPlaneType.Oblique;
             this.OnChanged();
         }
+        #endregion
 
+        #region 平移平面 —— void Translate(Vector3 offset)
         /// <summary>
         /// 平移平面
         /// </summary>
@@ -418,18 +416,20 @@ namespace MedicalSharp.Engine.Resources
             this.Center += offset;
             this.OnChanged();
         }
+        #endregion
 
+        #region 重置为标准平面 —— void ResetToStandard(BoundingBox box)
         /// <summary>
         /// 重置为标准平面
         /// </summary>
-        public void ResetToStandard(BoundingBox bounds)
+        public void ResetToStandard(BoundingBox box)
         {
             MPRPlane standardPlane = this.PlaneType switch
             {
-                MPRPlaneType.Axial => CreateAxial(bounds),
-                MPRPlaneType.Coronal => CreateCoronal(bounds),
-                MPRPlaneType.Sagittal => CreateSagittal(bounds),
-                _ => CreateAxial(bounds)
+                MPRPlaneType.Axial => CreateAxial(box),
+                MPRPlaneType.Coronal => CreateCoronal(box),
+                MPRPlaneType.Sagittal => CreateSagittal(box),
+                _ => CreateAxial(box)
             };
 
             this.Center = standardPlane.Center;
@@ -443,13 +443,16 @@ namespace MedicalSharp.Engine.Resources
 
             this.OnChanged();
         }
+        #endregion
 
+        #region 获取平面上点在世界坐标位置 —— Vector3 GetPointOnPlane(float u, float v, Vector3? volumeScale)
         /// <summary>
-        /// 获取平面上的点在世界坐标中的位置
+        /// 获取平面上点在世界坐标位置
         /// </summary>
         /// <param name="u">U坐标，范围[-1, 1]</param>
         /// <param name="v">V坐标，范围[-1, 1]</param>
         /// <param name="volumeScale">体积缩放（可选，用于精确计算）</param>
+        /// <returns>世界坐标位置</returns>
         public Vector3 GetPointOnPlane(float u, float v, Vector3? volumeScale = null)
         {
             //单位平面半长固定为 0.5
@@ -472,12 +475,15 @@ namespace MedicalSharp.Engine.Resources
 
             return localPoint;
         }
+        #endregion
 
+        #region 将世界坐标点投影到平面 —— Vector2 ProjectPoint(Vector3 point, Vector3? volumeScale)
         /// <summary>
-        /// 将世界坐标点投影到平面上
+        /// 将世界坐标点投影到平面
         /// </summary>
         /// <param name="point">世界坐标点</param>
         /// <param name="volumeScale">体积缩放（可选，用于精确计算）</param>
+        /// <returns>平面UV坐标</returns>
         public Vector2 ProjectPoint(Vector3 point, Vector3? volumeScale = null)
         {
             const float halfSize = 0.5f;
@@ -502,6 +508,7 @@ namespace MedicalSharp.Engine.Resources
 
             return new Vector2(u, v);
         }
+        #endregion
 
 
         //Private
