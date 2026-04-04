@@ -92,6 +92,13 @@ namespace MedicalSharp.Engine.Resources
         public MPRPlaneType PlaneType { get; private set; }
         #endregion
 
+        #region 原始平面类型 —— MPRPlaneType OriginalPlaneType
+        /// <summary>
+        /// 原始平面类型
+        /// </summary>
+        public MPRPlaneType OriginalPlaneType { get; private set; }
+        #endregion
+
         #region 切片数量 —— int SlicesCount
         /// <summary>
         /// 切片数量
@@ -147,6 +154,7 @@ namespace MedicalSharp.Engine.Resources
                 VAxis = new Vector3(0, 1, 0),
                 Normal = new Vector3(0, 0, 1),
                 PlaneType = MPRPlaneType.Axial,
+                OriginalPlaneType = MPRPlaneType.Axial,
                 SlicesCount = volumeSize.Z,
                 SliceIndex = volumeSize.Z / 2
             };
@@ -173,6 +181,7 @@ namespace MedicalSharp.Engine.Resources
                 VAxis = new Vector3(0, 0, 1),
                 Normal = new Vector3(0, 1, 0),
                 PlaneType = MPRPlaneType.Coronal,
+                OriginalPlaneType = MPRPlaneType.Coronal,
                 SlicesCount = volumeSize.Y,
                 SliceIndex = volumeSize.Y / 2
             };
@@ -199,6 +208,7 @@ namespace MedicalSharp.Engine.Resources
                 VAxis = new Vector3(0, 0, 1),
                 Normal = new Vector3(1, 0, 0),
                 PlaneType = MPRPlaneType.Sagittal,
+                OriginalPlaneType = MPRPlaneType.Sagittal,
                 SlicesCount = volumeSize.X,
                 SliceIndex = volumeSize.X / 2
             };
