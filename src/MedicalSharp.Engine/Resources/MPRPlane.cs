@@ -255,17 +255,17 @@ namespace MedicalSharp.Engine.Resources
             Matrix4 rotation = rotX * rotY * rotZ;
 
             //旋转轴方向
-            Vector3 newUAxis = Vector3.TransformNormal(originalPlane.UAxis, rotation).Normalized();
-            Vector3 newVAxis = Vector3.TransformNormal(originalPlane.VAxis, rotation).Normalized();
-            Vector3 newNormal = Vector3.TransformNormal(originalPlane.Normal, rotation).Normalized();
+            Vector3 uAxis = Vector3.TransformNormal(originalPlane.UAxis, rotation).Normalized();
+            Vector3 vAxis = Vector3.TransformNormal(originalPlane.VAxis, rotation).Normalized();
+            Vector3 normal = Vector3.TransformNormal(originalPlane.Normal, rotation).Normalized();
 
             //创建斜切平面
             MPRPlane plane = new MPRPlane(originalPlane._volumeSize, originalPlane._spacing, originalPlane._physicalSize, originalPlane._volumeScale)
             {
                 Center = originalPlane.Center,
-                UAxis = newUAxis,
-                VAxis = newVAxis,
-                Normal = newNormal,
+                UAxis = uAxis,
+                VAxis = vAxis,
+                Normal = normal,
                 PlaneType = MPRPlaneType.Oblique,
                 OriginalPlaneType = originalPlane.OriginalPlaneType
             };
