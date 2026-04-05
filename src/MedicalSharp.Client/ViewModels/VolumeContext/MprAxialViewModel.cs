@@ -1,7 +1,8 @@
 ﻿using Caliburn.Micro;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Dicoms.Models;
 using MedicalSharp.Engine.Cameras;
-using MedicalSharp.Engine.ValueTypes;
+using MedicalSharp.Engine.Resources;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using System.Threading;
@@ -27,27 +28,51 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public MprAxialViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
-            this.AxialCamera = new MPRCamera(MPRPlaneType.Axial);
+            this.AxialCamera = new MPRCamera2();
         }
 
         #endregion
 
         #region # 属性
 
-        #region MPR横断位相机 —— MPRCamera AxialCamera
+        #region MPR横断面 —— MPRPlane AxialPlane
+        /// <summary>
+        /// MPR横断面
+        /// </summary>
+        [DependencyProperty]
+        public MPRPlane AxialPlane { get; set; }
+        #endregion
+
+        #region MPR横断位相机 —— MPRCamera2 AxialCamera
         /// <summary>
         /// MPR横断位相机
         /// </summary>
         [DependencyProperty]
-        public MPRCamera AxialCamera { get; set; }
+        public MPRCamera2 AxialCamera { get; set; }
         #endregion
 
         #region 体积数据 —— VolumeData VolumeData
         /// <summary>
         /// 体积数据
         /// </summary>
-        [DependencyProperty]
-        public VolumeData VolumeData { get; set; }
+        private VolumeData _volumeData;
+
+        /// <summary>
+        /// 体积数据
+        /// </summary>
+        public VolumeData VolumeData
+        {
+            get => this._volumeData;
+            set
+            {
+                this._volumeData = value;
+                this.Set(ref this._volumeData, value);
+                if (value != null)
+                {
+                    this.AxialPlane = MPRPlane.CreateAxialPlane(value.VolumeSize.ToGlmVector3(), value.Spacing.ToGlmVector3(), value.PhysicalSize.ToGlmVector3(), value.VolumeScale.ToGlmVector3());
+                }
+            }
+        }
         #endregion
 
         #endregion

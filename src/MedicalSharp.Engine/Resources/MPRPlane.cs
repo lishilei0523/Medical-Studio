@@ -205,7 +205,7 @@ namespace MedicalSharp.Engine.Resources
                 _maxProjection = 0.5f,
                 Center = Vector3.Zero,
                 UAxis = new Vector3(1, 0, 0),
-                VAxis = new Vector3(0, -1, 0),
+                VAxis = new Vector3(0, 1, 0),
                 Normal = new Vector3(0, 0, 1),
                 PlaneType = MPRPlaneType.Axial,
                 OriginalPlaneType = MPRPlaneType.Axial,
@@ -264,7 +264,7 @@ namespace MedicalSharp.Engine.Resources
                 Center = Vector3.Zero,
                 UAxis = new Vector3(0, 1, 0),
                 VAxis = new Vector3(0, 0, 1),
-                Normal = new Vector3(-1, 0, 0),
+                Normal = new Vector3(1, 0, 0),
                 PlaneType = MPRPlaneType.Sagittal,
                 OriginalPlaneType = MPRPlaneType.Sagittal,
                 SlicesCount = volumeSize.X,
@@ -280,24 +280,22 @@ namespace MedicalSharp.Engine.Resources
         /// 创建斜切面
         /// </summary>
         /// <param name="originalPlane">原始平面</param>
-        /// <param name="eulerAngles">欧拉角</param>
+        /// <param name="rotationU">绕U轴旋转角度（上下旋转）</param>
+        /// <param name="rotationV">绕V轴旋转角度（左右旋转）</param>
         /// <returns>斜切面</returns>
-        public static MPRPlane CreateObliquePlane(MPRPlane originalPlane, Vector3 eulerAngles)
+        public static MPRPlane CreateObliquePlane(MPRPlane originalPlane, float rotationU, float rotationV)
         {
-            //计算旋转矩阵
-            float pitchRad = MathHelper.DegreesToRadians(eulerAngles.X);
-            float yawRad = MathHelper.DegreesToRadians(eulerAngles.Y);
-            float rollRad = MathHelper.DegreesToRadians(eulerAngles.Z);
+            //基于原始轴计算旋转
+            Quaternion rotU = Quaternion.FromAxisAngle(originalPlane.UAxis, MathHelper.DegreesToRadians(rotationU));
+            Quaternion rotV = Quaternion.FromAxisAngle(originalPlane.VAxis, MathHelper.DegreesToRadians(rotationV));
 
-            Matrix4 rotX = Matrix4.CreateRotationX(pitchRad);
-            Matrix4 rotY = Matrix4.CreateRotationY(yawRad);
-            Matrix4 rotZ = Matrix4.CreateRotationZ(rollRad);
-            Matrix4 rotation = rotX * rotY * rotZ;
+            //组合旋转：先左右，再上下
+            Quaternion total = rotU * rotV;
 
-            //旋转轴方向
-            Vector3 uAxis = Vector3.TransformNormal(originalPlane.UAxis, rotation).Normalized();
-            Vector3 vAxis = Vector3.TransformNormal(originalPlane.VAxis, rotation).Normalized();
-            Vector3 normal = Vector3.TransformNormal(originalPlane.Normal, rotation).Normalized();
+            //旋转原始轴
+            Vector3 uAxis = Vector3.Transform(originalPlane.UAxis, total).Normalized();
+            Vector3 vAxis = Vector3.Transform(originalPlane.VAxis, total).Normalized();
+            Vector3 normal = Vector3.Transform(originalPlane.Normal, total).Normalized();
 
             //创建斜切平面
             MPRPlane plane = new MPRPlane(originalPlane._volumeSize, originalPlane._spacing, originalPlane._physicalSize, originalPlane._volumeScale)
@@ -320,8 +318,7 @@ namespace MedicalSharp.Engine.Resources
             plane.CalculateObliqueSlicesCount();
 
             //保持切片索引比例
-            float t = originalPlane.SliceIndex / (float)(originalPlane.SlicesCount - 1);
-            plane.SliceIndex = Math.Clamp((int)(t * (plane.SlicesCount - 1)), 0, plane.SlicesCount - 1);
+            plane.SliceIndex = originalPlane.SliceIndex;
 
             return plane;
         }
@@ -330,39 +327,39 @@ namespace MedicalSharp.Engine.Resources
 
         //Public
 
-        #region 旋转平面 —— void Rotate(Vector3 eulerAngles)
+        #region 旋转平面 —— void Rotate(float deltaU, float deltaV)
         /// <summary>
         /// 旋转平面
         /// </summary>
-        /// <param name="eulerAngles">欧拉角</param>
-        public void Rotate(Vector3 eulerAngles)
+        /// <param name="deltaU">绕U轴旋转角度（上下旋转）</param>
+        /// <param name="deltaV">绕V轴旋转角度（左右旋转）</param>
+        public void Rotate(float deltaU, float deltaV)
         {
-            float pitchRad = MathHelper.DegreesToRadians(eulerAngles.X);
-            float yawRad = MathHelper.DegreesToRadians(eulerAngles.Y);
-            float rollRad = MathHelper.DegreesToRadians(eulerAngles.Z);
+            //绕U轴旋转（上下）
+            Quaternion rotU = Quaternion.FromAxisAngle(this.UAxis, MathHelper.DegreesToRadians(deltaU));
 
-            Matrix4 rotX = Matrix4.CreateRotationX(pitchRad);
-            Matrix4 rotY = Matrix4.CreateRotationY(yawRad);
-            Matrix4 rotZ = Matrix4.CreateRotationZ(rollRad);
-            Matrix4 rotation = rotX * rotY * rotZ;
+            //绕V轴旋转（左右）
+            Quaternion rotV = Quaternion.FromAxisAngle(this.VAxis, MathHelper.DegreesToRadians(deltaV));
 
-            this.UAxis = Vector3.TransformNormal(this.UAxis, rotation).Normalized();
-            this.VAxis = Vector3.TransformNormal(this.VAxis, rotation).Normalized();
-            this.Normal = Vector3.Cross(this.UAxis, this.VAxis).Normalized();
+            //组合旋转：先左右，再上下
+            Quaternion total = rotU * rotV;
 
+            //应用旋转
+            this.UAxis = Vector3.Transform(this.UAxis, total).Normalized();
+            this.VAxis = Vector3.Transform(this.VAxis, total).Normalized();
+            this.Normal = Vector3.Transform(this.Normal, total).Normalized();
+
+            //重新正交化
             this.Orthonormalize();
+
+            //更新类型
             this.PlaneType = MPRPlaneType.Oblique;
 
+            //计算投影范围
             this.CalculateProjectionRange();
-
-            //保存当前切片比例
-            float t = this._sliceIndex / (float)(this.SlicesCount - 1);
 
             //重新计算切片数量
             this.CalculateObliqueSlicesCount();
-
-            //恢复切片比例
-            this._sliceIndex = Math.Clamp((int)(t * (this.SlicesCount - 1)), 0, this.SlicesCount - 1);
 
             this.OnChanged();
         }
@@ -439,7 +436,10 @@ namespace MedicalSharp.Engine.Resources
                 new Vector4(0, 0, 0, 1)
             );
 
-            return basis * translation;
+            //处理缩放
+            Matrix4 scale = Matrix4.CreateScale(this._volumeScale);
+
+            return basis * scale * translation;
         }
         #endregion
 

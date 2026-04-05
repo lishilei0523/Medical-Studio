@@ -193,13 +193,12 @@ namespace MedicalSharp.Engine.Cameras
         }
         #endregion
 
-        #region 绑定MPR平面 —— void BindPlane(MPRPlane plane, float distance)
+        #region 绑定MPR平面 —— void BindPlane(MPRPlane plane)
         /// <summary>
         /// 绑定MPR平面
         /// </summary>
         /// <param name="plane">MPR平面</param>
-        /// <param name="distance">目标距离</param>
-        public void BindPlane(MPRPlane plane, float distance = 2.0f)
+        public void BindPlane(MPRPlane plane)
         {
             if (this._targetPlane != null)
             {
@@ -207,8 +206,6 @@ namespace MedicalSharp.Engine.Cameras
             }
 
             this._targetPlane = plane;
-            this._distance = distance;
-
             if (this._targetPlane != null)
             {
                 this._targetPlane.PlaneChangedEvent += this.OnPlaneChanged;
@@ -378,10 +375,15 @@ namespace MedicalSharp.Engine.Cameras
 
             float sliceOffset = this._targetPlane.GetSliceOffset();
 
-            Vector3 worldNormal = new Vector3(this._targetPlane.Normal.X * this._targetPlane.VolumeScale.X, this._targetPlane.Normal.Y * this._targetPlane.VolumeScale.Y, this._targetPlane.Normal.Z * this._targetPlane.VolumeScale.Z
+            Vector3 worldNormal = new Vector3(
+                this._targetPlane.Normal.X * this._targetPlane.VolumeScale.X,
+                this._targetPlane.Normal.Y * this._targetPlane.VolumeScale.Y,
+                this._targetPlane.Normal.Z * this._targetPlane.VolumeScale.Z
             ).Normalized();
-
-            Vector3 worldVAxis = new Vector3(this._targetPlane.VAxis.X * this._targetPlane.VolumeScale.X, this._targetPlane.VAxis.Y * this._targetPlane.VolumeScale.Y, this._targetPlane.VAxis.Z * this._targetPlane.VolumeScale.Z
+            Vector3 worldVAxis = new Vector3(
+                this._targetPlane.VAxis.X * this._targetPlane.VolumeScale.X,
+                this._targetPlane.VAxis.Y * this._targetPlane.VolumeScale.Y,
+                this._targetPlane.VAxis.Z * this._targetPlane.VolumeScale.Z
             ).Normalized();
 
             float normalScale = Math.Abs(Vector3.Dot(worldNormal, this._targetPlane.VolumeScale));
