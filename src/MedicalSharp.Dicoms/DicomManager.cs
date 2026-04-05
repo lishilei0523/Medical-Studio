@@ -122,7 +122,7 @@ namespace MedicalSharp.Dicoms
             ExtractData(volumeData);
 
             //添加字典缓存
-            _VolumeDatas.Add(volumeData.Id.ToString(), volumeData);
+            _VolumeDatas.Add(volumeData.Id, volumeData);
 
             return volumeData;
         }
@@ -221,7 +221,7 @@ namespace MedicalSharp.Dicoms
                 volumeData.WindowCenter = float.Parse(image.GetMetaData(DicomTags.WindowCenter));
             }
 
-            //转换像素类型为short
+            //转换像素类型为short TODO 克隆/存储转换后的SITKImage
             if (image.GetPixelID() != PixelIDValueEnum.sitkInt16)
             {
                 image = SimpleITK.Cast(image, PixelIDValueEnum.sitkInt16);
