@@ -8,11 +8,11 @@
 			 mc:Ignorable="d">
 
 	<sd:GroupBox Header="MPR-Axial">
-        <sd:MPRViewport2 Background="Black"
-                         Plane="{Binding AxialPlane}"
-                         Camera="{Binding AxialCamera}"
-                         VolumeData="{Binding VolumeData}">
+        <sd:MPRViewport Background="Black"
+                        Plane="{Binding AxialPlane}"
+                        Camera="{Binding AxialCamera}"
+                        VolumeData="{Binding VolumeData}">
 
-        </sd:MPRViewport2>
+        </sd:MPRViewport>
     </sd:GroupBox>
 </UserControl>

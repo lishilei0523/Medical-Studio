@@ -17,6 +17,16 @@ namespace MedicalSharp.Engine.Renderers
         #region # 字段及构造器
 
         /// <summary>
+        /// MPR平面
+        /// </summary>
+        private MPRPlane _plane;
+
+        /// <summary>
+        /// 模型矩阵
+        /// </summary>
+        private Matrix4 _modelMatrix;
+
+        /// <summary>
         /// 单位平面
         /// </summary>
         private readonly VertexBuffer _unitPlane;
@@ -24,29 +34,18 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 创建MPR渲染器构造器
         /// </summary>
-        /// <param name="camera">相机</param>
+        /// <param name="camera">MPR相机</param>
         public MPRRenderer(MPRCamera camera)
             : base(camera)
         {
-            //默认值
             this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
             this._unitPlane.Setup();
+            this.WindowWidth = 400;
+            this.WindowCenter = 40;
+            this.Brightness = 1.0f;
+            this.Contrast = 1.0f;
             this.TransferFunction = new TransferFunction();
             this.InitShaderProgram();
-        }
-
-        /// <summary>
-        /// 创建MPR渲染器构造器
-        /// </summary>
-        /// <param name="camera">相机</param>
-        /// <param name="program">Shader程序</param>
-        public MPRRenderer(MPRCamera camera, ShaderProgram program)
-            : base(camera, program)
-        {
-            //默认值
-            this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
-            this._unitPlane.Setup();
-            this.TransferFunction = new TransferFunction();
         }
 
         #endregion
@@ -101,15 +100,17 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         public MPRCamera MPRCamera
         {
-            get
-            {
-                if (base.Camera == null)
-                {
-                    return null;
-                }
+            get => base.Camera as MPRCamera;
+        }
+        #endregion
 
-                return (MPRCamera)base.Camera;
-            }
+        #region 只读属性 - MPR平面 —— MPRPlane Plane
+        /// <summary>
+        /// 只读属性 - MPR平面
+        /// </summary>
+        public MPRPlane Plane
+        {
+            get => this._plane;
         }
         #endregion
 
@@ -119,17 +120,35 @@ namespace MedicalSharp.Engine.Renderers
 
         //Public
 
-        #region 设置相机 —— void SetCamera(MPRCamera camera)
+        #region 绑定MPR平面 —— void BindPlane(MPRPlane plane)
         /// <summary>
-        /// 设置相机
+        /// 绑定MPR平面
         /// </summary>
-        public void SetCamera(MPRCamera camera)
+        /// <param name="plane">MPR平面</param>
+        public void BindPlane(MPRPlane plane)
         {
-            base.SetCamera(camera);
-
-            if (this.Renderable != null)
+            if (this._plane == plane)
             {
-                this.UpdateCameraFromRenderable();
+                return;
+            }
+
+            if (this._plane != null)
+            {
+                this._plane.PlaneChangedEvent -= this.OnPlaneChanged;
+            }
+
+            this._plane = plane;
+
+            if (this._plane != null)
+            {
+                this._plane.PlaneChangedEvent += this.OnPlaneChanged;
+
+                if (this.MPRCamera != null)
+                {
+                    this.MPRCamera.BindPlane(this._plane);
+                }
+
+                this.UpdateModelMatrix();
             }
         }
         #endregion
@@ -181,10 +200,6 @@ namespace MedicalSharp.Engine.Renderers
             #endregion
 
             this.Renderable = renderable;
-            if (this.MPRCamera != null)
-            {
-                this.UpdateCameraFromRenderable();
-            }
         }
         #endregion
 
@@ -196,7 +211,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <param name="viewportHeight">视口高度</param>
         public override void RenderFrame(float viewportWidth, float viewportHeight)
         {
-            #region 验证
+            #region # 验证
 
             if (viewportWidth <= 0 || viewportHeight <= 0)
             {
@@ -210,6 +225,14 @@ namespace MedicalSharp.Engine.Renderers
             {
                 throw new InvalidOperationException("相机不可为空！");
             }
+            if (this.Renderable?.VolumeTexture == null)
+            {
+                return;
+            }
+            if (this._plane == null)
+            {
+                return;
+            }
 
             #endregion
 
@@ -220,12 +243,9 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.Use();
 
             //设置Uniform变量
-            this.Program.SetUniformMatrix4("u_ModelMatrix", this.GetPlaneModelMatrix());
+            this.Program.SetUniformMatrix4("u_ModelMatrix", this._modelMatrix);
             this.Program.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
             this.Program.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
-
-            this.Program.SetUniformInt("u_PlaneType", (int)this.MPRCamera.PlaneType);
-            this.Program.SetUniformFloat("u_SliceIndex", this.MPRCamera.SliceIndex);
 
             this.Program.SetUniformFloat("u_WindowWidth", this.WindowWidth);
             this.Program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
@@ -236,8 +256,6 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
 
             this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
-            this.Program.SetUniformVector3("u_VolumeSize", this.Renderable.VolumeSize);
-            this.Program.SetUniformVector3("u_Spacing", this.Renderable.Spacing);
 
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);
@@ -259,13 +277,18 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 释放资源 —— void Dispose()
+        #region 释放资源 —— override void Dispose()
         /// <summary>
         /// 释放资源
         /// </summary>
         public override void Dispose()
         {
             base.Dispose();
+
+            if (this._plane != null)
+            {
+                this._plane.PlaneChangedEvent -= this.OnPlaneChanged;
+            }
 
             this._unitPlane.Dispose();
             this.TransferFunction.Dispose();
@@ -281,96 +304,34 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         private void InitShaderProgram()
         {
-            base.Program = new ShaderProgram();
-            base.Program.ReadVertexShaderFromFile("Shaders/GLSLs/mpr.vert");
-            base.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/mpr.frag");
-            base.Program.Build();
+            this.Program = new ShaderProgram();
+            this.Program.ReadVertexShaderFromFile("Shaders/GLSLs/mpr.vert");
+            this.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/mpr.frag");
+            this.Program.Build();
         }
         #endregion
 
-        #region 根据渲染对象更新相机参数 —— void UpdateCameraFromRenderable()
+        #region 更新模型矩阵 —— void UpdateModelMatrix()
         /// <summary>
-        /// 根据渲染对象更新相机参数
+        /// 更新模型矩阵
         /// </summary>
-        private void UpdateCameraFromRenderable()
+        private void UpdateModelMatrix()
         {
-            #region # 验证
-
-            if (this.Renderable?.VolumeTexture == null || this.MPRCamera == null)
+            if (this._plane != null)
             {
-                return;
+                this._modelMatrix = this._plane.GetModelMatrix();
             }
-
-            #endregion
-
-            //根据平面类型设置最大切片数
-            int maxSlicesCount = this.MPRCamera.PlaneType switch
-            {
-                MPRPlaneType.Axial => this.Renderable.VolumeTexture.Depth,
-                MPRPlaneType.Coronal => this.Renderable.VolumeTexture.Height,
-                MPRPlaneType.Sagittal => this.Renderable.VolumeTexture.Width,
-                //MPRPlaneType.Oblique => //TODO 实现斜切最大切片数
-                _ => 100
-            };
-            this.MPRCamera.MaxSliceCount = maxSlicesCount;
-            this.MPRCamera.SliceIndex = maxSlicesCount / 2;
-
-            //设置切片间距为体素间距
-            float sliceSpacing = this.MPRCamera.PlaneType switch
-            {
-                MPRPlaneType.Axial => this.Renderable.Spacing.Z,
-                MPRPlaneType.Coronal => this.Renderable.Spacing.Y,
-                MPRPlaneType.Sagittal => this.Renderable.Spacing.X,
-                //MPRPlaneType.Oblique => //TODO 实现斜切体素间距
-                _ => 1.0f
-            };
-            this.MPRCamera.SliceSpacing = sliceSpacing;
         }
         #endregion
 
-        #region 获取平面模型矩阵 —— Matrix4 GetPlaneModelMatrix()
+        #region MPR平面变化事件 —— void OnPlaneChanged(MPRPlane plane)
         /// <summary>
-        /// 获取平面模型矩阵
+        /// MPR平面变化事件
         /// </summary>
-        private Matrix4 GetPlaneModelMatrix()
+        /// <param name="plane">MPR平面</param>
+        private void OnPlaneChanged(MPRPlane plane)
         {
-            //TODO 考虑斜切
-            #region # 验证
-
-            if (this.Renderable?.VolumeTexture == null)
-            {
-                return Matrix4.Identity;
-            }
-
-            #endregion
-
-            //构建方向矩阵
-            Matrix4 directionMatrix = new Matrix4(
-                new Vector4(this.Renderable.RowDirection, 0),
-                new Vector4(this.Renderable.ColDirection, 0),
-                new Vector4(this.Renderable.SliceDirection, 0),
-                new Vector4(0, 0, 0, 1)
-            );
-
-            //根据平面类型构建缩放和旋转
-            Matrix4 planeTransform = this.MPRCamera.PlaneType switch
-            {
-                MPRPlaneType.Axial =>       //XY平面
-                    Matrix4.CreateScale(this.Renderable.VolumeScale.X, this.Renderable.VolumeScale.Y, 1),
-
-                MPRPlaneType.Coronal =>     //XZ平面
-                    Matrix4.CreateScale(this.Renderable.VolumeScale.X, this.Renderable.VolumeScale.Z, 1) *
-                    Matrix4.CreateRotationX(MathHelper.DegreesToRadians(-90.0f)),
-
-                MPRPlaneType.Sagittal =>    //YZ平面
-                    Matrix4.CreateScale(this.Renderable.VolumeScale.Y, this.Renderable.VolumeScale.Z, 1) *
-                    Matrix4.CreateRotationY(MathHelper.DegreesToRadians(90.0f)),
-
-                _ => Matrix4.Identity
-            };
-
-            //组合变换：方向 * 平面变换
-            return directionMatrix * planeTransform;
+            this.UpdateModelMatrix();
         }
         #endregion
 

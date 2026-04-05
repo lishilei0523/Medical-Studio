@@ -28,7 +28,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public MprAxialViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
-            this.AxialCamera = new MPRCamera2();
+            this.AxialCamera = new MPRCamera();
         }
 
         #endregion
@@ -48,7 +48,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// MPR横断位相机
         /// </summary>
         [DependencyProperty]
-        public MPRCamera2 AxialCamera { get; set; }
+        public MPRCamera AxialCamera { get; set; }
         #endregion
 
         #region 体积数据 —— VolumeData VolumeData
@@ -66,7 +66,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             set
             {
                 this._volumeData = value;
-                this.Set(ref this._volumeData, value);
+                this.NotifyOfPropertyChange();
                 if (value != null)
                 {
                     this.AxialPlane = MPRPlane.CreateAxialPlane(value.VolumeSize.ToGlmVector3(), value.Spacing.ToGlmVector3(), value.PhysicalSize.ToGlmVector3(), value.VolumeScale.ToGlmVector3());

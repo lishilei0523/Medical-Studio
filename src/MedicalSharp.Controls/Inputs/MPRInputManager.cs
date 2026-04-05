@@ -81,7 +81,7 @@ namespace MedicalSharp.Controls.Inputs
         /// <param name="offsetY">Y轴偏移量</param>
         public override void OnMouseWheel(OpenTKViewport viewport, double offsetX, double offsetY)
         {
-            this._camera.SliceIndex += (int)Math.Ceiling(offsetY);
+            this._camera.TargetPlane.SliceIndex += (int)Math.Ceiling(offsetY);
             viewport.RequestNextFrameRendering();
         }
         #endregion 

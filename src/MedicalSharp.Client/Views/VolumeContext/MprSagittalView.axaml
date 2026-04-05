@@ -9,6 +9,7 @@
 
 	<sd:GroupBox Header="MPR-Sagittal">
         <sd:MPRViewport Background="Black"
+                        Plane="{Binding SagittalPlane}"
                         Camera="{Binding SagittalCamera}"
                         VolumeData="{Binding VolumeData}">
 

@@ -19,6 +19,11 @@ namespace MedicalSharp.Controls.Viewports
         #region # 字段及构造器
 
         /// <summary>
+        /// 平面依赖属性
+        /// </summary>
+        public new static readonly StyledProperty<MPRPlane> PlaneProperty;
+
+        /// <summary>
         /// 相机依赖属性
         /// </summary>
         public new static readonly StyledProperty<MPRCamera> CameraProperty;
@@ -53,6 +58,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         static MPRViewport()
         {
+            PlaneProperty = AvaloniaProperty.Register<MPRViewport, MPRPlane>(nameof(Plane));
             CameraProperty = AvaloniaProperty.Register<MPRViewport, MPRCamera>(nameof(Camera));
             WindowWidthProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(WindowWidth), 400.0f);
             WindowCenterProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(WindowCenter), 40.0f);
@@ -61,6 +67,7 @@ namespace MedicalSharp.Controls.Viewports
             VolumeDataProperty = AvaloniaProperty.Register<MPRViewport, VolumeData>(nameof(VolumeData));
 
             //属性改变事件
+            PlaneProperty.Changed.AddClassHandler<MPRViewport, MPRPlane>(OnPlaneChanged);
             WindowWidthProperty.Changed.AddClassHandler<MPRViewport, float>(OnWindowWidthChanged);
             WindowCenterProperty.Changed.AddClassHandler<MPRViewport, float>(OnWindowCenterChanged);
             BrightnessProperty.Changed.AddClassHandler<MPRViewport, float>(OnBrightnessChanged);
@@ -89,6 +96,17 @@ namespace MedicalSharp.Controls.Viewports
         #endregion
 
         #region # 属性
+
+        #region 依赖属性 - 平面 —— MPRPlane Plane
+        /// <summary>
+        /// 依赖属性 - 平面
+        /// </summary>
+        public MPRPlane Plane
+        {
+            get => this.GetValue(PlaneProperty);
+            set => this.SetValue(PlaneProperty, value);
+        }
+        #endregion
 
         #region 依赖属性 - 相机 —— new MPRCamera Camera
         /// <summary>
@@ -156,7 +174,7 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 只读属性 - MPR渲染器 —— MPRRenderer MPRRenderer
+        #region 只读属性 - MPR渲染器 —— MPRRenderer2 MPRRenderer
         /// <summary>
         /// 只读属性 - MPR渲染器
         /// </summary>
@@ -186,13 +204,6 @@ namespace MedicalSharp.Controls.Viewports
             this._mprRenderer = new MPRRenderer(this.Camera);
             this._mprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._mprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
-
-            //初始化线框渲染器
-            //this._wireframeRenderer = new WireframeRenderer(this.Camera);
-            //foreach (BoundingVisual3D visual3D in this.Children)
-            //{
-            //    this._wireframeRenderer.AppendItem(visual3D.Renderable);
-            //}
         }
         #endregion
 
@@ -226,6 +237,16 @@ namespace MedicalSharp.Controls.Viewports
             this._mprRenderer?.Dispose();
         }
         #endregion 
+
+        #region 平面改变事件 —— static void OnPlaneChanged(MPRViewport viewport...
+        /// <summary>
+        /// 平面改变事件
+        /// </summary>
+        private static void OnPlaneChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<MPRPlane> eventArgs)
+        {
+            viewport._mprRenderer?.BindPlane(eventArgs.NewValue.Value);
+        }
+        #endregion
 
         #region 窗宽改变事件 —— static void OnWindowWidthChanged(MPRViewport viewport...
         /// <summary>

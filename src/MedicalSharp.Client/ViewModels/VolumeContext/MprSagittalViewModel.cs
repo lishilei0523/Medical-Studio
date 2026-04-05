@@ -1,7 +1,8 @@
 ﻿using Caliburn.Micro;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Dicoms.Models;
 using MedicalSharp.Engine.Cameras;
-using MedicalSharp.Engine.ValueTypes;
+using MedicalSharp.Engine.Resources;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using System.Threading;
@@ -27,12 +28,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public MprSagittalViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
-            this.SagittalCamera = new MPRCamera(MPRPlaneType.Sagittal);
+            this.SagittalCamera = new MPRCamera();
         }
 
         #endregion
 
         #region # 属性
+
+        #region MPR矢状面 —— MPRPlane SagittalPlane
+        /// <summary>
+        /// MPR矢状面
+        /// </summary>
+        [DependencyProperty]
+        public MPRPlane SagittalPlane { get; set; }
+        #endregion
 
         #region MPR矢状位相机 —— MPRCamera SagittalCamera
         /// <summary>
@@ -46,8 +55,24 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// 体积数据
         /// </summary>
-        [DependencyProperty]
-        public VolumeData VolumeData { get; set; }
+        private VolumeData _volumeData;
+
+        /// <summary>
+        /// 体积数据
+        /// </summary>
+        public VolumeData VolumeData
+        {
+            get => this._volumeData;
+            set
+            {
+                this._volumeData = value;
+                this.NotifyOfPropertyChange();
+                if (value != null)
+                {
+                    this.SagittalPlane = MPRPlane.CreateSagittalPlane(value.VolumeSize.ToGlmVector3(), value.Spacing.ToGlmVector3(), value.PhysicalSize.ToGlmVector3(), value.VolumeScale.ToGlmVector3());
+                }
+            }
+        }
         #endregion
 
         #endregion

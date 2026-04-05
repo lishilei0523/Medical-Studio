@@ -9,6 +9,7 @@
 
 	<sd:GroupBox Header="MPR-Coronal">
         <sd:MPRViewport Background="Black"
+                        Plane="{Binding CoronalPlane}"
                         Camera="{Binding CoronalCamera}"
                         VolumeData="{Binding VolumeData}">
 

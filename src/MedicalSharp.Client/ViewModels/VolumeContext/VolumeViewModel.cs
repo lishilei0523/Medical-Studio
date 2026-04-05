@@ -56,7 +56,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             //Vector3 upDirection = new Vector3(0, 1, 0);
 
             //Z-Up
-            Vector3 cameraPosition = new Vector3(0, 4, 0);
+            Vector3 cameraPosition = new Vector3(0, 2, 0);
             Vector3 targetPosition = new Vector3(0.0f);
             Vector3 upDirection = new Vector3(0, 0, 1);
             this.OrbitCamera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
