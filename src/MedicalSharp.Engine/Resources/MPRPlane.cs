@@ -142,6 +142,46 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 只读属性 - 体积尺寸 —— Vector3i VolumeSize
+        /// <summary>
+        /// 只读属性 - 体积尺寸
+        /// </summary>
+        public Vector3i VolumeSize
+        {
+            get => this._volumeSize;
+        }
+        #endregion
+
+        #region 只读属性 - 间距 —— Vector3 Spacing
+        /// <summary>
+        /// 只读属性 - 间距
+        /// </summary>
+        public Vector3 Spacing
+        {
+            get => this._spacing;
+        }
+        #endregion
+
+        #region 只读属性 - 物理尺寸 —— Vector3 PhysicalSize
+        /// <summary>
+        /// 只读属性 - 物理尺寸
+        /// </summary>
+        public Vector3 PhysicalSize
+        {
+            get => this._physicalSize;
+        }
+        #endregion
+
+        #region 只读属性 - 体积缩放 —— Vector3 VolumeScale
+        /// <summary>
+        /// 只读属性 - 体积缩放
+        /// </summary>
+        public Vector3 VolumeScale
+        {
+            get => this._volumeScale;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -405,6 +445,40 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 获取切片偏移量 —— float GetSliceOffset()
+        /// <summary>
+        /// 获取切片偏移量
+        /// </summary>
+        /// <returns>切片偏移量</returns>
+        public float GetSliceOffset()
+        {
+            #region # 验证
+
+            if (this.SlicesCount <= 1)
+            {
+                return 0;
+            }
+
+            #endregion
+
+            float sliceOffset;
+            if (this.PlaneType == MPRPlaneType.Oblique)
+            {
+                //斜切平面：根据投影范围映射
+                float t = this._sliceIndex / (float)(this.SlicesCount - 1);
+                sliceOffset = this._minProjection + t * (this._maxProjection - this._minProjection);
+            }
+            else
+            {
+                //标准平面：逻辑空间范围 -0.5到0.5
+                float t = this.SliceIndex * 1.0f / (this.SlicesCount - 1);
+                sliceOffset = -0.5f + t;
+            }
+
+            return sliceOffset;
+        }
+        #endregion
+
         #region 获取平面上的点（逻辑空间） —— Vector3 GetPointOnPlane(float u, float v)
         /// <summary>
         /// 获取平面上的点（逻辑空间）
@@ -552,40 +626,6 @@ namespace MedicalSharp.Engine.Resources
                 this._volumeSize.Z * absNormal.Z;
 
             this.SlicesCount = (int)Math.Floor(Math.Max(projection, 2));
-        }
-        #endregion
-
-        #region 获取切片偏移量 —— float GetSliceOffset()
-        /// <summary>
-        /// 获取切片偏移量
-        /// </summary>
-        /// <returns>切片偏移量</returns>
-        private float GetSliceOffset()
-        {
-            #region # 验证
-
-            if (this.SlicesCount <= 1)
-            {
-                return 0;
-            }
-
-            #endregion
-
-            float sliceOffset;
-            if (this.PlaneType == MPRPlaneType.Oblique)
-            {
-                //斜切平面：根据投影范围映射
-                float t = this._sliceIndex / (float)(this.SlicesCount - 1);
-                sliceOffset = this._minProjection + t * (this._maxProjection - this._minProjection);
-            }
-            else
-            {
-                //标准平面：逻辑空间范围 -0.5到0.5
-                float t = this.SliceIndex * 1.0f / (this.SlicesCount - 1);
-                sliceOffset = -0.5f + t;
-            }
-
-            return sliceOffset;
         }
         #endregion
 
