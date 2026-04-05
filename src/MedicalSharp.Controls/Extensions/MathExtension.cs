@@ -91,13 +91,13 @@ namespace MedicalSharp.Controls.Extensions
         }
         #endregion
 
-        #region # Size3I转GLM三维向量 —— static Vector3 ToGlmVector3(this in Size3I size)
+        #region # Size3I转GLM三维向量 —— static Vector3i ToGlmVector3(this in Size3I size)
         /// <summary>
         /// Size3I转GLM三维向量
         /// </summary>
-        public static Vector3 ToGlmVector3(this in Size3I size)
+        public static Vector3i ToGlmVector3(this in Size3I size)
         {
-            return new Vector3(size.Width, size.Height, size.Depth);
+            return new Vector3i(size.Width, size.Height, size.Depth);
         }
         #endregion
 

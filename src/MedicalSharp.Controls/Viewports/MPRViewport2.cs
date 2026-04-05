@@ -67,6 +67,7 @@ namespace MedicalSharp.Controls.Viewports
             VolumeDataProperty = AvaloniaProperty.Register<MPRViewport2, VolumeData>(nameof(VolumeData));
 
             //属性改变事件
+            PlaneProperty.Changed.AddClassHandler<MPRViewport2, MPRPlane>(OnPlaneChanged);
             WindowWidthProperty.Changed.AddClassHandler<MPRViewport2, float>(OnWindowWidthChanged);
             WindowCenterProperty.Changed.AddClassHandler<MPRViewport2, float>(OnWindowCenterChanged);
             BrightnessProperty.Changed.AddClassHandler<MPRViewport2, float>(OnBrightnessChanged);
@@ -201,7 +202,6 @@ namespace MedicalSharp.Controls.Viewports
 
             //初始化体积渲染器
             this._mprRenderer = new MPRRenderer2(this.Camera);
-            this._mprRenderer.BindPlane(this.Plane);
             this._mprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._mprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
         }
@@ -237,6 +237,16 @@ namespace MedicalSharp.Controls.Viewports
             this._mprRenderer?.Dispose();
         }
         #endregion 
+
+        #region 平面改变事件 —— static void OnPlaneChanged(MPRViewport2 viewport...
+        /// <summary>
+        /// 平面改变事件
+        /// </summary>
+        private static void OnPlaneChanged(MPRViewport2 viewport, AvaloniaPropertyChangedEventArgs<MPRPlane> eventArgs)
+        {
+            viewport._mprRenderer?.BindPlane(eventArgs.NewValue.Value);
+        }
+        #endregion
 
         #region 窗宽改变事件 —— static void OnWindowWidthChanged(MPRViewport2 viewport...
         /// <summary>
