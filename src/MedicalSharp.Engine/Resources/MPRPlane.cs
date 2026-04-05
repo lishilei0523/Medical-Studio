@@ -264,7 +264,7 @@ namespace MedicalSharp.Engine.Resources
                 Center = Vector3.Zero,
                 UAxis = new Vector3(0, 1, 0),
                 VAxis = new Vector3(0, 0, 1),
-                Normal = new Vector3(1, 0, 0),
+                Normal = new Vector3(-1, 0, 0),
                 PlaneType = MPRPlaneType.Sagittal,
                 OriginalPlaneType = MPRPlaneType.Sagittal,
                 SlicesCount = volumeSize.X,
