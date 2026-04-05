@@ -205,7 +205,7 @@ namespace MedicalSharp.Engine.Resources
                 _maxProjection = 0.5f,
                 Center = Vector3.Zero,
                 UAxis = new Vector3(1, 0, 0),
-                VAxis = new Vector3(0, 1, 0),
+                VAxis = new Vector3(0, -1, 0),
                 Normal = new Vector3(0, 0, 1),
                 PlaneType = MPRPlaneType.Axial,
                 OriginalPlaneType = MPRPlaneType.Axial,
@@ -403,8 +403,6 @@ namespace MedicalSharp.Engine.Resources
         /// <returns>模型矩阵</returns>
         public Matrix4 GetModelMatrix()
         {
-            const float halfSize = 0.5f;
-
             //切片偏移：逻辑空间 -0.5 到 0.5
             float sliceOffset = this.GetSliceOffset();
 
@@ -435,8 +433,8 @@ namespace MedicalSharp.Engine.Resources
 
             Matrix4 translation = Matrix4.CreateTranslation(worldCenter + worldOffset);
             Matrix4 basis = new Matrix4(
-                new Vector4(worldUAxis * halfSize, 0),
-                new Vector4(worldVAxis * halfSize, 0),
+                new Vector4(worldUAxis, 0),
+                new Vector4(worldVAxis, 0),
                 new Vector4(worldNormal, 0),
                 new Vector4(0, 0, 0, 1)
             );
@@ -465,7 +463,7 @@ namespace MedicalSharp.Engine.Resources
             if (this.PlaneType == MPRPlaneType.Oblique)
             {
                 //斜切平面：根据投影范围映射
-                float t = this._sliceIndex / (float)(this.SlicesCount - 1);
+                float t = this._sliceIndex * 1.0f / (this.SlicesCount - 1);
                 sliceOffset = this._minProjection + t * (this._maxProjection - this._minProjection);
             }
             else
