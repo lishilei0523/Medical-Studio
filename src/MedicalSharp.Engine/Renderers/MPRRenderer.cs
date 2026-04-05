@@ -138,7 +138,6 @@ namespace MedicalSharp.Engine.Renderers
             }
 
             this._plane = plane;
-
             if (this._plane != null)
             {
                 this._plane.PlaneChangedEvent += this.OnPlaneChanged;

@@ -222,6 +222,7 @@ namespace MedicalSharp.Controls.Viewports
                 //关闭混合
                 GL.Disable(EnableCap.Blend);
 
+                this._mprRenderer.BindPlane(this.Plane);
                 this._mprRenderer.SetRenderable(this._volumeRenderable);
                 this._mprRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
             }
