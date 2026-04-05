@@ -185,7 +185,7 @@ namespace MedicalSharp.Dicoms
             );
 
             //计算缩放
-            float maxSide = Math.Max(volumeData.PhysicalSize.Width, Math.Max(volumeData.PhysicalSize.Height, volumeData.PhysicalSize.Depth));
+            float maxSide = Math.Max(volumeData.PhysicalSize.Width, volumeData.PhysicalSize.Height);
             volumeData.VolumeScale = new Vector3
             {
                 X = volumeData.PhysicalSize.Width / maxSide,
