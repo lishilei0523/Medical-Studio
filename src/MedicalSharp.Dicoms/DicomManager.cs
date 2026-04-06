@@ -115,11 +115,11 @@ namespace MedicalSharp.Dicoms
             reader.MetaDataDictionaryArrayUpdateOn();
 
             //执行读取
-            Image image = reader.Execute();
+            using Image image = reader.Execute();
 
             //创建体积数据
-            VolumeData volumeData = new VolumeData(image);
-            ExtractData(volumeData);
+            VolumeData volumeData = new VolumeData();
+            ExtractData(volumeData, image);
 
             //添加字典缓存
             _VolumeDatas.Add(volumeData.Id, volumeData);
@@ -145,23 +145,22 @@ namespace MedicalSharp.Dicoms
 
         //Private
 
-        #region 提取数据 —— static void ExtractData(VolumeData volumeData)
+        #region 提取数据 —— static void ExtractData(VolumeData volumeData...
         /// <summary>
         /// 提取数据
         /// </summary>
         /// <param name="volumeData">体积数据</param>
-        private static void ExtractData(VolumeData volumeData)
+        /// <param name="image">SimpleITK图像</param>
+        private static void ExtractData(VolumeData volumeData, Image image)
         {
             #region # 验证
 
-            if (volumeData.SitkImage == null)
+            if (image == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(volumeData), "SimpleITK图像不可为空！");
+                throw new ArgumentOutOfRangeException(nameof(image), "SimpleITK图像不可为空！");
             }
 
             #endregion
-
-            Image image = volumeData.SitkImage;
 
             //获取图像尺寸
             VectorUInt32 size = image.GetSize();
@@ -221,15 +220,14 @@ namespace MedicalSharp.Dicoms
                 volumeData.WindowCenter = float.Parse(image.GetMetaData(DicomTags.WindowCenter));
             }
 
-            //转换像素类型为short TODO 克隆/存储转换后的SITKImage
-            if (image.GetPixelID() != PixelIDValueEnum.sitkInt16)
-            {
-                image = SimpleITK.Cast(image, PixelIDValueEnum.sitkInt16);
-            }
+            //转换像素类型为short
+            Image normalizedImage = image.GetPixelID() != PixelIDValueEnum.sitkInt16
+                ? SimpleITK.Cast(image, PixelIDValueEnum.sitkInt16)
+                : new Image(image);
 
             //获取体素原始数据
             volumeData.VoxelsCount = (long)volumeData.VolumeSize.Width * volumeData.VolumeSize.Height * volumeData.VolumeSize.Depth;
-            volumeData.OriginalData = image.GetBufferAsInt16();
+            volumeData.SitkImage = normalizedImage;
             if (volumeData.OriginalData == IntPtr.Zero)
             {
                 throw new InvalidCastException("Failed to get pixel buffer");

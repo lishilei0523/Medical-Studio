@@ -18,9 +18,9 @@ namespace MedicalSharp.Dicoms.Models
         private bool _disposed;
 
         /// <summary>
-        /// 无参构造器
+        /// 默认构造器
         /// </summary>
-        private VolumeData()
+        internal VolumeData()
         {
             //默认值
             this.Id = Guid.NewGuid().ToString();
@@ -28,16 +28,6 @@ namespace MedicalSharp.Dicoms.Models
             this.RescaleIntercept = 0.0f;
             this.WindowWidth = 400;
             this.WindowCenter = 40;
-        }
-
-        /// <summary>
-        /// 创建体积数据构造器
-        /// </summary>
-        /// <param name="sitkImage">SimpleITK图像</param>
-        internal VolumeData(Image sitkImage)
-            : this()
-        {
-            this.SitkImage = sitkImage;
         }
 
         #endregion
@@ -49,13 +39,6 @@ namespace MedicalSharp.Dicoms.Models
         /// 标识Id
         /// </summary>
         public string Id { get; private set; }
-        #endregion
-
-        #region 原始数据 —— IntPtr OriginalData
-        /// <summary>
-        /// 原始数据
-        /// </summary>
-        public IntPtr OriginalData { get; internal set; }
         #endregion
 
         #region 体素数量 —— long VoxelsCount
@@ -153,7 +136,25 @@ namespace MedicalSharp.Dicoms.Models
         /// <summary>
         /// SimpleITK图像
         /// </summary>
-        public Image SitkImage { get; private set; }
+        public Image SitkImage { get; internal set; }
+        #endregion
+
+        #region 只读属性 - 原始数据 —— IntPtr OriginalData
+        /// <summary>
+        /// 只读属性 - 原始数据
+        /// </summary>
+        public IntPtr OriginalData
+        {
+            get
+            {
+                if (this.SitkImage == null)
+                {
+                    return IntPtr.Zero;
+                }
+
+                return this.SitkImage.GetBufferAsInt16();
+            }
+        }
         #endregion
 
         #endregion
