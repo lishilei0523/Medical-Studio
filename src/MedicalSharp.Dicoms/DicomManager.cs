@@ -157,7 +157,7 @@ namespace MedicalSharp.Dicoms
 
             if (image == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(image), "SimpleITK图像不可为空！");
+                throw new ArgumentNullException(nameof(image), "SimpleITK图像不可为空！");
             }
 
             #endregion
