@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Media;
-using MedicalSharp.Dicoms.ValueTypes;
 using OpenTK.Mathematics;
 using System;
 
@@ -88,26 +87,6 @@ namespace MedicalSharp.Controls.Extensions
         public static Vector2 ToVector2(this PixelSize pixelSize)
         {
             return new Vector2(pixelSize.Width, pixelSize.Height);
-        }
-        #endregion
-
-        #region # Size3I转GLM三维向量 —— static Vector3i ToGlmVector3(this in Size3I size)
-        /// <summary>
-        /// Size3I转GLM三维向量
-        /// </summary>
-        public static Vector3i ToGlmVector3(this in Size3I size)
-        {
-            return new Vector3i(size.Width, size.Height, size.Depth);
-        }
-        #endregion
-
-        #region # Size3F转GLM三维向量 —— static Vector3 ToGlmVector3(this in Size3F size)
-        /// <summary>
-        /// Size3F转GLM三维向量
-        /// </summary>
-        public static Vector3 ToGlmVector3(this in Size3F size)
-        {
-            return new Vector3(size.Width, size.Height, size.Depth);
         }
         #endregion
 

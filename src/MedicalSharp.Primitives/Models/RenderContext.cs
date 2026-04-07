@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace MedicalSharp.Engine.ValueTypes
+namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
     /// 渲染上下文

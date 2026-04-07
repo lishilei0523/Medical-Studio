@@ -2,7 +2,9 @@
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Engine.Shaders;
-using MedicalSharp.Engine.ValueTypes;
+using MedicalSharp.Primitives.Managers;
+using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;

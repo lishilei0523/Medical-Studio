@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Engine.ValueTypes;
+﻿using MedicalSharp.Primitives.Enums;
 using OpenTK.Mathematics;
 using System;
 
@@ -292,16 +292,16 @@ namespace MedicalSharp.Engine.Cameras
         public Vector3 WorldUpDirection => this._worldUpDirection;
         #endregion
 
-        #region 当前坐标系类型 —— CoordinateSystem CoordinateSystem
+        #region 当前坐标系类型 —— CoordinateType CoordinateType
         /// <summary>
         /// 当前坐标系类型
         /// </summary>
-        private CoordinateSystem _coordinateSystem;
+        private CoordinateType _coordinateType;
 
         /// <summary>
         /// 当前坐标系类型
         /// </summary>
-        public CoordinateSystem CoordinateSystem => this._coordinateSystem;
+        public CoordinateType CoordinateType => this._coordinateType;
         #endregion
 
         #endregion
@@ -390,18 +390,18 @@ namespace MedicalSharp.Engine.Cameras
         }
         #endregion
 
-        #region 设置坐标系类型 —— void SetCoordinateSystem(CoordinateSystem coordinateSystem)
+        #region 设置坐标系类型 —— void SetCoordinateType(CoordinateType coordinateSystem)
         /// <summary>
         /// 设置坐标系类型
         /// </summary>
         /// <param name="coordinateSystem">坐标系类型</param>
-        public void SetCoordinateSystem(CoordinateSystem coordinateSystem)
+        public void SetCoordinateType(CoordinateType coordinateSystem)
         {
             Vector3 worldUpDirection = coordinateSystem switch
             {
-                CoordinateSystem.XUp => new Vector3(1, 0, 0),
-                CoordinateSystem.YUp => new Vector3(0, 1, 0),
-                CoordinateSystem.ZUp => new Vector3(0, 0, 1),
+                CoordinateType.XUp => new Vector3(1, 0, 0),
+                CoordinateType.YUp => new Vector3(0, 1, 0),
+                CoordinateType.ZUp => new Vector3(0, 0, 1),
                 _ => new Vector3(0, 1, 0)
             };
             this.SetWorldUpDirection(worldUpDirection);
@@ -573,15 +573,15 @@ namespace MedicalSharp.Engine.Cameras
             //使用点积判断方向，避免浮点精度问题
             if (Math.Abs(Vector3.Dot(worldUpDirection, new Vector3(1, 0, 0))) > 0.9999f)
             {
-                this._coordinateSystem = CoordinateSystem.XUp;
+                this._coordinateType = CoordinateType.XUp;
             }
             else if (Math.Abs(Vector3.Dot(worldUpDirection, new Vector3(0, 0, 1))) > 0.9999f)
             {
-                this._coordinateSystem = CoordinateSystem.ZUp;
+                this._coordinateType = CoordinateType.ZUp;
             }
             else
             {
-                this._coordinateSystem = CoordinateSystem.YUp;
+                this._coordinateType = CoordinateType.YUp;
             }
         }
         #endregion
@@ -603,15 +603,15 @@ namespace MedicalSharp.Engine.Cameras
             float cosYaw = MathF.Cos(yawRad);
             float sinYaw = MathF.Sin(yawRad);
 
-            switch (this._coordinateSystem)
+            switch (this._coordinateType)
             {
-                case CoordinateSystem.XUp:  //X-up: 方向向量 = (-sin(pitch), cos(yaw)*cos(pitch), sin(yaw)*cos(pitch))
+                case CoordinateType.XUp:  //X-up: 方向向量 = (-sin(pitch), cos(yaw)*cos(pitch), sin(yaw)*cos(pitch))
                     return new Vector3(-sinPitch, cosPitch * cosYaw, cosPitch * sinYaw).Normalized();
 
-                case CoordinateSystem.YUp:  //Y-up: 方向向量 = (cos(yaw)*cos(pitch), sin(pitch), sin(yaw)*cos(pitch))
+                case CoordinateType.YUp:  //Y-up: 方向向量 = (cos(yaw)*cos(pitch), sin(pitch), sin(yaw)*cos(pitch))
                     return new Vector3(cosYaw * cosPitch, sinPitch, sinYaw * cosPitch).Normalized();
 
-                case CoordinateSystem.ZUp:  //Z-up: 方向向量 = (cos(yaw)*cos(pitch), -sin(yaw)*cos(pitch), sin(pitch))
+                case CoordinateType.ZUp:  //Z-up: 方向向量 = (cos(yaw)*cos(pitch), -sin(yaw)*cos(pitch), sin(pitch))
                     return new Vector3(cosYaw * cosPitch, -sinYaw * cosPitch, sinPitch).Normalized();
 
                 default:
@@ -628,20 +628,20 @@ namespace MedicalSharp.Engine.Cameras
         /// <remarks>根据世界坐标系上方向</remarks>
         private void CalculateAngles(Vector3 lookDirection)
         {
-            switch (this._coordinateSystem)
+            switch (this._coordinateType)
             {
-                case CoordinateSystem.XUp:  //X-up: 偏航角绕X轴，俯仰角绕Y轴
+                case CoordinateType.XUp:  //X-up: 偏航角绕X轴，俯仰角绕Y轴
                     this._yaw = MathHelper.RadiansToDegrees(MathF.Atan2(lookDirection.Z, lookDirection.Y));
                     float yzLength = MathF.Sqrt(lookDirection.Y * lookDirection.Y + lookDirection.Z * lookDirection.Z);
                     this._pitch = MathHelper.RadiansToDegrees(MathF.Atan2(lookDirection.X, yzLength));
                     break;
 
-                case CoordinateSystem.YUp:  //Y-up: 偏航角绕Y轴，俯仰角绕X轴
+                case CoordinateType.YUp:  //Y-up: 偏航角绕Y轴，俯仰角绕X轴
                     this._yaw = MathHelper.RadiansToDegrees(MathF.Atan2(lookDirection.Z, lookDirection.X));
                     this._pitch = MathHelper.RadiansToDegrees(MathF.Asin(MathHelper.Clamp(lookDirection.Y, -1.0f, 1.0f)));
                     break;
 
-                case CoordinateSystem.ZUp:  //Z-up: 偏航角绕Z轴，俯仰角绕X轴
+                case CoordinateType.ZUp:  //Z-up: 偏航角绕Z轴，俯仰角绕X轴
                     this._yaw = MathHelper.RadiansToDegrees(MathF.Atan2(lookDirection.Y, lookDirection.X));
                     float xyLength = MathF.Sqrt(lookDirection.X * lookDirection.X + lookDirection.Y * lookDirection.Y);
                     this._pitch = MathHelper.RadiansToDegrees(MathF.Atan2(lookDirection.Z, xyLength));
@@ -666,11 +666,11 @@ namespace MedicalSharp.Engine.Cameras
         /// <remarks>当视线与世界上方向平行时使用</remarks>
         private Vector3 GetAlternativeUpDirection()
         {
-            return this._coordinateSystem switch
+            return this._coordinateType switch
             {
-                CoordinateSystem.XUp => Vector3.UnitY,
-                CoordinateSystem.YUp => Vector3.UnitZ,
-                CoordinateSystem.ZUp => Vector3.UnitY,
+                CoordinateType.XUp => Vector3.UnitY,
+                CoordinateType.YUp => Vector3.UnitZ,
+                CoordinateType.ZUp => Vector3.UnitY,
                 _ => Vector3.UnitZ
             };
         }

@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Engine.Resources;
-using MedicalSharp.Engine.ValueTypes;
+using MedicalSharp.Primitives.Managers;
+using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
 using System.Linq;

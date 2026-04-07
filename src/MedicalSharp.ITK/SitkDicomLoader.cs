@@ -1,73 +1,30 @@
 ﻿using itk.simple;
-using MedicalSharp.Dicoms.Models;
-using MedicalSharp.Dicoms.ValueTypes;
+using MedicalSharp.ITK.Models;
+using MedicalSharp.Primitives.Constants;
+using MedicalSharp.Primitives.Interfaces;
+using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 
-namespace MedicalSharp.Dicoms
+namespace MedicalSharp.ITK
 {
     /// <summary>
-    /// DICOM管理器
+    /// SimpleITK DICOM加载器
     /// </summary>
-    public static class DicomManager
+    public class SitkDicomLoader : IDicomLoader
     {
-        #region # 字段及构造器
+        //Implements
 
-        /// <summary>
-        /// 体积数据字典
-        /// </summary>
-        private static readonly IDictionary<string, VolumeData> _VolumeDatas;
-
-        /// <summary>
-        /// 静态构造器
-        /// </summary>
-        static DicomManager()
-        {
-            _VolumeDatas = new ConcurrentDictionary<string, VolumeData>();
-        }
-
-        #endregion
-
-        #region # 属性
-
-        #region 只读属性 - 体积数据字典 —— static IReadOnlyDictionary<string, VolumeData> VolumeDatas
-        /// <summary>
-        /// 只读属性 - 体积数据字典
-        /// </summary>
-        public static IReadOnlyDictionary<string, VolumeData> VolumeDatas
-        {
-            get => _VolumeDatas.AsReadOnly();
-        }
-        #endregion 
-
-        #endregion
-
-        #region # 方法
-
-        //Public
-
-        #region 初始化 —— static void Initialize()
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        public static void Initialize()
-        {
-            ImageSeriesReader reader = new ImageSeriesReader();
-            reader.Dispose();
-        }
-        #endregion
-
-        #region 加载DICOM序列 —— static VolumeData LoadSeries(string dicomFolder)
+        #region # 加载DICOM序列 —— VolumeData LoadSeries(string dicomFolder)
         /// <summary>
         /// 加载DICOM序列
         /// </summary>
         /// <param name="dicomFolder">DICOM文件夹</param>
         /// <returns>体积数据</returns>
-        public static VolumeData LoadSeries(string dicomFolder)
+        public VolumeData LoadSeries(string dicomFolder)
         {
             #region # 验证
 
@@ -84,17 +41,17 @@ namespace MedicalSharp.Dicoms
 
             using VectorString dicomPaths = ImageSeriesReader.GetGDCMSeriesFileNames(dicomFolder);
 
-            return LoadSeries(dicomPaths.ToList());
+            return this.LoadSeries(dicomPaths.ToList());
         }
         #endregion
 
-        #region 加载DICOM序列 —— static VolumeData LoadSeries(ICollection<string> dicomPaths)
+        #region # 加载DICOM序列 —— VolumeData LoadSeries(ICollection<string> dicomPaths)
         /// <summary>
         /// 加载DICOM序列
         /// </summary>
         /// <param name="dicomPaths">DICOM文件路径集</param>
         /// <returns>体积数据</returns>
-        public static VolumeData LoadSeries(ICollection<string> dicomPaths)
+        public VolumeData LoadSeries(ICollection<string> dicomPaths)
         {
             #region # 验证
 
@@ -118,40 +75,23 @@ namespace MedicalSharp.Dicoms
             using Image image = reader.Execute();
 
             //创建体积数据
-            VolumeData volumeData = new VolumeData();
-            ExtractData(volumeData, image);
-
-            //添加字典缓存
-            _VolumeDatas.Add(volumeData.Id, volumeData);
+            SitkVolumeData volumeData = new SitkVolumeData();
+            this.ExtractData(volumeData, image);
 
             return volumeData;
-        }
-        #endregion
-
-        #region 删除体积数据 —— static void RemoveVolumeData(string id)
-        /// <summary>
-        /// 删除体积数据
-        /// </summary>
-        /// <param name="id">体积数据Id</param>
-        public static void RemoveVolumeData(string id)
-        {
-            if (_VolumeDatas.Remove(id, out VolumeData volumeData))
-            {
-                volumeData.Dispose();
-            }
         }
         #endregion
 
 
         //Private
 
-        #region 提取数据 —— static void ExtractData(VolumeData volumeData...
+        #region # 提取数据 —— void ExtractData(SitkVolumeData volumeData...
         /// <summary>
         /// 提取数据
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         /// <param name="image">SimpleITK图像</param>
-        private static void ExtractData(VolumeData volumeData, Image image)
+        private void ExtractData(SitkVolumeData volumeData, Image image)
         {
             #region # 验证
 
@@ -169,27 +109,27 @@ namespace MedicalSharp.Dicoms
                 throw new ArgumentOutOfRangeException(nameof(volumeData), "Image is not 3D");
             }
 
-            volumeData.VolumeSize = new Size3I((int)size[0], (int)size[1], (int)size[2]);
+            volumeData.VolumeSize = new Vector3i((int)size[0], (int)size[1], (int)size[2]);
 
             //获取像素间距
             VectorDouble spacing = image.GetSpacing();
-            volumeData.Spacing = new Size3F((float)spacing[0], (float)spacing[1], (float)spacing[2]);
+            volumeData.Spacing = new Vector3((float)spacing[0], (float)spacing[1], (float)spacing[2]);
 
             //计算实际尺寸
-            volumeData.PhysicalSize = new Size3F
+            volumeData.PhysicalSize = new Vector3
             (
-                volumeData.VolumeSize.Width * volumeData.Spacing.Width,
-                volumeData.VolumeSize.Height * volumeData.Spacing.Height,
-                volumeData.VolumeSize.Depth * volumeData.Spacing.Depth
+                volumeData.VolumeSize.X * volumeData.Spacing.X,
+                volumeData.VolumeSize.Y * volumeData.Spacing.Y,
+                volumeData.VolumeSize.Z * volumeData.Spacing.Z
             );
 
             //计算缩放
-            float maxSide = Math.Max(volumeData.PhysicalSize.Width, volumeData.PhysicalSize.Height);
+            float maxSide = Math.Max(volumeData.PhysicalSize.X, volumeData.PhysicalSize.Y);
             volumeData.VolumeScale = new Vector3
             {
-                X = volumeData.PhysicalSize.Width / maxSide,
-                Y = volumeData.PhysicalSize.Height / maxSide,
-                Z = volumeData.PhysicalSize.Depth / maxSide
+                X = volumeData.PhysicalSize.X / maxSide,
+                Y = volumeData.PhysicalSize.Y / maxSide,
+                Z = volumeData.PhysicalSize.Z / maxSide
             };
 
             //获取斜率和截距
@@ -226,7 +166,7 @@ namespace MedicalSharp.Dicoms
                 : new Image(image);
 
             //获取体素原始数据
-            volumeData.VoxelsCount = (long)volumeData.VolumeSize.Width * volumeData.VolumeSize.Height * volumeData.VolumeSize.Depth;
+            volumeData.VoxelsCount = (long)volumeData.VolumeSize.X * volumeData.VolumeSize.Y * volumeData.VolumeSize.Z;
             volumeData.SitkImage = normalizedImage;
             if (volumeData.OriginalData == IntPtr.Zero)
             {
@@ -244,7 +184,5 @@ namespace MedicalSharp.Dicoms
 #endif
         }
         #endregion 
-
-        #endregion
     }
 }

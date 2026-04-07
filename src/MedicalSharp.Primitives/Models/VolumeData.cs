@@ -1,33 +1,27 @@
-﻿using itk.simple;
-using MedicalSharp.Dicoms.ValueTypes;
+﻿using OpenTK.Mathematics;
 using System;
-using System.Numerics;
 
-namespace MedicalSharp.Dicoms.Models
+namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
     /// 体积数据
     /// </summary>
-    public sealed class VolumeData : IDisposable
+    public abstract class VolumeData : IDisposable
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 释放标识
         /// </summary>
-        private bool _disposed;
+        protected bool _disposed;
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        internal VolumeData()
+        protected VolumeData()
         {
             //默认值
             this.Id = Guid.NewGuid().ToString();
-            this.RescaleSlope = 1.0f;
-            this.RescaleIntercept = 0.0f;
-            this.WindowWidth = 400;
-            this.WindowCenter = 40;
         }
 
         #endregion
@@ -38,123 +32,105 @@ namespace MedicalSharp.Dicoms.Models
         /// <summary>
         /// 标识Id
         /// </summary>
-        public string Id { get; private set; }
+        public string Id { get; protected set; }
         #endregion
 
         #region 体素数量 —— long VoxelsCount
         /// <summary>
         /// 体素数量
         /// </summary>
-        public long VoxelsCount { get; internal set; }
+        public long VoxelsCount { get; set; }
         #endregion
 
-        #region 体积尺寸 —— Size3I VolumeSize
+        #region 体积尺寸 —— Vector3i VolumeSize
         /// <summary>
         /// 体积尺寸
         /// </summary>
-        public Size3I VolumeSize { get; internal set; }
+        public Vector3i VolumeSize { get; set; }
         #endregion
 
-        #region 间距 —— Size3F Spacing
+        #region 间距 —— Vector3 Spacing
         /// <summary>
         /// 间距
         /// </summary>
-        public Size3F Spacing { get; internal set; }
+        public Vector3 Spacing { get; set; }
         #endregion
 
         #region 物理尺寸 —— Size3F PhysicalSize
         /// <summary>
         /// 物理尺寸
         /// </summary>
-        public Size3F PhysicalSize { get; internal set; }
+        public Vector3 PhysicalSize { get; set; }
         #endregion
 
         #region 体积缩放 —— Vector3 VolumeScale
         /// <summary>
         /// 体积缩放
         /// </summary>
-        public Vector3 VolumeScale { get; internal set; }
+        public Vector3 VolumeScale { get; set; }
         #endregion
 
         #region 斜率 —— float RescaleSlope
         /// <summary>
         /// 斜率
         /// </summary>
-        public float RescaleSlope { get; internal set; }
+        public float RescaleSlope { get; set; }
         #endregion
 
         #region 截距 —— float RescaleIntercept
         /// <summary>
         /// 截距
         /// </summary>
-        public float RescaleIntercept { get; internal set; }
+        public float RescaleIntercept { get; set; }
         #endregion
 
         #region 图像原点 —— Vector3 Origin
         /// <summary>
         /// 图像原点
         /// </summary>
-        public Vector3 Origin { get; internal set; }
+        public Vector3 Origin { get; set; }
         #endregion
 
         #region 行向量 —— Vector3 RowDirection
         /// <summary>
         /// 行向量
         /// </summary>
-        public Vector3 RowDirection { get; internal set; }
+        public Vector3 RowDirection { get; set; }
         #endregion
 
         #region 列向量 —— Vector3 ColDirection
         /// <summary>
         /// 列向量
         /// </summary>
-        public Vector3 ColDirection { get; internal set; }
+        public Vector3 ColDirection { get; set; }
         #endregion
 
         #region 切面向量 —— Vector3 SliceDirection
         /// <summary>
         /// 切面向量
         /// </summary>
-        public Vector3 SliceDirection { get; internal set; }
+        public Vector3 SliceDirection { get; set; }
         #endregion
 
         #region 窗宽 —— float WindowWidth
         /// <summary>
         /// 窗宽
         /// </summary>
-        public float WindowWidth { get; internal set; }
+        public float WindowWidth { get; set; }
         #endregion
 
         #region 窗位 —— float WindowCenter
         /// <summary>
         /// 窗位
         /// </summary>
-        public float WindowCenter { get; internal set; }
+        public float WindowCenter { get; set; }
         #endregion
 
-        #region SimpleITK图像 —— Image SitkImage
+        #region 原始数据 —— abstract IntPtr OriginalData
         /// <summary>
-        /// SimpleITK图像
+        /// 原始数据
         /// </summary>
-        public Image SitkImage { get; internal set; }
-        #endregion
-
-        #region 只读属性 - 原始数据 —— IntPtr OriginalData
-        /// <summary>
-        /// 只读属性 - 原始数据
-        /// </summary>
-        public IntPtr OriginalData
-        {
-            get
-            {
-                if (this.SitkImage == null)
-                {
-                    return IntPtr.Zero;
-                }
-
-                return this.SitkImage.GetBufferAsInt16();
-            }
-        }
+        public abstract IntPtr OriginalData { get; }
         #endregion
 
         #endregion
@@ -173,12 +149,12 @@ namespace MedicalSharp.Dicoms.Models
         {
             get
             {
-                if (x < 0 || x >= this.VolumeSize.Width || y < 0 || y >= this.VolumeSize.Height || z < 0 || z >= this.VolumeSize.Depth)
+                if (x < 0 || x >= this.VolumeSize.X || y < 0 || y >= this.VolumeSize.Y || z < 0 || z >= this.VolumeSize.Z)
                 {
                     return 0;
                 }
 
-                int index = z * this.VolumeSize.Width * this.VolumeSize.Height + y * this.VolumeSize.Width + x;
+                int index = z * this.VolumeSize.X * this.VolumeSize.Y + y * this.VolumeSize.X + x;
                 short* pointer = (short*)this.OriginalData.ToPointer();
                 short voxel = pointer[index];
 
@@ -187,21 +163,12 @@ namespace MedicalSharp.Dicoms.Models
         }
         #endregion
 
-        #region 释放资源 —— void Dispose()
+        #region 释放资源 —— abstract void Dispose()
         /// <summary>
         /// 释放资源
         /// </summary>
-        public void Dispose()
-        {
-            if (this._disposed)
-            {
-                return;
-            }
-
-            this.SitkImage?.Dispose();
-            this._disposed = true;
-        }
-        #endregion 
+        public abstract void Dispose();
+        #endregion
 
         #endregion
     }

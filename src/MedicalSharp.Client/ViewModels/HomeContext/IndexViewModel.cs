@@ -1,9 +1,10 @@
 ﻿using Avalonia.Platform.Storage;
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.LayoutContext;
-using MedicalSharp.Dicoms;
-using MedicalSharp.Dicoms.Models;
-using MedicalSharp.Engine.Resources;
+using MedicalSharp.Engine.Managers;
+using MedicalSharp.Primitives.Interfaces;
+using MedicalSharp.Primitives.Managers;
+using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.Caliburn.Extensions;
@@ -29,11 +30,17 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         private readonly IWindowManager _windowManager;
 
         /// <summary>
+        /// DICOM加载器
+        /// </summary>
+        private readonly IDicomLoader _dicomLoader;
+
+        /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public IndexViewModel(IWindowManager windowManager)
+        public IndexViewModel(IWindowManager windowManager, IDicomLoader dicomLoader)
         {
             this._windowManager = windowManager;
+            this._dicomLoader = dicomLoader;
             this.LayoutViewModel = ResolveMediator.Resolve<Layout22ViewModel>();
         }
 
@@ -139,11 +146,13 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             if (folders.Any())
             {
                 string dicomFolder = folders[0].Path.AbsolutePath;
-                VolumeData volumeData = await Task.Run(() => DicomManager.LoadSeries(dicomFolder));
+                VolumeData volumeData = await Task.Run(() => this._dicomLoader.LoadSeries(dicomFolder));
+                DicomManager.AddVolumeData(volumeData);
+
                 if (this.VolumeData != null)
                 {
                     DicomManager.RemoveVolumeData(this.VolumeData.Id);
-                    ResourceManager.RemoveTexture3D(this.VolumeData.Id);
+                    TextureManager.RemoveTexture3D(this.VolumeData.Id);
                 }
 
                 this.VolumeData = volumeData;
@@ -170,7 +179,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             #endregion
 
             DicomManager.RemoveVolumeData(this.VolumeData.Id);
-            ResourceManager.RemoveTexture3D(this.VolumeData.Id);
+            TextureManager.RemoveTexture3D(this.VolumeData.Id);
             this.LayoutViewModel.ClearVolumeData();
         }
         #endregion

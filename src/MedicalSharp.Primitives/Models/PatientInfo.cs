@@ -1,4 +1,4 @@
-﻿namespace MedicalSharp.Dicoms.Models
+﻿namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
     /// 患者信息

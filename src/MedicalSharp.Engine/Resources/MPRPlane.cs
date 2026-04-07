@@ -1,4 +1,5 @@
-﻿using MedicalSharp.Engine.ValueTypes;
+﻿using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Managers;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;

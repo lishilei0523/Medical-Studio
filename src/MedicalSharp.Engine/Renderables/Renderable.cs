@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Engine.Resources;
-using MedicalSharp.Engine.ValueTypes;
+using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 

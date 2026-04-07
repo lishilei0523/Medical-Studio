@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace MedicalSharp.Dicoms.ValueTypes
+namespace MedicalSharp.Primitives.Constants
 {
     /// <summary>
     /// DICOM标准常量

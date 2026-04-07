@@ -1,4 +1,5 @@
-﻿using MedicalSharp.Engine.ValueTypes;
+﻿using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using Microsoft.CSharp.RuntimeBinder;
 using OpenTK.Graphics.OpenGL4;
 using System;

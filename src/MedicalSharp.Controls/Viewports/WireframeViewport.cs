@@ -7,7 +7,7 @@ using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderers;
-using MedicalSharp.Engine.ValueTypes;
+using MedicalSharp.Primitives.Maths;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System.Collections.Generic;

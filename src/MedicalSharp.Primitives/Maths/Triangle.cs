@@ -1,10 +1,12 @@
 ﻿using OpenTK.Mathematics;
+using System.Runtime.InteropServices;
 
-namespace MedicalSharp.Engine.ValueTypes
+namespace MedicalSharp.Primitives.Maths
 {
     /// <summary>
     /// 三角形
     /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
     public struct Triangle
     {
         #region # 字段及构造器

@@ -1,7 +1,7 @@
 ﻿using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Shaders;
-using MedicalSharp.Engine.ValueTypes;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;

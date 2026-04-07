@@ -1,8 +1,9 @@
-﻿using System;
+﻿using MedicalSharp.Primitives.Maths;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MedicalSharp.Engine.ValueTypes
+namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
     /// 网格几何
@@ -12,7 +13,7 @@ namespace MedicalSharp.Engine.ValueTypes
         #region # 字段及构造器
 
         /// <summary>
-        /// 无参构造器
+        /// 默认构造器
         /// </summary>
         private MeshGeometry()
         {

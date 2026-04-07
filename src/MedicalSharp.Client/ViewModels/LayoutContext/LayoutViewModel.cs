@@ -1,5 +1,5 @@
 ﻿using MedicalSharp.Client.ViewModels.VolumeContext;
-using MedicalSharp.Dicoms.Models;
+using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.IOC.Core.Mediators;

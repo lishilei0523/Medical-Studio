@@ -2,15 +2,20 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Description>MedicalSharp 渲染引擎</Description>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="OpenTK.Graphics" Version="4.9.4" />
-  </ItemGroup>
-  
   <ItemGroup>
     <None Update="Shaders\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenTK.Graphics" Version="4.9.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MedicalSharp.Primitives\MedicalSharp.Primitives.csproj" />
   </ItemGroup>
 </Project>

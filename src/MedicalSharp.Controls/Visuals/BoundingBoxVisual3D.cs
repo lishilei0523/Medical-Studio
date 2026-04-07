@@ -2,7 +2,7 @@
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Builders;
 using MedicalSharp.Engine.Renderables;
-using MedicalSharp.Engine.ValueTypes;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 
 namespace MedicalSharp.Controls.Visuals

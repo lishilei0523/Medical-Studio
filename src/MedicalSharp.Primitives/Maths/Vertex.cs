@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using System.Runtime.InteropServices;
 
-namespace MedicalSharp.Engine.ValueTypes
+namespace MedicalSharp.Primitives.Maths
 {
     /// <summary>
     /// 顶点

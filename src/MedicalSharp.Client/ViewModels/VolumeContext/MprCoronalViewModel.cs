@@ -1,8 +1,7 @@
 ﻿using Caliburn.Micro;
-using MedicalSharp.Controls.Extensions;
-using MedicalSharp.Dicoms.Models;
 using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using System.Threading;
@@ -69,7 +68,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this.NotifyOfPropertyChange();
                 if (value != null)
                 {
-                    this.CoronalPlane = MPRPlane.CreateCoronalPlane(value.VolumeSize.ToGlmVector3(), value.Spacing.ToGlmVector3(), value.PhysicalSize.ToGlmVector3(), value.VolumeScale.ToGlmVector3());
+                    this.CoronalPlane = MPRPlane.CreateCoronalPlane(value.VolumeSize, value.Spacing, value.PhysicalSize, value.VolumeScale);
                 }
             }
         }

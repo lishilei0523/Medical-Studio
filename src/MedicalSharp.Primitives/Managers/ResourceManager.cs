@@ -1,9 +1,9 @@
-﻿using MedicalSharp.Engine.ValueTypes;
+﻿using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace MedicalSharp.Engine.Resources
+namespace MedicalSharp.Primitives.Managers
 {
     /// <summary>
     /// 资源管理器
@@ -11,11 +11,6 @@ namespace MedicalSharp.Engine.Resources
     public static class ResourceManager
     {
         #region # 字段及构造器
-
-        /// <summary>
-        /// 3D纹理字典
-        /// </summary>
-        private static readonly IDictionary<string, Texture3D> _Texture3Ds;
 
         /// <summary>
         /// 单位立方体
@@ -47,27 +42,16 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         static ResourceManager()
         {
-            _Texture3Ds = new ConcurrentDictionary<string, Texture3D>();
-            _UnitCube = GetUnitCube();
-            _UnitPlane = GetUnitPlane();
-            _GrayControlPoints = GetGrayControlPoints();
-            _RainbowControlPoints = GetRainbowControlPoints();
-            _BoneControlPoints = GetBoneControlPoints();
+            ResourceManager._UnitCube = ResourceManager.GetUnitCube();
+            ResourceManager._UnitPlane = ResourceManager.GetUnitPlane();
+            ResourceManager._GrayControlPoints = ResourceManager.GetGrayControlPoints();
+            ResourceManager._RainbowControlPoints = ResourceManager.GetRainbowControlPoints();
+            ResourceManager._BoneControlPoints = ResourceManager.GetBoneControlPoints();
         }
 
         #endregion
 
         #region # 属性
-
-        #region 只读属性 - 3D纹理字典 —— static IReadOnlyDictionary<string, Texture3D> Texture3Ds
-        /// <summary>
-        /// 只读属性 - 3D纹理字典
-        /// </summary>
-        public static IReadOnlyDictionary<string, Texture3D> Texture3Ds
-        {
-            get => _Texture3Ds.AsReadOnly();
-        }
-        #endregion 
 
         #region 只读属性 - 单位立方体 —— static MeshGeometry UnitCube
         /// <summary>
@@ -75,7 +59,7 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public static MeshGeometry UnitCube
         {
-            get => _UnitCube;
+            get => ResourceManager._UnitCube;
         }
         #endregion 
 
@@ -85,7 +69,7 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public static MeshGeometry UnitPlane
         {
-            get => _UnitPlane;
+            get => ResourceManager._UnitPlane;
         }
         #endregion 
 
@@ -95,7 +79,7 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public static IReadOnlyList<TFControlPoint> GrayControlPoints
         {
-            get => _GrayControlPoints.AsReadOnly();
+            get => ResourceManager._GrayControlPoints.AsReadOnly();
         }
         #endregion 
 
@@ -105,7 +89,7 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public static IReadOnlyList<TFControlPoint> RainbowControlPoints
         {
-            get => _RainbowControlPoints.AsReadOnly();
+            get => ResourceManager._RainbowControlPoints.AsReadOnly();
         }
         #endregion 
 
@@ -115,42 +99,13 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public static IReadOnlyList<TFControlPoint> BoneControlPoints
         {
-            get => _BoneControlPoints.AsReadOnly();
+            get => ResourceManager._BoneControlPoints.AsReadOnly();
         }
         #endregion 
 
         #endregion
 
         #region # 方法
-
-        //Public
-
-        #region 添加3D纹理 —— static void AddTexture3D(string id, Texture3D texture3D)
-        /// <summary>
-        /// 添加3D纹理
-        /// </summary>
-        /// <param name="id">标识Id</param>
-        /// <param name="texture3D">3D纹理</param>
-        public static void AddTexture3D(string id, Texture3D texture3D)
-        {
-            _Texture3Ds.Add(id, texture3D);
-        }
-        #endregion
-
-        #region 删除3D纹理 —— static void RemoveTexture3D(string id)
-        /// <summary>
-        /// 删除3D纹理
-        /// </summary>
-        /// <param name="id">标识Id</param>
-        public static void RemoveTexture3D(string id)
-        {
-            if (_Texture3Ds.Remove(id, out Texture3D texture3D))
-            {
-                texture3D.Dispose();
-            }
-        }
-        #endregion
-
 
         //Private
 

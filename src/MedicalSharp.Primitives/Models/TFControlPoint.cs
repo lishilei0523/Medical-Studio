@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using System.Runtime.InteropServices;
 
-namespace MedicalSharp.Engine.ValueTypes
+namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
     /// 传输函数控制点
@@ -14,6 +14,11 @@ namespace MedicalSharp.Engine.ValueTypes
         /// </summary>
         /// <remarks>值域: [0, 1]</remarks>
         public float Position;
+
+        /// <summary>
+        /// HU值
+        /// </summary>
+        public short HU;//TODO 实现HU控制
 
         /// <summary>
         /// 颜色

@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Engine.ValueTypes;
+﻿using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;

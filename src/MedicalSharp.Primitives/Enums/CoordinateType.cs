@@ -1,9 +1,9 @@
-﻿namespace MedicalSharp.Engine.ValueTypes
+﻿namespace MedicalSharp.Primitives.Enums
 {
     /// <summary>
     /// 坐标系类型
     /// </summary>
-    public enum CoordinateSystem
+    public enum CoordinateType
     {
         /// <summary>
         /// X轴向上

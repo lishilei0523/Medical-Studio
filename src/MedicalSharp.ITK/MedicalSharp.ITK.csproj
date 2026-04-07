@@ -2,9 +2,14 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Description>MedicalSharp SimpleITK算法</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="SimpleITKCSharpManaged" Version="2.5.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MedicalSharp.Primitives\MedicalSharp.Primitives.csproj" />
   </ItemGroup>
 </Project>

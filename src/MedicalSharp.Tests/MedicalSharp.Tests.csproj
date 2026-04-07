@@ -15,6 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MedicalSharp.Dicoms\MedicalSharp.Dicoms.csproj" />
+    <ProjectReference Include="..\MedicalSharp.ITK\MedicalSharp.ITK.csproj" />
   </ItemGroup>
 </Project>

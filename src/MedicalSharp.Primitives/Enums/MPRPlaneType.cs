@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace MedicalSharp.Engine.ValueTypes
+namespace MedicalSharp.Primitives.Enums
 {
     /// <summary>
     /// MPR平面类型

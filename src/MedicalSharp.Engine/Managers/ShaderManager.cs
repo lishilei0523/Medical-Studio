@@ -2,7 +2,7 @@
 using OpenTK.Graphics.OpenGL4;
 using System.Text;
 
-namespace MedicalSharp.Engine.Shaders
+namespace MedicalSharp.Engine.Managers
 {
     /// <summary>
     /// Shader管理器
