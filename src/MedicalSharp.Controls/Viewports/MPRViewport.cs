@@ -6,6 +6,7 @@ using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 

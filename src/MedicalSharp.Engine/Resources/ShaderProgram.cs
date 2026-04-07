@@ -5,7 +5,7 @@ using OpenTK.Mathematics;
 using System;
 using System.IO;
 
-namespace MedicalSharp.Engine.Shaders
+namespace MedicalSharp.Engine.Resources
 {
     /// <summary>
     /// Shader程序

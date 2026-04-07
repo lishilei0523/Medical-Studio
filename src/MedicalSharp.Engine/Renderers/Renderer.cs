@@ -1,5 +1,5 @@
 ﻿using MedicalSharp.Engine.Cameras;
-using MedicalSharp.Engine.Shaders;
+using MedicalSharp.Engine.Resources;
 using System;
 
 namespace MedicalSharp.Engine.Renderers

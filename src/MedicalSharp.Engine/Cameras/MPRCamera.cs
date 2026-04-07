@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Engine.Resources;
+﻿using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using System;
 

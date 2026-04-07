@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace MedicalSharp.Engine.Resources
+namespace MedicalSharp.Primitives.Maths
 {
     /// <summary>
     /// 变换

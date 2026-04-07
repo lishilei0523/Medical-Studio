@@ -1,7 +1,6 @@
 ﻿using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
-using MedicalSharp.Engine.Shaders;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -376,13 +375,13 @@ namespace MedicalSharp.Engine.Renderers
         private void InitShaderProgram()
         {
             base.Program = new ShaderProgram();
-            base.Program.ReadVertexShaderFromFile("Shaders/GLSLs/raycast.vert");
-            base.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/raycast.frag");
+            base.Program.ReadVertexShaderFromFile("Resources/GLSLs/raycast.vert");
+            base.Program.ReadFragmentShaderFromFile("Resources/GLSLs/raycast.frag");
             base.Program.Build();
 
             this._pickProgram = new ShaderProgram();
-            this._pickProgram.ReadVertexShaderFromFile("Shaders/GLSLs/raycast.vert");
-            this._pickProgram.ReadFragmentShaderFromFile("Shaders/GLSLs/raycast_pick.frag");
+            this._pickProgram.ReadVertexShaderFromFile("Resources/GLSLs/raycast.vert");
+            this._pickProgram.ReadFragmentShaderFromFile("Resources/GLSLs/raycast_pick.frag");
             this._pickProgram.Build();
         }
         #endregion

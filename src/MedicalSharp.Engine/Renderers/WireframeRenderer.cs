@@ -1,6 +1,6 @@
 ﻿using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Renderables;
-using MedicalSharp.Engine.Shaders;
+using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using System;
@@ -197,8 +197,8 @@ namespace MedicalSharp.Engine.Renderers
         private void InitShaderProgram()
         {
             base.Program = new ShaderProgram();
-            base.Program.ReadVertexShaderFromFile("Shaders/GLSLs/wireframe.vert");
-            base.Program.ReadFragmentShaderFromFile("Shaders/GLSLs/wireframe.frag");
+            base.Program.ReadVertexShaderFromFile("Resources/GLSLs/wireframe.vert");
+            base.Program.ReadFragmentShaderFromFile("Resources/GLSLs/wireframe.frag");
             base.Program.Build();
         }
         #endregion 
