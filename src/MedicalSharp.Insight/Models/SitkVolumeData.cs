@@ -2,7 +2,7 @@
 using MedicalSharp.Primitives.Models;
 using System;
 
-namespace MedicalSharp.ITK.Models
+namespace MedicalSharp.Insight.Models
 {
     /// <summary>
     /// 体积数据

@@ -1,6 +1,6 @@
 ﻿using itk.simple;
 
-namespace MedicalSharp.ITK
+namespace MedicalSharp.Insight
 {
     /// <summary>
     /// SimpleITK初始化器

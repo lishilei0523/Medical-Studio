@@ -1,4 +1,4 @@
-using MedicalSharp.ITK;
+using MedicalSharp.Insight;
 using MedicalSharp.Primitives.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;

@@ -2,7 +2,7 @@
 using Avalonia.Threading;
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.HomeContext;
-using MedicalSharp.ITK;
+using MedicalSharp.Insight;
 using Microsoft.Extensions.DependencyInjection;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.IOC.Core.Mediators;

@@ -39,7 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MedicalSharp.Controls\MedicalSharp.Controls.csproj" />
     <ProjectReference Include="..\MedicalSharp.Engine\MedicalSharp.Engine.csproj" />
-    <ProjectReference Include="..\MedicalSharp.ITK\MedicalSharp.ITK.csproj" />
+    <ProjectReference Include="..\MedicalSharp.Insight\MedicalSharp.Insight.csproj" />
     <ProjectReference Include="..\MedicalSharp.Primitives\MedicalSharp.Primitives.csproj" />
   </ItemGroup>
 </Project>

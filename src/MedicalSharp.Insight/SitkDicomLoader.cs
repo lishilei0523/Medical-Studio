@@ -1,5 +1,5 @@
 ﻿using itk.simple;
-using MedicalSharp.ITK.Models;
+using MedicalSharp.Insight.Models;
 using MedicalSharp.Primitives.Constants;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Models;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace MedicalSharp.ITK
+namespace MedicalSharp.Insight
 {
     /// <summary>
     /// SimpleITK DICOM加载器
