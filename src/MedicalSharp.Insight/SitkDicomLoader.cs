@@ -109,55 +109,55 @@ namespace MedicalSharp.Insight
                 throw new ArgumentOutOfRangeException(nameof(volumeData), "Image is not 3D");
             }
 
-            volumeData.VolumeSize = new Vector3i((int)size[0], (int)size[1], (int)size[2]);
+            volumeData.Metadata.VolumeSize = new Vector3i((int)size[0], (int)size[1], (int)size[2]);
 
             //获取像素间距
             VectorDouble spacing = image.GetSpacing();
-            volumeData.Spacing = new Vector3((float)spacing[0], (float)spacing[1], (float)spacing[2]);
+            volumeData.Metadata.Spacing = new Vector3((float)spacing[0], (float)spacing[1], (float)spacing[2]);
 
             //计算实际尺寸
-            volumeData.PhysicalSize = new Vector3
+            volumeData.Metadata.PhysicalSize = new Vector3
             (
-                volumeData.VolumeSize.X * volumeData.Spacing.X,
-                volumeData.VolumeSize.Y * volumeData.Spacing.Y,
-                volumeData.VolumeSize.Z * volumeData.Spacing.Z
+                volumeData.Metadata.VolumeSize.X * volumeData.Metadata.Spacing.X,
+                volumeData.Metadata.VolumeSize.Y * volumeData.Metadata.Spacing.Y,
+                volumeData.Metadata.VolumeSize.Z * volumeData.Metadata.Spacing.Z
             );
 
             //计算缩放
-            float maxSide = Math.Max(volumeData.PhysicalSize.X, volumeData.PhysicalSize.Y);
-            volumeData.VolumeScale = new Vector3
+            float maxSide = Math.Max(volumeData.Metadata.PhysicalSize.X, volumeData.Metadata.PhysicalSize.Y);
+            volumeData.Metadata.VolumeScale = new Vector3
             {
-                X = volumeData.PhysicalSize.X / maxSide,
-                Y = volumeData.PhysicalSize.Y / maxSide,
-                Z = volumeData.PhysicalSize.Z / maxSide
+                X = volumeData.Metadata.PhysicalSize.X / maxSide,
+                Y = volumeData.Metadata.PhysicalSize.Y / maxSide,
+                Z = volumeData.Metadata.PhysicalSize.Z / maxSide
             };
 
             //获取斜率和截距
             if (image.HasMetaDataKey(DicomTags.RescaleSlope))
             {
-                volumeData.RescaleSlope = float.Parse(image.GetMetaData(DicomTags.RescaleSlope));
+                volumeData.Metadata.RescaleSlope = float.Parse(image.GetMetaData(DicomTags.RescaleSlope));
             }
             if (image.HasMetaDataKey(DicomTags.RescaleIntercept))
             {
-                volumeData.RescaleIntercept = float.Parse(image.GetMetaData(DicomTags.RescaleIntercept));
+                volumeData.Metadata.RescaleIntercept = float.Parse(image.GetMetaData(DicomTags.RescaleIntercept));
             }
 
             //获取图像原点和方向
             VectorDouble origin = image.GetOrigin();
             VectorDouble direction = image.GetDirection();
-            volumeData.Origin = new Vector3((float)origin[0], (float)origin[1], (float)origin[2]);
-            volumeData.RowDirection = new Vector3((float)direction[0], (float)direction[1], (float)direction[2]);
-            volumeData.ColDirection = new Vector3((float)direction[3], (float)direction[4], (float)direction[5]);
-            volumeData.SliceDirection = new Vector3((float)direction[6], (float)direction[7], (float)direction[8]);
+            volumeData.Metadata.Origin = new Vector3((float)origin[0], (float)origin[1], (float)origin[2]);
+            volumeData.Metadata.RowDirection = new Vector3((float)direction[0], (float)direction[1], (float)direction[2]);
+            volumeData.Metadata.ColDirection = new Vector3((float)direction[3], (float)direction[4], (float)direction[5]);
+            volumeData.Metadata.SliceDirection = new Vector3((float)direction[6], (float)direction[7], (float)direction[8]);
 
             //获取窗宽窗位
             if (image.HasMetaDataKey(DicomTags.WindowWidth))
             {
-                volumeData.WindowWidth = float.Parse(image.GetMetaData(DicomTags.WindowWidth));
+                volumeData.Metadata.WindowWidth = float.Parse(image.GetMetaData(DicomTags.WindowWidth));
             }
             if (image.HasMetaDataKey(DicomTags.WindowCenter))
             {
-                volumeData.WindowCenter = float.Parse(image.GetMetaData(DicomTags.WindowCenter));
+                volumeData.Metadata.WindowCenter = float.Parse(image.GetMetaData(DicomTags.WindowCenter));
             }
 
             //转换像素类型为short
@@ -166,7 +166,7 @@ namespace MedicalSharp.Insight
                 : new Image(image);
 
             //获取体素原始数据
-            volumeData.VoxelsCount = (long)volumeData.VolumeSize.X * volumeData.VolumeSize.Y * volumeData.VolumeSize.Z;
+            volumeData.Metadata.VoxelsCount = (long)volumeData.Metadata.VolumeSize.X * volumeData.Metadata.VolumeSize.Y * volumeData.Metadata.VolumeSize.Z;
             volumeData.SitkImage = normalizedImage;
             if (volumeData.OriginalData == IntPtr.Zero)
             {

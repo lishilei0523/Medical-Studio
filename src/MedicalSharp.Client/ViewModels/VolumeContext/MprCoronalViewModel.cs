@@ -54,21 +54,16 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// 体积数据
         /// </summary>
-        private VolumeData _volumeData;
-
-        /// <summary>
-        /// 体积数据
-        /// </summary>
         public VolumeData VolumeData
         {
-            get => this._volumeData;
+            get;
             set
             {
-                this._volumeData = value;
+                field = value;
                 this.NotifyOfPropertyChange();
                 if (value != null)
                 {
-                    this.CoronalPlane = MPRPlane.CreateCoronalPlane(value.VolumeSize, value.Spacing, value.PhysicalSize, value.VolumeScale);
+                    this.CoronalPlane = MPRPlane.CreateCoronalPlane(value.Metadata);
                 }
             }
         }

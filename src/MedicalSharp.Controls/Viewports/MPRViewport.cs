@@ -308,23 +308,25 @@ namespace MedicalSharp.Controls.Viewports
             #endregion
 
             VolumeData volumeData = eventArgs.NewValue.Value;
+            Texture3D volumeTexture;
             if (!TextureManager.Texture3Ds.ContainsKey(volumeData.Id))
             {
                 viewport.GlContext.MakeCurrent();
-                Texture3D volumeTexture = Texture3D.CreateFromVolume(volumeData.VolumeSize.X, volumeData.VolumeSize.Y, volumeData.VolumeSize.Z, volumeData.OriginalData);
-                viewport._volumeRenderable = new VolumeRenderable(volumeTexture, volumeData.VolumeSize, volumeData.Spacing, volumeData.PhysicalSize, volumeData.VolumeScale, volumeData.RescaleSlope, volumeData.RescaleIntercept, volumeData.Origin, volumeData.RowDirection, volumeData.ColDirection, volumeData.SliceDirection);
-                viewport.WindowWidth = volumeData.WindowWidth;
-                viewport.WindowCenter = volumeData.WindowCenter;
-
+                volumeTexture = Texture3D.CreateFromVolume(
+                   volumeData.Metadata.VolumeSize.X,
+                   volumeData.Metadata.VolumeSize.Y,
+                   volumeData.Metadata.VolumeSize.Z,
+                   volumeData.OriginalData);
                 TextureManager.AddTexture3D(volumeData.Id, volumeTexture);
             }
             else
             {
-                Texture3D volumeTexture = TextureManager.Texture3Ds[volumeData.Id];
-                viewport._volumeRenderable = new VolumeRenderable(volumeTexture, volumeData.VolumeSize, volumeData.Spacing, volumeData.PhysicalSize, volumeData.VolumeScale, volumeData.RescaleSlope, volumeData.RescaleIntercept, volumeData.Origin, volumeData.RowDirection, volumeData.ColDirection, volumeData.SliceDirection);
-                viewport.WindowWidth = volumeData.WindowWidth;
-                viewport.WindowCenter = volumeData.WindowCenter;
+                volumeTexture = TextureManager.Texture3Ds[volumeData.Id];
             }
+
+            viewport._volumeRenderable = new VolumeRenderable(volumeTexture, volumeData.Metadata);
+            viewport.WindowWidth = volumeData.Metadata.WindowWidth;
+            viewport.WindowCenter = volumeData.Metadata.WindowCenter;
             viewport.RequestNextFrameRendering();
         }
         #endregion

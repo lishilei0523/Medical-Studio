@@ -17,11 +17,7 @@ namespace MedicalSharp.Insight.Models
         internal SitkVolumeData()
             : base()
         {
-            //默认值
-            this.RescaleSlope = 1.0f;
-            this.RescaleIntercept = 0.0f;
-            this.WindowWidth = 400;
-            this.WindowCenter = 40;
+
         }
 
         #endregion

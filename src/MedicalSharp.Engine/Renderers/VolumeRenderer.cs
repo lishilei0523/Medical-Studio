@@ -243,17 +243,17 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.Use();
 
             //处理缩放
-            Matrix4 volumeScaleMatrix = Matrix4.CreateScale(this.Renderable.VolumeScale);
+            Matrix4 volumeScaleMatrix = Matrix4.CreateScale(this.Renderable.VolumeMetadata.VolumeScale);
 
             //设置MVP矩阵、相机位置、缩放
             this.Program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             this.Program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
             this.Program.SetUniformMatrix4("u_ModelMatrix", this.Renderable.ModelMatrix * volumeScaleMatrix);
             this.Program.SetUniformVector3("u_CameraPosition", renderContext.CameraPosition);
-            this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
+            this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
-            this.Program.SetUniformFloat("u_RescaleSlope", this.Renderable.RescaleSlope);
-            this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
+            this.Program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
+            this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);
@@ -417,7 +417,7 @@ namespace MedicalSharp.Engine.Renderers
             this._pickProgram.Use();
 
             //设置矩阵
-            Matrix4 volumeScaleMatrix = Matrix4.CreateScale(this.Renderable.VolumeScale);
+            Matrix4 volumeScaleMatrix = Matrix4.CreateScale(this.Renderable.VolumeMetadata.VolumeScale);
             Matrix4 modelMatrix = this.Renderable.ModelMatrix * volumeScaleMatrix;
 
             this._pickProgram.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
@@ -430,11 +430,11 @@ namespace MedicalSharp.Engine.Renderers
 
             //相机参数
             this._pickProgram.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
-            this._pickProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
+            this._pickProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
             //DICOM参数
-            this._pickProgram.SetUniformFloat("u_RescaleSlope", this.Renderable.RescaleSlope);
-            this._pickProgram.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
+            this._pickProgram.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
+            this._pickProgram.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
             //窗宽窗位（与渲染一致）
             this._pickProgram.SetUniformFloat("u_WindowCenter", this.WindowCenter);

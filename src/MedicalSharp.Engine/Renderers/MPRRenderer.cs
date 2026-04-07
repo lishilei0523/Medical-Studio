@@ -252,10 +252,10 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformFloat("u_Brightness", this.Brightness);
             this.Program.SetUniformFloat("u_Contrast", this.Contrast);
 
-            this.Program.SetUniformFloat("u_RescaleSlope", this.Renderable.RescaleSlope);
-            this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.RescaleIntercept);
+            this.Program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
+            this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
-            this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeScale);
+            this.Program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);

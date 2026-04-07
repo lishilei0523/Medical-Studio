@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -30,38 +31,12 @@ namespace MedicalSharp.Primitives.Maths
         private float _maxProjection;
 
         /// <summary>
-        /// 体积尺寸
-        /// </summary>
-        private readonly Vector3i _volumeSize;
-
-        /// <summary>
-        /// 间距
-        /// </summary>
-        private readonly Vector3 _spacing;
-
-        /// <summary>
-        /// 物理尺寸
-        /// </summary>
-        private readonly Vector3 _physicalSize;
-
-        /// <summary>
-        /// 体积缩放
-        /// </summary>
-        private readonly Vector3 _volumeScale;
-
-        /// <summary>
         /// 创建MPR平面构造器
         /// </summary>
-        /// <param name="volumeSize">体积尺寸</param>
-        /// <param name="spacing">间距</param>
-        /// <param name="physicalSize">物理尺寸</param>
-        /// <param name="volumeScale">体积缩放</param>
-        private MPRPlane(Vector3i volumeSize, Vector3 spacing, Vector3 physicalSize, Vector3 volumeScale)
+        /// <param name="volumeMetadata">体积元数据</param>
+        private MPRPlane(VolumeMetadata volumeMetadata)
         {
-            this._volumeSize = volumeSize;
-            this._spacing = spacing;
-            this._physicalSize = physicalSize;
-            this._volumeScale = volumeScale;
+            this.VolumeMetadata = volumeMetadata;
         }
 
         #endregion
@@ -143,44 +118,11 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 只读属性 - 体积尺寸 —— Vector3i VolumeSize
+        #region 体积元数据 —— VolumeMetadata VolumeMetadata
         /// <summary>
-        /// 只读属性 - 体积尺寸
+        /// 体积元数据
         /// </summary>
-        public Vector3i VolumeSize
-        {
-            get => this._volumeSize;
-        }
-        #endregion
-
-        #region 只读属性 - 间距 —— Vector3 Spacing
-        /// <summary>
-        /// 只读属性 - 间距
-        /// </summary>
-        public Vector3 Spacing
-        {
-            get => this._spacing;
-        }
-        #endregion
-
-        #region 只读属性 - 物理尺寸 —— Vector3 PhysicalSize
-        /// <summary>
-        /// 只读属性 - 物理尺寸
-        /// </summary>
-        public Vector3 PhysicalSize
-        {
-            get => this._physicalSize;
-        }
-        #endregion
-
-        #region 只读属性 - 体积缩放 —— Vector3 VolumeScale
-        /// <summary>
-        /// 只读属性 - 体积缩放
-        /// </summary>
-        public Vector3 VolumeScale
-        {
-            get => this._volumeScale;
-        }
+        public VolumeMetadata VolumeMetadata { get; private set; }
         #endregion
 
         #endregion
@@ -189,18 +131,15 @@ namespace MedicalSharp.Primitives.Maths
 
         //Static
 
-        #region 创建横断面 —— static MPRPlane CreateAxialPlane(Vector3i volumeSize...
+        #region 创建横断面 —— static MPRPlane CreateAxialPlane(VolumeMetadata volumeMetadata)
         /// <summary>
         /// 创建横断面
         /// </summary>
-        /// <param name="volumeSize">体积尺寸</param>
-        /// <param name="spacing">间距</param>
-        /// <param name="physicalSize">物理尺寸</param>
-        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="volumeMetadata">体积元数据</param>
         /// <returns>横断面</returns>
-        public static MPRPlane CreateAxialPlane(Vector3i volumeSize, Vector3 spacing, Vector3 physicalSize, Vector3 volumeScale)
+        public static MPRPlane CreateAxialPlane(VolumeMetadata volumeMetadata)
         {
-            MPRPlane plane = new MPRPlane(volumeSize, spacing, physicalSize, volumeScale)
+            MPRPlane plane = new MPRPlane(volumeMetadata)
             {
                 _minProjection = -0.5f,
                 _maxProjection = 0.5f,
@@ -210,26 +149,23 @@ namespace MedicalSharp.Primitives.Maths
                 Normal = new Vector3(0, 0, 1),
                 PlaneType = MPRPlaneType.Axial,
                 OriginalPlaneType = MPRPlaneType.Axial,
-                SlicesCount = volumeSize.Z,
-                SliceIndex = volumeSize.Z / 2
+                SlicesCount = volumeMetadata.VolumeSize.Z,
+                SliceIndex = volumeMetadata.VolumeSize.Z / 2
             };
 
             return plane;
         }
         #endregion
 
-        #region 创建冠状面 —— static MPRPlane CreateCoronalPlane(Vector3i volumeSize...
+        #region 创建冠状面 —— static MPRPlane CreateCoronalPlane(VolumeMetadata volumeMetadata)
         /// <summary>
         /// 创建冠状面
         /// </summary>
-        /// <param name="volumeSize">体积尺寸</param>
-        /// <param name="spacing">间距</param>
-        /// <param name="physicalSize">物理尺寸</param>
-        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="volumeMetadata">体积元数据</param>
         /// <returns>冠状面</returns>
-        public static MPRPlane CreateCoronalPlane(Vector3i volumeSize, Vector3 spacing, Vector3 physicalSize, Vector3 volumeScale)
+        public static MPRPlane CreateCoronalPlane(VolumeMetadata volumeMetadata)
         {
-            MPRPlane plane = new MPRPlane(volumeSize, spacing, physicalSize, volumeScale)
+            MPRPlane plane = new MPRPlane(volumeMetadata)
             {
                 _minProjection = -0.5f,
                 _maxProjection = 0.5f,
@@ -239,26 +175,23 @@ namespace MedicalSharp.Primitives.Maths
                 Normal = new Vector3(0, 1, 0),
                 PlaneType = MPRPlaneType.Coronal,
                 OriginalPlaneType = MPRPlaneType.Coronal,
-                SlicesCount = volumeSize.Y,
-                SliceIndex = volumeSize.Y / 2
+                SlicesCount = volumeMetadata.VolumeSize.Y,
+                SliceIndex = volumeMetadata.VolumeSize.Y / 2
             };
 
             return plane;
         }
         #endregion
 
-        #region 创建矢状面 —— static MPRPlane CreateSagittalPlane(Vector3i volumeSize...
+        #region 创建矢状面 —— static MPRPlane CreateSagittalPlane(VolumeMetadata volumeMetadata)
         /// <summary>
         /// 创建矢状面
         /// </summary>
-        /// <param name="volumeSize">体积尺寸</param>
-        /// <param name="spacing">间距</param>
-        /// <param name="physicalSize">物理尺寸</param>
-        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="volumeMetadata">体积元数据</param>
         /// <returns>矢状面</returns>
-        public static MPRPlane CreateSagittalPlane(Vector3i volumeSize, Vector3 spacing, Vector3 physicalSize, Vector3 volumeScale)
+        public static MPRPlane CreateSagittalPlane(VolumeMetadata volumeMetadata)
         {
-            MPRPlane plane = new MPRPlane(volumeSize, spacing, physicalSize, volumeScale)
+            MPRPlane plane = new MPRPlane(volumeMetadata)
             {
                 _minProjection = -0.5f,
                 _maxProjection = 0.5f,
@@ -268,8 +201,8 @@ namespace MedicalSharp.Primitives.Maths
                 Normal = new Vector3(1, 0, 0),
                 PlaneType = MPRPlaneType.Sagittal,
                 OriginalPlaneType = MPRPlaneType.Sagittal,
-                SlicesCount = volumeSize.X,
-                SliceIndex = volumeSize.X / 2
+                SlicesCount = volumeMetadata.VolumeSize.X,
+                SliceIndex = volumeMetadata.VolumeSize.X / 2
             };
 
             return plane;
@@ -299,7 +232,7 @@ namespace MedicalSharp.Primitives.Maths
             Vector3 normal = Vector3.Transform(originalPlane.Normal, total).Normalized();
 
             //创建斜切平面
-            MPRPlane plane = new MPRPlane(originalPlane._volumeSize, originalPlane._spacing, originalPlane._physicalSize, originalPlane._volumeScale)
+            MPRPlane plane = new MPRPlane(originalPlane.VolumeMetadata)
             {
                 Center = originalPlane.Center,
                 UAxis = uAxis,
@@ -374,10 +307,10 @@ namespace MedicalSharp.Primitives.Maths
         {
             MPRPlane standardPlane = this.OriginalPlaneType switch
             {
-                MPRPlaneType.Axial => CreateAxialPlane(this._volumeSize, this._spacing, this._physicalSize, this._volumeScale),
-                MPRPlaneType.Coronal => CreateCoronalPlane(this._volumeSize, this._spacing, this._physicalSize, this._volumeScale),
-                MPRPlaneType.Sagittal => CreateSagittalPlane(this._volumeSize, this._spacing, this._physicalSize, this._volumeScale),
-                _ => CreateAxialPlane(this._volumeSize, this._spacing, this._physicalSize, this._volumeScale)
+                MPRPlaneType.Axial => CreateAxialPlane(this.VolumeMetadata),
+                MPRPlaneType.Coronal => CreateCoronalPlane(this.VolumeMetadata),
+                MPRPlaneType.Sagittal => CreateSagittalPlane(this.VolumeMetadata),
+                _ => CreateAxialPlane(this.VolumeMetadata)
             };
 
             this.Center = standardPlane.Center;
@@ -401,29 +334,29 @@ namespace MedicalSharp.Primitives.Maths
         /// <returns>模型矩阵</returns>
         public Matrix4 GetModelMatrix()
         {
-            //切片偏移：逻辑空间 -0.5 到 0.5
+            //切片偏移：逻辑空间 -0.5到0.5
             float sliceOffset = this.GetSliceOffset();
 
-            //平面中心：逻辑空间 (0,0,0) → 世界空间 (0,0,0)
+            //平面中心：逻辑空间 (0,0,0) -> 世界空间 (0,0,0)
             Vector3 worldCenter = Vector3.Zero;
 
-            //法线方向的世界偏移 = 逻辑偏移 × volumeScale
+            //法线方向的世界偏移 = 逻辑偏移 * VolumeScale
             Vector3 worldOffset = new Vector3(
-                this.Normal.X * sliceOffset * this._volumeScale.X,
-                this.Normal.Y * sliceOffset * this._volumeScale.Y,
-                this.Normal.Z * sliceOffset * this._volumeScale.Z
+                this.Normal.X * sliceOffset * this.VolumeMetadata.VolumeScale.X,
+                this.Normal.Y * sliceOffset * this.VolumeMetadata.VolumeScale.Y,
+                this.Normal.Z * sliceOffset * this.VolumeMetadata.VolumeScale.Z
             );
 
-            //U/V轴：逻辑方向 × volumeScale，然后归一化
+            //U/V轴：逻辑方向 * VolumeScale，然后归一化
             Vector3 worldUAxis = new Vector3(
-                this.UAxis.X * this._volumeScale.X,
-                this.UAxis.Y * this._volumeScale.Y,
-                this.UAxis.Z * this._volumeScale.Z
+                this.UAxis.X * this.VolumeMetadata.VolumeScale.X,
+                this.UAxis.Y * this.VolumeMetadata.VolumeScale.Y,
+                this.UAxis.Z * this.VolumeMetadata.VolumeScale.Z
             ).Normalized();
             Vector3 worldVAxis = new Vector3(
-                this.VAxis.X * this._volumeScale.X,
-                this.VAxis.Y * this._volumeScale.Y,
-                this.VAxis.Z * this._volumeScale.Z
+                this.VAxis.X * this.VolumeMetadata.VolumeScale.X,
+                this.VAxis.Y * this.VolumeMetadata.VolumeScale.Y,
+                this.VAxis.Z * this.VolumeMetadata.VolumeScale.Z
             ).Normalized();
 
             //法线方向（重新正交化确保正确）
@@ -438,7 +371,7 @@ namespace MedicalSharp.Primitives.Maths
             );
 
             //处理缩放
-            Matrix4 scale = Matrix4.CreateScale(this._volumeScale);
+            Matrix4 scale = Matrix4.CreateScale(this.VolumeMetadata.VolumeScale);
 
             return basis * scale * translation;
         }
@@ -525,26 +458,26 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 获取平面上的体素坐标
         /// </summary>
-        /// <param name="u">U坐标，范围 -1 到 1</param>
-        /// <param name="v">V坐标，范围 -1 到 1</param>
-        /// <returns>体素坐标，范围 0 到 volumeSize-1</returns>
+        /// <param name="u">U坐标，[-1, 1]</param>
+        /// <param name="v">V坐标，[-1, 1]</param>
+        /// <returns>体素坐标，[0, VolumeSize-1]</returns>
         public Vector3i GetVoxelOnPlane(float u, float v)
         {
-            //先获取逻辑空间点，范围 -0.5 到 0.5
+            //先获取逻辑空间点（-0.5到0.5）
             Vector3 localPoint = this.GetPointOnPlane(u, v);
 
-            //逻辑空间 → 纹理坐标（0 到 1）
+            //逻辑空间 -> 纹理坐标（0到1）
             Vector3 texCoord = localPoint + new Vector3(0.5f);
 
-            //纹理坐标 → 体素坐标
-            int x = (int)(texCoord.X * this._volumeSize.X);
-            int y = (int)(texCoord.Y * this._volumeSize.Y);
-            int z = (int)(texCoord.Z * this._volumeSize.Z);
+            //纹理坐标 -> 体素坐标
+            int x = (int)Math.Floor(texCoord.X * this.VolumeMetadata.VolumeSize.X);
+            int y = (int)Math.Floor(texCoord.Y * this.VolumeMetadata.VolumeSize.Y);
+            int z = (int)Math.Floor(texCoord.Z * this.VolumeMetadata.VolumeSize.Z);
 
             //边界裁剪
-            x = Math.Clamp(x, 0, this._volumeSize.X - 1);
-            y = Math.Clamp(y, 0, this._volumeSize.Y - 1);
-            z = Math.Clamp(z, 0, this._volumeSize.Z - 1);
+            x = Math.Clamp(x, 0, this.VolumeMetadata.VolumeSize.X - 1);
+            y = Math.Clamp(y, 0, this.VolumeMetadata.VolumeSize.Y - 1);
+            z = Math.Clamp(z, 0, this.VolumeMetadata.VolumeSize.Z - 1);
 
             return new Vector3i(x, y, z);
         }
@@ -558,17 +491,17 @@ namespace MedicalSharp.Primitives.Maths
         /// <returns>平面UV坐标，范围 -1 到 1</returns>
         public Vector2 ProjectVoxel(Vector3i voxel)
         {
-            // 体素坐标 → 纹理坐标（0 到 1）
+            //体素坐标 -> 纹理坐标（0到1）
             Vector3 texCoord = new Vector3(
-                voxel.X / (float)(this._volumeSize.X - 1),
-                voxel.Y / (float)(this._volumeSize.Y - 1),
-                voxel.Z / (float)(this._volumeSize.Z - 1)
+                voxel.X * 1.0f / (this.VolumeMetadata.VolumeSize.X - 1),
+                voxel.Y * 1.0f / (this.VolumeMetadata.VolumeSize.Y - 1),
+                voxel.Z * 1.0f / (this.VolumeMetadata.VolumeSize.Z - 1)
             );
 
-            // 纹理坐标 → 逻辑空间点（-0.5 到 0.5）
+            //纹理坐标 -> 逻辑空间点（-0.5到0.5）
             Vector3 localPoint = texCoord - new Vector3(0.5f);
 
-            // 投影到平面得到 UV
+            //投影到平面得到 UV
             return this.ProjectPoint(localPoint);
         }
         #endregion
@@ -620,9 +553,9 @@ namespace MedicalSharp.Primitives.Maths
                 Math.Abs(this.Normal.Z)
             );
             float projection =
-                this._volumeSize.X * absNormal.X +
-                this._volumeSize.Y * absNormal.Y +
-                this._volumeSize.Z * absNormal.Z;
+                this.VolumeMetadata.VolumeSize.X * absNormal.X +
+                this.VolumeMetadata.VolumeSize.Y * absNormal.Y +
+                this.VolumeMetadata.VolumeSize.Z * absNormal.Z;
 
             this.SlicesCount = (int)Math.Floor(Math.Max(projection, 2));
         }

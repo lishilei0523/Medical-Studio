@@ -289,21 +289,24 @@ namespace MedicalSharp.Engine.Cameras
             #endregion
 
             Vector3 texCoord = new Vector3(
-                voxelPosition.X * 1.0f / (this._targetPlane.VolumeSize.X - 1),
-                voxelPosition.Y * 1.0f / (this._targetPlane.VolumeSize.Y - 1),
-                voxelPosition.Z * 1.0f / (this._targetPlane.VolumeSize.Z - 1)
+                voxelPosition.X * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.X - 1),
+                voxelPosition.Y * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.Y - 1),
+                voxelPosition.Z * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.Z - 1)
             );
             Vector3 localPoint = texCoord - new Vector3(0.5f);
 
             Vector3 worldPoint = new Vector3(
-                localPoint.X * this._targetPlane.VolumeScale.X,
-                localPoint.Y * this._targetPlane.VolumeScale.Y,
-                localPoint.Z * this._targetPlane.VolumeScale.Z
+                localPoint.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
+                localPoint.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
+                localPoint.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
             );
 
             this._targetPosition = worldPoint;
 
-            Vector3 worldNormal = new Vector3(this._targetPlane.Normal.X * this._targetPlane.VolumeScale.X, this._targetPlane.Normal.Y * this._targetPlane.VolumeScale.Y, this._targetPlane.Normal.Z * this._targetPlane.VolumeScale.Z
+            Vector3 worldNormal = new Vector3(
+                this._targetPlane.Normal.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
+                this._targetPlane.Normal.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
+                this._targetPlane.Normal.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
             ).Normalized();
 
             this._cameraPosition = this._targetPosition - worldNormal * this._distance;
@@ -329,9 +332,9 @@ namespace MedicalSharp.Engine.Cameras
             #endregion
 
             Vector3 texCoord = new Vector3(
-                voxelPosition.X * 1.0f / (this._targetPlane.VolumeSize.X - 1),
-                voxelPosition.Y * 1.0f / (this._targetPlane.VolumeSize.Y - 1),
-                voxelPosition.Z * 1.0f / (this._targetPlane.VolumeSize.Z - 1)
+                voxelPosition.X * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.X - 1),
+                voxelPosition.Y * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.Y - 1),
+                voxelPosition.Z * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.Z - 1)
             );
             Vector3 localPoint = texCoord - new Vector3(0.5f);
 
@@ -340,14 +343,17 @@ namespace MedicalSharp.Engine.Cameras
             localPoint += offsetLocal;
 
             Vector3 worldPoint = new Vector3(
-                localPoint.X * this._targetPlane.VolumeScale.X,
-                localPoint.Y * this._targetPlane.VolumeScale.Y,
-                localPoint.Z * this._targetPlane.VolumeScale.Z
+                localPoint.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
+                localPoint.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
+                localPoint.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
             );
 
             this._targetPosition = worldPoint;
 
-            Vector3 worldNormal = new Vector3(this._targetPlane.Normal.X * this._targetPlane.VolumeScale.X, this._targetPlane.Normal.Y * this._targetPlane.VolumeScale.Y, this._targetPlane.Normal.Z * this._targetPlane.VolumeScale.Z
+            Vector3 worldNormal = new Vector3(
+                this._targetPlane.Normal.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
+                this._targetPlane.Normal.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
+                this._targetPlane.Normal.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
             ).Normalized();
 
             this._cameraPosition = this._targetPosition - worldNormal * this._distance;
@@ -376,17 +382,17 @@ namespace MedicalSharp.Engine.Cameras
             float sliceOffset = this._targetPlane.GetSliceOffset();
 
             Vector3 worldNormal = new Vector3(
-                this._targetPlane.Normal.X * this._targetPlane.VolumeScale.X,
-                this._targetPlane.Normal.Y * this._targetPlane.VolumeScale.Y,
-                this._targetPlane.Normal.Z * this._targetPlane.VolumeScale.Z
+                this._targetPlane.Normal.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
+                this._targetPlane.Normal.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
+                this._targetPlane.Normal.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
             ).Normalized();
             Vector3 worldVAxis = new Vector3(
-                this._targetPlane.VAxis.X * this._targetPlane.VolumeScale.X,
-                this._targetPlane.VAxis.Y * this._targetPlane.VolumeScale.Y,
-                this._targetPlane.VAxis.Z * this._targetPlane.VolumeScale.Z
+                this._targetPlane.VAxis.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
+                this._targetPlane.VAxis.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
+                this._targetPlane.VAxis.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
             ).Normalized();
 
-            float normalScale = Math.Abs(Vector3.Dot(worldNormal, this._targetPlane.VolumeScale));
+            float normalScale = Math.Abs(Vector3.Dot(worldNormal, this._targetPlane.VolumeMetadata.VolumeScale));
             float worldSliceOffset = sliceOffset * normalScale;
 
             Vector3 planePosition = worldNormal * worldSliceOffset;

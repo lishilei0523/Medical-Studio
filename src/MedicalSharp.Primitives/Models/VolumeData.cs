@@ -1,5 +1,4 @@
-﻿using OpenTK.Mathematics;
-using System;
+﻿using System;
 
 namespace MedicalSharp.Primitives.Models
 {
@@ -22,6 +21,7 @@ namespace MedicalSharp.Primitives.Models
         {
             //默认值
             this.Id = Guid.NewGuid().ToString();
+            this.Metadata = new VolumeMetadata();
         }
 
         #endregion
@@ -35,95 +35,11 @@ namespace MedicalSharp.Primitives.Models
         public string Id { get; protected set; }
         #endregion
 
-        #region 体素数量 —— long VoxelsCount
+        #region 体积信息 —— VolumeInfo Metadata
         /// <summary>
-        /// 体素数量
+        /// 体积信息
         /// </summary>
-        public long VoxelsCount { get; set; }
-        #endregion
-
-        #region 体积尺寸 —— Vector3i VolumeSize
-        /// <summary>
-        /// 体积尺寸
-        /// </summary>
-        public Vector3i VolumeSize { get; set; }
-        #endregion
-
-        #region 间距 —— Vector3 Spacing
-        /// <summary>
-        /// 间距
-        /// </summary>
-        public Vector3 Spacing { get; set; }
-        #endregion
-
-        #region 物理尺寸 —— Size3F PhysicalSize
-        /// <summary>
-        /// 物理尺寸
-        /// </summary>
-        public Vector3 PhysicalSize { get; set; }
-        #endregion
-
-        #region 体积缩放 —— Vector3 VolumeScale
-        /// <summary>
-        /// 体积缩放
-        /// </summary>
-        public Vector3 VolumeScale { get; set; }
-        #endregion
-
-        #region 斜率 —— float RescaleSlope
-        /// <summary>
-        /// 斜率
-        /// </summary>
-        public float RescaleSlope { get; set; }
-        #endregion
-
-        #region 截距 —— float RescaleIntercept
-        /// <summary>
-        /// 截距
-        /// </summary>
-        public float RescaleIntercept { get; set; }
-        #endregion
-
-        #region 图像原点 —— Vector3 Origin
-        /// <summary>
-        /// 图像原点
-        /// </summary>
-        public Vector3 Origin { get; set; }
-        #endregion
-
-        #region 行向量 —— Vector3 RowDirection
-        /// <summary>
-        /// 行向量
-        /// </summary>
-        public Vector3 RowDirection { get; set; }
-        #endregion
-
-        #region 列向量 —— Vector3 ColDirection
-        /// <summary>
-        /// 列向量
-        /// </summary>
-        public Vector3 ColDirection { get; set; }
-        #endregion
-
-        #region 切面向量 —— Vector3 SliceDirection
-        /// <summary>
-        /// 切面向量
-        /// </summary>
-        public Vector3 SliceDirection { get; set; }
-        #endregion
-
-        #region 窗宽 —— float WindowWidth
-        /// <summary>
-        /// 窗宽
-        /// </summary>
-        public float WindowWidth { get; set; }
-        #endregion
-
-        #region 窗位 —— float WindowCenter
-        /// <summary>
-        /// 窗位
-        /// </summary>
-        public float WindowCenter { get; set; }
+        public VolumeMetadata Metadata { get; private set; }
         #endregion
 
         #region 原始数据 —— abstract IntPtr OriginalData
@@ -149,12 +65,12 @@ namespace MedicalSharp.Primitives.Models
         {
             get
             {
-                if (x < 0 || x >= this.VolumeSize.X || y < 0 || y >= this.VolumeSize.Y || z < 0 || z >= this.VolumeSize.Z)
+                if (x < 0 || x >= this.Metadata.VolumeSize.X || y < 0 || y >= this.Metadata.VolumeSize.Y || z < 0 || z >= this.Metadata.VolumeSize.Z)
                 {
                     return 0;
                 }
 
-                int index = z * this.VolumeSize.X * this.VolumeSize.Y + y * this.VolumeSize.X + x;
+                int index = z * this.Metadata.VolumeSize.X * this.Metadata.VolumeSize.Y + y * this.Metadata.VolumeSize.X + x;
                 short* pointer = (short*)this.OriginalData.ToPointer();
                 short voxel = pointer[index];
 
