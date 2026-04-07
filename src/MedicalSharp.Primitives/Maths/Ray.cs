@@ -63,21 +63,21 @@ namespace MedicalSharp.Primitives.Maths
 
         //Static
 
-        #region 反投影创建射线 —— static Ray UnProject(Vector2 mousePosition, Vector3 cameraPosition...
+        #region 反投影创建射线 —— static Ray UnProject(Vector2 mousePos2D, Vector3 cameraPosition...
         /// <summary>
         /// 反投影创建射线
         /// </summary>
-        /// <param name="mousePosition">鼠标位置</param>
+        /// <param name="mousePos2D">鼠标2D位置</param>
         /// <param name="cameraPosition">相机位置</param>
         /// <param name="viewportSize">视口尺寸</param>
         /// <param name="projectionMatrix">投影矩阵</param>
         /// <param name="viewMatrix">视图矩阵</param>
         /// <returns>射线</returns>
-        public static Ray UnProject(Vector2 mousePosition, Vector3 cameraPosition, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix)
+        public static Ray UnProject(Vector2 mousePos2D, Vector3 cameraPosition, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix)
         {
             //将屏幕坐标转换到NDC（标准化设备坐标）
-            float ndcX = (2.0f * mousePosition.X) / viewportSize.X - 1.0f;
-            float ndcY = 1.0f - (2.0f * mousePosition.Y) / viewportSize.Y;
+            float ndcX = (2.0f * mousePos2D.X) / viewportSize.X - 1.0f;
+            float ndcY = 1.0f - (2.0f * mousePos2D.Y) / viewportSize.Y;
 
             //创建近平面和远平面上的点
             Vector4 rayStartNDC = new Vector4(ndcX, ndcY, -1.0f, 1.0f);

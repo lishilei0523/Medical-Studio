@@ -411,6 +411,57 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
+        #region 屏幕坐标转换平面UV坐标 —— Vector2? ScreenToPlaneUV(Vector2 mousePosition...
+        /// <summary>
+        /// 屏幕坐标转换平面UV坐标
+        /// </summary>
+        /// <param name="mousePos2D">鼠标2D位置</param>
+        /// <param name="cameraPosition">相机位置</param>
+        /// <param name="viewportSize">视口尺寸</param>
+        /// <param name="projectionMatrix">投影矩阵</param>
+        /// <param name="viewMatrix">视图矩阵</param>
+        /// <returns>UV坐标，[-1, 1]，如果不在平面上则返回null</returns>
+        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector3 cameraPosition, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix)
+        {
+            //创建射线
+            Ray ray = Ray.UnProject(mousePos2D, cameraPosition, viewportSize, projectionMatrix, viewMatrix);
+
+            //计算平面的世界位置，平面实际位置 = Normal * sliceOffset（因为Center = (0,0,0)）
+            float sliceOffset = this.GetSliceOffset();
+            Vector3 worldNormal = new Vector3(
+                this.Normal.X * this.VolumeMetadata.VolumeScale.X,
+                this.Normal.Y * this.VolumeMetadata.VolumeScale.Y,
+                this.Normal.Z * this.VolumeMetadata.VolumeScale.Z
+            ).Normalized();
+
+            float normalScale = Math.Abs(Vector3.Dot(worldNormal, this.VolumeMetadata.VolumeScale));
+            float worldSliceOffset = sliceOffset * normalScale;
+            Vector3 planePoint = worldNormal * worldSliceOffset;
+
+            //射线与平面求交
+            if (ray.IntersectsPlane(planePoint, worldNormal, out Vector3 hitPoint))
+            {
+                //转换到逻辑空间
+                Vector3 localPoint = new Vector3(
+                    hitPoint.X / this.VolumeMetadata.VolumeScale.X,
+                    hitPoint.Y / this.VolumeMetadata.VolumeScale.Y,
+                    hitPoint.Z / this.VolumeMetadata.VolumeScale.Z
+                );
+
+                //投影到平面得到UV
+                Vector2 uv = this.ProjectPoint(localPoint);
+
+                //检查是否在平面范围内
+                if (uv.X >= -1 && uv.X <= 1 && uv.Y >= -1 && uv.Y <= 1)
+                {
+                    return uv;
+                }
+            }
+
+            return null;
+        }
+        #endregion
+
         #region 获取平面上的点（逻辑空间） —— Vector3 GetPointOnPlane(float u, float v)
         /// <summary>
         /// 获取平面上的点（逻辑空间）
@@ -424,9 +475,7 @@ namespace MedicalSharp.Primitives.Maths
             float sliceOffset = this.GetSliceOffset();
 
             //平面上的点 = 中心 + 法线方向偏移 + U方向偏移 + V方向偏移
-            Vector3 point = this.Center + this.Normal * sliceOffset +
-                            this.UAxis * u * halfSize +
-                            this.VAxis * v * halfSize;
+            Vector3 point = this.Center + this.Normal * sliceOffset + this.UAxis * u * halfSize + this.VAxis * v * halfSize;
 
             return point;
         }
@@ -454,14 +503,14 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 获取平面上的体素坐标 —— Vector3i GetVoxelOnPlane(float u, float v)
+        #region 获取平面上的体素坐标 —— Vector3i GetVoxelPosition(float u, float v)
         /// <summary>
         /// 获取平面上的体素坐标
         /// </summary>
         /// <param name="u">U坐标，[-1, 1]</param>
         /// <param name="v">V坐标，[-1, 1]</param>
         /// <returns>体素坐标，[0, VolumeSize-1]</returns>
-        public Vector3i GetVoxelOnPlane(float u, float v)
+        public Vector3i GetVoxelPosition(float u, float v)
         {
             //先获取逻辑空间点（-0.5到0.5）
             Vector3 localPoint = this.GetPointOnPlane(u, v);
@@ -483,25 +532,25 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 将体素坐标投影到平面 —— Vector2 ProjectVoxel(Vector3i voxel)
+        #region 将体素坐标投影到平面 —— Vector2 ProjectVoxel(Vector3i voxelPosition)
         /// <summary>
         /// 将体素坐标投影到平面
         /// </summary>
-        /// <param name="voxel">体素坐标，范围 0 到 volumeSize-1</param>
-        /// <returns>平面UV坐标，范围 -1 到 1</returns>
-        public Vector2 ProjectVoxel(Vector3i voxel)
+        /// <param name="voxelPosition">体素坐标，[0, VolumeSize-1]</param>
+        /// <returns>平面UV坐标，[-1, 1]</returns>
+        public Vector2 ProjectVoxel(Vector3i voxelPosition)
         {
             //体素坐标 -> 纹理坐标（0到1）
             Vector3 texCoord = new Vector3(
-                voxel.X * 1.0f / (this.VolumeMetadata.VolumeSize.X - 1),
-                voxel.Y * 1.0f / (this.VolumeMetadata.VolumeSize.Y - 1),
-                voxel.Z * 1.0f / (this.VolumeMetadata.VolumeSize.Z - 1)
+                voxelPosition.X * 1.0f / (this.VolumeMetadata.VolumeSize.X - 1),
+                voxelPosition.Y * 1.0f / (this.VolumeMetadata.VolumeSize.Y - 1),
+                voxelPosition.Z * 1.0f / (this.VolumeMetadata.VolumeSize.Z - 1)
             );
 
             //纹理坐标 -> 逻辑空间点（-0.5到0.5）
             Vector3 localPoint = texCoord - new Vector3(0.5f);
 
-            //投影到平面得到 UV
+            //投影到平面得到UV
             return this.ProjectPoint(localPoint);
         }
         #endregion
