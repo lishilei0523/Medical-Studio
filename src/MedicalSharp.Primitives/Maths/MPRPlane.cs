@@ -411,21 +411,20 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 屏幕坐标转换平面UV坐标 —— Vector2? ScreenToPlaneUV(Vector2 mousePosition...
+        #region 屏幕坐标转换平面UV坐标 —— Vector2? ScreenToPlaneUV(Vector2 mousePos2D...
         /// <summary>
         /// 屏幕坐标转换平面UV坐标
         /// </summary>
         /// <param name="mousePos2D">鼠标2D位置</param>
-        /// <param name="cameraPosition">相机位置</param>
         /// <param name="lookDirection">视角方向</param>
         /// <param name="viewportSize">视口尺寸</param>
         /// <param name="projectionMatrix">投影矩阵</param>
         /// <param name="viewMatrix">视图矩阵</param>
         /// <returns>UV坐标，[-1, 1]，如果不在平面上则返回null</returns>
-        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector3 cameraPosition, Vector3 lookDirection, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix)
+        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector3 lookDirection, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix)
         {
             //将屏幕坐标转换到世界空间的射线起点（近平面上的点）
-            float ndcX = 1.0f - (2.0f * mousePos2D.X) / viewportSize.X;
+            float ndcX = (2.0f * mousePos2D.X) / viewportSize.X - 1.0f;
             float ndcY = 1.0f - (2.0f * mousePos2D.Y) / viewportSize.Y;
 
             Vector4 rayStartNDC = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
@@ -467,7 +466,8 @@ namespace MedicalSharp.Primitives.Maths
                 //投影到平面得到UV
                 Vector2 uv = this.ProjectPoint(localPoint);
 
-                if (this.PlaneType == MPRPlaneType.Sagittal)
+                //方向修正
+                if (this.PlaneType == MPRPlaneType.Axial || this.PlaneType == MPRPlaneType.Sagittal)
                 {
                     uv = new Vector2(-uv.X, uv.Y);
                 }
