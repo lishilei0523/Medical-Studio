@@ -467,6 +467,11 @@ namespace MedicalSharp.Primitives.Maths
                 //投影到平面得到UV
                 Vector2 uv = this.ProjectPoint(localPoint);
 
+                if (this.PlaneType == MPRPlaneType.Sagittal)
+                {
+                    uv = new Vector2(-uv.X, uv.Y);
+                }
+
                 //检查是否在平面范围内
                 if (uv.X >= -1 && uv.X <= 1 && uv.Y >= -1 && uv.Y <= 1)
                 {
