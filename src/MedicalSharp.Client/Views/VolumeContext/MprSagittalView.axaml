@@ -11,7 +11,8 @@
         <sd:MPRViewport Background="Black"
                         Plane="{Binding SagittalPlane}"
                         Camera="{Binding SagittalCamera}"
-                        VolumeData="{Binding VolumeData}">
+                        VolumeData="{Binding VolumeData}"
+                        cm:Message.Attach="[Event PointerPressed] = [Action OnSagittalViewportPointerPressed($source, $eventArgs)];">
 
         </sd:MPRViewport>
     </sd:GroupBox>

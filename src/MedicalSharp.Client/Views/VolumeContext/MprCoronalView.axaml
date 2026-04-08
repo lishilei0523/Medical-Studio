@@ -11,7 +11,8 @@
         <sd:MPRViewport Background="Black"
                         Plane="{Binding CoronalPlane}"
                         Camera="{Binding CoronalCamera}"
-                        VolumeData="{Binding VolumeData}">
+                        VolumeData="{Binding VolumeData}"
+                        cm:Message.Attach="[Event PointerPressed] = [Action OnCoronalViewportPointerPressed($source, $eventArgs)];">
 
         </sd:MPRViewport>
     </sd:GroupBox>
