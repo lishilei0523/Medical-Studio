@@ -417,14 +417,30 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         /// <param name="mousePos2D">鼠标2D位置</param>
         /// <param name="cameraPosition">相机位置</param>
+        /// <param name="lookDirection">视角方向</param>
         /// <param name="viewportSize">视口尺寸</param>
         /// <param name="projectionMatrix">投影矩阵</param>
         /// <param name="viewMatrix">视图矩阵</param>
         /// <returns>UV坐标，[-1, 1]，如果不在平面上则返回null</returns>
-        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector3 cameraPosition, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix)
+        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector3 cameraPosition, Vector3 lookDirection, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix)
         {
+            //将屏幕坐标转换到世界空间的射线起点（近平面上的点）
+            float ndcX = 1.0f - (2.0f * mousePos2D.X) / viewportSize.X;
+            float ndcY = 1.0f - (2.0f * mousePos2D.Y) / viewportSize.Y;
+
+            Vector4 rayStartNDC = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
+            Matrix4 invProjection = Matrix4.Invert(projectionMatrix);
+            Matrix4 invView = Matrix4.Invert(viewMatrix);
+
+            Vector4 rayStartCamera = rayStartNDC * invProjection;
+            rayStartCamera /= rayStartCamera.W;
+            Vector3 rayStartWorld = Vector3.TransformPosition(rayStartCamera.Xyz, invView);
+
+            //射线方向固定为相机的前向方向（正交投影）
+            Vector3 rayDirection = lookDirection;
+
             //创建射线
-            Ray ray = Ray.UnProject(mousePos2D, cameraPosition, viewportSize, projectionMatrix, viewMatrix);
+            Ray ray = new Ray(rayStartWorld, rayDirection);
 
             //计算平面的世界位置，平面实际位置 = Normal * sliceOffset（因为Center = (0,0,0)）
             float sliceOffset = this.GetSliceOffset();

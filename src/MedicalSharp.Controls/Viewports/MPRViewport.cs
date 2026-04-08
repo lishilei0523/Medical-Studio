@@ -206,7 +206,7 @@ namespace MedicalSharp.Controls.Viewports
             voxelPosition = null;
             voxelValue = null;
 
-            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera.CameraPosition, this.Camera.LookDirection, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
             if (planeUV.HasValue)
             {
                 voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y);
