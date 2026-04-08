@@ -84,7 +84,38 @@ namespace MedicalSharp.Controls.Inputs
             this._camera.TargetPlane.SliceIndex += (int)Math.Ceiling(offsetY);
             viewport.RequestNextFrameRendering();
         }
-        #endregion 
+        #endregion
+
+        #region 键盘按下事件 —— override void OnKeyDown(OpenTKViewport viewport, Key key)
+        /// <summary>
+        /// 键盘按下事件
+        /// </summary>
+        /// <param name="viewport">OpenTK视口</param>
+        /// <param name="key">键</param>
+        public override void OnKeyDown(OpenTKViewport viewport, Key key)
+        {
+            if (key == Key.Up)
+            {
+                this._camera.TargetPlane.Rotate(-3, 0);
+                viewport.RequestNextFrameRendering();
+            }
+            if (key == Key.Down)
+            {
+                this._camera.TargetPlane.Rotate(3, 0);
+                viewport.RequestNextFrameRendering();
+            }
+            if (key == Key.Left)
+            {
+                this._camera.TargetPlane.Rotate(0, 3);
+                viewport.RequestNextFrameRendering();
+            }
+            if (key == Key.Right)
+            {
+                this._camera.TargetPlane.Rotate(0, -3);
+                viewport.RequestNextFrameRendering();
+            }
+        }
+        #endregion
 
         #endregion
     }
