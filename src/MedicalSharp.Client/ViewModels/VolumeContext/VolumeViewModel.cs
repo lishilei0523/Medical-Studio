@@ -123,7 +123,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region VR视口鼠标按下事件 —— void OnVolumeViewportPointerPressed(WireframeViewport viewport...
+        #region VR视口鼠标按下事件 —— void OnVolumeViewportPointerPressed(VolumeViewport viewport...
         /// <summary>
         /// VR视口鼠标按下事件
         /// </summary>

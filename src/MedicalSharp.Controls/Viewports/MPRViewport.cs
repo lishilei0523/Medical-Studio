@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Base;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
@@ -9,6 +10,7 @@ using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 
 namespace MedicalSharp.Controls.Viewports
 {
@@ -188,6 +190,36 @@ namespace MedicalSharp.Controls.Viewports
         #endregion
 
         #region # 方法
+
+        #region 查找最近元素 —— bool FindNearest(Vector2 position, out Vector3i? voxelPosition...
+        /// <summary>
+        /// 查找最近元素
+        /// </summary>
+        /// <param name="position">2D位置</param>
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="voxelValue">体素HU值</param>
+        /// <returns>是否成功</returns>
+        public bool FindNearest(Vector2 position, out Vector3i? voxelPosition, out short? voxelValue)
+        {
+            this.GlContext.MakeCurrent();
+
+            voxelPosition = null;
+            voxelValue = null;
+
+            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            if (planeUV.HasValue)
+            {
+                voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y);
+                if (voxelPosition.HasValue)
+                {
+                    voxelValue = this.VolumeData[voxelPosition.Value.X, voxelPosition.Value.Y, voxelPosition.Value.Z];
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        #endregion
 
         #region OpenTK初始化事件 —— override void OnOpenTKInit()
         /// <summary>
