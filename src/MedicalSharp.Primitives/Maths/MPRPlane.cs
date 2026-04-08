@@ -31,23 +31,6 @@ namespace MedicalSharp.Primitives.Maths
         private float _maxProjection;
 
         /// <summary>
-        /// 原始U轴方向
-        /// </summary>
-        /// <remarks>水平</remarks>
-        private Vector3 _originalUAxis;
-
-        /// <summary>
-        /// 原始V轴方向
-        /// </summary>
-        /// <remarks>垂直</remarks>
-        private Vector3 _originalVAxis;
-
-        /// <summary>
-        /// 原始法向量
-        /// </summary>
-        private Vector3 _originalNormal;
-
-        /// <summary>
         /// 创建MPR平面构造器
         /// </summary>
         /// <param name="volumeMetadata">体积元数据</param>
@@ -160,9 +143,6 @@ namespace MedicalSharp.Primitives.Maths
             {
                 _minProjection = -0.5f,
                 _maxProjection = 0.5f,
-                _originalUAxis = new Vector3(1, 0, 0),
-                _originalVAxis = new Vector3(0, 1, 0),
-                _originalNormal = new Vector3(0, 0, 1),
                 Center = Vector3.Zero,
                 UAxis = new Vector3(1, 0, 0),
                 VAxis = new Vector3(0, 1, 0),
@@ -189,9 +169,6 @@ namespace MedicalSharp.Primitives.Maths
             {
                 _minProjection = -0.5f,
                 _maxProjection = 0.5f,
-                _originalUAxis = new Vector3(1, 0, 0),
-                _originalVAxis = new Vector3(0, 0, 1),
-                _originalNormal = new Vector3(0, 1, 0),
                 Center = Vector3.Zero,
                 UAxis = new Vector3(1, 0, 0),
                 VAxis = new Vector3(0, 0, 1),
@@ -218,9 +195,6 @@ namespace MedicalSharp.Primitives.Maths
             {
                 _minProjection = -0.5f,
                 _maxProjection = 0.5f,
-                _originalUAxis = new Vector3(0, 1, 0),
-                _originalVAxis = new Vector3(0, 0, 1),
-                _originalNormal = new Vector3(1, 0, 0),
                 Center = Vector3.Zero,
                 UAxis = new Vector3(0, 1, 0),
                 VAxis = new Vector3(0, 0, 1),
@@ -260,9 +234,6 @@ namespace MedicalSharp.Primitives.Maths
             //创建斜切平面
             MPRPlane plane = new MPRPlane(originalPlane.VolumeMetadata)
             {
-                _originalUAxis = uAxis,
-                _originalVAxis = vAxis,
-                _originalNormal = normal,
                 Center = originalPlane.Center,
                 UAxis = uAxis,
                 VAxis = vAxis,
@@ -311,9 +282,6 @@ namespace MedicalSharp.Primitives.Maths
             this.UAxis = Vector3.Transform(this.UAxis, total).Normalized();
             this.VAxis = Vector3.Transform(this.VAxis, total).Normalized();
             this.Normal = Vector3.Transform(this.Normal, total).Normalized();
-
-            //重新正交化
-            this.Orthonormalize();
 
             //更新类型
             this.PlaneType = MPRPlaneType.Oblique;
