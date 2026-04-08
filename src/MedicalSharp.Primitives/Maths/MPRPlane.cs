@@ -270,18 +270,18 @@ namespace MedicalSharp.Primitives.Maths
         public void Rotate(float deltaU, float deltaV)
         {
             //绕U轴旋转（上下）
-            Quaternion rotU = Quaternion.FromAxisAngle(this.UAxis, MathHelper.DegreesToRadians(deltaU));
+            Quaternion rotationU = Quaternion.FromAxisAngle(this.UAxis, MathHelper.DegreesToRadians(deltaU));
 
             //绕V轴旋转（左右）
-            Quaternion rotV = Quaternion.FromAxisAngle(this.VAxis, MathHelper.DegreesToRadians(deltaV));
+            Quaternion rotationV = Quaternion.FromAxisAngle(this.VAxis, MathHelper.DegreesToRadians(deltaV));
 
             //组合旋转：先左右，再上下
-            Quaternion total = rotU * rotV;
+            Quaternion rotation = rotationU * rotationV;
 
             //应用旋转
-            this.UAxis = Vector3.Transform(this.UAxis, total).Normalized();
-            this.VAxis = Vector3.Transform(this.VAxis, total).Normalized();
-            this.Normal = Vector3.Transform(this.Normal, total).Normalized();
+            this.UAxis = Vector3.Transform(this.UAxis, rotation).Normalized();
+            this.VAxis = Vector3.Transform(this.VAxis, rotation).Normalized();
+            this.Normal = Vector3.Transform(this.Normal, rotation).Normalized();
 
             //更新类型
             this.PlaneType = MPRPlaneType.Oblique;
