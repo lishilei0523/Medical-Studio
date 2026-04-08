@@ -5,7 +5,7 @@ using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
-using MedicalSharp.Engine.Cameras;
+using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;

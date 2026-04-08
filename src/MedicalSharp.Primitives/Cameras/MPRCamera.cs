@@ -2,7 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 
-namespace MedicalSharp.Engine.Cameras
+namespace MedicalSharp.Primitives.Cameras
 {
     /// <summary>
     /// MPR相机

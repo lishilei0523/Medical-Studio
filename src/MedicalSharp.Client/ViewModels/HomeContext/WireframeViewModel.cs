@@ -6,7 +6,7 @@ using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
-using MedicalSharp.Engine.Cameras;
+using MedicalSharp.Primitives.Cameras;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;

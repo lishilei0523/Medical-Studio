@@ -1,11 +1,11 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Inputs;
-using MedicalSharp.Engine.Cameras;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;

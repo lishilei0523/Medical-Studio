@@ -6,7 +6,7 @@ using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Inputs;
-using MedicalSharp.Engine.Cameras;
+using MedicalSharp.Primitives.Cameras;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;

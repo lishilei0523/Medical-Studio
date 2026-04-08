@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using System;
 
-namespace MedicalSharp.Engine.Builders
+namespace MedicalSharp.Primitives.Builders
 {
     /// <summary>
     /// 颜色工厂

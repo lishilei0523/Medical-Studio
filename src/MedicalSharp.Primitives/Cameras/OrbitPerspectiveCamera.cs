@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace MedicalSharp.Engine.Cameras
+namespace MedicalSharp.Primitives.Cameras
 {
     /// <summary>
     /// 轨道透视相机

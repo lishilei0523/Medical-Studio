@@ -1,6 +1,6 @@
-﻿using MedicalSharp.Engine.Cameras;
-using MedicalSharp.Engine.Renderables;
+﻿using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;

@@ -1,7 +1,8 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Extensions;
-using MedicalSharp.Engine.Builders;
 using MedicalSharp.Engine.Renderables;
+using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 
@@ -123,8 +124,8 @@ namespace MedicalSharp.Controls.Visuals
             {
                 if (this._renderable == null)
                 {
-                    MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Lines);
-                    MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Triangles);
+                    MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
+                    MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
                     this._renderable = new WireframeRenderable(strokeMesh, fillMesh);
                     this._renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
                 }
@@ -146,8 +147,8 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this._renderable != null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), PrimitiveType.Triangles);
+                MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
                 this._renderable.Update(strokeMesh, fillMesh);
             }
         }

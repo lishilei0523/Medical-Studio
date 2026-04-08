@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Input;
 using MedicalSharp.Controls.Base;
-using MedicalSharp.Engine.Cameras;
+using MedicalSharp.Primitives.Cameras;
 
 namespace MedicalSharp.Controls.Inputs
 {

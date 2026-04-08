@@ -1,5 +1,5 @@
 ﻿using Caliburn.Micro;
-using MedicalSharp.Engine.Cameras;
+using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;

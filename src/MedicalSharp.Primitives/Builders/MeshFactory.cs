@@ -1,12 +1,12 @@
-﻿using MedicalSharp.Primitives.Maths;
+﻿using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MedicalSharp.Engine.Builders
+namespace MedicalSharp.Primitives.Builders
 {
     /// <summary>
     /// Mesh工厂
@@ -371,7 +371,7 @@ namespace MedicalSharp.Engine.Builders
         /// <param name="primitiveType">图元类型</param>
         /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateBoundingBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector3 center = default, PrimitiveType primitiveType = PrimitiveType.Lines, Vector4 color = default)
+        public static MeshGeometry CreateBoundingBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector3 center = default, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Lines, Vector4 color = default)
         {
             if (color == default)
             {
@@ -385,7 +385,7 @@ namespace MedicalSharp.Engine.Builders
             List<Vertex> vertices = [];
             List<uint> indices = [];
 
-            if (primitiveType == PrimitiveType.Lines)
+            if (primitiveType == GraphicPrimitiveType.Lines)
             {
                 //线框模式 - 8个顶点，12条边（24个索引）
                 Vector3[] cornerVertices =
@@ -774,7 +774,7 @@ namespace MedicalSharp.Engine.Builders
             }
 
             MeshGeometry meshGeometry = new(vertices, indices);
-            CalculateNormals(meshGeometry);
+            MeshFactory.CalculateNormals(meshGeometry);
 
             return meshGeometry;
         }
