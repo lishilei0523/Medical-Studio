@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Input;
+using Avalonia.Media;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Controls.Extensions;
@@ -16,12 +17,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MedicalSharp.Client.ViewModels.HomeContext
+namespace MedicalSharp.Client.ViewModels.MeshContext
 {
     /// <summary>
-    /// 线框视图模型
+    /// 查看视图模型
     /// </summary>
-    public class WireframeViewModel : ScreenBase
+    public class LookViewModel : ScreenBase
     {
         #region # 字段及构造器
 
@@ -33,9 +34,15 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public WireframeViewModel(IWindowManager windowManager)
+        public LookViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
+
+            //初始化相机
+            Vector3 cameraPosition = new Vector3(0, 7, 0);
+            Vector3 targetPosition = new Vector3(0.0f);
+            Vector3 upDirection = new Vector3(0, 0, 1);
+            this.OrbitCamera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
         }
 
         #endregion
@@ -78,22 +85,22 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
-            Vector3 targetPosition = new Vector3(0.0f);
-            const float distance = 7.0f;
-            const float yaw = 45.0f;
-            const float pitch = -45.0f;
-            this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
-
             this.BoundingSphere = new BoundingSphereVisual3D
             {
                 Radius = 1,
-                Center = new Vector3D(-2, 0, 0)
+                Center = new Vector3D(-2, 0, 0),
+                Stroke = Colors.Green,
+                StrokeThickness = 1,
+                Fill = Color.Parse("#0FFF0000")
             };
             this.BoundingVisuals =
             [
                 new BoundingBoxVisual3D
                 {
-                    Center = new Vector3D(2,0,0)
+                    Center = new Vector3D(2,0,0),
+                    Stroke = Colors.Blue,
+                    StrokeThickness = 1,
+                    Fill = Color.Parse("#0FFFFF00")
                 }
             ];
 

@@ -573,8 +573,8 @@ namespace MedicalSharp.Primitives.Builders
 
                     //计算相对于原点的位置
                     float x = radius * (float)Math.Sin(phi) * (float)Math.Cos(theta);
-                    float y = radius * (float)Math.Cos(phi);
-                    float z = radius * (float)Math.Sin(phi) * (float)Math.Sin(theta);
+                    float y = radius * (float)Math.Sin(phi) * (float)Math.Sin(theta);
+                    float z = radius * (float)Math.Cos(phi);
 
                     //应用中心点偏移
                     Vector3 position = new(center.X + x, center.Y + y, center.Z + z);
@@ -846,55 +846,83 @@ namespace MedicalSharp.Primitives.Builders
         /// </summary>
         /// <param name="size">尺寸</param>
         /// <param name="divisions">分隔数量</param>
+        /// <param name="normal">法向量（控制网格朝向）</param>
         /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateGrid(float size = 10.0f, int divisions = 10, Vector4 color = default)
+        public static MeshGeometry CreateGrid(float size = 10.0f, int divisions = 10, Vector3? normal = null, Vector4 color = default)
         {
             if (color == default)
             {
                 color = new Vector4(0.5f);
             }
 
+            //默认朝上(Z轴)
+            Vector3 upNormal = normal ?? Vector3.UnitZ;
+            upNormal = Vector3.Normalize(upNormal);
+
             float halfSize = size * 0.5f;
             float step = size / divisions;
 
+            //计算旋转矩阵，将Y轴旋转到指定的法向量方向
+            Matrix4 rotationMatrix;
+            if (Vector3.Dot(upNormal, Vector3.UnitY) > 0.999f)
+            {
+                rotationMatrix = Matrix4.Identity;
+            }
+            else if (Vector3.Dot(upNormal, Vector3.UnitY) < -0.999f)
+            {
+                rotationMatrix = Matrix4.CreateRotationX(MathF.PI);
+            }
+            else
+            {
+                Vector3 rotationAxis = Vector3.Cross(Vector3.UnitY, upNormal);
+                rotationAxis = Vector3.Normalize(rotationAxis);
+                float angle = (float)Math.Acos(Vector3.Dot(Vector3.UnitY, upNormal));
+                rotationMatrix = Matrix4.CreateFromAxisAngle(rotationAxis, angle);
+            }
+
             List<Vertex> vertices = [];
             List<uint> indices = [];
-
             for (int i = 0; i <= divisions; i++)
             {
                 float pos = -halfSize + i * step;
 
                 //竖线
+                Vector3 startPoint1 = Vector3.TransformPosition(new Vector3(pos, 0, -halfSize), rotationMatrix);
+                Vector3 endPoint1 = Vector3.TransformPosition(new Vector3(pos, 0, halfSize), rotationMatrix);
+
                 vertices.Add(new Vertex
                 {
-                    Position = new Vector3(pos, 0, -halfSize),
+                    Position = startPoint1,
                     Color = color,
                     TextureCoord = Vector2.Zero,
-                    Normal = Vector3.UnitY
+                    Normal = upNormal
                 });
                 vertices.Add(new Vertex
                 {
-                    Position = new Vector3(pos, 0, halfSize),
+                    Position = endPoint1,
                     Color = color,
                     TextureCoord = Vector2.UnitX,
-                    Normal = Vector3.UnitY
+                    Normal = upNormal
                 });
 
                 //横线
+                Vector3 startPoint2 = Vector3.TransformPosition(new Vector3(-halfSize, 0, pos), rotationMatrix);
+                Vector3 endPoint2 = Vector3.TransformPosition(new Vector3(halfSize, 0, pos), rotationMatrix);
+
                 vertices.Add(new Vertex
                 {
-                    Position = new Vector3(-halfSize, 0, pos),
+                    Position = startPoint2,
                     Color = color,
                     TextureCoord = Vector2.Zero,
-                    Normal = Vector3.UnitY
+                    Normal = upNormal
                 });
                 vertices.Add(new Vertex
                 {
-                    Position = new Vector3(halfSize, 0, pos),
+                    Position = endPoint2,
                     Color = color,
                     TextureCoord = Vector2.UnitX,
-                    Normal = Vector3.UnitY
+                    Normal = upNormal
                 });
             }
 

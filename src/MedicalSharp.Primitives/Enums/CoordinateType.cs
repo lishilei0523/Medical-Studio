@@ -3,7 +3,7 @@
     /// <summary>
     /// 坐标系类型
     /// </summary>
-    public enum CoordinateType
+    public enum CoordinateType : byte
     {
         /// <summary>
         /// X轴向上

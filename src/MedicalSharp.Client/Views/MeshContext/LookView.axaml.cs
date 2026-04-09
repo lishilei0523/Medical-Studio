@@ -1,16 +1,16 @@
 ﻿using FluentAvalonia.UI.Windowing;
 
-namespace MedicalSharp.Client.Views.HomeContext
+namespace MedicalSharp.Client.Views.MeshContext
 {
     /// <summary>
-    /// 线框视图
+    /// 查看视图
     /// </summary>
-    public partial class WireframeView : AppWindow
+    public partial class LookView : AppWindow
     {
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public WireframeView()
+        public LookView()
         {
             this.InitializeComponent();
             this.TitleBar.ExtendsContentIntoTitleBar = true;

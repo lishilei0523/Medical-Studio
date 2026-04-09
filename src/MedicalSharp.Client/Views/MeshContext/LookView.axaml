@@ -1,4 +1,4 @@
-﻿<fa:AppWindow x:Class="MedicalSharp.Client.Views.HomeContext.WireframeView"
+﻿<fa:AppWindow x:Class="MedicalSharp.Client.Views.MeshContext.LookView"
 			  xmlns="https://github.com/avaloniaui"
 			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -44,7 +44,7 @@
 				<sd:WireframeViewport Background="Black"
 									  Camera="{Binding OrbitCamera}"
 									  cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
-					<sd:BoundingBoxVisual3D />
+					<sd:BoundingBoxVisual3D Stroke="Red" Fill="#0F00FF00" />
 					<sd:BoundingItemPresenter Content="{Binding BoundingSphere}" />
 					<sd:BoundingItemsPresenter ItemsSource="{Binding BoundingVisuals}" />
 				</sd:WireframeViewport>
