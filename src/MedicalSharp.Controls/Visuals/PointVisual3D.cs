@@ -65,9 +65,9 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable == null)
             {
-                MeshGeometry fillMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
+                MeshGeometry fillMesh = MeshFactory.CreateSphere(0.015f, this.Position.ToVector3());
                 this.Renderable = ShapeRenderable.CreateFill(fillMesh);
-                this.Renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                this.Renderable.SetFill(this.Fill.ToVector4());
             }
         }
         #endregion

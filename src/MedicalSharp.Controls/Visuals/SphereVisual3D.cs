@@ -86,7 +86,8 @@ namespace MedicalSharp.Controls.Visuals
                 MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
                 MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
                 this.Renderable = ShapeRenderable.CreateFull(strokeMesh, fillMesh);
-                this.Renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                this.Renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+                this.Renderable.SetFill(this.Fill.ToVector4());
             }
         }
         #endregion

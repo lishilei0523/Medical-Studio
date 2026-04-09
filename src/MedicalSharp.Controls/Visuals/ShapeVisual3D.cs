@@ -114,7 +114,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         private static void OnStrokeChanged(ShapeVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Color> eventArgs)
         {
-            visual3D.Renderable?.SetColor(eventArgs.NewValue.Value.ToVector4(), visual3D.StrokeThickness, visual3D.Fill.ToVector4());
+            visual3D.Renderable?.SetStroke(eventArgs.NewValue.Value.ToVector4(), visual3D.StrokeThickness);
         }
         #endregion
 
@@ -124,7 +124,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         private static void OnStrokeThicknessChanged(ShapeVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
-            visual3D.Renderable?.SetColor(visual3D.Stroke.ToVector4(), eventArgs.NewValue.Value, visual3D.Fill.ToVector4());
+            visual3D.Renderable?.SetStroke(visual3D.Stroke.ToVector4(), eventArgs.NewValue.Value);
         }
         #endregion
 
@@ -134,7 +134,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         private static void OnFillChanged(ShapeVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Color> eventArgs)
         {
-            visual3D.Renderable?.SetColor(visual3D.Stroke.ToVector4(), visual3D.StrokeThickness, eventArgs.NewValue.Value.ToVector4());
+            visual3D.Renderable?.SetFill(eventArgs.NewValue.Value.ToVector4());
         }
         #endregion
 

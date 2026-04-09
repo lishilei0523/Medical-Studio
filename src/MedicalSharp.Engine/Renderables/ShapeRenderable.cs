@@ -105,6 +105,8 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 方法
 
+        //Static
+
         #region 创建线框形状渲染对象 —— static ShapeRenderable CreateStroke(MeshGeometry strokeMesh)
         /// <summary>
         /// 创建线框形状渲染对象
@@ -297,17 +299,26 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 设置颜色 —— void SetColor(Vector4 stroke, float strokeThickness...
+        #region 设置线框 —— void SetStroke(Vector4 stroke, float strokeThickness)
         /// <summary>
-        /// 设置颜色
+        /// 设置线框
         /// </summary>
         /// <param name="stroke">线框颜色</param>
         /// <param name="strokeThickness">线框粗细</param>
-        /// <param name="fill">填充颜色</param>
-        public void SetColor(Vector4 stroke, float strokeThickness, Vector4 fill)
+        public void SetStroke(Vector4 stroke, float strokeThickness)
         {
             this.Stroke = stroke;
             this.StrokeThickness = strokeThickness;
+        }
+        #endregion
+
+        #region 设置填充 —— void SetFill(Vector4 fill)
+        /// <summary>
+        /// 设置填充
+        /// </summary>
+        /// <param name="fill">填充颜色</param>
+        public void SetFill(Vector4 fill)
+        {
             this.Fill = fill;
         }
         #endregion
@@ -405,7 +416,21 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            IEnumerable<Vector3> positions = this.StrokeBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
+            VertexBuffer vertexBuffer;
+            if (this.StrokeBuffer != null)
+            {
+                vertexBuffer = this.StrokeBuffer;
+            }
+            else if (this.FillBuffer != null)
+            {
+                vertexBuffer = this.FillBuffer;
+            }
+            else
+            {
+                throw new InvalidOperationException("线框与填充顶点缓冲区不可同时为null！");
+            }
+
+            IEnumerable<Vector3> positions = vertexBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
             BoundingBox boundingBox = BoundingBox.FromPoints([.. positions]);
 
             return boundingBox;
