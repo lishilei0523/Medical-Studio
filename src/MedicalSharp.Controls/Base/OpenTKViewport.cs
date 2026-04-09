@@ -46,6 +46,10 @@ namespace MedicalSharp.Controls.Base
             InputManagerProperty = AvaloniaProperty.Register<OpenTKViewport, InputManager>(nameof(InputManager));
         }
 
+        /// <summary>
+        /// FBO
+        /// </summary>
+        private int _frameBufferId;
 
         /// <summary>
         /// OpenGL上下文
@@ -53,9 +57,9 @@ namespace MedicalSharp.Controls.Base
         private IGlContext _glContext;
 
         /// <summary>
-        /// FBO
+        /// OpenGL是否已初始化
         /// </summary>
-        private int _frameBufferId;
+        protected bool _glInitialized;
 
         /// <summary>
         /// 视口尺寸
@@ -68,6 +72,7 @@ namespace MedicalSharp.Controls.Base
         protected OpenTKViewport()
         {
             this._frameBufferId = 0;
+            this._glInitialized = false;
             this.Focusable = true;
         }
 
@@ -166,6 +171,8 @@ namespace MedicalSharp.Controls.Base
             AvaloniaBindingsContext bindingsContext = new AvaloniaBindingsContext(glInterface);
             GL.LoadBindings(bindingsContext);
 
+            this._glInitialized = true;
+
             this.OnOpenTKInit();
         }
         #endregion
@@ -199,6 +206,9 @@ namespace MedicalSharp.Controls.Base
 
             //清理颜色及深度缓存
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            //开启深度测试
+            GL.Enable(EnableCap.DepthTest);
 
             //OpenTK渲染
             this.OnOpenTKRender(this._viewportSize);

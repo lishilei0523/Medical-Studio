@@ -172,9 +172,6 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="viewportSize">视口尺寸</param>
         protected override void OnOpenTKRender(PixelSize viewportSize)
         {
-            //开启深度测试
-            GL.Enable(EnableCap.DepthTest);
-
             //禁用面剔除
             GL.Disable(EnableCap.CullFace);
 
@@ -187,11 +184,13 @@ namespace MedicalSharp.Controls.Viewports
             {
                 if (visual3D is BoundingVisual3D boundingVisual3D)
                 {
+                    boundingVisual3D.EnsureRenderable();
                     this._boundingVisual3Ds.Add(boundingVisual3D);
                     this._renderer.AppendItem(boundingVisual3D.Renderable);
                 }
                 if (visual3D is BoundingItemPresenter itemPresenter)
                 {
+                    itemPresenter.Content.EnsureRenderable();
                     this._boundingVisual3Ds.Add(itemPresenter.Content);
                     this._renderer.AppendItem(itemPresenter.Content.Renderable);
                 }
@@ -199,6 +198,7 @@ namespace MedicalSharp.Controls.Viewports
                 {
                     foreach (BoundingVisual3D item in itemsPresenter.ItemsSource)
                     {
+                        item.EnsureRenderable();
                         this._boundingVisual3Ds.Add(item);
                         this._renderer.AppendItem(item.Renderable);
                     }

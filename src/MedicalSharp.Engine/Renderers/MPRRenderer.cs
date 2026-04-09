@@ -128,10 +128,14 @@ namespace MedicalSharp.Engine.Renderers
         /// <param name="plane">MPR平面</param>
         public void BindPlane(MPRPlane plane)
         {
+            #region # 验证
+
             if (this._plane == plane)
             {
                 return;
             }
+
+            #endregion
 
             if (this._plane != null)
             {
@@ -142,12 +146,7 @@ namespace MedicalSharp.Engine.Renderers
             if (this._plane != null)
             {
                 this._plane.PlaneChangedEvent += this.OnPlaneChanged;
-
-                if (this.MPRCamera != null)
-                {
-                    this.MPRCamera.BindPlane(this._plane);
-                }
-
+                this.MPRCamera?.BindPlane(this._plane);
                 this.UpdateModelMatrix();
             }
         }

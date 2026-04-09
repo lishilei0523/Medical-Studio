@@ -322,15 +322,12 @@ namespace MedicalSharp.Controls.Viewports
         {
             if (this._volumeRenderable != null)
             {
-                //开启深度测试
-                GL.Enable(EnableCap.DepthTest);
+                //禁用面剔除
+                GL.Disable(EnableCap.CullFace);
 
                 //启用混合
                 GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
-                //禁用面剔除
-                GL.Disable(EnableCap.CullFace);
 
                 this._volumeRenderer.SetRenderable(this._volumeRenderable);
                 this._volumeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);

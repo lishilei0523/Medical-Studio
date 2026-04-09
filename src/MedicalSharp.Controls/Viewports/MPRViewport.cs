@@ -252,9 +252,6 @@ namespace MedicalSharp.Controls.Viewports
         {
             if (this._volumeRenderable != null)
             {
-                //开启深度测试
-                GL.Enable(EnableCap.DepthTest);
-
                 //关闭混合
                 GL.Disable(EnableCap.Blend);
 

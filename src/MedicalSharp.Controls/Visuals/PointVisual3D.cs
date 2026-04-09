@@ -31,16 +31,11 @@ namespace MedicalSharp.Controls.Visuals
 
 
         /// <summary>
-        /// 线框渲染对象
-        /// </summary>
-        private WireframeRenderable _renderable;
-
-        /// <summary>
         /// 默认构造器
         /// </summary>
         public PointVisual3D()
         {
-            this._renderable = null;
+
         }
 
         #endregion
@@ -58,30 +53,25 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 只读属性 - 线框渲染对象 —— override WireframeRenderable Renderable
-        /// <summary>
-        /// 只读属性 - 线框渲染对象
-        /// </summary>
-        public override WireframeRenderable Renderable
-        {
-            get
-            {
-                if (this._renderable == null)
-                {
-                    MeshGeometry strokeMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
-                    MeshGeometry fillMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
-                    this._renderable = new WireframeRenderable(strokeMesh, fillMesh);
-                    this._renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-                }
-
-                return this._renderable;
-            }
-        }
-        #endregion
-
         #endregion
 
         #region # 方法
+
+        #region 确保渲染对象 —— override void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal override void EnsureRenderable()
+        {
+            if (this.Renderable == null)
+            {
+                MeshGeometry strokeMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
+                MeshGeometry fillMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
+                this.Renderable = new WireframeRenderable(strokeMesh, fillMesh);
+                this.Renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+            }
+        }
+        #endregion
 
         #region 更新渲染对象 —— void UpdateRenderable()
         /// <summary>
@@ -89,11 +79,11 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         private void UpdateRenderable()
         {
-            if (this._renderable != null)
+            if (this.Renderable != null)
             {
                 MeshGeometry strokeMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
                 MeshGeometry fillMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
-                this._renderable.Update(strokeMesh, fillMesh);
+                this.Renderable.Update(strokeMesh, fillMesh);
             }
         }
         #endregion
