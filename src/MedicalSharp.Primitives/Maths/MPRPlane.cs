@@ -521,25 +521,26 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 获取平面上的体素坐标 —— Vector3i GetVoxelPosition(float u, float v)
+        #region 获取平面上的体素坐标 —— Vector3i GetVoxelPosition(float u, float v...
         /// <summary>
         /// 获取平面上的体素坐标
         /// </summary>
         /// <param name="u">U坐标，[-1, 1]</param>
         /// <param name="v">V坐标，[-1, 1]</param>
+        /// <param name="textureCoord">纹理坐标</param>
         /// <returns>体素坐标，[0, VolumeSize-1]</returns>
-        public Vector3i GetVoxelPosition(float u, float v)
+        public Vector3i GetVoxelPosition(float u, float v, out Vector3 textureCoord)
         {
             //先获取逻辑空间点（-0.5到0.5）
             Vector3 localPoint = this.GetPointOnPlane(u, v);
 
             //逻辑空间 -> 纹理坐标（0到1）
-            Vector3 texCoord = localPoint + new Vector3(0.5f);
+            textureCoord = localPoint + new Vector3(0.5f);
 
             //纹理坐标 -> 体素坐标
-            int x = (int)Math.Floor(texCoord.X * this.VolumeMetadata.VolumeSize.X);
-            int y = (int)Math.Floor(texCoord.Y * this.VolumeMetadata.VolumeSize.Y);
-            int z = (int)Math.Floor(texCoord.Z * this.VolumeMetadata.VolumeSize.Z);
+            int x = (int)Math.Floor(textureCoord.X * this.VolumeMetadata.VolumeSize.X);
+            int y = (int)Math.Floor(textureCoord.Y * this.VolumeMetadata.VolumeSize.Y);
+            int z = (int)Math.Floor(textureCoord.Z * this.VolumeMetadata.VolumeSize.Z);
 
             //边界裁剪
             x = Math.Clamp(x, 0, this.VolumeMetadata.VolumeSize.X - 1);

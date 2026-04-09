@@ -256,23 +256,25 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
-        #region 查找最近元素 —— bool FindNearest(Vector2 position, out Vector3i? voxelPosition...
+        #region 查找最近元素 —— bool FindNearest(Vector2 position, out Vector3? textureCoord...
         /// <summary>
         /// 查找最近元素
         /// </summary>
         /// <param name="position">2D位置</param>
+        /// <param name="textureCoord">纹理坐标</param>
         /// <param name="voxelPosition">体素坐标</param>
         /// <param name="voxelValue">体素HU值</param>
         /// <returns>是否成功</returns>
-        public bool FindNearest(Vector2 position, out Vector3i? voxelPosition, out short? voxelValue)
+        public bool FindNearest(Vector2 position, out Vector3? textureCoord, out Vector3i? voxelPosition, out short? voxelValue)
         {
             this.GlContext.MakeCurrent();
 
+            textureCoord = null;
             voxelPosition = null;
             voxelValue = null;
 
             Ray ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
-            voxelPosition = this._volumeRenderer.PickVoxel(ray, this._viewportSize.Width, this._viewportSize.Height);
+            voxelPosition = this._volumeRenderer.PickVoxel(ray, this._viewportSize.Width, this._viewportSize.Height, out textureCoord);
             if (voxelPosition.HasValue)
             {
                 voxelValue = this.VolumeData[voxelPosition.Value.X, voxelPosition.Value.Y, voxelPosition.Value.Z];

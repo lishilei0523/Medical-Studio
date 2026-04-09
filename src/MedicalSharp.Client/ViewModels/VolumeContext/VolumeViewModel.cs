@@ -132,11 +132,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             if (this.VolumeData != null && eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3i? voxelPostion, out short? voxelValue);
+                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3? textureCoord, out Vector3i? voxelPostion, out short? voxelValue);
                 if (success)
                 {
                     StringBuilder builder = new StringBuilder();
                     builder.AppendLine($"点击2D坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
+                    builder.AppendLine($"点击纹理坐标: X:{textureCoord.Value.X}, Y:{textureCoord.Value.Y}, Z:{textureCoord.Value.Z}");
                     builder.AppendLine($"点击体素坐标: X:{voxelPostion.Value.X}, Y:{voxelPostion.Value.Y}, Z:{voxelPostion.Value.Z}");
                     builder.AppendLine($"点击体素HU值: {voxelValue}");
                     MessageBox.Show(builder.ToString(), "成功", MessageBoxButton.OK, PackIconMaterialDesignKind.Info);

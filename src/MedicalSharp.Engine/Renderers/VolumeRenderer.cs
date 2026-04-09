@@ -286,28 +286,32 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 拾取体素 —— Vector3i? PickVoxel(Ray ray, float viewportWidth, float viewportHeight)
+        #region 拾取体素 —— Vector3i? PickVoxel(Ray ray, float viewportWidth, float viewportHeight...
         /// <summary>
         /// 拾取体素
         /// </summary>
         /// <param name="ray">射线（世界空间）</param>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
+        /// <param name="textureCoord">纹理坐标</param>
         /// <returns>体素坐标，未命中返回null</returns>
-        public Vector3i? PickVoxel(Ray ray, float viewportWidth, float viewportHeight)
+        public Vector3i? PickVoxel(Ray ray, float viewportWidth, float viewportHeight, out Vector3? textureCoord)
         {
             #region # 验证
 
             if (this.Renderable == null)
             {
+                textureCoord = null;
                 return null;
             }
             if (this.Camera == null)
             {
+                textureCoord = null;
                 return null;
             }
             if (this._pickProgram == null)
             {
+                textureCoord = null;
                 return null;
             }
 
@@ -335,8 +339,12 @@ namespace MedicalSharp.Engine.Renderers
             //过滤纹理坐标
             if (pixel[0] < 0.001f && pixel[1] < 0.001f && pixel[2] < 0.001f)
             {
+                textureCoord = null;
                 return null;
             }
+
+            //提取纹理坐标
+            textureCoord = new Vector3(pixel[0], pixel[1], pixel[2]);
 
             //转换体素坐标
             int voxelX = (int)Math.Ceiling(pixel[0] * this.Renderable.VolumeTexture.Width);
