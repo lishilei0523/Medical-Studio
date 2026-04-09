@@ -8,6 +8,5 @@ uniform mat4 u_ModelMatrix;
 void main()
 {
 	//位置变换
-	/* 混合注释 */
 	gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix * vec4(aPos, 1.0);
 }

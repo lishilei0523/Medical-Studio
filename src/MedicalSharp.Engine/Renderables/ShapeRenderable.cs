@@ -9,9 +9,9 @@ using System.Linq;
 namespace MedicalSharp.Engine.Renderables
 {
     /// <summary>
-    /// 线框渲染对象
+    /// 形状渲染对象
     /// </summary>
-    public class WireframeRenderable : Renderable, IDisposable
+    public class ShapeRenderable : Renderable, IDisposable
     {
         #region # 字段及构造器
 
@@ -33,7 +33,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 默认构造器
         /// </summary>
-        private WireframeRenderable()
+        private ShapeRenderable()
         {
             this._triangles = new List<Triangle>();
             this.Stroke = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -42,11 +42,11 @@ namespace MedicalSharp.Engine.Renderables
         }
 
         /// <summary>
-        /// 创建线框渲染对象构造器
+        /// 创建形状渲染对象构造器
         /// </summary>
         /// <param name="strokeMesh">线框网格</param>
         /// <param name="fillMesh">填充网格</param>
-        public WireframeRenderable(MeshGeometry strokeMesh, MeshGeometry fillMesh)
+        public ShapeRenderable(MeshGeometry strokeMesh, MeshGeometry fillMesh)
             : this()
         {
             #region # 验证
@@ -132,9 +132,9 @@ namespace MedicalSharp.Engine.Renderables
 
         //Public
 
-        #region 更新线框渲染对象 —— void Update(MeshGeometry strokeMesh, MeshGeometry fillMesh)
+        #region 更新形状渲染对象 —— void Update(MeshGeometry strokeMesh, MeshGeometry fillMesh)
         /// <summary>
-        /// 更新线框渲染对象
+        /// 更新形状渲染对象
         /// </summary>
         /// <param name="strokeMesh">线框网格</param>
         /// <param name="fillMesh">填充网格</param>

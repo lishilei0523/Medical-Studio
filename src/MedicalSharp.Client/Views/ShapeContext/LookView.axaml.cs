@@ -1,6 +1,6 @@
 ﻿using FluentAvalonia.UI.Windowing;
 
-namespace MedicalSharp.Client.Views.MeshContext
+namespace MedicalSharp.Client.Views.ShapeContext
 {
     /// <summary>
     /// 查看视图

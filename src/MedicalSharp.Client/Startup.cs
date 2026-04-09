@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Caliburn.Micro;
-using MedicalSharp.Client.ViewModels.MeshContext;
+using MedicalSharp.Client.ViewModels.ShapeContext;
 using MedicalSharp.Insight;
 using Microsoft.Extensions.DependencyInjection;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;

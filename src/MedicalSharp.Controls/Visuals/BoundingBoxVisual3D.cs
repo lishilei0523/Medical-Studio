@@ -123,7 +123,7 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
                 MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
-                this.Renderable = new WireframeRenderable(strokeMesh, fillMesh);
+                this.Renderable = new ShapeRenderable(strokeMesh, fillMesh);
                 this.Renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }

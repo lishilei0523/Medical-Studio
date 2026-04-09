@@ -44,7 +44,7 @@ namespace MedicalSharp.Engine.Renderers
         }
 
         /// <summary>
-        /// 创建线框渲染器构造器
+        /// 创建渲染器构造器
         /// </summary>
         /// <param name="camera">相机</param>
         /// <param name="program">Shader程序</param>

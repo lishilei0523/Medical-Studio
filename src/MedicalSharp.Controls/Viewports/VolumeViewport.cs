@@ -109,9 +109,9 @@ namespace MedicalSharp.Controls.Viewports
         private VolumeRenderer _volumeRenderer;
 
         /// <summary>
-        /// 线框渲染器
+        /// 形状渲染器
         /// </summary>
-        private WireframeRenderer _wireframeRenderer;
+        private ShapeRenderer _shapeRenderer;
 
         /// <summary>
         /// 默认构造器
@@ -242,13 +242,13 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 只读属性 - 线框渲染器 —— WireframeRenderer WireframeRenderer
+        #region 只读属性 - 形状渲染器 —— ShapeRenderer ShapeRenderer
         /// <summary>
-        /// 只读属性 - 线框渲染器
+        /// 只读属性 - 形状渲染器
         /// </summary>
-        public WireframeRenderer WireframeRenderer
+        public ShapeRenderer ShapeRenderer
         {
-            get => this._wireframeRenderer;
+            get => this._shapeRenderer;
         }
         #endregion
 
@@ -304,11 +304,11 @@ namespace MedicalSharp.Controls.Viewports
             this._volumeRenderer.SetSamplingOptions(this.StepSize, this.MaxStepsCount, this.OpacityThreshold);
             this._volumeRenderer.TransferFunction.InitFromControlPoints(this.TFControlPoints);
 
-            //初始化线框渲染器
-            this._wireframeRenderer = new WireframeRenderer(this.Camera);
+            //初始化形状渲染器
+            this._shapeRenderer = new ShapeRenderer(this.Camera);
             foreach (BoundingVisual3D visual3D in this.Children)
             {
-                this._wireframeRenderer.AppendItem(visual3D.Renderable);
+                this._shapeRenderer.AppendItem(visual3D.Renderable);
             }
         }
         #endregion
@@ -342,7 +342,7 @@ namespace MedicalSharp.Controls.Viewports
         protected override void OnOpenTKDeinit()
         {
             this._volumeRenderer?.Dispose();
-            this._wireframeRenderer?.Dispose();
+            this._shapeRenderer?.Dispose();
         }
         #endregion 
 

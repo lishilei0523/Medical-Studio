@@ -9,52 +9,52 @@ using System.Collections.Generic;
 namespace MedicalSharp.Engine.Renderers
 {
     /// <summary>
-    /// 线框渲染器
+    /// 形状渲染器
     /// </summary>
-    public class WireframeRenderer : Renderer
+    public class ShapeRenderer : Renderer
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 渲染对象列表
         /// </summary>
-        private readonly ICollection<WireframeRenderable> _renderables;
+        private readonly ICollection<ShapeRenderable> _renderables;
 
         /// <summary>
-        /// 创建线框渲染器构造器
+        /// 创建形状渲染器构造器
         /// </summary>
         /// <param name="camera">相机</param>
-        public WireframeRenderer(Camera camera)
+        public ShapeRenderer(Camera camera)
             : base(camera)
         {
             //默认值
-            this._renderables = new HashSet<WireframeRenderable>();
+            this._renderables = new HashSet<ShapeRenderable>();
             this.InitShaderProgram();
         }
 
         /// <summary>
-        /// 创建线框渲染器构造器
+        /// 创建形状渲染器构造器
         /// </summary>
         /// <param name="camera">相机</param>
         /// <param name="program">Shader程序</param>
-        public WireframeRenderer(Camera camera, ShaderProgram program)
+        public ShapeRenderer(Camera camera, ShaderProgram program)
             : base(camera, program)
         {
             //默认值
-            this._renderables = new HashSet<WireframeRenderable>();
+            this._renderables = new HashSet<ShapeRenderable>();
         }
 
         #endregion
 
         #region # 属性
 
-        #region 只读属性 - 渲染对象列表 —— IReadOnlySet<WireframeRenderable> Renderables
+        #region 只读属性 - 渲染对象列表 —— IReadOnlySet<ShapeRenderable> Renderables
         /// <summary>
         /// 只读属性 - 渲染对象列表
         /// </summary>
-        public IReadOnlySet<WireframeRenderable> Renderables
+        public IReadOnlySet<ShapeRenderable> Renderables
         {
-            get => (IReadOnlySet<WireframeRenderable>)this._renderables;
+            get => (IReadOnlySet<ShapeRenderable>)this._renderables;
         }
         #endregion
 
@@ -64,28 +64,28 @@ namespace MedicalSharp.Engine.Renderers
 
         //Public
 
-        #region 追加渲染对象 —— void AppendItem(WireframeRenderable renderable)
+        #region 追加渲染对象 —— void AppendItem(ShapeRenderable renderable)
         /// <summary>
         /// 追加渲染对象
         /// </summary>
         /// <param name="renderable">渲染对象</param>
-        public void AppendItem(WireframeRenderable renderable)
+        public void AppendItem(ShapeRenderable renderable)
         {
             if (renderable == null)
             {
-                throw new ArgumentNullException(nameof(renderable), "线框渲染对象不可为空！");
+                throw new ArgumentNullException(nameof(renderable), "形状渲染对象不可为空！");
             }
 
             this._renderables.Add(renderable);
         }
         #endregion
 
-        #region 删除渲染对象 —— void RemoveItem(WireframeRenderable renderable)
+        #region 删除渲染对象 —— void RemoveItem(ShapeRenderable renderable)
         /// <summary>
         /// 删除渲染对象
         /// </summary>
         /// <param name="renderable">渲染对象</param>
-        public void RemoveItem(WireframeRenderable renderable)
+        public void RemoveItem(ShapeRenderable renderable)
         {
             if (renderable == null)
             {
@@ -145,7 +145,7 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
             this.Program.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
 
-            foreach (WireframeRenderable renderable in this._renderables)
+            foreach (ShapeRenderable renderable in this._renderables)
             {
                 //设置模型矩阵
                 this.Program.SetUniformMatrix4("u_ModelMatrix", renderable.ModelMatrix);
@@ -185,7 +185,7 @@ namespace MedicalSharp.Engine.Renderers
         {
             base.Dispose();
 
-            foreach (WireframeRenderable renderable in this._renderables)
+            foreach (ShapeRenderable renderable in this._renderables)
             {
                 renderable.Dispose();
             }
@@ -204,8 +204,8 @@ namespace MedicalSharp.Engine.Renderers
         private void InitShaderProgram()
         {
             base.Program = new ShaderProgram();
-            base.Program.ReadVertexShaderFromFile("Resources/GLSLs/wireframe.vert");
-            base.Program.ReadFragmentShaderFromFile("Resources/GLSLs/wireframe.frag");
+            base.Program.ReadVertexShaderFromFile("Resources/GLSLs/shape.vert");
+            base.Program.ReadFragmentShaderFromFile("Resources/GLSLs/shape.frag");
             base.Program.Build();
         }
         #endregion 

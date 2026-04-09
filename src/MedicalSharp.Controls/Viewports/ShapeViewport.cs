@@ -17,16 +17,16 @@ using System.Linq;
 namespace MedicalSharp.Controls.Viewports
 {
     /// <summary>
-    /// 线框渲染视口
+    /// 形状渲染视口
     /// </summary>
-    public class WireframeViewport : OpenTKViewport
+    public class ShapeViewport : OpenTKViewport
     {
         #region # 字段及构造器
 
         /// <summary>
-        /// 线框渲染器
+        /// 形状渲染器
         /// </summary>
-        private WireframeRenderer _renderer;
+        private ShapeRenderer _renderer;
 
         /// <summary>
         /// 边界3D元素列表
@@ -36,7 +36,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public WireframeViewport()
+        public ShapeViewport()
         {
             this._boundingVisual3Ds = new List<BoundingVisual3D>();
             this.Children = new AvaloniaList<Visual3D>();
@@ -55,11 +55,11 @@ namespace MedicalSharp.Controls.Viewports
         public AvaloniaList<Visual3D> Children { get; private set; }
         #endregion
 
-        #region 只读属性 - 线框渲染器 —— WireframeRenderer Renderer
+        #region 只读属性 - 形状渲染器 —— ShapeRenderer Renderer
         /// <summary>
-        /// 只读属性 - 线框渲染器
+        /// 只读属性 - 形状渲染器
         /// </summary>
-        public WireframeRenderer Renderer
+        public ShapeRenderer Renderer
         {
             get => this._renderer;
         }
@@ -161,7 +161,7 @@ namespace MedicalSharp.Controls.Viewports
                 this.InputManager = new OrbitInputManager(orbitCamera);
             }
 
-            this._renderer = new WireframeRenderer(this.Camera);
+            this._renderer = new ShapeRenderer(this.Camera);
         }
         #endregion
 

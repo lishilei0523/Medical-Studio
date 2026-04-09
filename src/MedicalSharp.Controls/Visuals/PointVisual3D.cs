@@ -67,7 +67,7 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
                 MeshGeometry fillMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
-                this.Renderable = new WireframeRenderable(strokeMesh, fillMesh);
+                this.Renderable = new ShapeRenderable(strokeMesh, fillMesh);
                 this.Renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }

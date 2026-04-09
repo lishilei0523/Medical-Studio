@@ -17,7 +17,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MedicalSharp.Client.ViewModels.MeshContext
+namespace MedicalSharp.Client.ViewModels.ShapeContext
 {
     /// <summary>
     /// 查看视图模型
@@ -111,11 +111,11 @@ namespace MedicalSharp.Client.ViewModels.MeshContext
 
         //Actions
 
-        #region 视口鼠标按下事件 —— void OnViewportPointerPressed(WireframeViewport viewport...
+        #region 视口鼠标按下事件 —— void OnViewportPointerPressed(ShapeViewport viewport...
         /// <summary>
         /// 视口鼠标按下事件
         /// </summary>
-        public void OnViewportPointerPressed(WireframeViewport viewport, PointerPressedEventArgs eventArgs)
+        public void OnViewportPointerPressed(ShapeViewport viewport, PointerPressedEventArgs eventArgs)
         {
             if (eventArgs.Properties.IsLeftButtonPressed)
             {

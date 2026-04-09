@@ -80,11 +80,11 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 线框渲染对象 —— WireframeRenderable Renderable
+        #region 形状渲染对象 —— ShapeRenderable Renderable
         /// <summary>
-        /// 线框渲染对象
+        /// 形状渲染对象
         /// </summary>
-        public WireframeRenderable Renderable { get; protected set; }
+        public ShapeRenderable Renderable { get; protected set; }
         #endregion
 
         #endregion
