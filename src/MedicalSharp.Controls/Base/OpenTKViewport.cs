@@ -209,6 +209,7 @@ namespace MedicalSharp.Controls.Base
 
             //开启深度测试
             GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Less);
 
             //OpenTK渲染
             this.OnOpenTKRender(this._viewportSize);
