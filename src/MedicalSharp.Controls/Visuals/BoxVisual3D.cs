@@ -9,9 +9,9 @@ using OpenTK.Graphics.OpenGL4;
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
-    /// 边界立方体3D元素
+    /// 立方体3D元素
     /// </summary>
-    public class BoundingBoxVisual3D : BoundingVisual3D
+    public class BoxVisual3D : ShapeVisual3D
     {
         #region # 字段及构造器
 
@@ -38,25 +38,25 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static BoundingBoxVisual3D()
+        static BoxVisual3D()
         {
-            WidthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Width), 1.0f);
-            HeightProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Height), 1.0f);
-            DepthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Depth), 1.0f);
-            CenterProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+            WidthProperty = AvaloniaProperty.Register<BoxVisual3D, float>(nameof(Width), 1.0f);
+            HeightProperty = AvaloniaProperty.Register<BoxVisual3D, float>(nameof(Height), 1.0f);
+            DepthProperty = AvaloniaProperty.Register<BoxVisual3D, float>(nameof(Depth), 1.0f);
+            CenterProperty = AvaloniaProperty.Register<BoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
 
             //属性改变事件
-            WidthProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnWidthChanged);
-            HeightProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnHeightChanged);
-            DepthProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnDepthChanged);
-            CenterProperty.Changed.AddClassHandler<BoundingBoxVisual3D, Vector3D>(OnCenterChanged);
+            WidthProperty.Changed.AddClassHandler<BoxVisual3D, float>(OnWidthChanged);
+            HeightProperty.Changed.AddClassHandler<BoxVisual3D, float>(OnHeightChanged);
+            DepthProperty.Changed.AddClassHandler<BoxVisual3D, float>(OnDepthChanged);
+            CenterProperty.Changed.AddClassHandler<BoxVisual3D, Vector3D>(OnCenterChanged);
         }
 
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public BoundingBoxVisual3D()
+        public BoxVisual3D()
         {
 
         }
@@ -123,7 +123,7 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
                 MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
-                this.Renderable = new ShapeRenderable(strokeMesh, fillMesh);
+                this.Renderable = ShapeRenderable.CreateFull(strokeMesh, fillMesh);
                 this.Renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }
@@ -139,46 +139,46 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
                 MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
-                this.Renderable.Update(strokeMesh, fillMesh);
+                this.Renderable.UpdateFull(strokeMesh, fillMesh);
             }
         }
         #endregion
 
-        #region 宽度改变事件 —— static void OnWidthChanged(BoundingBoxVisual3D visual3D...
+        #region 宽度改变事件 —— static void OnWidthChanged(BoxVisual3D visual3D...
         /// <summary>
         /// 宽度改变事件
         /// </summary>
-        private static void OnWidthChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnWidthChanged(BoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
         #endregion
 
-        #region 高度改变事件 —— static void OnHeightChanged(BoundingBoxVisual3D visual3D...
+        #region 高度改变事件 —— static void OnHeightChanged(BoxVisual3D visual3D...
         /// <summary>
         /// 高度改变事件
         /// </summary>
-        private static void OnHeightChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnHeightChanged(BoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
         #endregion
 
-        #region 深度改变事件 —— static void OnDepthChanged(BoundingBoxVisual3D visual3D...
+        #region 深度改变事件 —— static void OnDepthChanged(BoxVisual3D visual3D...
         /// <summary>
         /// 深度改变事件
         /// </summary>
-        private static void OnDepthChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnDepthChanged(BoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
         #endregion
 
-        #region 中心位置改变事件 —— static void OnCenterChanged(BoundingBoxVisual3D visual3D...
+        #region 中心位置改变事件 —— static void OnCenterChanged(BoxVisual3D visual3D...
         /// <summary>
         /// 中心位置改变事件
         /// </summary>
-        private static void OnCenterChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
+        private static void OnCenterChanged(BoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
         {
             visual3D.UpdateRenderable();
         }

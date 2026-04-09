@@ -118,19 +118,19 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         public VolumeViewport()
         {
-            this.Children = new AvaloniaList<BoundingVisual3D>();
+            this.Children = new AvaloniaList<ShapeVisual3D>();
         }
 
         #endregion
 
         #region # 属性
 
-        #region 子元素列表 —— AvaloniaList<BoundingVisual3D> Children
+        #region 子元素列表 —— AvaloniaList<SphereVisual3D> Children
         /// <summary>
         /// 子元素列表
         /// </summary>
         [Content]
-        public AvaloniaList<BoundingVisual3D> Children { get; private set; }
+        public AvaloniaList<ShapeVisual3D> Children { get; private set; }
         #endregion
 
         #region 依赖属性 - 窗宽 —— float WindowWidth
@@ -306,7 +306,7 @@ namespace MedicalSharp.Controls.Viewports
 
             //初始化形状渲染器
             this._shapeRenderer = new ShapeRenderer(this.Camera);
-            foreach (BoundingVisual3D visual3D in this.Children)
+            foreach (ShapeVisual3D visual3D in this.Children)
             {
                 this._shapeRenderer.AppendItem(visual3D.Renderable);
             }

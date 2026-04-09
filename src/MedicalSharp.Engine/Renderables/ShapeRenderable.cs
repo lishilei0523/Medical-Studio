@@ -16,6 +16,11 @@ namespace MedicalSharp.Engine.Renderables
         #region # 字段及构造器
 
         /// <summary>
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
         /// 线框顶点缓冲区
         /// </summary>
         private VertexBuffer _strokeBuffer;
@@ -39,36 +44,6 @@ namespace MedicalSharp.Engine.Renderables
             this.Stroke = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
             this.StrokeThickness = 1.0f;
             this.Fill = new Vector4(1.0f, 0.0f, 0.0f, 0.1f);
-        }
-
-        /// <summary>
-        /// 创建形状渲染对象构造器
-        /// </summary>
-        /// <param name="strokeMesh">线框网格</param>
-        /// <param name="fillMesh">填充网格</param>
-        public ShapeRenderable(MeshGeometry strokeMesh, MeshGeometry fillMesh)
-            : this()
-        {
-            #region # 验证
-
-            if (strokeMesh == null)
-            {
-                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
-            }
-            if (fillMesh == null)
-            {
-                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
-            }
-
-            #endregion
-
-            this._strokeBuffer = new VertexBuffer(strokeMesh);
-            this._fillBuffer = new VertexBuffer(fillMesh);
-            this._strokeBuffer.Setup();
-            this._fillBuffer.Setup();
-
-            //提取三角形面数据
-            this.ExtractTriangles();
         }
 
         #endregion
@@ -130,15 +105,167 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 方法
 
-        //Public
-
-        #region 更新形状渲染对象 —— void Update(MeshGeometry strokeMesh, MeshGeometry fillMesh)
+        #region 创建线框形状渲染对象 —— static ShapeRenderable CreateStroke(MeshGeometry strokeMesh)
         /// <summary>
-        /// 更新形状渲染对象
+        /// 创建线框形状渲染对象
+        /// </summary>
+        /// <param name="strokeMesh">线框网格</param>
+        /// <returns>形状渲染对象</returns>
+        public static ShapeRenderable CreateStroke(MeshGeometry strokeMesh)
+        {
+            #region # 验证
+
+            if (strokeMesh == null)
+            {
+                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
+            }
+
+            #endregion
+
+            ShapeRenderable renderable = new ShapeRenderable();
+            renderable._strokeBuffer = new VertexBuffer(strokeMesh);
+            renderable._strokeBuffer.Setup();
+
+            //提取三角形面数据
+            renderable.ExtractTriangles();
+
+            return renderable;
+        }
+        #endregion
+
+        #region 创建填充形状渲染对象 —— static ShapeRenderable CreateFill(MeshGeometry fillMesh)
+        /// <summary>
+        /// 创建填充形状渲染对象
+        /// </summary>
+        /// <param name="fillMesh">填充网格</param>
+        /// <returns>形状渲染对象</returns>
+        public static ShapeRenderable CreateFill(MeshGeometry fillMesh)
+        {
+            #region # 验证
+
+            if (fillMesh == null)
+            {
+                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
+            }
+
+            #endregion
+
+            ShapeRenderable renderable = new ShapeRenderable();
+            renderable._fillBuffer = new VertexBuffer(fillMesh);
+            renderable._fillBuffer.Setup();
+
+            //提取三角形面数据
+            renderable.ExtractTriangles();
+
+            return renderable;
+        }
+        #endregion
+
+        #region 创建完整形状渲染对象 —— static ShapeRenderable CreateFull(MeshGeometry strokeMesh...
+        /// <summary>
+        /// 创建完整形状渲染对象
         /// </summary>
         /// <param name="strokeMesh">线框网格</param>
         /// <param name="fillMesh">填充网格</param>
-        public void Update(MeshGeometry strokeMesh, MeshGeometry fillMesh)
+        /// <returns>形状渲染对象</returns>
+        public static ShapeRenderable CreateFull(MeshGeometry strokeMesh, MeshGeometry fillMesh)
+        {
+            #region # 验证
+
+            if (strokeMesh == null)
+            {
+                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
+            }
+            if (fillMesh == null)
+            {
+                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
+            }
+
+            #endregion
+
+            ShapeRenderable renderable = new ShapeRenderable();
+            renderable._strokeBuffer = new VertexBuffer(strokeMesh);
+            renderable._fillBuffer = new VertexBuffer(fillMesh);
+            renderable._strokeBuffer.Setup();
+            renderable._fillBuffer.Setup();
+
+            //提取三角形面数据
+            renderable.ExtractTriangles();
+
+            return renderable;
+        }
+        #endregion
+
+
+        //Public
+
+        #region 更新线框形状渲染对象 —— void UpdateStroke(MeshGeometry strokeMesh)
+        /// <summary>
+        /// 更新线框形状渲染对象
+        /// </summary>
+        /// <param name="strokeMesh">线框网格</param>
+        public void UpdateStroke(MeshGeometry strokeMesh)
+        {
+            #region # 验证
+
+            if (strokeMesh == null)
+            {
+                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
+            }
+
+            #endregion
+
+            //先释放旧的
+            this._strokeBuffer.Dispose();
+
+            this._strokeBuffer = new VertexBuffer(strokeMesh);
+            this._strokeBuffer.Setup();
+
+            //提取三角形面数据
+            this.ExtractTriangles();
+
+            //标记包围盒/包围球为脏
+            this.InvalidateBoundings();
+        }
+        #endregion
+
+        #region 更新填充形状渲染对象 —— void UpdateFill(MeshGeometry fillMesh)
+        /// <summary>
+        /// 更新填充形状渲染对象
+        /// </summary>
+        /// <param name="fillMesh">填充网格</param>
+        public void UpdateFill(MeshGeometry fillMesh)
+        {
+            #region # 验证
+
+            if (fillMesh == null)
+            {
+                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
+            }
+
+            #endregion
+
+            //先释放旧的
+            this._fillBuffer.Dispose();
+
+            this._fillBuffer = new VertexBuffer(fillMesh);
+            this._fillBuffer.Setup();
+
+            //提取三角形面数据
+            this.ExtractTriangles();
+
+            //标记包围盒/包围球为脏
+            this.InvalidateBoundings();
+        }
+        #endregion
+
+        #region 更新完整形状渲染对象 —— void UpdateFull(MeshGeometry strokeMesh, MeshGeometry fillMesh)
+        /// <summary>
+        /// 更新完整形状渲染对象
+        /// </summary>
+        /// <param name="strokeMesh">线框网格</param>
+        /// <param name="fillMesh">填充网格</param>
+        public void UpdateFull(MeshGeometry strokeMesh, MeshGeometry fillMesh)
         {
             #region # 验证
 
@@ -256,9 +383,16 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         public void Dispose()
         {
+            if (this._disposed)
+            {
+                return;
+            }
+
             this._triangles.Clear();
-            this._strokeBuffer.Dispose();
-            this._fillBuffer.Dispose();
+            this._strokeBuffer?.Dispose();
+            this._fillBuffer?.Dispose();
+
+            this._disposed = true;
         }
         #endregion
 
@@ -286,9 +420,23 @@ namespace MedicalSharp.Engine.Renderables
         {
             this._triangles.Clear();
 
+            VertexBuffer vertexBuffer;
+            if (this.StrokeBuffer != null)
+            {
+                vertexBuffer = this.StrokeBuffer;
+            }
+            else if (this.FillBuffer != null)
+            {
+                vertexBuffer = this.FillBuffer;
+            }
+            else
+            {
+                throw new InvalidOperationException("线框与填充顶点缓冲区不可同时为null！");
+            }
+
             //获取顶点数据
-            Vertex[] vertices = this.FillBuffer.MeshGeometry.Vertices;
-            uint[] indices = this.FillBuffer.MeshGeometry.Indices;
+            Vertex[] vertices = vertexBuffer.MeshGeometry.Vertices;
+            uint[] indices = vertexBuffer.MeshGeometry.Indices;
             if (indices != null && indices.Any())
             {
                 //有索引：按索引构建三角形

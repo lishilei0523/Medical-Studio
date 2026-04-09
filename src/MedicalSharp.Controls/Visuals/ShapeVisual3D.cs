@@ -7,9 +7,9 @@ using MedicalSharp.Engine.Renderables;
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
-    /// 边界3D元素
+    /// 形状3D元素
     /// </summary>
-    public abstract class BoundingVisual3D : Visual3D
+    public abstract class ShapeVisual3D : Visual3D
     {
         #region # 字段及构造器
 
@@ -31,16 +31,16 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static BoundingVisual3D()
+        static ShapeVisual3D()
         {
-            StrokeProperty = AvaloniaProperty.Register<BoundingVisual3D, Color>(nameof(Stroke), Colors.Red);
-            StrokeThicknessProperty = AvaloniaProperty.Register<BoundingVisual3D, float>(nameof(StrokeThickness), 1.0f);
-            FillProperty = AvaloniaProperty.Register<BoundingVisual3D, Color>(nameof(Fill), Colors.Transparent);
+            StrokeProperty = AvaloniaProperty.Register<ShapeVisual3D, Color>(nameof(Stroke), Colors.Red);
+            StrokeThicknessProperty = AvaloniaProperty.Register<ShapeVisual3D, float>(nameof(StrokeThickness), 1.0f);
+            FillProperty = AvaloniaProperty.Register<ShapeVisual3D, Color>(nameof(Fill), Colors.Transparent);
 
             //属性改变事件
-            StrokeProperty.Changed.AddClassHandler<BoundingVisual3D, Color>(OnStrokeChanged);
-            StrokeThicknessProperty.Changed.AddClassHandler<BoundingVisual3D, float>(OnStrokeThicknessChanged);
-            FillProperty.Changed.AddClassHandler<BoundingVisual3D, Color>(OnFillChanged);
+            StrokeProperty.Changed.AddClassHandler<ShapeVisual3D, Color>(OnStrokeChanged);
+            StrokeThicknessProperty.Changed.AddClassHandler<ShapeVisual3D, float>(OnStrokeThicknessChanged);
+            FillProperty.Changed.AddClassHandler<ShapeVisual3D, Color>(OnFillChanged);
         }
 
         #endregion
@@ -108,31 +108,31 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 线框颜色改变事件 —— static void OnStrokeChanged(BoundingVisual3D visual3D...
+        #region 线框颜色改变事件 —— static void OnStrokeChanged(ShapeVisual3D visual3D...
         /// <summary>
         /// 线框颜色改变事件
         /// </summary>
-        private static void OnStrokeChanged(BoundingVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Color> eventArgs)
+        private static void OnStrokeChanged(ShapeVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Color> eventArgs)
         {
             visual3D.Renderable?.SetColor(eventArgs.NewValue.Value.ToVector4(), visual3D.StrokeThickness, visual3D.Fill.ToVector4());
         }
         #endregion
 
-        #region 线框粗细改变事件 —— static void OnStrokeThicknessChanged(BoundingVisual3D visual3D...
+        #region 线框粗细改变事件 —— static void OnStrokeThicknessChanged(ShapeVisual3D visual3D...
         /// <summary>
         /// 线框粗细改变事件
         /// </summary>
-        private static void OnStrokeThicknessChanged(BoundingVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnStrokeThicknessChanged(ShapeVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.Renderable?.SetColor(visual3D.Stroke.ToVector4(), eventArgs.NewValue.Value, visual3D.Fill.ToVector4());
         }
         #endregion
 
-        #region 填充颜色改变事件 —— static void OnFillChanged(BoundingVisual3D visual3D...
+        #region 填充颜色改变事件 —— static void OnFillChanged(ShapeVisual3D visual3D...
         /// <summary>
         /// 填充颜色改变事件
         /// </summary>
-        private static void OnFillChanged(BoundingVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Color> eventArgs)
+        private static void OnFillChanged(ShapeVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Color> eventArgs)
         {
             visual3D.Renderable?.SetColor(visual3D.Stroke.ToVector4(), visual3D.StrokeThickness, eventArgs.NewValue.Value.ToVector4());
         }

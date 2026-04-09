@@ -29,16 +29,16 @@ namespace MedicalSharp.Controls.Viewports
         private ShapeRenderer _renderer;
 
         /// <summary>
-        /// 边界3D元素列表
+        /// 形状3D元素列表
         /// </summary>
-        private readonly IList<BoundingVisual3D> _boundingVisual3Ds;
+        private readonly IList<ShapeVisual3D> _shapeVisual3Ds;
 
         /// <summary>
         /// 默认构造器
         /// </summary>
         public ShapeViewport()
         {
-            this._boundingVisual3Ds = new List<BoundingVisual3D>();
+            this._shapeVisual3Ds = new List<ShapeVisual3D>();
             this.Children = new AvaloniaList<Visual3D>();
             this.Children.CollectionChanged += this.OnChildrenItemsChanged;
         }
@@ -76,29 +76,29 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="position">2D位置</param>
         /// <param name="point">3D位置</param>
         /// <param name="normal">法向量</param>
-        /// <param name="visual3D">边界3D元素</param>
+        /// <param name="visual3D">3D元素</param>
         /// <returns>是否成功</returns>
-        public bool FindNearest(Vector2 position, out Vector3 point, out Vector3 normal, out BoundingVisual3D visual3D)
+        public bool FindNearest(Vector2 position, out Vector3 point, out Vector3 normal, out ShapeVisual3D visual3D)
         {
             this.GlContext.MakeCurrent();
 
             Ray ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             //快速检测
-            IList<(float, BoundingVisual3D)> hitResults = new List<(float, BoundingVisual3D)>();
-            foreach (BoundingVisual3D boundingVisual3D in this._boundingVisual3Ds)
+            IList<(float, ShapeVisual3D)> hitResults = new List<(float, ShapeVisual3D)>();
+            foreach (ShapeVisual3D shapeVisual3D in this._shapeVisual3Ds)
             {
-                bool intersects = boundingVisual3D.Renderable.IntersectsRay(ray, out float distance);
+                bool intersects = shapeVisual3D.Renderable.IntersectsRay(ray, out float distance);
                 if (intersects)
                 {
-                    hitResults.Add((distance, boundingVisual3D));
+                    hitResults.Add((distance, shapeVisual3D));
                 }
             }
 
             //详细检测
             if (hitResults.Any())
             {
-                (float, BoundingVisual3D) hitResult = hitResults.MinBy(x => x.Item1);
+                (float, ShapeVisual3D) hitResult = hitResults.MinBy(x => x.Item1);
                 bool intersects = hitResult.Item2.Renderable.IntersectsRay(ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex);
                 if (intersects)
                 {
@@ -176,30 +176,30 @@ namespace MedicalSharp.Controls.Viewports
             GL.Disable(EnableCap.CullFace);
 
             //清空渲染对象
-            this._boundingVisual3Ds.Clear();
+            this._shapeVisual3Ds.Clear();
             this._renderer.ClearItems();
 
             //填充渲染对象
             foreach (Visual3D visual3D in this.Children)
             {
-                if (visual3D is BoundingVisual3D boundingVisual3D)
+                if (visual3D is ShapeVisual3D shapeVisual3D)
                 {
-                    boundingVisual3D.EnsureRenderable();
-                    this._boundingVisual3Ds.Add(boundingVisual3D);
-                    this._renderer.AppendItem(boundingVisual3D.Renderable);
+                    shapeVisual3D.EnsureRenderable();
+                    this._shapeVisual3Ds.Add(shapeVisual3D);
+                    this._renderer.AppendItem(shapeVisual3D.Renderable);
                 }
-                if (visual3D is BoundingItemPresenter itemPresenter)
+                if (visual3D is ShapePresenter shapePresenter)
                 {
-                    itemPresenter.Content.EnsureRenderable();
-                    this._boundingVisual3Ds.Add(itemPresenter.Content);
-                    this._renderer.AppendItem(itemPresenter.Content.Renderable);
+                    shapePresenter.Content.EnsureRenderable();
+                    this._shapeVisual3Ds.Add(shapePresenter.Content);
+                    this._renderer.AppendItem(shapePresenter.Content.Renderable);
                 }
-                if (visual3D is BoundingItemsPresenter itemsPresenter)
+                if (visual3D is ShapesPresenter shapesPresenter)
                 {
-                    foreach (BoundingVisual3D item in itemsPresenter.ItemsSource)
+                    foreach (ShapeVisual3D item in shapesPresenter.ItemsSource)
                     {
                         item.EnsureRenderable();
-                        this._boundingVisual3Ds.Add(item);
+                        this._shapeVisual3Ds.Add(item);
                         this._renderer.AppendItem(item.Renderable);
                     }
                 }
@@ -229,7 +229,7 @@ namespace MedicalSharp.Controls.Viewports
             {
                 Visual3D visual3D = this.Children[eventArgs.NewStartingIndex];
                 visual3D.DataContext = this.DataContext;
-                if (visual3D is BoundingItemsPresenter itemsPresenter)
+                if (visual3D is ShapesPresenter itemsPresenter)
                 {
                     itemsPresenter.ItemsSource.CollectionChanged += this.OnItemsPresenterItemsChanged;
                 }
@@ -237,9 +237,9 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 边界3D元素列表容器元素改变事件 —— void OnItemsPresenterItemsChanged(object sender...
+        #region 3D元素列表容器元素改变事件 —— void OnItemsPresenterItemsChanged(object sender...
         /// <summary>
-        /// 边界3D元素列表容器元素改变事件
+        /// 3D元素列表容器元素改变事件
         /// </summary>
         private void OnItemsPresenterItemsChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {

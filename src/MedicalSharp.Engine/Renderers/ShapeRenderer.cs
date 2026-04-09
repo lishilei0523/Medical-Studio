@@ -150,23 +150,30 @@ namespace MedicalSharp.Engine.Renderers
                 //设置模型矩阵
                 this.Program.SetUniformMatrix4("u_ModelMatrix", renderable.ModelMatrix);
 
-                //禁用深度写入、让透明面可以互相混合
-                GL.DepthMask(false);
-                GL.Enable(EnableCap.Blend);
-                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
                 //绘制填充模型	
-                this.Program.SetUniformVector4("u_Color", renderable.Fill);
-                renderable.FillBuffer.Draw(PrimitiveType.Triangles);
+                if (renderable.FillBuffer != null)
+                {
+                    //禁用深度写入、让透明面可以互相混合
+                    GL.DepthMask(false);
+                    GL.Enable(EnableCap.Blend);
+                    GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
-                //恢复状态
-                GL.DepthMask(true);
-                GL.Disable(EnableCap.Blend);
+                    //绘制
+                    this.Program.SetUniformVector4("u_Color", renderable.Fill);
+                    renderable.FillBuffer.Draw(PrimitiveType.Triangles);
+
+                    //恢复状态
+                    GL.DepthMask(true);
+                    GL.Disable(EnableCap.Blend);
+                }
 
                 //绘制线框模型
-                GL.LineWidth(renderable.StrokeThickness);
-                this.Program.SetUniformVector4("u_Color", renderable.Stroke);
-                renderable.StrokeBuffer.Draw(PrimitiveType.Lines);
+                if (renderable.StrokeBuffer != null)
+                {
+                    GL.LineWidth(renderable.StrokeThickness);
+                    this.Program.SetUniformVector4("u_Color", renderable.Stroke);
+                    renderable.StrokeBuffer.Draw(PrimitiveType.Lines);
+                }
 
                 //触发渲染事件
                 renderable.OnRender(renderContext);

@@ -7,9 +7,9 @@ using MedicalSharp.Primitives.Models;
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
-    /// 边界球体3D元素
+    /// 球体3D元素
     /// </summary>
-    public class BoundingSphereVisual3D : BoundingVisual3D
+    public class SphereVisual3D : ShapeVisual3D
     {
         #region # 字段及构造器
 
@@ -26,21 +26,21 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static BoundingSphereVisual3D()
+        static SphereVisual3D()
         {
-            RadiusProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, float>(nameof(Radius), 1.0f);
-            CenterProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+            RadiusProperty = AvaloniaProperty.Register<SphereVisual3D, float>(nameof(Radius), 1.0f);
+            CenterProperty = AvaloniaProperty.Register<SphereVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
 
             //属性改变事件
-            RadiusProperty.Changed.AddClassHandler<BoundingSphereVisual3D, float>(OnRadiusChanged);
-            CenterProperty.Changed.AddClassHandler<BoundingSphereVisual3D, Vector3D>(OnCenterChanged);
+            RadiusProperty.Changed.AddClassHandler<SphereVisual3D, float>(OnRadiusChanged);
+            CenterProperty.Changed.AddClassHandler<SphereVisual3D, Vector3D>(OnCenterChanged);
         }
 
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public BoundingSphereVisual3D()
+        public SphereVisual3D()
         {
 
         }
@@ -85,7 +85,7 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
                 MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
-                this.Renderable = new ShapeRenderable(strokeMesh, fillMesh);
+                this.Renderable = ShapeRenderable.CreateFull(strokeMesh, fillMesh);
                 this.Renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }
@@ -101,26 +101,26 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
                 MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
-                this.Renderable.Update(strokeMesh, fillMesh);
+                this.Renderable.UpdateFull(strokeMesh, fillMesh);
             }
         }
         #endregion
 
-        #region 半径改变事件 —— static void OnRadiusChanged(BoundingSphereVisual3D visual3D...
+        #region 半径改变事件 —— static void OnRadiusChanged(SphereVisual3D visual3D...
         /// <summary>
         /// 半径改变事件
         /// </summary>
-        private static void OnRadiusChanged(BoundingSphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnRadiusChanged(SphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
         #endregion
 
-        #region 中心位置改变事件 —— static void OnCenterChanged(BoundingSphereVisual3D visual3D...
+        #region 中心位置改变事件 —— static void OnCenterChanged(SphereVisual3D visual3D...
         /// <summary>
         /// 中心位置改变事件
         /// </summary>
-        private static void OnCenterChanged(BoundingSphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
+        private static void OnCenterChanged(SphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
         {
             visual3D.UpdateRenderable();
         }

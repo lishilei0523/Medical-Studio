@@ -9,7 +9,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 点3D元素
     /// </summary>
-    public class PointVisual3D : BoundingVisual3D
+    public class PointVisual3D : ShapeVisual3D
     {
         #region # 字段及构造器
 
@@ -65,9 +65,8 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable == null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
                 MeshGeometry fillMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
-                this.Renderable = new ShapeRenderable(strokeMesh, fillMesh);
+                this.Renderable = ShapeRenderable.CreateFill(fillMesh);
                 this.Renderable.SetColor(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }
@@ -83,7 +82,7 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
                 MeshGeometry fillMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
-                this.Renderable.Update(strokeMesh, fillMesh);
+                this.Renderable.UpdateFull(strokeMesh, fillMesh);
             }
         }
         #endregion

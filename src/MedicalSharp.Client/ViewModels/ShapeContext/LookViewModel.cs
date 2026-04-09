@@ -57,20 +57,20 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         public OrbitCamera OrbitCamera { get; set; }
         #endregion
 
-        #region 边界球体3D元素 —— BoundingSphereVisual3D BoundingSphere
+        #region 球体3D元素 —— SphereVisual3D Sphere
         /// <summary>
-        /// 边界球体3D元素
+        /// 球体3D元素
         /// </summary>
         [DependencyProperty]
-        public BoundingSphereVisual3D BoundingSphere { get; set; }
+        public SphereVisual3D Sphere { get; set; }
         #endregion
 
-        #region 边界3D元素列表 —— AvaloniaList<BoundingVisual3D> BoundingVisuals
+        #region 3D元素列表 —— AvaloniaList<ShapeVisual3D> Visual3Ds
         /// <summary>
-        /// 边界3D元素列表
+        /// 3D元素列表
         /// </summary>
         [DependencyProperty]
-        public AvaloniaList<BoundingVisual3D> BoundingVisuals { get; set; }
+        public AvaloniaList<ShapeVisual3D> Visual3Ds { get; set; }
         #endregion
 
         #endregion
@@ -85,7 +85,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
-            this.BoundingSphere = new BoundingSphereVisual3D
+            this.Sphere = new SphereVisual3D
             {
                 Radius = 1,
                 Center = new Vector3D(-2, 0, 0),
@@ -93,9 +93,9 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                 StrokeThickness = 1,
                 Fill = Color.Parse("#0FFF0000")
             };
-            this.BoundingVisuals =
+            this.Visual3Ds =
             [
-                new BoundingBoxVisual3D
+                new BoxVisual3D
                 {
                     Center = new Vector3D(2,0,0),
                     Stroke = Colors.Blue,
@@ -120,7 +120,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             if (eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out BoundingVisual3D element);
+                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out ShapeVisual3D element);
 
                 if (success)
                 {
