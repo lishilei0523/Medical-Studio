@@ -123,9 +123,11 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
                 MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
-                this.Renderable = ShapeRenderable.CreateFull(strokeMesh, fillMesh);
-                this.Renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
-                this.Renderable.SetFill(this.Fill.ToVector4());
+
+                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+
+                this.Renderable = renderable;
             }
         }
         #endregion
@@ -140,7 +142,10 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
                 MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
-                this.Renderable.UpdateFull(strokeMesh, fillMesh);
+
+                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
+                renderable.Update(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }
         #endregion

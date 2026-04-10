@@ -44,7 +44,7 @@
 				<sd:ShapeViewport Background="Black"
                                   Camera="{Binding OrbitCamera}"
                                   cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
-                    <sd:PointVisual3D Position="0,0,1" Fill="Cyan" />
+                    <sd:PointVisual3D Position="0,0,1" Fill="Cyan" PointSize="5" />
 					<sd:BoxVisual3D Stroke="Red" Fill="#0F00FF00" />
 					<sd:ShapePresenter Content="{Binding Sphere}" />
 					<sd:ShapesPresenter ItemsSource="{Binding Visual3Ds}" />

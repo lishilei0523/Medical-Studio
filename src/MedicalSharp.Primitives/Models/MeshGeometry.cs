@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Primitives.Maths;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,6 +110,50 @@ namespace MedicalSharp.Primitives.Models
             }
 
             this.Indices = [.. indices];
+        }
+        #endregion
+
+        #region 提取三角形面 —— IList<Triangle> ExtractTriangles()
+        /// <summary>
+        /// 提取三角形面
+        /// </summary>
+        /// <returns>三角形面列表</returns>
+        public IList<Triangle> ExtractTriangles()
+        {
+            IList<Triangle> triangles = new List<Triangle>();
+
+            //获取顶点数据
+            Vertex[] vertices = this.Vertices;
+            uint[] indices = this.Indices;
+            if (indices != null && indices.Any())
+            {
+                //有索引：按索引构建三角形
+                for (int index = 0; index < indices.Length; index += 3)
+                {
+                    Vector3 pointA = vertices[indices[index]].Position;
+                    Vector3 pointB = vertices[indices[index + 1]].Position;
+                    Vector3 pointC = vertices[indices[index + 2]].Position;
+                    triangles.Add(new Triangle(pointA, pointB, pointC));
+                }
+            }
+            else
+            {
+                //无索引：假设顶点是连续的三角形列表
+                for (int index = 0; index < vertices.Length; index += 3)
+                {
+                    if (index + 2 >= vertices.Length)
+                    {
+                        break;
+                    }
+
+                    Vector3 pointA = vertices[index].Position;
+                    Vector3 pointB = vertices[index + 1].Position;
+                    Vector3 pointC = vertices[index + 2].Position;
+                    triangles.Add(new Triangle(pointA, pointB, pointC));
+                }
+            }
+
+            return triangles;
         }
         #endregion
 

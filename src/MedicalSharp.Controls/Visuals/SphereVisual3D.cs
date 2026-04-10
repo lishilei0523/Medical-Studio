@@ -85,9 +85,11 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
                 MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
-                this.Renderable = ShapeRenderable.CreateFull(strokeMesh, fillMesh);
-                this.Renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
-                this.Renderable.SetFill(this.Fill.ToVector4());
+
+                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+
+                this.Renderable = renderable;
             }
         }
         #endregion
@@ -102,7 +104,10 @@ namespace MedicalSharp.Controls.Visuals
             {
                 MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
                 MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
-                this.Renderable.UpdateFull(strokeMesh, fillMesh);
+
+                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
+                renderable.Update(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }
         #endregion

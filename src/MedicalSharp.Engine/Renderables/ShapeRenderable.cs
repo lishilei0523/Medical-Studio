@@ -1,329 +1,50 @@
 ﻿using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
-using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MedicalSharp.Engine.Renderables
 {
     /// <summary>
     /// 形状渲染对象
     /// </summary>
-    public class ShapeRenderable : Renderable, IDisposable
+    public abstract class ShapeRenderable : Renderable, IDisposable
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 释放标识
         /// </summary>
-        private bool _disposed;
-
-        /// <summary>
-        /// 线框顶点缓冲区
-        /// </summary>
-        private VertexBuffer _strokeBuffer;
-
-        /// <summary>
-        /// 填充顶点缓冲区
-        /// </summary>
-        private VertexBuffer _fillBuffer;
-
-        /// <summary>
-        /// 三角形列表
-        /// </summary>
-        private readonly IList<Triangle> _triangles;
+        protected bool _disposed;
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        private ShapeRenderable()
+        protected ShapeRenderable()
         {
-            this._triangles = new List<Triangle>();
-            this.Stroke = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
-            this.StrokeThickness = 1.0f;
-            this.Fill = new Vector4(1.0f, 0.0f, 0.0f, 0.1f);
+            this._disposed = false;
         }
 
         #endregion
 
         #region # 属性
 
-        #region 线框颜色 —— Vector4 Stroke
-        /// <summary>
-        /// 线框颜色
-        /// </summary>
-        public Vector4 Stroke { get; private set; }
-        #endregion
-
-        #region 线框粗细 —— float StrokeThickness
-        /// <summary>
-        /// 线框粗细
-        /// </summary>
-        public float StrokeThickness { get; private set; }
-        #endregion
-
-        #region 填充颜色 —— Vector4 Fill
-        /// <summary>
-        /// 填充颜色
-        /// </summary>
-        public Vector4 Fill { get; private set; }
-        #endregion
-
-        #region 只读属性 - 线框顶点缓冲区 —— VertexBuffer StrokeBuffer
-        /// <summary>
-        /// 只读属性 - 线框顶点缓冲区
-        /// </summary>
-        internal VertexBuffer StrokeBuffer
-        {
-            get => this._strokeBuffer;
-        }
-        #endregion
-
-        #region 只读属性 - 填充顶点缓冲区 —— VertexBuffer FillBuffer
-        /// <summary>
-        /// 只读属性 - 填充顶点缓冲区
-        /// </summary>
-        internal VertexBuffer FillBuffer
-        {
-            get => this._fillBuffer;
-        }
-        #endregion
-
-        #region 只读属性 - 三角形列表 —— IReadOnlyList<Triangle> Triangles
-        /// <summary>
-        /// 只读属性 - 三角形列表
-        /// </summary>
-        public IReadOnlyList<Triangle> Triangles
-        {
-            get => this._triangles.AsReadOnly();
-        }
-        #endregion
+        //
 
         #endregion
 
         #region # 方法
 
-        //Static
-
-        #region 创建线框形状渲染对象 —— static ShapeRenderable CreateStroke(MeshGeometry strokeMesh)
+        #region 渲染 —— abstract void Render(ShaderProgram program)
         /// <summary>
-        /// 创建线框形状渲染对象
+        /// 渲染
         /// </summary>
-        /// <param name="strokeMesh">线框网格</param>
-        /// <returns>形状渲染对象</returns>
-        public static ShapeRenderable CreateStroke(MeshGeometry strokeMesh)
-        {
-            #region # 验证
-
-            if (strokeMesh == null)
-            {
-                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
-            }
-
-            #endregion
-
-            ShapeRenderable renderable = new ShapeRenderable();
-            renderable._strokeBuffer = new VertexBuffer(strokeMesh);
-            renderable._strokeBuffer.Setup();
-
-            //提取三角形面数据
-            renderable.ExtractTriangles();
-
-            return renderable;
-        }
+        /// <param name="program">Shader程序</param>
+        public abstract void Render(ShaderProgram program);
         #endregion
 
-        #region 创建填充形状渲染对象 —— static ShapeRenderable CreateFill(MeshGeometry fillMesh)
-        /// <summary>
-        /// 创建填充形状渲染对象
-        /// </summary>
-        /// <param name="fillMesh">填充网格</param>
-        /// <returns>形状渲染对象</returns>
-        public static ShapeRenderable CreateFill(MeshGeometry fillMesh)
-        {
-            #region # 验证
-
-            if (fillMesh == null)
-            {
-                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
-            }
-
-            #endregion
-
-            ShapeRenderable renderable = new ShapeRenderable();
-            renderable._fillBuffer = new VertexBuffer(fillMesh);
-            renderable._fillBuffer.Setup();
-
-            //提取三角形面数据
-            renderable.ExtractTriangles();
-
-            return renderable;
-        }
-        #endregion
-
-        #region 创建完整形状渲染对象 —— static ShapeRenderable CreateFull(MeshGeometry strokeMesh...
-        /// <summary>
-        /// 创建完整形状渲染对象
-        /// </summary>
-        /// <param name="strokeMesh">线框网格</param>
-        /// <param name="fillMesh">填充网格</param>
-        /// <returns>形状渲染对象</returns>
-        public static ShapeRenderable CreateFull(MeshGeometry strokeMesh, MeshGeometry fillMesh)
-        {
-            #region # 验证
-
-            if (strokeMesh == null)
-            {
-                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
-            }
-            if (fillMesh == null)
-            {
-                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
-            }
-
-            #endregion
-
-            ShapeRenderable renderable = new ShapeRenderable();
-            renderable._strokeBuffer = new VertexBuffer(strokeMesh);
-            renderable._fillBuffer = new VertexBuffer(fillMesh);
-            renderable._strokeBuffer.Setup();
-            renderable._fillBuffer.Setup();
-
-            //提取三角形面数据
-            renderable.ExtractTriangles();
-
-            return renderable;
-        }
-        #endregion
-
-
-        //Public
-
-        #region 更新线框形状渲染对象 —— void UpdateStroke(MeshGeometry strokeMesh)
-        /// <summary>
-        /// 更新线框形状渲染对象
-        /// </summary>
-        /// <param name="strokeMesh">线框网格</param>
-        public void UpdateStroke(MeshGeometry strokeMesh)
-        {
-            #region # 验证
-
-            if (strokeMesh == null)
-            {
-                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
-            }
-
-            #endregion
-
-            //先释放旧的
-            this._strokeBuffer.Dispose();
-
-            this._strokeBuffer = new VertexBuffer(strokeMesh);
-            this._strokeBuffer.Setup();
-
-            //提取三角形面数据
-            this.ExtractTriangles();
-
-            //标记包围盒/包围球为脏
-            this.InvalidateBoundings();
-        }
-        #endregion
-
-        #region 更新填充形状渲染对象 —— void UpdateFill(MeshGeometry fillMesh)
-        /// <summary>
-        /// 更新填充形状渲染对象
-        /// </summary>
-        /// <param name="fillMesh">填充网格</param>
-        public void UpdateFill(MeshGeometry fillMesh)
-        {
-            #region # 验证
-
-            if (fillMesh == null)
-            {
-                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
-            }
-
-            #endregion
-
-            //先释放旧的
-            this._fillBuffer.Dispose();
-
-            this._fillBuffer = new VertexBuffer(fillMesh);
-            this._fillBuffer.Setup();
-
-            //提取三角形面数据
-            this.ExtractTriangles();
-
-            //标记包围盒/包围球为脏
-            this.InvalidateBoundings();
-        }
-        #endregion
-
-        #region 更新完整形状渲染对象 —— void UpdateFull(MeshGeometry strokeMesh, MeshGeometry fillMesh)
-        /// <summary>
-        /// 更新完整形状渲染对象
-        /// </summary>
-        /// <param name="strokeMesh">线框网格</param>
-        /// <param name="fillMesh">填充网格</param>
-        public void UpdateFull(MeshGeometry strokeMesh, MeshGeometry fillMesh)
-        {
-            #region # 验证
-
-            if (strokeMesh == null)
-            {
-                throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
-            }
-            if (fillMesh == null)
-            {
-                throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
-            }
-
-            #endregion
-
-            //先释放旧的
-            this._strokeBuffer.Dispose();
-            this._fillBuffer.Dispose();
-
-            this._strokeBuffer = new VertexBuffer(strokeMesh);
-            this._fillBuffer = new VertexBuffer(fillMesh);
-            this._strokeBuffer.Setup();
-            this._fillBuffer.Setup();
-
-            //提取三角形面数据
-            this.ExtractTriangles();
-
-            //标记包围盒/包围球为脏
-            this.InvalidateBoundings();
-        }
-        #endregion
-
-        #region 设置线框 —— void SetStroke(Vector4 stroke, float strokeThickness)
-        /// <summary>
-        /// 设置线框
-        /// </summary>
-        /// <param name="stroke">线框颜色</param>
-        /// <param name="strokeThickness">线框粗细</param>
-        public void SetStroke(Vector4 stroke, float strokeThickness)
-        {
-            this.Stroke = stroke;
-            this.StrokeThickness = strokeThickness;
-        }
-        #endregion
-
-        #region 设置填充 —— void SetFill(Vector4 fill)
-        /// <summary>
-        /// 设置填充
-        /// </summary>
-        /// <param name="fill">填充颜色</param>
-        public void SetFill(Vector4 fill)
-        {
-            this.Fill = fill;
-        }
-        #endregion
-
-        #region 检测射线相交 —— bool IntersectsRay(Ray ray, out float distance...
+        #region 检测射线相交 —— virtual bool IntersectsRay(Ray ray, out float distance...
         /// <summary>
         /// 检测射线相交
         /// </summary>
@@ -333,7 +54,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="hitNormal">命中点法向量</param>
         /// <param name="hitTriangleIndex">命中三角形索引</param>
         /// <returns>是否相交</returns>
-        public bool IntersectsRay(Ray ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex)
+        public virtual bool IntersectsRay(Ray ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex)
         {
             distance = float.MaxValue;
             hitPoint = Vector3.Zero;
@@ -346,151 +67,60 @@ namespace MedicalSharp.Engine.Renderables
                 return false;
             }
 
-            //将射线变换到局部空间
-            Matrix4 worldToLocal = Matrix4.Invert(this.ModelMatrix);
-            Ray localRay = ray.Transform(worldToLocal);
-
-            //遍历所有三角形
-            for (int index = 0; index < this._triangles.Count; index++)
+            //三角形检测
+            if (this is IHasTriangles hasTriangles)
             {
-                Triangle triangle = this._triangles[index];
+                //将射线变换到局部空间
+                Matrix4 worldToLocal = Matrix4.Invert(this.ModelMatrix);
+                Ray localRay = ray.Transform(worldToLocal);
 
-                //三角形相交检测
-                if (triangle.IntersectRay(localRay, out float t, out float u, out float v))
+                //遍历所有三角形
+                for (int index = 0; index < hasTriangles.Triangles.Count; index++)
                 {
-                    if (t > 0 && t < distance)
+                    Triangle triangle = hasTriangles.Triangles[index];
+
+                    //三角形相交检测
+                    if (triangle.IntersectRay(localRay, out float t, out float u, out float v))
                     {
-                        distance = t;
-                        hitTriangleIndex = index;
+                        if (t > 0 && t < distance)
+                        {
+                            distance = t;
+                            hitTriangleIndex = index;
 
-                        //计算局部交点
-                        Vector3 localHitPoint = triangle.GetPoint(u, v);
+                            //计算局部交点
+                            Vector3 localHitPoint = triangle.GetPoint(u, v);
 
-                        //转换到世界空间
-                        hitPoint = Vector3.TransformPosition(localHitPoint, this.ModelMatrix);
+                            //转换到世界空间
+                            hitPoint = Vector3.TransformPosition(localHitPoint, this.ModelMatrix);
 
-                        //计算世界空间法线（考虑变换）
-                        hitNormal = Vector3.TransformNormal(triangle.Normal, this.ModelMatrix);
-                        hitNormal = Vector3.Normalize(hitNormal);
+                            //计算世界空间法线（考虑变换）
+                            hitNormal = Vector3.TransformNormal(triangle.Normal, this.ModelMatrix);
+                            hitNormal = Vector3.Normalize(hitNormal);
+                        }
                     }
                 }
+
+                bool hit = hitTriangleIndex >= 0;
+
+                //如果没有命中任何三角形，返回包围盒距离
+                if (!hit && boxDistance < float.MaxValue)
+                {
+                    distance = boxDistance;
+                }
+
+                return hit;
             }
 
-            bool hit = hitTriangleIndex >= 0;
-
-            //如果没有命中任何三角形，返回包围盒距离
-            if (!hit && boxDistance < float.MaxValue)
-            {
-                distance = boxDistance;
-            }
-
-            return hit;
+            return false;
         }
         #endregion
 
-        #region 释放资源 —— void Dispose()
+        #region 释放资源 —— abstract void Dispose()
         /// <summary>
         /// 释放资源
         /// </summary>
-        public void Dispose()
-        {
-            if (this._disposed)
-            {
-                return;
-            }
-
-            this._triangles.Clear();
-            this._strokeBuffer?.Dispose();
-            this._fillBuffer?.Dispose();
-
-            this._disposed = true;
-        }
-        #endregion
-
-
-        //Protected
-
-        #region 计算包围盒 —— override BoundingBox CalculateBoundingBox()
-        /// <summary>
-        /// 计算包围盒
-        /// </summary>
-        protected override BoundingBox CalculateBoundingBox()
-        {
-            VertexBuffer vertexBuffer;
-            if (this.StrokeBuffer != null)
-            {
-                vertexBuffer = this.StrokeBuffer;
-            }
-            else if (this.FillBuffer != null)
-            {
-                vertexBuffer = this.FillBuffer;
-            }
-            else
-            {
-                throw new InvalidOperationException("线框与填充顶点缓冲区不可同时为null！");
-            }
-
-            IEnumerable<Vector3> positions = vertexBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
-            BoundingBox boundingBox = BoundingBox.FromPoints([.. positions]);
-
-            return boundingBox;
-        }
-        #endregion
-
-        #region 提取三角形面数据 —— void ExtractTriangles()
-        /// <summary>
-        /// 提取三角形面数据
-        /// </summary>
-        private void ExtractTriangles()
-        {
-            this._triangles.Clear();
-
-            VertexBuffer vertexBuffer;
-            if (this.StrokeBuffer != null)
-            {
-                vertexBuffer = this.StrokeBuffer;
-            }
-            else if (this.FillBuffer != null)
-            {
-                vertexBuffer = this.FillBuffer;
-            }
-            else
-            {
-                throw new InvalidOperationException("线框与填充顶点缓冲区不可同时为null！");
-            }
-
-            //获取顶点数据
-            Vertex[] vertices = vertexBuffer.MeshGeometry.Vertices;
-            uint[] indices = vertexBuffer.MeshGeometry.Indices;
-            if (indices != null && indices.Any())
-            {
-                //有索引：按索引构建三角形
-                for (int index = 0; index < indices.Length; index += 3)
-                {
-                    Vector3 pointA = vertices[indices[index]].Position;
-                    Vector3 pointB = vertices[indices[index + 1]].Position;
-                    Vector3 pointC = vertices[indices[index + 2]].Position;
-                    this._triangles.Add(new Triangle(pointA, pointB, pointC));
-                }
-            }
-            else
-            {
-                //无索引：假设顶点是连续的三角形列表
-                for (int index = 0; index < vertices.Length; index += 3)
-                {
-                    if (index + 2 >= vertices.Length)
-                    {
-                        break;
-                    }
-
-                    Vector3 pointA = vertices[index].Position;
-                    Vector3 pointB = vertices[index + 1].Position;
-                    Vector3 pointC = vertices[index + 2].Position;
-                    this._triangles.Add(new Triangle(pointA, pointB, pointC));
-                }
-            }
-        }
-        #endregion
+        public abstract void Dispose();
+        #endregion 
 
         #endregion
     }

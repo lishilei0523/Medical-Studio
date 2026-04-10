@@ -1,8 +1,6 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Renderables;
-using MedicalSharp.Primitives.Builders;
-using MedicalSharp.Primitives.Models;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -19,11 +17,17 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<Vector3D> PositionProperty;
 
         /// <summary>
+        /// 点尺寸依赖属性
+        /// </summary>
+        public static readonly StyledProperty<float> PointSizeProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static PointVisual3D()
         {
             PositionProperty = AvaloniaProperty.Register<PointVisual3D, Vector3D>(nameof(Position), new Vector3D(0, 0, 0));
+            PointSizeProperty = AvaloniaProperty.Register<PointVisual3D, float>(nameof(PointSize), 2.0f);
 
             //属性改变事件
             PositionProperty.Changed.AddClassHandler<PointVisual3D, Vector3D>(OnPositionChanged);
@@ -53,6 +57,17 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 依赖属性 - 点尺寸 —— float PointSize
+        /// <summary>
+        /// 依赖属性 - 点尺寸
+        /// </summary>
+        public float PointSize
+        {
+            get => this.GetValue(PointSizeProperty);
+            set => this.SetValue(PointSizeProperty, value);
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -65,9 +80,10 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable == null)
             {
-                MeshGeometry fillMesh = MeshFactory.CreateSphere(0.015f, this.Position.ToVector3());
-                this.Renderable = ShapeRenderable.CreateFill(fillMesh);
-                this.Renderable.SetFill(this.Fill.ToVector4());
+                PointRenderable renderable = new PointRenderable(this.Position.ToVector3());
+                renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
+
+                this.Renderable = renderable;
             }
         }
         #endregion
@@ -80,9 +96,9 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable != null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
-                MeshGeometry fillMesh = MeshFactory.CreatePoint(this.Position.ToVector3());
-                this.Renderable.UpdateFull(strokeMesh, fillMesh);
+                PointRenderable renderable = (PointRenderable)this.Renderable;
+                renderable.Update(this.Position.ToVector3());
+                renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
             }
         }
         #endregion
