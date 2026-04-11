@@ -57,12 +57,12 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         public OrbitCamera OrbitCamera { get; set; }
         #endregion
 
-        #region 球体3D元素 —— SphereVisual3D Sphere
+        #region 包围球3D元素 —— BoundingSphereVisual3D Sphere
         /// <summary>
-        /// 球体3D元素
+        /// 包围球3D元素
         /// </summary>
         [DependencyProperty]
-        public SphereVisual3D Sphere { get; set; }
+        public BoundingSphereVisual3D Sphere { get; set; }
         #endregion
 
         #region 3D元素列表 —— AvaloniaList<ShapeVisual3D> Visual3Ds
@@ -85,7 +85,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
-            this.Sphere = new SphereVisual3D
+            this.Sphere = new BoundingSphereVisual3D
             {
                 Radius = 1,
                 Center = new Vector3D(-2, 0, 0),
@@ -95,7 +95,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             };
             this.Visual3Ds =
             [
-                new BoxVisual3D
+                new BoundingBoxVisual3D
                 {
                     Center = new Vector3D(2,0,0),
                     Stroke = Colors.Blue,

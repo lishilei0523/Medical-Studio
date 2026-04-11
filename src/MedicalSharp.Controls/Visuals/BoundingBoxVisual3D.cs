@@ -9,9 +9,9 @@ using OpenTK.Graphics.OpenGL4;
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
-    /// 立方体3D元素
+    /// 包围盒3D元素
     /// </summary>
-    public class BoxVisual3D : ShapeVisual3D
+    public class BoundingBoxVisual3D : ShapeVisual3D
     {
         #region # 字段及构造器
 
@@ -38,25 +38,25 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static BoxVisual3D()
+        static BoundingBoxVisual3D()
         {
-            WidthProperty = AvaloniaProperty.Register<BoxVisual3D, float>(nameof(Width), 1.0f);
-            HeightProperty = AvaloniaProperty.Register<BoxVisual3D, float>(nameof(Height), 1.0f);
-            DepthProperty = AvaloniaProperty.Register<BoxVisual3D, float>(nameof(Depth), 1.0f);
-            CenterProperty = AvaloniaProperty.Register<BoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+            WidthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Width), 1.0f);
+            HeightProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Height), 1.0f);
+            DepthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Depth), 1.0f);
+            CenterProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
 
             //属性改变事件
-            WidthProperty.Changed.AddClassHandler<BoxVisual3D, float>(OnWidthChanged);
-            HeightProperty.Changed.AddClassHandler<BoxVisual3D, float>(OnHeightChanged);
-            DepthProperty.Changed.AddClassHandler<BoxVisual3D, float>(OnDepthChanged);
-            CenterProperty.Changed.AddClassHandler<BoxVisual3D, Vector3D>(OnCenterChanged);
+            WidthProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnWidthChanged);
+            HeightProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnHeightChanged);
+            DepthProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnDepthChanged);
+            CenterProperty.Changed.AddClassHandler<BoundingBoxVisual3D, Vector3D>(OnCenterChanged);
         }
 
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public BoxVisual3D()
+        public BoundingBoxVisual3D()
         {
 
         }
@@ -154,7 +154,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 宽度改变事件
         /// </summary>
-        private static void OnWidthChanged(BoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnWidthChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
@@ -164,7 +164,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 高度改变事件
         /// </summary>
-        private static void OnHeightChanged(BoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnHeightChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
@@ -174,7 +174,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 深度改变事件
         /// </summary>
-        private static void OnDepthChanged(BoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnDepthChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
@@ -184,7 +184,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 中心位置改变事件
         /// </summary>
-        private static void OnCenterChanged(BoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
+        private static void OnCenterChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
         {
             visual3D.UpdateRenderable();
         }

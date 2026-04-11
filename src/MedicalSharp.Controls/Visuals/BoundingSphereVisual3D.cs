@@ -7,9 +7,9 @@ using MedicalSharp.Primitives.Models;
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
-    /// 球体3D元素
+    /// 包围球3D元素
     /// </summary>
-    public class SphereVisual3D : ShapeVisual3D
+    public class BoundingSphereVisual3D : ShapeVisual3D
     {
         #region # 字段及构造器
 
@@ -26,21 +26,21 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static SphereVisual3D()
+        static BoundingSphereVisual3D()
         {
-            RadiusProperty = AvaloniaProperty.Register<SphereVisual3D, float>(nameof(Radius), 1.0f);
-            CenterProperty = AvaloniaProperty.Register<SphereVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+            RadiusProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, float>(nameof(Radius), 1.0f);
+            CenterProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
 
             //属性改变事件
-            RadiusProperty.Changed.AddClassHandler<SphereVisual3D, float>(OnRadiusChanged);
-            CenterProperty.Changed.AddClassHandler<SphereVisual3D, Vector3D>(OnCenterChanged);
+            RadiusProperty.Changed.AddClassHandler<BoundingSphereVisual3D, float>(OnRadiusChanged);
+            CenterProperty.Changed.AddClassHandler<BoundingSphereVisual3D, Vector3D>(OnCenterChanged);
         }
 
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public SphereVisual3D()
+        public BoundingSphereVisual3D()
         {
 
         }
@@ -116,7 +116,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 半径改变事件
         /// </summary>
-        private static void OnRadiusChanged(SphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnRadiusChanged(BoundingSphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
@@ -126,7 +126,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 中心位置改变事件
         /// </summary>
-        private static void OnCenterChanged(SphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
+        private static void OnCenterChanged(BoundingSphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
