@@ -26,7 +26,7 @@
 						   VolumeData="{Binding VolumeData}"
 						   TFControlPoints="{Binding TFControlPoints}"
 						   cm:Message.Attach="[Event PointerPressed] = [Action OnVolumeViewportPointerPressed($source, $eventArgs)];">
-            <sd:BoundingBoxVisual3D Width="0.7" Height="0.5" Stroke="Red" Fill="#0F00FF00" />
+            <!--<sd:BoundingBoxVisual3D Width="0.7" Height="0.5" Stroke="Red" Fill="#0F00FF00" />-->
 		</sd:VolumeViewport>
 	</sd:GroupBox>
 </UserControl>
