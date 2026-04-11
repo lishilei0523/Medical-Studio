@@ -15,11 +15,6 @@ namespace MedicalSharp.Primitives.Maths
         public Vector3 Position;
 
         /// <summary>
-        /// 颜色
-        /// </summary>
-        public Vector4 Color;
-
-        /// <summary>
         /// 纹理坐标
         /// </summary>
         public Vector2 TextureCoord;

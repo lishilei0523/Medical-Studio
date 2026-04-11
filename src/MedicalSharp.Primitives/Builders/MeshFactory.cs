@@ -13,24 +13,17 @@ namespace MedicalSharp.Primitives.Builders
     /// </summary>
     public static class MeshFactory
     {
-        #region # 创建点 —— static MeshGeometry CreatePoint(Vector3 position...
+        #region # 创建点 —— static MeshGeometry CreatePoint(Vector3 position)
         /// <summary>
         /// 创建点
         /// </summary>
         /// <param name="position">位置</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreatePoint(Vector3 position, Vector4 color = default)
+        public static MeshGeometry CreatePoint(Vector3 position)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             Vertex vertex = new()
             {
                 Position = position,
-                Color = color,
                 TextureCoord = Vector2.Zero,
                 Normal = Vector3.UnitY
             };
@@ -42,20 +35,14 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建点集 —— static MeshGeometry CreatePoints(ICollection<Vector3> positions...
+        #region # 创建点云 —— static MeshGeometry CreatePointCloud(ICollection<Vector3> positions)
         /// <summary>
-        /// 创建点集
+        /// 创建点云
         /// </summary>
         /// <param name="positions">位置列表</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreatePoints(ICollection<Vector3> positions, Vector4 color = default)
+        public static MeshGeometry CreatePointCloud(ICollection<Vector3> positions)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             List<Vertex> vertices = [];
             List<uint> indices = [];
 
@@ -65,7 +52,6 @@ namespace MedicalSharp.Primitives.Builders
                 vertices.Add(new Vertex
                 {
                     Position = position,
-                    Color = color,
                     TextureCoord = Vector2.Zero,
                     Normal = Vector3.UnitY
                 });
@@ -76,35 +62,27 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建线 —— static MeshGeometry CreateLine(Vector3 start, Vector3 end...
+        #region # 创建线段 —— static MeshGeometry CreateLineSegment(Vector3 start, Vector3 end)
         /// <summary>
-        /// 创建线
+        /// 创建线段
         /// </summary>
         /// <param name="start">起点</param>
         /// <param name="end">终点</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateLine(Vector3 start, Vector3 end, Vector4 color = default)
+        public static MeshGeometry CreateLineSegment(Vector3 start, Vector3 end)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             Vector3 direction = Vector3.Normalize(end - start);
             List<Vertex> vertices =
             [
                 new()
                 {
                     Position = start,
-                    Color = color,
                     TextureCoord = new Vector2(0, 0),
                     Normal = direction
                 },
                 new()
                 {
                     Position = end,
-                    Color = color,
                     TextureCoord = new Vector2(1, 0),
                     Normal = direction
                 }
@@ -121,15 +99,9 @@ namespace MedicalSharp.Primitives.Builders
         /// </summary>
         /// <param name="positions">位置列表</param>
         /// <param name="closed">是否闭合</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreatePolyline(ICollection<Vector3> positions, bool closed = false, Vector4 color = default)
+        public static MeshGeometry CreatePolyline(ICollection<Vector3> positions, bool closed = false)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             List<Vertex> vertices = [];
             List<Vector3> posList = positions.ToList();
 
@@ -142,7 +114,6 @@ namespace MedicalSharp.Primitives.Builders
                 vertices.Add(new Vertex
                 {
                     Position = posList[i],
-                    Color = color,
                     TextureCoord = new Vector2(i / (float)posList.Count, 0),
                     Normal = normal
                 });
@@ -172,36 +143,27 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="pointA">顶点A</param>
         /// <param name="pointB">顶点B</param>
         /// <param name="pointC">顶点C</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateTriangle(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector4 color = default)
+        public static MeshGeometry CreateTriangle(Vector3 pointA, Vector3 pointB, Vector3 pointC)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             Vector3 normal = Vector3.Normalize(Vector3.Cross(pointB - pointA, pointC - pointA));
             List<Vertex> vertices =
             [
                 new()
                 {
                     Position = pointA,
-                    Color = color,
                     TextureCoord = new Vector2(0, 0),
                     Normal = normal
                 },
                 new()
                 {
                     Position = pointB,
-                    Color = color,
                     TextureCoord = new Vector2(0.5f, 1),
                     Normal = normal
                 },
                 new()
                 {
                     Position = pointC,
-                    Color = color,
                     TextureCoord = new Vector2(1, 0),
                     Normal = normal
                 }
@@ -221,14 +183,9 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="height">高度（Y轴方向）</param>
         /// <param name="normal">法向量（控制矩形朝向）</param>
         /// <param name="primitiveType">图元类型</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateRectangle(Vector3 center, float width, float height, Vector3 normal = default, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Lines, Vector4 color = default)
+        public static MeshGeometry CreateRectangle(Vector3 center, float width, float height, Vector3 normal = default, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Lines)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
             if (normal == default)
             {
                 //默认朝上（Z轴）
@@ -288,7 +245,6 @@ namespace MedicalSharp.Primitives.Builders
                     vertices.Add(new Vertex
                     {
                         Position = corners[i],
-                        Color = color,
                         TextureCoord = Vector2.Zero,
                         Normal = Vector3.Zero  //线框不需要法线
                     });
@@ -297,10 +253,10 @@ namespace MedicalSharp.Primitives.Builders
                 //创建索引 - 4条边
                 uint[][] edges = new uint[][]
                 {
-            [0, 1], //下边
-            [1, 2], //右边
-            [2, 3], //上边
-            [3, 0]  //左边
+                    [0, 1], //下边
+                    [1, 2], //右边
+                    [2, 3], //上边
+                    [3, 0]  //左边
                 };
 
                 for (int i = 0; i < 4; i++)
@@ -326,7 +282,6 @@ namespace MedicalSharp.Primitives.Builders
                     vertices.Add(new Vertex
                     {
                         Position = corners[i],
-                        Color = color,
                         TextureCoord = texCoords[i],
                         Normal = normal
                     });
@@ -341,6 +296,135 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
+        #region # 创建椭圆 —— static MeshGeometry CreateEllipse(Vector3 center, float width...
+        /// <summary>
+        /// 创建椭圆
+        /// </summary>
+        /// <param name="center">中心点位置</param>
+        /// <param name="width">宽度（X轴方向的直径）</param>
+        /// <param name="height">高度（Y轴方向的直径）</param>
+        /// <param name="normal">法向量（控制椭圆朝向）</param>
+        /// <param name="segments">细分数量（边数）</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreateEllipse(Vector3 center, float width, float height, Vector3 normal = default, int segments = 64, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Triangles)
+        {
+            if (normal == default)
+            {
+                //默认朝上（Z轴）
+                normal = Vector3.UnitZ;
+            }
+
+            float halfW = width * 0.5f;
+            float halfH = height * 0.5f;
+
+            //计算局部坐标系
+            Vector3 right, up;
+
+            //根据法向量计算基向量
+            if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.999f)
+            {
+                //法向量平行于Z轴
+                right = Vector3.UnitX;
+                up = Vector3.UnitY;
+            }
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.999f)
+            {
+                //法向量平行于Y轴
+                right = Vector3.UnitX;
+                up = Vector3.UnitZ;
+            }
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitX)) > 0.999f)
+            {
+                //法向量平行于X轴
+                right = Vector3.UnitY;
+                up = Vector3.UnitZ;
+            }
+            else
+            {
+                //一般情况：使用叉积构建正交基
+                right = Vector3.Normalize(Vector3.Cross(normal, Vector3.UnitZ));
+                up = Vector3.Normalize(Vector3.Cross(right, normal));
+            }
+
+            //确保segments至少为3
+            segments = Math.Max(3, segments);
+
+            List<Vertex> vertices = [];
+            List<uint> indices = [];
+
+            //线框模式 - 只绘制边界
+            if (primitiveType == GraphicPrimitiveType.Lines)
+            {
+                //创建边界顶点（不包含中心点）
+                for (int i = 0; i < segments; i++)
+                {
+                    float angle = 2.0f * MathHelper.Pi * i / segments;
+                    float x = halfW * (float)Math.Cos(angle);
+                    float y = halfH * (float)Math.Sin(angle);
+
+                    Vector3 position = center + right * x + up * y;
+
+                    vertices.Add(new Vertex
+                    {
+                        Position = position,
+                        TextureCoord = Vector2.Zero,
+                        Normal = Vector3.Zero  //线框不需要法向量
+                    });
+                }
+
+                //创建边界线的索引（闭合）
+                for (int i = 0; i < segments; i++)
+                {
+                    indices.Add((uint)i);
+                    indices.Add((uint)((i + 1) % segments));
+                }
+            }
+            //填充模式 - 使用三角形扇形（中心点 + 边界顶点）
+            else
+            {
+                //添加中心点
+                vertices.Add(new Vertex
+                {
+                    Position = center,
+                    TextureCoord = new Vector2(0.5f, 0.5f),
+                    Normal = normal
+                });
+
+                //添加边界顶点
+                for (int i = 0; i <= segments; i++)
+                {
+                    float angle = 2.0f * MathHelper.Pi * i / segments;
+                    float x = halfW * (float)Math.Cos(angle);
+                    float y = halfH * (float)Math.Sin(angle);
+
+                    Vector3 position = center + right * x + up * y;
+
+                    //计算纹理坐标（将椭圆映射到单位圆）
+                    float u = (float)Math.Cos(angle) * 0.5f + 0.5f;
+                    float v = (float)Math.Sin(angle) * 0.5f + 0.5f;
+
+                    vertices.Add(new Vertex
+                    {
+                        Position = position,
+                        TextureCoord = new Vector2(u, v),
+                        Normal = normal
+                    });
+                }
+
+                //创建三角形索引（中心点 + 相邻的两个边界点）
+                for (int i = 0; i < segments; i++)
+                {
+                    indices.Add(0);                          //中心点
+                    indices.Add((uint)(i + 1));              //当前边界点
+                    indices.Add((uint)(i + 2));              //下一个边界点
+                }
+            }
+
+            return new MeshGeometry(vertices, indices);
+        }
+        #endregion
+
         #region # 创建四边形 —— static MeshGeometry CreateQuadrangle(Vector3 pointA, Vector3 pointB...
         /// <summary>
         /// 创建四边形
@@ -349,43 +433,33 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="pointB">顶点B</param>
         /// <param name="pointC">顶点C</param>
         /// <param name="pointD">顶点D</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateQuadrangle(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 pointD, Vector4 color = default)
+        public static MeshGeometry CreateQuadrangle(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 pointD)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             Vector3 normal = Vector3.Normalize(Vector3.Cross(pointB - pointA, pointD - pointA));
             List<Vertex> vertices =
             [
                 new()
                 {
                     Position = pointA,
-                    Color = color,
                     TextureCoord = new Vector2(0, 1),
                     Normal = normal
                 },
                 new()
                 {
                     Position = pointB,
-                    Color = color,
                     TextureCoord = new Vector2(1, 1),
                     Normal = normal
                 },
                 new()
                 {
                     Position = pointC,
-                    Color = color,
                     TextureCoord = new Vector2(1, 0),
                     Normal = normal
                 },
                 new()
                 {
                     Position = pointD,
-                    Color = color,
                     TextureCoord = new Vector2(0, 0),
                     Normal = normal
                 }
@@ -404,15 +478,9 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="height">高度</param>
         /// <param name="depth">深度</param>
         /// <param name="center">中心点位置</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector3 center = default, Vector4 color = default)
+        public static MeshGeometry CreateBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector3 center = default)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             float halfW = width * 0.5f;
             float halfH = height * 0.5f;
             float halfD = depth * 0.5f;
@@ -477,7 +545,6 @@ namespace MedicalSharp.Primitives.Builders
                     finalVertices.Add(new Vertex
                     {
                         Position = vertices[vertexIdx],
-                        Color = color,
                         TextureCoord = texCoords[face][texIdx],
                         Normal = normals[face]
                     });
@@ -498,15 +565,9 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="depth">深度</param>
         /// <param name="center">中心点位置</param>
         /// <param name="primitiveType">图元类型</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateBoundingBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector3 center = default, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Lines, Vector4 color = default)
+        public static MeshGeometry CreateBoundingBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector3 center = default, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Lines)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             float halfW = width * 0.5f;
             float halfH = height * 0.5f;  //对应Z轴高度
             float halfD = depth * 0.5f;   //对应Y轴深度
@@ -560,7 +621,6 @@ namespace MedicalSharp.Primitives.Builders
                     vertices.Add(new Vertex
                     {
                         Position = cornerVertices[i],
-                        Color = color,
                         TextureCoord = Vector2.Zero,
                         Normal = Vector3.Zero
                     });
@@ -642,7 +702,6 @@ namespace MedicalSharp.Primitives.Builders
                         vertices.Add(new Vertex
                         {
                             Position = faceVertices[face][vert],
-                            Color = color,
                             TextureCoord = Vector2.Zero,
                             Normal = faceNormals[face]
                         });
@@ -678,15 +737,9 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="center">中心点位置</param>
         /// <param name="segments">经线数量</param>
         /// <param name="rings">纬线数量</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateSphere(float radius = 1.0f, Vector3 center = default, int segments = 32, int rings = 16, Vector4 color = default)
+        public static MeshGeometry CreateSphere(float radius = 1.0f, Vector3 center = default, int segments = 32, int rings = 16)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             List<Vertex> vertices = [];
             List<uint> indices = [];
 
@@ -708,14 +761,13 @@ namespace MedicalSharp.Primitives.Builders
                     //应用中心点偏移
                     Vector3 position = new(center.X + x, center.Y + y, center.Z + z);
 
-                    //法线方向保持不变（从球心指向表面）
+                    //法向量方向保持不变（从球心指向表面）
                     Vector3 normal = Vector3.Normalize(new Vector3(x, y, z));
                     Vector2 texCoord = new(u, v);
 
                     vertices.Add(new Vertex
                     {
                         Position = position,
-                        Color = color,
                         TextureCoord = texCoord,
                         Normal = normal
                     });
@@ -751,15 +803,9 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="height">高度</param>
         /// <param name="widthSegments">宽度细分数量</param>
         /// <param name="heightSegments">高度细分数量</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f, int widthSegments = 1, int heightSegments = 1, Vector4 color = default)
+        public static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f, int widthSegments = 1, int heightSegments = 1)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             float halfW = width * 0.5f;
             float halfH = height * 0.5f;
 
@@ -779,7 +825,6 @@ namespace MedicalSharp.Primitives.Builders
                     vertices.Add(new Vertex
                     {
                         Position = new Vector3(px, 0, pz),
-                        Color = color,
                         TextureCoord = new Vector2(u, 1.0f - v),
                         Normal = Vector3.UnitY
                     });
@@ -817,15 +862,9 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="height">高度</param>
         /// <param name="segments">细分数量</param>
         /// <param name="withCaps">是否封闭</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f, int segments = 32, bool withCaps = true, Vector4 color = default)
+        public static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f, int segments = 32, bool withCaps = true)
         {
-            if (color == default)
-            {
-                color = new Vector4(1.0f);
-            }
-
             float halfH = height * 0.5f;
             List<Vertex> vertices = [];
             List<uint> indices = [];
@@ -840,7 +879,6 @@ namespace MedicalSharp.Primitives.Builders
                 vertices.Add(new Vertex
                 {
                     Position = new Vector3(x, halfH, z),
-                    Color = color,
                     TextureCoord = new Vector2(i / (float)segments, 0),
                     Normal = new Vector3(x, 0, z)
                 });
@@ -848,7 +886,6 @@ namespace MedicalSharp.Primitives.Builders
                 vertices.Add(new Vertex
                 {
                     Position = new Vector3(x, -halfH, z),
-                    Color = color,
                     TextureCoord = new Vector2(i / (float)segments, 1),
                     Normal = new Vector3(x, 0, z)
                 });
@@ -873,7 +910,6 @@ namespace MedicalSharp.Primitives.Builders
                 vertices.Add(new Vertex
                 {
                     Position = new Vector3(0, halfH, 0),
-                    Color = color,
                     TextureCoord = new Vector2(0.5f, 0.5f),
                     Normal = Vector3.UnitY
                 });
@@ -882,7 +918,6 @@ namespace MedicalSharp.Primitives.Builders
                 vertices.Add(new Vertex
                 {
                     Position = new Vector3(0, -halfH, 0),
-                    Color = color,
                     TextureCoord = new Vector2(0.5f, 0.5f),
                     Normal = -Vector3.UnitY
                 });
@@ -922,42 +957,36 @@ namespace MedicalSharp.Primitives.Builders
                 new()
                 {
                     Position = Vector3.Zero,
-                    Color = new Vector4(1, 0, 0, 1),
                     TextureCoord = Vector2.Zero,
                     Normal = Vector3.UnitX
                 },
                 new()
                 {
                     Position = new Vector3(length, 0, 0),
-                    Color = new Vector4(1, 0, 0, 1),
                     TextureCoord = Vector2.UnitX,
                     Normal = Vector3.UnitX
                 },
                 new()
                 {
                     Position = Vector3.Zero,
-                    Color = new Vector4(0, 1, 0, 1),
                     TextureCoord = Vector2.Zero,
                     Normal = Vector3.UnitY
                 },
                 new()
                 {
                     Position = new Vector3(0, length, 0),
-                    Color = new Vector4(0, 1, 0, 1),
                     TextureCoord = Vector2.UnitX,
                     Normal = Vector3.UnitY
                 },
                 new()
                 {
                     Position = Vector3.Zero,
-                    Color = new Vector4(0, 0, 1, 1),
                     TextureCoord = Vector2.Zero,
                     Normal = Vector3.UnitZ
                 },
                 new()
                 {
                     Position = new Vector3(0, 0, length),
-                    Color = new Vector4(0, 0, 1, 1),
                     TextureCoord = Vector2.UnitX,
                     Normal = Vector3.UnitZ
                 }
@@ -976,37 +1005,33 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="size">尺寸</param>
         /// <param name="divisions">分隔数量</param>
         /// <param name="normal">法向量（控制网格朝向）</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateGrid(float size = 10.0f, int divisions = 10, Vector3? normal = null, Vector4 color = default)
+        public static MeshGeometry CreateGrid(float size = 10.0f, int divisions = 10, Vector3 normal = default)
         {
-            if (color == default)
-            {
-                color = new Vector4(0.5f);
-            }
-
             //默认朝上(Z轴)
-            Vector3 upNormal = normal ?? Vector3.UnitZ;
-            upNormal = Vector3.Normalize(upNormal);
+            if (normal == default)
+            {
+                normal = Vector3.UnitZ;
+            }
 
             float halfSize = size * 0.5f;
             float step = size / divisions;
 
             //计算旋转矩阵，将Y轴旋转到指定的法向量方向
             Matrix4 rotationMatrix;
-            if (Vector3.Dot(upNormal, Vector3.UnitY) > 0.999f)
+            if (Vector3.Dot(normal, Vector3.UnitY) > 0.999f)
             {
                 rotationMatrix = Matrix4.Identity;
             }
-            else if (Vector3.Dot(upNormal, Vector3.UnitY) < -0.999f)
+            else if (Vector3.Dot(normal, Vector3.UnitY) < -0.999f)
             {
                 rotationMatrix = Matrix4.CreateRotationX(MathF.PI);
             }
             else
             {
-                Vector3 rotationAxis = Vector3.Cross(Vector3.UnitY, upNormal);
+                Vector3 rotationAxis = Vector3.Cross(Vector3.UnitY, normal);
                 rotationAxis = Vector3.Normalize(rotationAxis);
-                float angle = (float)Math.Acos(Vector3.Dot(Vector3.UnitY, upNormal));
+                float angle = (float)Math.Acos(Vector3.Dot(Vector3.UnitY, normal));
                 rotationMatrix = Matrix4.CreateFromAxisAngle(rotationAxis, angle);
             }
 
@@ -1023,16 +1048,14 @@ namespace MedicalSharp.Primitives.Builders
                 vertices.Add(new Vertex
                 {
                     Position = startPoint1,
-                    Color = color,
                     TextureCoord = Vector2.Zero,
-                    Normal = upNormal
+                    Normal = normal
                 });
                 vertices.Add(new Vertex
                 {
                     Position = endPoint1,
-                    Color = color,
                     TextureCoord = Vector2.UnitX,
-                    Normal = upNormal
+                    Normal = normal
                 });
 
                 //横线
@@ -1042,16 +1065,14 @@ namespace MedicalSharp.Primitives.Builders
                 vertices.Add(new Vertex
                 {
                     Position = startPoint2,
-                    Color = color,
                     TextureCoord = Vector2.Zero,
-                    Normal = upNormal
+                    Normal = normal
                 });
                 vertices.Add(new Vertex
                 {
                     Position = endPoint2,
-                    Color = color,
                     TextureCoord = Vector2.UnitX,
-                    Normal = upNormal
+                    Normal = normal
                 });
             }
 
@@ -1071,15 +1092,9 @@ namespace MedicalSharp.Primitives.Builders
         /// 创建线框
         /// </summary>
         /// <param name="meshGeometry">网格模型</param>
-        /// <param name="color">颜色</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateWireframe(MeshGeometry meshGeometry, Vector4 color = default)
+        public static MeshGeometry CreateWireframe(MeshGeometry meshGeometry)
         {
-            if (color == default)
-            {
-                color = new Vector4(0, 0, 0, 1);
-            }
-
             List<Vertex> vertices = [];
             List<uint> indices = [];
             HashSet<(uint, uint)> edges = [];
@@ -1107,14 +1122,12 @@ namespace MedicalSharp.Primitives.Builders
                         vertices.Add(new Vertex
                         {
                             Position = v1.Position,
-                            Color = color,
                             TextureCoord = v1.TextureCoord,
                             Normal = v1.Normal
                         });
                         vertices.Add(new Vertex
                         {
                             Position = v2.Position,
-                            Color = color,
                             TextureCoord = v2.TextureCoord,
                             Normal = v2.Normal
                         });

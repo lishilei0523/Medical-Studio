@@ -50,7 +50,7 @@ namespace MedicalSharp.Engine.Renderables
             this.StartPoint = startPoint;
             this.EndPoint = endPoint;
 
-            MeshGeometry lineGeometry = MeshFactory.CreateLine(startPoint, endPoint);
+            MeshGeometry lineGeometry = MeshFactory.CreateLineSegment(startPoint, endPoint);
             this._strokeBuffer = new VertexBuffer(lineGeometry);
             this._strokeBuffer.Setup();
         }
@@ -130,7 +130,7 @@ namespace MedicalSharp.Engine.Renderables
             //先释放旧的
             this._strokeBuffer.Dispose();
 
-            MeshGeometry lineGeometry = MeshFactory.CreateLine(startPoint, endPoint);
+            MeshGeometry lineGeometry = MeshFactory.CreateLineSegment(startPoint, endPoint);
             this._strokeBuffer = new VertexBuffer(lineGeometry);
             this._strokeBuffer.Setup();
 

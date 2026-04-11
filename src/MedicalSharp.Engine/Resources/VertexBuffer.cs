@@ -136,10 +136,6 @@ namespace MedicalSharp.Engine.Resources
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Position)).ToInt32());
             GL.EnableVertexAttribArray(0);
 
-            //颜色(location = 1)
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Color)).ToInt32());
-            GL.EnableVertexAttribArray(1);
-
             //纹理坐标(location = 2)
             GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.TextureCoord)).ToInt32());
             GL.EnableVertexAttribArray(2);

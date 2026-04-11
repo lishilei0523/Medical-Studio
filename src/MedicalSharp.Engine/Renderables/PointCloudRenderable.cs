@@ -41,7 +41,7 @@ namespace MedicalSharp.Engine.Renderables
             this.Positions = positions;
 
             //初始化缓冲区
-            MeshGeometry pointCloudGeometry = MeshFactory.CreatePoints(positions);
+            MeshGeometry pointCloudGeometry = MeshFactory.CreatePointCloud(positions);
             this._vertexBuffer = new VertexBuffer(pointCloudGeometry);
             this._vertexBuffer.Setup();
         }
@@ -109,8 +109,8 @@ namespace MedicalSharp.Engine.Renderables
             //先释放旧的
             this._vertexBuffer.Dispose();
 
-            MeshGeometry pointGeometry = MeshFactory.CreatePoints(positions);
-            this._vertexBuffer = new VertexBuffer(pointGeometry);
+            MeshGeometry pointCloudGeometry = MeshFactory.CreatePointCloud(positions);
+            this._vertexBuffer = new VertexBuffer(pointCloudGeometry);
             this._vertexBuffer.Setup();
 
             //标记包围盒/包围球为脏
