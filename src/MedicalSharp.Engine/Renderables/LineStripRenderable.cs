@@ -11,9 +11,9 @@ using System.Linq;
 namespace MedicalSharp.Engine.Renderables
 {
     /// <summary>
-    /// 线渲染对象
+    /// 线条渲染对象
     /// </summary>
-    public class LineRenderable : ShapeRenderable, IHasTriangles
+    public class LineStripRenderable : ShapeRenderable, IHasTriangles
     {
         #region # 字段及构造器
 
@@ -30,7 +30,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 默认构造器
         /// </summary>
-        private LineRenderable()
+        private LineStripRenderable()
         {
             //默认值
             this.Stroke = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -38,10 +38,10 @@ namespace MedicalSharp.Engine.Renderables
         }
 
         /// <summary>
-        /// 创建线渲染对象构造器
+        /// 创建线条渲染对象构造器
         /// </summary>
         /// <param name="strokeMesh">线框网格</param>
-        public LineRenderable(MeshGeometry strokeMesh)
+        public LineStripRenderable(MeshGeometry strokeMesh)
             : this()
         {
             #region # 验证
@@ -49,6 +49,10 @@ namespace MedicalSharp.Engine.Renderables
             if (strokeMesh == null)
             {
                 throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
+            }
+            if (strokeMesh.Vertices.Length <= 2)
+            {
+                throw new ArgumentOutOfRangeException(nameof(strokeMesh), "线条顶点数必须大于2！");
             }
 
             #endregion
@@ -104,9 +108,9 @@ namespace MedicalSharp.Engine.Renderables
 
         //Public
 
-        #region 更新线渲染对象 —— void Update(MeshGeometry strokeMesh)
+        #region 更新线条渲染对象 —— void Update(MeshGeometry strokeMesh)
         /// <summary>
-        /// 更新线渲染对象
+        /// 更新线条渲染对象
         /// </summary>
         /// <param name="strokeMesh">线框网格</param>
         public void Update(MeshGeometry strokeMesh)
@@ -157,7 +161,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
-            this.StrokeBuffer.Draw(PrimitiveType.Lines);
+            this.StrokeBuffer.Draw(PrimitiveType.LineStrip);
         }
         #endregion
 

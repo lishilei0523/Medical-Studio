@@ -112,7 +112,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 半径改变事件 —— static void OnRadiusChanged(SphereVisual3D visual3D...
+        #region 半径改变事件 —— static void OnRadiusChanged(BoundingSphereVisual3D visual3D...
         /// <summary>
         /// 半径改变事件
         /// </summary>
@@ -122,7 +122,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 中心位置改变事件 —— static void OnCenterChanged(SphereVisual3D visual3D...
+        #region 中心位置改变事件 —— static void OnCenterChanged(BoundingSphereVisual3D visual3D...
         /// <summary>
         /// 中心位置改变事件
         /// </summary>

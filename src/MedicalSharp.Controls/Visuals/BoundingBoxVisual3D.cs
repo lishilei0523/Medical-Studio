@@ -150,7 +150,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 宽度改变事件 —— static void OnWidthChanged(BoxVisual3D visual3D...
+        #region 宽度改变事件 —— static void OnWidthChanged(BoundingBoxVisual3D visual3D...
         /// <summary>
         /// 宽度改变事件
         /// </summary>
@@ -160,7 +160,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 高度改变事件 —— static void OnHeightChanged(BoxVisual3D visual3D...
+        #region 高度改变事件 —— static void OnHeightChanged(BoundingBoxVisual3D visual3D...
         /// <summary>
         /// 高度改变事件
         /// </summary>
@@ -170,7 +170,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 深度改变事件 —— static void OnDepthChanged(BoxVisual3D visual3D...
+        #region 深度改变事件 —— static void OnDepthChanged(BoundingBoxVisual3D visual3D...
         /// <summary>
         /// 深度改变事件
         /// </summary>
@@ -180,7 +180,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 中心位置改变事件 —— static void OnCenterChanged(BoxVisual3D visual3D...
+        #region 中心位置改变事件 —— static void OnCenterChanged(BoundingBoxVisual3D visual3D...
         /// <summary>
         /// 中心位置改变事件
         /// </summary>

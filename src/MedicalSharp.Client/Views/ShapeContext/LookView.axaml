@@ -45,6 +45,7 @@
 								  Camera="{Binding OrbitCamera}"
 								  cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
 					<sd:PointVisual3D Position="0,0,1" Fill="Cyan" PointSize="5" />
+					<sd:LineSegmentVisual3D StartPoint="1,0,-1" EndPoint="-1,0,-1" Stroke="Chartreuse" StrokeThickness="2" />
 					<sd:BoundingBoxVisual3D Stroke="Red" Fill="#0F00FF00" />
 					<sd:ShapePresenter Content="{Binding Sphere}" />
 					<sd:ShapesPresenter ItemsSource="{Binding Visual3Ds}" />
