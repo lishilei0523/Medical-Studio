@@ -85,26 +85,26 @@ namespace MedicalSharp.Controls.Viewports
             Ray ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             //快速检测
-            IList<(float, ShapeVisual3D)> hitResults = new List<(float, ShapeVisual3D)>();
+            IDictionary<ShapeVisual3D, float> hitResults = new Dictionary<ShapeVisual3D, float>();
             foreach (ShapeVisual3D shapeVisual3D in this._shapeVisual3Ds)
             {
                 bool intersects = shapeVisual3D.Renderable.IntersectsRay(ray, out float distance);
                 if (intersects)
                 {
-                    hitResults.Add((distance, shapeVisual3D));
+                    hitResults.Add(shapeVisual3D, distance);
                 }
             }
 
-            //详细检测
+            //精确检测
             if (hitResults.Any())
             {
-                (float, ShapeVisual3D) hitResult = hitResults.MinBy(x => x.Item1);
-                bool intersects = hitResult.Item2.Renderable.IntersectsRay(ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex);
+                KeyValuePair<ShapeVisual3D, float> hitResult = hitResults.MinBy(x => x.Value);
+                bool intersects = hitResult.Key.Renderable.IntersectsRay(ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex);
                 if (intersects)
                 {
                     point = hitPoint;
                     normal = hitNormal;
-                    visual3D = hitResult.Item2;
+                    visual3D = hitResult.Key;
                     return true;
                 }
             }
