@@ -291,36 +291,36 @@ namespace MedicalSharp.Primitives.Builders
             //8个顶点（相对于中心点）
             Vector3[] vertices =
             [
-                new(center.X - halfW, center.Y - halfH, center.Z + halfD), //0
-                new(center.X + halfW, center.Y - halfH, center.Z + halfD), //1
-                new(center.X + halfW, center.Y + halfH, center.Z + halfD), //2
-                new(center.X - halfW, center.Y + halfH, center.Z + halfD), //3
-                new(center.X - halfW, center.Y - halfH, center.Z - halfD), //4
-                new(center.X - halfW, center.Y + halfH, center.Z - halfD), //5
-                new(center.X + halfW, center.Y + halfH, center.Z - halfD), //6
-                new(center.X + halfW, center.Y - halfH, center.Z - halfD)  //7
+                new(center.X - halfW, center.Y + halfD, center.Z - halfH), //0: 左前下
+                new(center.X + halfW, center.Y + halfD, center.Z - halfH), //1: 右前下
+                new(center.X + halfW, center.Y + halfD, center.Z + halfH), //2: 右前上
+                new(center.X - halfW, center.Y + halfD, center.Z + halfH), //3: 左前上
+                new(center.X - halfW, center.Y - halfD, center.Z - halfH), //4: 左后下
+                new(center.X - halfW, center.Y - halfD, center.Z + halfH), //5: 左后上
+                new(center.X + halfW, center.Y - halfD, center.Z + halfH), //6: 右后上
+                new(center.X + halfW, center.Y - halfD, center.Z - halfH)  //7: 右后下
             ];
 
             //每个面的顶点索引
             uint[][] faceIndices = new uint[][]
             {
-                [0, 1, 2, 0, 2, 3], //前
-                [4, 5, 6, 4, 6, 7], //后
-                [3, 2, 6, 3, 6, 5], //上
-                [0, 4, 7, 0, 7, 1], //下
-                [0, 3, 5, 0, 5, 4], //左
-                [1, 7, 6, 1, 6, 2]  //右
+                [0, 1, 2, 0, 2, 3], //前（Y正方向）
+                [4, 5, 6, 4, 6, 7], //后（Y负方向）
+                [3, 2, 6, 3, 6, 5], //上（Z正方向）
+                [0, 4, 7, 0, 7, 1], //下（Z负方向）
+                [0, 3, 5, 0, 5, 4], //左（X负方向）
+                [1, 7, 6, 1, 6, 2]  //右（X正方向）
             };
 
             //每个面的法向量
             Vector3[] normals =
             [
-                new(0, 0, 1),   //前
-                new(0, 0, -1),  //后
-                new(0, 1, 0),   //上
-                new(0, -1, 0),  //下
-                new(-1, 0, 0),  //左
-                new(1, 0, 0)    //右
+                new(0, 1, 0),   //前（Y正）
+                new(0, -1, 0),  //后（Y负）
+                new(0, 0, 1),   //上（Z正）
+                new(0, 0, -1),  //下（Z负）
+                new(-1, 0, 0),  //左（X负）
+                new(1, 0, 0)    //右（X正）
             ];
 
             //纹理坐标
@@ -379,8 +379,8 @@ namespace MedicalSharp.Primitives.Builders
             }
 
             float halfW = width * 0.5f;
-            float halfH = height * 0.5f;
-            float halfD = depth * 0.5f;
+            float halfH = height * 0.5f;  //对应Z轴高度
+            float halfD = depth * 0.5f;   //对应Y轴深度
 
             List<Vertex> vertices = [];
             List<uint> indices = [];
@@ -390,17 +390,17 @@ namespace MedicalSharp.Primitives.Builders
                 //线框模式 - 8个顶点，12条边（24个索引）
                 Vector3[] cornerVertices =
                 [
-                    //前平面
-                    new Vector3(center.X - halfW, center.Y - halfH, center.Z + halfD), //0: 左下前
-                    new Vector3(center.X + halfW, center.Y - halfH, center.Z + halfD), //1: 右下前
-                    new Vector3(center.X + halfW, center.Y + halfH, center.Z + halfD), //2: 右上前
-                    new Vector3(center.X - halfW, center.Y + halfH, center.Z + halfD), //3: 左上前
+                    //前平面（Y为正方向）
+                    new Vector3(center.X - halfW, center.Y + halfD, center.Z - halfH), //0: 左下前
+                    new Vector3(center.X + halfW, center.Y + halfD, center.Z - halfH), //1: 右下前
+                    new Vector3(center.X + halfW, center.Y + halfD, center.Z + halfH), //2: 右上前
+                    new Vector3(center.X - halfW, center.Y + halfD, center.Z + halfH), //3: 左上前
 
-                    //后平面
-                    new Vector3(center.X - halfW, center.Y - halfH, center.Z - halfD), //4: 左下后
-                    new Vector3(center.X - halfW, center.Y + halfH, center.Z - halfD), //5: 左上后
-                    new Vector3(center.X + halfW, center.Y + halfH, center.Z - halfD), //6: 右上后
-                    new Vector3(center.X + halfW, center.Y - halfH, center.Z - halfD)  //7: 右下后
+                    //后平面（Y为负方向）
+                    new Vector3(center.X - halfW, center.Y - halfD, center.Z - halfH), //4: 左下后
+                    new Vector3(center.X - halfW, center.Y - halfD, center.Z + halfH), //5: 左上后
+                    new Vector3(center.X + halfW, center.Y - halfD, center.Z + halfH), //6: 右上后
+                    new Vector3(center.X + halfW, center.Y - halfD, center.Z - halfH)  //7: 右下后
                 ];
 
                 //12条边（每边2个点）
@@ -450,59 +450,59 @@ namespace MedicalSharp.Primitives.Builders
                 //定义6个面的24个顶点（相对于中心点）
                 Vector3[][] faceVertices = new Vector3[][]
                 {
-                    //前面 (z = center.Z + halfD)
-                    [
-                        new Vector3(center.X - halfW, center.Y - halfH, center.Z + halfD), //0
-                        new Vector3(center.X + halfW, center.Y - halfH, center.Z + halfD), //1
-                        new Vector3(center.X + halfW, center.Y + halfH, center.Z + halfD), //2
-                        new Vector3(center.X - halfW, center.Y + halfH, center.Z + halfD)  //3
-                    ],
-                    //后面 (z = center.Z - halfD)
-                    [
-                        new Vector3(center.X + halfW, center.Y - halfH, center.Z - halfD), //4
-                        new Vector3(center.X - halfW, center.Y - halfH, center.Z - halfD), //5
-                        new Vector3(center.X - halfW, center.Y + halfH, center.Z - halfD), //6
-                        new Vector3(center.X + halfW, center.Y + halfH, center.Z - halfD)  //7
-                    ],
-                    //右面 (x = center.X + halfW)
-                    [
-                        new Vector3(center.X + halfW, center.Y - halfH, center.Z + halfD), //8
-                        new Vector3(center.X + halfW, center.Y - halfH, center.Z - halfD), //9
-                        new Vector3(center.X + halfW, center.Y + halfH, center.Z - halfD), //10
-                        new Vector3(center.X + halfW, center.Y + halfH, center.Z + halfD)  //11
-                    ],
-                    //左面 (x = center.X - halfW)
-                    [
-                        new Vector3(center.X - halfW, center.Y - halfH, center.Z - halfD), //12
-                        new Vector3(center.X - halfW, center.Y - halfH, center.Z + halfD), //13
-                        new Vector3(center.X - halfW, center.Y + halfH, center.Z + halfD), //14
-                        new Vector3(center.X - halfW, center.Y + halfH, center.Z - halfD)  //15
-                    ],
-                    //上面 (y = center.Y + halfH)
-                    [
-                        new Vector3(center.X - halfW, center.Y + halfH, center.Z + halfD), //16
-                        new Vector3(center.X + halfW, center.Y + halfH, center.Z + halfD), //17
-                        new Vector3(center.X + halfW, center.Y + halfH, center.Z - halfD), //18
-                        new Vector3(center.X - halfW, center.Y + halfH, center.Z - halfD)  //19
-                    ],
-                    //下面 (y = center.Y - halfH)
-                    [
-                        new Vector3(center.X - halfW, center.Y - halfH, center.Z - halfD), //20
-                        new Vector3(center.X + halfW, center.Y - halfH, center.Z - halfD), //21
-                        new Vector3(center.X + halfW, center.Y - halfH, center.Z + halfD), //22
-                        new Vector3(center.X - halfW, center.Y - halfH, center.Z + halfD)  //23
-                    ]
+            //前面 (Y = center.Y + halfD)
+            [
+                new Vector3(center.X - halfW, center.Y + halfD, center.Z - halfH), //0
+                new Vector3(center.X + halfW, center.Y + halfD, center.Z - halfH), //1
+                new Vector3(center.X + halfW, center.Y + halfD, center.Z + halfH), //2
+                new Vector3(center.X - halfW, center.Y + halfD, center.Z + halfH)  //3
+            ],
+            //后面 (Y = center.Y - halfD)
+            [
+                new Vector3(center.X + halfW, center.Y - halfD, center.Z - halfH), //4
+                new Vector3(center.X - halfW, center.Y - halfD, center.Z - halfH), //5
+                new Vector3(center.X - halfW, center.Y - halfD, center.Z + halfH), //6
+                new Vector3(center.X + halfW, center.Y - halfD, center.Z + halfH)  //7
+            ],
+            //右面 (X = center.X + halfW)
+            [
+                new Vector3(center.X + halfW, center.Y + halfD, center.Z - halfH), //8
+                new Vector3(center.X + halfW, center.Y - halfD, center.Z - halfH), //9
+                new Vector3(center.X + halfW, center.Y - halfD, center.Z + halfH), //10
+                new Vector3(center.X + halfW, center.Y + halfD, center.Z + halfH)  //11
+            ],
+            //左面 (X = center.X - halfW)
+            [
+                new Vector3(center.X - halfW, center.Y - halfD, center.Z - halfH), //12
+                new Vector3(center.X - halfW, center.Y + halfD, center.Z - halfH), //13
+                new Vector3(center.X - halfW, center.Y + halfD, center.Z + halfH), //14
+                new Vector3(center.X - halfW, center.Y - halfD, center.Z + halfH)  //15
+            ],
+            //上面 (Z = center.Z + halfH)
+            [
+                new Vector3(center.X - halfW, center.Y + halfD, center.Z + halfH), //16
+                new Vector3(center.X + halfW, center.Y + halfD, center.Z + halfH), //17
+                new Vector3(center.X + halfW, center.Y - halfD, center.Z + halfH), //18
+                new Vector3(center.X - halfW, center.Y - halfD, center.Z + halfH)  //19
+            ],
+            //下面 (Z = center.Z - halfH)
+            [
+                new Vector3(center.X - halfW, center.Y - halfD, center.Z - halfH), //20
+                new Vector3(center.X + halfW, center.Y - halfD, center.Z - halfH), //21
+                new Vector3(center.X + halfW, center.Y + halfD, center.Z - halfH), //22
+                new Vector3(center.X - halfW, center.Y + halfD, center.Z - halfH)  //23
+            ]
                 };
 
                 //每个面的法线
                 Vector3[] faceNormals =
                 [
-                    new Vector3(0, 0, 1),  //前面
-                    new Vector3(0, 0, -1), //后面
-                    new Vector3(1, 0, 0),  //右面
-                    new Vector3(-1, 0, 0), //左面
-                    new Vector3(0, 1, 0),  //上面
-                    new Vector3(0, -1, 0)  //下面
+                    new Vector3(0, 1, 0),  //前面（Y正方向）
+                    new Vector3(0, -1, 0), //后面（Y负方向）
+                    new Vector3(1, 0, 0),  //右面（X正方向）
+                    new Vector3(-1, 0, 0), //左面（X负方向）
+                    new Vector3(0, 0, 1),  //上面（Z正方向）
+                    new Vector3(0, 0, -1)  //下面（Z负方向）
                 ];
 
                 //创建24个顶点（每个面4个）
