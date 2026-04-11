@@ -1,10 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
-using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Inputs;
-using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
@@ -109,29 +107,16 @@ namespace MedicalSharp.Controls.Viewports
         private VolumeRenderer _volumeRenderer;
 
         /// <summary>
-        /// 形状渲染器
-        /// </summary>
-        private ShapeRenderer _shapeRenderer;
-
-        /// <summary>
         /// 默认构造器
         /// </summary>
         public VolumeViewport()
         {
-            this.Children = new AvaloniaList<ShapeVisual3D>();
+
         }
 
         #endregion
 
         #region # 属性
-
-        #region 子元素列表 —— AvaloniaList<SphereVisual3D> Children
-        /// <summary>
-        /// 子元素列表
-        /// </summary>
-        [Content]
-        public AvaloniaList<ShapeVisual3D> Children { get; private set; }
-        #endregion
 
         #region 依赖属性 - 窗宽 —— float WindowWidth
         /// <summary>
@@ -242,16 +227,6 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 只读属性 - 形状渲染器 —— ShapeRenderer ShapeRenderer
-        /// <summary>
-        /// 只读属性 - 形状渲染器
-        /// </summary>
-        public ShapeRenderer ShapeRenderer
-        {
-            get => this._shapeRenderer;
-        }
-        #endregion
-
         #endregion
 
         #region # 方法
@@ -303,13 +278,6 @@ namespace MedicalSharp.Controls.Viewports
             this._volumeRenderer.SetMaterialOptions(this.Brightness, this.DensityScale);
             this._volumeRenderer.SetSamplingOptions(this.StepSize, this.MaxStepsCount, this.OpacityThreshold);
             this._volumeRenderer.TransferFunction.InitFromControlPoints(this.TFControlPoints);
-
-            //初始化形状渲染器
-            this._shapeRenderer = new ShapeRenderer(this.Camera);
-            foreach (ShapeVisual3D visual3D in this.Children)
-            {
-                this._shapeRenderer.AppendItem(visual3D.Renderable);
-            }
         }
         #endregion
 
@@ -329,6 +297,10 @@ namespace MedicalSharp.Controls.Viewports
                 GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
+                //关闭深度
+                GL.DepthMask(false);
+
+                //体积渲染
                 this._volumeRenderer.SetRenderable(this._volumeRenderable);
                 this._volumeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
             }
@@ -342,7 +314,6 @@ namespace MedicalSharp.Controls.Viewports
         protected override void OnOpenTKDeinit()
         {
             this._volumeRenderer?.Dispose();
-            this._shapeRenderer?.Dispose();
         }
         #endregion 
 

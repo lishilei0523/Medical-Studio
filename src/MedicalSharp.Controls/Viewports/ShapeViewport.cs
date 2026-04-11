@@ -26,12 +26,12 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 形状渲染器
         /// </summary>
-        private ShapeRenderer _renderer;
+        protected ShapeRenderer _shapeRenderer;
 
         /// <summary>
         /// 形状3D元素列表
         /// </summary>
-        private readonly IList<ShapeVisual3D> _shapeVisual3Ds;
+        protected readonly IList<ShapeVisual3D> _shapeVisual3Ds;
 
         /// <summary>
         /// 默认构造器
@@ -55,13 +55,13 @@ namespace MedicalSharp.Controls.Viewports
         public AvaloniaList<Visual3D> Children { get; private set; }
         #endregion
 
-        #region 只读属性 - 形状渲染器 —— ShapeRenderer Renderer
+        #region 只读属性 - 形状渲染器 —— ShapeRenderer ShapeRenderer
         /// <summary>
         /// 只读属性 - 形状渲染器
         /// </summary>
-        public ShapeRenderer Renderer
+        public ShapeRenderer ShapeRenderer
         {
-            get => this._renderer;
+            get => this._shapeRenderer;
         }
         #endregion
 
@@ -161,7 +161,7 @@ namespace MedicalSharp.Controls.Viewports
                 this.InputManager = new OrbitInputManager(orbitCamera);
             }
 
-            this._renderer = new ShapeRenderer(this.Camera);
+            this._shapeRenderer = new ShapeRenderer(this.Camera);
         }
         #endregion
 
@@ -172,12 +172,15 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="viewportSize">视口尺寸</param>
         protected override void OnOpenTKRender(PixelSize viewportSize)
         {
+            //开启深度
+            GL.DepthMask(true);
+
             //禁用面剔除
             GL.Disable(EnableCap.CullFace);
 
             //清空渲染对象
             this._shapeVisual3Ds.Clear();
-            this._renderer.ClearItems();
+            this._shapeRenderer.ClearItems();
 
             //填充渲染对象
             foreach (Visual3D visual3D in this.Children)
@@ -186,13 +189,13 @@ namespace MedicalSharp.Controls.Viewports
                 {
                     shapeVisual3D.EnsureRenderable();
                     this._shapeVisual3Ds.Add(shapeVisual3D);
-                    this._renderer.AppendItem(shapeVisual3D.Renderable);
+                    this._shapeRenderer.AppendItem(shapeVisual3D.Renderable);
                 }
                 if (visual3D is ShapePresenter shapePresenter)
                 {
                     shapePresenter.Content.EnsureRenderable();
                     this._shapeVisual3Ds.Add(shapePresenter.Content);
-                    this._renderer.AppendItem(shapePresenter.Content.Renderable);
+                    this._shapeRenderer.AppendItem(shapePresenter.Content.Renderable);
                 }
                 if (visual3D is ShapesPresenter shapesPresenter)
                 {
@@ -200,12 +203,12 @@ namespace MedicalSharp.Controls.Viewports
                     {
                         item.EnsureRenderable();
                         this._shapeVisual3Ds.Add(item);
-                        this._renderer.AppendItem(item.Renderable);
+                        this._shapeRenderer.AppendItem(item.Renderable);
                     }
                 }
             }
 
-            this._renderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+            this._shapeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
         }
         #endregion
 
@@ -215,7 +218,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         protected override void OnOpenTKDeinit()
         {
-            this._renderer.Dispose();
+            this._shapeRenderer.Dispose();
         }
         #endregion
 
