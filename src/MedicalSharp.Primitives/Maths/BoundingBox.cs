@@ -15,6 +15,11 @@ namespace MedicalSharp.Primitives.Maths
         #region # 字段及构造器
 
         /// <summary>
+        /// 最小厚度
+        /// </summary>
+        private const float MinThickness = 0.02f;
+
+        /// <summary>
         /// 最小点
         /// </summary>
         private Vector3 _minimum;
@@ -31,6 +36,25 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="maximum">最大点</param>
         public BoundingBox(Vector3 minimum, Vector3 maximum)
         {
+            //对零厚度的轴进行扩展
+            Vector3 size = maximum - minimum;
+            Vector3 halfThickness = new Vector3(MinThickness * 0.5f);
+            if (size.X < float.Epsilon)
+            {
+                minimum.X -= halfThickness.X;
+                maximum.X += halfThickness.X;
+            }
+            if (size.Y < float.Epsilon)
+            {
+                minimum.Y -= halfThickness.Y;
+                maximum.Y += halfThickness.Y;
+            }
+            if (size.Z < float.Epsilon)
+            {
+                minimum.Z -= halfThickness.Z;
+                maximum.Z += halfThickness.Z;
+            }
+
             this._minimum = minimum;
             this._maximum = maximum;
             this.Corners = new Vector3[8];
