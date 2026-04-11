@@ -10,19 +10,4 @@
     <Title>$(AssemblyName)</Title>
     <Owners>$(Company)</Owners>
   </PropertyGroup>
-
-  <!--Runtimes-->
-  <PropertyGroup>
-    <SimpleITK Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(SolutionDir)\runtimes\win-x64\SimpleITK\dll\*.*</SimpleITK>
-    <SimpleITK Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(SolutionDir)\runtimes\linux-x64\SimpleITK\lib\*.*</SimpleITK>
-  </PropertyGroup>
-
-  <!--Runtimes-->
-  <ItemGroup>
-    <None Include="$(SimpleITK)" Condition="'$(SimpleITK)' != ''">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <Visible>False</Visible>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>
