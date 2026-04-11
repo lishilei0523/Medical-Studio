@@ -212,6 +212,135 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
+        #region # 创建矩形 —— static MeshGeometry CreateRectangle(Vector3 center, float width...
+        /// <summary>
+        /// 创建矩形
+        /// </summary>
+        /// <param name="center">中心点位置</param>
+        /// <param name="width">宽度（X轴方向）</param>
+        /// <param name="height">高度（Y轴方向）</param>
+        /// <param name="normal">法向量（控制矩形朝向）</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <param name="color">颜色</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreateRectangle(Vector3 center, float width, float height, Vector3 normal = default, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Lines, Vector4 color = default)
+        {
+            if (color == default)
+            {
+                color = new Vector4(1.0f);
+            }
+            if (normal == default)
+            {
+                //默认朝上（Z轴）
+                normal = Vector3.UnitZ;
+            }
+
+            float halfW = width * 0.5f;
+            float halfH = height * 0.5f;
+
+            //计算局部坐标系
+            Vector3 right, up;
+
+            //根据法向量计算基向量
+            if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.999f)
+            {
+                //法向量平行于Z轴
+                right = Vector3.UnitX;
+                up = Vector3.UnitY;
+            }
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.999f)
+            {
+                //法向量平行于Y轴
+                right = Vector3.UnitX;
+                up = Vector3.UnitZ;
+            }
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitX)) > 0.999f)
+            {
+                //法向量平行于X轴
+                right = Vector3.UnitY;
+                up = Vector3.UnitZ;
+            }
+            else
+            {
+                //一般情况：使用叉积构建正交基
+                right = Vector3.Normalize(Vector3.Cross(normal, Vector3.UnitZ));
+                up = Vector3.Normalize(Vector3.Cross(right, normal));
+            }
+
+            //计算四个角点（相对于中心点）
+            Vector3[] corners =
+            [
+                center - right * halfW - up * halfH, //0: 左下
+                center + right * halfW - up * halfH, //1: 右下
+                center + right * halfW + up * halfH, //2: 右上
+                center - right * halfW + up * halfH  //3: 左上
+            ];
+
+            List<Vertex> vertices = [];
+            List<uint> indices = [];
+
+            //线框模式 - 4个顶点，4条边（8个索引）
+            if (primitiveType == GraphicPrimitiveType.Lines)
+            {
+                //创建顶点
+                for (int i = 0; i < 4; i++)
+                {
+                    vertices.Add(new Vertex
+                    {
+                        Position = corners[i],
+                        Color = color,
+                        TextureCoord = Vector2.Zero,
+                        Normal = Vector3.Zero  //线框不需要法线
+                    });
+                }
+
+                //创建索引 - 4条边
+                uint[][] edges = new uint[][]
+                {
+            [0, 1], //下边
+            [1, 2], //右边
+            [2, 3], //上边
+            [3, 0]  //左边
+                };
+
+                for (int i = 0; i < 4; i++)
+                {
+                    indices.Add(edges[i][0]);
+                    indices.Add(edges[i][1]);
+                }
+            }
+            //填充模式 - 4个顶点，2个三角形（6个索引）
+            else
+            {
+                //创建顶点
+                Vector2[] texCoords =
+                [
+                    new Vector2(0, 0),
+                    new Vector2(1, 0),
+                    new Vector2(1, 1),
+                    new Vector2(0, 1)
+                ];
+
+                for (int i = 0; i < 4; i++)
+                {
+                    vertices.Add(new Vertex
+                    {
+                        Position = corners[i],
+                        Color = color,
+                        TextureCoord = texCoords[i],
+                        Normal = normal
+                    });
+                }
+
+                //创建索引 - 2个三角形
+                indices.AddRange([0, 1, 2]); //第一个三角形
+                indices.AddRange([0, 2, 3]); //第二个三角形
+            }
+
+            return new MeshGeometry(vertices, indices);
+        }
+        #endregion
+
         #region # 创建四边形 —— static MeshGeometry CreateQuadrangle(Vector3 pointA, Vector3 pointB...
         /// <summary>
         /// 创建四边形
