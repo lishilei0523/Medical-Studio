@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Caliburn.Micro;
-using MedicalSharp.Client.ViewModels.ShapeContext;
+using MedicalSharp.Client.ViewModels.HomeContext;
 using MedicalSharp.Insight;
 using Microsoft.Extensions.DependencyInjection;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
@@ -40,8 +40,8 @@ namespace MedicalSharp.Client
         /// </summary>
         protected override async void OnStartup(object sender, ControlledApplicationLifetimeStartupEventArgs eventArgs)
         {
-            //await base.DisplayRootViewFor<IndexViewModel>();
-            await base.DisplayRootViewFor<LookViewModel>();
+            await base.DisplayRootViewFor<IndexViewModel>();
+            //await base.DisplayRootViewFor<LookViewModel>();
         }
         #endregion
 

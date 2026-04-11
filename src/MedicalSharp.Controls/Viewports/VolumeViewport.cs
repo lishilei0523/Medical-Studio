@@ -1,13 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
-using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
-using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Engine.Resources;
-using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -19,7 +16,7 @@ namespace MedicalSharp.Controls.Viewports
     /// <summary>
     /// 体积渲染视口
     /// </summary>
-    public class VolumeViewport : OpenTKViewport
+    public class VolumeViewport : ShapeViewport
     {
         #region # 字段及构造器
 
@@ -266,11 +263,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         protected override void OnOpenTKInit()
         {
-            //InputManger默认值
-            if (this.InputManager == null && this.Camera is OrbitCamera orbitCamera)
-            {
-                this.InputManager = new OrbitInputManager(orbitCamera);
-            }
+            base.OnOpenTKInit();
 
             //初始化体积渲染器
             this._volumeRenderer = new VolumeRenderer(this.Camera);
@@ -303,6 +296,9 @@ namespace MedicalSharp.Controls.Viewports
                 //体积渲染
                 this._volumeRenderer.SetRenderable(this._volumeRenderable);
                 this._volumeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+
+                //形状渲染
+                base.OnOpenTKRender(viewportSize);
             }
         }
         #endregion
@@ -313,6 +309,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         protected override void OnOpenTKDeinit()
         {
+            base.OnOpenTKDeinit();
             this._volumeRenderer?.Dispose();
         }
         #endregion 
