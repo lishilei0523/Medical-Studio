@@ -69,16 +69,16 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
-        #region 查找最近元素 —— bool FindNearest(Vector2 position, out Vector3 point...
+        #region 查找最近形状 —— bool FindNearestShape(Vector2 position, out Vector3 point...
         /// <summary>
-        /// 查找最近元素
+        /// 查找最近形状
         /// </summary>
         /// <param name="position">2D位置</param>
         /// <param name="point">3D位置</param>
         /// <param name="normal">法向量</param>
         /// <param name="visual3D">3D元素</param>
         /// <returns>是否成功</returns>
-        public bool FindNearest(Vector2 position, out Vector3 point, out Vector3 normal, out ShapeVisual3D visual3D)
+        public bool FindNearestShape(Vector2 position, out Vector3 point, out Vector3 normal, out ShapeVisual3D visual3D)
         {
             this.GlContext.MakeCurrent();
 
@@ -117,15 +117,15 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 查找最近位置 —— Vector3? FindNearestPoint(Vector2 position)
+        #region 查找最近位置 —— Vector3? FindNearestPosition(Vector2 position)
         /// <summary>
         /// 查找最近位置
         /// </summary>
         /// <param name="position">2D位置</param>
         /// <returns>3D位置</returns>
-        public Vector3? FindNearestPoint(Vector2 position)
+        public Vector3? FindNearestPosition(Vector2 position)
         {
-            if (this.FindNearest(position, out Vector3 point, out _, out _))
+            if (this.FindNearestShape(position, out Vector3 point, out _, out _))
             {
                 return point;
             }

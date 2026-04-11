@@ -120,8 +120,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             if (eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out ShapeVisual3D element);
-
+                bool success = viewport.FindNearestShape(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out ShapeVisual3D element);
                 if (success)
                 {
                     StringBuilder builder = new StringBuilder();

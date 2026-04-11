@@ -107,7 +107,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             if (this.VolumeData != null && eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3? textureCoord, out Vector3i? voxelPostion, out short? voxelValue);
+                bool success = viewport.FindNearestVoxel(mousePos2D.ToVector2(), out Vector3? textureCoord, out Vector3i? voxelPostion, out short? voxelValue);
                 if (success)
                 {
                     StringBuilder builder = new StringBuilder();
