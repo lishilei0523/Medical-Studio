@@ -289,11 +289,11 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         /// <param name="planePoint">平面上的一点</param>
         /// <param name="planeNormal">平面法向量</param>
-        /// <param name="intersectionPoint">交点坐标</param>
+        /// <param name="hitPoint">交点坐标</param>
         /// <returns>是否相交</returns>
-        public bool IntersectsPlane(Vector3 planePoint, Vector3 planeNormal, out Vector3 intersectionPoint)
+        public bool IntersectsPlane(Vector3 planePoint, Vector3 planeNormal, out Vector3 hitPoint)
         {
-            intersectionPoint = Vector3.Zero;
+            hitPoint = Vector3.Zero;
 
             //计算平面方程常数项：Ax + By + Cz + D = 0，其中 D = -(N · P0)
             float planeDistance = -Vector3.Dot(planeNormal, planePoint);
@@ -312,7 +312,7 @@ namespace MedicalSharp.Primitives.Maths
             //射线方向为正向且 t >= 0 才有交点
             if (t >= 0)
             {
-                intersectionPoint = this._position + this._direction * t;
+                hitPoint = this._position + this._direction * t;
                 return true;
             }
 

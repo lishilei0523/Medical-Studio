@@ -151,29 +151,34 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             {
                 //计算模型位置
                 Matrix4 modelMatrix = this._selectedVisual.Renderable.Transform.Matrix;  //模型的变换矩阵
-                Vector3 oldVisualPos3D = modelMatrix.ExtractTranslation();               //模型位置
+                Vector3 oldVisualPos3D = modelMatrix.ExtractTranslation();               //模型平移位置
 
-                //计算模型新位置
-                Point mousePos2D = eventArgs.GetPosition(viewport);             //鼠标位置
-                Ray ray3D = viewport.UnProject(mousePos2D);                     //反投影
-                Vector3 lookDirction = viewport.Camera.LookDirection;           //相机方向
-                Vector3 position = oldVisualPos3D;
+                //获取鼠标射线
+                Point mousePos2D = eventArgs.GetPosition(viewport);
+                Ray ray = viewport.UnProject(mousePos2D);
 
-                //将射线变换到局部空间
+                //将变换到局部空间
                 Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
-                Ray localRay = ray3D.Transform(worldToLocal);
+                Ray localRay = ray.Transform(worldToLocal);
+                Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal);
 
                 //移动平面上的交点
-                bool success = localRay.IntersectsPlane(position, lookDirction, out Vector3 newVisualPos3D);
+                bool success = localRay.IntersectsPlane(oldVisualPos3D, localLookDirection, out Vector3 hitPoint);
                 if (success && eventArgs.Properties.IsLeftButtonPressed)
                 {
                     viewport.Cursor = new Cursor(StandardCursorType.Hand);
 
-                    //移动新位置
-                    Vector3 newWorldVisualPos3D = Vector3.TransformPosition(newVisualPos3D, modelMatrix);
-                    newWorldVisualPos3D -= this._selectedVisual.Renderable.BoundingBox.Center;
+                    //将局部交点变换回世界空间
+                    Vector3 worldHitPoint = Vector3.TransformPosition(hitPoint, modelMatrix);
 
-                    this._selectedVisual.Renderable.Transform.SetPosition(newWorldVisualPos3D);
+                    //计算物体的包围盒中心在世界空间的位置
+                    Vector3 localCenter = this._selectedVisual.Renderable.BoundingBox.Center;
+                    Vector3 worldCenter = Vector3.TransformPosition(localCenter, modelMatrix);
+
+                    //计算新位置：当前变换位置 + (鼠标交点 - 世界包围盒中心)
+                    Vector3 newVisualPos3D = oldVisualPos3D + (worldHitPoint - worldCenter);
+
+                    this._selectedVisual.Renderable.Transform.SetPosition(newVisualPos3D);
                     viewport.RequestNextFrameRendering();
                 }
             }
