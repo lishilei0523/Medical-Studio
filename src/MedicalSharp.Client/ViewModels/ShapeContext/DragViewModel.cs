@@ -151,6 +151,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             {
                 //计算模型位置
                 Matrix4 modelMatrix = this._selectedVisual.Renderable.Transform.Matrix;  //模型变换矩阵
+                Vector3 translation = modelMatrix.ExtractTranslation();
                 Vector3 localCenter = this._selectedVisual.Renderable.BoundingBox.Center;
                 Vector3 worldCenter = Vector3.TransformPosition(localCenter, modelMatrix);
 
@@ -159,7 +160,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                 Ray ray = viewport.UnProject(mousePos2D);
 
                 //移动平面上的交点
-                bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out Vector3 hitPoint);
+                bool success = ray.IntersectsPlane(translation, viewport.Camera.LookDirection, out Vector3 hitPoint);
 
                 //旋转
                 if (success &&
