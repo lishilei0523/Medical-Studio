@@ -74,6 +74,7 @@ namespace MedicalSharp.Engine.Renderables
                 {
                     this._boundingBox = this.CalculateBoundingBox();
                     this._boundingsDirty = false;
+                    this.Transform.SetPivot(this._boundingBox.Value.Center);
                 }
 
                 return this._boundingBox.Value;

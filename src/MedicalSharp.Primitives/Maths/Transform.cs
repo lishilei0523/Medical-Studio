@@ -22,6 +22,7 @@ namespace MedicalSharp.Primitives.Maths
             this.Position = Vector3.Zero;
             this.Rotation = Quaternion.Identity;
             this.Scaling = Vector3.One;
+            this.Pivot = Vector3.Zero;
             this._matrix = Matrix4.Identity;
             this.UpdateMatrix();
         }
@@ -49,6 +50,14 @@ namespace MedicalSharp.Primitives.Maths
         /// 缩放
         /// </summary>
         public Vector3 Scaling { get; private set; }
+        #endregion
+
+        #region 轴心点 —— Vector3 Pivot
+        /// <summary>
+        /// 轴心点
+        /// </summary>
+        /// <remarks>旋转和缩放的中心</remarks>
+        public Vector3 Pivot { get; private set; }
         #endregion
 
         #region 只读属性 - 变换矩阵 —— Matrix4 Matrix
@@ -105,16 +114,14 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 设置位置和旋转 —— void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+        #region 设置轴心点 —— void SetPivot(Vector3 pivot)
         /// <summary>
-        /// 设置位置和旋转
+        /// 设置轴心点
         /// </summary>
-        /// <param name="position">位置</param>
-        /// <param name="rotation">旋转四元数</param>
-        public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+        /// <param name="pivot">轴心点</param>
+        public void SetPivot(Vector3 pivot)
         {
-            this.Position = position;
-            this.Rotation = rotation;
+            this.Pivot = pivot;
             this.UpdateMatrix();
         }
         #endregion
@@ -207,11 +214,21 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         private void UpdateMatrix()
         {
-            Matrix4 translation = Matrix4.CreateTranslation(this.Position);
+            //平移到轴心点
+            Matrix4 toPivot = Matrix4.CreateTranslation(-this.Pivot);
+
+            //应用旋转和缩放
             Matrix4 rotation = Matrix4.CreateFromQuaternion(this.Rotation);
             Matrix4 scale = Matrix4.CreateScale(this.Scaling);
 
-            this._matrix = translation * rotation * scale;
+            //平移回原位置
+            Matrix4 fromPivot = Matrix4.CreateTranslation(this.Pivot);
+
+            //应用世界位置平移
+            Matrix4 translation = Matrix4.CreateTranslation(this.Position);
+
+            // 组合：先移到轴心点，应用变换，移回，最后平移到世界位置
+            this._matrix = scale * toPivot * rotation * fromPivot * translation;
         }
         #endregion 
 
