@@ -10,25 +10,20 @@ namespace MedicalSharp.Primitives.Maths
         #region # 字段及构造器
 
         /// <summary>
-        /// 缓存矩阵
+        /// 变换矩阵
         /// </summary>
-        private Matrix4 _cachedMatrix;
-
-        /// <summary>
-        /// 是否需要重新计算矩阵
-        /// </summary>
-        private bool _dirty;
+        private Matrix4 _matrix;
 
         /// <summary>
         /// 默认构造器
         /// </summary>
         public Transform()
         {
-            this._position = Vector3.Zero;
-            this._rotation = Quaternion.Identity;
-            this._scaling = Vector3.One;
-            this._cachedMatrix = Matrix4.Identity;
-            this._dirty = true;
+            this.Position = Vector3.Zero;
+            this.Rotation = Quaternion.Identity;
+            this.Scaling = Vector3.One;
+            this._matrix = Matrix4.Identity;
+            this.UpdateMatrix();
         }
 
         #endregion
@@ -39,60 +34,21 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 位置
         /// </summary>
-        private Vector3 _position;
-
-        /// <summary>
-        /// 位置
-        /// </summary>
-        public Vector3 Position
-        {
-            get => this._position;
-            set
-            {
-                this._position = value;
-                this._dirty = true;
-            }
-        }
+        public Vector3 Position { get; private set; }
         #endregion
 
         #region 旋转 —— Quaternion Rotation
         /// <summary>
         /// 旋转
         /// </summary>
-        private Quaternion _rotation;
-
-        /// <summary>
-        /// 旋转
-        /// </summary>
-        public Quaternion Rotation
-        {
-            get => this._rotation;
-            set
-            {
-                this._rotation = value;
-                this._dirty = true;
-            }
-        }
+        public Quaternion Rotation { get; private set; }
         #endregion
 
         #region 缩放 —— Vector3 Scaling
         /// <summary>
         /// 缩放
         /// </summary>
-        private Vector3 _scaling;
-
-        /// <summary>
-        /// 缩放
-        /// </summary>
-        public Vector3 Scaling
-        {
-            get => this._scaling;
-            set
-            {
-                this._scaling = value;
-                this._dirty = true;
-            }
-        }
+        public Vector3 Scaling { get; private set; }
         #endregion
 
         #region 只读属性 - 变换矩阵 —— Matrix4 Matrix
@@ -101,15 +57,7 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         public Matrix4 Matrix
         {
-            get
-            {
-                if (this._dirty)
-                {
-                    this.UpdateMatrix();
-                }
-
-                return this._cachedMatrix;
-            }
+            get => this._matrix;
         }
         #endregion 
 
@@ -119,6 +67,18 @@ namespace MedicalSharp.Primitives.Maths
 
         //Public
 
+        #region 设置位置 —— void SetPosition(Vector3 position)
+        /// <summary>
+        /// 设置位置
+        /// </summary>
+        /// <param name="position">位置</param>
+        public void SetPosition(Vector3 position)
+        {
+            this.Position = position;
+            this.UpdateMatrix();
+        }
+        #endregion
+
         #region 设置旋转 —— void SetRotation(Vector3 eulerAngles)
         /// <summary>
         /// 设置旋转
@@ -126,8 +86,8 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="eulerAngles">欧拉角</param>
         public void SetRotation(Vector3 eulerAngles)
         {
-            this._rotation = Quaternion.FromEulerAngles(eulerAngles);
-            this._dirty = true;
+            this.Rotation = Quaternion.FromEulerAngles(eulerAngles);
+            this.UpdateMatrix();
         }
         #endregion
 
@@ -138,8 +98,8 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="translation">平移向量</param>
         public void Translate(Vector3 translation)
         {
-            this._position += translation;
-            this._dirty = true;
+            this.Position += translation;
+            this.UpdateMatrix();
         }
         #endregion
 
@@ -152,8 +112,8 @@ namespace MedicalSharp.Primitives.Maths
         public void Rotate(float angle, Vector3 axis)
         {
             Quaternion rotation = Quaternion.FromAxisAngle(axis.Normalized(), MathHelper.DegreesToRadians(angle));
-            this._rotation = rotation * this._rotation;
-            this._dirty = true;
+            this.Rotation = rotation * this.Rotation;
+            this.UpdateMatrix();
         }
         #endregion
 
@@ -164,8 +124,8 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="rotation">旋转四元数</param>
         public void Rotate(Quaternion rotation)
         {
-            this._rotation = rotation * this._rotation;
-            this._dirty = true;
+            this.Rotation = rotation * this.Rotation;
+            this.UpdateMatrix();
         }
         #endregion
 
@@ -176,8 +136,8 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="scaling">缩放向量</param>
         public void Scale(Vector3 scaling)
         {
-            this._scaling *= scaling;
-            this._dirty = true;
+            this.Scaling *= scaling;
+            this.UpdateMatrix();
         }
         #endregion
 
@@ -189,7 +149,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <returns>方向向量</returns>
         public Vector3 ApplyToDirection(Vector3 direction)
         {
-            return this._rotation * direction;
+            return this.Rotation * direction;
         }
         #endregion
 
@@ -219,12 +179,11 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         private void UpdateMatrix()
         {
-            Matrix4 translation = Matrix4.CreateTranslation(this._position);
-            Matrix4 rotation = Matrix4.CreateFromQuaternion(this._rotation);
-            Matrix4 scale = Matrix4.CreateScale(this._scaling);
+            Matrix4 translation = Matrix4.CreateTranslation(this.Position);
+            Matrix4 rotation = Matrix4.CreateFromQuaternion(this.Rotation);
+            Matrix4 scale = Matrix4.CreateScale(this.Scaling);
 
-            this._cachedMatrix = translation * rotation * scale;
-            this._dirty = false;
+            this._matrix = translation * rotation * scale;
         }
         #endregion 
 
