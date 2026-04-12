@@ -7,6 +7,7 @@ using Avalonia.Rendering;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Maths;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -147,6 +148,20 @@ namespace MedicalSharp.Controls.Base
         {
             return point.X >= 0 && point.X <= this.Bounds.Width &&
                    point.Y >= 0 && point.Y <= this.Bounds.Height;
+        }
+        #endregion
+
+        #region 反投影 —— Ray UnProject(Point position)
+        /// <summary>
+        /// 反投影
+        /// </summary>
+        /// <param name="position">2D位置</param>
+        /// <returns>射线</returns>
+        public Ray UnProject(Point position)
+        {
+            Ray ray = Ray.UnProject(position.ToVector2(), this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+
+            return ray;
         }
         #endregion
 
