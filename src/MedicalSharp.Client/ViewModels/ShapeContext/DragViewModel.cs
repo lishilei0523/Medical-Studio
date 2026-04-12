@@ -150,8 +150,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             if (this._selectedVisual != null)
             {
                 //计算模型位置
-                Matrix4 modelMatrix = this._selectedVisual.Renderable.Transform.Matrix;  //模型变换矩阵
-                Vector3 translation = modelMatrix.ExtractTranslation();
+                Matrix4 modelMatrix = this._selectedVisual.Renderable.Transform.Matrix;
                 Vector3 localCenter = this._selectedVisual.Renderable.BoundingBox.Center;
                 Vector3 worldCenter = Vector3.TransformPosition(localCenter, modelMatrix);
 
@@ -160,18 +159,29 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                 Ray ray = viewport.UnProject(mousePos2D);
 
                 //移动平面上的交点
-                bool success = ray.IntersectsPlane(translation, viewport.Camera.LookDirection, out Vector3 hitPoint);
+                bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out Vector3 hitPoint);
 
                 //旋转
                 if (success &&
                     eventArgs.Properties.IsLeftButtonPressed &&
                     KeyModifiers.Alt == (eventArgs.KeyModifiers & KeyModifiers.Alt))
                 {
-                    //设置光标
-                    viewport.Cursor = new Cursor(StandardCursorType.SizeWestEast);
-
                     float deltaX = (float)(mousePos2D.X - this._selectedPoint2D!.Value.X);
                     float deltaY = (float)(mousePos2D.Y - this._selectedPoint2D!.Value.Y);
+
+                    //设置光标
+                    if (deltaX != 0 && deltaY == 0)
+                    {
+                        viewport.Cursor = new Cursor(StandardCursorType.SizeWestEast);
+                    }
+                    if (deltaX == 0 && deltaY != 0)
+                    {
+                        viewport.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
+                    }
+                    if (deltaX != 0 && deltaY != 0)
+                    {
+                        viewport.Cursor = new Cursor(StandardCursorType.SizeAll);
+                    }
 
                     //旋转轴
                     Vector3 axisY = viewport.Camera.UpDirection.Normalized();

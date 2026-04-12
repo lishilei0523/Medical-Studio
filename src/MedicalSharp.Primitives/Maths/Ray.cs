@@ -295,24 +295,41 @@ namespace MedicalSharp.Primitives.Maths
         {
             hitPoint = Vector3.Zero;
 
-            //计算平面方程常数项：Ax + By + Cz + D = 0，其中 D = -(N · P0)
-            float planeDistance = -Vector3.Dot(planeNormal, planePoint);
+            //确保法向量已归一化
+            Vector3 normal = planeNormal;
+            float normalLength = normal.Length;
+            if (normalLength < float.Epsilon)
+            {
+                return false; // 无效的法向量
+            }
+            normal /= normalLength;
 
-            float denominator = Vector3.Dot(planeNormal, this._direction);
+            //计算射线方向与法向量的点积
+            float dotND = Vector3.Dot(normal, this._direction);
 
-            //射线方向与平面平行，不相交
-            if (Math.Abs(denominator) < float.Epsilon)
+            //如果射线与平面平行，则无交点或无穷多个交点
+            if (Math.Abs(dotND) < 1e-7f)
             {
                 return false;
             }
 
-            //计算交点参数t
-            float t = (planeDistance - Vector3.Dot(planeNormal, this._position)) / denominator;
+            //计算从射线起点到平面上点的向量
+            Vector3 planeToRayOrigin = planePoint - this._position;
 
-            //射线方向为正向且 t >= 0 才有交点
-            if (t >= 0)
+            //计算射线起点到平面的垂直距离（带符号）
+            float signedDistance = Vector3.Dot(planeToRayOrigin, normal);
+
+            //计算交点参数 t
+            float t = signedDistance / dotND;
+
+            //使用小的容差处理浮点精度问题
+            const float tolerance = 1e-5f;
+            if (t >= -tolerance)
             {
+                //如果t为负数但在容差范围内，则取0
+                t = Math.Max(0, t);
                 hitPoint = this._position + this._direction * t;
+
                 return true;
             }
 
