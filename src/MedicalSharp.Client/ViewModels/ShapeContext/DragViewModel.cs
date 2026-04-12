@@ -3,19 +3,17 @@ using Avalonia.Collections;
 using Avalonia.Input;
 using Avalonia.Media;
 using Caliburn.Micro;
-using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
-using SD.Infrastructure.Avalonia.CustomControls;
-using SD.Infrastructure.Avalonia.Enums;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Vector3 = OpenTK.Mathematics.Vector3;
 
 namespace MedicalSharp.Client.ViewModels.ShapeContext
 {
@@ -25,6 +23,16 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
     public class DragViewModel : ScreenBase
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 选中的3D元素
+        /// </summary>
+        private ShapeVisual3D _selectedVisual;
+
+        /// <summary>
+        /// 选中2D点
+        /// </summary>
+        private Point? _selectedPoint2D;
 
         /// <summary>
         /// 窗口管理器
@@ -123,18 +131,69 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                 bool success = viewport.FindNearestShape(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out ShapeVisual3D element);
                 if (success)
                 {
-                    StringBuilder builder = new StringBuilder();
-                    builder.AppendLine($"点击对象: {element?.GetType().Name}");
-                    builder.AppendLine($"点击2D坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
-                    builder.AppendLine($"点击3D坐标: X:{mousePos3D.X}, Y:{mousePos3D.Y}, Z:{mousePos3D.Z}");
-                    builder.AppendLine($"法向量: X:{normal.X}, Y:{normal.Y}, Z:{normal.Z}");
-                    MessageBox.Show(builder.ToString(), "成功", MessageBoxButton.OK, PackIconMaterialDesignKind.Info);
-                }
-                else
-                {
-                    MessageBox.Show("获取失败！", "错误", MessageBoxButton.OK, PackIconMaterialDesignKind.Error);
+                    this._selectedVisual = element;
+                    this._selectedPoint2D = mousePos2D;
+
+                    eventArgs.Handled = true;
+                    return;
                 }
             }
+        }
+        #endregion
+
+        #region 视口鼠标移动事件 —— void OnViewportPointerMoved(ShapeViewport viewport...
+        /// <summary>
+        /// 视口鼠标移动事件
+        /// </summary>
+        public void OnViewportPointerMoved(ShapeViewport viewport, PointerEventArgs eventArgs)
+        {
+            if (this._selectedVisual != null)
+            {
+                //计算模型位置
+                Matrix4 modelMatrix = this._selectedVisual.Renderable.Transform.Matrix;  //模型的变换矩阵
+                Vector3 oldVisualPos3D = modelMatrix.ExtractTranslation();               //模型位置
+
+                //计算模型新位置
+                Point mousePos2D = eventArgs.GetPosition(viewport);             //鼠标位置
+                Ray ray3D = viewport.UnProject(mousePos2D);                     //反投影
+                Vector3 lookDirction = viewport.Camera.LookDirection;           //相机方向
+                Vector3 position = oldVisualPos3D;
+
+                //将射线变换到局部空间
+                Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
+                Ray localRay = ray3D.Transform(worldToLocal);
+
+                //移动平面上的交点
+                bool success = localRay.IntersectsPlane(position, lookDirction, out Vector3 newVisualPos3D);
+                if (success && eventArgs.Properties.IsLeftButtonPressed)
+                {
+                    viewport.Cursor = new Cursor(StandardCursorType.Hand);
+
+                    //移动新位置
+                    Vector3 newWorldVisualPos3D = Vector3.TransformPosition(newVisualPos3D, modelMatrix);
+                    newWorldVisualPos3D -= this._selectedVisual.Renderable.BoundingBox.Center;
+
+                    this._selectedVisual.Renderable.Transform.SetPosition(newWorldVisualPos3D);
+                    viewport.RequestNextFrameRendering();
+                }
+            }
+        }
+        #endregion
+
+        #region 视口鼠标松开事件 —— void OnViewportPointerReleased(ShapeViewport viewport...
+        /// <summary>
+        /// 视口鼠标松开事件
+        /// </summary>
+        public void OnViewportPointerReleased(ShapeViewport viewport, PointerReleasedEventArgs eventArgs)
+        {
+            //设置光标
+            viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //清空选中
+            this._selectedVisual = null;
+            this._selectedPoint2D = null;
+
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 

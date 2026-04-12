@@ -43,7 +43,11 @@
 			<Grid Grid.Row="1">
 				<sd:ShapeViewport Background="Black"
 								  Camera="{Binding OrbitCamera}"
-								  cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
+								  cm:Message.Attach="
+								  [Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];
+								  [Event PointerMoved] = [Action OnViewportPointerMoved($source, $eventArgs)];
+								  [Event PointerReleased] = [Action OnViewportPointerReleased($source, $eventArgs)];
+								  ">
 					<sd:PointVisual3D Position="0,0,1" Fill="Cyan" PointSize="5" />
 					<sd:LineSegmentVisual3D StartPoint="1,0,-1" EndPoint="-1,0,-1" Stroke="Chartreuse" StrokeThickness="2" />
 					<sd:RectangleVisual3D Center="0,1,0" Normal="0,1,0" Stroke="Cyan" Fill="#0F0000FF" />
