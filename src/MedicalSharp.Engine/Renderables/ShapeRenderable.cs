@@ -61,8 +61,12 @@ namespace MedicalSharp.Engine.Renderables
             hitNormal = Vector3.Zero;
             hitTriangleIndex = -1;
 
+            //将射线变换到局部空间
+            Matrix4 worldToLocal = Matrix4.Invert(this.ModelMatrix);
+            Ray localRay = ray.Transform(worldToLocal);
+
             //快速剔除：先检测包围盒
-            if (!this.BoundingBox.Intersects(ray, out float boxDistance))
+            if (!this.BoundingBox.Intersects(localRay, out float boxDistance))
             {
                 return false;
             }
@@ -70,10 +74,6 @@ namespace MedicalSharp.Engine.Renderables
             //三角形检测
             if (this is IHasTriangles hasTriangles)
             {
-                //将射线变换到局部空间
-                Matrix4 worldToLocal = Matrix4.Invert(this.ModelMatrix);
-                Ray localRay = ray.Transform(worldToLocal);
-
                 //遍历所有三角形
                 for (int index = 0; index < hasTriangles.Triangles.Count; index++)
                 {

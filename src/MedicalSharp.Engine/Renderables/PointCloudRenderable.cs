@@ -162,8 +162,12 @@ namespace MedicalSharp.Engine.Renderables
             hitNormal = Vector3.Zero;
             hitTriangleIndex = -1;
 
+            //将射线变换到局部空间
+            Matrix4 worldToLocal = Matrix4.Invert(this.ModelMatrix);
+            Ray localRay = ray.Transform(worldToLocal);
+
             //快速剔除：先检测包围盒
-            if (!this.BoundingBox.Intersects(ray, out float boxDistance))
+            if (!this.BoundingBox.Intersects(localRay, out _))
             {
                 return false;
             }
@@ -173,7 +177,7 @@ namespace MedicalSharp.Engine.Renderables
             foreach (Vector3 position in this.Positions)
             {
                 BoundingSphere sphere = new BoundingSphere(position, 0.02f);
-                if (sphere.Intersects(ray, out float pointDistance))
+                if (sphere.Intersects(localRay, out float pointDistance))
                 {
                     hitPoints.Add(sphere, pointDistance);
                 }
