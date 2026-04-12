@@ -59,13 +59,27 @@ namespace MedicalSharp.Primitives.Maths
         {
             get => this._matrix;
         }
-        #endregion 
+        #endregion
 
         #endregion
 
         #region # 方法
 
         //Public
+
+        #region 设置矩阵 —— void SetMatrix(Matrix4 matrix)
+        /// <summary>
+        /// 设置矩阵
+        /// </summary>
+        /// <param name="matrix">变换矩阵</param>
+        public void SetMatrix(Matrix4 matrix)
+        {
+            this._matrix = matrix;
+            this.Position = matrix.ExtractTranslation();
+            this.Rotation = matrix.ExtractRotation();
+            this.Scaling = matrix.ExtractScale();
+        }
+        #endregion
 
         #region 设置位置 —— void SetPosition(Vector3 position)
         /// <summary>
@@ -87,6 +101,20 @@ namespace MedicalSharp.Primitives.Maths
         public void SetRotation(Vector3 eulerAngles)
         {
             this.Rotation = Quaternion.FromEulerAngles(eulerAngles);
+            this.UpdateMatrix();
+        }
+        #endregion
+
+        #region 设置位置和旋转 —— void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+        /// <summary>
+        /// 设置位置和旋转
+        /// </summary>
+        /// <param name="position">位置</param>
+        /// <param name="rotation">旋转四元数</param>
+        public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+        {
+            this.Position = position;
+            this.Rotation = rotation;
             this.UpdateMatrix();
         }
         #endregion
