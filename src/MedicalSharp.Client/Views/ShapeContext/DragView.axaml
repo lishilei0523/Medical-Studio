@@ -1,0 +1,72 @@
+﻿<fa:AppWindow x:Class="MedicalSharp.Client.Views.ShapeContext.DragView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  xmlns:cm="http://caliburnmicro.com"
+			  mc:Ignorable="d"
+			  Width="1440" Height="900"
+			  WindowStartupLocation="CenterScreen">
+
+	<sd:BusyMask IsBusy="{Binding IsBusy}">
+		<Grid>
+			<Grid.RowDefinitions>
+				<!--Header-->
+				<RowDefinition Height="Auto" />
+				<!--Body-->
+				<RowDefinition Height="*" />
+				<!--Footer-->
+				<RowDefinition Height="25" />
+			</Grid.RowDefinitions>
+			<!--Header-->
+			<Grid Grid.Row="0">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+					<Image Grid.Column="0"
+						   Source="/favicon.ico"
+						   Width="24" Height="24" Margin="10,0,5,0"
+						   IsHitTestVisible="False"
+						   RenderOptions.BitmapInterpolationMode="HighQuality">
+					</Image>
+					<Menu Grid.Column="1">
+						<MenuItem Header="文件(_F)">
+						</MenuItem>
+					</Menu>
+				</Grid>
+			</Grid>
+			<!--Body-->
+			<Grid Grid.Row="1">
+				<sd:ShapeViewport Background="Black"
+								  Camera="{Binding OrbitCamera}"
+								  cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
+					<sd:PointVisual3D Position="0,0,1" Fill="Cyan" PointSize="5" />
+					<sd:LineSegmentVisual3D StartPoint="1,0,-1" EndPoint="-1,0,-1" Stroke="Chartreuse" StrokeThickness="2" />
+					<sd:RectangleVisual3D Center="0,1,0" Normal="0,1,0" Stroke="Cyan" Fill="#0F0000FF" />
+					<sd:EllipseVisual3D Width="2" Height="1" Center="0,-1,0" Normal="0,1,0" Stroke="Cyan" Fill="#0F0000FF" />
+					<sd:CircleVisual3D Radius="2" Center="0,-2,0" Normal="0,1,0" Stroke="Cyan" Fill="#0F0000FF" />
+					<sd:BoundingBoxVisual3D Stroke="Red" Fill="#0F00FF00" />
+					<sd:ShapePresenter Content="{Binding Sphere}" />
+					<sd:ShapesPresenter ItemsSource="{Binding Visual3Ds}" />
+				</sd:ShapeViewport>
+			</Grid>
+			<!--Footer-->
+			<Grid Grid.Row="2" Background="#FF6C6C6C">
+				<WrapPanel Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+					<TextBlock Text="{Binding OrbitCamera.LookDirection, StringFormat=LookDirection: \{0:0.0\}}" FontSize="12" />
+					<TextBlock Text=" | " FontSize="12" />
+					<TextBlock Text="{Binding OrbitCamera.UpDirection, StringFormat=UpDirection: \{0:0.0\}}" FontSize="12" />
+					<TextBlock Text=" | " FontSize="12" />
+					<TextBlock Text="{Binding OrbitCamera.CameraPosition, StringFormat=Position: \{0:0.0\}}" FontSize="12" />
+				</WrapPanel>
+				<WrapPanel Margin="0,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Center">
+
+				</WrapPanel>
+			</Grid>
+		</Grid>
+	</sd:BusyMask>
+</fa:AppWindow>

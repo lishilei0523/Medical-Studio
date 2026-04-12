@@ -1,6 +1,7 @@
 ﻿using Avalonia.Platform.Storage;
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.LayoutContext;
+using MedicalSharp.Client.ViewModels.ShapeContext;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Managers;
@@ -119,6 +120,28 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             this.LayoutViewModel = ResolveMediator.Resolve<Layout22ViewModel>();
             this.LayoutViewModel.SetVolumeData(this.VolumeData);
+        });
+        #endregion
+
+        #region 查看形状命令 —— ICommand LookShapeCommand
+        /// <summary>
+        /// 查看形状命令
+        /// </summary>
+        public ICommand LookShapeCommand => new AsyncRelayCommand(async _ =>
+        {
+            LookViewModel viewModel = ResolveMediator.Resolve<LookViewModel>();
+            await this._windowManager.ShowWindowAsync(viewModel);
+        });
+        #endregion
+
+        #region 拖拽形状命令 —— ICommand DragShapeCommand
+        /// <summary>
+        /// 拖拽形状命令
+        /// </summary>
+        public ICommand DragShapeCommand => new AsyncRelayCommand(async _ =>
+        {
+            DragViewModel viewModel = ResolveMediator.Resolve<DragViewModel>();
+            await this._windowManager.ShowWindowAsync(viewModel);
         });
         #endregion
 

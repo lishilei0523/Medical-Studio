@@ -44,6 +44,11 @@
                             <MenuItem Header="布局13(_A)" Command="{Binding Layout13Command}" />
                             <MenuItem Header="布局22(_B)" Command="{Binding Layout22Command}" />
                         </MenuItem>
+                        <MenuItem Header="线框(_W)">
+                            <MenuItem Header="查看(_L)" Command="{Binding LookShapeCommand}" />
+                            <MenuItem Header="拖拽(_D)" Command="{Binding DragShapeCommand}" />
+                            <MenuItem Header="绘制(_P)" Command="{Binding DrawShapeCommand}" />
+                        </MenuItem>
 					</Menu>
 				</Grid>
 			</Grid>
