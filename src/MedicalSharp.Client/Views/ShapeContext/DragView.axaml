@@ -53,7 +53,7 @@
 					<sd:RectangleVisual3D Center="0,1,0" Normal="0,1,0" Stroke="Cyan" Fill="#0F0000FF" />
 					<sd:EllipseVisual3D Width="2" Height="1" Center="0,-1,0" Normal="0,1,0" Stroke="Cyan" Fill="#0F0000FF" />
 					<sd:CircleVisual3D Radius="2" Center="0,-2,0" Normal="0,1,0" Stroke="Cyan" Fill="#0F0000FF" />
-					<sd:BoundingBoxVisual3D Stroke="Red" Fill="#0F00FF00" />
+					<sd:BoundingBoxVisual3D Width="0.5" Height="0.7" Depth="1" Center="2,2,2" Stroke="Red" Fill="#0F00FF00" />
 					<sd:ShapePresenter Content="{Binding Sphere}" />
 					<sd:ShapesPresenter ItemsSource="{Binding Visual3Ds}" />
 				</sd:ShapeViewport>
