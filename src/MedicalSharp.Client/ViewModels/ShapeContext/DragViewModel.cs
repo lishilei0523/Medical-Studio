@@ -185,12 +185,12 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     eventArgs.Properties.IsLeftButtonPressed &&
                     KeyModifiers.Control == (eventArgs.KeyModifiers & KeyModifiers.Control))
                 {
-                    //设置光标
-                    viewport.Cursor = new Cursor(StandardCursorType.Cross);
-
                     //调整尺寸
                     if (this._selectedVisual is IResizable resizable && this._selectedResizeContext.HasValue)
                     {
+                        //设置光标
+                        viewport.Cursor = new Cursor(StandardCursorType.Cross);
+
                         Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
                         Ray localRay = ray.Transform(worldToLocal);
 
