@@ -451,7 +451,7 @@ namespace MedicalSharp.Primitives.Maths
             Vector3 planePoint = worldNormal * worldSliceOffset;
 
             //射线与平面求交
-            if (ray.IntersectsPlane(planePoint, worldNormal, out Vector3 hitPoint))
+            if (ray.IntersectsPlane(planePoint, worldNormal, out Vector3 hitPoint, out _))
             {
                 //转换到逻辑空间
                 Vector3 localPoint = new Vector3(

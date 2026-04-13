@@ -337,10 +337,12 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="planePoint">平面上的一点</param>
         /// <param name="planeNormal">平面法向量</param>
         /// <param name="hitPoint">交点坐标</param>
+        /// <param name="distance">距离</param>
         /// <returns>是否相交</returns>
-        public bool IntersectsPlane(Vector3 planePoint, Vector3 planeNormal, out Vector3 hitPoint)
+        public bool IntersectsPlane(Vector3 planePoint, Vector3 planeNormal, out Vector3 hitPoint, out float distance)
         {
             hitPoint = Vector3.Zero;
+            distance = 0f;
 
             //确保法向量已归一化
             Vector3 normal = planeNormal;
@@ -376,6 +378,7 @@ namespace MedicalSharp.Primitives.Maths
                 //如果t为负数但在容差范围内，则取0
                 t = Math.Max(0, t);
                 hitPoint = this._position + this._direction * t;
+                distance = t;
 
                 return true;
             }

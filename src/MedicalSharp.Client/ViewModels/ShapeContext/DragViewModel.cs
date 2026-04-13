@@ -7,7 +7,9 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
@@ -171,7 +173,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                 Ray ray = viewport.UnProject(mousePos2D);
 
                 //移动平面上的交点
-                bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out Vector3 hitPoint);
+                bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out Vector3 hitPoint, out _);
 
                 //调整尺寸
                 if (success &&
@@ -182,7 +184,28 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     viewport.Cursor = new Cursor(StandardCursorType.Cross);
 
                     //调整尺寸
-                    //TODO 实现
+                    if (this._selectedVisual is IResizable resizable)
+                    {
+                        Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
+                        Ray localRay = ray.Transform(worldToLocal);
+                        if (resizable.TryGetResizeAxis(localRay, out ResizeContext context))
+                        {
+                            //构造平面法向量：包含伸缩轴，且面向相机
+                            Vector3 localCameraDir = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
+                            Vector3 planeNormal = Vector3.Cross(context.Axis, Vector3.Cross(localCameraDir, context.Axis));
+                            if (planeNormal.LengthSquared < 0.001f)
+                            {
+                                planeNormal = Vector3.UnitY;  //兜底
+                            }
+                            planeNormal.Normalize();
+
+                            if (localRay.IntersectsPlane(context.Anchor, planeNormal, out Vector3 newHitPoint, out _))
+                            {
+                                resizable.ApplyResize(context, newHitPoint);
+                                viewport.RequestNextFrameRendering();
+                            }
+                        }
+                    }
 
                     eventArgs.Handled = true;
                     return;
