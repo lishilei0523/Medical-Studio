@@ -7,6 +7,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
@@ -32,7 +33,17 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// <summary>
         /// 选中2D点
         /// </summary>
-        private Point? _selectedPoint2D;
+        private Vector2? _selectedPoint2D;
+
+        /// <summary>
+        /// 选中2D点
+        /// </summary>
+        private Vector3? _selectedPoint3D;
+
+        /// <summary>
+        /// 选中法向量
+        /// </summary>
+        private Vector3? _selectedNormal;
 
         /// <summary>
         /// 窗口管理器
@@ -132,7 +143,9 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                 if (success)
                 {
                     this._selectedVisual = element;
-                    this._selectedPoint2D = mousePos2D;
+                    this._selectedPoint2D = mousePos2D.ToVector2();
+                    this._selectedPoint3D = mousePos3D;
+                    this._selectedNormal = normal;
 
                     eventArgs.Handled = true;
                     return;
@@ -155,11 +168,30 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                 Vector3 worldCenter = Vector3.TransformPosition(localCenter, modelMatrix);
 
                 //获取鼠标射线
-                Point mousePos2D = eventArgs.GetPosition(viewport);
+                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
                 Ray ray = viewport.UnProject(mousePos2D);
 
                 //移动平面上的交点
                 bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out Vector3 hitPoint);
+
+                //调整尺寸
+                if (success &&
+                    eventArgs.Properties.IsLeftButtonPressed &&
+                    KeyModifiers.Control == (eventArgs.KeyModifiers & KeyModifiers.Control))
+                {
+                    //设置光标
+                    viewport.Cursor = new Cursor(StandardCursorType.Cross);
+
+                    //调整尺寸
+                    if (this._selectedVisual is IResizable resizable)
+                    {
+                        resizable.Resize(this._selectedPoint2D!.Value, mousePos2D, this._selectedPoint3D!.Value, hitPoint, this._selectedNormal!.Value);
+                        viewport.RequestNextFrameRendering();
+                    }
+
+                    eventArgs.Handled = true;
+                    return;
+                }
 
                 //旋转
                 if (success &&
@@ -220,6 +252,8 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             //清空选中
             this._selectedVisual = null;
             this._selectedPoint2D = null;
+            this._selectedPoint3D = null;
+            this._selectedNormal = null;
 
             viewport.RequestNextFrameRendering();
         }

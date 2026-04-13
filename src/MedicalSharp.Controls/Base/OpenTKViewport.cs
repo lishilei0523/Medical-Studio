@@ -151,15 +151,38 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region 反投影 —— Ray UnProject(Point position)
+        #region 投影 —— Vector2 Project(Vector3 worldPos3D)
+        /// <summary>
+        /// 投影
+        /// </summary>
+        /// <param name="worldPos3D">世界3D位置</param>
+        /// <returns>屏幕2D位置</returns>
+        public Vector2 Project(Vector3 worldPos3D)
+        {
+            #region # 验证
+
+            if (this._viewportSize.Width == 0 || this._viewportSize.Height == 0)
+            {
+                return Vector2.Zero;
+            }
+
+            #endregion
+
+            Vector2 screenPos2D = Ray.Project(worldPos3D, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+
+            return screenPos2D;
+        }
+        #endregion
+
+        #region 反投影 —— Ray UnProject(Vector2 screenPos2D)
         /// <summary>
         /// 反投影
         /// </summary>
-        /// <param name="position">2D位置</param>
+        /// <param name="screenPos2D">屏幕2D位置</param>
         /// <returns>射线</returns>
-        public Ray UnProject(Point position)
+        public Ray UnProject(Vector2 screenPos2D)
         {
-            Ray ray = Ray.UnProject(position.ToVector2(), this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            Ray ray = Ray.UnProject(screenPos2D, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             return ray;
         }
