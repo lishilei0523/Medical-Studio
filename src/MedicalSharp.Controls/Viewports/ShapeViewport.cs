@@ -77,12 +77,13 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="point">3D位置</param>
         /// <param name="normal">法向量</param>
         /// <param name="visual3D">3D元素</param>
+        /// <param name="ray">射线</param>
         /// <returns>是否成功</returns>
-        public bool FindNearestShape(Vector2 position, out Vector3 point, out Vector3 normal, out ShapeVisual3D visual3D)
+        public bool FindNearestShape(Vector2 position, out Vector3 point, out Vector3 normal, out ShapeVisual3D visual3D, out Ray ray)
         {
             this.GlContext.MakeCurrent();
 
-            Ray ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             //快速检测
             IDictionary<ShapeVisual3D, float> hitResults = new Dictionary<ShapeVisual3D, float>();
@@ -125,7 +126,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <returns>3D位置</returns>
         public Vector3? FindNearestPosition(Vector2 position)
         {
-            if (this.FindNearestShape(position, out Vector3 point, out _, out _))
+            if (this.FindNearestShape(position, out Vector3 point, out _, out _, out _))
             {
                 return point;
             }

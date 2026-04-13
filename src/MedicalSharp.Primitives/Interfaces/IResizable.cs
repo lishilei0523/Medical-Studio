@@ -21,7 +21,7 @@ namespace MedicalSharp.Primitives.Interfaces
         /// 应用调整尺寸
         /// </summary>
         /// <param name="resizeContext">调整尺寸上下文</param>
-        /// <param name="hitPoint">命中点</param>
-        void ApplyResize(ResizeContext resizeContext, Vector3 hitPoint);
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint);
     }
 }

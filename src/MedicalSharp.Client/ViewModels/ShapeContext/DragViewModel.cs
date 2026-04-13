@@ -37,14 +37,9 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         private Vector2? _selectedPoint2D;
 
         /// <summary>
-        /// 选中2D点
+        /// 选中改变尺寸上下文
         /// </summary>
-        private Vector3? _selectedPoint3D;
-
-        /// <summary>
-        /// 选中法向量
-        /// </summary>
-        private Vector3? _selectedNormal;
+        private ResizeContext? _selectedResizeContext;
 
         /// <summary>
         /// 窗口管理器
@@ -140,13 +135,23 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             if (eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearestShape(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out ShapeVisual3D element);
+                bool success = viewport.FindNearestShape(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out ShapeVisual3D visual3D, out Ray ray);
                 if (success)
                 {
-                    this._selectedVisual = element;
+                    this._selectedVisual = visual3D;
                     this._selectedPoint2D = mousePos2D.ToVector2();
-                    this._selectedPoint3D = mousePos3D;
-                    this._selectedNormal = normal;
+
+                    //可改变尺寸对象
+                    if (visual3D is IResizable resizable)
+                    {
+                        Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
+                        Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
+                        Ray localRay = ray.Transform(worldToLocal);
+                        if (resizable.TryGetResizeAxis(localRay, out ResizeContext resizeContext))
+                        {
+                            this._selectedResizeContext = resizeContext;
+                        }
+                    }
 
                     eventArgs.Handled = true;
                     return;
@@ -164,8 +169,8 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             if (this._selectedVisual != null)
             {
                 //计算模型位置
-                Matrix4 modelMatrix = this._selectedVisual.Renderable.Transform.Matrix;
-                Vector3 localCenter = this._selectedVisual.Renderable.BoundingBox.Center;
+                Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
+                Vector3 localCenter = this._selectedVisual.Bounds.Center;
                 Vector3 worldCenter = Vector3.TransformPosition(localCenter, modelMatrix);
 
                 //获取鼠标射线
@@ -184,26 +189,25 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     viewport.Cursor = new Cursor(StandardCursorType.Cross);
 
                     //调整尺寸
-                    if (this._selectedVisual is IResizable resizable)
+                    if (this._selectedVisual is IResizable resizable && this._selectedResizeContext.HasValue)
                     {
                         Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
                         Ray localRay = ray.Transform(worldToLocal);
-                        if (resizable.TryGetResizeAxis(localRay, out ResizeContext context))
-                        {
-                            //构造平面法向量：包含伸缩轴，且面向相机
-                            Vector3 localCameraDir = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
-                            Vector3 planeNormal = Vector3.Cross(context.Axis, Vector3.Cross(localCameraDir, context.Axis));
-                            if (planeNormal.LengthSquared < 0.001f)
-                            {
-                                planeNormal = Vector3.UnitY;  //兜底
-                            }
-                            planeNormal.Normalize();
 
-                            if (localRay.IntersectsPlane(context.Anchor, planeNormal, out Vector3 newHitPoint, out _))
-                            {
-                                resizable.ApplyResize(context, newHitPoint);
-                                viewport.RequestNextFrameRendering();
-                            }
+                        //构造平面法向量：包含伸缩轴，且面向相机
+                        ResizeContext resizeContext = this._selectedResizeContext.Value;
+                        Vector3 localCameraDir = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
+                        Vector3 planeNormal = Vector3.Cross(resizeContext.Axis, Vector3.Cross(localCameraDir, resizeContext.Axis));
+                        if (planeNormal.LengthSquared < 0.001f)
+                        {
+                            planeNormal = Vector3.UnitY;  //兜底
+                        }
+                        planeNormal.Normalize();
+
+                        if (localRay.IntersectsPlane(resizeContext.Anchor, planeNormal, out Vector3 localHitPoint, out _))
+                        {
+                            resizable.ApplyResize(resizeContext, localHitPoint);
+                            viewport.RequestNextFrameRendering();
                         }
                     }
 
@@ -270,8 +274,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             //清空选中
             this._selectedVisual = null;
             this._selectedPoint2D = null;
-            this._selectedPoint3D = null;
-            this._selectedNormal = null;
+            this._selectedResizeContext = null;
 
             viewport.RequestNextFrameRendering();
         }

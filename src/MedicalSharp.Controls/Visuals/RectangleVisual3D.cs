@@ -249,15 +249,15 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 适用调整尺寸 —— void ApplyResize(ResizeContext resizeContext, Vector3 hitPoint)
+        #region 适用调整尺寸 —— void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
         /// <summary>
         /// 适用调整尺寸
         /// </summary>
         /// <param name="resizeContext">调整尺寸上下文</param>
-        /// <param name="hitPoint">命中点</param>
-        public void ApplyResize(ResizeContext resizeContext, Vector3 hitPoint)
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        public void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
         {
-            Vector3 delta = hitPoint - resizeContext.Anchor;
+            Vector3 delta = localHitPoint - resizeContext.Anchor;
             float newHalf = Math.Abs(Vector3.Dot(delta, resizeContext.Axis));
             newHalf = Math.Max(newHalf, 0.01f);
 
