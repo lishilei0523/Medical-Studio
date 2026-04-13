@@ -3,17 +3,14 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
-using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Models;
-using OpenTK.Mathematics;
-using System;
 
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
     /// 椭圆形3D元素
     /// </summary>
-    public class EllipseVisual3D : ShapeVisual3D, IResizable
+    public class EllipseVisual3D : ShapeVisual3D
     {
         #region # 字段及构造器
 
@@ -149,28 +146,6 @@ namespace MedicalSharp.Controls.Visuals
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
-        }
-        #endregion
-
-        #region 调整尺寸 —— void Resize(float offsetX, float offsetY...
-        /// <summary>
-        /// 调整尺寸
-        /// </summary>
-        /// <param name="startPos2D">起始2D位置</param>
-        /// <param name="endPos2D">中止2D位置</param>
-        /// <param name="startPos3D">起始3D位置</param>
-        /// <param name="endPos3D">中止3D位置</param>
-        /// <param name="hitNormal">命中法向量</param>
-        public void Resize(Vector2 startPos2D, Vector2 endPos2D, Vector3 startPos3D, Vector3 endPos3D, Vector3 hitNormal)
-        {
-            // 计算有符号距离
-            float signedDistance = Vector3.Dot(endPos3D - this.Center.ToVector3(), hitNormal);
-            Vector3 distanceVector = hitNormal * signedDistance;
-
-            // 返回绝对值得到无符号距离
-
-            this.Width = Math.Abs(distanceVector.X * 5);
-            this.Height = Math.Abs(distanceVector.Z * 5);
         }
         #endregion
 

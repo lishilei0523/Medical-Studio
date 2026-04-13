@@ -1,4 +1,6 @@
-﻿using OpenTK.Mathematics;
+﻿using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
 
 namespace MedicalSharp.Primitives.Interfaces
 {
@@ -8,13 +10,18 @@ namespace MedicalSharp.Primitives.Interfaces
     public interface IResizable
     {
         /// <summary>
-        /// 调整尺寸
+        /// 尝试获取伸缩方向
         /// </summary>
-        /// <param name="startPos2D">起始2D位置</param>
-        /// <param name="endPos2D">中止2D位置</param>
-        /// <param name="startPos3D">起始3D位置</param>
-        /// <param name="endPos3D">中止3D位置</param>
-        /// <param name="hitNormal">命中法向量</param>
-        void Resize(Vector2 startPos2D, Vector2 endPos2D, Vector3 startPos3D, Vector3 endPos3D, Vector3 hitNormal);
+        /// <param name="ray">射线</param>
+        /// <param name="resizeContext">调整尺寸上下文</param>
+        /// <returns>是否成功</returns>
+        bool TryGetResizeAxis(Ray ray, out ResizeContext resizeContext);
+
+        /// <summary>
+        /// 应用调整尺寸
+        /// </summary>
+        /// <param name="resizeContext">调整尺寸上下文</param>
+        /// <param name="hitPoint">命中点</param>
+        void ApplyResize(ResizeContext resizeContext, Vector3 hitPoint);
     }
 }

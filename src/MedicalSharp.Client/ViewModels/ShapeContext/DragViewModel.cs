@@ -7,7 +7,6 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
-using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
@@ -183,11 +182,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     viewport.Cursor = new Cursor(StandardCursorType.Cross);
 
                     //调整尺寸
-                    if (this._selectedVisual is IResizable resizable)
-                    {
-                        resizable.Resize(this._selectedPoint2D!.Value, mousePos2D, this._selectedPoint3D!.Value, hitPoint, this._selectedNormal!.Value);
-                        viewport.RequestNextFrameRendering();
-                    }
+                    //TODO 实现
 
                     eventArgs.Handled = true;
                     return;

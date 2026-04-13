@@ -2,6 +2,8 @@
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using MedicalSharp.Engine.Renderables;
+using MedicalSharp.Primitives.Maths;
+using Transform = MedicalSharp.Primitives.Maths.Transform;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -79,6 +81,26 @@ namespace MedicalSharp.Controls.Visuals
         /// 形状渲染对象
         /// </summary>
         public ShapeRenderable Renderable { get; protected set; }
+        #endregion
+
+        #region 只读属性 - 变换 —— Transform Transform
+        /// <summary>
+        /// 只读属性 - 变换
+        /// </summary>
+        public Transform Transform
+        {
+            get => this.Renderable?.Transform;
+        }
+        #endregion
+
+        #region 只读属性 - 包围盒 —— new BoundingBox Bounds
+        /// <summary>
+        /// 只读属性 - 包围盒
+        /// </summary>
+        public new BoundingBox Bounds
+        {
+            get => this.Renderable.BoundingBox;
+        }
         #endregion
 
         #endregion

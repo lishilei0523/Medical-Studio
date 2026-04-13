@@ -4,6 +4,8 @@ using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -63,6 +65,16 @@ namespace MedicalSharp.Controls.Visuals
         #endregion
 
         #region # 属性
+
+        /// <summary>
+        /// U轴
+        /// </summary>
+        public Vector3 UAxis { get; private set; }
+
+        /// <summary>
+        /// V轴
+        /// </summary>
+        public Vector3 VAxis { get; private set; }
 
         #region 依赖属性 - 宽度 —— float Width
         /// <summary>
@@ -186,6 +198,29 @@ namespace MedicalSharp.Controls.Visuals
         private static void OnNormalChanged(RectangleVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
         {
             visual3D.UpdateRenderable();
+        }
+        #endregion
+
+        #region 构建UV正交基 —— void BuildBasis()
+        /// <summary>
+        /// 构建UV正交基
+        /// </summary>
+        private void BuildBasis()
+        {
+            Vector3 normal = this.Normal.ToVector3();
+
+            //Z-up下，默认法线是+Z，所以U = X, V = Y
+            if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitX;
+                this.VAxis = Vector3.UnitY;
+            }
+            else
+            {
+                //如果法线被旋转过，重新构造正交基（保证U在XY平面内优先）
+                this.UAxis = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, normal));
+                this.VAxis = Vector3.Normalize(Vector3.Cross(normal, UAxis));
+            }
         }
         #endregion
 
