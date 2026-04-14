@@ -3,15 +3,19 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Interfaces;
+using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
     /// 包围盒3D元素
     /// </summary>
-    public class BoundingBoxVisual3D : ShapeVisual3D
+    public class BoundingBoxVisual3D : ShapeVisual3D, IResizable
     {
         #region # 字段及构造器
 
@@ -146,6 +150,97 @@ namespace MedicalSharp.Controls.Visuals
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+            }
+        }
+        #endregion
+
+        #region 尝试获取伸缩方向 —— bool TryGetResizeAxis(Ray localRay, out ResizeContext resizeContext)
+        /// <summary>
+        /// 尝试获取伸缩方向
+        /// </summary>
+        /// <param name="localRay">射线（局部空间）</param>
+        /// <param name="resizeContext">调整尺寸上下文</param>
+        /// <returns>是否成功</returns>
+        public bool TryGetResizeAxis(Ray localRay, out ResizeContext resizeContext)
+        {
+            resizeContext = default;
+
+            Vector3 minimum = this.Bounds.Minimum;
+            Vector3 maximum = this.Bounds.Maximum;
+            Vector3 center = this.Bounds.Center;
+            float halfX = (maximum.X - minimum.X) * 0.5f;  //Width
+            float halfY = (maximum.Y - minimum.Y) * 0.5f;  //Depth （前后）
+            float halfZ = (maximum.Z - minimum.Z) * 0.5f;  //Height（上下）
+
+            //射线与包围盒求交
+            if (!localRay.Intersects(this.Bounds, out float distance))
+            {
+                return false;
+            }
+
+            Vector3 hitPoint = localRay.GetPoint(distance);
+            Vector3 localHitPoint = hitPoint - center;
+
+            //根据交点判断是哪个面（Z-up映射）
+            float distX = halfX - Math.Abs(localHitPoint.X);  //Width  方向
+            float distY = halfY - Math.Abs(localHitPoint.Y);  //Depth  方向（前后）
+            float distZ = halfZ - Math.Abs(localHitPoint.Z);  //Height 方向（上下）
+
+            Vector3 axis;
+            float currentValue;
+            if (distX < distY && distX < distZ)
+            {
+                //X轴方向：Right / Left
+                axis = (localHitPoint.X > 0) ? Vector3.UnitX : -Vector3.UnitX;
+                currentValue = halfX;
+            }
+            else if (distY < distZ)
+            {
+                //Y轴方向：Front / Back（Z-up下Y是前后）
+                axis = (localHitPoint.Y > 0) ? Vector3.UnitY : -Vector3.UnitY;
+                currentValue = halfY;
+            }
+            else
+            {
+                //Z轴方向：Top / Bottom（Z-up下Z是上下）
+                axis = (localHitPoint.Z > 0) ? Vector3.UnitZ : -Vector3.UnitZ;
+                currentValue = halfZ;
+            }
+
+            resizeContext.Anchor = center;
+            resizeContext.Axis = axis;
+            resizeContext.CurrentValue = currentValue;
+
+            return true;
+        }
+        #endregion
+
+        #region 适用调整尺寸 —— void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
+        /// <summary>
+        /// 适用调整尺寸
+        /// </summary>
+        /// <param name="resizeContext">调整尺寸上下文</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        public void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
+        {
+            Vector3 delta = localHitPoint - resizeContext.Anchor;
+            float newHalf = Math.Abs(Vector3.Dot(delta, resizeContext.Axis));
+            newHalf = Math.Max(newHalf, 0.01f);
+
+            float dotX = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitX));
+            float dotY = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitY));
+            float dotZ = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitZ));
+            if (dotX > 0.99f)
+            {
+                this.Width = newHalf * 2.0f;
+            }
+            else if (dotY > 0.99f)
+            {
+                this.Depth = newHalf * 2.0f;   //Y轴对应Depth
+            }
+            else if (dotZ > 0.99f)
+            {
+                this.Height = newHalf * 2.0f;  //Z轴对应Height
             }
         }
         #endregion
