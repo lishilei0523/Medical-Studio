@@ -13,9 +13,10 @@ namespace MedicalSharp.Primitives.Interfaces
         /// 尝试获取顶点拖拽约束
         /// </summary>
         /// <param name="localRay">射线（局部空间）</param>
+        /// <param name="localLookDirection">视角方向（局部空间）</param>
         /// <param name="constraint">拖拽约束</param>
         /// <returns>是否命中顶点</returns>
-        bool TryGetVertexDrag(Ray localRay, out VertexDragConstraint constraint);
+        bool TryGetVertexDrag(Ray localRay, Vector3 localLookDirection, out VertexDragConstraint constraint);
 
         /// <summary>
         /// 移动命中顶点

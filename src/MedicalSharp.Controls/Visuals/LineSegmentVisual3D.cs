@@ -108,20 +108,20 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 尝试获取顶点拖拽约束 —— bool TryGetVertexDrag(Ray localRay, out VertexDragConstraint constraint)
+        #region 尝试获取顶点拖拽约束 —— bool TryGetVertexDrag(Ray localRay, Vector3 localLookDirection...
         /// <summary>
         /// 尝试获取顶点拖拽约束
         /// </summary>
         /// <param name="localRay">射线（局部空间）</param>
+        /// <param name="localLookDirection">视角方向（局部空间）</param>
         /// <param name="constraint">拖拽约束</param>
         /// <returns>是否命中顶点</returns>
-        public bool TryGetVertexDrag(Ray localRay, out VertexDragConstraint constraint)
+        public bool TryGetVertexDrag(Ray localRay, Vector3 localLookDirection, out VertexDragConstraint constraint)
         {
             constraint = default;
 
             Vector3 start = this.StartPoint.ToVector3();
             Vector3 end = this.EndPoint.ToVector3();
-            Vector3 cameraDir = -localRay.Direction;
             float distanceToStart = localRay.CalculateDistanceToPoint(start);
             float distanceToEnd = localRay.CalculateDistanceToPoint(end);
             const float pickRadius = 0.3f;
@@ -133,7 +133,7 @@ namespace MedicalSharp.Controls.Visuals
                 {
                     VertexIndex = 0,
                     Anchor = start,
-                    Normal = cameraDir
+                    Normal = localLookDirection
                 };
 
                 return true;
@@ -144,7 +144,7 @@ namespace MedicalSharp.Controls.Visuals
                 {
                     VertexIndex = 1,
                     Anchor = end,
-                    Normal = cameraDir
+                    Normal = localLookDirection
                 };
 
                 return true;
