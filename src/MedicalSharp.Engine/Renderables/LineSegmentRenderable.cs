@@ -16,9 +16,9 @@ namespace MedicalSharp.Engine.Renderables
         #region # 字段及构造器
 
         /// <summary>
-        /// 线框顶点缓冲区
+        /// 顶点缓冲区
         /// </summary>
-        private VertexBuffer _strokeBuffer;
+        private VertexBuffer _vertexBuffer;
 
         /// <summary>
         /// 默认构造器
@@ -51,8 +51,8 @@ namespace MedicalSharp.Engine.Renderables
             this.EndPoint = endPoint;
 
             MeshGeometry lineGeometry = MeshFactory.CreateLineSegment(startPoint, endPoint);
-            this._strokeBuffer = new VertexBuffer(lineGeometry);
-            this._strokeBuffer.Setup();
+            this._vertexBuffer = new VertexBuffer(lineGeometry);
+            this._vertexBuffer.Setup();
         }
 
         #endregion
@@ -87,13 +87,13 @@ namespace MedicalSharp.Engine.Renderables
         public float StrokeThickness { get; private set; }
         #endregion
 
-        #region 只读属性 - 线框顶点缓冲区 —— VertexBuffer StrokeBuffer
+        #region 只读属性 - 顶点缓冲区 —— VertexBuffer StrokeBuffer
         /// <summary>
-        /// 只读属性 - 线框顶点缓冲区
+        /// 只读属性 - 顶点缓冲区
         /// </summary>
-        internal VertexBuffer StrokeBuffer
+        internal VertexBuffer VertexBuffer
         {
-            get => this._strokeBuffer;
+            get => this._vertexBuffer;
         }
         #endregion
 
@@ -128,11 +128,11 @@ namespace MedicalSharp.Engine.Renderables
             this.EndPoint = endPoint;
 
             //先释放旧的
-            this._strokeBuffer.Dispose();
+            this._vertexBuffer.Dispose();
 
             MeshGeometry lineGeometry = MeshFactory.CreateLineSegment(startPoint, endPoint);
-            this._strokeBuffer = new VertexBuffer(lineGeometry);
-            this._strokeBuffer.Setup();
+            this._vertexBuffer = new VertexBuffer(lineGeometry);
+            this._vertexBuffer.Setup();
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();
@@ -162,7 +162,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
-            this.StrokeBuffer.Draw(PrimitiveType.Lines);
+            this.VertexBuffer.Draw(PrimitiveType.Lines);
         }
         #endregion
 
@@ -310,7 +310,7 @@ namespace MedicalSharp.Engine.Renderables
                 return;
             }
 
-            this._strokeBuffer.Dispose();
+            this._vertexBuffer.Dispose();
 
             this._disposed = true;
         }

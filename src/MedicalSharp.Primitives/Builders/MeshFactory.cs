@@ -35,27 +35,26 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建点云 —— static MeshGeometry CreatePointCloud(ICollection<Vector3> positions)
+        #region # 创建点云 —— static MeshGeometry CreatePointCloud(IList<Vector3> positions)
         /// <summary>
         /// 创建点云
         /// </summary>
         /// <param name="positions">位置列表</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreatePointCloud(ICollection<Vector3> positions)
+        public static MeshGeometry CreatePointCloud(IList<Vector3> positions)
         {
-            List<Vertex> vertices = [];
-            List<uint> indices = [];
-
-            uint index = 0;
-            foreach (Vector3 position in positions)
+            IList<Vertex> vertices = [];
+            IList<uint> indices = [];
+            for (int index = 0; index < positions.Count; index++)
             {
+                Vector3 position = positions[index];
                 vertices.Add(new Vertex
                 {
                     Position = position,
                     TextureCoord = Vector2.Zero,
                     Normal = Vector3.UnitY
                 });
-                indices.Add(index++);
+                indices.Add((uint)index);
             }
 
             return new MeshGeometry(vertices, indices);
@@ -93,42 +92,39 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建折线 —— static MeshGeometry CreatePolyline(ICollection<Vector3> positions...
+        #region # 创建折线 —— static MeshGeometry CreatePolyline(IList<Vector3> positions...
         /// <summary>
         /// 创建折线
         /// </summary>
         /// <param name="positions">位置列表</param>
         /// <param name="closed">是否闭合</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreatePolyline(ICollection<Vector3> positions, bool closed = false)
+        public static MeshGeometry CreatePolyline(IList<Vector3> positions, bool closed = false)
         {
             List<Vertex> vertices = [];
-            List<Vector3> posList = positions.ToList();
-
-            for (int i = 0; i < posList.Count; i++)
+            for (int index = 0; index < positions.Count; index++)
             {
-                Vector3 normal = i < posList.Count - 1
-                    ? Vector3.Normalize(posList[i + 1] - posList[i])
-                    : Vector3.Normalize(posList[i] - posList[i - 1]);
-
+                Vector3 normal = index < positions.Count - 1
+                    ? Vector3.Normalize(positions[index + 1] - positions[index])
+                    : Vector3.Normalize(positions[index] - positions[index - 1]);
                 vertices.Add(new Vertex
                 {
-                    Position = posList[i],
-                    TextureCoord = new Vector2(i / (float)posList.Count, 0),
+                    Position = positions[index],
+                    TextureCoord = new Vector2(index / (float)positions.Count, 0),
                     Normal = normal
                 });
             }
 
             List<uint> indices = [];
-            for (int i = 0; i < posList.Count - 1; i++)
+            for (int index = 0; index < positions.Count - 1; index++)
             {
-                indices.Add((uint)i);
-                indices.Add((uint)(i + 1));
+                indices.Add((uint)(index));
+                indices.Add((uint)(index + 1));
             }
 
-            if (closed && posList.Count > 2)
+            if (closed && positions.Count > 2)
             {
-                indices.Add((uint)(posList.Count - 1));
+                indices.Add((uint)(positions.Count - 1));
                 indices.Add(0);
             }
 

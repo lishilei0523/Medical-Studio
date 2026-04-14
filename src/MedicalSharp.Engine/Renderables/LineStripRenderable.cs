@@ -18,9 +18,9 @@ namespace MedicalSharp.Engine.Renderables
         #region # 字段及构造器
 
         /// <summary>
-        /// 线框顶点缓冲区
+        /// 顶点缓冲区
         /// </summary>
-        private VertexBuffer _strokeBuffer;
+        private VertexBuffer _vertexBuffer;
 
         /// <summary>
         /// 三角形列表
@@ -57,11 +57,11 @@ namespace MedicalSharp.Engine.Renderables
 
             #endregion
 
-            this._strokeBuffer = new VertexBuffer(strokeMesh);
-            this._strokeBuffer.Setup();
+            this._vertexBuffer = new VertexBuffer(strokeMesh);
+            this._vertexBuffer.Setup();
 
             //提取三角形面
-            this._triangles = this.StrokeBuffer.MeshGeometry.ExtractTriangles();
+            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
         }
 
         #endregion
@@ -92,13 +92,13 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 只读属性 - 线框顶点缓冲区 —— VertexBuffer StrokeBuffer
+        #region 只读属性 - 顶点缓冲区 —— VertexBuffer VertexBuffer
         /// <summary>
-        /// 只读属性 - 线框顶点缓冲区
+        /// 只读属性 - 顶点缓冲区
         /// </summary>
-        internal VertexBuffer StrokeBuffer
+        internal VertexBuffer VertexBuffer
         {
-            get => this._strokeBuffer;
+            get => this._vertexBuffer;
         }
         #endregion
 
@@ -125,13 +125,13 @@ namespace MedicalSharp.Engine.Renderables
             #endregion
 
             //先释放旧的
-            this._strokeBuffer.Dispose();
+            this._vertexBuffer.Dispose();
 
-            this._strokeBuffer = new VertexBuffer(strokeMesh);
-            this._strokeBuffer.Setup();
+            this._vertexBuffer = new VertexBuffer(strokeMesh);
+            this._vertexBuffer.Setup();
 
             //提取三角形面
-            this._triangles = this.StrokeBuffer.MeshGeometry.ExtractTriangles();
+            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();
@@ -161,7 +161,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
-            this.StrokeBuffer.Draw(PrimitiveType.LineStrip);
+            this.VertexBuffer.Draw(PrimitiveType.LineStrip);
         }
         #endregion
 
@@ -177,7 +177,7 @@ namespace MedicalSharp.Engine.Renderables
             }
 
             this._triangles.Clear();
-            this._strokeBuffer.Dispose();
+            this._vertexBuffer.Dispose();
 
             this._disposed = true;
         }
@@ -192,7 +192,7 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            IEnumerable<Vector3> positions = this.StrokeBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
+            IEnumerable<Vector3> positions = this.VertexBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
             BoundingBox boundingBox = BoundingBox.FromPoints([.. positions]);
 
             return boundingBox;
