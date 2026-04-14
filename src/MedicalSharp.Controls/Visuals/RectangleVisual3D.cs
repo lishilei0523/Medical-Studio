@@ -328,11 +328,23 @@ namespace MedicalSharp.Controls.Visuals
         {
             Vector3 normal = this.Normal.ToVector3();
 
-            //Z-up下，默认法线是+Z，所以U = X, V = Y
+            //法向量接近Z轴
             if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.99f)
             {
                 this.UAxis = Vector3.UnitX;
                 this.VAxis = Vector3.UnitY;
+            }
+            //法向量接近Y轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitX;
+                this.VAxis = Vector3.UnitZ;
+            }
+            //法向量接近X轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitX)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitY;
+                this.VAxis = Vector3.UnitZ;
             }
             else
             {

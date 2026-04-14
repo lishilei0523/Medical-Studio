@@ -198,12 +198,6 @@ namespace MedicalSharp.Controls.Visuals
 
             foreach ((HitFace face, Vector3 point, Vector3 normal) in planes)
             {
-                //过滤背面
-                if (Vector3.Dot(localRay.Direction, normal) >= 0)
-                {
-                    continue;
-                }
-
                 if (localRay.IntersectsPlane(point, normal, out Vector3 hitPoint, out float distance))
                 {
                     Vector3 localHit = hitPoint - center;
@@ -211,8 +205,8 @@ namespace MedicalSharp.Controls.Visuals
                     float v = Vector3.Dot(localHit, this.VAxis);
 
                     bool inBounds = (face == HitFace.Right || face == HitFace.Left)
-                        ? Math.Abs(v) <= halfH + 0.1f
-                        : Math.Abs(u) <= halfW + 0.1f;
+                        ? Math.Abs(v) <= Math.Max(this.Height * 0.5f, 0.5f) + 0.1f  // ✅ 用 Height 的一半
+                        : Math.Abs(u) <= Math.Max(this.Width * 0.5f, 0.5f) + 0.1f;  // ✅ 用 Width 的一半
                     if (inBounds && distance < nearestDistance)
                     {
                         nearestDistance = distance;
@@ -326,11 +320,23 @@ namespace MedicalSharp.Controls.Visuals
         {
             Vector3 normal = this.Normal.ToVector3();
 
-            //Z-up下，默认法线是+Z，所以U = X, V = Y
+            //法向量接近Z轴
             if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.99f)
             {
                 this.UAxis = Vector3.UnitX;
                 this.VAxis = Vector3.UnitY;
+            }
+            //法向量接近Y轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitX;
+                this.VAxis = Vector3.UnitZ;
+            }
+            //法向量接近X轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitX)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitY;
+                this.VAxis = Vector3.UnitZ;
             }
             else
             {
