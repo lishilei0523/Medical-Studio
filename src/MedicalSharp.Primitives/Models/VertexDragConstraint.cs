@@ -15,11 +15,11 @@ namespace MedicalSharp.Primitives.Models
         /// <summary>
         /// 约束平面锚点
         /// </summary>
-        public Vector3 AnchorPoint;
+        public Vector3 Anchor;
 
         /// <summary>
-        /// 约束平面法线
+        /// 约束平面法向量
         /// </summary>
-        public Vector3 PlaneNormal;
+        public Vector3 Normal;
     }
 }

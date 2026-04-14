@@ -108,13 +108,13 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 尝试获取顶点拖拽 —— bool TryGetVertexDrag(Ray localRay, out VertexDragConstraint constraint)
+        #region 尝试获取顶点拖拽约束 —— bool TryGetVertexDrag(Ray localRay, out VertexDragConstraint constraint)
         /// <summary>
-        /// 尝试获取顶点拖拽
+        /// 尝试获取顶点拖拽约束
         /// </summary>
-        /// <param name="localRay">局部空间射线</param>
+        /// <param name="localRay">射线（局部空间）</param>
         /// <param name="constraint">拖拽约束</param>
-        /// <returns>是否点中了顶点</returns>
+        /// <returns>是否命中顶点</returns>
         public bool TryGetVertexDrag(Ray localRay, out VertexDragConstraint constraint)
         {
             constraint = default;
@@ -122,31 +122,31 @@ namespace MedicalSharp.Controls.Visuals
             Vector3 start = this.StartPoint.ToVector3();
             Vector3 end = this.EndPoint.ToVector3();
             Vector3 cameraDir = -localRay.Direction;
-
-            float distToStart = localRay.CalculateDistanceToPoint(start);
-            float distToEnd = localRay.CalculateDistanceToPoint(end);
-
+            float distanceToStart = localRay.CalculateDistanceToPoint(start);
+            float distanceToEnd = localRay.CalculateDistanceToPoint(end);
             const float pickRadius = 0.3f;
 
-            // 优先选择距离更近的顶点
-            if (distToStart < pickRadius && distToStart <= distToEnd)
+            //优先选择距离更近的顶点
+            if (distanceToStart < pickRadius && distanceToStart <= distanceToEnd)
             {
                 constraint = new VertexDragConstraint
                 {
                     VertexIndex = 0,
-                    AnchorPoint = start,
-                    PlaneNormal = cameraDir
+                    Anchor = start,
+                    Normal = cameraDir
                 };
+
                 return true;
             }
-            else if (distToEnd < pickRadius)
+            if (distanceToEnd < pickRadius)
             {
                 constraint = new VertexDragConstraint
                 {
                     VertexIndex = 1,
-                    AnchorPoint = end,
-                    PlaneNormal = cameraDir
+                    Anchor = end,
+                    Normal = cameraDir
                 };
+
                 return true;
             }
 
@@ -154,12 +154,12 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 移动顶点 —— void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
+        #region 移动命中顶点 —— void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
         /// <summary>
-        /// 移动顶点
+        /// 移动命中顶点
         /// </summary>
         /// <param name="constraint">拖拽约束</param>
-        /// <param name="localHitPoint">局部空间命中点</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
         public void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
         {
             if (constraint.VertexIndex == 0)

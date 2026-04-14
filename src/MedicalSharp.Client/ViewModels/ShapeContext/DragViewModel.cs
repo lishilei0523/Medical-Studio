@@ -205,16 +205,17 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     //设置光标
                     viewport.Cursor = new Cursor(StandardCursorType.Cross);
 
+                    //构造局部射线
                     Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
                     Ray localRay = ray.Transform(worldToLocal);
+                    Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
 
                     //可调整尺寸类型
                     if (this._selectedVisual is IResizable resizable && this._selectedResizeContext.HasValue)
                     {
                         //构造平面法向量：包含伸缩轴，且面向相机
                         ResizeContext resizeContext = this._selectedResizeContext.Value;
-                        Vector3 localCameraDir = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
-                        Vector3 planeNormal = Vector3.Cross(resizeContext.Axis, Vector3.Cross(localCameraDir, resizeContext.Axis));
+                        Vector3 planeNormal = Vector3.Cross(resizeContext.Axis, Vector3.Cross(localLookDirection, resizeContext.Axis));
                         if (planeNormal.LengthSquared < 0.001f)
                         {
                             planeNormal = Vector3.UnitY;  //兜底
@@ -229,16 +230,12 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     }
 
                     //可顶点编辑类型
-                    if (this._selectedVisual is IVertexEditable editable && this._selectedVertexConstraint.HasValue)
+                    if (this._selectedVisual is IVertexEditable vertexEditable && this._selectedVertexConstraint.HasValue)
                     {
                         VertexDragConstraint constraint = this._selectedVertexConstraint.Value;
-                        Vector3 localCameraDir = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
-                        Vector3 planeNormal = Vector3.Cross(localCameraDir, Vector3.UnitY);
-                        planeNormal.Normalize();
-
-                        if (localRay.IntersectsPlane(constraint.AnchorPoint, planeNormal, out Vector3 localHitPoint, out _))
+                        if (localRay.IntersectsPlane(constraint.Anchor, localLookDirection, out Vector3 localHitPoint, out _))
                         {
-                            editable.MoveVertex(constraint, localHitPoint);
+                            vertexEditable.MoveVertex(constraint, localHitPoint);
                             viewport.RequestNextFrameRendering();
                         }
                     }

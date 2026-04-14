@@ -10,18 +10,18 @@ namespace MedicalSharp.Primitives.Interfaces
     public interface IVertexEditable
     {
         /// <summary>
-        /// 尝试获取顶点拖拽上下文
+        /// 尝试获取顶点拖拽约束
         /// </summary>
-        /// <param name="localRay">局部空间射线</param>
+        /// <param name="localRay">射线（局部空间）</param>
         /// <param name="constraint">拖拽约束</param>
-        /// <returns>是否点中了顶点</returns>
+        /// <returns>是否命中顶点</returns>
         bool TryGetVertexDrag(Ray localRay, out VertexDragConstraint constraint);
 
         /// <summary>
-        /// 移动当前选中的顶点
+        /// 移动命中顶点
         /// </summary>
         /// <param name="constraint">拖拽约束</param>
-        /// <param name="localHitPoint">局部空间命中点</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
         void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint);
     }
 }
