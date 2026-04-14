@@ -232,7 +232,6 @@ namespace MedicalSharp.Primitives.Maths
             float closestDistanceSquared = Vector3.Dot(toSphere, toSphere) - rayLength * rayLength;
 
             float radiusSquared = sphere.Radius * sphere.Radius;
-
             if (closestDistanceSquared > radiusSquared)
             {
                 return false;
@@ -240,7 +239,6 @@ namespace MedicalSharp.Primitives.Maths
 
             float intersectionDistance = (float)Math.Sqrt(radiusSquared - closestDistanceSquared);
             distance = rayLength - intersectionDistance;
-
             if (distance < 0)
             {
                 distance = rayLength + intersectionDistance;
@@ -249,6 +247,46 @@ namespace MedicalSharp.Primitives.Maths
                     return false;
                 }
             }
+
+            return true;
+        }
+        #endregion
+
+        #region 检查是否与包围球相交 —— bool Intersects(BoundingSphere sphere, out Vector3 hitPoint...
+        /// <summary>
+        /// 检查是否与包围球相交
+        /// </summary>
+        /// <param name="sphere">包围球</param>
+        /// <param name="hitPoint">交点</param>
+        /// <param name="distance">距离</param>
+        /// <returns>是否相交</returns>
+        public bool Intersects(BoundingSphere sphere, out Vector3 hitPoint, out float distance)
+        {
+            hitPoint = Vector3.Zero;
+            distance = 0f;
+
+            Vector3 toSphere = sphere.Center - this._position;
+            float rayLength = Vector3.Dot(this._direction, toSphere);
+            float closestDistanceSquared = Vector3.Dot(toSphere, toSphere) - rayLength * rayLength;
+
+            float radiusSquared = sphere.Radius * sphere.Radius;
+            if (closestDistanceSquared > radiusSquared)
+            {
+                return false;
+            }
+
+            float intersectionDistance = (float)Math.Sqrt(radiusSquared - closestDistanceSquared);
+            distance = rayLength - intersectionDistance;
+            if (distance < 0)
+            {
+                distance = rayLength + intersectionDistance;
+                if (distance < 0)
+                {
+                    return false;
+                }
+            }
+
+            hitPoint = this._position + this._direction * distance;
 
             return true;
         }

@@ -2,14 +2,18 @@
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Interfaces;
+using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
     /// 包围球3D元素
     /// </summary>
-    public class BoundingSphereVisual3D : ShapeVisual3D
+    public class BoundingSphereVisual3D : ShapeVisual3D, IResizable
     {
         #region # 字段及构造器
 
@@ -109,6 +113,53 @@ namespace MedicalSharp.Controls.Visuals
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
+        }
+        #endregion
+
+        #region 尝试获取伸缩方向 —— bool TryGetResizeAxis(Ray localRay, out ResizeContext resizeContext)
+        /// <summary>
+        /// 尝试获取伸缩方向
+        /// </summary>
+        /// <param name="localRay">射线（局部空间）</param>
+        /// <param name="resizeContext">调整尺寸上下文</param>
+        /// <returns>是否成功</returns>
+        public bool TryGetResizeAxis(Ray localRay, out ResizeContext resizeContext)
+        {
+            resizeContext = default;
+            Vector3 center = this.Center.ToVector3();
+
+            //射线与球面求交
+            BoundingSphere sphere = new BoundingSphere(center, this.Radius);
+            if (!localRay.Intersects(sphere, out Vector3 hitPoint, out float distance))
+            {
+                return false;
+            }
+
+            //过滤背面：球面法线与射线方向夹角
+            Vector3 normal = Vector3.Normalize(hitPoint - center);
+            if (Vector3.Dot(localRay.Direction, normal) >= 0)
+            {
+                return false;
+            }
+
+            resizeContext.Anchor = center;
+            resizeContext.Axis = normal;
+            resizeContext.CurrentValue = this.Radius;
+
+            return true;
+        }
+        #endregion
+
+        #region 适用调整尺寸 —— void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
+        /// <summary>
+        /// 适用调整尺寸
+        /// </summary>
+        /// <param name="resizeContext">调整尺寸上下文</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        public void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
+        {
+            float newRadius = Vector3.Distance(resizeContext.Anchor, localHitPoint);
+            this.Radius = Math.Max(newRadius, 0.01f);
         }
         #endregion
 
