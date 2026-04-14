@@ -19,14 +19,14 @@ namespace MedicalSharp.Controls.Visuals
         #region # 字段及构造器
 
         /// <summary>
-        /// 长轴依赖属性
+        /// 宽度依赖属性
         /// </summary>
-        public static readonly StyledProperty<float> RadiusXProperty;
+        public new static readonly StyledProperty<float> WidthProperty;
 
         /// <summary>
-        /// 短轴依赖属性
+        /// 高度依赖属性
         /// </summary>
-        public static readonly StyledProperty<float> RadiusYProperty;
+        public new static readonly StyledProperty<float> HeightProperty;
 
         /// <summary>
         /// 中心位置依赖属性
@@ -43,14 +43,14 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         static EllipseVisual3D()
         {
-            RadiusXProperty = AvaloniaProperty.Register<EllipseVisual3D, float>(nameof(RadiusX), 1.0f);
-            RadiusYProperty = AvaloniaProperty.Register<EllipseVisual3D, float>(nameof(EllipseVisual3D.RadiusY), 1.0f);
+            WidthProperty = AvaloniaProperty.Register<EllipseVisual3D, float>(nameof(Width), 1.0f);
+            HeightProperty = AvaloniaProperty.Register<EllipseVisual3D, float>(nameof(Height), 1.0f);
             CenterProperty = AvaloniaProperty.Register<EllipseVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
             NormalProperty = AvaloniaProperty.Register<EllipseVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 0, 1));
 
             //属性改变事件
-            RadiusXProperty.Changed.AddClassHandler<EllipseVisual3D, float>(EllipseVisual3D.OnRadiusXChanged);
-            RadiusYProperty.Changed.AddClassHandler<EllipseVisual3D, float>(EllipseVisual3D.OnRadiusYChanged);
+            WidthProperty.Changed.AddClassHandler<EllipseVisual3D, float>(OnWidthChanged);
+            HeightProperty.Changed.AddClassHandler<EllipseVisual3D, float>(OnHeightChanged);
             CenterProperty.Changed.AddClassHandler<EllipseVisual3D, Vector3D>(OnCenterChanged);
             NormalProperty.Changed.AddClassHandler<EllipseVisual3D, Vector3D>(OnNormalChanged);
         }
@@ -82,25 +82,25 @@ namespace MedicalSharp.Controls.Visuals
         public Vector3 VAxis { get; private set; }
         #endregion
 
-        #region 依赖属性 - 长轴 —— float RadiusX
+        #region 依赖属性 - 宽度 —— new float Width
         /// <summary>
-        /// 依赖属性 - 长轴
+        /// 依赖属性 - 宽度
         /// </summary>
-        public float RadiusX
+        public new float Width
         {
-            get => this.GetValue(EllipseVisual3D.RadiusXProperty);
-            set => this.SetValue(EllipseVisual3D.RadiusXProperty, value);
+            get => this.GetValue(WidthProperty);
+            set => this.SetValue(WidthProperty, value);
         }
         #endregion
 
-        #region 依赖属性 - 短轴 —— float RadiusY
+        #region 依赖属性 - 高度 —— new float Height
         /// <summary>
-        /// 依赖属性 - 短轴
+        /// 依赖属性 - 高度
         /// </summary>
-        public float RadiusY
+        public new float Height
         {
-            get => this.GetValue(EllipseVisual3D.RadiusYProperty);
-            set => this.SetValue(EllipseVisual3D.RadiusYProperty, value);
+            get => this.GetValue(HeightProperty);
+            set => this.SetValue(HeightProperty, value);
         }
         #endregion
 
@@ -140,8 +140,8 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable == null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.RadiusX, this.RadiusY, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.RadiusX, this.RadiusY, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
+                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
 
                 WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
@@ -160,8 +160,8 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable != null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.RadiusX, this.RadiusY, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.RadiusX, this.RadiusY, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
+                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
 
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
@@ -182,17 +182,20 @@ namespace MedicalSharp.Controls.Visuals
         {
             resizeContext = default;
             Vector3 center = this.Center.ToVector3();
+            float halfW = this.Width * 0.5f;
+            float halfH = this.Height * 0.5f;
 
             (HitFace face, Vector3 point, Vector3 normal)[] planes =
             [
-                (HitFace.Right,  center + this.UAxis * this.RadiusX,  this.UAxis),
-                (HitFace.Left,   center - this.UAxis * this.RadiusX, -this.UAxis),
-                (HitFace.Top,    center + this.VAxis * this.RadiusY,  this.VAxis),
-                (HitFace.Bottom, center - this.VAxis * this.RadiusY, -this.VAxis)
+                (HitFace.Right,  center + this.UAxis * halfW,  this.UAxis),
+                (HitFace.Left,   center - this.UAxis * halfW, -this.UAxis),
+                (HitFace.Top,    center + this.VAxis * halfH,  this.VAxis),
+                (HitFace.Bottom, center - this.VAxis * halfH, -this.VAxis)
             ];
 
             HitFace nearestFace = HitFace.None;
             float nearestDistance = float.MaxValue;
+
             foreach ((HitFace face, Vector3 point, Vector3 normal) in planes)
             {
                 //过滤背面
@@ -208,8 +211,8 @@ namespace MedicalSharp.Controls.Visuals
                     float v = Vector3.Dot(localHit, this.VAxis);
 
                     bool inBounds = (face == HitFace.Right || face == HitFace.Left)
-                        ? Math.Abs(v) <= this.RadiusY + 0.1f
-                        : Math.Abs(u) <= this.RadiusX + 0.1f;
+                        ? Math.Abs(v) <= halfH + 0.1f
+                        : Math.Abs(u) <= halfW + 0.1f;
                     if (inBounds && distance < nearestDistance)
                     {
                         nearestDistance = distance;
@@ -223,22 +226,22 @@ namespace MedicalSharp.Controls.Visuals
                 case HitFace.Right:
                     resizeContext.Anchor = center;
                     resizeContext.Axis = this.UAxis;
-                    resizeContext.CurrentValue = this.RadiusX;
+                    resizeContext.CurrentValue = halfW;
                     return true;
                 case HitFace.Left:
                     resizeContext.Anchor = center;
                     resizeContext.Axis = -this.UAxis;
-                    resizeContext.CurrentValue = this.RadiusX;
+                    resizeContext.CurrentValue = halfW;
                     return true;
                 case HitFace.Top:
                     resizeContext.Anchor = center;
                     resizeContext.Axis = this.VAxis;
-                    resizeContext.CurrentValue = this.RadiusY;
+                    resizeContext.CurrentValue = halfH;
                     return true;
                 case HitFace.Bottom:
                     resizeContext.Anchor = center;
                     resizeContext.Axis = -this.VAxis;
-                    resizeContext.CurrentValue = this.RadiusY;
+                    resizeContext.CurrentValue = halfH;
                     return true;
             }
 
@@ -255,16 +258,16 @@ namespace MedicalSharp.Controls.Visuals
         public void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
         {
             Vector3 delta = localHitPoint - resizeContext.Anchor;
-            float newValue = Math.Abs(Vector3.Dot(delta, resizeContext.Axis));
-            newValue = Math.Max(newValue, 0.01f);
+            float newHalf = Math.Abs(Vector3.Dot(delta, resizeContext.Axis));
+            newHalf = Math.Max(newHalf, 0.01f);
 
             if (Vector3.Dot(resizeContext.Axis, this.UAxis) > 0.99f)
             {
-                this.RadiusX = newValue * 2;
+                this.Width = newHalf * 2.0f;
             }
             else
             {
-                this.RadiusY = newValue * 2;
+                this.Height = newHalf * 2.0f;
             }
         }
         #endregion
@@ -272,21 +275,21 @@ namespace MedicalSharp.Controls.Visuals
 
         //Events
 
-        #region 长轴改变事件 —— static void OnRadiusXChanged(EllipseVisual3D visual3D...
+        #region 宽度改变事件 —— static void OnWidthChanged(EllipseVisual3D visual3D...
         /// <summary>
-        /// 长轴改变事件
+        /// 宽度改变事件
         /// </summary>
-        private static void OnRadiusXChanged(EllipseVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnWidthChanged(EllipseVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
         #endregion
 
-        #region 短轴改变事件 —— static void OnRadiusYChanged(EllipseVisual3D visual3D...
+        #region 高度改变事件 —— static void OnHeightChanged(EllipseVisual3D visual3D...
         /// <summary>
-        /// 短轴改变事件
+        /// 高度改变事件
         /// </summary>
-        private static void OnRadiusYChanged(EllipseVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnHeightChanged(EllipseVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             visual3D.UpdateRenderable();
         }
