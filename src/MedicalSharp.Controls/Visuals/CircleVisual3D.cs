@@ -3,14 +3,18 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Interfaces;
+using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
     /// 圆形3D元素
     /// </summary>
-    public class CircleVisual3D : ShapeVisual3D
+    public class CircleVisual3D : ShapeVisual3D, IResizable
     {
         #region # 字段及构造器
 
@@ -57,6 +61,20 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 属性
 
+        #region U轴 —— Vector3 UAxis
+        /// <summary>
+        /// U轴
+        /// </summary>
+        public Vector3 UAxis { get; private set; }
+        #endregion
+
+        #region V轴 —— Vector3 VAxis
+        /// <summary>
+        /// V轴
+        /// </summary>
+        public Vector3 VAxis { get; private set; }
+        #endregion
+
         #region 依赖属性 - 半径 —— float Radius
         /// <summary>
         /// 依赖属性 - 半径
@@ -102,13 +120,14 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable == null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Radius, this.Radius, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Radius, this.Radius, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
+                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Radius * 2, this.Radius * 2, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Radius * 2, this.Radius * 2, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
 
                 WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
 
                 this.Renderable = renderable;
+                this.BuildBasis();
             }
         }
         #endregion
@@ -121,15 +140,69 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable != null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Radius, this.Radius, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Radius, this.Radius, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
+                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Radius * 2, this.Radius * 2, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Radius * 2, this.Radius * 2, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
 
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                this.BuildBasis();
             }
         }
         #endregion
+
+        #region 尝试获取伸缩方向 —— bool TryGetResizeAxis(Ray localRay, out ResizeContext resizeContext)
+        /// <summary>
+        /// 尝试获取伸缩方向
+        /// </summary>
+        /// <param name="localRay">射线（局部空间）</param>
+        /// <param name="resizeContext">调整尺寸上下文</param>
+        /// <returns>是否成功</returns>
+        public bool TryGetResizeAxis(Ray localRay, out ResizeContext resizeContext)
+        {
+            resizeContext = default;
+            Vector3 center = this.Center.ToVector3();
+            Vector3 normal = Vector3.Cross(this.UAxis, this.VAxis).Normalized();
+
+            //射线与圆所在平面求交
+            if (!localRay.IntersectsPlane(center, normal, out Vector3 hitPoint, out _))
+            {
+                return false;
+            }
+
+            //检查是否在圆周附近
+            float dist = Vector3.Distance(hitPoint, center);
+            if (Math.Abs(dist - this.Radius) > Math.Max(this.Radius * 0.3f, 0.3f))
+            {
+                return false;
+            }
+
+            //计算伸缩方向（径向）
+            Vector3 radialDir = Vector3.Normalize(hitPoint - center);
+
+            resizeContext.Anchor = center;
+            resizeContext.Axis = radialDir;
+            resizeContext.CurrentValue = this.Radius;
+
+            return true;
+        }
+        #endregion
+
+        #region 适用调整尺寸 —— void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
+        /// <summary>
+        /// 适用调整尺寸
+        /// </summary>
+        /// <param name="resizeContext">调整尺寸上下文</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        public void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
+        {
+            float newRadius = Vector3.Distance(resizeContext.Anchor, localHitPoint);
+            this.Radius = Math.Max(newRadius, 0.01f);
+        }
+        #endregion
+
+
+        //Events
 
         #region 半径改变事件 —— static void OnRadiusChanged(CircleVisual3D visual3D...
         /// <summary>
@@ -158,6 +231,44 @@ namespace MedicalSharp.Controls.Visuals
         private static void OnNormalChanged(CircleVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
         {
             visual3D.UpdateRenderable();
+        }
+        #endregion
+
+
+        //Private
+
+        #region 构建UV正交基 —— void BuildBasis()
+        /// <summary>
+        /// 构建UV正交基
+        /// </summary>
+        private void BuildBasis()
+        {
+            Vector3 normal = this.Normal.ToVector3();
+
+            //法向量接近Z轴
+            if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitX;
+                this.VAxis = Vector3.UnitY;
+            }
+            //法向量接近Y轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitX;
+                this.VAxis = Vector3.UnitZ;
+            }
+            //法向量接近X轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitX)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitY;
+                this.VAxis = Vector3.UnitZ;
+            }
+            else
+            {
+                //如果法线被旋转过，重新构造正交基（保证U在XY平面内优先）
+                this.UAxis = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, normal));
+                this.VAxis = Vector3.Normalize(Vector3.Cross(normal, this.UAxis));
+            }
         }
         #endregion
 
