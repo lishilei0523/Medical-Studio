@@ -42,6 +42,11 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         private ResizeContext? _selectedResizeContext;
 
         /// <summary>
+        /// 选中的顶点拖拽约束
+        /// </summary>
+        private VertexDragConstraint? _selectedVertexConstraint;
+
+        /// <summary>
         /// 窗口管理器
         /// </summary>
         private readonly IWindowManager _windowManager;
@@ -141,15 +146,27 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     this._selectedVisual = visual3D;
                     this._selectedPoint2D = mousePos2D.ToVector2();
 
+                    Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
+                    Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
+                    Ray localRay = ray.Transform(worldToLocal);
+
                     //可改变尺寸对象
                     if (visual3D is IResizable resizable)
                     {
-                        Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
-                        Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
-                        Ray localRay = ray.Transform(worldToLocal);
                         if (resizable.TryGetResizeAxis(localRay, out ResizeContext resizeContext))
                         {
                             this._selectedResizeContext = resizeContext;
+                            this._selectedVertexConstraint = null;
+                        }
+                    }
+
+                    //调整顶点
+                    if (visual3D is IVertexEditable vertexEditable)
+                    {
+                        if (vertexEditable.TryGetVertexDrag(localRay, out VertexDragConstraint constraint))
+                        {
+                            this._selectedVertexConstraint = constraint;
+                            this._selectedResizeContext = null;
                         }
                     }
 
@@ -185,15 +202,15 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     eventArgs.Properties.IsLeftButtonPressed &&
                     KeyModifiers.Control == (eventArgs.KeyModifiers & KeyModifiers.Control))
                 {
-                    //调整尺寸
+                    //设置光标
+                    viewport.Cursor = new Cursor(StandardCursorType.Cross);
+
+                    Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
+                    Ray localRay = ray.Transform(worldToLocal);
+
+                    //可调整尺寸类型
                     if (this._selectedVisual is IResizable resizable && this._selectedResizeContext.HasValue)
                     {
-                        //设置光标
-                        viewport.Cursor = new Cursor(StandardCursorType.Cross);
-
-                        Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
-                        Ray localRay = ray.Transform(worldToLocal);
-
                         //构造平面法向量：包含伸缩轴，且面向相机
                         ResizeContext resizeContext = this._selectedResizeContext.Value;
                         Vector3 localCameraDir = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
@@ -207,6 +224,21 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                         if (localRay.IntersectsPlane(resizeContext.Anchor, planeNormal, out Vector3 localHitPoint, out _))
                         {
                             resizable.ApplyResize(resizeContext, localHitPoint);
+                            viewport.RequestNextFrameRendering();
+                        }
+                    }
+
+                    //可顶点编辑类型
+                    if (this._selectedVisual is IVertexEditable editable && this._selectedVertexConstraint.HasValue)
+                    {
+                        VertexDragConstraint constraint = this._selectedVertexConstraint.Value;
+                        Vector3 localCameraDir = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
+                        Vector3 planeNormal = Vector3.Cross(localCameraDir, Vector3.UnitY);
+                        planeNormal.Normalize();
+
+                        if (localRay.IntersectsPlane(constraint.AnchorPoint, planeNormal, out Vector3 localHitPoint, out _))
+                        {
+                            editable.MoveVertex(constraint, localHitPoint);
                             viewport.RequestNextFrameRendering();
                         }
                     }
@@ -275,6 +307,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             this._selectedVisual = null;
             this._selectedPoint2D = null;
             this._selectedResizeContext = null;
+            this._selectedVertexConstraint = null;
 
             viewport.RequestNextFrameRendering();
         }
