@@ -196,10 +196,10 @@ namespace MedicalSharp.Controls.Visuals
             foreach ((HitFace face, Vector3 point, Vector3 normal) in planes)
             {
                 //过滤背面
-                //if (Vector3.Dot(localRay.Direction, normal) >= 0)
-                //{
-                //    continue;
-                //}
+                if (Vector3.Dot(localRay.Direction, normal) >= 0)
+                {
+                    continue;
+                }
 
                 if (localRay.IntersectsPlane(point, normal, out Vector3 hitPoint, out float distance))
                 {
