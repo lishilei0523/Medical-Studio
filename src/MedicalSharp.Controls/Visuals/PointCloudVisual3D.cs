@@ -2,6 +2,9 @@
 using Avalonia.Collections;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Renderables;
+using MedicalSharp.Primitives.Interfaces;
+using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -12,7 +15,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 点云3D元素
     /// </summary>
-    public class PointCloudVisual3D : ShapeVisual3D
+    public class PointCloudVisual3D : ShapeVisual3D, IVertexEditable
     {
         #region # 字段及构造器
 
@@ -44,7 +47,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         public PointCloudVisual3D()
         {
-
+            this.Positions.CollectionChanged += this.OnPositionsItemChanged;
         }
 
         #endregion
@@ -110,6 +113,76 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 尝试获取顶点拖拽约束 —— bool TryGetVertexDrag(Ray localRay, Vector3 localLookDirection...
+        /// <summary>
+        /// 尝试获取顶点拖拽约束
+        /// </summary>
+        /// <param name="localRay">射线（局部空间）</param>
+        /// <param name="localLookDirection">视角方向（局部空间）</param>
+        /// <param name="constraint">拖拽约束</param>
+        /// <returns>是否命中顶点</returns>
+        public bool TryGetVertexDrag(Ray localRay, Vector3 localLookDirection, out VertexDragConstraint constraint)
+        {
+            constraint = default;
+
+            if (this.Positions == null || this.Positions.Count == 0)
+            {
+                return false;
+            }
+
+            float minDistance = float.MaxValue;
+            int bestIndex = -1;
+            Vector3 bestAnchor = Vector3.Zero;
+
+            //遍历所有点，找到距离射线最近且在拾取半径内的点
+            for (int index = 0; index < this.Positions.Count; index++)
+            {
+                Vector3 point = this.Positions[index].ToVector3();
+                float distance = localRay.CalculateDistanceToPoint(point);
+
+                //拾取半径：基于点尺寸的屏幕空间映射（简化：局部空间固定值）
+                float pickRadius = this.PointSize * 0.1f;
+                if (distance < pickRadius && distance < minDistance)
+                {
+                    minDistance = distance;
+                    bestIndex = index;
+                    bestAnchor = point;
+                }
+            }
+
+            if (bestIndex >= 0)
+            {
+                constraint = new VertexDragConstraint
+                {
+                    VertexIndex = bestIndex,
+                    Anchor = bestAnchor,
+                    Normal = localLookDirection
+                };
+
+                return true;
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region 移动命中顶点 —— void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
+        /// <summary>
+        /// 移动命中顶点
+        /// </summary>
+        /// <param name="constraint">拖拽约束</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        public void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
+        {
+            if (this.Positions == null || constraint.VertexIndex < 0 || constraint.VertexIndex >= this.Positions.Count)
+            {
+                return;
+            }
+
+            this.Positions[constraint.VertexIndex] = localHitPoint.ToVector3();
+        }
+        #endregion
+
         #region 位置列表改变事件 —— static void OnPositionsChanged(PointCloudVisual3D visual3D...
         /// <summary>
         /// 位置列表改变事件
@@ -125,7 +198,6 @@ namespace MedicalSharp.Controls.Visuals
             {
                 eventArgs.NewValue.Value.CollectionChanged += visual3D.OnPositionsItemChanged;
             }
-
         }
         #endregion
 
