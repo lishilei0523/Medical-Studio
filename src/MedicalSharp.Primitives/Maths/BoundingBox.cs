@@ -17,7 +17,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 最小厚度
         /// </summary>
-        private const float MinThickness = 0.02f;
+        private const float MinThickness = 0.1f;
 
         /// <summary>
         /// 最小点

@@ -4,6 +4,7 @@ using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -150,6 +151,24 @@ namespace MedicalSharp.Engine.Renderables
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
             this.VertexBuffer.Draw(PrimitiveType.Lines);
+
+            //点尺寸
+            float pointSize = Math.Clamp(this.StrokeThickness * 3.0f, 5f, 20f);
+            GL.PointSize(pointSize);
+
+            //点颜色
+            Vector4 invertedStroke = this.Stroke.Invert();
+            float contrast = Math.Abs(invertedStroke.X - invertedStroke.X) +
+                             Math.Abs(invertedStroke.Y - invertedStroke.Y) +
+                             Math.Abs(invertedStroke.Z - invertedStroke.Z);
+            if (contrast < 0.5f)
+            {
+                invertedStroke = ColorFactory.Yellow(); //固定用亮黄色
+            }
+
+            //绘制控制点
+            program.SetUniformVector4("u_Color", invertedStroke);
+            this.VertexBuffer.Draw(PrimitiveType.Points);
         }
         #endregion
 

@@ -295,5 +295,17 @@ namespace MedicalSharp.Primitives.Builders
             return color1 * (1.0f - factor) + color2 * factor;
         }
         #endregion
+
+        #region # 取相反颜色 —— static Vector4 Invert(this Vector4 color)
+        /// <summary>
+        /// 取相反颜色
+        /// </summary>
+        /// <param name="color">原颜色</param>
+        /// <returns>相反颜色</returns>
+        public static Vector4 Invert(this Vector4 color)
+        {
+            return new Vector4(1.0f - color.X, 1.0f - color.Y, 1.0f - color.Z, color.W);
+        }
+        #endregion
     }
 }
