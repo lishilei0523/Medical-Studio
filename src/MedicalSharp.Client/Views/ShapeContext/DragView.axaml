@@ -65,6 +65,15 @@
                             <Vector3D>2,2,2</Vector3D>
 						</sd:PointCloudVisual3D.Positions>
 					</sd:PointCloudVisual3D>
+                    <sd:PolylineVisual3D Stroke="Green" Closed="False">
+                        <sd:PolylineVisual3D.Positions>
+                            <Vector3D>-3,2,3</Vector3D>
+                            <Vector3D>-3,3,3</Vector3D>
+                            <Vector3D>-2,2,3</Vector3D>
+                            <Vector3D>-2,3,3</Vector3D>
+                            <Vector3D>-2,2,2</Vector3D>
+                        </sd:PolylineVisual3D.Positions>
+                    </sd:PolylineVisual3D>
 				</sd:ShapeViewport>
 			</Grid>
 			<!--Footer-->
