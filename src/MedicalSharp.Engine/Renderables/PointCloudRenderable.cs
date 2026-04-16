@@ -35,7 +35,7 @@ namespace MedicalSharp.Engine.Renderables
         /// 创建点云渲染对象构造器
         /// </summary>
         /// <param name="positions">位置列表</param>
-        public PointCloudRenderable(IList<Vector3> positions)
+        public PointCloudRenderable(IReadOnlyList<Vector3> positions)
             : this()
         {
             this.Positions = positions;
@@ -50,11 +50,11 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 属性
 
-        #region 位置列表 —— IList<Vector3> Positions
+        #region 位置列表 —— IReadOnlyList<Vector3> Positions
         /// <summary>
         /// 位置列表
         /// </summary>
-        public IList<Vector3> Positions { get; private set; }
+        public IReadOnlyList<Vector3> Positions { get; private set; }
         #endregion
 
         #region 填充颜色 —— Vector4 Fill
@@ -88,12 +88,12 @@ namespace MedicalSharp.Engine.Renderables
 
         //Public
 
-        #region 更新点云渲染对象 —— void Update(IList<Vector3> positions)
+        #region 更新点云渲染对象 —— void Update(IReadOnlyList<Vector3> positions)
         /// <summary>
         /// 更新点云渲染对象
         /// </summary>
         /// <param name="positions">位置列表</param>
-        public void Update(IList<Vector3> positions)
+        public void Update(IReadOnlyList<Vector3> positions)
         {
             #region # 验证
 
@@ -187,7 +187,6 @@ namespace MedicalSharp.Engine.Renderables
                 KeyValuePair<BoundingSphere, float> hit = hitPoints.MinBy(x => x.Value);
                 distance = hit.Value;
                 hitPoint = hit.Key.Center;
-                hitTriangleIndex = this.Positions.IndexOf(hitPoint);
 
                 return true;
             }

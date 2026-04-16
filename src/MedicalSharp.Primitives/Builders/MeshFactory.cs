@@ -35,13 +35,13 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建点云 —— static MeshGeometry CreatePointCloud(IList<Vector3> positions)
+        #region # 创建点云 —— static MeshGeometry CreatePointCloud(IReadOnlyList<Vector3> positions)
         /// <summary>
         /// 创建点云
         /// </summary>
         /// <param name="positions">位置列表</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreatePointCloud(IList<Vector3> positions)
+        public static MeshGeometry CreatePointCloud(IReadOnlyList<Vector3> positions)
         {
             IList<Vertex> vertices = [];
             IList<uint> indices = [];
@@ -92,14 +92,14 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建折线 —— static MeshGeometry CreatePolyline(IList<Vector3> positions...
+        #region # 创建折线 —— static MeshGeometry CreatePolyline(IReadOnlyList<Vector3> positions...
         /// <summary>
         /// 创建折线
         /// </summary>
         /// <param name="positions">位置列表</param>
         /// <param name="closed">是否闭合</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreatePolyline(IList<Vector3> positions, bool closed = false)
+        public static MeshGeometry CreatePolyline(IReadOnlyList<Vector3> positions, bool closed = false)
         {
             List<Vertex> vertices = [];
             for (int index = 0; index < positions.Count; index++)

@@ -11,21 +11,26 @@ using System.Linq;
 namespace MedicalSharp.Engine.Renderables
 {
     /// <summary>
-    /// 折线渲染对象
+    /// 曲线渲染对象
     /// </summary>
-    public class PolylineRenderable : ShapeRenderable
+    public class CurveRenderable : ShapeRenderable
     {
         #region # 字段及构造器
 
         /// <summary>
-        /// 顶点缓冲区
+        /// 控制点缓冲区
         /// </summary>
-        private VertexBuffer _vertexBuffer;
+        private VertexBuffer _pointBuffer;
+
+        /// <summary>
+        /// 曲线缓冲区
+        /// </summary>
+        private VertexBuffer _curveBuffer;
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        private PolylineRenderable()
+        private CurveRenderable()
         {
             //默认值
             this.Stroke = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -35,29 +40,41 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 创建折线渲染对象构造器
         /// </summary>
-        /// <param name="positions">位置列表</param>
+        /// <param name="controlPositions">控制点列表</param>
+        /// <param name="sampledPositions">采样点列表</param>
         /// <param name="closed">是否闭合</param>
-        public PolylineRenderable(IReadOnlyList<Vector3> positions, bool closed = false)
+        public CurveRenderable(IReadOnlyList<Vector3> controlPositions, IReadOnlyList<Vector3> sampledPositions, bool closed = false)
             : this()
         {
-            this.Positions = positions;
+            this.ControlPositions = controlPositions;
+            this.SampledPositions = sampledPositions;
             this.Closed = closed;
 
             //初始化缓冲区
-            MeshGeometry polylineGeometry = MeshFactory.CreatePolyline(positions, this.Closed);
-            this._vertexBuffer = new VertexBuffer(polylineGeometry);
-            this._vertexBuffer.Setup();
+            MeshGeometry pointGeometry = MeshFactory.CreatePointCloud(this.ControlPositions);
+            MeshGeometry curveGeometry = MeshFactory.CreatePolyline(this.SampledPositions, this.Closed);
+            this._pointBuffer = new VertexBuffer(pointGeometry);
+            this._curveBuffer = new VertexBuffer(curveGeometry);
+            this._pointBuffer.Setup();
+            this._curveBuffer.Setup();
         }
 
         #endregion
 
         #region # 属性
 
-        #region 位置列表 —— IReadOnlyList<Vector3> Positions
+        #region 控制点列表 —— IReadOnlyList<Vector3> ControlPositions
         /// <summary>
-        /// 位置列表
+        /// 控制点列表
         /// </summary>
-        public IReadOnlyList<Vector3> Positions { get; private set; }
+        public IReadOnlyList<Vector3> ControlPositions { get; private set; }
+        #endregion
+
+        #region 采样点列表 —— IReadOnlyList<Vector3> SampledPositions
+        /// <summary>
+        /// 采样点列表
+        /// </summary>
+        public IReadOnlyList<Vector3> SampledPositions { get; private set; }
         #endregion
 
         #region 是否闭合 —— bool Closed
@@ -81,13 +98,23 @@ namespace MedicalSharp.Engine.Renderables
         public float StrokeThickness { get; private set; }
         #endregion
 
-        #region 只读属性 - 顶点缓冲区 —— VertexBuffer VertexBuffer
+        #region 只读属性 - 控制点缓冲区 —— VertexBuffer PointBuffer
         /// <summary>
-        /// 只读属性 - 顶点缓冲区
+        /// 只读属性 - 控制点缓冲区
         /// </summary>
-        internal VertexBuffer VertexBuffer
+        internal VertexBuffer PointBuffer
         {
-            get => this._vertexBuffer;
+            get => this._pointBuffer;
+        }
+        #endregion
+
+        #region 只读属性 - 曲线缓冲区 —— VertexBuffer CurveBuffer
+        /// <summary>
+        /// 只读属性 - 曲线缓冲区
+        /// </summary>
+        internal VertexBuffer CurveBuffer
+        {
+            get => this._curveBuffer;
         }
         #endregion
 
@@ -97,30 +124,36 @@ namespace MedicalSharp.Engine.Renderables
 
         //Public
 
-        #region 更新折线渲染对象 —— void Update(IReadOnlyList<Vector3> positions)
+        #region 更新曲线渲染对象 —— void Update(IReadOnlyList<Vector3> controlPositions...
         /// <summary>
-        /// 更新折线渲染对象
+        /// 更新曲线渲染对象
         /// </summary>
-        /// <param name="positions">位置列表</param>
-        public void Update(IReadOnlyList<Vector3> positions)
+        /// <param name="controlPositions">控制点列表</param>
+        /// <param name="sampledPositions">采样点列表</param>
+        public void Update(IReadOnlyList<Vector3> controlPositions, IReadOnlyList<Vector3> sampledPositions)
         {
             #region # 验证
 
-            if (this.Positions.Equals(positions))
+            if (this.ControlPositions.Equals(controlPositions) && Equals(this.SampledPositions, sampledPositions))
             {
                 return;
             }
 
             #endregion
 
-            this.Positions = positions;
+            this.ControlPositions = controlPositions;
+            this.SampledPositions = sampledPositions;
 
             //先释放旧的
-            this._vertexBuffer.Dispose();
+            this._pointBuffer.Dispose();
+            this._curveBuffer.Dispose();
 
-            MeshGeometry polylineGeometry = MeshFactory.CreatePolyline(positions, this.Closed);
-            this._vertexBuffer = new VertexBuffer(polylineGeometry);
-            this._vertexBuffer.Setup();
+            MeshGeometry pointGeometry = MeshFactory.CreatePointCloud(this.ControlPositions);
+            MeshGeometry curveGeometry = MeshFactory.CreatePolyline(this.SampledPositions, this.Closed);
+            this._pointBuffer = new VertexBuffer(pointGeometry);
+            this._curveBuffer = new VertexBuffer(curveGeometry);
+            this._pointBuffer.Setup();
+            this._curveBuffer.Setup();
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();
@@ -150,7 +183,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
-            this.VertexBuffer.Draw(PrimitiveType.Lines);
+            this._curveBuffer.Draw(PrimitiveType.Lines);
 
             //点尺寸
             float pointSize = Math.Clamp(this.StrokeThickness * 3.0f, 5f, 20f);
@@ -168,7 +201,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //绘制控制点
             program.SetUniformVector4("u_Color", invertedStroke);
-            this.VertexBuffer.Draw(PrimitiveType.Points);
+            this._pointBuffer.Draw(PrimitiveType.Points);
         }
         #endregion
 
@@ -201,12 +234,12 @@ namespace MedicalSharp.Engine.Renderables
 
             //精确检测
             IDictionary<BoundingSphere, float> hitPoints = new Dictionary<BoundingSphere, float>();
-            foreach (Vector3 position in this.Positions)
+            foreach (Vector3 position in this.SampledPositions)
             {
                 BoundingSphere sphere = new BoundingSphere(position, 0.02f);
                 if (sphere.Intersects(localRay, out float pointDistance))
                 {
-                    hitPoints.Add(sphere, pointDistance);
+                    hitPoints.TryAdd(sphere, pointDistance);
                 }
             }
             if (hitPoints.Any())
@@ -233,7 +266,8 @@ namespace MedicalSharp.Engine.Renderables
                 return;
             }
 
-            this._vertexBuffer.Dispose();
+            this._pointBuffer.Dispose();
+            this._curveBuffer.Dispose();
 
             this._disposed = true;
         }
@@ -248,7 +282,7 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            BoundingBox boundingBox = BoundingBox.FromPoints(this.Positions);
+            BoundingBox boundingBox = BoundingBox.FromPoints(this.SampledPositions);
 
             return boundingBox;
         }

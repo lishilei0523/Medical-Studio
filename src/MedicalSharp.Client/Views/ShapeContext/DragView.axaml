@@ -58,22 +58,31 @@
 					<sd:ShapesPresenter ItemsSource="{Binding Visual3Ds}" />
 					<sd:PointCloudVisual3D PointSize="5" Fill="Red">
 						<sd:PointCloudVisual3D.Positions>
-                            <Vector3D>3,2,3</Vector3D>
-                            <Vector3D>3,3,3</Vector3D>
-                            <Vector3D>2,2,3</Vector3D>
-                            <Vector3D>2,3,3</Vector3D>
-                            <Vector3D>2,2,2</Vector3D>
+							<Vector3D>3,2,3</Vector3D>
+							<Vector3D>3,3,3</Vector3D>
+							<Vector3D>2,2,3</Vector3D>
+							<Vector3D>2,3,3</Vector3D>
+							<Vector3D>2,2,2</Vector3D>
 						</sd:PointCloudVisual3D.Positions>
 					</sd:PointCloudVisual3D>
-                    <sd:PolylineVisual3D Stroke="Green" Closed="False">
-                        <sd:PolylineVisual3D.Positions>
-                            <Vector3D>-3,2,3</Vector3D>
-                            <Vector3D>-3,3,3</Vector3D>
-                            <Vector3D>-2,2,3</Vector3D>
-                            <Vector3D>-2,3,3</Vector3D>
-                            <Vector3D>-2,2,2</Vector3D>
-                        </sd:PolylineVisual3D.Positions>
-                    </sd:PolylineVisual3D>
+					<sd:PolylineVisual3D Stroke="Green" Closed="False">
+						<sd:PolylineVisual3D.Positions>
+							<Vector3D>-3,2,3</Vector3D>
+							<Vector3D>-3,3,3</Vector3D>
+							<Vector3D>-2,2,3</Vector3D>
+							<Vector3D>-2,3,3</Vector3D>
+							<Vector3D>-2,2,2</Vector3D>
+						</sd:PolylineVisual3D.Positions>
+					</sd:PolylineVisual3D>
+					<sd:CurveVisual3D Stroke="Gold" Closed="False">
+						<sd:CurveVisual3D.ControlPositions>
+							<Vector3D>3,-2,3</Vector3D>
+							<Vector3D>3,-3,3</Vector3D>
+							<Vector3D>2,-2,3</Vector3D>
+							<Vector3D>2,-3,3</Vector3D>
+							<Vector3D>2,-2,2</Vector3D>
+						</sd:CurveVisual3D.ControlPositions>
+					</sd:CurveVisual3D>
 				</sd:ShapeViewport>
 			</Grid>
 			<!--Footer-->

@@ -129,11 +129,11 @@ namespace MedicalSharp.Primitives.Maths
 
         //Static
 
-        #region 从点集创建包围盒 —— static BoundingBox FromPoints(IList<Vector3> points)
+        #region 从点集创建包围盒 —— static BoundingBox FromPoints(IReadOnlyList<Vector3> points)
         /// <summary>
         /// 从点集创建包围盒
         /// </summary>
-        public static BoundingBox FromPoints(IList<Vector3> points)
+        public static BoundingBox FromPoints(IReadOnlyList<Vector3> points)
         {
             #region # 验证
 
