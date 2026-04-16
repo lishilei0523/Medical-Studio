@@ -1139,6 +1139,88 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
+        #region # 创建文本容器 —— static MeshGeometry CreateTextContainer(float width, float height, Vector3 normal)
+        /// <summary>
+        /// 创建文本容器
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="normal">法向量（决定平面朝向）</param>
+        /// <returns>网格模型</returns>
+        /// <remarks>
+        /// 纹理坐标左下角为(0,0)，右上角为(1,1)，平面中心在原点
+        /// 支持任意法向量方向的平面创建
+        /// </remarks>
+        public static MeshGeometry CreateTextContainer(float width, float height, Vector3 normal)
+        {
+            float halfW = width * 0.5f;
+            float halfH = height * 0.5f;
+
+            //根据法向量计算局部坐标系
+            Vector3 right, up;
+
+            //法向量平行于Z轴
+            if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.999f)
+            {
+                right = Vector3.UnitX;
+                up = Vector3.UnitY;
+            }
+            //法向量平行于Y轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.999f)
+            {
+                right = Vector3.UnitX;
+                up = Vector3.UnitZ;
+            }
+            //法向量平行于X轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitX)) > 0.999f)
+            {
+                right = Vector3.UnitY;
+                up = Vector3.UnitZ;
+            }
+            //一般情况：使用叉积构建正交基
+            else
+            {
+                right = Vector3.Normalize(Vector3.Cross(normal, Vector3.UnitZ));
+                up = Vector3.Normalize(Vector3.Cross(right, normal));
+            }
+
+            //四个顶点（相对于中心点）
+            Vector3[] positions =
+            [
+                -right * halfW - up * halfH, // 0: 左下
+                right * halfW - up * halfH, // 1: 右下
+                right * halfW + up * halfH, // 2: 右上
+                -right * halfW + up * halfH // 3: 左上
+            ];
+
+            //纹理坐标
+            Vector2[] texCoords =
+            [
+                new Vector2(0, 0), // 左下
+                new Vector2(1, 0), // 右下
+                new Vector2(1, 1), // 右上
+                new Vector2(0, 1) // 左上
+            ];
+
+            //构建顶点列表
+            List<Vertex> vertices = [];
+            for (int i = 0; i < 4; i++)
+            {
+                vertices.Add(new Vertex
+                {
+                    Position = positions[i],
+                    TextureCoord = texCoords[i],
+                    Normal = normal
+                });
+            }
+
+            //构建索引（两个三角形）
+            List<uint> indices = [0, 1, 2, 0, 2, 3];
+
+            return new MeshGeometry(vertices, indices);
+        }
+        #endregion
+
         #region # 计算法向量 —— static void CalculateNormals(MeshGeometry meshGeometry)
         /// <summary>
         /// 计算法向量
