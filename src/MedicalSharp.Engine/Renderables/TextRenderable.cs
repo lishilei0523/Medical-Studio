@@ -2,6 +2,7 @@ using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -9,15 +10,21 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using SkiaSharp;
 using System;
+using System.Collections.Generic;
 
 namespace MedicalSharp.Engine.Renderables
 {
     /// <summary>
     /// 文本渲染对象
     /// </summary>
-    public class TextRenderable : ShapeRenderable
+    public class TextRenderable : Renderable, IHasTriangles, IDisposable
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
 
         /// <summary>
         /// 文本纹理
@@ -30,6 +37,11 @@ namespace MedicalSharp.Engine.Renderables
         private VertexBuffer _vertexBuffer;
 
         /// <summary>
+        /// 三角形列表
+        /// </summary>
+        private IList<Triangle> _triangles;
+
+        /// <summary>
         /// 创建固定朝向文本渲染对象构造器
         /// </summary>
         /// <param name="text">文本内容</param>
@@ -39,10 +51,10 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="normal">法向量</param>
         public TextRenderable(string text, Vector3 position, float fontSize = 16.0f, Vector4 color = default, Vector3 normal = default)
         {
-            this._text = text;
-            this._fontSize = fontSize;
-            this._color = color == default ? ColorFactory.White() : color;
-            this._normal = normal == default ? Vector3.UnitY : normal;
+            this.Text = text;
+            this.FontSize = fontSize;
+            this.Color = color == default ? ColorFactory.White() : color;
+            this.Normal = normal == default ? Vector3.UnitY : normal;
             this.RenderMode = TextRenderMode.Fixed;
             this.LockYAxis = true;
 
@@ -50,6 +62,9 @@ namespace MedicalSharp.Engine.Renderables
 
             this.CreateTexture();
             this.CreateContainer2D();
+
+            //提取三角形面
+            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
         }
 
         /// <summary>
@@ -62,17 +77,20 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="lockYAxis">是否锁定Y轴</param>
         public TextRenderable(string text, Vector3 position, float fontSize = 24.0f, Vector4 color = default, bool lockYAxis = true)
         {
-            this._text = text;
-            this._fontSize = fontSize;
-            this._color = color == default ? ColorFactory.White() : color;
-            this._normal = Vector3.UnitZ;
-            this.RenderMode = TextRenderMode.Billboard;
+            this.Text = text;
+            this.FontSize = fontSize;
+            this.Color = color == default ? ColorFactory.White() : color;
             this.LockYAxis = lockYAxis;
+            this.Normal = Vector3.UnitZ;
+            this.RenderMode = TextRenderMode.Billboard;
 
             this.Transform.SetPosition(position);
 
             this.CreateTexture();
             this.CreateContainer2D();
+
+            //提取三角形面
+            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
         }
 
         #endregion
@@ -83,70 +101,21 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 文本内容
         /// </summary>
-        private string _text;
-
-        /// <summary>
-        /// 文本内容
-        /// </summary>
-        public string Text
-        {
-            get => this._text;
-            set
-            {
-                if (this._text == value)
-                {
-                    return;
-                }
-
-                this._text = value;
-                this.CreateTexture();
-                this.CreateContainer2D();
-                base.InvalidateBoundings();
-            }
-        }
+        public string Text { get; private set; }
         #endregion
 
         #region 字体大小 —— float FontSize
         /// <summary>
         /// 字体大小
         /// </summary>
-        private float _fontSize;
-
-        /// <summary>
-        /// 字体大小
-        /// </summary>
-        public float FontSize
-        {
-            get => this._fontSize;
-            set
-            {
-                if (Math.Abs(this._fontSize - value) < 0.01f)
-                {
-                    return;
-                }
-
-                this._fontSize = value;
-                this.CreateTexture();
-                this.CreateContainer2D();
-                base.InvalidateBoundings();
-            }
-        }
+        public float FontSize { get; private set; }
         #endregion
 
         #region 文本颜色 —— Vector4 Color
         /// <summary>
         /// 文本颜色
         /// </summary>
-        private Vector4 _color;
-
-        /// <summary>
-        /// 文本颜色
-        /// </summary>
-        public Vector4 Color
-        {
-            get => this._color;
-            set => this._color = value;
-        }
+        public Vector4 Color { get; private set; }
         #endregion
 
         #region 渲染模式 —— TextRenderMode RenderMode
@@ -161,21 +130,7 @@ namespace MedicalSharp.Engine.Renderables
         /// 法向量
         /// </summary>
         /// <remarks>固定朝向模式下生效</remarks>
-        private Vector3 _normal;
-
-        /// <summary>
-        /// 法向量
-        /// </summary>
-        /// <remarks>固定朝向模式下生效</remarks>
-        public Vector3 Normal
-        {
-            get => this._normal;
-            set
-            {
-                this._normal = value;
-                this.CreateContainer2D();
-            }
-        }
+        public Vector3 Normal { get; private set; }
         #endregion
 
         #region 是否锁定Y轴 —— bool LockYAxis
@@ -194,52 +149,71 @@ namespace MedicalSharp.Engine.Renderables
         public Vector2 TextSize { get; private set; }
         #endregion
 
+        #region 只读属性 - 三角形列表 —— IList<Triangle> Triangles
+        /// <summary>
+        /// 只读属性 - 三角形列表
+        /// </summary>
+        public IList<Triangle> Triangles
+        {
+            get => this._triangles;
+        }
+        #endregion
+
+        #region 只读属性 - 顶点缓冲区 —— VertexBuffer VertexBuffer
+        /// <summary>
+        /// 只读属性 - 顶点缓冲区
+        /// </summary>
+        internal VertexBuffer VertexBuffer
+        {
+            get => this._vertexBuffer;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
 
         //Public
 
-        #region 渲染固定朝向文本 —— override void Render(ShaderProgram program)
+        #region 更新文本渲染对象 —— void Update(string text, float fontSize)
         /// <summary>
-        /// 渲染固定朝向文本
+        /// 更新文本渲染对象
         /// </summary>
-        /// <param name="program">Shader程序</param>
-        public override void Render(ShaderProgram program)
+        /// <param name="text">文本</param>
+        /// <param name="fontSize">字体大小</param>
+        public void Update(string text, float fontSize)
         {
-            if (this._texture == null || this._vertexBuffer == null)
-            {
-                return;
-            }
+            this.Text = text;
+            this.FontSize = fontSize;
 
-            if (this.RenderMode == TextRenderMode.Fixed)
-            {
+            this.CreateTexture();
+            this.CreateContainer2D();
+            base.InvalidateBoundings();
 
-            }
-
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.Enable(EnableCap.DepthTest);
-
-            this._texture.Bind(0);
-            program.SetUniformInt("u_TextTexture", 0);
-            program.SetUniformVector4("u_Color", this._color);
-
-            this._vertexBuffer.Draw(PrimitiveType.Triangles);
-
-            GL.Disable(EnableCap.DepthTest);
-            GL.Disable(EnableCap.Blend);
+            //提取三角形面
+            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
         }
         #endregion
 
-        #region 渲染广告牌文本 —— void RenderBillboard(ShaderProgram program, Camera camera)
+        #region 设置颜色 —— void SetColor(Vector4 color)
         /// <summary>
-        /// 渲染广告牌文本
+        /// 设置颜色
+        /// </summary>
+        /// <param name="color">颜色</param>
+        public void SetColor(Vector4 color)
+        {
+            this.Color = color;
+        }
+        #endregion
+
+        #region 渲染 —— void Render(ShaderProgram program, Camera camera)
+        /// <summary>
+        /// 渲染
         /// </summary>
         /// <param name="program">Shader程序</param>
         /// <param name="camera">相机</param>
         /// <remarks>始终面向相机</remarks>
-        public void RenderBillboard(ShaderProgram program, Camera camera)
+        public void Render(ShaderProgram program, Camera camera)
         {
             #region # 验证
 
@@ -254,17 +228,24 @@ namespace MedicalSharp.Engine.Renderables
 
             #endregion
 
-            //计算广告牌矩阵
-            Matrix4 billboardMatrix = this.CalculateBillboardMatrix(camera);
-
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.Enable(EnableCap.DepthTest);
 
             this._texture.Bind(0);
             program.SetUniformInt("u_TextTexture", 0);
-            program.SetUniformVector4("u_Color", this._color);
-            program.SetUniformMatrix4("u_ModelMatrix", billboardMatrix);
+            program.SetUniformVector4("u_Color", this.Color);
+
+            if (this.RenderMode == TextRenderMode.Fixed)
+            {
+                program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
+            }
+            if (this.RenderMode == TextRenderMode.Billboard)
+            {
+                //计算广告牌矩阵
+                Matrix4 billboardMatrix = this.CalculateBillboardMatrix(camera);
+                program.SetUniformMatrix4("u_ModelMatrix", billboardMatrix);
+            }
 
             this._vertexBuffer.Draw(PrimitiveType.Triangles);
 
@@ -273,11 +254,11 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 释放资源 —— override void Dispose()
+        #region 释放资源 —— void Dispose()
         /// <summary>
         /// 释放资源
         /// </summary>
-        public override void Dispose()
+        public void Dispose()
         {
             if (this._disposed)
             {
@@ -308,7 +289,7 @@ namespace MedicalSharp.Engine.Renderables
                 new Vector3(halfW, halfH, 0)
             );
         }
-        #endregion 
+        #endregion
 
 
         //Private
@@ -320,20 +301,19 @@ namespace MedicalSharp.Engine.Renderables
         private void CreateTexture()
         {
             this._texture?.Dispose();
-
-            if (string.IsNullOrWhiteSpace(this._text))
+            if (string.IsNullOrWhiteSpace(this.Text))
             {
                 this._texture = null;
                 return;
             }
 
             using SKTypeface typeface = SKTypeface.FromFile(ResourceManager.FontPath) ?? SKTypeface.Default;
-            using SKFont font = new SKFont(typeface, this._fontSize);
+            using SKFont font = new SKFont(typeface, this.FontSize);
             using SKPaint paint = new SKPaint();
             paint.Color = SKColors.White;
             paint.IsAntialias = true;
 
-            font.MeasureText(this._text, out SKRect bounds, paint);
+            font.MeasureText(this.Text, out SKRect bounds, paint);
 
             int width = Math.Max((int)Math.Ceiling(bounds.Width), 1);
             int height = Math.Max((int)Math.Ceiling(bounds.Height), 1);
@@ -342,7 +322,7 @@ namespace MedicalSharp.Engine.Renderables
             using SKSurface surface = SKSurface.Create(new SKImageInfo(width, height));
             using SKCanvas canvas = surface.Canvas;
             canvas.Clear(SKColors.Transparent);
-            canvas.DrawText(this._text, -bounds.Left, -bounds.Top, font, paint);
+            canvas.DrawText(this.Text, -bounds.Left, -bounds.Top, font, paint);
 
             using SKImage image = surface.Snapshot();
             using SKBitmap bitmap = SKBitmap.FromImage(image);
@@ -373,12 +353,7 @@ namespace MedicalSharp.Engine.Renderables
 
             this._vertexBuffer?.Dispose();
 
-            MeshGeometry meshGeometry = MeshFactory.CreateContainer2D(
-                this.TextSize.X,
-                this.TextSize.Y,
-                this._normal
-            );
-
+            MeshGeometry meshGeometry = MeshFactory.CreateContainer2D(this.TextSize.X, this.TextSize.Y, this.Normal);
             this._vertexBuffer = new VertexBuffer(meshGeometry);
             this._vertexBuffer.Setup();
         }
@@ -399,7 +374,7 @@ namespace MedicalSharp.Engine.Renderables
             //锁定Y轴：只绕Z轴旋转，保持文本直立
             if (this.LockYAxis)
             {
-                float angle = (float)Math.Atan2(forward.Y, forward.X) - MathHelper.PiOver2;
+                float angle = MathF.Atan2(forward.Y, forward.X) - MathHelper.PiOver2;
                 Matrix4 rotation = Matrix4.CreateRotationZ(angle);
                 Matrix4 translation = Matrix4.CreateTranslation(this.Transform.Position);
 

@@ -1,7 +1,8 @@
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
-using OpenTK.Mathematics;
+using MedicalSharp.Primitives.Models;
+using System;
 using System.Collections.Generic;
 
 namespace MedicalSharp.Engine.Renderers
@@ -14,14 +15,9 @@ namespace MedicalSharp.Engine.Renderers
         #region # 字段及构造器
 
         /// <summary>
-        /// 固定朝向文本列表
+        /// 渲染对象列表
         /// </summary>
-        private readonly ICollection<TextRenderable> _fixedTextRenderables;
-
-        /// <summary>
-        /// 广告牌文本列表
-        /// </summary>
-        private readonly ICollection<TextRenderable> _billboardTextRenderables;
+        private readonly ICollection<TextRenderable> _renderables;
 
         /// <summary>
         /// 创建文本渲染器构造器
@@ -30,8 +26,7 @@ namespace MedicalSharp.Engine.Renderers
         public TextRenderer(Camera camera)
             : base(camera)
         {
-            this._fixedTextRenderables = new HashSet<TextRenderable>();
-            this._billboardTextRenderables = new HashSet<TextRenderable>();
+            this._renderables = new HashSet<TextRenderable>();
             this.InitShaderProgram();
         }
 
@@ -43,85 +38,72 @@ namespace MedicalSharp.Engine.Renderers
         public TextRenderer(Camera camera, ShaderProgram program)
             : base(camera, program)
         {
-            this._fixedTextRenderables = new HashSet<TextRenderable>();
-            this._billboardTextRenderables = new HashSet<TextRenderable>();
+            this._renderables = new HashSet<TextRenderable>();
         }
 
         #endregion
 
         #region # 属性
 
-        #region 只读属性 - 渲染对象列表 —— IReadOnlySet<ShapeRenderable> Renderables
+        #region 只读属性 - 渲染对象列表 —— IReadOnlySet<TextRenderable> Renderables
         /// <summary>
         /// 只读属性 - 渲染对象列表
         /// </summary>
-        public IReadOnlySet<ShapeRenderable> Renderables
+        public IReadOnlySet<TextRenderable> Renderables
         {
-            get => (IReadOnlySet<ShapeRenderable>)this._renderables;
+            get => (IReadOnlySet<TextRenderable>)this._renderables;
         }
         #endregion
 
         #endregion
 
-        #region 方法
+        #region # 方法
 
+        //Public
+
+        #region 追加渲染对象 —— void AppendItem(TextRenderable renderable)
         /// <summary>
-        /// 添加固定朝向文本
+        /// 追加渲染对象
         /// </summary>
-        /// <param name="text">文本内容</param>
-        /// <param name="position">位置</param>
-        /// <param name="fontSize">字体大小</param>
-        /// <param name="color">文本颜色</param>
-        /// <param name="planeNormal">平面法向量</param>
-        /// <param name="fontPath">字体文件路径</param>
-        /// <returns>文本对象</returns>
-        public TextRenderable AddFixedText(string text, Vector3 position, float fontSize = 24.0f,
-            Vector4? color = null, Vector3? planeNormal = null, string fontPath = "msyh.ttf")
+        /// <param name="renderable">渲染对象</param>
+        public void AppendItem(TextRenderable renderable)
         {
-            TextRenderable textObj = new TextRenderable(text, position, fontSize, color, planeNormal, fontPath);
-            this._fixedTextRenderables.Add(textObj);
-            return textObj;
-        }
+            if (renderable == null)
+            {
+                throw new ArgumentNullException(nameof(renderable), "文本渲染对象不可为空！");
+            }
 
+            this._renderables.Add(renderable);
+        }
+        #endregion
+
+        #region 删除渲染对象 —— void RemoveItem(TextRenderable renderable)
         /// <summary>
-        /// 添加广告牌文本
+        /// 删除渲染对象
         /// </summary>
-        /// <param name="text">文本内容</param>
-        /// <param name="position">位置</param>
-        /// <param name="fontSize">字体大小</param>
-        /// <param name="color">文本颜色</param>
-        /// <param name="lockYAxis">是否锁定Y轴</param>
-        /// <param name="fontPath">字体文件路径</param>
-        /// <returns>文本对象</returns>
-        public TextRenderable AddBillboardText(string text, Vector3 position, float fontSize = 24.0f,
-            Vector4? color = null, bool lockYAxis = true, string fontPath = "msyh.ttf")
+        /// <param name="renderable">渲染对象</param>
+        public void RemoveItem(TextRenderable renderable)
         {
-            TextRenderable textObj = new TextRenderable(text, position, fontSize, color, lockYAxis, fontPath);
-            this._billboardTextRenderables.Add(textObj);
-            return textObj;
-        }
+            if (renderable == null)
+            {
+                return;
+            }
 
+            this._renderables.Remove(renderable);
+        }
+        #endregion
+
+        #region 清空渲染对象 —— void ClearItems()
         /// <summary>
-        /// 移除固定朝向文本
+        /// 清空渲染对象
         /// </summary>
-        /// <param name="text">文本对象</param>
-        public void RemoveFixedText(TextRenderable text)
+        public void ClearItems()
         {
-            this._fixedTextRenderables.Remove(text);
-            text.Dispose();
+            this._renderables.Clear();
         }
+        #endregion
 
-        /// <summary>
-        /// 移除广告牌文本
-        /// </summary>
-        /// <param name="text">文本对象</param>
-        public void RemoveBillboardText(TextRenderable text)
-        {
-            this._billboardTextRenderables.Remove(text);
-            text.Dispose();
-        }
-
-
+        #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight)
         /// <summary>
         /// 渲染帧
         /// </summary>
@@ -136,32 +118,52 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
-            //设置相机视口
+            //设置相机视口尺寸
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
-            //使用Shader
+            //渲染上下文
+            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+
+            //开启Shader程序
             this.Program.Use();
+
+            //设置投影矩阵、视图矩阵
             this.Program.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
             this.Program.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
 
-            //渲染固定朝向文本
-            foreach (TextRenderable text in this._fixedTextRenderables)
+            foreach (TextRenderable renderable in this._renderables)
             {
-                this.Program.SetUniformMatrix4("u_ModelMatrix", text.ModelMatrix);
-                text.Render(this.Program);
-            }
+                //渲染
+                renderable.Render(this.Program, this.Camera);
 
-            //渲染广告牌文本
-            foreach (TextRenderable text in this._billboardTextRenderables)
-            {
-                text.RenderBillboard(this.Program, this.Camera);
+                //触发渲染事件
+                renderable.OnRender(renderContext);
             }
 
             //取消使用
             this.Program.Unuse();
         }
-
         #endregion
+
+        #region 释放资源 —— override void Dispose()
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            foreach (TextRenderable text in this._renderables)
+            {
+                text.Dispose();
+            }
+
+            this._renderables.Clear();
+        }
+        #endregion
+
+
+        //Private
 
         #region 初始化Shader程序 —— void InitShaderProgram()
         /// <summary>
@@ -176,25 +178,6 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 释放资源 —— override void Dispose()
-        /// <summary>
-        /// 释放资源
-        /// </summary>
-        public override void Dispose()
-        {
-            base.Dispose();
-
-            foreach (TextRenderable text in this._fixedTextRenderables)
-            {
-                text.Dispose();
-            }
-            foreach (TextRenderable text in this._billboardTextRenderables)
-            {
-                text.Dispose();
-            }
-            this._fixedTextRenderables.Clear();
-            this._billboardTextRenderables.Clear();
-        }
         #endregion
     }
 }
