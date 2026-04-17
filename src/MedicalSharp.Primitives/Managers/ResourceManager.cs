@@ -13,6 +13,11 @@ namespace MedicalSharp.Primitives.Managers
         #region # 字段及构造器
 
         /// <summary>
+        /// 字体路径
+        /// </summary>
+        public const string FontPath = "Content/Fonts/msyh.ttf";
+
+        /// <summary>
         /// 单位立方体
         /// </summary>
         private static readonly MeshGeometry _UnitCube;

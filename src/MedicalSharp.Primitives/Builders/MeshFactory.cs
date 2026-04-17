@@ -1139,9 +1139,9 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建文本容器 —— static MeshGeometry CreateTextContainer(float width, float height, Vector3 normal)
+        #region # 创建2D容器 —— static MeshGeometry CreateContainer2D(float width, float height, Vector3 normal)
         /// <summary>
-        /// 创建文本容器
+        /// 创建2D容器
         /// </summary>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
@@ -1151,7 +1151,7 @@ namespace MedicalSharp.Primitives.Builders
         /// 纹理坐标左下角为(0,0)，右上角为(1,1)，平面中心在原点
         /// 支持任意法向量方向的平面创建
         /// </remarks>
-        public static MeshGeometry CreateTextContainer(float width, float height, Vector3 normal)
+        public static MeshGeometry CreateContainer2D(float width, float height, Vector3 normal)
         {
             float halfW = width * 0.5f;
             float halfH = height * 0.5f;
