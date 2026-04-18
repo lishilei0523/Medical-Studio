@@ -17,7 +17,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 渲染对象列表
         /// </summary>
-        private readonly ICollection<TextRenderable> _renderables;
+        private readonly HashSet<TextRenderable> _renderables;
 
         /// <summary>
         /// 创建文本渲染器构造器
@@ -51,7 +51,7 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         public IReadOnlySet<TextRenderable> Renderables
         {
-            get => (IReadOnlySet<TextRenderable>)this._renderables;
+            get => this._renderables;
         }
         #endregion
 
