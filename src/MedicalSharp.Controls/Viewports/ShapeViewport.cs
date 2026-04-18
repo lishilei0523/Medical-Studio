@@ -29,9 +29,19 @@ namespace MedicalSharp.Controls.Viewports
         protected ShapeRenderer _shapeRenderer;
 
         /// <summary>
+        /// 文本渲染器
+        /// </summary>
+        protected TextRenderer _textRenderer;
+
+        /// <summary>
         /// 形状3D元素列表
         /// </summary>
         protected readonly IList<ShapeVisual3D> _shapeVisual3Ds;
+
+        /// <summary>
+        /// 文本3D元素列表
+        /// </summary>
+        protected readonly IList<TextVisual3D> _textVisual3Ds;
 
         /// <summary>
         /// 默认构造器
@@ -39,6 +49,7 @@ namespace MedicalSharp.Controls.Viewports
         public ShapeViewport()
         {
             this._shapeVisual3Ds = new List<ShapeVisual3D>();
+            this._textVisual3Ds = new List<TextVisual3D>();
             this.Children = new AvaloniaList<Visual3D>();
             this.Children.CollectionChanged += this.OnChildrenItemsChanged;
         }
@@ -163,6 +174,7 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             this._shapeRenderer = new ShapeRenderer(this.Camera);
+            this._textRenderer = new TextRenderer(this.Camera);
         }
         #endregion
 
@@ -207,9 +219,16 @@ namespace MedicalSharp.Controls.Viewports
                         this._shapeRenderer.AppendItem(item.Renderable);
                     }
                 }
+                if (visual3D is TextVisual3D textVisual3D)
+                {
+                    textVisual3D.EnsureRenderable();
+                    this._textVisual3Ds.Add(textVisual3D);
+                    this._textRenderer.AppendItem(textVisual3D.Renderable);
+                }
             }
 
             this._shapeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+            this._textRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
         }
         #endregion
 
@@ -220,6 +239,7 @@ namespace MedicalSharp.Controls.Viewports
         protected override void OnOpenTKDeinit()
         {
             this._shapeRenderer.Dispose();
+            this._textRenderer.Dispose();
         }
         #endregion
 

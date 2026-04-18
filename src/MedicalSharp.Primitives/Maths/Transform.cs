@@ -114,6 +114,18 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
+        #region 设置缩放 —— void SetScale(Vector3 scaling)
+        /// <summary>
+        /// 设置缩放
+        /// </summary>
+        /// <param name="scaling">缩放</param>
+        public void SetScale(Vector3 scaling)
+        {
+            this.Scaling = scaling;
+            this.UpdateMatrix();
+        }
+        #endregion
+
         #region 设置轴心点 —— void SetPivot(Vector3 pivot)
         /// <summary>
         /// 设置轴心点

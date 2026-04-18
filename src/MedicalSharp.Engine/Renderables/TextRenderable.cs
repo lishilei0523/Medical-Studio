@@ -22,6 +22,16 @@ namespace MedicalSharp.Engine.Renderables
         #region # 字段及构造器
 
         /// <summary>
+        /// 参考距离
+        /// </summary>
+        private const float ReferenceDistance = 7.0f;
+
+        /// <summary>
+        /// 参考距离时基础缩放
+        /// </summary>
+        private const float BaseScale = 0.005f;
+
+        /// <summary>
         /// 释放标识
         /// </summary>
         private bool _disposed;
@@ -81,7 +91,7 @@ namespace MedicalSharp.Engine.Renderables
             this.FontSize = fontSize;
             this.Color = color == default ? ColorFactory.White() : color;
             this.LockYAxis = lockYAxis;
-            this.Normal = Vector3.UnitZ;
+            this.Normal = Vector3.UnitY;
             this.RenderMode = TextRenderMode.Billboard;
 
             this.Transform.SetPosition(position);
@@ -236,15 +246,19 @@ namespace MedicalSharp.Engine.Renderables
             program.SetUniformInt("u_TextTexture", 0);
             program.SetUniformVector4("u_Color", this.Color);
 
+            float distance = Vector3.Distance(camera.CameraPosition, this.Transform.Position);
+            float scale = BaseScale * (distance / ReferenceDistance);
             if (this.RenderMode == TextRenderMode.Fixed)
             {
+                this.Transform.SetScale(new Vector3(scale));
                 program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
             }
             if (this.RenderMode == TextRenderMode.Billboard)
             {
                 //计算广告牌矩阵
                 Matrix4 billboardMatrix = this.CalculateBillboardMatrix(camera);
-                program.SetUniformMatrix4("u_ModelMatrix", billboardMatrix);
+                Matrix4 scaleMatrix = Matrix4.CreateScale(scale);
+                program.SetUniformMatrix4("u_ModelMatrix", scaleMatrix * billboardMatrix);
             }
 
             this._vertexBuffer.Draw(PrimitiveType.Triangles);
@@ -319,7 +333,8 @@ namespace MedicalSharp.Engine.Renderables
             int height = Math.Max((int)Math.Ceiling(bounds.Height), 1);
             this.TextSize = new Vector2(width, height);
 
-            using SKSurface surface = SKSurface.Create(new SKImageInfo(width, height));
+            SKImageInfo imageInfo = new SKImageInfo(width, height, SKColorType.Gray8);
+            using SKSurface surface = SKSurface.Create(imageInfo);
             using SKCanvas canvas = surface.Canvas;
             canvas.Clear(SKColors.Transparent);
             canvas.DrawText(this.Text, -bounds.Left, -bounds.Top, font, paint);
@@ -328,9 +343,10 @@ namespace MedicalSharp.Engine.Renderables
             using SKBitmap bitmap = SKBitmap.FromImage(image);
             IntPtr pixels = bitmap.GetPixels();
 
-            this._texture = new Texture2D(width, height, PixelInternalFormat.R8, PixelFormat.Red, PixelType.UnsignedByte);
+            this._texture = new Texture2D(width, height, PixelInternalFormat.Rgba, PixelFormat.Bgra, PixelType.UnsignedByte);
             this._texture.AllocateMemory(pixels);
-            this._texture.SetFilter(TextureMinFilter.Linear, TextureMagFilter.Linear);
+            this._texture.SetFilter(TextureMinFilter.Nearest, TextureMagFilter.Linear);
+            this._texture.SetWrapMode(TextureWrapMode.ClampToEdge);
         }
         #endregion
 
@@ -374,7 +390,7 @@ namespace MedicalSharp.Engine.Renderables
             //锁定Y轴：只绕Z轴旋转，保持文本直立
             if (this.LockYAxis)
             {
-                float angle = MathF.Atan2(forward.Y, forward.X) - MathHelper.PiOver2;
+                float angle = MathF.Atan2(forward.Y, forward.X) - MathHelper.PiOver2 + MathHelper.Pi;
                 Matrix4 rotation = Matrix4.CreateRotationZ(angle);
                 Matrix4 translation = Matrix4.CreateTranslation(this.Transform.Position);
 
@@ -383,16 +399,19 @@ namespace MedicalSharp.Engine.Renderables
             //完全面向相机（球形广告牌）
             else
             {
-                Vector3 up = Vector3.UnitZ;
-                Vector3 right = Vector3.Normalize(Vector3.Cross(up, forward));
-                Vector3 newUp = Vector3.Cross(forward, right);
+                //先计算绕Z轴的角度（同锁定Y轴）
+                float angleZ = MathF.Atan2(forward.Y, forward.X) - MathHelper.PiOver2 + MathHelper.Pi;
+                Matrix4 rotationZ = Matrix4.CreateRotationZ(angleZ);
 
-                Matrix4 rotation = new Matrix4(
-                    right.X, right.Y, right.Z, 0,
-                    newUp.X, newUp.Y, newUp.Z, 0,
-                    forward.X, forward.Y, forward.Z, 0,
-                    0, 0, 0, 1
-                );
+                //再计算绕X轴的角度（上下倾斜）
+                //计算 forward 在 XY 平面上的投影长度
+                float forwardXY = MathF.Sqrt(forward.X * forward.X + forward.Y * forward.Y);
+                float angleX = MathF.Atan2(forward.Z, forwardXY);
+
+                Matrix4 rotationX = Matrix4.CreateRotationX(-angleX);
+
+                //组合旋转：先绕Z，再绕X
+                Matrix4 rotation = rotationX * rotationZ;
                 Matrix4 translation = Matrix4.CreateTranslation(this.Transform.Position);
 
                 return rotation * translation;

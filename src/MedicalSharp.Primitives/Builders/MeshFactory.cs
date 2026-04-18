@@ -1188,18 +1188,18 @@ namespace MedicalSharp.Primitives.Builders
             Vector3[] positions =
             [
                 -right * halfW - up * halfH, // 0: 左下
-                right * halfW - up * halfH, // 1: 右下
-                right * halfW + up * halfH, // 2: 右上
-                -right * halfW + up * halfH // 3: 左上
+                 right * halfW - up * halfH, // 1: 右下
+                 right * halfW + up * halfH, // 2: 右上
+                -right * halfW + up * halfH  // 3: 左上
             ];
 
             //纹理坐标
             Vector2[] texCoords =
             [
-                new Vector2(0, 0), // 左下
-                new Vector2(1, 0), // 右下
-                new Vector2(1, 1), // 右上
-                new Vector2(0, 1) // 左上
+                new Vector2(0, 1),  // 左下 -> 纹理左上
+                new Vector2(1, 1),  // 右下 -> 纹理右上
+                new Vector2(1, 0),  // 右上 -> 纹理右下
+                new Vector2(0, 0)   // 左上 -> 纹理左下
             ];
 
             //构建顶点列表
