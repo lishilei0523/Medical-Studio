@@ -5,13 +5,13 @@ using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
 using MedicalSharp.Controls.Extensions;
-using MedicalSharp.Controls.Inputs;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Reflection;
+using IInputManager = MedicalSharp.Controls.Interfaces.IInputManager;
 
 namespace MedicalSharp.Controls.Base
 {
@@ -35,7 +35,7 @@ namespace MedicalSharp.Controls.Base
         /// <summary>
         /// 输入管理器依赖属性
         /// </summary>
-        public static readonly StyledProperty<InputManager> InputManagerProperty;
+        public static readonly StyledProperty<IInputManager> InputManagerProperty;
 
         /// <summary>
         /// 静态构造器
@@ -44,7 +44,7 @@ namespace MedicalSharp.Controls.Base
         {
             BackgroundProperty = AvaloniaProperty.Register<OpenTKViewport, Color>(nameof(Background), Colors.Black);
             CameraProperty = AvaloniaProperty.Register<OpenTKViewport, Camera>(nameof(Camera));
-            InputManagerProperty = AvaloniaProperty.Register<OpenTKViewport, InputManager>(nameof(InputManager));
+            InputManagerProperty = AvaloniaProperty.Register<OpenTKViewport, IInputManager>(nameof(InputManager));
         }
 
         /// <summary>
@@ -103,11 +103,11 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region 依赖属性 - 输入管理器 —— InputManager InputManager
+        #region 依赖属性 - 输入管理器 —— IInputManager InputManager
         /// <summary>
         /// 依赖属性 - 输入管理器
         /// </summary>
-        public InputManager InputManager
+        public IInputManager InputManager
         {
             get => this.GetValue(InputManagerProperty);
             set => this.SetValue(InputManagerProperty, value);

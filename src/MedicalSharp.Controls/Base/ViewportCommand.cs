@@ -1,13 +1,13 @@
 ﻿using Avalonia;
 using Avalonia.Input;
-using MedicalSharp.Controls.Base;
+using MedicalSharp.Controls.Interfaces;
 
-namespace MedicalSharp.Controls.Inputs
+namespace MedicalSharp.Controls.Base
 {
     /// <summary>
-    /// 输入管理器
+    /// 视口命令
     /// </summary>
-    public abstract class InputManager
+    public abstract class ViewportCommand : IViewportCommand
     {
         #region # 字段及构造器
 
@@ -19,7 +19,7 @@ namespace MedicalSharp.Controls.Inputs
         /// <summary>
         /// 创建输入管理器构造器
         /// </summary>
-        protected InputManager()
+        protected ViewportCommand()
         {
             this._mousePosition2D = null;
         }

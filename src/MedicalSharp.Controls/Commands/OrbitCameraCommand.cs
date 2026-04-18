@@ -2,26 +2,26 @@
 using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Primitives.Cameras;
-using System;
 
-namespace MedicalSharp.Controls.Inputs
+namespace MedicalSharp.Controls.Commands
 {
     /// <summary>
-    /// MPR输入管理器
+    /// 轨道相机命令
     /// </summary>
-    public class MPRInputManager : InputManager
+    public class OrbitCameraCommand : ViewportCommand
     {
         #region # 字段及构造器
 
         /// <summary>
-        /// MPR相机
+        /// 轨道相机
         /// </summary>
-        private readonly MPRCamera _camera;
+        private readonly OrbitCamera _camera;
 
         /// <summary>
-        /// 创建输入管理器构造器
+        /// 创建轨道相机命令构造器
         /// </summary>
-        public MPRInputManager(MPRCamera camera)
+        /// <param name="camera">轨道相机</param>
+        public OrbitCameraCommand(OrbitCamera camera)
         {
             this._camera = camera;
         }
@@ -30,11 +30,11 @@ namespace MedicalSharp.Controls.Inputs
 
         #region # 属性
 
-        #region 只读属性 - MPR相机 —— MPRCamera Camera
+        #region 只读属性 - 轨道相机 —— OrbitCamera Camera
         /// <summary>
-        /// 只读属性 - MPR相机
+        /// 只读属性 - 轨道相机
         /// </summary>
-        public MPRCamera Camera
+        public OrbitCamera Camera
         {
             get => this._camera;
         }
@@ -57,12 +57,12 @@ namespace MedicalSharp.Controls.Inputs
                 float deltaY = (float)(position.Y - this._mousePosition2D.Value.Y);
                 if (eventArgs.Properties.IsMiddleButtonPressed)
                 {
-                    this._camera.Pan(deltaX, deltaY);
+                    this._camera.Pan(deltaX / 50.0f, deltaY / 50.0f);
                     viewport.RequestNextFrameRendering();
                 }
                 if (eventArgs.Properties.IsRightButtonPressed)
                 {
-                    this._camera.Zoom(-deltaY);
+                    this._camera.Rotate(deltaX, -deltaY);
                     viewport.RequestNextFrameRendering();
                 }
             }
@@ -76,10 +76,10 @@ namespace MedicalSharp.Controls.Inputs
         /// </summary>
         public override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         {
-            this._camera.TargetPlane.SliceIndex += (int)Math.Ceiling(eventArgs.Delta.Y);
+            this._camera.Zoom((float)eventArgs.Delta.Y);
             viewport.RequestNextFrameRendering();
         }
-        #endregion
+        #endregion 
 
         #region 键盘按下事件 —— override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
         /// <summary>
@@ -87,24 +87,44 @@ namespace MedicalSharp.Controls.Inputs
         /// </summary>
         public override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
         {
+            if (eventArgs.Key == Key.W)
+            {
+                this._camera.Zoom(0.1f);
+                viewport.RequestNextFrameRendering();
+            }
+            if (eventArgs.Key == Key.S)
+            {
+                this._camera.Zoom(-0.1f);
+                viewport.RequestNextFrameRendering();
+            }
+            if (eventArgs.Key == Key.A)
+            {
+                this._camera.Pan(-0.5f, 0);
+                viewport.RequestNextFrameRendering();
+            }
+            if (eventArgs.Key == Key.D)
+            {
+                this._camera.Pan(0.5f, 0);
+                viewport.RequestNextFrameRendering();
+            }
             if (eventArgs.Key == Key.Up)
             {
-                this._camera.TargetPlane.Rotate(-3, 0);
+                this._camera.Rotate(0, 3);
                 viewport.RequestNextFrameRendering();
             }
             if (eventArgs.Key == Key.Down)
             {
-                this._camera.TargetPlane.Rotate(3, 0);
+                this._camera.Rotate(0, -3);
                 viewport.RequestNextFrameRendering();
             }
             if (eventArgs.Key == Key.Left)
             {
-                this._camera.TargetPlane.Rotate(0, 3);
+                this._camera.Rotate(-3, 0);
                 viewport.RequestNextFrameRendering();
             }
             if (eventArgs.Key == Key.Right)
             {
-                this._camera.TargetPlane.Rotate(0, -3);
+                this._camera.Rotate(3, 0);
                 viewport.RequestNextFrameRendering();
             }
         }

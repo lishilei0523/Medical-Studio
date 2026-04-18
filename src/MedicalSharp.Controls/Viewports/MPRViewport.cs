@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
-using MedicalSharp.Controls.Inputs;
+using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
