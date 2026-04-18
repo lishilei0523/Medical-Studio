@@ -2,7 +2,6 @@ using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
-using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -10,14 +9,13 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using SkiaSharp;
 using System;
-using System.Collections.Generic;
 
 namespace MedicalSharp.Engine.Renderables
 {
     /// <summary>
     /// 文本渲染对象
     /// </summary>
-    public class TextRenderable : Renderable, IHasTriangles, IDisposable
+    public class TextRenderable : Renderable, IDisposable
     {
         #region # 字段及构造器
 
@@ -30,6 +28,11 @@ namespace MedicalSharp.Engine.Renderables
         /// 参考距离时基础缩放
         /// </summary>
         private const float BaseScale = 0.005f;
+
+        /// <summary>
+        /// 参考距离缩放
+        /// </summary>
+        private float _referenceScale;
 
         /// <summary>
         /// 释放标识
@@ -47,9 +50,12 @@ namespace MedicalSharp.Engine.Renderables
         private VertexBuffer _vertexBuffer;
 
         /// <summary>
-        /// 三角形列表
+        /// 默认构造器
         /// </summary>
-        private IList<Triangle> _triangles;
+        public TextRenderable()
+        {
+            this._referenceScale = BaseScale;
+        }
 
         /// <summary>
         /// 创建固定朝向文本渲染对象构造器
@@ -60,6 +66,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="color">文本颜色</param>
         /// <param name="normal">法向量</param>
         public TextRenderable(string text, Vector3 position, float fontSize = 16.0f, Vector4 color = default, Vector3 normal = default)
+            : this()
         {
             this.Text = text;
             this.FontSize = fontSize;
@@ -72,9 +79,6 @@ namespace MedicalSharp.Engine.Renderables
 
             this.CreateTexture();
             this.CreateContainer2D();
-
-            //提取三角形面
-            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
         }
 
         /// <summary>
@@ -86,6 +90,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="color">文本颜色</param>
         /// <param name="lockYAxis">是否锁定Y轴</param>
         public TextRenderable(string text, Vector3 position, float fontSize = 24.0f, Vector4 color = default, bool lockYAxis = true)
+            : this()
         {
             this.Text = text;
             this.FontSize = fontSize;
@@ -98,9 +103,6 @@ namespace MedicalSharp.Engine.Renderables
 
             this.CreateTexture();
             this.CreateContainer2D();
-
-            //提取三角形面
-            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
         }
 
         #endregion
@@ -159,16 +161,6 @@ namespace MedicalSharp.Engine.Renderables
         public Vector2 TextSize { get; private set; }
         #endregion
 
-        #region 只读属性 - 三角形列表 —— IList<Triangle> Triangles
-        /// <summary>
-        /// 只读属性 - 三角形列表
-        /// </summary>
-        public IList<Triangle> Triangles
-        {
-            get => this._triangles;
-        }
-        #endregion
-
         #region 只读属性 - 顶点缓冲区 —— VertexBuffer VertexBuffer
         /// <summary>
         /// 只读属性 - 顶点缓冲区
@@ -199,9 +191,6 @@ namespace MedicalSharp.Engine.Renderables
             this.CreateTexture();
             this.CreateContainer2D();
             base.InvalidateBoundings();
-
-            //提取三角形面
-            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
         }
         #endregion
 
@@ -246,18 +235,22 @@ namespace MedicalSharp.Engine.Renderables
             program.SetUniformInt("u_TextTexture", 0);
             program.SetUniformVector4("u_Color", this.Color);
 
-            float distance = Vector3.Distance(camera.CameraPosition, this.Transform.Position);
-            float scale = BaseScale * (distance / ReferenceDistance);
+            //计算缩放
+            float cameraDistance = Vector3.Distance(camera.CameraPosition, this.Transform.Position);
+            this._referenceScale = BaseScale * (cameraDistance / ReferenceDistance);
+            Matrix4 scaleMatrix = Matrix4.CreateScale(this._referenceScale);
+
+            //重新计算包围盒
+            this.InvalidateBoundings();
+
             if (this.RenderMode == TextRenderMode.Fixed)
             {
-                this.Transform.SetScale(new Vector3(scale));
-                program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
+                program.SetUniformMatrix4("u_ModelMatrix", scaleMatrix * this.ModelMatrix);
             }
             if (this.RenderMode == TextRenderMode.Billboard)
             {
                 //计算广告牌矩阵
                 Matrix4 billboardMatrix = this.CalculateBillboardMatrix(camera);
-                Matrix4 scaleMatrix = Matrix4.CreateScale(scale);
                 program.SetUniformMatrix4("u_ModelMatrix", scaleMatrix * billboardMatrix);
             }
 
@@ -265,6 +258,37 @@ namespace MedicalSharp.Engine.Renderables
 
             GL.Disable(EnableCap.DepthTest);
             GL.Disable(EnableCap.Blend);
+        }
+        #endregion
+
+        #region 检测射线相交 —— bool IntersectsRay(Ray ray, out float distance...
+        /// <summary>
+        /// 检测射线相交
+        /// </summary>
+        /// <param name="ray">射线（世界空间）</param>
+        /// <param name="distance">相交距离</param>
+        /// <param name="hitPoint">命中点坐标</param>
+        /// <param name="hitNormal">命中点法向量</param>
+        /// <param name="hitTriangleIndex">命中三角形索引</param>
+        /// <returns>是否相交</returns>
+        public bool IntersectsRay(Ray ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex)
+        {
+            distance = float.MaxValue;
+            hitPoint = Vector3.Zero;
+            hitNormal = Vector3.Zero;
+            hitTriangleIndex = -1;
+
+            //将射线变换到局部空间
+            Matrix4 worldToLocal = Matrix4.Invert(this.ModelMatrix);
+            Ray localRay = ray.Transform(worldToLocal);
+
+            //快速剔除：先检测包围盒
+            if (!this.BoundingBox.Intersects(localRay, out float boxDistance))
+            {
+                return false;
+            }
+
+            return true;
         }
         #endregion
 
@@ -295,8 +319,8 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            float halfW = this.TextSize.X * 0.5f;
-            float halfH = this.TextSize.Y * 0.5f;
+            float halfW = this.TextSize.X * 0.5f * this._referenceScale;
+            float halfH = this.TextSize.Y * 0.5f * this._referenceScale;
 
             return new BoundingBox(
                 new Vector3(-halfW, -halfH, 0),

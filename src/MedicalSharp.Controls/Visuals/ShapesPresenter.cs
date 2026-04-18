@@ -1,5 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
+using MedicalSharp.Primitives.Maths;
+using System;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -35,6 +37,26 @@ namespace MedicalSharp.Controls.Visuals
         {
             get => this.GetValue(ItemsSourceProperty);
             set => this.SetValue(ItemsSourceProperty, value);
+        }
+        #endregion
+
+        #region 只读属性 - 变换 —— override Transform Transform
+        /// <summary>
+        /// 只读属性 - 变换
+        /// </summary>
+        public override Transform Transform
+        {
+            get => throw new NotSupportedException();
+        }
+        #endregion
+
+        #region 只读属性 - 包围盒 —— override BoundingBox Bounds
+        /// <summary>
+        /// 只读属性 - 包围盒
+        /// </summary>
+        public override BoundingBox Bounds
+        {
+            get => throw new NotSupportedException();
         }
         #endregion
 

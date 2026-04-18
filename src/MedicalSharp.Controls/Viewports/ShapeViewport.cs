@@ -10,6 +10,7 @@ using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -90,14 +91,14 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="visual3D">3D元素</param>
         /// <param name="ray">射线</param>
         /// <returns>是否成功</returns>
-        public bool FindNearestShape(Vector2 position, out Vector3 point, out Vector3 normal, out ShapeVisual3D visual3D, out Ray ray)
+        public bool FindNearestShape(Vector2 position, out Vector3 point, out Vector3 normal, out Visual3D visual3D, out Ray ray)
         {
             this.GlContext.MakeCurrent();
 
             ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             //快速检测
-            IDictionary<ShapeVisual3D, float> hitResults = new Dictionary<ShapeVisual3D, float>();
+            IDictionary<Visual3D, float> hitResults = new Dictionary<Visual3D, float>();
             foreach (ShapeVisual3D shapeVisual3D in this._shapeVisual3Ds)
             {
                 bool intersects = shapeVisual3D.Renderable.IntersectsRay(ray, out float distance);
@@ -106,12 +107,35 @@ namespace MedicalSharp.Controls.Viewports
                     hitResults.Add(shapeVisual3D, distance);
                 }
             }
+            foreach (TextVisual3D textVisual3D in this._textVisual3Ds)
+            {
+                bool intersects = textVisual3D.Renderable.IntersectsRay(ray, out float distance, out _, out _, out _);
+                if (intersects)
+                {
+                    hitResults.Add(textVisual3D, distance);
+                }
+            }
 
             //精确检测
             if (hitResults.Any())
             {
-                KeyValuePair<ShapeVisual3D, float> hitResult = hitResults.MinBy(x => x.Value);
-                bool intersects = hitResult.Key.Renderable.IntersectsRay(ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex);
+                KeyValuePair<Visual3D, float> hitResult = hitResults.MinBy(x => x.Value);
+                bool intersects;
+                Vector3 hitPoint;
+                Vector3 hitNormal;
+                if (hitResult.Key is ShapeVisual3D shapeVisual3D)
+                {
+                    intersects = shapeVisual3D.Renderable.IntersectsRay(ray, out _, out hitPoint, out hitNormal, out _);
+                }
+                else if (hitResult.Key is TextVisual3D textVisual3D)
+                {
+                    intersects = textVisual3D.Renderable.IntersectsRay(ray, out _, out hitPoint, out hitNormal, out _);
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+
                 if (intersects)
                 {
                     point = hitPoint;
@@ -193,7 +217,9 @@ namespace MedicalSharp.Controls.Viewports
 
             //清空渲染对象
             this._shapeVisual3Ds.Clear();
+            this._textVisual3Ds.Clear();
             this._shapeRenderer.ClearItems();
+            this._textRenderer.ClearItems();
 
             //填充渲染对象
             foreach (Visual3D visual3D in this.Children)

@@ -83,21 +83,21 @@ namespace MedicalSharp.Controls.Visuals
         public ShapeRenderable Renderable { get; protected set; }
         #endregion
 
-        #region 只读属性 - 变换 —— Transform Transform
+        #region 只读属性 - 变换 —— override Transform Transform
         /// <summary>
         /// 只读属性 - 变换
         /// </summary>
-        public Transform Transform
+        public override Transform Transform
         {
             get => this.Renderable?.Transform;
         }
         #endregion
 
-        #region 只读属性 - 包围盒 —— new BoundingBox Bounds
+        #region 只读属性 - 包围盒 —— override BoundingBox Bounds
         /// <summary>
         /// 只读属性 - 包围盒
         /// </summary>
-        public new BoundingBox Bounds
+        public override BoundingBox Bounds
         {
             get => this.Renderable.BoundingBox;
         }

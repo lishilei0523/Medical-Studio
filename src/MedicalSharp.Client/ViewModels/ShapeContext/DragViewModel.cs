@@ -29,7 +29,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// <summary>
         /// 选中的3D元素
         /// </summary>
-        private ShapeVisual3D _selectedVisual;
+        private Visual3D _selectedVisual;
 
         /// <summary>
         /// 选中2D点
@@ -140,7 +140,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             if (eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearestShape(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out ShapeVisual3D visual3D, out Ray ray);
+                bool success = viewport.FindNearestShape(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out Visual3D visual3D, out Ray ray);
                 if (success)
                 {
                     this._selectedVisual = visual3D;
@@ -270,8 +270,8 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     //旋转轴
                     Vector3 axisY = viewport.Camera.UpDirection.Normalized();
                     Vector3 axisX = viewport.Camera.RightDirection.Normalized();
-                    this._selectedVisual.Renderable.Transform.Rotate(deltaX, axisY);
-                    this._selectedVisual.Renderable.Transform.Rotate(deltaY, axisX);
+                    this._selectedVisual.Transform.Rotate(deltaX, axisY);
+                    this._selectedVisual.Transform.Rotate(deltaY, axisX);
 
                     viewport.RequestNextFrameRendering();
 
@@ -285,7 +285,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                 {
                     viewport.Cursor = new Cursor(StandardCursorType.Hand);
 
-                    this._selectedVisual.Renderable.Transform.SetPosition(hitPoint - localCenter);
+                    this._selectedVisual.Transform.SetPosition(hitPoint - localCenter);
                     viewport.RequestNextFrameRendering();
                 }
             }
