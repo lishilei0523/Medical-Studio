@@ -4,6 +4,7 @@ using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
+using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Primitives.Cameras;
@@ -20,7 +21,7 @@ namespace MedicalSharp.Controls.Viewports
     /// <summary>
     /// 形状渲染视口
     /// </summary>
-    public class ShapeViewport : OpenTKViewport
+    public class ShapeViewport : OpenTKViewport, IPickVisual3D
     {
         #region # 字段及构造器
 
@@ -81,9 +82,9 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
-        #region 查找最近形状 —— bool FindNearestShape(Vector2 position, out Vector3 point...
+        #region 查找最近元素 —— bool FindNearest(Vector2 position, out Vector3 point...
         /// <summary>
-        /// 查找最近形状
+        /// 查找最近元素
         /// </summary>
         /// <param name="position">2D位置</param>
         /// <param name="point">3D位置</param>
@@ -91,7 +92,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="visual3D">3D元素</param>
         /// <param name="ray">射线</param>
         /// <returns>是否成功</returns>
-        public bool FindNearestShape(Vector2 position, out Vector3 point, out Vector3 normal, out Visual3D visual3D, out Ray ray)
+        public bool FindNearest(Vector2 position, out Vector3 point, out Vector3 normal, out Visual3D visual3D, out Ray ray)
         {
             this.GlContext.MakeCurrent();
 
@@ -161,7 +162,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <returns>3D位置</returns>
         public Vector3? FindNearestPosition(Vector2 position)
         {
-            if (this.FindNearestShape(position, out Vector3 point, out _, out _, out _))
+            if (this.FindNearest(position, out Vector3 point, out _, out _, out _))
             {
                 return point;
             }

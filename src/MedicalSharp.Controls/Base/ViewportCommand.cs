@@ -12,29 +12,29 @@ namespace MedicalSharp.Controls.Base
         #region # 字段及构造器
 
         /// <summary>
-        /// 鼠标位置
+        /// 鼠标2D位置
         /// </summary>
-        protected Point? _mousePosition2D;
+        protected Point? _mousePos2D;
 
         /// <summary>
-        /// 创建输入管理器构造器
+        /// 创建视口命令构造器
         /// </summary>
         protected ViewportCommand()
         {
-            this._mousePosition2D = null;
+            this._mousePos2D = null;
         }
 
         #endregion
 
         #region # 属性
 
-        #region 只读属性 - 鼠标位置 —— Point? MousePosition2D
+        #region 只读属性 - 鼠标位置 —— Point? MousePos2D
         /// <summary>
         /// 只读属性 - 鼠标位置
         /// </summary>
-        public Point? MousePosition2D
+        public Point? MousePos2D
         {
-            get => this._mousePosition2D;
+            get => this._mousePos2D;
         }
         #endregion
 
@@ -48,7 +48,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            this._mousePosition2D = eventArgs.GetPosition(viewport);
+            this._mousePos2D = eventArgs.GetPosition(viewport);
         }
         #endregion
 
@@ -58,7 +58,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
-            this._mousePosition2D = null;
+            this._mousePos2D = null;
         }
         #endregion
 

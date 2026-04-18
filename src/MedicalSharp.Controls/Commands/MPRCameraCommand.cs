@@ -51,10 +51,10 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
             Point position = eventArgs.GetPosition(viewport);
-            if (this._mousePosition2D.HasValue)
+            if (this._mousePos2D.HasValue)
             {
-                float deltaX = (float)(position.X - this._mousePosition2D.Value.X);
-                float deltaY = (float)(position.Y - this._mousePosition2D.Value.Y);
+                float deltaX = (float)(position.X - this._mousePos2D.Value.X);
+                float deltaY = (float)(position.Y - this._mousePos2D.Value.Y);
                 if (eventArgs.Properties.IsMiddleButtonPressed)
                 {
                     this._camera.Pan(deltaX, deltaY);
@@ -66,7 +66,7 @@ namespace MedicalSharp.Controls.Commands
                     viewport.RequestNextFrameRendering();
                 }
             }
-            this._mousePosition2D = position;
+            this._mousePos2D = position;
         }
         #endregion
 

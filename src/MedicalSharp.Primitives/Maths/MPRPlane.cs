@@ -417,8 +417,9 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="viewportSize">视口尺寸</param>
         /// <param name="projectionMatrix">投影矩阵</param>
         /// <param name="viewMatrix">视图矩阵</param>
+        /// <param name="ray">射线</param>
         /// <returns>UV坐标，[-1, 1]，如果不在平面上则返回null</returns>
-        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector3 lookDirection, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix)
+        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector3 lookDirection, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix, out Ray ray)
         {
             //将屏幕坐标转换到世界空间的射线起点（近平面上的点）
             float ndcX = (2.0f * mousePos2D.X) / viewportSize.X - 1.0f;
@@ -436,7 +437,7 @@ namespace MedicalSharp.Primitives.Maths
             Vector3 rayDirection = lookDirection;
 
             //创建射线
-            Ray ray = new Ray(rayStartWorld, rayDirection);
+            ray = new Ray(rayStartWorld, rayDirection);
 
             //计算平面的世界位置，平面实际位置 = Normal * sliceOffset（因为Center = (0,0,0)）
             float sliceOffset = this.GetSliceOffset();

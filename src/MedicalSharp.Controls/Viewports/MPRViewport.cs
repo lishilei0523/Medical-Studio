@@ -2,6 +2,7 @@
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
+using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
@@ -17,7 +18,7 @@ namespace MedicalSharp.Controls.Viewports
     /// <summary>
     /// MPR渲染视口
     /// </summary>
-    public class MPRViewport : OpenTKViewport
+    public class MPRViewport : OpenTKViewport, IPickVoxel
     {
         #region # 字段及构造器
 
@@ -191,7 +192,7 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
-        #region 查找最近体素 —— bool FindNearestVoxel(Vector2 position, out Vector3? textureCoord...
+        #region 查找最近体素 —— bool FindNearestVoxel(Vector2 position, out Vector3 textureCoord...
         /// <summary>
         /// 查找最近体素
         /// </summary>
@@ -199,25 +200,24 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="textureCoord">纹理坐标</param>
         /// <param name="voxelPosition">体素坐标</param>
         /// <param name="voxelValue">体素HU值</param>
+        /// <param name="ray">射线</param>
         /// <returns>是否成功</returns>
-        public bool FindNearestVoxel(Vector2 position, out Vector3? textureCoord, out Vector3i? voxelPosition, out short? voxelValue)
+        public bool FindNearestVoxel(Vector2 position, out Vector3 textureCoord, out Vector3i voxelPosition, out short voxelValue, out Ray ray)
         {
             this.GlContext.MakeCurrent();
 
-            textureCoord = null;
-            voxelPosition = null;
-            voxelValue = null;
+            textureCoord = Vector3.Zero;
+            voxelPosition = Vector3i.Zero;
+            voxelValue = -1;
 
-            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera.LookDirection, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera.LookDirection, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, out ray);
             if (planeUV.HasValue)
             {
                 voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y, out Vector3 texCoord);
-                if (voxelPosition.HasValue)
-                {
-                    textureCoord = texCoord;
-                    voxelValue = this.VolumeData[voxelPosition.Value.X, voxelPosition.Value.Y, voxelPosition.Value.Z];
-                    return true;
-                }
+                textureCoord = texCoord;
+                voxelValue = this.VolumeData[voxelPosition.X, voxelPosition.Y, voxelPosition.Z];
+
+                return true;
             }
 
             return false;
