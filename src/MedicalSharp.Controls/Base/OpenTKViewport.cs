@@ -289,22 +289,7 @@ namespace MedicalSharp.Controls.Base
         protected override void OnPointerPressed(PointerPressedEventArgs eventArgs)
         {
             base.OnPointerPressed(eventArgs);
-
-            MouseButton mouseButton = MouseButton.Left;
-            if (eventArgs.Properties.IsLeftButtonPressed)
-            {
-                mouseButton = MouseButton.Left;
-            }
-            if (eventArgs.Properties.IsMiddleButtonPressed)
-            {
-                mouseButton = MouseButton.Middle;
-            }
-            if (eventArgs.Properties.IsRightButtonPressed)
-            {
-                mouseButton = MouseButton.Right;
-            }
-
-            this.InputManager.OnMouseDown(this, mouseButton, eventArgs.GetPosition(this));
+            this.InputManager.OnMouseDown(this, eventArgs);
         }
         #endregion
 
@@ -315,22 +300,7 @@ namespace MedicalSharp.Controls.Base
         protected override void OnPointerReleased(PointerReleasedEventArgs eventArgs)
         {
             base.OnPointerReleased(eventArgs);
-
-            MouseButton mouseButton = MouseButton.Left;
-            if (eventArgs.Properties.IsLeftButtonPressed)
-            {
-                mouseButton = MouseButton.Left;
-            }
-            if (eventArgs.Properties.IsMiddleButtonPressed)
-            {
-                mouseButton = MouseButton.Middle;
-            }
-            if (eventArgs.Properties.IsRightButtonPressed)
-            {
-                mouseButton = MouseButton.Right;
-            }
-
-            this.InputManager.OnMouseUp(this, mouseButton, eventArgs.GetPosition(this));
+            this.InputManager.OnMouseUp(this, eventArgs);
         }
         #endregion
 
@@ -341,22 +311,7 @@ namespace MedicalSharp.Controls.Base
         protected override void OnPointerMoved(PointerEventArgs eventArgs)
         {
             base.OnPointerMoved(eventArgs);
-
-            MouseButton mouseButton = MouseButton.Left;
-            if (eventArgs.Properties.IsLeftButtonPressed)
-            {
-                mouseButton = MouseButton.Left;
-            }
-            if (eventArgs.Properties.IsMiddleButtonPressed)
-            {
-                mouseButton = MouseButton.Middle;
-            }
-            if (eventArgs.Properties.IsRightButtonPressed)
-            {
-                mouseButton = MouseButton.Right;
-            }
-
-            this.InputManager.OnMouseMove(this, mouseButton, eventArgs.GetPosition(this));
+            this.InputManager.OnMouseMove(this, eventArgs);
         }
         #endregion
 
@@ -367,8 +322,7 @@ namespace MedicalSharp.Controls.Base
         protected override void OnPointerWheelChanged(PointerWheelEventArgs eventArgs)
         {
             base.OnPointerWheelChanged(eventArgs);
-
-            this.InputManager.OnMouseWheel(this, eventArgs.Delta.X, eventArgs.Delta.Y);
+            this.InputManager.OnMouseWheel(this, eventArgs);
         }
         #endregion
 
@@ -380,7 +334,7 @@ namespace MedicalSharp.Controls.Base
         {
             base.OnKeyDown(eventArgs);
 
-            this.InputManager.OnKeyDown(this, eventArgs.Key);
+            this.InputManager.OnKeyDown(this, eventArgs);
         }
         #endregion
 
@@ -392,7 +346,7 @@ namespace MedicalSharp.Controls.Base
         {
             base.OnKeyUp(eventArgs);
 
-            this.InputManager.OnKeyUp(this, eventArgs.Key);
+            this.InputManager.OnKeyUp(this, eventArgs);
         }
         #endregion
 

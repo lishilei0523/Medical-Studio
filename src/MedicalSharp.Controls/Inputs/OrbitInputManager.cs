@@ -44,25 +44,23 @@ namespace MedicalSharp.Controls.Inputs
 
         #region # 方法
 
-        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport, MouseButton button...
+        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="button">鼠标按键</param>
-        /// <param name="position">鼠标位置</param>
-        public override void OnMouseMove(OpenTKViewport viewport, MouseButton button, Point position)
+        public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
+            Point position = eventArgs.GetPosition(viewport);
             if (this._mousePosition2D.HasValue)
             {
                 float deltaX = (float)(position.X - this._mousePosition2D.Value.X);
                 float deltaY = (float)(position.Y - this._mousePosition2D.Value.Y);
-                if (button == MouseButton.Middle)
+                if (eventArgs.Properties.IsMiddleButtonPressed)
                 {
                     this._camera.Pan(deltaX / 50.0f, deltaY / 50.0f);
                     viewport.RequestNextFrameRendering();
                 }
-                if (button == MouseButton.Right)
+                if (eventArgs.Properties.IsRightButtonPressed)
                 {
                     this._camera.Rotate(deltaX, -deltaY);
                     viewport.RequestNextFrameRendering();
@@ -72,64 +70,59 @@ namespace MedicalSharp.Controls.Inputs
         }
         #endregion
 
-        #region 鼠标滚轮事件 —— override void OnMouseWheel(OpenTKViewport viewport, double offsetX...
+        #region 鼠标滚轮事件 —— override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         /// <summary>
         /// 鼠标滚轮事件
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="offsetX">X轴偏移量</param>
-        /// <param name="offsetY">Y轴偏移量</param>
-        public override void OnMouseWheel(OpenTKViewport viewport, double offsetX, double offsetY)
+        public override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         {
-            this._camera.Zoom((float)offsetY);
+            this._camera.Zoom((float)eventArgs.Delta.Y);
             viewport.RequestNextFrameRendering();
         }
         #endregion 
 
-        #region 键盘按下事件 —— override void OnKeyDown(OpenTKViewport viewport, Key key)
+        #region 键盘按下事件 —— override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
         /// <summary>
         /// 键盘按下事件
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="key">键</param>
-        public override void OnKeyDown(OpenTKViewport viewport, Key key)
+        public override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
         {
-            if (key == Key.W)
+            if (eventArgs.Key == Key.W)
             {
                 this._camera.Zoom(0.1f);
                 viewport.RequestNextFrameRendering();
             }
-            if (key == Key.S)
+            if (eventArgs.Key == Key.S)
             {
                 this._camera.Zoom(-0.1f);
                 viewport.RequestNextFrameRendering();
             }
-            if (key == Key.A)
+            if (eventArgs.Key == Key.A)
             {
                 this._camera.Pan(-0.5f, 0);
                 viewport.RequestNextFrameRendering();
             }
-            if (key == Key.D)
+            if (eventArgs.Key == Key.D)
             {
                 this._camera.Pan(0.5f, 0);
                 viewport.RequestNextFrameRendering();
             }
-            if (key == Key.Up)
+            if (eventArgs.Key == Key.Up)
             {
                 this._camera.Rotate(0, 3);
                 viewport.RequestNextFrameRendering();
             }
-            if (key == Key.Down)
+            if (eventArgs.Key == Key.Down)
             {
                 this._camera.Rotate(0, -3);
                 viewport.RequestNextFrameRendering();
             }
-            if (key == Key.Left)
+            if (eventArgs.Key == Key.Left)
             {
                 this._camera.Rotate(-3, 0);
                 viewport.RequestNextFrameRendering();
             }
-            if (key == Key.Right)
+            if (eventArgs.Key == Key.Right)
             {
                 this._camera.Rotate(3, 0);
                 viewport.RequestNextFrameRendering();

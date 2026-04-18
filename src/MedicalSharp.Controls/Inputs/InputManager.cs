@@ -42,77 +42,61 @@ namespace MedicalSharp.Controls.Inputs
 
         #region # 方法
 
-        #region 鼠标按下事件 —— virtual void OnMouseDown(OpenTKViewport viewport, MouseButton button...
+        #region 鼠标按下事件 —— virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="button">鼠标按键</param>
-        /// <param name="position">鼠标位置</param>
-        public virtual void OnMouseDown(OpenTKViewport viewport, MouseButton button, Point position)
+        public virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            this._mousePosition2D = position;
+            this._mousePosition2D = eventArgs.GetPosition(viewport);
         }
         #endregion
 
-        #region 鼠标松开事件 —— virtual void OnMouseUp(OpenTKViewport viewport, MouseButton button...
+        #region 鼠标松开事件 —— virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         /// <summary>
         /// 鼠标松开事件
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="button">鼠标按键</param>
-        /// <param name="position">鼠标位置</param>
-        public virtual void OnMouseUp(OpenTKViewport viewport, MouseButton button, Point position)
+        public virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
             this._mousePosition2D = null;
         }
         #endregion
 
-        #region 鼠标移动事件 —— virtual void OnMouseMove(OpenTKViewport viewport, MouseButton button...
+        #region 鼠标移动事件 —— virtual void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="button">鼠标按键</param>
-        /// <param name="position">鼠标位置</param>
-        public virtual void OnMouseMove(OpenTKViewport viewport, MouseButton button, Point position)
+        public virtual void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
 
         }
         #endregion
 
-        #region 鼠标滚轮事件 —— virtual void OnMouseWheel(OpenTKViewport viewport, double offsetX...
+        #region 鼠标滚轮事件 —— virtual void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         /// <summary>
         /// 鼠标滚轮事件
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="offsetX">X轴偏移量</param>
-        /// <param name="offsetY">Y轴偏移量</param>
-        public virtual void OnMouseWheel(OpenTKViewport viewport, double offsetX, double offsetY)
+        public virtual void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         {
 
         }
         #endregion
 
-        #region 键盘按下事件 —— virtual void OnKeyDown(OpenTKViewport viewport, Key key)
+        #region 键盘按下事件 —— virtual void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
         /// <summary>
         /// 键盘按下事件
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="key">键</param>
-        public virtual void OnKeyDown(OpenTKViewport viewport, Key key)
+        public virtual void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
         {
 
         }
         #endregion
 
-        #region 键盘松开事件 —— virtual void OnKeyUp(OpenTKViewport viewport, Key key)
+        #region 键盘松开事件 —— virtual void OnKeyUp(OpenTKViewport viewport, KeyEventArgs eventArgs)
         /// <summary>
         /// 键盘松开事件
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="key">键</param>
-        public virtual void OnKeyUp(OpenTKViewport viewport, Key key)
+        public virtual void OnKeyUp(OpenTKViewport viewport, KeyEventArgs eventArgs)
         {
 
         }
