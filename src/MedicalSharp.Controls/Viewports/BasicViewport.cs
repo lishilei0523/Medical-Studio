@@ -19,9 +19,9 @@ using System.Linq;
 namespace MedicalSharp.Controls.Viewports
 {
     /// <summary>
-    /// 形状渲染视口
+    /// 基础渲染视口
     /// </summary>
-    public class ShapeViewport : OpenTKViewport, IPickVisual3D
+    public class BasicViewport : OpenTKViewport, IPickVisual3D
     {
         #region # 字段及构造器
 
@@ -48,7 +48,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public ShapeViewport()
+        public BasicViewport()
         {
             this._shapeVisual3Ds = new List<ShapeVisual3D>();
             this._textVisual3Ds = new List<TextVisual3D>();
@@ -225,6 +225,7 @@ namespace MedicalSharp.Controls.Viewports
             //填充渲染对象
             foreach (Visual3D visual3D in this.Children)
             {
+                //形状部分
                 if (visual3D is ShapeVisual3D shapeVisual3D)
                 {
                     shapeVisual3D.EnsureRenderable();
@@ -246,11 +247,28 @@ namespace MedicalSharp.Controls.Viewports
                         this._shapeRenderer.AppendItem(item.Renderable);
                     }
                 }
+
+                //文本部分
                 if (visual3D is TextVisual3D textVisual3D)
                 {
                     textVisual3D.EnsureRenderable();
                     this._textVisual3Ds.Add(textVisual3D);
                     this._textRenderer.AppendItem(textVisual3D.Renderable);
+                }
+                if (visual3D is TextPresenter textPresenter)
+                {
+                    textPresenter.Content.EnsureRenderable();
+                    this._textVisual3Ds.Add(textPresenter.Content);
+                    this._textRenderer.AppendItem(textPresenter.Content.Renderable);
+                }
+                if (visual3D is TextsPresenter textsPresenter)
+                {
+                    foreach (TextVisual3D item in textsPresenter.ItemsSource)
+                    {
+                        item.EnsureRenderable();
+                        this._textVisual3Ds.Add(item);
+                        this._textRenderer.AppendItem(item.Renderable);
+                    }
                 }
             }
 
@@ -280,9 +298,13 @@ namespace MedicalSharp.Controls.Viewports
             {
                 Visual3D visual3D = this.Children[eventArgs.NewStartingIndex];
                 visual3D.DataContext = this.DataContext;
-                if (visual3D is ShapesPresenter itemsPresenter)
+                if (visual3D is ShapesPresenter shapesPresenter)
                 {
-                    itemsPresenter.ItemsSource.CollectionChanged += this.OnItemsPresenterItemsChanged;
+                    shapesPresenter.ItemsSource.CollectionChanged += this.OnItemsPresenterItemsChanged;
+                }
+                if (visual3D is TextsPresenter textsPresenter)
+                {
+                    textsPresenter.ItemsSource.CollectionChanged += this.OnItemsPresenterItemsChanged;
                 }
             }
         }

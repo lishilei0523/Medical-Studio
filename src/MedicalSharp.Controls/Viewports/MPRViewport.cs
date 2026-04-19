@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Interfaces;
@@ -18,14 +17,14 @@ namespace MedicalSharp.Controls.Viewports
     /// <summary>
     /// MPR渲染视口
     /// </summary>
-    public class MPRViewport : OpenTKViewport, IPickVoxel
+    public class MPRViewport : BasicViewport, IPickVoxel
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 平面依赖属性
         /// </summary>
-        public new static readonly StyledProperty<MPRPlane> PlaneProperty;
+        public static readonly StyledProperty<MPRPlane> PlaneProperty;
 
         /// <summary>
         /// 相机依赖属性
@@ -236,7 +235,11 @@ namespace MedicalSharp.Controls.Viewports
                 this.InputManager = new MPRInputManager(this.Camera);
             }
 
-            //初始化体积渲染器
+            //初始化形状、文本渲染器
+            this._shapeRenderer = new ShapeRenderer(this.Camera);
+            this._textRenderer = new TextRenderer(this.Camera);
+
+            //初始化MPR渲染器
             this._mprRenderer = new MPRRenderer(this.Camera);
             this._mprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._mprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
@@ -255,9 +258,13 @@ namespace MedicalSharp.Controls.Viewports
                 //关闭混合
                 GL.Disable(EnableCap.Blend);
 
+                //MPR渲染
                 this._mprRenderer.BindPlane(this.Plane);
                 this._mprRenderer.SetRenderable(this._volumeRenderable);
                 this._mprRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+
+                //形状、文本渲染
+                base.OnOpenTKRender(viewportSize);
             }
         }
         #endregion
@@ -268,6 +275,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         protected override void OnOpenTKDeinit()
         {
+            base.OnOpenTKDeinit();
             this._mprRenderer?.Dispose();
         }
         #endregion 

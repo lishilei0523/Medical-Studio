@@ -7,6 +7,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -77,6 +78,14 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         public OrbitCamera OrbitCamera { get; set; }
         #endregion
 
+        #region 文本3D元素 —— TextVisual3D Text
+        /// <summary>
+        /// 文本3D元素
+        /// </summary>
+        [DependencyProperty]
+        public TextVisual3D Text { get; set; }
+        #endregion
+
         #region 包围球3D元素 —— BoundingSphereVisual3D Sphere
         /// <summary>
         /// 包围球3D元素
@@ -105,6 +114,14 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
+            this.Text = new TextVisual3D
+            {
+                Text = "Hello World",
+                Color = Colors.Ivory,
+                FontSize = 14,
+                RenderMode = TextRenderMode.Fixed,
+                Normal = new Vector3D(0, 1, 0)
+            };
             this.Sphere = new BoundingSphereVisual3D
             {
                 Radius = 1,
@@ -135,7 +152,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// <summary>
         /// 视口鼠标按下事件
         /// </summary>
-        public void OnViewportPointerPressed(ShapeViewport viewport, PointerPressedEventArgs eventArgs)
+        public void OnViewportPointerPressed(BasicViewport viewport, PointerPressedEventArgs eventArgs)
         {
             if (eventArgs.Properties.IsLeftButtonPressed)
             {
@@ -182,7 +199,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// <summary>
         /// 视口鼠标移动事件
         /// </summary>
-        public void OnViewportPointerMoved(ShapeViewport viewport, PointerEventArgs eventArgs)
+        public void OnViewportPointerMoved(BasicViewport viewport, PointerEventArgs eventArgs)
         {
             if (this._selectedVisual != null)
             {
@@ -296,7 +313,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// <summary>
         /// 视口鼠标松开事件
         /// </summary>
-        public void OnViewportPointerReleased(ShapeViewport viewport, PointerReleasedEventArgs eventArgs)
+        public void OnViewportPointerReleased(BasicViewport viewport, PointerReleasedEventArgs eventArgs)
         {
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);

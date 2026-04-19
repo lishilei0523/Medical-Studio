@@ -116,7 +116,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// <summary>
         /// 视口鼠标按下事件
         /// </summary>
-        public void OnViewportPointerPressed(ShapeViewport viewport, PointerPressedEventArgs eventArgs)
+        public void OnViewportPointerPressed(BasicViewport viewport, PointerPressedEventArgs eventArgs)
         {
             if (eventArgs.Properties.IsLeftButtonPressed)
             {

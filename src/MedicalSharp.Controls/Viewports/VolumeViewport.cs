@@ -17,7 +17,7 @@ namespace MedicalSharp.Controls.Viewports
     /// <summary>
     /// 体积渲染视口
     /// </summary>
-    public class VolumeViewport : ShapeViewport, IPickVoxel
+    public class VolumeViewport : BasicViewport, IPickVoxel
     {
         #region # 字段及构造器
 

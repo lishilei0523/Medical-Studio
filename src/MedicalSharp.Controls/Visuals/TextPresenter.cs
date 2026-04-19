@@ -6,35 +6,35 @@ using System;
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
-    /// 形状3D元素容器
+    /// 文本3D元素容器
     /// </summary>
-    public class ShapePresenter : Visual3D
+    public class TextPresenter : Visual3D
     {
         #region # 字段及构造器
 
         /// <summary>
-        /// 形状3D元素依赖属性
+        /// 文本3D元素依赖属性
         /// </summary>
-        public static readonly StyledProperty<ShapeVisual3D> ContentProperty;
+        public static readonly StyledProperty<TextVisual3D> ContentProperty;
 
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static ShapePresenter()
+        static TextPresenter()
         {
-            ContentProperty = AvaloniaProperty.Register<ShapePresenter, ShapeVisual3D>(nameof(Content));
+            ContentProperty = AvaloniaProperty.Register<TextPresenter, TextVisual3D>(nameof(Content));
         }
 
         #endregion
 
         #region # 属性
 
-        #region 依赖属性 - 形状3D元素 —— ShapeVisual3D Content
+        #region 依赖属性 - 文本3D元素 —— TextVisual3D Content
         /// <summary>
-        /// 依赖属性 - 形状3D元素
+        /// 依赖属性 - 文本3D元素
         /// </summary>
         [Content]
-        public ShapeVisual3D Content
+        public TextVisual3D Content
         {
             get => this.GetValue(ContentProperty);
             set => this.SetValue(ContentProperty, value);
