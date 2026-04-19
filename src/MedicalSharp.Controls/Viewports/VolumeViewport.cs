@@ -251,8 +251,9 @@ namespace MedicalSharp.Controls.Viewports
             Vector3i? pickedVoxelPosition = this._volumeRenderer.PickVoxel(ray, this._viewportSize.Width, this._viewportSize.Height, out Vector3? texCoord);
             if (pickedVoxelPosition.HasValue)
             {
-                voxelValue = this.VolumeData[pickedVoxelPosition.Value.X, pickedVoxelPosition.Value.Y, pickedVoxelPosition.Value.Z];
                 textureCoord = texCoord!.Value;
+                voxelPosition = pickedVoxelPosition.Value;
+                voxelValue = this.VolumeData[voxelPosition.X, voxelPosition.Y, voxelPosition.Z];
 
                 return true;
             }

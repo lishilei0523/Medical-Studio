@@ -49,7 +49,7 @@ namespace MedicalSharp.Primitives.Cameras
         public MPRCamera(float nearPlaneDistance = -1000, float farPlaneDistance = 1000)
             : base(nearPlaneDistance, farPlaneDistance)
         {
-            this._distance = 2.0f;
+            this._distance = 4.0f;
             this._panOffset = Vector2.Zero;
             this._targetPosition = Vector3.Zero;
             this._zoomFactor = 1.0f;

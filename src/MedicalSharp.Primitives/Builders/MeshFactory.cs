@@ -1163,7 +1163,7 @@ namespace MedicalSharp.Primitives.Builders
             if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.999f)
             {
                 right = Vector3.UnitX;
-                up = Vector3.UnitY;
+                up = -Vector3.UnitY;
             }
             //法向量平行于Y轴
             else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.999f)

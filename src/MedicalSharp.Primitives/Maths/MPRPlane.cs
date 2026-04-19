@@ -145,7 +145,7 @@ namespace MedicalSharp.Primitives.Maths
                 _maxProjection = 0.5f,
                 Center = Vector3.Zero,
                 UAxis = new Vector3(1, 0, 0),
-                VAxis = new Vector3(0, 1, 0),
+                VAxis = new Vector3(0, -1, 0),
                 Normal = new Vector3(0, 0, 1),
                 PlaneType = MPRPlaneType.Axial,
                 OriginalPlaneType = MPRPlaneType.Axial,
@@ -198,7 +198,7 @@ namespace MedicalSharp.Primitives.Maths
                 Center = Vector3.Zero,
                 UAxis = new Vector3(0, 1, 0),
                 VAxis = new Vector3(0, 0, 1),
-                Normal = new Vector3(1, 0, 0),
+                Normal = new Vector3(-1, 0, 0),
                 PlaneType = MPRPlaneType.Sagittal,
                 OriginalPlaneType = MPRPlaneType.Sagittal,
                 SlicesCount = volumeMetadata.VolumeSize.X,
@@ -463,12 +463,6 @@ namespace MedicalSharp.Primitives.Maths
 
                 //投影到平面得到UV
                 Vector2 uv = this.ProjectPoint(localPoint);
-
-                //方向修正
-                if (this.PlaneType == MPRPlaneType.Axial || this.PlaneType == MPRPlaneType.Sagittal)
-                {
-                    uv = new Vector2(-uv.X, uv.Y);
-                }
 
                 //检查是否在平面范围内
                 if (uv.X >= -1 && uv.X <= 1 && uv.Y >= -1 && uv.Y <= 1)
