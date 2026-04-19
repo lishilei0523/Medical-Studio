@@ -1,6 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Input;
+﻿using Avalonia.Input;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using OpenTK.Mathematics;
 
 namespace MedicalSharp.Controls.Base
 {
@@ -14,7 +15,7 @@ namespace MedicalSharp.Controls.Base
         /// <summary>
         /// 鼠标2D位置
         /// </summary>
-        protected Point? _mousePos2D;
+        protected Vector2? _mousePos2D;
 
         /// <summary>
         /// 创建视口命令构造器
@@ -28,11 +29,11 @@ namespace MedicalSharp.Controls.Base
 
         #region # 属性
 
-        #region 只读属性 - 鼠标位置 —— Point? MousePos2D
+        #region 只读属性 - 鼠标2D位置 —— Vector2? MousePos2D
         /// <summary>
-        /// 只读属性 - 鼠标位置
+        /// 只读属性 - 鼠标2D位置
         /// </summary>
-        public Point? MousePos2D
+        public Vector2? MousePos2D
         {
             get => this._mousePos2D;
         }
@@ -48,7 +49,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            this._mousePos2D = eventArgs.GetPosition(viewport);
+            this._mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
         }
         #endregion
 

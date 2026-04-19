@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Input;
 using MedicalSharp.Controls.Base;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Primitives.Cameras;
 
 namespace MedicalSharp.Controls.Commands
@@ -66,7 +67,7 @@ namespace MedicalSharp.Controls.Commands
                     viewport.RequestNextFrameRendering();
                 }
             }
-            this._mousePos2D = position;
+            this._mousePos2D = position.ToVector2();
         }
         #endregion
 
