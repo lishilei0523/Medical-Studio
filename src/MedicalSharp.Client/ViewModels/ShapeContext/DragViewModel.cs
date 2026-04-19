@@ -148,7 +148,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
 
         //Actions
 
-        #region 视口鼠标按下事件 —— void OnViewportPointerPressed(ShapeViewport viewport...
+        #region 视口鼠标按下事件 —— void OnViewportPointerPressed(BasicViewport viewport...
         /// <summary>
         /// 视口鼠标按下事件
         /// </summary>
@@ -195,7 +195,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         }
         #endregion
 
-        #region 视口鼠标移动事件 —— void OnViewportPointerMoved(ShapeViewport viewport...
+        #region 视口鼠标移动事件 —— void OnViewportPointerMoved(BasicViewport viewport...
         /// <summary>
         /// 视口鼠标移动事件
         /// </summary>
@@ -309,7 +309,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         }
         #endregion
 
-        #region 视口鼠标松开事件 —— void OnViewportPointerReleased(ShapeViewport viewport...
+        #region 视口鼠标松开事件 —— void OnViewportPointerReleased(BasicViewport viewport...
         /// <summary>
         /// 视口鼠标松开事件
         /// </summary>

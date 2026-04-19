@@ -112,7 +112,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
 
         //Actions
 
-        #region 视口鼠标按下事件 —— void OnViewportPointerPressed(ShapeViewport viewport...
+        #region 视口鼠标按下事件 —— void OnViewportPointerPressed(BasicViewport viewport...
         /// <summary>
         /// 视口鼠标按下事件
         /// </summary>
