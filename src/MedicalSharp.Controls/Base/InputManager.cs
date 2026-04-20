@@ -50,7 +50,7 @@ namespace MedicalSharp.Controls.Base
 
         #region 只读属性 - 视口命令 —— IViewportCommand Command
         /// <summary>
-        /// 视口命令
+        /// 只读属性 - 视口命令
         /// </summary>
         public IViewportCommand Command
         {

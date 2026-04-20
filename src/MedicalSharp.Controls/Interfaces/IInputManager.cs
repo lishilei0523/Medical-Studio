@@ -9,6 +9,17 @@ namespace MedicalSharp.Controls.Interfaces
     public interface IInputManager
     {
         /// <summary>
+        /// 视口命令
+        /// </summary>
+        IViewportCommand Command { get; }
+
+        /// <summary>
+        /// 切换命令
+        /// </summary>
+        /// <param name="command">视口命令</param>
+        void SwitchCommand(IViewportCommand command);
+
+        /// <summary>
         /// 鼠标按下事件
         /// </summary>
         void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs);
