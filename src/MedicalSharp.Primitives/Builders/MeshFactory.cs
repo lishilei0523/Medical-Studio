@@ -1001,8 +1001,9 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="size">尺寸</param>
         /// <param name="divisions">分隔数量</param>
         /// <param name="normal">法向量（控制网格朝向）</param>
+        /// <param name="primitiveType">图元类型</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateGridLines(float size = 10.0f, int divisions = 10, Vector3 normal = default)
+        public static MeshGeometry CreateGridLines(float size = 10.0f, int divisions = 10, Vector3 normal = default, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Lines)
         {
             //默认朝上(Z轴)
             if (normal == default)
@@ -1033,48 +1034,84 @@ namespace MedicalSharp.Primitives.Builders
 
             List<Vertex> vertices = [];
             List<uint> indices = [];
-            for (int index = 0; index <= divisions; index++)
+
+            //线框模式
+            if (primitiveType == GraphicPrimitiveType.Lines)
             {
-                float pos = -halfSize + index * step;
+                for (int index = 0; index <= divisions; index++)
+                {
+                    float pos = -halfSize + index * step;
 
-                //竖线
-                Vector3 startPointV = Vector3.TransformPosition(new Vector3(pos, 0, -halfSize), rotationMatrix);
-                Vector3 endPointV = Vector3.TransformPosition(new Vector3(pos, 0, halfSize), rotationMatrix);
-                vertices.Add(new Vertex
-                {
-                    Position = startPointV,
-                    TextureCoord = Vector2.Zero,
-                    Normal = normal
-                });
-                vertices.Add(new Vertex
-                {
-                    Position = endPointV,
-                    TextureCoord = Vector2.UnitX,
-                    Normal = normal
-                });
+                    //竖线
+                    Vector3 startPointV = Vector3.TransformPosition(new Vector3(pos, 0, -halfSize), rotationMatrix);
+                    Vector3 endPointV = Vector3.TransformPosition(new Vector3(pos, 0, halfSize), rotationMatrix);
+                    vertices.Add(new Vertex
+                    {
+                        Position = startPointV
+                    });
+                    vertices.Add(new Vertex
+                    {
+                        Position = endPointV
+                    });
+                    indices.Add((uint)(vertices.Count - 2));
+                    indices.Add((uint)(vertices.Count - 1));
 
-                //横线
-                Vector3 startPointH = Vector3.TransformPosition(new Vector3(-halfSize, 0, pos), rotationMatrix);
-                Vector3 endPointH = Vector3.TransformPosition(new Vector3(halfSize, 0, pos), rotationMatrix);
-                vertices.Add(new Vertex
-                {
-                    Position = startPointH,
-                    TextureCoord = Vector2.Zero,
-                    Normal = normal
-                });
-                vertices.Add(new Vertex
-                {
-                    Position = endPointH,
-                    TextureCoord = Vector2.UnitX,
-                    Normal = normal
-                });
+                    //横线
+                    Vector3 startPointH = Vector3.TransformPosition(new Vector3(-halfSize, 0, pos), rotationMatrix);
+                    Vector3 endPointH = Vector3.TransformPosition(new Vector3(halfSize, 0, pos), rotationMatrix);
+                    vertices.Add(new Vertex
+                    {
+                        Position = startPointH
+                    });
+                    vertices.Add(new Vertex
+                    {
+                        Position = endPointH
+                    });
+                    indices.Add((uint)(vertices.Count - 2));
+                    indices.Add((uint)(vertices.Count - 1));
+                }
             }
-
-            int lines = divisions + 1;
-            for (int index = 0; index < lines * 2; index++)
+            //填充模式
+            else
             {
-                indices.Add((uint)(index * 2));
-                indices.Add((uint)(index * 2 + 1));
+                //生成三角形网格，每个小格子分成两个三角形
+                for (int i = 0; i < divisions; i++)
+                {
+                    for (int j = 0; j < divisions; j++)
+                    {
+                        float x1 = -halfSize + i * step;
+                        float x2 = x1 + step;
+                        float z1 = -halfSize + j * step;
+                        float z2 = z1 + step;
+
+                        //四个角点
+                        Vector3 p1 = new Vector3(x1, 0, z1);
+                        Vector3 p2 = new Vector3(x2, 0, z1);
+                        Vector3 p3 = new Vector3(x2, 0, z2);
+                        Vector3 p4 = new Vector3(x1, 0, z2);
+
+                        //变换到目标朝向
+                        p1 = Vector3.TransformPosition(p1, rotationMatrix);
+                        p2 = Vector3.TransformPosition(p2, rotationMatrix);
+                        p3 = Vector3.TransformPosition(p3, rotationMatrix);
+                        p4 = Vector3.TransformPosition(p4, rotationMatrix);
+
+                        //添加顶点（带纹理坐标）
+                        int baseIndex = vertices.Count;
+                        vertices.Add(new Vertex { Position = p1, TextureCoord = new Vector2(0, 0), Normal = normal });
+                        vertices.Add(new Vertex { Position = p2, TextureCoord = new Vector2(1, 0), Normal = normal });
+                        vertices.Add(new Vertex { Position = p3, TextureCoord = new Vector2(1, 1), Normal = normal });
+                        vertices.Add(new Vertex { Position = p4, TextureCoord = new Vector2(0, 1), Normal = normal });
+
+                        //两个三角形组成一个格子
+                        indices.Add((uint)(baseIndex));
+                        indices.Add((uint)(baseIndex + 1));
+                        indices.Add((uint)(baseIndex + 2));
+                        indices.Add((uint)(baseIndex));
+                        indices.Add((uint)(baseIndex + 2));
+                        indices.Add((uint)(baseIndex + 3));
+                    }
+                }
             }
 
             return new MeshGeometry(vertices, indices);

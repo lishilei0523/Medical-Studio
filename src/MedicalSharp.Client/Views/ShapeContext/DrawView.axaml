@@ -45,7 +45,7 @@
                                   Camera="{Binding OrbitCamera}"
 								  InputManager="{Binding InputManager}"
                                   cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
-					<sd:GridLinesVisual3D Stroke="LightGray" Fill="Transparent" />
+					<sd:GridLinesVisual3D Size="10" Divisions="50" Stroke="Gray" Fill="Transparent" />
 				</sd:BasicViewport>
 			</Grid>
 			<!--Footer-->
