@@ -1,7 +1,8 @@
-﻿using Avalonia.Input;
-using MedicalSharp.Controls.Base;
+﻿using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Commands;
+using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Primitives.Cameras;
+using System.Linq;
 
 namespace MedicalSharp.Controls.InputManagers
 {
@@ -23,7 +24,8 @@ namespace MedicalSharp.Controls.InputManagers
         public MPRInputManager(MPRCamera camera)
         {
             this._camera = camera;
-            this._command = new MPRCameraCommand(camera);
+            MPRCameraCommand cameraCommand = new MPRCameraCommand(camera);
+            this._command = new CompositeCommand(cameraCommand);
         }
 
         #endregion
@@ -44,33 +46,24 @@ namespace MedicalSharp.Controls.InputManagers
 
         #region # 方法
 
-        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
+        #region 切换命令 —— override void SwitchCommand(IViewportCommand command)
         /// <summary>
-        /// 鼠标移动事件
+        /// 切换命令
         /// </summary>
-        public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
+        /// <param name="command">视口命令</param>
+        public override void SwitchCommand(IViewportCommand command)
         {
-            base.OnMouseMove(viewport, eventArgs);
-        }
-        #endregion
-
-        #region 鼠标滚轮事件 —— override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
-        /// <summary>
-        /// 鼠标滚轮事件
-        /// </summary>
-        public override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
-        {
-            base.OnMouseWheel(viewport, eventArgs);
-        }
-        #endregion
-
-        #region 键盘按下事件 —— override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
-        /// <summary>
-        /// 键盘按下事件
-        /// </summary>
-        public override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
-        {
-            base.OnKeyDown(viewport, eventArgs);
+            if (this._command is CompositeCommand compositeCommand)
+            {
+                if (compositeCommand.Commands.Count == 2)
+                {
+                    compositeCommand.RemoveCommand(compositeCommand.Commands.Last());
+                }
+                if (command != null)
+                {
+                    compositeCommand.AddCommand(command);
+                }
+            }
         }
         #endregion
 
