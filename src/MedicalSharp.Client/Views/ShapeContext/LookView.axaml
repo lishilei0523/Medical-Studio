@@ -43,6 +43,7 @@
 			<Grid Grid.Row="1">
 				<sd:BasicViewport Background="Black"
                                   Camera="{Binding OrbitCamera}"
+								  InputManager="{Binding InputManager}"
                                   cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
 					<sd:PointVisual3D Position="0,0,1" Fill="Cyan" PointSize="5" />
 					<sd:LineSegmentVisual3D StartPoint="1,0,-1" EndPoint="-1,0,-1" Stroke="Chartreuse" StrokeThickness="2" />

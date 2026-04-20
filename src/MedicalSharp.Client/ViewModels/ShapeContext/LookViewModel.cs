@@ -4,7 +4,9 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
+using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
@@ -44,6 +46,10 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             Vector3 targetPosition = new Vector3(0.0f);
             Vector3 upDirection = new Vector3(0, 0, 1);
             this.OrbitCamera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
+
+            //初始化输入管理器
+            this.InputManager = new OrbitInputManager(this.OrbitCamera);
+            this.InputManager.SwitchCommand(new TranslateVisual3DCommand());
         }
 
         #endregion
@@ -56,6 +62,14 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// </summary>
         [DependencyProperty]
         public OrbitCamera OrbitCamera { get; set; }
+        #endregion
+
+        #region 输入管理器 —— OrbitInputManager InputManager
+        /// <summary>
+        /// 输入管理器
+        /// </summary>
+        [DependencyProperty]
+        public OrbitInputManager InputManager { get; set; }
         #endregion
 
         #region 包围球3D元素 —— BoundingSphereVisual3D Sphere
