@@ -145,6 +145,17 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         });
         #endregion
 
+        #region 绘制形状命令 —— ICommand DrawShapeCommand
+        /// <summary>
+        /// 绘制形状命令
+        /// </summary>
+        public ICommand DrawShapeCommand => new AsyncRelayCommand(async _ =>
+        {
+            DrawViewModel viewModel = ResolveMediator.Resolve<DrawViewModel>();
+            await this._windowManager.ShowWindowAsync(viewModel);
+        });
+        #endregion
+
         #endregion
 
         #region # 方法

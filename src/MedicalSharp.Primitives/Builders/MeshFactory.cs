@@ -994,15 +994,15 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建网格 —— static MeshGeometry CreateGrid(float size = 10.0f, int divisions = 10...
+        #region # 创建网格线 —— static MeshGeometry CreateGridLines(float size = 10.0f, int divisions = 10...
         /// <summary>
-        /// 创建网格
+        /// 创建网格线
         /// </summary>
         /// <param name="size">尺寸</param>
         /// <param name="divisions">分隔数量</param>
         /// <param name="normal">法向量（控制网格朝向）</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateGrid(float size = 10.0f, int divisions = 10, Vector3 normal = default)
+        public static MeshGeometry CreateGridLines(float size = 10.0f, int divisions = 10, Vector3 normal = default)
         {
             //默认朝上(Z轴)
             if (normal == default)
@@ -1033,50 +1033,48 @@ namespace MedicalSharp.Primitives.Builders
 
             List<Vertex> vertices = [];
             List<uint> indices = [];
-            for (int i = 0; i <= divisions; i++)
+            for (int index = 0; index <= divisions; index++)
             {
-                float pos = -halfSize + i * step;
+                float pos = -halfSize + index * step;
 
                 //竖线
-                Vector3 startPoint1 = Vector3.TransformPosition(new Vector3(pos, 0, -halfSize), rotationMatrix);
-                Vector3 endPoint1 = Vector3.TransformPosition(new Vector3(pos, 0, halfSize), rotationMatrix);
-
+                Vector3 startPointV = Vector3.TransformPosition(new Vector3(pos, 0, -halfSize), rotationMatrix);
+                Vector3 endPointV = Vector3.TransformPosition(new Vector3(pos, 0, halfSize), rotationMatrix);
                 vertices.Add(new Vertex
                 {
-                    Position = startPoint1,
+                    Position = startPointV,
                     TextureCoord = Vector2.Zero,
                     Normal = normal
                 });
                 vertices.Add(new Vertex
                 {
-                    Position = endPoint1,
+                    Position = endPointV,
                     TextureCoord = Vector2.UnitX,
                     Normal = normal
                 });
 
                 //横线
-                Vector3 startPoint2 = Vector3.TransformPosition(new Vector3(-halfSize, 0, pos), rotationMatrix);
-                Vector3 endPoint2 = Vector3.TransformPosition(new Vector3(halfSize, 0, pos), rotationMatrix);
-
+                Vector3 startPointH = Vector3.TransformPosition(new Vector3(-halfSize, 0, pos), rotationMatrix);
+                Vector3 endPointH = Vector3.TransformPosition(new Vector3(halfSize, 0, pos), rotationMatrix);
                 vertices.Add(new Vertex
                 {
-                    Position = startPoint2,
+                    Position = startPointH,
                     TextureCoord = Vector2.Zero,
                     Normal = normal
                 });
                 vertices.Add(new Vertex
                 {
-                    Position = endPoint2,
+                    Position = endPointH,
                     TextureCoord = Vector2.UnitX,
                     Normal = normal
                 });
             }
 
             int lines = divisions + 1;
-            for (int i = 0; i < lines * 2; i++)
+            for (int index = 0; index < lines * 2; index++)
             {
-                indices.Add((uint)(i * 2));
-                indices.Add((uint)(i * 2 + 1));
+                indices.Add((uint)(index * 2));
+                indices.Add((uint)(index * 2 + 1));
             }
 
             return new MeshGeometry(vertices, indices);
