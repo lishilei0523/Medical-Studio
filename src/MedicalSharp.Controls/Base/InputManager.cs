@@ -1,5 +1,8 @@
-﻿using Avalonia;
-using Avalonia.Input;
+﻿using Avalonia.Input;
+using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Interfaces;
+using OpenTK.Mathematics;
+using System;
 using IInputManager = MedicalSharp.Controls.Interfaces.IInputManager;
 
 namespace MedicalSharp.Controls.Base
@@ -14,7 +17,12 @@ namespace MedicalSharp.Controls.Base
         /// <summary>
         /// 鼠标2D位置
         /// </summary>
-        protected Point? _mousePos2D;
+        protected Vector2? _mousePos2D;
+
+        /// <summary>
+        /// 视口命令
+        /// </summary>
+        protected IViewportCommand _command;
 
         /// <summary>
         /// 创建输入管理器构造器
@@ -24,17 +32,46 @@ namespace MedicalSharp.Controls.Base
             this._mousePos2D = null;
         }
 
+        /// <summary>
+        /// 创建输入管理器构造器
+        /// </summary>
+        /// <param name="command">视口命令</param>
+        protected InputManager(IViewportCommand command)
+            : this()
+        {
+            #region # 验证
+
+            if (command == null)
+            {
+                throw new ArgumentNullException(nameof(command), "视口命令不可为空！");
+            }
+
+            #endregion
+
+            this._command = command;
+        }
+
         #endregion
 
         #region # 属性
 
-        #region 只读属性 - 鼠标2D位置 —— Point? MousePos2D
+        #region 只读属性 - 鼠标2D位置 —— Vector2? MousePos2D
         /// <summary>
         /// 只读属性 - 鼠标2D位置
         /// </summary>
-        public Point? MousePos2D
+        public Vector2? MousePos2D
         {
             get => this._mousePos2D;
+        }
+        #endregion
+
+        #region 只读属性 - 视口命令 —— IViewportCommand Command
+        /// <summary>
+        /// 视口命令
+        /// </summary>
+        public IViewportCommand Command
+        {
+            get => this._command;
         }
         #endregion
 
@@ -42,13 +79,25 @@ namespace MedicalSharp.Controls.Base
 
         #region # 方法
 
+        #region 切换命令 —— virtual void SwitchCommand(IViewportCommand command)
+        /// <summary>
+        /// 切换命令
+        /// </summary>
+        /// <param name="command">视口命令</param>
+        public virtual void SwitchCommand(IViewportCommand command)
+        {
+            this._command = command;
+        }
+        #endregion
+
         #region 鼠标按下事件 —— virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
         public virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            this._mousePos2D = eventArgs.GetPosition(viewport);
+            this._mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+            this._command?.OnMouseDown(viewport, eventArgs);
         }
         #endregion
 
@@ -59,6 +108,7 @@ namespace MedicalSharp.Controls.Base
         public virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
             this._mousePos2D = null;
+            this._command?.OnMouseUp(viewport, eventArgs);
         }
         #endregion
 
@@ -68,7 +118,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
-
+            this._command?.OnMouseMove(viewport, eventArgs);
         }
         #endregion
 
@@ -78,7 +128,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         {
-
+            this._command?.OnMouseWheel(viewport, eventArgs);
         }
         #endregion
 
@@ -88,7 +138,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
         {
-
+            this._command?.OnKeyDown(viewport, eventArgs);
         }
         #endregion
 
@@ -98,7 +148,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnKeyUp(OpenTKViewport viewport, KeyEventArgs eventArgs)
         {
-
+            this._command?.OnKeyUp(viewport, eventArgs);
         }
         #endregion
 

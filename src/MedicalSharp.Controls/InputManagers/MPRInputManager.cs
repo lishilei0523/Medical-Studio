@@ -1,8 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Input;
+﻿using Avalonia.Input;
 using MedicalSharp.Controls.Base;
+using MedicalSharp.Controls.Commands;
 using MedicalSharp.Primitives.Cameras;
-using System;
 
 namespace MedicalSharp.Controls.InputManagers
 {
@@ -24,6 +23,7 @@ namespace MedicalSharp.Controls.InputManagers
         public MPRInputManager(MPRCamera camera)
         {
             this._camera = camera;
+            this._command = new MPRCameraCommand(camera);
         }
 
         #endregion
@@ -50,23 +50,7 @@ namespace MedicalSharp.Controls.InputManagers
         /// </summary>
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
-            Point position = eventArgs.GetPosition(viewport);
-            if (this._mousePos2D.HasValue)
-            {
-                float deltaX = (float)(position.X - this._mousePos2D.Value.X);
-                float deltaY = (float)(position.Y - this._mousePos2D.Value.Y);
-                if (eventArgs.Properties.IsMiddleButtonPressed)
-                {
-                    this._camera.Pan(deltaX, deltaY);
-                    viewport.RequestNextFrameRendering();
-                }
-                if (eventArgs.Properties.IsRightButtonPressed)
-                {
-                    this._camera.Zoom(-deltaY);
-                    viewport.RequestNextFrameRendering();
-                }
-            }
-            this._mousePos2D = position;
+            base.OnMouseMove(viewport, eventArgs);
         }
         #endregion
 
@@ -76,8 +60,7 @@ namespace MedicalSharp.Controls.InputManagers
         /// </summary>
         public override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         {
-            this._camera.TargetPlane.SliceIndex += (int)Math.Ceiling(eventArgs.Delta.Y);
-            viewport.RequestNextFrameRendering();
+            base.OnMouseWheel(viewport, eventArgs);
         }
         #endregion
 
@@ -87,26 +70,7 @@ namespace MedicalSharp.Controls.InputManagers
         /// </summary>
         public override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
         {
-            if (eventArgs.Key == Key.Up)
-            {
-                this._camera.TargetPlane.Rotate(-3, 0);
-                viewport.RequestNextFrameRendering();
-            }
-            if (eventArgs.Key == Key.Down)
-            {
-                this._camera.TargetPlane.Rotate(3, 0);
-                viewport.RequestNextFrameRendering();
-            }
-            if (eventArgs.Key == Key.Left)
-            {
-                this._camera.TargetPlane.Rotate(0, 3);
-                viewport.RequestNextFrameRendering();
-            }
-            if (eventArgs.Key == Key.Right)
-            {
-                this._camera.TargetPlane.Rotate(0, -3);
-                viewport.RequestNextFrameRendering();
-            }
+            base.OnKeyDown(viewport, eventArgs);
         }
         #endregion
 
