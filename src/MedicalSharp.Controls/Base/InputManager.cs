@@ -1,7 +1,5 @@
 ﻿using Avalonia.Input;
-using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
-using OpenTK.Mathematics;
 using System;
 using IInputManager = MedicalSharp.Controls.Interfaces.IInputManager;
 
@@ -15,11 +13,6 @@ namespace MedicalSharp.Controls.Base
         #region # 字段及构造器
 
         /// <summary>
-        /// 鼠标2D位置
-        /// </summary>
-        protected Vector2? _mousePos2D;
-
-        /// <summary>
         /// 视口命令
         /// </summary>
         protected IViewportCommand _command;
@@ -29,7 +22,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         protected InputManager()
         {
-            this._mousePos2D = null;
+
         }
 
         /// <summary>
@@ -54,16 +47,6 @@ namespace MedicalSharp.Controls.Base
         #endregion
 
         #region # 属性
-
-        #region 只读属性 - 鼠标2D位置 —— Vector2? MousePos2D
-        /// <summary>
-        /// 只读属性 - 鼠标2D位置
-        /// </summary>
-        public Vector2? MousePos2D
-        {
-            get => this._mousePos2D;
-        }
-        #endregion
 
         #region 只读属性 - 视口命令 —— IViewportCommand Command
         /// <summary>
@@ -96,7 +79,6 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            this._mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
             this._command?.OnMouseDown(viewport, eventArgs);
         }
         #endregion
@@ -107,7 +89,6 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
-            this._mousePos2D = null;
             this._command?.OnMouseUp(viewport, eventArgs);
         }
         #endregion
