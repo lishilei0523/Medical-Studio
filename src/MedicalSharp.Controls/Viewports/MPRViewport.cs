@@ -255,8 +255,15 @@ namespace MedicalSharp.Controls.Viewports
         {
             if (this._volumeRenderable != null)
             {
-                //关闭混合
-                GL.Disable(EnableCap.Blend);
+                //禁用面剔除
+                GL.Disable(EnableCap.CullFace);
+
+                //启用混合
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+                //关闭深度
+                GL.DepthMask(false);
 
                 //MPR渲染
                 this._mprRenderer.BindPlane(this.Plane);
