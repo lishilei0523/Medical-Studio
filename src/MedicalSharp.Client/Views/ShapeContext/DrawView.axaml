@@ -42,10 +42,10 @@
 			<!--Body-->
 			<Grid Grid.Row="1">
 				<sd:BasicViewport Background="Black"
-                                  Camera="{Binding OrbitCamera}"
-								  InputManager="{Binding InputManager}"
-                                  cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
+								  Camera="{Binding OrbitCamera}"
+								  InputManager="{Binding InputManager}">
 					<sd:GridLinesVisual3D Size="10" Divisions="50" Stroke="Gray" Fill="Transparent" />
+					<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
 				</sd:BasicViewport>
 			</Grid>
 			<!--Footer-->

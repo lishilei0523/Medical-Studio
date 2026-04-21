@@ -1,22 +1,12 @@
-﻿using Avalonia;
-using Avalonia.Collections;
-using Avalonia.Input;
-using Avalonia.Media;
+﻿using Avalonia.Collections;
 using Caliburn.Micro;
-using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Controls.Commands;
-using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
-using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
-using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
-using SD.Infrastructure.Avalonia.CustomControls;
-using SD.Infrastructure.Avalonia.Enums;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,6 +30,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         public DrawViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
+            this.Shapes = [];
 
             //初始化相机
             Vector3 cameraPosition = new Vector3(0, 7, 0);
@@ -48,8 +39,9 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             this.OrbitCamera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
 
             //初始化输入管理器
+            DrawBoundingBoxCommand command = new DrawBoundingBoxCommand(shape => this.Shapes.Add(shape));
             this.InputManager = new OrbitInputManager(this.OrbitCamera);
-            this.InputManager.SwitchCommand(new TranslateVisual3DCommand());
+            this.InputManager.SwitchCommand(command);
         }
 
         #endregion
@@ -72,27 +64,17 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         public OrbitInputManager InputManager { get; set; }
         #endregion
 
-        #region 包围球3D元素 —— BoundingSphereVisual3D Sphere
+        #region 形状列表 —— AvaloniaList<ShapeVisual3D> Shapes
         /// <summary>
-        /// 包围球3D元素
+        /// 形状列表
         /// </summary>
         [DependencyProperty]
-        public BoundingSphereVisual3D Sphere { get; set; }
-        #endregion
-
-        #region 3D元素列表 —— AvaloniaList<ShapeVisual3D> Visual3Ds
-        /// <summary>
-        /// 3D元素列表
-        /// </summary>
-        [DependencyProperty]
-        public AvaloniaList<ShapeVisual3D> Visual3Ds { get; set; }
+        public AvaloniaList<ShapeVisual3D> Shapes { get; set; }
         #endregion
 
         #endregion
 
         #region # 方法
-
-        //Initializations
 
         #region 初始化 —— override Task OnInitializedAsync(CancellationToken...
         /// <summary>
@@ -100,56 +82,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
-            this.Sphere = new BoundingSphereVisual3D
-            {
-                Radius = 1,
-                Center = new Vector3D(-2, 0, 0),
-                Stroke = Colors.Green,
-                StrokeThickness = 1,
-                Fill = Color.Parse("#0FFF0000")
-            };
-            this.Visual3Ds =
-            [
-                new BoundingBoxVisual3D
-                {
-                    Center = new Vector3D(2,0,0),
-                    Stroke = Colors.Blue,
-                    StrokeThickness = 1,
-                    Fill = Color.Parse("#0FFFFF00")
-                }
-            ];
-
             return base.OnInitializedAsync(cancellationToken);
-        }
-        #endregion
-
-
-        //Actions
-
-        #region 视口鼠标按下事件 —— void OnViewportPointerPressed(BasicViewport viewport...
-        /// <summary>
-        /// 视口鼠标按下事件
-        /// </summary>
-        public void OnViewportPointerPressed(BasicViewport viewport, PointerPressedEventArgs eventArgs)
-        {
-            if (eventArgs.Properties.IsLeftButtonPressed)
-            {
-                Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out Visual3D visual3D, out Ray ray);
-                if (success)
-                {
-                    StringBuilder builder = new StringBuilder();
-                    builder.AppendLine($"点击对象: {visual3D?.GetType().Name}");
-                    builder.AppendLine($"点击2D坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
-                    builder.AppendLine($"点击3D坐标: X:{mousePos3D.X}, Y:{mousePos3D.Y}, Z:{mousePos3D.Z}");
-                    builder.AppendLine($"法向量: X:{normal.X}, Y:{normal.Y}, Z:{normal.Z}");
-                    MessageBox.Show(builder.ToString(), "成功", MessageBoxButton.OK, PackIconMaterialDesignKind.Info);
-                }
-                else
-                {
-                    MessageBox.Show("获取失败！", "错误", MessageBoxButton.OK, PackIconMaterialDesignKind.Error);
-                }
-            }
         }
         #endregion
 
