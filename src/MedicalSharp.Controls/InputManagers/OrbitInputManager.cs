@@ -1,11 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using MedicalSharp.Controls.Base;
+﻿using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Primitives.Cameras;
-using MedicalSharp.Primitives.Models;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace MedicalSharp.Controls.InputManagers
@@ -70,40 +66,6 @@ namespace MedicalSharp.Controls.InputManagers
                     compositeCommand.AddCommand(command);
                 }
             }
-        }
-        #endregion
-
-        #region 显示右键菜单 —— virtual void ShowContextMenu(OpenTKViewport viewport...
-        /// <summary>
-        /// 显示右键菜单
-        /// </summary>
-        protected override void ShowContextMenu(OpenTKViewport viewport, Point position, IReadOnlyList<ContextMenuItem> items)
-        {
-            ContextMenu contextMenu = new ContextMenu();
-            foreach (ContextMenuItem item in items)
-            {
-                if (item.IsSeparator)
-                {
-                    contextMenu.Items.Add(new Separator());
-                    continue;
-                }
-
-                MenuItem menuItem = new MenuItem
-                {
-                    Header = item.Header,
-                    IsEnabled = item.IsEnabled
-                };
-                if (item.Command != null)
-                {
-                    menuItem.Click += (_, _) => item.Command();
-                }
-
-                contextMenu.Items.Add(menuItem);
-            }
-
-            contextMenu.HorizontalOffset = position.X;
-            contextMenu.VerticalOffset = position.Y;
-            contextMenu.Open(viewport);
         }
         #endregion
 

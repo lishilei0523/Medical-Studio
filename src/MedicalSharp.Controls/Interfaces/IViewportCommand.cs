@@ -45,7 +45,7 @@ namespace MedicalSharp.Controls.Interfaces
         /// </summary>
         /// <returns>上下文菜单项列表</returns>
         /// <remarks>右键点击松开时调用，返回null或空列表表示不弹出菜单</remarks>
-        IReadOnlyList<ContextMenuItem> GetContextMenu(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs);
+        IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs);
 
         /// <summary>
         /// 失效命令

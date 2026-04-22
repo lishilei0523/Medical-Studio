@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Primitives.Models;
@@ -111,19 +112,19 @@ namespace MedicalSharp.Controls.Base
         public virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
             //检查右键单击（非拖拽）
-            if (eventArgs.Properties.IsRightButtonPressed && this._rightButtonDownPos.HasValue)
+            if (this._rightButtonDownPos.HasValue)
             {
-                Point currentPos = eventArgs.GetPosition(viewport);
-                Point delta = currentPos - this._rightButtonDownPos.Value;
+                Point mousePos2D = eventArgs.GetPosition(viewport);
+                Point delta = mousePos2D - this._rightButtonDownPos.Value;
                 TimeSpan elapsed = DateTime.Now - this._rightButtonDownTime;
 
-                //移动小于5像素且时间小于500ms视为单击
-                if (Math.Abs(delta.X) < 5 && Math.Abs(delta.Y) < 5 && elapsed.TotalMilliseconds < 500)
+                //移动小于5像素且时间小于200ms视为单击
+                if (Math.Abs(delta.X) < 5 && Math.Abs(delta.Y) < 5 && elapsed.TotalMilliseconds < 200)
                 {
-                    IReadOnlyList<ContextMenuItem> menuItems = this._command?.GetContextMenu(viewport, eventArgs);
-                    if (menuItems != null && menuItems.Any())
+                    IReadOnlyList<ContextMenuItem> contextMenuItems = this._command?.GetContextMenuItems(viewport, eventArgs);
+                    if (contextMenuItems != null && contextMenuItems.Any())
                     {
-                        this.ShowContextMenu(viewport, currentPos, menuItems);
+                        this.ShowContextMenu(viewport, contextMenuItems);
                     }
                 }
             }
@@ -177,9 +178,34 @@ namespace MedicalSharp.Controls.Base
         /// 显示右键菜单
         /// </summary>
         /// <remarks>由子类实现具体UI框架的菜单弹出</remarks>
-        protected virtual void ShowContextMenu(OpenTKViewport viewport, Point position, IReadOnlyList<ContextMenuItem> items)
+        protected virtual void ShowContextMenu(OpenTKViewport viewport, IReadOnlyList<ContextMenuItem> contextMenuItems)
         {
+            Flyout flyout = new Flyout();
+            MenuFlyoutPresenter contextMenu = new MenuFlyoutPresenter();
+            foreach (ContextMenuItem contextMenuItem in contextMenuItems)
+            {
+                if (contextMenuItem.IsSeparator)
+                {
+                    contextMenu.Items.Add(new Separator());
+                    continue;
+                }
 
+                MenuItem menuItem = new MenuItem
+                {
+                    Header = contextMenuItem.Header,
+                    IsEnabled = contextMenuItem.IsEnabled
+                };
+                if (contextMenuItem.Command != null)
+                {
+                    menuItem.Click += (_, _) => contextMenuItem.Command.Invoke();
+                }
+
+                contextMenu.Items.Add(menuItem);
+            }
+
+            flyout.Content = contextMenu;
+            flyout.Placement = PlacementMode.Pointer;
+            flyout.ShowAt(viewport, true);
         }
         #endregion
 

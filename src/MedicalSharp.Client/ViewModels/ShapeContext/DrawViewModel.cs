@@ -1,4 +1,5 @@
-﻿using Avalonia.Collections;
+﻿using Avalonia;
+using Avalonia.Collections;
 using Caliburn.Micro;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.InputManagers;
@@ -43,8 +44,8 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             //DrawBoundingSphereCommand command = new DrawBoundingSphereCommand(shape => this.Shapes.Add(shape));
             //DrawRectangleCommand command = new DrawRectangleCommand(new Vector3D(0, 1, 0), shape => this.Shapes.Add(shape));
             //DrawEllipseCommand command = new DrawEllipseCommand(new Vector3D(0, 1, 0), shape => this.Shapes.Add(shape));
-            //DrawCircleCommand command = new DrawCircleCommand(new Vector3D(0, 1, 0), shape => this.Shapes.Add(shape));
-            DrawLineSegmentCommand command = new DrawLineSegmentCommand(shape => this.Shapes.Add(shape));
+            DrawCircleCommand command = new DrawCircleCommand(new Vector3D(0, 1, 0), shape => this.Shapes.Add(shape));
+            //DrawLineSegmentCommand command = new DrawLineSegmentCommand(shape => this.Shapes.Add(shape));
             this.InputManager = new OrbitInputManager(this.OrbitCamera);
             this.InputManager.SwitchCommand(command);
         }

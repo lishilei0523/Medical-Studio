@@ -105,13 +105,13 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region 获取上下文菜单项列表 —— virtual IReadOnlyList<ContextMenuItem> GetContextMenu(...
+        #region 获取上下文菜单项列表 —— virtual IReadOnlyList<ContextMenuItem> GetContextMenuItems(...
         /// <summary>
         /// 获取上下文菜单项列表
         /// </summary>
         /// <returns>上下文菜单项列表</returns>
         /// <remarks>右键点击松开时调用，返回null或空列表表示不弹出菜单</remarks>
-        public virtual IReadOnlyList<ContextMenuItem> GetContextMenu(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
+        public virtual IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
             return null;
         }

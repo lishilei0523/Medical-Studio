@@ -1,8 +1,10 @@
 ﻿using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Primitives.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -187,6 +189,48 @@ namespace MedicalSharp.Controls.Commands
             foreach (IViewportCommand command in this._commands)
             {
                 command.OnKeyUp(viewport, eventArgs);
+            }
+        }
+        #endregion
+
+        #region 获取上下文菜单项列表 —— virtual IReadOnlyList<ContextMenuItem> GetContextMenuItems(...
+        /// <summary>
+        /// 获取上下文菜单项列表
+        /// </summary>
+        /// <returns>上下文菜单项列表</returns>
+        /// <remarks>右键点击松开时调用，返回null或空列表表示不弹出菜单</remarks>
+        public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
+        {
+            List<ContextMenuItem> contextMenuItems = [];
+            bool hasPrevious = false;
+            foreach (IViewportCommand command in this.Commands)
+            {
+                IReadOnlyList<ContextMenuItem> subContextMenuItems = command.GetContextMenuItems(viewport, eventArgs);
+                if (subContextMenuItems != null && subContextMenuItems.Any())
+                {
+                    if (hasPrevious)
+                    {
+                        contextMenuItems.Add(ContextMenuItem.CreateSeparator());
+                    }
+                    contextMenuItems.AddRange(subContextMenuItems);
+                    hasPrevious = true;
+                }
+            }
+
+            return contextMenuItems.AsReadOnly();
+        }
+        #endregion
+
+        #region 失效命令 —— virtual void Deactivate()
+        /// <summary>
+        /// 失效命令
+        /// </summary>
+        /// <remarks>命令被停用时调用，切换命令前</remarks>
+        public override void Deactivate()
+        {
+            foreach (IViewportCommand command in this.Commands)
+            {
+                command.Deactivate();
             }
         }
         #endregion
