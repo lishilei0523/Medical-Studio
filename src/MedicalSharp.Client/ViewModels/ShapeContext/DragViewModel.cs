@@ -16,7 +16,6 @@ using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using System.Threading;
 using System.Threading.Tasks;
-using Vector3 = OpenTK.Mathematics.Vector3;
 
 namespace MedicalSharp.Client.ViewModels.ShapeContext
 {
@@ -157,7 +156,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             if (eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3 mousePos3D, out Vector3 normal, out Visual3D visual3D, out Ray ray);
+                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out Ray ray);
                 if (success)
                 {
                     this._selectedVisual = visual3D;
@@ -189,7 +188,6 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     }
 
                     eventArgs.Handled = true;
-                    return;
                 }
             }
         }
@@ -267,8 +265,8 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     eventArgs.Properties.IsLeftButtonPressed &&
                     KeyModifiers.Alt == (eventArgs.KeyModifiers & KeyModifiers.Alt))
                 {
-                    float deltaX = (float)(mousePos2D.X - this._selectedPoint2D!.Value.X);
-                    float deltaY = (float)(mousePos2D.Y - this._selectedPoint2D!.Value.Y);
+                    float deltaX = (mousePos2D.X - this._selectedPoint2D!.Value.X);
+                    float deltaY = (mousePos2D.Y - this._selectedPoint2D!.Value.Y);
 
                     //设置光标
                     if (deltaX != 0 && deltaY == 0)
