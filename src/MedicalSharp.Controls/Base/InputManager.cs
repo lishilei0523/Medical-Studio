@@ -118,14 +118,11 @@ namespace MedicalSharp.Controls.Base
                 Point delta = mousePos2D - this._rightButtonDownPos.Value;
                 TimeSpan elapsed = DateTime.Now - this._rightButtonDownTime;
 
-                //移动小于5像素且时间小于200ms视为单击
-                if (Math.Abs(delta.X) < 5 && Math.Abs(delta.Y) < 5 && elapsed.TotalMilliseconds < 200)
+                //移动小于5像素且时间小于300ms视为单击
+                if (Math.Abs(delta.X) < 5 && Math.Abs(delta.Y) < 5 && elapsed.TotalMilliseconds < 300)
                 {
                     IReadOnlyList<ContextMenuItem> contextMenuItems = this._command?.GetContextMenuItems(viewport, eventArgs);
-                    if (contextMenuItems != null && contextMenuItems.Any())
-                    {
-                        this.ShowContextMenu(viewport, contextMenuItems);
-                    }
+                    this.ShowContextMenu(viewport, contextMenuItems);
                 }
             }
 
@@ -180,6 +177,15 @@ namespace MedicalSharp.Controls.Base
         /// <remarks>由子类实现具体UI框架的菜单弹出</remarks>
         protected virtual void ShowContextMenu(OpenTKViewport viewport, IReadOnlyList<ContextMenuItem> contextMenuItems)
         {
+            #region # 验证
+
+            if (contextMenuItems == null || !contextMenuItems.Any())
+            {
+                return;
+            }
+
+            #endregion
+
             Flyout flyout = new Flyout();
             MenuFlyoutPresenter contextMenu = new MenuFlyoutPresenter();
             foreach (ContextMenuItem contextMenuItem in contextMenuItems)
