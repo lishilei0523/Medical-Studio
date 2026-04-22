@@ -1,7 +1,9 @@
 ﻿using Avalonia.Input;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using System.Collections.Generic;
 
 namespace MedicalSharp.Controls.Base
 {
@@ -98,6 +100,29 @@ namespace MedicalSharp.Controls.Base
         /// 键盘松开事件
         /// </summary>
         public virtual void OnKeyUp(OpenTKViewport viewport, KeyEventArgs eventArgs)
+        {
+
+        }
+        #endregion
+
+        #region 获取上下文菜单项列表 —— virtual IReadOnlyList<ContextMenuItem> GetContextMenu(...
+        /// <summary>
+        /// 获取上下文菜单项列表
+        /// </summary>
+        /// <returns>上下文菜单项列表</returns>
+        /// <remarks>右键点击松开时调用，返回null或空列表表示不弹出菜单</remarks>
+        public virtual IReadOnlyList<ContextMenuItem> GetContextMenu(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
+        {
+            return null;
+        }
+        #endregion
+
+        #region 失效命令 —— virtual void Deactivate()
+        /// <summary>
+        /// 失效命令
+        /// </summary>
+        /// <remarks>命令被停用时调用，切换命令前</remarks>
+        public virtual void Deactivate()
         {
 
         }

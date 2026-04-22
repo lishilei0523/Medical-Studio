@@ -1,6 +1,10 @@
-﻿using Avalonia.Input;
+﻿using Avalonia;
+using Avalonia.Input;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Primitives.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using IInputManager = MedicalSharp.Controls.Interfaces.IInputManager;
 
 namespace MedicalSharp.Controls.Base
@@ -11,6 +15,16 @@ namespace MedicalSharp.Controls.Base
     public abstract class InputManager : IInputManager
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 右键点击位置
+        /// </summary>
+        private Point? _rightButtonDownPos;
+
+        /// <summary>
+        /// 右键点击时间
+        /// </summary>
+        private DateTime _rightButtonDownTime;
 
         /// <summary>
         /// 视口命令
@@ -69,6 +83,7 @@ namespace MedicalSharp.Controls.Base
         /// <param name="command">视口命令</param>
         public virtual void SwitchCommand(IViewportCommand command)
         {
+            this._command?.Deactivate();
             this._command = command;
         }
         #endregion
@@ -79,6 +94,12 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
+            if (eventArgs.Properties.IsRightButtonPressed)
+            {
+                this._rightButtonDownPos = eventArgs.GetPosition(viewport);
+                this._rightButtonDownTime = DateTime.Now;
+            }
+
             this._command?.OnMouseDown(viewport, eventArgs);
         }
         #endregion
@@ -89,6 +110,24 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
+            //检查右键单击（非拖拽）
+            if (eventArgs.Properties.IsRightButtonPressed && this._rightButtonDownPos.HasValue)
+            {
+                Point currentPos = eventArgs.GetPosition(viewport);
+                Point delta = currentPos - this._rightButtonDownPos.Value;
+                TimeSpan elapsed = DateTime.Now - this._rightButtonDownTime;
+
+                //移动小于5像素且时间小于500ms视为单击
+                if (Math.Abs(delta.X) < 5 && Math.Abs(delta.Y) < 5 && elapsed.TotalMilliseconds < 500)
+                {
+                    IReadOnlyList<ContextMenuItem> menuItems = this._command?.GetContextMenu(viewport, eventArgs);
+                    if (menuItems != null && menuItems.Any())
+                    {
+                        this.ShowContextMenu(viewport, currentPos, menuItems);
+                    }
+                }
+            }
+
             this._command?.OnMouseUp(viewport, eventArgs);
         }
         #endregion
@@ -130,6 +169,17 @@ namespace MedicalSharp.Controls.Base
         public virtual void OnKeyUp(OpenTKViewport viewport, KeyEventArgs eventArgs)
         {
             this._command?.OnKeyUp(viewport, eventArgs);
+        }
+        #endregion
+
+        #region 显示右键菜单 —— virtual void ShowContextMenu(OpenTKViewport viewport...
+        /// <summary>
+        /// 显示右键菜单
+        /// </summary>
+        /// <remarks>由子类实现具体UI框架的菜单弹出</remarks>
+        protected virtual void ShowContextMenu(OpenTKViewport viewport, Point position, IReadOnlyList<ContextMenuItem> items)
+        {
+
         }
         #endregion
 
