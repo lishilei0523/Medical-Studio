@@ -5,14 +5,13 @@ using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using OpenTK.Mathematics;
 using System;
-using System.Linq;
 
 namespace MedicalSharp.Controls.Commands
 {
     /// <summary>
-    /// 绘制包围盒3D元素命令
+    /// 绘制线段3D元素命令
     /// </summary>
-    public class DrawBoundingBoxCommand : ViewportCommand
+    public class DrawLineSegmentCommand : ViewportCommand
     {
         /// <summary>
         /// 起始位置
@@ -20,22 +19,22 @@ namespace MedicalSharp.Controls.Commands
         private Vector3? _startPosition;
 
         /// <summary>
-        /// 包围盒3D元素
+        /// 线段3D元素
         /// </summary>
-        private BoundingBoxVisual3D _boundingBox;
+        private LineSegmentVisual3D _lineSegment;
 
         /// <summary>
-        /// 包围盒绘制完成事件
+        /// 线段绘制完成事件
         /// </summary>
-        private readonly Action<BoundingBoxVisual3D> _boxDrawnEvent;
+        private readonly Action<LineSegmentVisual3D> _lineSegmentDrawnEvent;
 
         /// <summary>
-        /// 创建绘制包围盒3D元素命令构造器
+        /// 创建绘制线段3D元素命令构造器
         /// </summary>
         /// <param name="callback">绘制回调</param>
-        public DrawBoundingBoxCommand(Action<BoundingBoxVisual3D> callback)
+        public DrawLineSegmentCommand(Action<LineSegmentVisual3D> callback)
         {
-            this._boxDrawnEvent = callback;
+            this._lineSegmentDrawnEvent = callback;
         }
 
         /// <summary>
@@ -51,11 +50,11 @@ namespace MedicalSharp.Controls.Commands
                 if (mousePos3D.HasValue)
                 {
                     this._startPosition = mousePos3D.Value;
-                    this._boundingBox = new BoundingBoxVisual3D
+                    this._lineSegment = new LineSegmentVisual3D
                     {
-                        Center = mousePos3D.Value.ToVector3()
+                        StartPoint = mousePos3D.Value.ToVector3()
                     };
-                    this._boxDrawnEvent?.Invoke(this._boundingBox);
+                    this._lineSegmentDrawnEvent?.Invoke(this._lineSegment);
                 }
             }
         }
@@ -66,10 +65,7 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
             base.OnMouseMove(viewport, eventArgs);
-            if (eventArgs.Properties.IsLeftButtonPressed &&
-                viewport is BasicViewport basicViewport &&
-                this._startPosition.HasValue &&
-                this._boundingBox != null)
+            if (eventArgs.Properties.IsLeftButtonPressed && viewport is BasicViewport basicViewport && this._lineSegment != null)
             {
                 //设置光标
                 viewport.Cursor = new Cursor(StandardCursorType.Cross);
@@ -78,13 +74,7 @@ namespace MedicalSharp.Controls.Commands
                 Vector3? mousePos3D = basicViewport.FindNearestPosition(mousePos2D);
                 if (mousePos3D.HasValue)
                 {
-                    float offsetX = Math.Abs(mousePos3D.Value.X - this._startPosition.Value.X);
-                    float offsetY = Math.Abs(mousePos3D.Value.Y - this._startPosition.Value.Y);
-                    float offsetZ = Math.Abs(mousePos3D.Value.Z - this._startPosition.Value.Z);
-                    float[] sides = new[] { offsetX, offsetY, offsetZ }.OrderByDescending(x => x).ToArray();
-                    this._boundingBox.Width = sides[0];
-                    this._boundingBox.Height = sides[1];
-                    this._boundingBox.Depth = sides[1];
+                    this._lineSegment.EndPoint = mousePos3D.Value.ToVector3();
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
@@ -104,7 +94,7 @@ namespace MedicalSharp.Controls.Commands
 
             //清空
             this._startPosition = null;
-            this._boundingBox = null;
+            this._lineSegment = null;
 
             //请求下一帧
             viewport.RequestNextFrameRendering();

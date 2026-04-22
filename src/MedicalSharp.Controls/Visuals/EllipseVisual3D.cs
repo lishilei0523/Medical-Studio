@@ -14,7 +14,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 椭圆形3D元素
     /// </summary>
-    public class EllipseVisual3D : ShapeVisual3D, IResizable
+    public class EllipseVisual3D : ShapeVisual3D, ITranslatable, IRotatable, IResizable
     {
         #region # 字段及构造器
 

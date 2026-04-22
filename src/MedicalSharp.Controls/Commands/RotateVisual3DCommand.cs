@@ -4,6 +4,7 @@ using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 
@@ -17,7 +18,7 @@ namespace MedicalSharp.Controls.Commands
         /// <summary>
         /// 选中的3D元素
         /// </summary>
-        private Visual3D _selectedVisual;
+        private IRotatable _selectedVisual;
 
         /// <summary>
         /// 默认构造器
@@ -37,9 +38,9 @@ namespace MedicalSharp.Controls.Commands
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
                 bool success = pickVisual3D.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out _);
-                if (success)
+                if (success && visual3D is IRotatable rotatable)
                 {
-                    this._selectedVisual = visual3D;
+                    this._selectedVisual = rotatable;
                 }
             }
         }

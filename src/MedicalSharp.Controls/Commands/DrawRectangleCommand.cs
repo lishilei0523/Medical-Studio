@@ -6,6 +6,7 @@ using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using OpenTK.Mathematics;
 using System;
+using System.Linq;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -89,9 +90,9 @@ namespace MedicalSharp.Controls.Commands
                     float offsetX = Math.Abs(mousePos3D.Value.X - this._startPosition.Value.X);
                     float offsetY = Math.Abs(mousePos3D.Value.Y - this._startPosition.Value.Y);
                     float offsetZ = Math.Abs(mousePos3D.Value.Z - this._startPosition.Value.Z);
-                    float side = Math.Max(offsetX, Math.Max(offsetY, offsetZ));
-                    this._rectangle.Width = side;
-                    this._rectangle.Height = side;
+                    float[] sides = new[] { offsetX, offsetY, offsetZ }.OrderByDescending(x => x).ToArray();
+                    this._rectangle.Width = sides[0];
+                    this._rectangle.Height = sides[1];
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();

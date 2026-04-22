@@ -10,6 +10,16 @@ namespace MedicalSharp.Primitives.Interfaces
     public interface IVertexEditable
     {
         /// <summary>
+        /// 变换
+        /// </summary>
+        Transform Transform { get; }
+
+        /// <summary>
+        /// 包围盒
+        /// </summary>
+        BoundingBox Bounds { get; }
+
+        /// <summary>
         /// 尝试获取顶点拖拽约束
         /// </summary>
         /// <param name="localRay">射线（局部空间）</param>

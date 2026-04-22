@@ -4,6 +4,7 @@ using Avalonia.Media;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using Transform = MedicalSharp.Primitives.Maths.Transform;
 
@@ -12,7 +13,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 文本3D元素
     /// </summary>
-    public class TextVisual3D : Visual3D
+    public class TextVisual3D : Visual3D, ITranslatable
     {
         #region # 字段及构造器
 

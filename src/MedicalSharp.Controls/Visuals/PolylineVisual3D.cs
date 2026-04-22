@@ -15,7 +15,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 折线3D元素
     /// </summary>
-    public class PolylineVisual3D : ShapeVisual3D, IVertexEditable
+    public class PolylineVisual3D : ShapeVisual3D, ITranslatable, IVertexEditable
     {
         #region # 字段及构造器
 

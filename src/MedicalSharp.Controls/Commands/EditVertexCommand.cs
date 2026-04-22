@@ -19,7 +19,7 @@ namespace MedicalSharp.Controls.Commands
         /// <summary>
         /// 选中的3D元素
         /// </summary>
-        private Visual3D _selectedVisual;
+        private IVertexEditable _selectedVisual;
 
         /// <summary>
         /// 选中的顶点拖拽约束
@@ -53,7 +53,7 @@ namespace MedicalSharp.Controls.Commands
                     Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
                     if (vertexEditable.TryGetVertexDrag(localRay, localLookDirection, out VertexDragConstraint constraint))
                     {
-                        this._selectedVisual = visual3D;
+                        this._selectedVisual = vertexEditable;
                         this._selectedVertexConstraint = constraint;
                     }
                 }

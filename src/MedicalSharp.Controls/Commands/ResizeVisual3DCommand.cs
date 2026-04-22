@@ -19,7 +19,7 @@ namespace MedicalSharp.Controls.Commands
         /// <summary>
         /// 选中的3D元素
         /// </summary>
-        private Visual3D _selectedVisual;
+        private IResizable _selectedVisual;
 
         /// <summary>
         /// 选中改变尺寸上下文
@@ -52,7 +52,7 @@ namespace MedicalSharp.Controls.Commands
                     Ray localRay = ray.Transform(worldToLocal);
                     if (resizable.TryGetResizeAxis(localRay, out ResizeContext resizeContext))
                     {
-                        this._selectedVisual = visual3D;
+                        this._selectedVisual = resizable;
                         this._selectedResizeContext = resizeContext;
                     }
                 }

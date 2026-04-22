@@ -1,4 +1,5 @@
-﻿using Avalonia.Input;
+﻿using Avalonia;
+using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
@@ -10,9 +11,9 @@ using System.Linq;
 namespace MedicalSharp.Controls.Commands
 {
     /// <summary>
-    /// 绘制包围盒3D元素命令
+    /// 绘制椭圆形3D元素命令
     /// </summary>
-    public class DrawBoundingBoxCommand : ViewportCommand
+    public class DrawEllipseCommand : ViewportCommand
     {
         /// <summary>
         /// 起始位置
@@ -20,22 +21,29 @@ namespace MedicalSharp.Controls.Commands
         private Vector3? _startPosition;
 
         /// <summary>
-        /// 包围盒3D元素
+        /// 椭圆形3D元素
         /// </summary>
-        private BoundingBoxVisual3D _boundingBox;
+        private EllipseVisual3D _ellipse;
 
         /// <summary>
-        /// 包围盒绘制完成事件
+        /// 法向量
         /// </summary>
-        private readonly Action<BoundingBoxVisual3D> _boxDrawnEvent;
+        private readonly Vector3D _normal;
 
         /// <summary>
-        /// 创建绘制包围盒3D元素命令构造器
+        /// 椭圆形绘制完成事件
         /// </summary>
+        private readonly Action<EllipseVisual3D> _ellipseDrawnEvent;
+
+        /// <summary>
+        /// 创建绘制椭圆形3D元素命令构造器
+        /// </summary>
+        /// <param name="normal">法向量</param>
         /// <param name="callback">绘制回调</param>
-        public DrawBoundingBoxCommand(Action<BoundingBoxVisual3D> callback)
+        public DrawEllipseCommand(Vector3D normal, Action<EllipseVisual3D> callback)
         {
-            this._boxDrawnEvent = callback;
+            this._normal = normal;
+            this._ellipseDrawnEvent = callback;
         }
 
         /// <summary>
@@ -51,11 +59,12 @@ namespace MedicalSharp.Controls.Commands
                 if (mousePos3D.HasValue)
                 {
                     this._startPosition = mousePos3D.Value;
-                    this._boundingBox = new BoundingBoxVisual3D
+                    this._ellipse = new EllipseVisual3D
                     {
-                        Center = mousePos3D.Value.ToVector3()
+                        Center = mousePos3D.Value.ToVector3(),
+                        Normal = this._normal
                     };
-                    this._boxDrawnEvent?.Invoke(this._boundingBox);
+                    this._ellipseDrawnEvent?.Invoke(this._ellipse);
                 }
             }
         }
@@ -69,7 +78,7 @@ namespace MedicalSharp.Controls.Commands
             if (eventArgs.Properties.IsLeftButtonPressed &&
                 viewport is BasicViewport basicViewport &&
                 this._startPosition.HasValue &&
-                this._boundingBox != null)
+                this._ellipse != null)
             {
                 //设置光标
                 viewport.Cursor = new Cursor(StandardCursorType.Cross);
@@ -82,9 +91,8 @@ namespace MedicalSharp.Controls.Commands
                     float offsetY = Math.Abs(mousePos3D.Value.Y - this._startPosition.Value.Y);
                     float offsetZ = Math.Abs(mousePos3D.Value.Z - this._startPosition.Value.Z);
                     float[] sides = new[] { offsetX, offsetY, offsetZ }.OrderByDescending(x => x).ToArray();
-                    this._boundingBox.Width = sides[0];
-                    this._boundingBox.Height = sides[1];
-                    this._boundingBox.Depth = sides[1];
+                    this._ellipse.Width = sides[0];
+                    this._ellipse.Height = sides[1];
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
@@ -104,7 +112,7 @@ namespace MedicalSharp.Controls.Commands
 
             //清空
             this._startPosition = null;
-            this._boundingBox = null;
+            this._ellipse = null;
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
