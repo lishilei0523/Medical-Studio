@@ -193,7 +193,7 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion
 
-        #region 获取上下文菜单项列表 —— virtual IReadOnlyList<ContextMenuItem> GetContextMenuItems(...
+        #region 获取上下文菜单项列表 —— override IReadOnlyList<ContextMenuItem> GetContextMenuItems(...
         /// <summary>
         /// 获取上下文菜单项列表
         /// </summary>
@@ -221,7 +221,7 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion
 
-        #region 失效命令 —— virtual void Deactivate()
+        #region 失效命令 —— override void Deactivate()
         /// <summary>
         /// 失效命令
         /// </summary>
