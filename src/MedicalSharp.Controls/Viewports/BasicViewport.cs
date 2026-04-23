@@ -182,17 +182,6 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 删除子元素 —— void RemoveChild(Visual3D visual3D)
-        /// <summary>
-        /// 删除子元素
-        /// </summary>
-        /// <param name="visual3D">子元素</param>
-        public void RemoveChild(Visual3D visual3D)
-        {
-            this.Children.Remove(visual3D);
-        }
-        #endregion
-
         #region 附加可视化树事件 —— override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs...
         /// <summary>
         /// 附加可视化树事件

@@ -206,7 +206,7 @@ namespace MedicalSharp.Engine.Renderables
                 BoundingSphere sphere = new BoundingSphere(position, 0.02f);
                 if (sphere.Intersects(localRay, out float pointDistance))
                 {
-                    hitPoints.Add(sphere, pointDistance);
+                    hitPoints[sphere] = pointDistance;
                 }
             }
             if (hitPoints.Any())

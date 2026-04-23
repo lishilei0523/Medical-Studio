@@ -39,14 +39,21 @@ namespace MedicalSharp.Controls.Commands
         private readonly Action<PolylineVisual3D> _polylineDrawnEvent;
 
         /// <summary>
+        /// 折线绘制取消事件
+        /// </summary>
+        private readonly Action<PolylineVisual3D> _polylineCancelledEvent;
+
+        /// <summary>
         /// 创建绘制折线3D元素命令构造器
         /// </summary>
-        /// <param name="callback">绘制回调</param>
+        /// <param name="completed">完成回调</param>
+        /// <param name="cancelled">取消回调</param>
         /// <param name="closed">是否闭合</param>
-        public DrawPolylineCommand(Action<PolylineVisual3D> callback, bool closed = false)
+        public DrawPolylineCommand(Action<PolylineVisual3D> completed, Action<PolylineVisual3D> cancelled, bool closed = false)
         {
             this._closed = closed;
-            this._polylineDrawnEvent = callback;
+            this._polylineDrawnEvent = completed;
+            this._polylineCancelledEvent = cancelled;
         }
 
         #endregion
@@ -150,12 +157,14 @@ namespace MedicalSharp.Controls.Commands
                 new ContextMenuItem
                 {
                     Header = "完成",
-                    Command = () => this.CompleteDrawing(viewport)
+                    Command = () => this.CompleteDrawing(viewport),
+                    IsEnabled = this._polyline != null
                 },
                 new ContextMenuItem
                 {
                     Header = "取消",
-                    Command = () => this.CancelDrawing(viewport)
+                    Command = () => this.CancelDrawing(viewport),
+                    IsEnabled = this._polyline != null
                 }
             ];
 
@@ -239,15 +248,7 @@ namespace MedicalSharp.Controls.Commands
         {
             if (this._polyline != null)
             {
-                //从场景中移除折线（需要上层支持，这里通过事件或直接标记）
-                if (viewport is BasicViewport basicViewport)
-                {
-                    basicViewport.RemoveChild(this._polyline);
-                }
-                else
-                {
-                    this._polyline.IsVisible = false;
-                }
+                this._polylineCancelledEvent?.Invoke(this._polyline);
             }
 
             //设置光标
