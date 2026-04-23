@@ -310,6 +310,20 @@ namespace MedicalSharp.Primitives.Cameras
 
         //Public
 
+        #region 看向指定位置 —— override void LookAt(Vector3 targetPosition)
+        /// <summary>
+        /// 看向指定位置
+        /// </summary>
+        /// <param name="targetPosition">目标位置（世界坐标）</param>
+        public override void LookAt(Vector3 targetPosition)
+        {
+            this._targetPosition = targetPosition;
+
+            this.UpdateCameraVectors();
+            this.UpdateViewMatrix();
+        }
+        #endregion
+
         #region 设置移动速度 —— void SetMoveSpeed(float speed)
         /// <summary>
         /// 设置移动速度

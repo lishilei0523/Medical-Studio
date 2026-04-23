@@ -105,6 +105,14 @@ namespace MedicalSharp.Primitives.Cameras
         }
         #endregion
 
+        #region 看向指定位置 —— abstract void LookAt(Vector3 targetPosition)
+        /// <summary>
+        /// 看向指定位置
+        /// </summary>
+        /// <param name="targetPosition">目标位置（世界坐标）</param>
+        public abstract void LookAt(Vector3 targetPosition);
+        #endregion
+
         #endregion
     }
 }

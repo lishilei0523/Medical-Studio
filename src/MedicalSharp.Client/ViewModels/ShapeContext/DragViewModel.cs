@@ -156,7 +156,18 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             if (eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out Ray ray);
+                bool success = viewport.FindNearest(mousePos2D.ToVector2(), out Vector3 point, out _, out Visual3D visual3D, out Ray ray);
+
+                //获得焦点
+                if (success && KeyModifiers.Shift == (eventArgs.KeyModifiers & KeyModifiers.Shift))
+                {
+                    viewport.LookAt(point);
+
+                    eventArgs.Handled = true;
+                    return;
+                }
+
+                //选中元素
                 if (success)
                 {
                     this._selectedVisual = visual3D;

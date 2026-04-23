@@ -82,6 +82,17 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
+        #region 看向指定位置 —— void LookAt(Vector3 targetPosition)
+        /// <summary>
+        /// 看向指定位置
+        /// </summary>
+        /// <param name="targetPosition">目标位置（世界坐标）</param>
+        public void LookAt(Vector3 targetPosition)
+        {
+            this.Camera?.LookAt(targetPosition);
+        }
+        #endregion
+
         #region 查找最近元素 —— bool FindNearest(Vector2 position, out Vector3 point...
         /// <summary>
         /// 查找最近元素
@@ -223,7 +234,7 @@ namespace MedicalSharp.Controls.Viewports
             this._textRenderer.ClearItems();
 
             //填充渲染对象
-            foreach (Visual3D visual3D in this.Children)
+            foreach (Visual3D visual3D in this.Children.Where(x => x.IsVisible))
             {
                 //形状部分
                 if (visual3D is ShapeVisual3D shapeVisual3D)
@@ -232,7 +243,7 @@ namespace MedicalSharp.Controls.Viewports
                     this._shapeVisual3Ds.Add(shapeVisual3D);
                     this._shapeRenderer.AppendItem(shapeVisual3D.Renderable);
                 }
-                if (visual3D is ShapePresenter shapePresenter)
+                if (visual3D is ShapePresenter shapePresenter && shapePresenter.Content.IsVisible)
                 {
                     shapePresenter.Content.EnsureRenderable();
                     this._shapeVisual3Ds.Add(shapePresenter.Content);
@@ -240,7 +251,7 @@ namespace MedicalSharp.Controls.Viewports
                 }
                 if (visual3D is ShapesPresenter shapesPresenter)
                 {
-                    foreach (ShapeVisual3D item in shapesPresenter.ItemsSource)
+                    foreach (ShapeVisual3D item in shapesPresenter.ItemsSource.Where(x => x.IsVisible))
                     {
                         item.EnsureRenderable();
                         this._shapeVisual3Ds.Add(item);
@@ -255,7 +266,7 @@ namespace MedicalSharp.Controls.Viewports
                     this._textVisual3Ds.Add(textVisual3D);
                     this._textRenderer.AppendItem(textVisual3D.Renderable);
                 }
-                if (visual3D is TextPresenter textPresenter)
+                if (visual3D is TextPresenter textPresenter && textPresenter.Content.IsVisible)
                 {
                     textPresenter.Content.EnsureRenderable();
                     this._textVisual3Ds.Add(textPresenter.Content);
@@ -263,7 +274,7 @@ namespace MedicalSharp.Controls.Viewports
                 }
                 if (visual3D is TextsPresenter textsPresenter)
                 {
-                    foreach (TextVisual3D item in textsPresenter.ItemsSource)
+                    foreach (TextVisual3D item in textsPresenter.ItemsSource.Where(x => x.IsVisible))
                     {
                         item.EnsureRenderable();
                         this._textVisual3Ds.Add(item);

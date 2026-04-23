@@ -193,6 +193,32 @@ namespace MedicalSharp.Primitives.Cameras
         }
         #endregion
 
+        #region 看向指定位置 —— override void LookAt(Vector3 targetPosition)
+        /// <summary>
+        /// 看向指定位置
+        /// </summary>
+        /// <param name="targetPosition">目标位置（世界坐标）</param>
+        public override void LookAt(Vector3 targetPosition)
+        {
+            //更新目标位置
+            this._targetPosition = targetPosition;
+
+            //重新计算相机位置（保持原距离）
+            if (this._targetPlane != null)
+            {
+                Vector3 worldNormal = new Vector3(
+                    this._targetPlane.Normal.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
+                    this._targetPlane.Normal.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
+                    this._targetPlane.Normal.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
+                ).Normalized();
+
+                this._cameraPosition = this._targetPosition - worldNormal * this._distance;
+            }
+
+            this.UpdateViewMatrix();
+        }
+        #endregion
+
         #region 绑定MPR平面 —— void BindPlane(MPRPlane plane)
         /// <summary>
         /// 绑定MPR平面
