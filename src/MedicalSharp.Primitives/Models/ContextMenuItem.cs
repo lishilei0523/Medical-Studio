@@ -3,7 +3,7 @@
 namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
-    /// 右键菜单项
+    /// 上下文菜单项
     /// </summary>
     public class ContextMenuItem
     {
@@ -13,6 +13,7 @@ namespace MedicalSharp.Primitives.Models
         public ContextMenuItem()
         {
             this.IsEnabled = true;
+            this.IsSeparator = false;
         }
 
         /// <summary>
@@ -21,7 +22,7 @@ namespace MedicalSharp.Primitives.Models
         public string Header { get; set; }
 
         /// <summary>
-        /// 点击执行的命令
+        /// 菜单命令
         /// </summary>
         public Action Command { get; set; }
 
@@ -40,7 +41,10 @@ namespace MedicalSharp.Primitives.Models
         /// </summary>
         public static ContextMenuItem CreateSeparator()
         {
-            return new ContextMenuItem { IsSeparator = true };
+            return new ContextMenuItem
+            {
+                IsSeparator = true
+            };
         }
     }
 }

@@ -4,10 +4,8 @@ using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
-using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
-using System.Collections.Generic;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -116,36 +114,6 @@ namespace MedicalSharp.Controls.Commands
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
-        }
-
-        /// <summary>
-        /// 测试右键菜单
-        /// </summary>
-        public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
-        {
-            List<ContextMenuItem> items =
-            [
-                new ContextMenuItem
-                {
-                    Header = $"属性"
-                },
-                ContextMenuItem.CreateSeparator(),
-                new ContextMenuItem
-                {
-                    Header = "删除"
-                },
-                new ContextMenuItem
-                {
-                    Header = "复制"
-                },
-                ContextMenuItem.CreateSeparator(),
-                new ContextMenuItem
-                {
-                    Header = "重置相机"
-                }
-            ];
-
-            return items;
         }
     }
 }

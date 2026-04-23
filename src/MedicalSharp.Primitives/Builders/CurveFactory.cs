@@ -23,9 +23,21 @@ namespace MedicalSharp.Primitives.Builders
         {
             #region # 验证
 
-            if (controlPoints.Count < 4)
+            if (controlPoints == null || controlPoints.Count == 0)
             {
-                throw new ArgumentException("Catmull-Rom曲线至少需要4个控制点");
+                return [];
+            }
+            if (controlPoints.Count == 1)
+            {
+                return controlPoints;
+            }
+            if (controlPoints.Count == 2)
+            {
+                return EvaluateLineSegment(controlPoints[0], controlPoints[1], tessellation);
+            }
+            if (controlPoints.Count == 3)
+            {
+                return EvaluateQuadraticBezier(controlPoints[0], controlPoints[1], controlPoints[2], tessellation);
             }
 
             #endregion
@@ -94,6 +106,51 @@ namespace MedicalSharp.Primitives.Builders
             float b3 = 0.5f * t3 - 0.5f * t2;
 
             return b0 * p0 + b1 * p1 + b2 * p2 + b3 * p3;
+        }
+        #endregion
+
+        #region # 生成线段 —— static IReadOnlyList<Vector3> EvaluateLineSegment(Vector3 start...
+        /// <summary>
+        /// 生成线段
+        /// </summary>
+        /// <param name="start">起始点</param>
+        /// <param name="end">终止点</param>
+        /// <param name="tessellation">采样密度（每段采样点数）</param>
+        /// <returns>采样点列表</returns>
+        private static IReadOnlyList<Vector3> EvaluateLineSegment(Vector3 start, Vector3 end, int tessellation)
+        {
+            List<Vector3> sampled = [];
+            for (int i = 0; i <= tessellation; i++)
+            {
+                float t = i / (float)tessellation;
+                sampled.Add(Vector3.Lerp(start, end, t));
+            }
+            return sampled;
+        }
+        #endregion
+
+        #region # 生成二次贝塞尔曲线 —— static IReadOnlyList<Vector3> EvaluateQuadraticBezier(Vector3 p0...
+        /// <summary>
+        /// 生成二次贝塞尔曲线
+        /// </summary>
+        /// <param name="p0">起点</param>
+        /// <param name="p1">控制点</param>
+        /// <param name="p2">终点</param>
+        /// <param name="tessellation">采样密度</param>
+        /// <returns>曲线上的采样点</returns>
+        /// <remarks>二次贝塞尔曲线公式：B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2</remarks>
+        private static IReadOnlyList<Vector3> EvaluateQuadraticBezier(Vector3 p0, Vector3 p1, Vector3 p2, int tessellation)
+        {
+            List<Vector3> sampled = [];
+            for (int i = 0; i <= tessellation; i++)
+            {
+                float t = i / (float)tessellation;
+                float u = 1 - t;
+                Vector3 point = u * u * p0 + 2 * u * t * p1 + t * t * p2;
+                sampled.Add(point);
+            }
+
+            return sampled;
         }
         #endregion
     }

@@ -101,16 +101,54 @@ namespace MedicalSharp.Primitives.Builders
         /// <returns>网格模型</returns>
         public static MeshGeometry CreatePolyline(IReadOnlyList<Vector3> positions, bool closed = false)
         {
+            #region # 验证
+
+            if (positions == null || positions.Count == 0)
+            {
+                return new MeshGeometry([]);  //空网格
+            }
+            if (positions.Count == 1)
+            {
+                // 单个点：创建一个零长度的线段（点）
+                Vertex vertex = new Vertex
+                {
+                    Position = positions[0],
+                    TextureCoord = Vector2.Zero,
+                    Normal = Vector3.Zero
+                };
+
+                return new MeshGeometry([vertex]);
+            }
+
+            #endregion
+
             List<Vertex> vertices = [];
             for (int index = 0; index < positions.Count; index++)
             {
-                Vector3 normal = index < positions.Count - 1
-                    ? Vector3.Normalize(positions[index + 1] - positions[index])
-                    : Vector3.Normalize(positions[index] - positions[index - 1]);
+                //计算法向量（方向）
+                Vector3 normal;
+                if (index == 0)
+                {
+                    //第一个点：使用到下一个点的方向
+                    normal = Vector3.Normalize(positions[1] - positions[0]);
+                }
+                else if (index == positions.Count - 1)
+                {
+                    //最后一个点：使用到前一个点的方向
+                    normal = Vector3.Normalize(positions[index] - positions[index - 1]);
+                }
+                else
+                {
+                    //中间点：使用前后向量的平均方向
+                    Vector3 dir1 = positions[index] - positions[index - 1];
+                    Vector3 dir2 = positions[index + 1] - positions[index];
+                    normal = Vector3.Normalize(dir1 + dir2);
+                }
+
                 vertices.Add(new Vertex
                 {
                     Position = positions[index],
-                    TextureCoord = new Vector2(index / (float)positions.Count, 0),
+                    TextureCoord = new Vector2(index / (float)(positions.Count - 1), 0),
                     Normal = normal
                 });
             }
@@ -118,10 +156,9 @@ namespace MedicalSharp.Primitives.Builders
             List<uint> indices = [];
             for (int index = 0; index < positions.Count - 1; index++)
             {
-                indices.Add((uint)(index));
+                indices.Add((uint)index);
                 indices.Add((uint)(index + 1));
             }
-
             if (closed && positions.Count > 2)
             {
                 indices.Add((uint)(positions.Count - 1));

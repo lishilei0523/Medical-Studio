@@ -186,6 +186,9 @@ namespace MedicalSharp.Controls.Base
 
             #endregion
 
+            //设置光标
+            viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
             Flyout flyout = new Flyout();
             MenuFlyoutPresenter contextMenu = new MenuFlyoutPresenter();
             foreach (ContextMenuItem contextMenuItem in contextMenuItems)
