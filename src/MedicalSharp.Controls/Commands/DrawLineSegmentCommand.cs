@@ -13,10 +13,7 @@ namespace MedicalSharp.Controls.Commands
     /// </summary>
     public class DrawLineSegmentCommand : ViewportCommand
     {
-        /// <summary>
-        /// 起始位置
-        /// </summary>
-        private Vector3? _startPosition;
+        #region # 字段及构造器
 
         /// <summary>
         /// 线段3D元素
@@ -37,6 +34,17 @@ namespace MedicalSharp.Controls.Commands
             this._lineSegmentDrawnEvent = callback;
         }
 
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -49,7 +57,6 @@ namespace MedicalSharp.Controls.Commands
                 Vector3? mousePos3D = basicViewport.FindNearestPosition(mousePos2D);
                 if (mousePos3D.HasValue)
                 {
-                    this._startPosition = mousePos3D.Value;
                     this._lineSegment = new LineSegmentVisual3D
                     {
                         StartPoint = mousePos3D.Value.ToVector3()
@@ -58,7 +65,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
@@ -81,7 +90,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标松开事件 —— override void OnMouseUp(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标松开事件
         /// </summary>
@@ -93,11 +104,13 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //清空
-            this._startPosition = null;
             this._lineSegment = null;
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
+        #endregion 
+
+        #endregion
     }
 }

@@ -16,6 +16,8 @@ namespace MedicalSharp.Controls.Commands
     /// </summary>
     public class EditVertexCommand : ViewportCommand
     {
+        #region # 字段及构造器
+
         /// <summary>
         /// 选中的3D元素
         /// </summary>
@@ -27,7 +29,7 @@ namespace MedicalSharp.Controls.Commands
         private VertexDragConstraint? _selectedVertexConstraint;
 
         /// <summary>
-        /// 默认构造器
+        /// 创建编辑顶点命令构造器
         /// </summary>
         public EditVertexCommand()
         {
@@ -35,6 +37,17 @@ namespace MedicalSharp.Controls.Commands
             this._selectedVertexConstraint = null;
         }
 
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -59,7 +72,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
@@ -89,19 +104,21 @@ namespace MedicalSharp.Controls.Commands
                     Ray localRay = ray.Transform(worldToLocal);
 
                     //可顶点编辑类型
-                    if (this._selectedVisual is IVertexEditable vertexEditable && this._selectedVertexConstraint.HasValue)
+                    if (this._selectedVertexConstraint.HasValue)
                     {
                         VertexDragConstraint constraint = this._selectedVertexConstraint.Value;
                         if (localRay.IntersectsPlane(constraint.Anchor, constraint.Normal, out Vector3 localHitPoint, out _))
                         {
-                            vertexEditable.MoveVertex(constraint, localHitPoint);
+                            this._selectedVisual.MoveVertex(constraint, localHitPoint);
                             viewport.RequestNextFrameRendering();
                         }
                     }
                 }
             }
         }
+        #endregion
 
+        #region 鼠标松开事件 —— override void OnMouseUp(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标松开事件
         /// </summary>
@@ -119,5 +136,8 @@ namespace MedicalSharp.Controls.Commands
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
+        #endregion 
+
+        #endregion
     }
 }

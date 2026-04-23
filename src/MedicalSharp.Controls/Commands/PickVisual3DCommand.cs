@@ -15,10 +15,12 @@ namespace MedicalSharp.Controls.Commands
     /// </summary>
     public class PickVisual3DCommand : ViewportCommand
     {
+        #region # 字段及构造器
+
         /// <summary>
         /// 3D元素拾取事件
         /// </summary>
-        private readonly Action<Visual3DPickedEventArgs> _visual3DPicked;
+        private readonly Action<Visual3DPickedEventArgs> _visual3DPickedEvent;
 
         /// <summary>
         /// 创建拾取3D元素命令构造器
@@ -26,9 +28,20 @@ namespace MedicalSharp.Controls.Commands
         /// <param name="callback">3D元素拾取回调</param>
         public PickVisual3DCommand(Action<Visual3DPickedEventArgs> callback)
         {
-            this._visual3DPicked = callback;
+            this._visual3DPickedEvent = callback;
         }
 
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -55,8 +68,11 @@ namespace MedicalSharp.Controls.Commands
                     commandEventArgs.PickedVisual = null;
                 }
 
-                this._visual3DPicked?.Invoke(commandEventArgs);
+                this._visual3DPickedEvent?.Invoke(commandEventArgs);
             }
         }
+        #endregion 
+
+        #endregion
     }
 }

@@ -16,6 +16,8 @@ namespace MedicalSharp.Controls.Commands
     /// </summary>
     public class ResizeVisual3DCommand : ViewportCommand
     {
+        #region # 字段及构造器
+
         /// <summary>
         /// 选中的3D元素
         /// </summary>
@@ -27,7 +29,7 @@ namespace MedicalSharp.Controls.Commands
         private ResizeContext? _selectedResizeContext;
 
         /// <summary>
-        /// 默认构造器
+        /// 创建调整3D元素尺寸命令构造器
         /// </summary>
         public ResizeVisual3DCommand()
         {
@@ -35,6 +37,17 @@ namespace MedicalSharp.Controls.Commands
             this._selectedResizeContext = null;
         }
 
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -58,7 +71,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
@@ -89,7 +104,7 @@ namespace MedicalSharp.Controls.Commands
                     Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
 
                     //可调整尺寸类型
-                    if (this._selectedVisual is IResizable resizable && this._selectedResizeContext.HasValue)
+                    if (this._selectedResizeContext.HasValue)
                     {
                         //构造平面法向量：包含伸缩轴，且面向相机
                         ResizeContext resizeContext = this._selectedResizeContext.Value;
@@ -102,14 +117,16 @@ namespace MedicalSharp.Controls.Commands
 
                         if (localRay.IntersectsPlane(resizeContext.Anchor, planeNormal, out Vector3 localHitPoint, out _))
                         {
-                            resizable.ApplyResize(resizeContext, localHitPoint);
+                            this._selectedVisual.ApplyResize(resizeContext, localHitPoint);
                             viewport.RequestNextFrameRendering();
                         }
                     }
                 }
             }
         }
+        #endregion
 
+        #region 鼠标松开事件 —— override void OnMouseUp(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标松开事件
         /// </summary>
@@ -127,5 +144,8 @@ namespace MedicalSharp.Controls.Commands
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
+        #endregion 
+
+        #endregion
     }
 }

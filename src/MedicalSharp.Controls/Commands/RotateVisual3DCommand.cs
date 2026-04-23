@@ -15,19 +15,32 @@ namespace MedicalSharp.Controls.Commands
     /// </summary>
     public class RotateVisual3DCommand : ViewportCommand
     {
+        #region # 字段及构造器
+
         /// <summary>
         /// 选中的3D元素
         /// </summary>
         private IRotatable _selectedVisual;
 
         /// <summary>
-        /// 默认构造器
+        /// 创建旋转3D元素命令构造器
         /// </summary>
         public RotateVisual3DCommand()
         {
             this._selectedVisual = null;
         }
 
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -44,7 +57,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
@@ -66,8 +81,8 @@ namespace MedicalSharp.Controls.Commands
                 bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out _, out _);
                 if (success)
                 {
-                    float deltaX = (float)(mousePos2D.X - this._mousePos2D!.Value.X);
-                    float deltaY = (float)(mousePos2D.Y - this._mousePos2D!.Value.Y);
+                    float deltaX = mousePos2D.X - this._mousePos2D!.Value.X;
+                    float deltaY = mousePos2D.Y - this._mousePos2D!.Value.Y;
 
                     //设置光标
                     if (deltaX != 0 && deltaY == 0)
@@ -95,7 +110,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标松开事件 —— override void OnMouseUp(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标松开事件
         /// </summary>
@@ -112,5 +129,8 @@ namespace MedicalSharp.Controls.Commands
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
+        #endregion 
+
+        #endregion
     }
 }

@@ -15,19 +15,32 @@ namespace MedicalSharp.Controls.Commands
     /// </summary>
     public class TranslateVisual3DCommand : ViewportCommand
     {
+        #region # 字段及构造器
+
         /// <summary>
         /// 选中的3D元素
         /// </summary>
         private ITranslatable _selectedVisual;
 
         /// <summary>
-        /// 默认构造器
+        /// 创建平移3D元素命令构造器
         /// </summary>
         public TranslateVisual3DCommand()
         {
             this._selectedVisual = null;
         }
 
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -44,7 +57,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
@@ -74,7 +89,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标松开事件 —— override void OnMouseUp(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标松开事件
         /// </summary>
@@ -91,5 +108,8 @@ namespace MedicalSharp.Controls.Commands
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
+        #endregion 
+
+        #endregion
     }
 }

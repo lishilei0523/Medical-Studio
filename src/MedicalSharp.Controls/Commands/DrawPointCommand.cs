@@ -13,6 +13,8 @@ namespace MedicalSharp.Controls.Commands
     /// </summary>
     public class DrawPointCommand : ViewportCommand
     {
+        #region # 字段及构造器
+
         /// <summary>
         /// 点绘制完成事件
         /// </summary>
@@ -27,6 +29,17 @@ namespace MedicalSharp.Controls.Commands
             this._pointDrawnEvent = callback;
         }
 
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -50,5 +63,8 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion 
+
+        #endregion
     }
 }

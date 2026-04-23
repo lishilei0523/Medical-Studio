@@ -14,10 +14,12 @@ namespace MedicalSharp.Controls.Commands
     /// </summary>
     public class PickVoxelCommand : ViewportCommand
     {
+        #region # 字段及构造器
+
         /// <summary>
         /// 体素拾取事件
         /// </summary>
-        private readonly Action<VoxelPickedEventArgs> _voxelPicked;
+        private readonly Action<VoxelPickedEventArgs> _voxelPickedEvent;
 
         /// <summary>
         /// 创建拾取体素命令构造器
@@ -25,9 +27,20 @@ namespace MedicalSharp.Controls.Commands
         /// <param name="callback">体素拾取回调</param>
         public PickVoxelCommand(Action<VoxelPickedEventArgs> callback)
         {
-            this._voxelPicked = callback;
+            this._voxelPickedEvent = callback;
         }
 
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -50,8 +63,11 @@ namespace MedicalSharp.Controls.Commands
                     commandEventArgs.Ray = ray;
                 }
 
-                this._voxelPicked?.Invoke(commandEventArgs);
+                this._voxelPickedEvent?.Invoke(commandEventArgs);
             }
         }
+        #endregion 
+
+        #endregion
     }
 }

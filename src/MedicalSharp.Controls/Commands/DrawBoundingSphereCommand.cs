@@ -13,6 +13,8 @@ namespace MedicalSharp.Controls.Commands
     /// </summary>
     public class DrawBoundingSphereCommand : ViewportCommand
     {
+        #region # 字段及构造器
+
         /// <summary>
         /// 起始位置
         /// </summary>
@@ -37,6 +39,17 @@ namespace MedicalSharp.Controls.Commands
             this._sphereDrawnEvent = callback;
         }
 
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标按下事件
         /// </summary>
@@ -58,7 +71,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
@@ -88,7 +103,9 @@ namespace MedicalSharp.Controls.Commands
                 }
             }
         }
+        #endregion
 
+        #region 鼠标松开事件 —— override void OnMouseUp(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标松开事件
         /// </summary>
@@ -106,5 +123,8 @@ namespace MedicalSharp.Controls.Commands
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
+        #endregion 
+
+        #endregion
     }
 }
