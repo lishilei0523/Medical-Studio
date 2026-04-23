@@ -141,12 +141,16 @@ namespace MedicalSharp.Primitives.Builders
         /// <remarks>二次贝塞尔曲线公式：B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2</remarks>
         private static IReadOnlyList<Vector3> EvaluateQuadraticBezier(Vector3 p0, Vector3 p1, Vector3 p2, int tessellation)
         {
+            //计算控制点 Q，使得 t=0.5 时曲线经过 p1
+            //p1 = (1-0.5)²p0 + 2(1-0.5)*0.5Q + 0.5²p2 = 0.25p0 + 0.5Q + 0.25p2
+            //=> Q = (p1 - 0.25p0 - 0.25p2) / 0.5 = 2p1 - 0.5p0 - 0.5p2
+            Vector3 controlPoint = 2 * p1 - 0.5f * p0 - 0.5f * p2;
             List<Vector3> sampled = [];
             for (int i = 0; i <= tessellation; i++)
             {
                 float t = i / (float)tessellation;
                 float u = 1 - t;
-                Vector3 point = u * u * p0 + 2 * u * t * p1 + t * t * p2;
+                Vector3 point = u * u * p0 + 2 * u * t * controlPoint + t * t * p2;
                 sampled.Add(point);
             }
 

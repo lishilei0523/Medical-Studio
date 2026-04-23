@@ -12,9 +12,9 @@ using System.Collections.Generic;
 namespace MedicalSharp.Controls.Commands
 {
     /// <summary>
-    /// 绘制折线3D元素命令
+    /// 绘制曲线3D元素命令
     /// </summary>
-    public class DrawPolylineCommand : ViewportCommand
+    public class DrawCurveCommand : ViewportCommand
     {
         #region # 字段及构造器
 
@@ -24,9 +24,9 @@ namespace MedicalSharp.Controls.Commands
         private Vector3D? _previewPoint;
 
         /// <summary>
-        /// 折线3D元素
+        /// 曲线3D元素
         /// </summary>
-        private PolylineVisual3D _polyline;
+        private CurveVisual3D _curve;
 
         /// <summary>
         /// 是否闭合
@@ -34,37 +34,31 @@ namespace MedicalSharp.Controls.Commands
         private readonly bool _closed;
 
         /// <summary>
-        /// 折线绘制完成事件
+        /// 曲线绘制完成事件
         /// </summary>
-        private readonly Action<PolylineVisual3D> _polylineDrawnEvent;
+        private readonly Action<CurveVisual3D> _curveDrawnEvent;
 
         /// <summary>
-        /// 折线绘制取消事件
+        /// 曲线绘制取消事件
         /// </summary>
-        private readonly Action<PolylineVisual3D> _polylineCancelledEvent;
+        private readonly Action<CurveVisual3D> _curveCancelledEvent;
 
         /// <summary>
-        /// 创建绘制折线3D元素命令构造器
+        /// 创建绘制曲线3D元素命令构造器
         /// </summary>
         /// <param name="completed">完成回调</param>
         /// <param name="cancelled">取消回调</param>
         /// <param name="closed">是否闭合</param>
-        public DrawPolylineCommand(Action<PolylineVisual3D> completed, Action<PolylineVisual3D> cancelled, bool closed = false)
+        public DrawCurveCommand(Action<CurveVisual3D> completed, Action<CurveVisual3D> cancelled, bool closed = false)
         {
             this._closed = closed;
-            this._polylineDrawnEvent = completed;
-            this._polylineCancelledEvent = cancelled;
+            this._curveDrawnEvent = completed;
+            this._curveCancelledEvent = cancelled;
         }
 
         #endregion
 
-        #region # 属性
-
-        //
-
-        #endregion
-
-        #region # 方法
+        #region 方法
 
         //Public
 
@@ -82,25 +76,25 @@ namespace MedicalSharp.Controls.Commands
                 if (mousePos3D.HasValue)
                 {
                     Vector3D position = mousePos3D.Value.ToVector3();
-                    if (this._polyline == null)
+                    if (this._curve == null)
                     {
-                        //第一次点击：创建折线，添加第一个控制点
-                        this._polyline = new PolylineVisual3D
+                        //第一次点击：创建曲线，添加第一个控制点
+                        this._curve = new CurveVisual3D
                         {
-                            Positions = [position],
+                            ControlPositions = [position],
                             Closed = this._closed
                         };
-                        this._polylineDrawnEvent?.Invoke(this._polyline);
+                        this._curveDrawnEvent?.Invoke(this._curve);
                     }
                     else
                     {
                         //先移除预览点（如果存在）
                         if (this._previewPoint.HasValue)
                         {
-                            this._polyline.Positions.RemoveAt(this._polyline.Positions.Count - 1);
+                            this._curve.ControlPositions.RemoveAt(this._curve.ControlPositions.Count - 1);
                             this._previewPoint = null;
                         }
-                        this._polyline.Positions.Add(position);
+                        this._curve.ControlPositions.Add(position);
                     }
 
                     //请求下一帧
@@ -117,7 +111,7 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
             base.OnMouseMove(viewport, eventArgs);
-            if (viewport is BasicViewport basicViewport && this._polyline != null)
+            if (this._curve != null && viewport is BasicViewport basicViewport)
             {
                 //设置光标
                 viewport.Cursor = new Cursor(StandardCursorType.Cross);
@@ -131,11 +125,11 @@ namespace MedicalSharp.Controls.Commands
                     //预览更新：替换最后一个点（预览点）
                     if (this._previewPoint.HasValue)
                     {
-                        this._polyline.Positions[^1] = currentPos;
+                        this._curve.ControlPositions[^1] = currentPos;
                     }
                     else
                     {
-                        this._polyline.Positions.Add(currentPos);
+                        this._curve.ControlPositions.Add(currentPos);
                         this._previewPoint = currentPos;
                     }
 
@@ -150,7 +144,6 @@ namespace MedicalSharp.Controls.Commands
         /// <summary>
         /// 获取上下文菜单项列表
         /// </summary>
-        /// <returns>上下文菜单项列表</returns>
         public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
             List<ContextMenuItem> items =
@@ -159,17 +152,17 @@ namespace MedicalSharp.Controls.Commands
                 {
                     Header = "完成",
                     Command = () => this.CompleteDrawing(viewport),
-                    IsEnabled = this._polyline != null
+                    IsEnabled = this._curve != null
                 },
                 new ContextMenuItem
                 {
                     Header = "取消",
                     Command = () => this.CancelDrawing(viewport),
-                    IsEnabled = this._polyline != null
+                    IsEnabled = this._curve != null
                 }
             ];
 
-            if (this._polyline != null && this._polyline.Positions.Count > 1)
+            if (this._curve != null && this._curve.ControlPositions.Count > 1)
             {
                 items.Add(new ContextMenuItem
                 {
@@ -186,14 +179,13 @@ namespace MedicalSharp.Controls.Commands
         /// <summary>
         /// 失效命令
         /// </summary>
-        /// <remarks>命令被停用时调用，切换命令前</remarks>
         public override void Deactivate()
         {
             base.Deactivate();
-
             this._previewPoint = null;
-            this._polyline = null;
+            this._curve = null;
         }
+
         #endregion
 
 
@@ -206,24 +198,22 @@ namespace MedicalSharp.Controls.Commands
         private void CompleteDrawing(OpenTKViewport viewport)
         {
             //移除预览点
-            if (this._previewPoint.HasValue && this._polyline != null)
+            if (this._previewPoint.HasValue && this._curve != null)
             {
-                this._polyline.Positions.RemoveAt(this._polyline.Positions.Count - 1);
+                this._curve.ControlPositions.RemoveAt(this._curve.ControlPositions.Count - 1);
                 this._previewPoint = null;
             }
 
-            //至少需要2个点才能形成折线（闭合需要至少3个点）
-            if (this._polyline != null)
+            //检查点数要求
+            if (this._curve != null)
             {
-                if (this._closed && this._polyline.Positions.Count < 3)
+                //Catmull-Rom曲线至少需要3个控制点才能生成有效曲线
+                //1个点：显示点
+                //2个点：显示直线
+                //3个点及以上：显示曲线
+                if (this._curve.ControlPositions.Count < 3)
                 {
-                    //闭合折线点数不足，取消绘制
-                    this.CancelDrawing(viewport);
-                    return;
-                }
-                if (!this._closed && this._polyline.Positions.Count < 2)
-                {
-                    //开放折线点数不足，取消绘制
+                    //点数不足，取消绘制
                     this.CancelDrawing(viewport);
                     return;
                 }
@@ -232,13 +222,14 @@ namespace MedicalSharp.Controls.Commands
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
-            //清空引用，绘制完成
+            //清空引用
             this._previewPoint = null;
-            this._polyline = null;
+            this._curve = null;
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
+
         #endregion
 
         #region 取消绘制 —— void CancelDrawing(OpenTKViewport viewport)
@@ -247,9 +238,9 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void CancelDrawing(OpenTKViewport viewport)
         {
-            if (this._polyline != null)
+            if (this._curve != null)
             {
-                this._polylineCancelledEvent?.Invoke(this._polyline);
+                this._curveCancelledEvent?.Invoke(this._curve);
             }
 
             //设置光标
@@ -257,7 +248,7 @@ namespace MedicalSharp.Controls.Commands
 
             //清空引用
             this._previewPoint = null;
-            this._polyline = null;
+            this._curve = null;
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
@@ -266,35 +257,32 @@ namespace MedicalSharp.Controls.Commands
 
         #region 撤销上一点 —— void UndoLastPoint(OpenTKViewport viewport)
         /// <summary>
-        /// 撤销上一点
+        /// 撤销上一个点
         /// </summary>
         private void UndoLastPoint(OpenTKViewport viewport)
         {
-            #region # 验证
-
-            if (this._polyline == null)
+            if (this._curve == null)
             {
                 return;
             }
 
-            #endregion
-
             //移除预览点
             if (this._previewPoint.HasValue)
             {
-                this._polyline.Positions.RemoveAt(this._polyline.Positions.Count - 1);
+                this._curve.ControlPositions.RemoveAt(this._curve.ControlPositions.Count - 1);
                 this._previewPoint = null;
             }
 
             //移除最后一个固定点
-            if (this._polyline.Positions.Count > 1)
+            if (this._curve.ControlPositions.Count > 1)
             {
-                this._polyline.Positions.RemoveAt(this._polyline.Positions.Count - 1);
+                this._curve.ControlPositions.RemoveAt(this._curve.ControlPositions.Count - 1);
             }
 
+            //请求下一帧
             viewport.RequestNextFrameRendering();
         }
-        #endregion 
+        #endregion
 
         #endregion
     }
