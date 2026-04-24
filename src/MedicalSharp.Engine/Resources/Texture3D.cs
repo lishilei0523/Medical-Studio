@@ -118,6 +118,48 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 创建标记场纹理 —— static Texture3D CreateMark(int width, int height, int depth)
+        /// <summary>
+        /// 创建标记场纹理
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
+        public static Texture3D CreateMark(int width, int height, int depth)
+        {
+            #region # 验证
+
+            if (width <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(width), "宽度必须大于0！");
+            }
+            if (height <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(height), "高度必须大于0！");
+            }
+            if (depth <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(depth), "深度必须大于0！");
+            }
+
+            #endregion
+
+            Texture3D texture = new Texture3D(width, height, depth, PixelInternalFormat.R8ui, PixelFormat.RedInteger, PixelType.UnsignedByte);
+
+            //分配显存
+            texture.AllocateMemory();
+
+            //设置默认纹理参数
+            texture.SetFilter(TextureMinFilter.Nearest, TextureMagFilter.Nearest);
+            texture.SetWrapMode(TextureWrapMode.ClampToEdge);
+
+            //检查错误
+            CheckError("GL.TexImage3D");
+
+            return texture;
+        }
+        #endregion
+
 
         //Public
 

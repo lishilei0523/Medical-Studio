@@ -5,6 +5,7 @@ in vec3 LocalPosition;
 out vec4 FragColor;
 
 uniform sampler3D u_VolumeTexture;
+uniform usampler3D u_MarkTexture; 
 uniform sampler1D u_TransferFunction;
 
 uniform vec3 u_CameraPosition;
@@ -13,11 +14,16 @@ uniform float u_RescaleSlope;
 uniform float u_RescaleIntercept;
 uniform float u_WindowCenter;
 uniform float u_WindowWidth;
-uniform float u_StepSize;             //步长
-uniform float u_Brightness;           //亮度
-uniform float u_DensityScale;         //密度缩放
-uniform int u_MaxStepsCount;          //最大步数
-uniform float u_OpacityThreshold;     //透明度阈值
+uniform float u_StepSize;               //步长
+uniform float u_Brightness;             //亮度
+uniform float u_DensityScale;           //密度缩放
+uniform int u_MaxStepsCount;            //最大步数
+uniform float u_OpacityThreshold;       //透明度阈值
+
+uniform int u_MarkMode;                 //标记模式
+uniform vec4 u_MarkHighlightColor;      //标记高亮颜色
+uniform float u_MarkHighlightIntensity; //标记高亮强度
+
 
 //线性窗宽窗位转换
 float applyWindowLevel(float voxelValue, float windowCenter, float windowWidth)
@@ -110,6 +116,37 @@ void main()
             continue;
         }
 
+
+
+        //采样标记场
+        uint markValue = texture(u_MarkTexture, texCoord).r;
+        
+        //根据ROI模式决定是否渲染
+        bool shouldRender = true;        
+        switch (u_MarkMode)
+        {
+            case 0: //正常模式
+                shouldRender = true;
+                break;
+                
+            case 1: //保留模式
+                shouldRender = (markValue != 0u);
+                break;
+                
+            case 2: //切除模式
+                shouldRender = (markValue == 0u);
+                break;
+                
+            case 3: //高亮
+                shouldRender = true;
+                break;
+        }        
+        if (!shouldRender)
+        {
+            currentPos += step;
+            continue;
+        }
+
         //应用密度缩放
         density = clamp(density * u_DensityScale, 0.0, 1.0);
         
@@ -121,6 +158,14 @@ void main()
         {
             currentPos += step;
             continue;
+        }
+
+        //差异化模式下，对标记区域应用特殊颜色
+        if (u_MarkMode == 3 && markValue != 0u)
+        {
+            //混合高亮颜色
+            float highlightFactor = u_MarkHighlightIntensity;
+            sampleColor.rgb = mix(sampleColor.rgb, u_MarkHighlightColor.rgb, highlightFactor);
         }
 
         //亮度调整

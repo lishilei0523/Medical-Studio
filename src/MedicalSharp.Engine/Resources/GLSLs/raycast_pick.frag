@@ -6,6 +6,7 @@ out vec4 FragColor;
 
 //体积纹理
 uniform sampler3D u_VolumeTexture;
+uniform usampler3D u_MarkTexture;
 uniform sampler1D u_TransferFunction;
 
 //变换矩阵
@@ -38,7 +39,10 @@ uniform float u_StepSize;
 uniform int u_MaxStepsCount;
 uniform float u_OpacityThreshold;
 
-// 常量
+//标记模式
+uniform int u_MarkMode;
+
+//常量
 const float MAX_16BIT_SIGNED = 32767.0;
 const float EPSILON = 0.0001;
 
@@ -91,6 +95,28 @@ float getMedicalValue(vec3 texCoord)
     float medicalValue = rawValue * u_RescaleSlope + u_RescaleIntercept;
     
     return medicalValue;
+}
+
+//根据标记模式判断是否应该被拾取
+bool shouldPick(uint markValue)
+{
+    switch (u_MarkMode)
+    {
+        case 0: //Normal模式：拾取任何可见体素
+            return true;
+            
+        case 1: //Keep模式：只拾取标记区域内的体素
+            return (markValue != 0u);
+            
+        case 2: //Cut模式：只拾取标记区域外的体素
+            return (markValue == 0u);
+            
+        case 3: //Highlight模式：拾取任何可见体素
+            return true;
+            
+        default:
+            return true;
+    }
 }
 
 void main()
@@ -167,11 +193,26 @@ void main()
         accumulatedColor.a += (1.0 - accumulatedColor.a) * sampleColor.a;
         
         //检查是否达到不透明度阈值
-        //达到阈值意味着用户能在屏幕上看到这个体素
+        //达到阈值意味着用户能在屏幕上看到当前体素
         if (accumulatedColor.a > u_OpacityThreshold)
         {
-            //找到第一个用户能看到的纹理坐标
-            FragColor = vec4(texCoord, 1);
+            //采样标记场
+            uint markValue = texture(u_MarkTexture, texCoord).r;
+            
+            //根据标记模式决定是否返回当前体素
+            if (shouldPick(markValue))
+            {
+                //返回纹理坐标和标记值（编码在颜色中）
+                //R: 纹理坐标X, G: 纹理坐标Y, B: 纹理坐标Z, A: 标记值/255
+                FragColor = vec4(texCoord, float(markValue) / 255.0);
+            }
+            else
+            {
+                //当前体素不符合标记模式要求，继续寻找下一个
+                //注意：需要继续步进，但当前累积颜色需要保持
+                currentPos += step;
+                continue;
+            }
             return;
         }
         

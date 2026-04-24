@@ -5,6 +5,8 @@ in vec3 WorldPosition;
 out vec4 FragColor;
 
 uniform sampler3D u_VolumeTexture;
+uniform usampler3D u_MarkTexture;
+uniform sampler1D u_TransferFunction;
 
 //窗宽窗位参数
 uniform float u_WindowWidth;
@@ -20,6 +22,11 @@ uniform float u_RescaleIntercept;
 
 //体积参数
 uniform vec3 u_VolumeScale;
+
+//标记模式参数
+uniform int u_MarkMode;
+uniform vec4 u_MarkHighlightColor;
+uniform float u_MarkHighlightIntensity;
 
 //常量
 const float EPSILON = 0.0001;
@@ -71,6 +78,31 @@ void main()
     //采样体积纹理 (R16Snorm格式)
     float snormValue = texture(u_VolumeTexture, texCoord).r;
 
+    //采样标记纹理
+    uint markValue = texture(u_MarkTexture, texCoord).r;
+
+    //根据标记模式决定是否渲染
+    bool shouldRender = true;
+    switch (u_MarkMode)
+    {
+        case 0: // Normal模式
+            shouldRender = true;
+            break;
+        case 1: // Keep模式：只显示标记区域
+            shouldRender = (markValue != 0u);
+            break;
+        case 2: // Cut模式：排除标记区域
+            shouldRender = (markValue == 0u);
+            break;
+        case 3: // Highlight模式
+            shouldRender = true;
+            break;
+    }    
+    if (!shouldRender)
+    {
+        discard;
+    }
+
     //转换为原始值
     float rawValue = convertR16SnormToRaw(snormValue);
 
@@ -86,5 +118,14 @@ void main()
     grayValue = clamp(grayValue, 0.0, 1.0);
     
     //基础颜色
-    FragColor = vec4(grayValue, grayValue, grayValue, 1.0);
+    vec3 color = vec3(grayValue);
+
+    //高亮模式下，标记区域使用高亮颜色
+    if (u_MarkMode == 3 && markValue != 0u)
+    {
+        float highlightFactor = u_MarkHighlightIntensity;
+        color = mix(color, u_MarkHighlightColor.rgb, highlightFactor);
+    }
+
+    FragColor = vec4(color, 1.0);
 }

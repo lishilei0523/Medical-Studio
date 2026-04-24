@@ -1,6 +1,8 @@
 ﻿using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -41,6 +43,9 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
             this.TransferFunction = new TransferFunction();
+            this.MarkMode = MarkMode.Normal;
+            this.MarkHighlightColor = null;
+            this.MarkHighlightIntensity = null;
             this.InitShaderProgram();
         }
 
@@ -55,6 +60,9 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
             this.TransferFunction = new TransferFunction();
+            this.MarkMode = MarkMode.Normal;
+            this.MarkHighlightColor = null;
+            this.MarkHighlightIntensity = null;
             this.InitShaderProgram();
         }
 
@@ -70,6 +78,9 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
             this.TransferFunction = new TransferFunction();
+            this.MarkMode = MarkMode.Normal;
+            this.MarkHighlightColor = null;
+            this.MarkHighlightIntensity = null;
         }
 
         #endregion
@@ -132,6 +143,27 @@ namespace MedicalSharp.Engine.Renderers
         public TransferFunction TransferFunction { get; }
         #endregion
 
+        #region 标记模式 —— MarkMode MarkMode
+        /// <summary>
+        /// 标记模式
+        /// </summary>
+        public MarkMode MarkMode { get; private set; }
+        #endregion
+
+        #region 标记高亮颜色 —— Vector4? MarkHighlightColor
+        /// <summary>
+        /// 标记高亮颜色
+        /// </summary>
+        public Vector4? MarkHighlightColor { get; private set; }
+        #endregion
+
+        #region 标记高亮强度 —— float? MarkHighlightIntensity
+        /// <summary>
+        /// 标记高亮强度
+        /// </summary>
+        public float? MarkHighlightIntensity { get; private set; }
+        #endregion
+
         #region 体积渲染对象 —— VolumeRenderable Renderable
         /// <summary>
         /// 体积渲染对象
@@ -181,6 +213,27 @@ namespace MedicalSharp.Engine.Renderers
             this.StepSize = stepSize;
             this.MaxStepsCount = maxStepsCount;
             this.OpacityThreshold = opacityThreshold;
+        }
+        #endregion
+
+        #region 设置标记策略 —— void SetMarkStrategy(MarkMode markMode, Vector4? markHighlightColor...
+        /// <summary>
+        /// 设置标记策略
+        /// </summary>
+        /// <param name="markMode">标记模式</param>
+        /// <param name="markHighlightColor">标记高亮颜色</param>
+        /// <param name="markHighlightIntensity">标记高亮强度</param>
+        public void SetMarkStrategy(MarkMode markMode, Vector4? markHighlightColor, float? markHighlightIntensity)
+        {
+            if (markMode == MarkMode.Highlight)
+            {
+                markHighlightColor ??= ColorFactory.Cyan();
+                markHighlightIntensity ??= 0.7f;
+            }
+
+            this.MarkMode = markMode;
+            this.MarkHighlightColor = markHighlightColor;
+            this.MarkHighlightIntensity = markHighlightIntensity;
         }
         #endregion
 
@@ -255,12 +308,22 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
             this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
+            //设置标记模式
+            this.Program.SetUniformInt("u_MarkMode", (int)this.MarkMode);
+            if (this.MarkMode == MarkMode.Highlight)
+            {
+                this.Program.SetUniformVector4("u_MarkHighlightColor", this.MarkHighlightColor!.Value);
+                this.Program.SetUniformFloat("u_MarkHighlightIntensity", this.MarkHighlightIntensity!.Value);
+            }
+
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);
-            this.TransferFunction.Texture.Bind(1);
+            this.Renderable.MarkTexture.Bind(1);
+            this.TransferFunction.Texture.Bind(2);
 
             this.Program.SetUniformInt("u_VolumeTexture", 0);
-            this.Program.SetUniformInt("u_TransferFunction", 1);
+            this.Program.SetUniformInt("u_MarkTexture", 1);
+            this.Program.SetUniformInt("u_TransferFunction", 2);
 
             //设置渲染参数
             this.Program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
@@ -276,6 +339,7 @@ namespace MedicalSharp.Engine.Renderers
 
             //解绑纹理
             this.Renderable.VolumeTexture.Unbind();
+            this.Renderable.MarkTexture.Unbind();
             this.TransferFunction.Texture.Unbind();
 
             //取消使用
@@ -457,17 +521,28 @@ namespace MedicalSharp.Engine.Renderers
             this._pickProgram.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
             this._pickProgram.SetUniformFloat("u_OpacityThreshold", this.OpacityThreshold);
 
+            //设置标记模式（与渲染一致）
+            this._pickProgram.SetUniformInt("u_MarkMode", (int)this.MarkMode);
+            if (this.MarkMode == MarkMode.Highlight)
+            {
+                this._pickProgram.SetUniformVector4("u_MarkHighlightColor", this.MarkHighlightColor!.Value);
+                this._pickProgram.SetUniformFloat("u_MarkHighlightIntensity", this.MarkHighlightIntensity!.Value);
+            }
+
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);
-            this.TransferFunction.Texture.Bind(1);
+            this.Renderable.MarkTexture.Bind(1);
+            this.TransferFunction.Texture.Bind(2);
             this._pickProgram.SetUniformInt("u_VolumeTexture", 0);
-            this._pickProgram.SetUniformInt("u_TransferFunction", 1);
+            this._pickProgram.SetUniformInt("u_MarkTexture", 1);
+            this._pickProgram.SetUniformInt("u_TransferFunction", 2);
 
             //绘制
             this._unitCube.Draw(PrimitiveType.Triangles);
 
             //解绑纹理
             this.Renderable.VolumeTexture.Unbind();
+            this.Renderable.MarkTexture.Unbind();
             this.TransferFunction.Texture.Unbind();
 
             //取消使用

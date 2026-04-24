@@ -68,6 +68,18 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 获取标记纹理Id —— static string GetMarkTextureId(string volumeDataId)
+        /// <summary>
+        /// 获取标记纹理Id
+        /// </summary>
+        /// <param name="volumeDataId">体积数据Id</param>
+        /// <returns>标记纹理Id</returns>
+        public static string GetMarkTextureId(string volumeDataId)
+        {
+            return $"{volumeDataId}_mark";
+        }
+        #endregion
+
         #endregion
     }
 }

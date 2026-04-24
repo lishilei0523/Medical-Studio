@@ -356,22 +356,34 @@ namespace MedicalSharp.Controls.Viewports
 
             VolumeData volumeData = eventArgs.NewValue.Value;
             Texture3D volumeTexture;
+            Texture3D markTexture;
+            string markTextureId = TextureManager.GetMarkTextureId(volumeData.Id);
             if (!TextureManager.Texture3Ds.ContainsKey(volumeData.Id))
             {
                 viewport.GlContext.MakeCurrent();
+
+                //创建体积纹理
                 volumeTexture = Texture3D.CreateFromVolume(
                    volumeData.Metadata.VolumeSize.X,
                    volumeData.Metadata.VolumeSize.Y,
                    volumeData.Metadata.VolumeSize.Z,
                    volumeData.OriginalData);
                 TextureManager.AddTexture3D(volumeData.Id, volumeTexture);
+
+                //创建标记纹理
+                markTexture = Texture3D.CreateMark(
+                    volumeData.Metadata.VolumeSize.X,
+                    volumeData.Metadata.VolumeSize.Y,
+                    volumeData.Metadata.VolumeSize.Z);
+                TextureManager.AddTexture3D(markTextureId, markTexture);
             }
             else
             {
                 volumeTexture = TextureManager.Texture3Ds[volumeData.Id];
+                markTexture = TextureManager.Texture3Ds[markTextureId];
             }
 
-            viewport._volumeRenderable = new VolumeRenderable(volumeTexture, volumeData.Metadata);
+            viewport._volumeRenderable = new VolumeRenderable(volumeTexture, markTexture, volumeData.Metadata);
             viewport.WindowWidth = volumeData.Metadata.WindowWidth;
             viewport.WindowCenter = volumeData.Metadata.WindowCenter;
             viewport.RequestNextFrameRendering();
