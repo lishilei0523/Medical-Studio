@@ -165,7 +165,7 @@ void main()
         //应用窗宽窗位
         float density = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
         
-        // 窗外值，跳过
+        //窗外值，跳过
         if (density < 0.0)
         {
             currentPos += step;

@@ -160,10 +160,9 @@ void main()
             continue;
         }
 
-        //差异化模式下，对标记区域应用特殊颜色
+        //高亮模式下，标记区域使用高亮颜色
         if (u_MarkMode == 3 && markValue != 0u)
         {
-            //混合高亮颜色
             float highlightFactor = u_MarkHighlightIntensity;
             sampleColor.rgb = mix(sampleColor.rgb, u_MarkHighlightColor.rgb, highlightFactor);
         }
