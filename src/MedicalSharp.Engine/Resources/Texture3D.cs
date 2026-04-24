@@ -118,14 +118,14 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 创建标记场纹理 —— static Texture3D CreateMark(int width, int height, int depth)
+        #region 创建标记场纹理 —— static Texture3D CreateMarkTexture(int width, int height, int depth)
         /// <summary>
         /// 创建标记场纹理
         /// </summary>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
         /// <param name="depth">深度</param>
-        public static Texture3D CreateMark(int width, int height, int depth)
+        public static Texture3D CreateMarkTexture(int width, int height, int depth)
         {
             #region # 验证
 

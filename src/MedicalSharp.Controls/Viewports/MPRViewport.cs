@@ -371,7 +371,7 @@ namespace MedicalSharp.Controls.Viewports
                 TextureManager.AddTexture3D(volumeData.Id, volumeTexture);
 
                 //创建标记纹理
-                markTexture = Texture3D.CreateMark(
+                markTexture = Texture3D.CreateMarkTexture(
                     volumeData.Metadata.VolumeSize.X,
                     volumeData.Metadata.VolumeSize.Y,
                     volumeData.Metadata.VolumeSize.Z);
