@@ -187,6 +187,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 {
                     DicomManager.RemoveVolumeData(this.VolumeData.Id);
                     TextureManager.RemoveTexture3D(this.VolumeData.Id);
+                    TextureManager.RemoveTexture3D(TextureManager.GetMarkTextureId(this.VolumeData.Id));
                 }
 
                 this.VolumeData = volumeData;
@@ -214,6 +215,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             DicomManager.RemoveVolumeData(this.VolumeData.Id);
             TextureManager.RemoveTexture3D(this.VolumeData.Id);
+            TextureManager.RemoveTexture3D(TextureManager.GetMarkTextureId(this.VolumeData.Id));
             this.LayoutViewModel.ClearVolumeData();
         }
         #endregion
