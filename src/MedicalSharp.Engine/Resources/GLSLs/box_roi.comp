@@ -4,15 +4,10 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 //标记纹理（可读写，R8UI格式）
 layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
 
-//立方体参数（纹理坐标空间，0-1范围）
-uniform vec3 u_BoxWorldMin;           //立方体世界最小点
-uniform vec3 u_BoxWorldMax;           //立方体世界最大点
+//立方体参数
 uniform vec3 u_BoxLocalMin;           //立方体局部最小点
 uniform vec3 u_BoxLocalMax;           //立方体局部最大点
-
-//变换矩阵
-uniform mat4 u_Transform;          //局部坐标 -> 世界坐标
-uniform mat4 u_InverseTransform;   //世界坐标 -> 局部坐标
+uniform mat4 u_WorldToLocal;          //世界坐标 -> 局部坐标
 
 //体积纹理尺寸
 uniform ivec3 u_TextureSize;
@@ -38,7 +33,7 @@ void main()
     bool inside = false;
     
     //应用逆变换到局部坐标
-    vec4 localPos = u_InverseTransform * vec4(texCoord, 1.0);
+    vec4 localPos = u_WorldToLocal * vec4(texCoord, 1.0);
     localPos /= localPos.w;
         
     //使用局部坐标范围判断
