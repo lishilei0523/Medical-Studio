@@ -37,7 +37,15 @@
 					</sd:ToggleRadioButton>
 				</WrapPanel>
 				<WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
-					<TextBlock Text="VR" />
+					<DropDownButton Content="VR" Classes="Transparent-Panel">
+                        <DropDownButton.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Header="Option 1" />
+                                <MenuItem Header="Option 2" />
+                                <MenuItem Header="Option 3" />
+                            </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
 				</WrapPanel>
 			</Grid>
 		</sd:GroupBox.Header>
