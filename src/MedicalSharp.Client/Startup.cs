@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.HomeContext;
+using MedicalSharp.Engine.Managers;
 using MedicalSharp.Insight;
 using Microsoft.Extensions.DependencyInjection;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
@@ -71,6 +72,7 @@ namespace MedicalSharp.Client
         /// </summary>
         protected override void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs eventArgs)
         {
+            ComputerManager.Cleanup();
             ResolveMediator.Dispose();
         }
         #endregion

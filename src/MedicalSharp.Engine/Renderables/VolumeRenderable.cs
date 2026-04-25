@@ -1,4 +1,5 @@
-﻿using MedicalSharp.Engine.Resources;
+﻿using MedicalSharp.Engine.Managers;
+using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -76,8 +77,6 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 方法
 
-        //Public
-
         #region 应用立方体ROI —— void ApplyBoxROI(Vector3 boxLocalMin, Vector3 boxLocalMax...
         /// <summary>
         /// 应用立方体ROI
@@ -100,7 +99,7 @@ namespace MedicalSharp.Engine.Renderables
             Matrix4 worldToLocal = localToWorld.Inverted();
 
             //初始化计算着色器
-            ShaderProgram boxComputer = CreateBoxComputer();
+            ShaderProgram boxComputer = ComputerManager.BoxComputer;
 
             //开启Shader程序
             boxComputer.Use();
@@ -121,14 +120,10 @@ namespace MedicalSharp.Engine.Renderables
             boxComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            this.DispatchCompute();
-
-            //等待GPU完成
-            GL.Finish();
+            ComputerManager.DispatchCompute(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
 
             //取消使用并释放
             boxComputer.Unuse();
-            boxComputer.Dispose();
         }
         #endregion
 
@@ -144,9 +139,6 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-
-        //Protected & Private
-
         #region 计算包围盒 —— override BoundingBox CalculateBoundingBox()
         /// <summary>
         /// 计算包围盒
@@ -159,42 +151,6 @@ namespace MedicalSharp.Engine.Renderables
             BoundingBox boundingBox = BoundingBox.FromPoints([.. localPositions]);
 
             return boundingBox;
-        }
-        #endregion
-
-        #region 调度计算着色器 —— void DispatchCompute()
-        /// <summary>
-        /// 调度计算着色器
-        /// </summary>
-        private void DispatchCompute()
-        {
-            //计算工作组数量（每组8×8×8线程）
-            int groupsX = (int)MathF.Ceiling(this.MarkTexture.Width / 8.0f);
-            int groupsY = (int)MathF.Ceiling(this.MarkTexture.Height / 8.0f);
-            int groupsZ = (int)MathF.Ceiling(this.MarkTexture.Depth / 8.0f);
-
-            //调度执行计算着色器
-            GL.DispatchCompute(groupsX, groupsY, groupsZ);
-
-            //内存屏障：确保计算完成后渲染能读到新数据
-            GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit);
-        }
-        #endregion
-
-
-        //Static
-
-        #region 创建立方体计算着色器 —— static ShaderProgram CreateBoxComputer()
-        /// <summary>
-        /// 创建立方体计算着色器
-        /// </summary>
-        private static ShaderProgram CreateBoxComputer()
-        {
-            ShaderProgram program = new ShaderProgram();
-            program.ReadComputeShaderFromFile("Resources/GLSLs/box_roi.comp");
-            program.BuildCompute();
-
-            return program;
         }
         #endregion
 

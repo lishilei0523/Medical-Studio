@@ -5,6 +5,7 @@ using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Engine.Managers;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Graphics.OpenGL4;
@@ -210,6 +211,9 @@ namespace MedicalSharp.Controls.Base
             GL.LoadBindings(bindingsContext);
 
             this._glInitialized = true;
+
+            //初始化计算着色器
+            ComputerManager.Initialize();
 
             this.OnOpenTKInit();
         }
