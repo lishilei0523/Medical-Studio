@@ -262,6 +262,23 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
+        #region 查找最近位置 —— override Vector3? FindNearestPosition(Vector2 position)
+        /// <summary>
+        /// 查找最近位置
+        /// </summary>
+        /// <param name="position">2D位置</param>
+        /// <returns>3D位置</returns>
+        public override Vector3? FindNearestPosition(Vector2 position)
+        {
+            if (this.FindNearestVoxel(position, out Vector3 textureCoord, out _, out _, out _))
+            {
+                return textureCoord - new Vector3(0.5f);
+            }
+
+            return null;
+        }
+        #endregion
+
         #region OpenTK初始化事件 —— override void OnOpenTKInit()
         /// <summary>
         /// OpenTK初始化事件

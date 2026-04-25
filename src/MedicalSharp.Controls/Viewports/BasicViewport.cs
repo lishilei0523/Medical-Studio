@@ -165,13 +165,13 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 查找最近位置 —— Vector3? FindNearestPosition(Vector2 position)
+        #region 查找最近位置 —— virtual Vector3? FindNearestPosition(Vector2 position)
         /// <summary>
         /// 查找最近位置
         /// </summary>
         /// <param name="position">2D位置</param>
         /// <returns>3D位置</returns>
-        public Vector3? FindNearestPosition(Vector2 position)
+        public virtual Vector3? FindNearestPosition(Vector2 position)
         {
             if (this.FindNearest(position, out Vector3 point, out _, out _, out _))
             {
