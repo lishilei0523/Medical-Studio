@@ -13,11 +13,14 @@
 		<sd:GroupBox.Header>
 			<Grid>
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition />
-					<ColumnDefinition />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<sd:ToggleRadioButton cm:Message.Attach="Translate()" Classes="Transparent-Panel">
+                    <sd:ToggleRadioButton cm:Message.Attach="Pick()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Pick}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="Translate()" Classes="Transparent-Panel">
                         <PathIcon Data="{StaticResource Icon-Translate}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Rotate()" Classes="Transparent-Panel">
@@ -29,6 +32,30 @@
 					<sd:ToggleRadioButton cm:Message.Attach="EditVertex()" Classes="Transparent-Panel">
                         <PathIcon Data="{StaticResource Icon-EditVertex}" />
 					</sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawPoint()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Point}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawLineSegment()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-LineSegment}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawRectangle()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Rectangle}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawCircle()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Circle}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawEllipse()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Ellipse}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawPolyline()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Polyline}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawCurve()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Curve}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawPolygon()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Polygon}" />
+                    </sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawBox()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-Cube}" />
 					</sd:ToggleRadioButton>

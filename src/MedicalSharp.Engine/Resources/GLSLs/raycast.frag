@@ -116,9 +116,7 @@ void main()
             continue;
         }
 
-
-
-        //采样标记场
+        //采样标记纹理
         uint markValue = texture(u_MarkTexture, texCoord).r;
         
         //根据ROI模式决定是否渲染
