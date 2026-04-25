@@ -75,6 +75,24 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 调度计算着色器 —— static void DispatchCompute(int width, int height)
+        /// <summary>
+        /// 调度计算着色器
+        /// </summary>
+        public static void DispatchCompute(int width, int height)
+        {
+            //计算工作组数量（每组16×16线程）
+            int groupsX = (int)MathF.Ceiling(width / 16.0f);
+            int groupsY = (int)MathF.Ceiling(height / 16.0f);
+
+            //调度执行计算着色器
+            GL.DispatchCompute(groupsX, groupsY, 1);
+
+            //内存屏障：确保计算完成后渲染能读到新数据
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit);
+        }
+        #endregion
+
         #region 调度计算着色器 —— static void DispatchCompute(int width, int height, int depth)
         /// <summary>
         /// 调度计算着色器
