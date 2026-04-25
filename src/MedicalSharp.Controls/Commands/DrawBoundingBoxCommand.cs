@@ -1,4 +1,5 @@
 ﻿using Avalonia.Input;
+using Avalonia.Media;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
@@ -66,6 +67,8 @@ namespace MedicalSharp.Controls.Commands
                     this._startPosition = mousePos3D.Value;
                     this._boundingBox = new BoundingBoxVisual3D
                     {
+                        Stroke = new Vector4(0.1f, 0.3f, 0.6f, 1.0f).ToColor(),
+                        Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor(),
                         Center = mousePos3D.Value.ToVector3()
                     };
                     this._boxDrawnEvent?.Invoke(this._boundingBox);
