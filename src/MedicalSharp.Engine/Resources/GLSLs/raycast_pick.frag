@@ -196,15 +196,12 @@ void main()
         //达到阈值意味着用户能在屏幕上看到当前体素
         if (accumulatedColor.a > u_OpacityThreshold)
         {
-            //采样标记场
+            //采样标记纹理，根据标记模式决定是否返回当前体素
             uint markValue = texture(u_MarkTexture, texCoord).r;
-            
-            //根据标记模式决定是否返回当前体素
             if (shouldPick(markValue))
             {
-                //返回纹理坐标和标记值（编码在颜色中）
-                //R: 纹理坐标X, G: 纹理坐标Y, B: 纹理坐标Z, A: 标记值/255
-                FragColor = vec4(texCoord, float(markValue) / 255.0);
+                //找到第一个用户能看到的纹理坐标
+                FragColor = vec4(texCoord, 1);
             }
             else
             {
