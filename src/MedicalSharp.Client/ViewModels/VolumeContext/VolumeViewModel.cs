@@ -3,8 +3,11 @@ using Avalonia.Collections;
 using Avalonia.Input;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
+using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Viewports;
+using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
@@ -38,41 +41,37 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public VolumeViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
+            this.Shapes = [];
 
-            //Vector3 targetPosition = new Vector3(0.0f);
-            //const float distance = 7.0f;
-            //const float yaw = 45.0f;
-            //const float pitch = -45.0f;
-            //this.OrbitCamera = new OrbitPerspectiveCamera(targetPosition, distance, yaw, pitch);
-
-            //X-Up
-            //Vector3 cameraPosition = new Vector3(0, 4, 0);
-            //Vector3 targetPosition = new Vector3(0.0f);
-            //Vector3 upDirection = new Vector3(1, 0, 0);
-
-            //Y-Up
-            //Vector3 cameraPosition = new Vector3(0, 0, 4);
-            //Vector3 targetPosition = new Vector3(0.0f);
-            //Vector3 upDirection = new Vector3(0, 1, 0);
-
-            //Z-Up
+            //初始化相机
             Vector3 cameraPosition = new Vector3(0, 2, 0);
             Vector3 targetPosition = new Vector3(0.0f);
             Vector3 upDirection = new Vector3(0, 0, 1);
-            this.OrbitCamera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
+            this.Camera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
             this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.GrayControlPoints);
+
+            //初始化输入管理器
+            this.InputManager = new OrbitInputManager(this.Camera);
         }
 
         #endregion
 
         #region # 属性
 
-        #region 轨道相机 —— OrbitCamera OrbitCamera
+        #region 轨道相机 —— OrbitCamera Camera
         /// <summary>
         /// 轨道相机
         /// </summary>
         [DependencyProperty]
-        public OrbitCamera OrbitCamera { get; set; }
+        public OrbitCamera Camera { get; set; }
+        #endregion
+
+        #region 输入管理器 —— OrbitInputManager InputManager
+        /// <summary>
+        /// 输入管理器
+        /// </summary>
+        [DependencyProperty]
+        public OrbitInputManager InputManager { get; set; }
         #endregion
 
         #region 体积数据 —— VolumeData VolumeData
@@ -89,6 +88,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
+        #endregion
+
+        #region 形状列表 —— AvaloniaList<ShapeVisual3D> Shapes
+        /// <summary>
+        /// 形状列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<ShapeVisual3D> Shapes { get; set; }
         #endregion
 
         #endregion
@@ -110,17 +117,69 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
         //Actions
 
-        #region 查看体积渲染视图 —— async Task LookVolumeView()
+        #region 平移 —— void Translate()
         /// <summary>
-        /// 查看体积渲染视图
+        /// 平移
         /// </summary>
-        public async Task LookVolumeView()
+        public void Translate()
         {
-            //ContainerViewModel viewModel = ResolveMediator.Resolve<ContainerViewModel>();
-            //viewModel.Title = "VR";
-            //viewModel.Content = this;
+            TranslateVisual3DCommand command = new TranslateVisual3DCommand();
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
 
-            //await this._windowManager.ShowWindowAsync(viewModel);
+        #region 旋转 —— void Rotate()
+        /// <summary>
+        /// 旋转
+        /// </summary>
+        public void Rotate()
+        {
+            RotateVisual3DCommand command = new RotateVisual3DCommand();
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 调整尺寸 —— void Resize()
+        /// <summary>
+        /// 调整尺寸
+        /// </summary>
+        public void Resize()
+        {
+            ResizeVisual3DCommand command = new ResizeVisual3DCommand();
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 编辑顶点 —— void EditVertex()
+        /// <summary>
+        /// 编辑顶点
+        /// </summary>
+        public void EditVertex()
+        {
+            EditVertexCommand command = new EditVertexCommand();
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制立方体 —— void DrawBox()
+        /// <summary>
+        /// 绘制立方体
+        /// </summary>
+        public void DrawBox()
+        {
+            DrawBoundingBoxCommand command = new DrawBoundingBoxCommand(shape => this.Shapes.Add(shape));
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制球体 —— void DrawSphere()
+        /// <summary>
+        /// 绘制球体
+        /// </summary>
+        public void DrawSphere()
+        {
+            DrawBoundingSphereCommand command = new DrawBoundingSphereCommand(shape => this.Shapes.Add(shape));
+            this.InputManager.SwitchCommand(command);
         }
         #endregion
 

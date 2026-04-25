@@ -5,6 +5,7 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:cm="http://caliburnmicro.com"
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			 xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
 			 mc:Ignorable="d">
 
 	<sd:GroupBox>
@@ -16,11 +17,23 @@
 					<ColumnDefinition />
 				</Grid.ColumnDefinitions>
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
+					<sd:ToggleRadioButton cm:Message.Attach="Translate()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Translate}" />
+					</sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="Rotate()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Rotate}" />
+					</sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="Resize()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Resize}" />
+					</sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="EditVertex()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-EditVertex}" />
+					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawBox()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-Cube}" />
+						<PathIcon Data="{StaticResource Icon-Cube}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawSphere()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-Sphere}" />
+						<PathIcon Data="{StaticResource Icon-Sphere}" />
 					</sd:ToggleRadioButton>
 				</WrapPanel>
 				<WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
@@ -29,14 +42,11 @@
 			</Grid>
 		</sd:GroupBox.Header>
 		<sd:VolumeViewport Background="Black"
-						   Camera="{Binding OrbitCamera}"
+						   Camera="{Binding Camera}"
+						   InputManager="{Binding InputManager}"
 						   VolumeData="{Binding VolumeData}"
-						   TFControlPoints="{Binding TFControlPoints}"
-						   cm:Message.Attach="[Event PointerPressed] = [Action OnVolumeViewportPointerPressed($source, $eventArgs)];">
-			<!--<sd:BoundingBoxVisual3D Stroke="Yellow" Fill="#10FFFF00" />-->
-			<!--<sd:RectangleVisual3D Stroke="#0FFF0000" Fill="#0FFF0000" Normal="0,0,1" />-->
-			<!--<sd:RectangleVisual3D Stroke="#0F00FF00" Fill="#0F00FF00" Normal="0,1,0" />-->
-			<!--<sd:RectangleVisual3D Stroke="#0F0000FF" Fill="#0F0000FF" Normal="1,0,0" />-->
+						   TFControlPoints="{Binding TFControlPoints}">
+			<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
 		</sd:VolumeViewport>
 	</sd:GroupBox>
 </UserControl>
