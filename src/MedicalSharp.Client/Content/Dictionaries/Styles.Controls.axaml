@@ -82,10 +82,10 @@
 	</Style>
 	<!--ToggleButton透明面板样式-->
 	<Style Selector="ToggleButton.Transparent-Panel">
-		<Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="Transparent" />
+		<Setter Property="Background" Value="#FF202020" />
+        <Setter Property="BorderBrush" Value="#FF202020" />
         <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="Margin" Value="0,0,0,0" />
+        <Setter Property="Margin" Value="0,0,2,0" />
         <Setter Property="Padding" Value="6" />
         <Setter Property="Width" Value="26" />
 		<Setter Property="Height" Value="26" />
