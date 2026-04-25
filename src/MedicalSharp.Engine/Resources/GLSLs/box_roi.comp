@@ -1,0 +1,59 @@
+#version 430 core
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+//标记纹理（可读写，R8UI格式）
+layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
+
+//立方体参数（纹理坐标空间，0-1范围）
+uniform vec3 u_BoxWorldMin;           //立方体世界最小点
+uniform vec3 u_BoxWorldMax;           //立方体世界最大点
+uniform vec3 u_BoxLocalMin;           //立方体局部最小点
+uniform vec3 u_BoxLocalMax;           //立方体局部最大点
+
+//变换矩阵
+uniform mat4 u_Transform;          //局部坐标 -> 世界坐标
+uniform mat4 u_InverseTransform;   //世界坐标 -> 局部坐标
+
+//体积纹理尺寸
+uniform ivec3 u_TextureSize;
+
+//标记值（1-255，0保留给未标记）
+uniform uint u_MarkValue;
+
+void main()
+{
+    //获取当前线程对应的体素坐标
+    ivec3 voxelCoord = ivec3(gl_GlobalInvocationID);
+    
+    //边界检查
+    if (voxelCoord.x >= u_TextureSize.x || voxelCoord.y >= u_TextureSize.y || voxelCoord.z >= u_TextureSize.z)
+    {
+        return;
+    }
+    
+    //体素坐标 -> 纹理坐标（0-1范围）
+    vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_TextureSize);
+    
+    //判断是否在立方体内
+    bool inside = false;
+    
+    //应用逆变换到局部坐标
+    vec4 localPos = u_InverseTransform * vec4(texCoord, 1.0);
+    localPos /= localPos.w;
+        
+    //使用局部坐标范围判断
+    inside = (localPos.x >= u_BoxLocalMin.x && localPos.x <= u_BoxLocalMax.x &&
+              localPos.y >= u_BoxLocalMin.y && localPos.y <= u_BoxLocalMax.y &&
+              localPos.z >= u_BoxLocalMin.z && localPos.z <= u_BoxLocalMax.z);
+    if (inside)
+    {
+        uint oldMarkValue = imageLoad(u_MarkTexture, voxelCoord).r;
+        uint newMarkValue = u_MarkValue;
+
+        //只有值发生变化时才写入
+        if (oldMarkValue != newMarkValue)
+        {
+            imageStore(u_MarkTexture, voxelCoord, uvec4(newMarkValue, 0, 0, 0));
+        }
+    }
+}
