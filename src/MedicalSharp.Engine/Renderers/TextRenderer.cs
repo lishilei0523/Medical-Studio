@@ -174,7 +174,7 @@ namespace MedicalSharp.Engine.Renderers
             this.Program = new ShaderProgram();
             this.Program.ReadVertexShaderFromFile("Resources/GLSLs/text.vert");
             this.Program.ReadFragmentShaderFromFile("Resources/GLSLs/text.frag");
-            this.Program.Build();
+            this.Program.BuildDraw();
         }
         #endregion
 

@@ -190,7 +190,7 @@ namespace MedicalSharp.Engine.Renderers
             base.Program = new ShaderProgram();
             base.Program.ReadVertexShaderFromFile("Resources/GLSLs/shape.vert");
             base.Program.ReadFragmentShaderFromFile("Resources/GLSLs/shape.frag");
-            base.Program.Build();
+            base.Program.BuildDraw();
         }
         #endregion 
 

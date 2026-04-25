@@ -449,12 +449,12 @@ namespace MedicalSharp.Engine.Renderers
             base.Program = new ShaderProgram();
             base.Program.ReadVertexShaderFromFile("Resources/GLSLs/raycast.vert");
             base.Program.ReadFragmentShaderFromFile("Resources/GLSLs/raycast.frag");
-            base.Program.Build();
+            base.Program.BuildDraw();
 
             this._pickProgram = new ShaderProgram();
             this._pickProgram.ReadVertexShaderFromFile("Resources/GLSLs/raycast.vert");
             this._pickProgram.ReadFragmentShaderFromFile("Resources/GLSLs/raycast_pick.frag");
-            this._pickProgram.Build();
+            this._pickProgram.BuildDraw();
         }
         #endregion
 

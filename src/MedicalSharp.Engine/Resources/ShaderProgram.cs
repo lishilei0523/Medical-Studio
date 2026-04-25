@@ -61,6 +61,13 @@ namespace MedicalSharp.Engine.Resources
         public string FragmentShaderSource { get; private set; }
         #endregion
 
+        #region 计算Shader源文本 —— string ComputeShaderSource
+        /// <summary>
+        /// 计算Shader源文本
+        /// </summary>
+        public string ComputeShaderSource { get; private set; }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -89,6 +96,17 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 设置计算Shader源文本 —— void SetComputeShaderSource(string sourceText)
+        /// <summary>
+        /// 设置计算Shader源文本
+        /// </summary>
+        /// <param name="sourceText">Shader源文本</param>
+        public void SetComputeShaderSource(string sourceText)
+        {
+            this.ComputeShaderSource = sourceText.RemoveComments();
+        }
+        #endregion
+
         #region 读取顶点Shader文件 —— void ReadVertexShaderFromFile(string filePath)
         /// <summary>
         /// 读取顶点Shader文件
@@ -111,11 +129,22 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 构建程序 —— void Build()
+        #region 读取计算Shader文件 —— void ReadComputeShaderFromFile(string filePath)
         /// <summary>
-        /// 构建程序
+        /// 读取计算Shader文件
         /// </summary>
-        public void Build()
+        /// <param name="filePath">Shader文件路径</param>
+        public void ReadComputeShaderFromFile(string filePath)
+        {
+            this.ComputeShaderSource = File.ReadAllText(filePath).RemoveComments();
+        }
+        #endregion
+
+        #region 构建绘制程序 —— void BuildDraw()
+        /// <summary>
+        /// 构建绘制程序
+        /// </summary>
+        public void BuildDraw()
         {
             int vertexShaderId = ShaderManager.CompileShader(this.VertexShaderSource, ShaderType.VertexShader);
             int fragmentShaderId = ShaderManager.CompileShader(this.FragmentShaderSource, ShaderType.FragmentShader);
@@ -135,6 +164,30 @@ namespace MedicalSharp.Engine.Resources
             //编译完成后清理Shader
             GL.DeleteShader(vertexShaderId);
             GL.DeleteShader(fragmentShaderId);
+        }
+        #endregion
+
+        #region 构建计算程序 —— void BuildCompute()
+        /// <summary>
+        /// 构建计算程序
+        /// </summary>
+        public void BuildCompute()
+        {
+            int computeShaderId = ShaderManager.CompileShader(this.ComputeShaderSource, ShaderType.ComputeShader);
+
+            //链接Shader程序 
+            GL.AttachShader(this.Id, computeShaderId);
+            GL.LinkProgram(this.Id);
+
+            GL.GetProgram(this.Id, GetProgramParameterName.LinkStatus, out int success);
+            if (success <= 0)
+            {
+                GL.GetProgramInfoLog(this.Id, out string logInfo);
+                throw new RuntimeBinderInternalCompilerException($"计算着色器链接失败: {logInfo}");
+            }
+
+            //编译完成后清理Shader
+            GL.DeleteShader(computeShaderId);
         }
         #endregion
 
@@ -178,6 +231,19 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="key">键</param>
         /// <param name="value">值</param>
         public void SetUniformInt(string key, int value)
+        {
+            int uniformId = GL.GetUniformLocation(this.Id, key);
+            GL.Uniform1(uniformId, value);
+        }
+        #endregion
+
+        #region 设置Uniform数值 —— void SetUniformUInt(string key, uint value)
+        /// <summary>
+        /// 设置Uniform数值
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
+        public void SetUniformUInt(string key, uint value)
         {
             int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform1(uniformId, value);
@@ -230,6 +296,19 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="key">键</param>
         /// <param name="value">值</param>
         public void SetUniformVector3(string key, in Vector3 value)
+        {
+            int uniformId = GL.GetUniformLocation(this.Id, key);
+            GL.Uniform3(uniformId, value);
+        }
+        #endregion
+
+        #region 设置Uniform三维向量 —— void SetUniformVector3i(string key, in Vector3i value)
+        /// <summary>
+        /// 设置Uniform三维向量
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
+        public void SetUniformVector3i(string key, in Vector3i value)
         {
             int uniformId = GL.GetUniformLocation(this.Id, key);
             GL.Uniform3(uniformId, value);
