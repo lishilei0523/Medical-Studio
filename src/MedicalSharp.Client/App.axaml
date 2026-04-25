@@ -21,6 +21,7 @@
 				<ResourceInclude Source="/Content/Dictionaries/Resources.Converters.axaml" />
 				<ResourceInclude Source="/Content/Dictionaries/Resources.Fluent.axaml" />
 				<ResourceInclude Source="/Content/Dictionaries/Resources.Fonts.axaml" />
+				<ResourceInclude Source="/Content/Dictionaries/Resources.Icons.axaml" />
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Application.Resources>

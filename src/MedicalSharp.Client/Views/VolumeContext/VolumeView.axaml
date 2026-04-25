@@ -5,20 +5,27 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:cm="http://caliburnmicro.com"
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
-			 xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
 			 mc:Ignorable="d">
 
 	<sd:GroupBox>
 		<!--Header-->
 		<sd:GroupBox.Header>
 			<Grid>
-				<TextBlock Text="VR" />
-				<Button cm:Message.Attach="LookVolumeView()" Classes="Transparent-Panel">
-					<WrapPanel>
-						<iconPacks:PackIconMaterialDesign Kind="ZoomOutMap" />
-						<TextBlock Text="查看" Margin="2,0,0,0" />
-					</WrapPanel>
-				</Button>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawBox()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Cube}" />
+					</sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="DrawSphere()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Sphere}" />
+					</sd:ToggleRadioButton>
+				</WrapPanel>
+				<WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+					<TextBlock Text="VR" />
+				</WrapPanel>
 			</Grid>
 		</sd:GroupBox.Header>
 		<sd:VolumeViewport Background="Black"
