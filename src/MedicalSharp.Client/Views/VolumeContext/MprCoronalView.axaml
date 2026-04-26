@@ -15,6 +15,8 @@
                         cm:Message.Attach="[Event PointerPressed] = [Action OnCoronalViewportPointerPressed($source, $eventArgs)];">
             <sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" 
                              RenderMode="Fixed" Normal="0,1,0" />
+            
+            <sd:RectangleVisual3D Width="0.2" Height="0.1" Center="0,0,0" Normal="0,1,0" />
         </sd:MPRViewport>
     </sd:GroupBox>
 </UserControl>
