@@ -276,6 +276,58 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 设置Uniform数值数组 —— void SetUniformIntArray(string key, int[] values)
+        /// <summary>
+        /// 设置Uniform数值数组
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="values">值数组</param>
+        public void SetUniformIntArray(string key, int[] values)
+        {
+            int uniformId = GL.GetUniformLocation(this.Id, key);
+            GL.Uniform1(uniformId, values.Length, values);
+        }
+        #endregion
+
+        #region 设置Uniform数值数组 —— void SetUniformUIntArray(string key, uint[] values)
+        /// <summary>
+        /// 设置Uniform数值数组
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="values">值数组</param>
+        public void SetUniformUIntArray(string key, uint[] values)
+        {
+            int uniformId = GL.GetUniformLocation(this.Id, key);
+            GL.Uniform1(uniformId, values.Length, values);
+        }
+        #endregion
+
+        #region 设置Uniform数值数组 —— void SetUniformFloatArray(string key, float[] values)
+        /// <summary>
+        /// 设置Uniform数值数组
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="values">值数组</param>
+        public void SetUniformFloatArray(string key, float[] values)
+        {
+            int uniformId = GL.GetUniformLocation(this.Id, key);
+            GL.Uniform1(uniformId, values.Length, values);
+        }
+        #endregion
+
+        #region 设置Uniform数值数组 —— void SetUniformDoubleArray(string key, double[] values)
+        /// <summary>
+        /// 设置Uniform数值数组
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="values">值数组</param>
+        public void SetUniformDoubleArray(string key, double[] values)
+        {
+            int uniformId = GL.GetUniformLocation(this.Id, key);
+            GL.Uniform1(uniformId, values.Length, values);
+        }
+        #endregion
+
         #region 设置Uniform二维向量 —— void SetUniformVector2(string key, in Vector2 value)
         /// <summary>
         /// 设置Uniform二维向量

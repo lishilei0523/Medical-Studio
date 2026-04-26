@@ -39,8 +39,9 @@ uniform float u_StepSize;
 uniform int u_MaxStepsCount;
 uniform float u_OpacityThreshold;
 
-//标记模式
-uniform int u_MarkMode;
+//标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Highlight）
+uniform int u_MarkModes[256];
+uniform float u_HighlightIntensity;
 
 //常量
 const float MAX_16BIT_SIGNED = 32767.0;
@@ -100,23 +101,11 @@ float getMedicalValue(vec3 texCoord)
 //根据标记模式判断是否应该被拾取
 bool shouldPick(uint markValue)
 {
-    switch (u_MarkMode)
-    {
-        case 0: //Normal模式：拾取任何可见体素
-            return true;
-            
-        case 1: //Keep模式：只拾取标记区域内的体素
-            return (markValue != 0u);
-            
-        case 2: //Cut模式：只拾取标记区域外的体素
-            return (markValue == 0u);
-            
-        case 3: //Highlight模式：拾取任何可见体素
-            return true;
-            
-        default:
-            return true;
-    }
+    int mode = u_MarkModes[markValue];
+
+    // Visible(0)和Highlight(2)都允许拾取
+    // Collapsed(1)不允许拾取
+    return (mode != 1);
 }
 
 void main()

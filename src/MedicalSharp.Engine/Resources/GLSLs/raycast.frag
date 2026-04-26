@@ -20,9 +20,9 @@ uniform float u_DensityScale;           //密度缩放
 uniform int u_MaxStepsCount;            //最大步数
 uniform float u_OpacityThreshold;       //透明度阈值
 
-uniform int u_MarkMode;                 //标记模式
-uniform vec4 u_MarkHighlightColor;      //标记高亮颜色
-uniform float u_MarkHighlightIntensity; //标记高亮强度
+//标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Highlight）
+uniform int u_MarkModes[256];
+uniform float u_HighlightIntensity;
 
 
 //线性窗宽窗位转换
@@ -117,29 +117,9 @@ void main()
         }
 
         //采样标记纹理
-        uint markValue = texture(u_MarkTexture, texCoord).r;
-        
-        //根据ROI模式决定是否渲染
-        bool shouldRender = true;        
-        switch (u_MarkMode)
-        {
-            case 0: //正常模式
-                shouldRender = true;
-                break;
-                
-            case 1: //保留模式
-                shouldRender = (markValue != 0u);
-                break;
-                
-            case 2: //切除模式
-                shouldRender = (markValue == 0u);
-                break;
-                
-            case 3: //高亮
-                shouldRender = true;
-                break;
-        }        
-        if (!shouldRender)
+        uint markValue = texture(u_MarkTexture, texCoord).r;        
+        int markMode = u_MarkModes[markValue];        
+        if (markMode == 1) //Collapsed - 隐藏
         {
             currentPos += step;
             continue;
@@ -158,11 +138,10 @@ void main()
             continue;
         }
 
-        //高亮模式下，标记区域使用高亮颜色
-        if (u_MarkMode == 3 && markValue != 0u)
+        //Mark值高亮处理
+        if (markMode == 2) //Highlight - 高亮
         {
-            float highlightFactor = u_MarkHighlightIntensity;
-            sampleColor.rgb = mix(sampleColor.rgb, u_MarkHighlightColor.rgb, highlightFactor);
+            sampleColor.rgb = min(sampleColor.rgb * u_HighlightIntensity, 1.0);
         }
 
         //亮度调整

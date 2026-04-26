@@ -23,10 +23,9 @@ uniform float u_RescaleIntercept;
 //体积参数
 uniform vec3 u_VolumeScale;
 
-//标记模式参数
-uniform int u_MarkMode;
-uniform vec4 u_MarkHighlightColor;
-uniform float u_MarkHighlightIntensity;
+//标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Highlight）
+uniform int u_MarkModes[256];
+uniform float u_HighlightIntensity;
 
 //常量
 const float EPSILON = 0.0001;
@@ -82,23 +81,8 @@ void main()
     uint markValue = texture(u_MarkTexture, texCoord).r;
 
     //根据标记模式决定是否渲染
-    bool shouldRender = true;
-    switch (u_MarkMode)
-    {
-        case 0: // Normal模式
-            shouldRender = true;
-            break;
-        case 1: // Keep模式：只显示标记区域
-            shouldRender = (markValue != 0u);
-            break;
-        case 2: // Cut模式：排除标记区域
-            shouldRender = (markValue == 0u);
-            break;
-        case 3: // Highlight模式
-            shouldRender = true;
-            break;
-    }    
-    if (!shouldRender)
+    int markMode = u_MarkModes[markValue];
+    if (markMode == 1) //Collapsed(1) - 隐藏
     {
         discard;
     }
@@ -121,10 +105,9 @@ void main()
     vec3 color = vec3(grayValue);
 
     //高亮模式下，标记区域使用高亮颜色
-    if (u_MarkMode == 3 && markValue != 0u)
+    if (markMode == 2)
     {
-        float highlightFactor = u_MarkHighlightIntensity;
-        color = mix(color, u_MarkHighlightColor.rgb, highlightFactor);
+        color = min(color * u_HighlightIntensity, 1.0);
     }
 
     FragColor = vec4(color, 1.0);

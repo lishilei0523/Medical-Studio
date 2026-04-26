@@ -1,14 +1,13 @@
 ﻿using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
-using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Cameras;
-using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
+using System.Linq;
 
 namespace MedicalSharp.Engine.Renderers
 {
@@ -43,9 +42,7 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
             this.TransferFunction = new TransferFunction();
-            this.MarkMode = MarkMode.Normal;
-            this.MarkHighlightColor = null;
-            this.MarkHighlightIntensity = null;
+            this.MarkStrategy = new MarkStrategy();
             this.InitShaderProgram();
         }
 
@@ -60,9 +57,7 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
             this.TransferFunction = new TransferFunction();
-            this.MarkMode = MarkMode.Normal;
-            this.MarkHighlightColor = null;
-            this.MarkHighlightIntensity = null;
+            this.MarkStrategy = new MarkStrategy();
             this.InitShaderProgram();
         }
 
@@ -78,9 +73,7 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
             this.TransferFunction = new TransferFunction();
-            this.MarkMode = MarkMode.Normal;
-            this.MarkHighlightColor = null;
-            this.MarkHighlightIntensity = null;
+            this.MarkStrategy = new MarkStrategy();
         }
 
         #endregion
@@ -143,25 +136,11 @@ namespace MedicalSharp.Engine.Renderers
         public TransferFunction TransferFunction { get; }
         #endregion
 
-        #region 标记模式 —— MarkMode MarkMode
+        #region 标记策略 —— MarkStrategy MarkStrategy
         /// <summary>
-        /// 标记模式
+        /// 标记策略
         /// </summary>
-        public MarkMode MarkMode { get; private set; }
-        #endregion
-
-        #region 标记高亮颜色 —— Vector4? MarkHighlightColor
-        /// <summary>
-        /// 标记高亮颜色
-        /// </summary>
-        public Vector4? MarkHighlightColor { get; private set; }
-        #endregion
-
-        #region 标记高亮强度 —— float? MarkHighlightIntensity
-        /// <summary>
-        /// 标记高亮强度
-        /// </summary>
-        public float? MarkHighlightIntensity { get; private set; }
+        public MarkStrategy MarkStrategy { get; private set; }
         #endregion
 
         #region 体积渲染对象 —— VolumeRenderable Renderable
@@ -213,27 +192,6 @@ namespace MedicalSharp.Engine.Renderers
             this.StepSize = stepSize;
             this.MaxStepsCount = maxStepsCount;
             this.OpacityThreshold = opacityThreshold;
-        }
-        #endregion
-
-        #region 设置标记策略 —— void SetMarkStrategy(MarkMode markMode, Vector4? markHighlightColor...
-        /// <summary>
-        /// 设置标记策略
-        /// </summary>
-        /// <param name="markMode">标记模式</param>
-        /// <param name="markHighlightColor">标记高亮颜色</param>
-        /// <param name="markHighlightIntensity">标记高亮强度</param>
-        public void SetMarkStrategy(MarkMode markMode, Vector4? markHighlightColor, float? markHighlightIntensity)
-        {
-            if (markMode == MarkMode.Highlight)
-            {
-                markHighlightColor ??= ColorFactory.Cyan();
-                markHighlightIntensity ??= 0.7f;
-            }
-
-            this.MarkMode = markMode;
-            this.MarkHighlightColor = markHighlightColor;
-            this.MarkHighlightIntensity = markHighlightIntensity;
         }
         #endregion
 
@@ -308,13 +266,9 @@ namespace MedicalSharp.Engine.Renderers
             this.Program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
             this.Program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
-            //设置标记模式
-            this.Program.SetUniformInt("u_MarkMode", (int)this.MarkMode);
-            if (this.MarkMode == MarkMode.Highlight)
-            {
-                this.Program.SetUniformVector4("u_MarkHighlightColor", this.MarkHighlightColor!.Value);
-                this.Program.SetUniformFloat("u_MarkHighlightIntensity", this.MarkHighlightIntensity!.Value);
-            }
+            //设置标记策略
+            this.Program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
+            this.Program.SetUniformFloat("u_HighlightIntensity", this.MarkStrategy.HighlightIntensity);
 
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);
@@ -521,13 +475,9 @@ namespace MedicalSharp.Engine.Renderers
             this._pickProgram.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
             this._pickProgram.SetUniformFloat("u_OpacityThreshold", this.OpacityThreshold);
 
-            //设置标记模式（与渲染一致）
-            this._pickProgram.SetUniformInt("u_MarkMode", (int)this.MarkMode);
-            if (this.MarkMode == MarkMode.Highlight)
-            {
-                this._pickProgram.SetUniformVector4("u_MarkHighlightColor", this.MarkHighlightColor!.Value);
-                this._pickProgram.SetUniformFloat("u_MarkHighlightIntensity", this.MarkHighlightIntensity!.Value);
-            }
+            //设置标记策略（与渲染一致）
+            this._pickProgram.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
+            this._pickProgram.SetUniformFloat("u_HighlightIntensity", this.MarkStrategy.HighlightIntensity);
 
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);
