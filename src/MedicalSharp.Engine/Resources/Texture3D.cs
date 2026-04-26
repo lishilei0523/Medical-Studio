@@ -75,9 +75,9 @@ namespace MedicalSharp.Engine.Resources
 
         //Static
 
-        #region 从体数据创建纹理 —— static Texture3D CreateFromVolume(int width, int height...
+        #region 从体积数据创建纹理 —— static Texture3D CreateFromVolume(int width, int height...
         /// <summary>
-        /// 从体数据创建纹理
+        /// 从体积数据创建纹理
         /// </summary>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
@@ -118,14 +118,15 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 创建标记场纹理 —— static Texture3D CreateMarkTexture(int width, int height, int depth)
+        #region 从标记数据创建纹理 —— static Texture3D CreateFromMark(int width, int height...
         /// <summary>
-        /// 创建标记场纹理
+        /// 从标记数据创建纹理
         /// </summary>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
         /// <param name="depth">深度</param>
-        public static Texture3D CreateMarkTexture(int width, int height, int depth)
+        /// <param name="markData">标记数据</param>
+        public static Texture3D CreateFromMark(int width, int height, int depth, IntPtr markData)
         {
             #region # 验证
 
@@ -147,7 +148,7 @@ namespace MedicalSharp.Engine.Resources
             Texture3D texture = new Texture3D(width, height, depth, PixelInternalFormat.R8ui, PixelFormat.RedInteger, PixelType.UnsignedByte);
 
             //分配显存
-            texture.AllocateMemory();
+            texture.AllocateMemory(markData);
 
             //设置默认纹理参数
             texture.SetFilter(TextureMinFilter.Nearest, TextureMagFilter.Nearest);

@@ -172,6 +172,9 @@ namespace MedicalSharp.Insight
             {
                 throw new InvalidCastException("Failed to get pixel buffer");
             }
+
+            //分配标记数据内存
+            volumeData.AllocMarkData();
 #if DEBUG
             unsafe
             {

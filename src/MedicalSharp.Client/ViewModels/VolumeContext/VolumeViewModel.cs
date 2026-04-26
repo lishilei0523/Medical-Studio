@@ -135,6 +135,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 Vector3? textureCoord = e.PickedTextureCoord;
                 Vector3i? voxelPostion = e.PickedVoxelPosition;
                 short? voxelValue = e.PickedVoxelValue;
+                byte? markValue = e.PickedMarkValue;
                 if (textureCoord.HasValue)
                 {
                     StringBuilder builder = new StringBuilder();
@@ -142,6 +143,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     builder.AppendLine($"点击纹理坐标: X:{textureCoord.Value.X}, Y:{textureCoord.Value.Y}, Z:{textureCoord.Value.Z}");
                     builder.AppendLine($"点击体素坐标: X:{voxelPostion.Value.X}, Y:{voxelPostion.Value.Y}, Z:{voxelPostion.Value.Z}");
                     builder.AppendLine($"点击体素HU值: {voxelValue}");
+                    builder.AppendLine($"点击标记值: {markValue}");
                     MessageBox.Show(builder.ToString(), "成功", MessageBoxButton.OK, PackIconMaterialDesignKind.Info);
                 }
                 else

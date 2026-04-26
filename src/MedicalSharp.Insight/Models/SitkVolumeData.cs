@@ -65,6 +65,7 @@ namespace MedicalSharp.Insight.Models
             }
 
             this.SitkImage?.Dispose();
+            base.Dispose();
             this._disposed = true;
         }
         #endregion 

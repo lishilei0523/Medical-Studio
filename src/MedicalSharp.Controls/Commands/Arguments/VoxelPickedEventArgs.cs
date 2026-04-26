@@ -25,6 +25,11 @@ namespace MedicalSharp.Controls.Commands.Arguments
         public short? PickedVoxelValue { get; set; }
 
         /// <summary>
+        /// 拾取的标记值
+        /// </summary>
+        public byte? PickedMarkValue { get; set; }
+
+        /// <summary>
         /// 射线
         /// </summary>
         public Ray? Ray { get; set; }

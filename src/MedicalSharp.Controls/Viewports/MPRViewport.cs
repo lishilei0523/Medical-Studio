@@ -199,15 +199,17 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="textureCoord">纹理坐标</param>
         /// <param name="voxelPosition">体素坐标</param>
         /// <param name="voxelValue">体素HU值</param>
+        /// <param name="markValue">标记值</param>
         /// <param name="ray">射线</param>
         /// <returns>是否成功</returns>
-        public bool FindNearestVoxel(Vector2 position, out Vector3 textureCoord, out Vector3i voxelPosition, out short voxelValue, out Ray ray)
+        public bool FindNearestVoxel(Vector2 position, out Vector3 textureCoord, out Vector3i voxelPosition, out short voxelValue, out byte markValue, out Ray ray)
         {
             this.GlContext.MakeCurrent();
 
             textureCoord = Vector3.Zero;
             voxelPosition = Vector3i.Zero;
             voxelValue = -1;
+            markValue = 0;
 
             Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera.LookDirection, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, out ray);
             if (planeUV.HasValue)
@@ -215,6 +217,7 @@ namespace MedicalSharp.Controls.Viewports
                 voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y, out Vector3 texCoord);
                 textureCoord = texCoord;
                 voxelValue = this.VolumeData[voxelPosition.X, voxelPosition.Y, voxelPosition.Z];
+                markValue = this.VolumeData.GetMarkValue(voxelPosition.X, voxelPosition.Y, voxelPosition.Z);
 
                 return true;
             }
@@ -231,7 +234,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <returns>3D位置</returns>
         public override Vector3? FindNearestPosition(Vector2 position)
         {
-            if (this.FindNearestVoxel(position, out Vector3 textureCoord, out _, out _, out _))
+            if (this.FindNearestVoxel(position, out Vector3 textureCoord, out _, out _, out _, out _))
             {
                 return textureCoord - new Vector3(0.5f);
             }
@@ -388,10 +391,11 @@ namespace MedicalSharp.Controls.Viewports
                 TextureManager.AddTexture3D(volumeData.Id, volumeTexture);
 
                 //创建标记纹理
-                markTexture = Texture3D.CreateMarkTexture(
+                markTexture = Texture3D.CreateFromMark(
                     volumeData.Metadata.VolumeSize.X,
                     volumeData.Metadata.VolumeSize.Y,
-                    volumeData.Metadata.VolumeSize.Z);
+                    volumeData.Metadata.VolumeSize.Z,
+                    volumeData.MarkData);
                 TextureManager.AddTexture3D(markTextureId, markTexture);
             }
             else
