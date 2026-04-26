@@ -62,6 +62,11 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<AvaloniaList<TFControlPoint>> TFControlPointsProperty;
 
         /// <summary>
+        /// 是否开启深度写入依赖属性
+        /// </summary>
+        public static readonly StyledProperty<bool> DepthMaskEnabledProperty;
+
+        /// <summary>
         /// 体积数据依赖属性
         /// </summary>
         public static readonly StyledProperty<VolumeData> VolumeDataProperty;
@@ -79,6 +84,7 @@ namespace MedicalSharp.Controls.Viewports
             MaxStepsCountProperty = AvaloniaProperty.Register<VolumeViewport, int>(nameof(MaxStepsCount), 1000);
             OpacityThresholdProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(OpacityThreshold), 0.99f);
             TFControlPointsProperty = AvaloniaProperty.Register<VolumeViewport, AvaloniaList<TFControlPoint>>(nameof(TFControlPoints));
+            DepthMaskEnabledProperty = AvaloniaProperty.Register<VolumeViewport, bool>(nameof(DepthMaskEnabled), false);
             VolumeDataProperty = AvaloniaProperty.Register<VolumeViewport, VolumeData>(nameof(VolumeData));
 
             //属性改变事件
@@ -204,6 +210,17 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
+        #region 依赖属性 - 是否开启深度写入 —— bool DepthMaskEnabled
+        /// <summary>
+        /// 依赖属性 - 是否开启深度写入
+        /// </summary>
+        public bool DepthMaskEnabled
+        {
+            get => this.GetValue(DepthMaskEnabledProperty);
+            set => this.SetValue(DepthMaskEnabledProperty, value);
+        }
+        #endregion
+
         #region 依赖属性 - 体积数据 —— VolumeData VolumeData
         /// <summary>
         /// 依赖属性 - 体积数据
@@ -315,8 +332,8 @@ namespace MedicalSharp.Controls.Viewports
                 GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
-                //关闭深度
-                GL.DepthMask(false);
+                //开启/关闭深度写入
+                GL.DepthMask(this.DepthMaskEnabled);
 
                 //体积渲染
                 this._volumeRenderer.SetRenderable(this._volumeRenderable);
