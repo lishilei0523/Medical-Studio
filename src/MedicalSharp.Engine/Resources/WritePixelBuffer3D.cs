@@ -2,6 +2,7 @@
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Runtime.InteropServices;
+using Buffer = System.Buffer;
 
 namespace MedicalSharp.Engine.Resources
 {
@@ -112,6 +113,26 @@ namespace MedicalSharp.Engine.Resources
 
         //Public
 
+        #region 上传指针数据 —— void UploadData(IntPtr data)
+        /// <summary>
+        /// 上传指针数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        public unsafe void UploadData(IntPtr data)
+        {
+            this.Bind();
+
+            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
+            if (ptr != IntPtr.Zero)
+            {
+                Buffer.MemoryCopy((void*)data, (void*)ptr, this.TotalBufferSize, this.TotalBufferSize);
+                GL.UnmapBuffer(this.BufferTarget);
+            }
+
+            this.Unbind();
+        }
+        #endregion
+
         #region 上传byte数组 —— override void UploadData(byte[] data)
         /// <summary>
         /// 上传byte数组
@@ -130,7 +151,6 @@ namespace MedicalSharp.Engine.Resources
             }
 
             #endregion
-
 
             this.Bind();
 
