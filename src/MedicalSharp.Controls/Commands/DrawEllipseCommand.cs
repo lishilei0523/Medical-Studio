@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Input;
+using Avalonia.Media;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
@@ -28,9 +29,9 @@ namespace MedicalSharp.Controls.Commands
         private EllipseVisual3D _ellipse;
 
         /// <summary>
-        /// 法向量
+        /// 获取法向量
         /// </summary>
-        private readonly Vector3D _normal;
+        private readonly Func<Vector3D> _getNormal;
 
         /// <summary>
         /// 椭圆形绘制完成事件
@@ -41,11 +42,11 @@ namespace MedicalSharp.Controls.Commands
         /// 创建绘制椭圆形3D元素命令构造器
         /// </summary>
         /// <param name="callback">绘制回调</param>
-        /// <param name="normal">法向量</param>
-        public DrawEllipseCommand(Action<EllipseVisual3D> callback, Vector3D normal = default)
+        /// <param name="getNormal">获取法向量</param>
+        public DrawEllipseCommand(Action<EllipseVisual3D> callback, Func<Vector3D> getNormal = null)
         {
             this._ellipseDrawnEvent = callback;
-            this._normal = normal == default ? new Vector3D(0, 1, 0) : normal;
+            this._getNormal = getNormal;
         }
 
         #endregion
@@ -74,8 +75,9 @@ namespace MedicalSharp.Controls.Commands
                     this._startPosition = mousePos3D.Value;
                     this._ellipse = new EllipseVisual3D
                     {
+                        Fill = Color.Parse("#0F00FF00"),
                         Center = mousePos3D.Value.ToVector3(),
-                        Normal = this._normal
+                        Normal = this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };
                     this._ellipseDrawnEvent?.Invoke(this._ellipse);
                 }

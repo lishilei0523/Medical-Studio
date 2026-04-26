@@ -1,8 +1,10 @@
-﻿using Avalonia.Collections;
+﻿using Avalonia;
+using Avalonia.Collections;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Commands.Arguments;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
@@ -256,7 +258,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawRectangle()
         {
-            DrawRectangleCommand command = new DrawRectangleCommand(shape => this.Shapes.Add(shape));
+            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            DrawRectangleCommand command = new DrawRectangleCommand(shape => this.Shapes.Add(shape), getNormal);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -267,7 +270,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawCircle()
         {
-            DrawCircleCommand command = new DrawCircleCommand(shape => this.Shapes.Add(shape));
+            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            DrawCircleCommand command = new DrawCircleCommand(shape => this.Shapes.Add(shape), getNormal);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -278,7 +282,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawEllipse()
         {
-            DrawEllipseCommand command = new DrawEllipseCommand(shape => this.Shapes.Add(shape));
+            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            DrawEllipseCommand command = new DrawEllipseCommand(shape => this.Shapes.Add(shape), getNormal);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
