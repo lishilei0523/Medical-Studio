@@ -236,7 +236,8 @@ namespace MedicalSharp.Controls.Viewports
         {
             if (this.FindNearestVoxel(position, out Vector3 textureCoord, out _, out _, out _, out _))
             {
-                return textureCoord - new Vector3(0.5f);
+                Vector3 worldPosition = (textureCoord - new Vector3(0.5f)) * this.VolumeData.Metadata.VolumeScale;
+                return worldPosition;
             }
 
             return null;
