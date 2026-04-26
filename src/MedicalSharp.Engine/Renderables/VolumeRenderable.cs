@@ -8,6 +8,8 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Engine.Renderables
 {
@@ -137,6 +139,211 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
+        #region 同步标记数据GPU->CPU —— void SyncMarkDataFromGpu()
+        /// <summary>
+        /// 同步标记数据GPU->CPU
+        /// </summary>
+        /// <remarks>将GPU标记纹理数据回读到CPU端的VolumeData.MarkData</remarks>
+        public void SyncMarkDataFromGpu()
+        {
+            #region # 验证
+
+            if (this.VolumeData.MarkData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("CPU标记数据未分配！");
+            }
+            if (!this.VolumeData.TryBeginGpuToCpu())
+            {
+                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{this.VolumeData.SyncStatus}\"");
+            }
+
+            #endregion
+
+            try
+            {
+                int width = this.MarkTexture.Width;
+                int height = this.MarkTexture.Height;
+                int depth = this.MarkTexture.Depth;
+                int bufferSize = width * height * depth;
+
+                //读取3D纹理到PBO
+                using ReadPixelBuffer readBuffer = new ReadPixelBuffer(width, height, PixelFormat.RedInteger);
+                readBuffer.ReadTexture3D(this.MarkTexture, 0, true);
+
+                //获取数据（阻塞等待）
+                byte[] data = readBuffer.GetCpuBuffer();
+
+                //复制到非托管内存
+                if (data != null && data.Length == bufferSize)
+                {
+                    Marshal.Copy(data, 0, this.VolumeData.MarkData, bufferSize);
+                }
+            }
+            finally
+            {
+                this.VolumeData.EndSync();
+            }
+        }
+        #endregion
+
+        #region 异步同步标记数据GPU->CPU  —— void SyncMarkDataFromGpuAsync(Action<bool> callback)
+        /// <summary>
+        /// 异步同步标记数据GPU->CPU
+        /// </summary>
+        /// <param name="callback">完成回调，参数表示是否成功</param>
+        public void SyncMarkDataFromGpuAsync(Action<bool> callback = null)
+        {
+            #region # 验证
+
+            if (this.VolumeData.MarkData == IntPtr.Zero)
+            {
+                callback?.Invoke(false);
+                throw new InvalidOperationException("CPU标记数据未分配！");
+            }
+            if (!this.VolumeData.TryBeginGpuToCpu())
+            {
+                callback?.Invoke(false);
+                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{this.VolumeData.SyncStatus}\"");
+            }
+
+            #endregion
+
+            int width = this.MarkTexture.Width;
+            int height = this.MarkTexture.Height;
+            int depth = this.MarkTexture.Depth;
+            int bufferSize = width * height * depth;
+            IntPtr markData = this.VolumeData.MarkData;
+
+            ReadPixelBuffer readBuffer = new ReadPixelBuffer(width, height, PixelFormat.RedInteger);
+            readBuffer.ReadTexture3D(this.MarkTexture, 0, true);
+
+            //异步等待数据就绪
+            Task.Run(() =>
+            {
+                bool success = false;
+                try
+                {
+                    //复制到非托管内存
+                    byte[] data = readBuffer.GetCpuBuffer();
+                    if (data != null && data.Length == bufferSize)
+                    {
+                        Marshal.Copy(data, 0, markData, bufferSize);
+                        success = true;
+                    }
+                }
+                finally
+                {
+                    readBuffer.Dispose();
+                    this.VolumeData.EndSync();
+                    callback?.Invoke(success);
+                }
+            });
+        }
+        #endregion
+
+        #region 同步标记数据CPU->GPU  —— void SyncMarkDataToGpu()
+        /// <summary>
+        /// 同步标记数据CPU->GPU
+        /// </summary>
+        /// <remarks>将CPU端VolumeData.MarkData上传到GPU标记纹理</remarks>
+        public void SyncMarkDataToGpu()
+        {
+            #region # 验证
+
+            if (this.VolumeData.MarkData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("CPU标记数据未分配！");
+            }
+            if (!this.VolumeData.TryBeginCpuToGpu())
+            {
+                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{this.VolumeData.SyncStatus}\"");
+            }
+
+            #endregion
+
+            try
+            {
+                int width = this.MarkTexture.Width;
+                int height = this.MarkTexture.Height;
+                int depth = this.MarkTexture.Depth;
+                using WritePixelBuffer3D writeBuffer = WritePixelBuffer3D.CreateGray8(width, height, depth);
+
+                //上传到PBO
+                writeBuffer.UploadData(this.VolumeData.MarkData);
+
+                //上传到纹理
+                writeBuffer.UploadToTexture(this.MarkTexture, true);
+            }
+            finally
+            {
+                this.VolumeData.EndSync();
+            }
+        }
+        #endregion
+
+        #region 异步同步标记数据CPU->GPU  —— void SyncMarkDataToGpuAsync(Action<bool> callback)
+        /// <summary>
+        /// 异步同步标记数据CPU->GPU
+        /// </summary>
+        /// <param name="callback">完成回调，参数表示是否成功</param>
+        public void SyncMarkDataToGpuAsync(Action<bool> callback = null)
+        {
+            #region # 验证
+
+            if (this.VolumeData.MarkData == IntPtr.Zero)
+            {
+                callback?.Invoke(false);
+                throw new InvalidOperationException("CPU标记数据未分配！");
+            }
+            if (!this.VolumeData.TryBeginCpuToGpu())
+            {
+                callback?.Invoke(false);
+                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{this.VolumeData.SyncStatus}\"");
+            }
+
+            #endregion
+
+            int width = this.MarkTexture.Width;
+            int height = this.MarkTexture.Height;
+            int depth = this.MarkTexture.Depth;
+            IntPtr markData = this.VolumeData.MarkData;
+            Texture3D markTexture = this.MarkTexture;
+
+            Task.Run(() =>
+            {
+                bool success = false;
+                try
+                {
+                    using WritePixelBuffer3D writeBuffer = WritePixelBuffer3D.CreateGray8(width, height, depth);
+
+                    //上传到PBO
+                    writeBuffer.UploadData(markData);
+
+                    //上传到纹理
+                    writeBuffer.UploadToTexture(markTexture, true);
+                    success = true;
+                }
+                finally
+                {
+                    this.VolumeData.EndSync();
+                    callback?.Invoke(success);
+                }
+            });
+        }
+        #endregion
+
+        #region 检查并同步（如果数据已就绪） —— bool TrySyncIfReady()
+        /// <summary>
+        /// 检查并同步（如果数据已就绪）
+        /// </summary>
+        /// <returns>是否完成了同步</returns>
+        public bool TrySyncIfReady()
+        {
+            // 这里可以检查是否有待处理的异步同步
+            return false;
+        }
+        #endregion
+
         #region 重置标记纹理 —— void ResetMarkTexture()
         /// <summary>
         /// 重置标记纹理
@@ -146,6 +353,16 @@ namespace MedicalSharp.Engine.Renderables
         {
             //使用glClearTexImage清除整个纹理（OpenGL 4.4+）
             GL.ClearTexImage(this.MarkTexture.Id, 0, PixelFormat.RedInteger, PixelType.UnsignedByte, IntPtr.Zero);
+
+            //清空CPU端内存
+            unsafe
+            {
+                if (this.VolumeData.MarkData != IntPtr.Zero)
+                {
+                    int size = this.VolumeMetadata.VolumeSize.X * this.VolumeMetadata.VolumeSize.Y * this.VolumeMetadata.VolumeSize.Z;
+                    NativeMemory.Clear((void*)this.VolumeData.MarkData, (nuint)size);
+                }
+            }
         }
         #endregion
 
