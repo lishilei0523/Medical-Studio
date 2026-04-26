@@ -39,12 +39,12 @@ namespace MedicalSharp.Controls.Commands
         /// <summary>
         /// 创建绘制圆形3D元素命令构造器
         /// </summary>
-        /// <param name="normal">法向量</param>
         /// <param name="callback">绘制回调</param>
-        public DrawCircleCommand(Vector3D normal, Action<CircleVisual3D> callback)
+        /// <param name="normal">法向量</param>
+        public DrawCircleCommand(Action<CircleVisual3D> callback, Vector3D normal = default)
         {
-            this._normal = normal;
             this._circleDrawnEvent = callback;
+            this._normal = normal == default ? new Vector3D(0, 1, 0) : normal;
         }
 
         #endregion

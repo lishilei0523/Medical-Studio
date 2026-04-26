@@ -17,8 +17,11 @@
 					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <sd:ToggleRadioButton cm:Message.Attach="Pick()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-Pick}" />
+                    <sd:ToggleRadioButton cm:Message.Attach="PickVoxel()" Classes="Transparent-Panel" IsChecked="True">
+                        <PathIcon Data="{StaticResource Icon-PickVoxel}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-PickShape}" />
                     </sd:ToggleRadioButton>
                     <sd:ToggleRadioButton cm:Message.Attach="Translate()" Classes="Transparent-Panel">
                         <PathIcon Data="{StaticResource Icon-Translate}" />

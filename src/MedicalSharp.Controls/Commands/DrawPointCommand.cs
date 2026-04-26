@@ -1,4 +1,5 @@
 ﻿using Avalonia.Input;
+using Avalonia.Media;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
@@ -54,7 +55,9 @@ namespace MedicalSharp.Controls.Commands
                 {
                     PointVisual3D point = new PointVisual3D
                     {
-                        Position = mousePos3D.Value.ToVector3()
+                        Fill = Colors.Cyan,
+                        Position = mousePos3D.Value.ToVector3(),
+                        PointSize = 5
                     };
                     this._pointDrawnEvent?.Invoke(point);
 

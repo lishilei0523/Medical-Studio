@@ -5,8 +5,10 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -18,17 +20,29 @@ namespace MedicalSharp.Controls.Commands
         #region # 字段及构造器
 
         /// <summary>
+        /// 选中的3D元素
+        /// </summary>
+        private Visual3D _selectedVisual;
+
+        /// <summary>
         /// 3D元素拾取事件
         /// </summary>
         private readonly Action<Visual3DPickedEventArgs> _visual3DPickedEvent;
 
         /// <summary>
+        /// 3D元素删除事件
+        /// </summary>
+        private readonly Action<Visual3D> _visual3DRemovedEvent;
+
+        /// <summary>
         /// 创建拾取3D元素命令构造器
         /// </summary>
-        /// <param name="callback">3D元素拾取回调</param>
-        public PickVisual3DCommand(Action<Visual3DPickedEventArgs> callback)
+        /// <param name="picked">3D元素拾取回调</param>
+        /// <param name="removed">3D元素删除回调</param>
+        public PickVisual3DCommand(Action<Visual3DPickedEventArgs> picked, Action<Visual3D> removed)
         {
-            this._visual3DPickedEvent = callback;
+            this._visual3DPickedEvent = picked;
+            this._visual3DRemovedEvent = removed;
         }
 
         #endregion
@@ -58,6 +72,7 @@ namespace MedicalSharp.Controls.Commands
                 };
                 if (pickVisual3D.FindNearest(mousePos2D, out Vector3 point, out Vector3 normal, out Visual3D visual, out Ray ray))
                 {
+                    this._selectedVisual = visual;
                     commandEventArgs.HitPoint = point;
                     commandEventArgs.Normal = normal;
                     commandEventArgs.PickedVisual = visual;
@@ -71,7 +86,60 @@ namespace MedicalSharp.Controls.Commands
                 this._visual3DPickedEvent?.Invoke(commandEventArgs);
             }
         }
-        #endregion 
+        #endregion
+
+        #region 获取上下文菜单项列表 —— override IReadOnlyList<ContextMenuItem> GetContextMenuItems(...
+        /// <summary>
+        /// 获取上下文菜单项列表
+        /// </summary>
+        /// <returns>上下文菜单项列表</returns>
+        public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
+        {
+            List<ContextMenuItem> items = [];
+            if (this._selectedVisual != null)
+            {
+                items.Add(new ContextMenuItem
+                {
+                    Header = "删除",
+                    Command = () => this.RemoveVisual(viewport)
+                });
+            }
+
+            return items;
+        }
+        #endregion
+
+        #region 失效命令 —— override void Deactivate()
+        /// <summary>
+        /// 失效命令
+        /// </summary>
+        /// <remarks>命令被停用时调用，切换命令前</remarks>
+        public override void Deactivate()
+        {
+            base.Deactivate();
+
+            this._selectedVisual = null;
+        }
+        #endregion
+
+        #region 删除元素 —— void RemoveVisual(OpenTKViewport viewport)
+        /// <summary>
+        /// 删除元素
+        /// </summary>
+        private void RemoveVisual(OpenTKViewport viewport)
+        {
+            if (this._selectedVisual != null)
+            {
+                this._visual3DRemovedEvent?.Invoke(this._selectedVisual);
+
+                //清空引用
+                this._selectedVisual = null;
+            }
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
 
         #endregion
     }
