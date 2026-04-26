@@ -149,6 +149,44 @@ namespace MedicalSharp.Primitives.Models
         }
         #endregion
 
+        #region 开始GPU->CPU同步 —— void BeginGpuToCpu()
+        /// <summary>
+        /// 开始GPU->CPU同步
+        /// </summary>
+        /// <remarks>调用前应确保UI层已防止重复操作</remarks>
+        public void BeginGpuToCpu()
+        {
+            int previous = Interlocked.Exchange(ref this._syncStatus, (int)MarkSyncStatus.GpuToCpu);
+#if DEBUG
+            //调试模式下检查状态（Release时可移除）
+            if (previous != (int)MarkSyncStatus.Idle)
+            {
+                string message = $"同步状态异常：当前状态为 {this.SyncStatus}，无法开始GPU->CPU同步。这通常是由于UI层未正确防止重复操作所致。";
+                throw new InvalidOperationException(message);
+            }
+#endif
+        }
+        #endregion
+
+        #region 开始CPU->GPU同步 —— void BeginCpuToGpu()
+        /// <summary>
+        /// 开始CPU->GPU同步
+        /// </summary>
+        /// <remarks>调用前应确保UI层已防止重复操作</remarks>
+        public void BeginCpuToGpu()
+        {
+            int previous = Interlocked.Exchange(ref this._syncStatus, (int)MarkSyncStatus.CpuToGpu);
+#if DEBUG
+            //调试模式下检查状态（Release 时可移除）
+            if (previous != (int)MarkSyncStatus.Idle)
+            {
+                string message = $"同步状态异常：当前状态为 {this.SyncStatus}，无法开始CPU->GPU同步。这通常是由于UI层未正确防止重复操作所致。";
+                throw new InvalidOperationException(message);
+            }
+#endif
+        }
+        #endregion
+
         #region 尝试开始GPU->CPU同步 —— bool TryBeginGpuToCpu()
         /// <summary>
         /// 尝试开始GPU->CPU同步
