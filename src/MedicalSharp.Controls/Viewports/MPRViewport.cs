@@ -404,7 +404,7 @@ namespace MedicalSharp.Controls.Viewports
                 markTexture = TextureManager.Texture3Ds[markTextureId];
             }
 
-            viewport._volumeRenderable = new VolumeRenderable(volumeTexture, markTexture, volumeData.Metadata);
+            viewport._volumeRenderable = new VolumeRenderable(volumeTexture, markTexture, volumeData);
             viewport.WindowWidth = volumeData.Metadata.WindowWidth;
             viewport.WindowCenter = volumeData.Metadata.WindowCenter;
             viewport.RequestNextFrameRendering();

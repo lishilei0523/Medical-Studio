@@ -23,8 +23,8 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         /// <param name="volumeTexture">体积纹理</param>
         /// <param name="markTexture">标记纹理</param>
-        /// <param name="volumeMetadata">体积元数据</param>
-        public VolumeRenderable(Texture3D volumeTexture, Texture3D markTexture, VolumeMetadata volumeMetadata)
+        /// <param name="volumeData">体积数据</param>
+        public VolumeRenderable(Texture3D volumeTexture, Texture3D markTexture, VolumeData volumeData)
         {
             #region # 验证
 
@@ -36,16 +36,16 @@ namespace MedicalSharp.Engine.Renderables
             {
                 throw new ArgumentNullException(nameof(markTexture), "标记纹理不可为空！");
             }
-            if (volumeMetadata == null)
+            if (volumeData == null)
             {
-                throw new ArgumentNullException(nameof(volumeMetadata), "体积元数据不可为空！");
+                throw new ArgumentNullException(nameof(volumeData), "体积数据不可为空！");
             }
 
             #endregion
 
             this.VolumeTexture = volumeTexture;
             this.MarkTexture = markTexture;
-            this.VolumeMetadata = volumeMetadata;
+            this.VolumeData = volumeData;
         }
 
         #endregion
@@ -66,11 +66,21 @@ namespace MedicalSharp.Engine.Renderables
         public Texture3D MarkTexture { get; private set; }
         #endregion
 
-        #region 体积元数据 —— VolumeMetadata VolumeMetadata
+        #region 体积数据 —— VolumeData VolumeData
         /// <summary>
-        /// 体积元数据
+        /// 体积数据
         /// </summary>
-        public VolumeMetadata VolumeMetadata { get; private set; }
+        public VolumeData VolumeData { get; private set; }
+        #endregion
+
+        #region 只读属性 - 体积元数据 —— VolumeMetadata VolumeMetadata
+        /// <summary>
+        /// 只读属性 - 体积元数据
+        /// </summary>
+        public VolumeMetadata VolumeMetadata
+        {
+            get => this.VolumeData.Metadata;
+        }
         #endregion
 
         #endregion
