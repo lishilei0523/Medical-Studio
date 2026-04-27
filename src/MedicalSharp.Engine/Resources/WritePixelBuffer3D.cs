@@ -81,6 +81,20 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 创建8位标记缓冲区 —— static WritePixelBuffer3D CreateMark8(int width, int height...
+        /// <summary>
+        /// 创建8位标记缓冲区
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
+        /// <returns>像素缓冲区(写)3D</returns>
+        public static WritePixelBuffer3D CreateMark8(int width, int height, int depth)
+        {
+            return new WritePixelBuffer3D(width, height, depth, PixelFormat.RedInteger, PixelType.UnsignedByte);
+        }
+        #endregion
+
         #region 创建16位灰度缓冲区 —— static WritePixelBuffer3D CreateGray16(int width, int height...
         /// <summary>
         /// 创建16位灰度缓冲区

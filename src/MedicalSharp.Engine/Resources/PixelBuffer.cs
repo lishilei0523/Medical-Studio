@@ -269,8 +269,11 @@ namespace MedicalSharp.Engine.Resources
             int components = pixelFormat switch
             {
                 PixelFormat.Red => 1,
+                PixelFormat.RedInteger => 1,
                 PixelFormat.Rgb => 3,
+                PixelFormat.RgbInteger => 3,
                 PixelFormat.Rgba => 4,
+                PixelFormat.RgbaInteger => 4,
                 _ => 4
             };
 

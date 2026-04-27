@@ -167,8 +167,8 @@ namespace MedicalSharp.Engine.Renderables
                 int bufferSize = width * height * depth;
 
                 //读取3D纹理到PBO
-                using ReadPixelBuffer readBuffer = new ReadPixelBuffer(width, height, PixelFormat.RedInteger);
-                readBuffer.ReadTexture3D(this.MarkTexture, 0, true);
+                using ReadPixelBuffer3D readBuffer = new ReadPixelBuffer3D(width, height, depth, PixelFormat.RedInteger, PixelType.UnsignedByte);
+                readBuffer.ReadTexture3D(this.MarkTexture, true);
 
                 //获取数据（阻塞等待）
                 byte[] data = readBuffer.GetCpuBuffer();
@@ -215,8 +215,8 @@ namespace MedicalSharp.Engine.Renderables
                 //异步读取3D纹理
                 byte[] data = await Task.Run(() =>
                 {
-                    using ReadPixelBuffer readBuffer = new ReadPixelBuffer(width, height, PixelFormat.RedInteger);
-                    readBuffer.ReadTexture3D(this.MarkTexture, 0, true);
+                    using ReadPixelBuffer3D readBuffer = new ReadPixelBuffer3D(width, height, depth, PixelFormat.RedInteger, PixelType.UnsignedByte);
+                    readBuffer.ReadTexture3D(this.MarkTexture, true);
                     return readBuffer.GetCpuBuffer();
                 });
 
@@ -258,7 +258,7 @@ namespace MedicalSharp.Engine.Renderables
                 int width = this.MarkTexture.Width;
                 int height = this.MarkTexture.Height;
                 int depth = this.MarkTexture.Depth;
-                using WritePixelBuffer3D writeBuffer = WritePixelBuffer3D.CreateGray8(width, height, depth);
+                using WritePixelBuffer3D writeBuffer = WritePixelBuffer3D.CreateMark8(width, height, depth);
 
                 //上传到PBO
                 writeBuffer.UploadData(this.VolumeData.MarkData);
@@ -300,7 +300,7 @@ namespace MedicalSharp.Engine.Renderables
 
                 await Task.Run(() =>
                 {
-                    using WritePixelBuffer3D writeBuffer = WritePixelBuffer3D.CreateGray8(width, height, depth);
+                    using WritePixelBuffer3D writeBuffer = WritePixelBuffer3D.CreateMark8(width, height, depth);
 
                     //上传到PBO
                     writeBuffer.UploadData(this.VolumeData.MarkData);

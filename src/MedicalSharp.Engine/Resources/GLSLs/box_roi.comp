@@ -25,7 +25,7 @@ void main()
     {
         return;
     }
-    
+
     //体素坐标 -> 纹理坐标（0-1范围）
     vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_TextureSize);
     
@@ -33,7 +33,7 @@ void main()
     bool inside = false;
     
     //应用逆变换到局部坐标
-    vec4 localPos = u_WorldToLocal * vec4(texCoord, 1.0);
+    vec4 localPos = u_WorldToLocal * vec4(texCoord - 0.5, 1.0);
     localPos /= localPos.w;
         
     //使用局部坐标范围判断
