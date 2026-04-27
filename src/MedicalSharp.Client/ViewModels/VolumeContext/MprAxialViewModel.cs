@@ -106,12 +106,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             if (this.VolumeData != null && eventArgs.Properties.IsLeftButtonPressed)
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = viewport.FindNearestVoxel(mousePos2D.ToVector2(), out Vector3 textureCoord, out Vector3i voxelPostion, out short voxelValue, out byte markValue, out Ray ray);
+                bool success = viewport.FindNearestVoxel(mousePos2D.ToVector2(), out Vector3 textureCoord, out Vector3 worldPosition, out Vector3i voxelPostion, out short voxelValue, out byte markValue, out Ray ray);
                 if (success)
                 {
                     StringBuilder builder = new StringBuilder();
                     builder.AppendLine($"点击2D坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
                     builder.AppendLine($"点击纹理坐标: X:{textureCoord.X}, Y:{textureCoord.Y}, Z:{textureCoord.Z}");
+                    builder.AppendLine($"点击世界坐标: X:{worldPosition.X}, Y:{worldPosition.Y}, Z:{worldPosition.Z}");
                     builder.AppendLine($"点击体素坐标: X:{voxelPostion.X}, Y:{voxelPostion.Y}, Z:{voxelPostion.Z}");
                     builder.AppendLine($"点击体素HU值: {voxelValue}");
                     builder.AppendLine($"点击标记值: {markValue}");

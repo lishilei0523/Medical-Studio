@@ -55,9 +55,10 @@ namespace MedicalSharp.Controls.Commands
                     Viewport = viewport,
                     MousePos2D = mousePos2D
                 };
-                if (pickVoxel.FindNearestVoxel(mousePos2D, out Vector3 textureCoord, out Vector3i voxelPosition, out short voxelValue, out byte markValue, out Ray ray))
+                if (pickVoxel.FindNearestVoxel(mousePos2D, out Vector3 textureCoord, out Vector3 worldPosition, out Vector3i voxelPosition, out short voxelValue, out byte markValue, out Ray ray))
                 {
                     commandEventArgs.PickedTextureCoord = textureCoord;
+                    commandEventArgs.PickedWorldPosition = worldPosition;
                     commandEventArgs.PickedVoxelPosition = voxelPosition;
                     commandEventArgs.PickedVoxelValue = voxelValue;
                     commandEventArgs.PickedMarkValue = markValue;

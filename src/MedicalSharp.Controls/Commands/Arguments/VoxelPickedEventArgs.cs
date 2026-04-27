@@ -15,6 +15,11 @@ namespace MedicalSharp.Controls.Commands.Arguments
         public Vector3? PickedTextureCoord { get; set; }
 
         /// <summary>
+        /// 拾取的世界位置
+        /// </summary>
+        public Vector3? PickedWorldPosition { get; set; }
+
+        /// <summary>
         /// 拾取的体素位置
         /// </summary>
         public Vector3i? PickedVoxelPosition { get; set; }
