@@ -9,8 +9,12 @@ uniform vec3 u_BoxLocalMin;           //立方体局部最小点
 uniform vec3 u_BoxLocalMax;           //立方体局部最大点
 uniform mat4 u_WorldToLocal;          //世界坐标 -> 局部坐标
 
-//体积纹理尺寸
-uniform ivec3 u_TextureSize;
+//体积参数
+uniform ivec3 u_VolumeSize;
+uniform vec3 u_VolumeScale;
+
+//切割模式（0=内切, 1=外切）
+uniform int u_CutMode;
 
 //标记值（1-255，0保留给未标记）
 uniform uint u_MarkValue;
@@ -21,32 +25,43 @@ void main()
     ivec3 voxelCoord = ivec3(gl_GlobalInvocationID);
     
     //边界检查
-    if (voxelCoord.x >= u_TextureSize.x || voxelCoord.y >= u_TextureSize.y || voxelCoord.z >= u_TextureSize.z)
+    if (voxelCoord.x >= u_VolumeSize.x || voxelCoord.y >= u_VolumeSize.y || voxelCoord.z >= u_VolumeSize.z)
     {
         return;
     }
 
     //体素坐标 -> 纹理坐标（0-1范围） -> 世界坐标
-    vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_TextureSize);
-    vec3 worldPos = texCoord - 0.5;
+    vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_VolumeSize);
+    vec3 worldPos = (texCoord - 0.5) * u_VolumeScale;
     
     //应用逆变换到局部坐标
     vec4 localPos = u_WorldToLocal * vec4(worldPos, 1.0);
     localPos /= localPos.w;
         
     //使用局部坐标范围判断是否在立方体内
-    bool inside = (localPos.x >= u_BoxLocalMin.x && localPos.x <= u_BoxLocalMax.x &&
-                   localPos.y >= u_BoxLocalMin.y && localPos.y <= u_BoxLocalMax.y &&
-                   localPos.z >= u_BoxLocalMin.z && localPos.z <= u_BoxLocalMax.z);
-    if (inside)
+    bool inBox = (localPos.x >= u_BoxLocalMin.x && localPos.x <= u_BoxLocalMax.x &&
+                  localPos.y >= u_BoxLocalMin.y && localPos.y <= u_BoxLocalMax.y &&
+                  localPos.z >= u_BoxLocalMin.z && localPos.z <= u_BoxLocalMax.z);
+
+    //根据切割模式决定是否标记
+    bool shouldMark = false;
+    if (u_CutMode == 0)
+    {
+        //内切：标记立方体内部
+        shouldMark = inBox;
+    }
+    else
+    {
+        //外切：标记立方体外部
+        shouldMark = !inBox;
+    }
+
+    if (shouldMark)
     {
         uint oldMarkValue = imageLoad(u_MarkTexture, voxelCoord).r;
-        uint newMarkValue = u_MarkValue;
-
-        //只有值发生变化时才写入
-        if (oldMarkValue != newMarkValue)
+        if (oldMarkValue != u_MarkValue)
         {
-            imageStore(u_MarkTexture, voxelCoord, uvec4(newMarkValue, 0, 0, 0));
+            imageStore(u_MarkTexture, voxelCoord, uvec4(u_MarkValue, 0, 0, 0));
         }
     }
 }

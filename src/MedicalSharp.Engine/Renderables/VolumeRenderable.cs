@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -100,41 +101,45 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="uAxis">U轴</param>
         /// <param name="vAxis">V轴</param>
         /// <param name="localToWorld">局部到世界变换矩阵</param>
+        /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public void ApplyRectCut(float width, float height, Vector3 center, Vector3 normal, Vector3 uAxis, Vector3 vAxis, Matrix4 localToWorld, byte markValue)
+        public void ApplyRectCut(float width, float height, Vector3 center, Vector3 normal, Vector3 uAxis, Vector3 vAxis, Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
             //立方体计算着色器
-            ShaderProgram rectangleComputer = ComputerManager.RectCutComputer;
+            ShaderProgram cutComputer = ComputerManager.RectCutComputer;
 
             //开启Shader程序
-            rectangleComputer.Use();
+            cutComputer.Use();
 
             //绑定标记纹理为可读写
             this.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //设置矩形参数
-            rectangleComputer.SetUniformFloat("u_RectHalfWidth", width / 2.0f);
-            rectangleComputer.SetUniformFloat("u_RectHalfHeight", height / 2.0f);
-            rectangleComputer.SetUniformVector3("u_RectCenter", center);
-            rectangleComputer.SetUniformVector3("u_RectNormal", normal);
-            rectangleComputer.SetUniformVector3("u_RectUAxis", uAxis);
-            rectangleComputer.SetUniformVector3("u_RectVAxis", vAxis);
-            rectangleComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
+            cutComputer.SetUniformFloat("u_RectHalfWidth", width / 2.0f);
+            cutComputer.SetUniformFloat("u_RectHalfHeight", height / 2.0f);
+            cutComputer.SetUniformVector3("u_RectCenter", center);
+            cutComputer.SetUniformVector3("u_RectNormal", normal);
+            cutComputer.SetUniformVector3("u_RectUAxis", uAxis);
+            cutComputer.SetUniformVector3("u_RectVAxis", vAxis);
+            cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
-            //设置纹理尺寸
-            Vector3i textureSize = new Vector3i(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
-            rectangleComputer.SetUniformVector3i("u_TextureSize", textureSize);
+            //设置体积参数
+            cutComputer.SetUniformVector3i("u_VolumeSize", this.VolumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", this.VolumeData.Metadata.VolumeScale);
+
+            //设置切割模式
+            cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
 
             //设置标记值
-            rectangleComputer.SetUniformUInt("u_MarkValue", markValue);
+            cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
             ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
 
             //取消使用
-            rectangleComputer.Unuse();
+            cutComputer.Unuse();
         }
         #endregion
 
@@ -145,8 +150,9 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="boxLocalMin">立方体最小点（局部空间）</param>
         /// <param name="boxLocalMax">立方体最大点（局部空间）</param>
         /// <param name="localToWorld">局部到世界变换矩阵</param>
+        /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public void ApplyBoxCut(Vector3 boxLocalMin, Vector3 boxLocalMax, Matrix4 localToWorld, byte markValue)
+        public void ApplyBoxCut(Vector3 boxLocalMin, Vector3 boxLocalMax, Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             #region # 验证
 
@@ -160,31 +166,34 @@ namespace MedicalSharp.Engine.Renderables
             Matrix4 worldToLocal = localToWorld.Inverted();
 
             //立方体计算着色器
-            ShaderProgram boxComputer = ComputerManager.BoxCutComputer;
+            ShaderProgram cutComputer = ComputerManager.BoxCutComputer;
 
             //开启Shader程序
-            boxComputer.Use();
+            cutComputer.Use();
 
             //绑定标记纹理为可读写
             this.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //设置立方体参数
-            boxComputer.SetUniformVector3("u_BoxLocalMin", boxLocalMin);
-            boxComputer.SetUniformVector3("u_BoxLocalMax", boxLocalMax);
-            boxComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
+            cutComputer.SetUniformVector3("u_BoxLocalMin", boxLocalMin);
+            cutComputer.SetUniformVector3("u_BoxLocalMax", boxLocalMax);
+            cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
-            //设置纹理尺寸
-            Vector3i textureSize = new Vector3i(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
-            boxComputer.SetUniformVector3i("u_TextureSize", textureSize);
+            //设置体积参数
+            cutComputer.SetUniformVector3i("u_VolumeSize", this.VolumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", this.VolumeData.Metadata.VolumeScale);
+
+            //设置切割模式
+            cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
 
             //设置标记值
-            boxComputer.SetUniformUInt("u_MarkValue", markValue);
+            cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
             ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
 
             //取消使用
-            boxComputer.Unuse();
+            cutComputer.Unuse();
         }
         #endregion
 

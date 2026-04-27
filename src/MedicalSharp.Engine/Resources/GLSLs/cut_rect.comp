@@ -5,19 +5,24 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
 
 //矩形参数
-uniform float u_RectHalfWidth;           //半宽
-uniform float u_RectHalfHeight;          //半高
-uniform vec3 u_RectCenter;           //中心（局部空间）
+uniform float u_RectHalfWidth;       //半宽
+uniform float u_RectHalfHeight;      //半高
+uniform vec3 u_RectCenter;           //中心位置（局部空间）
 uniform vec3 u_RectNormal;           //法向量（归一化）
 uniform vec3 u_RectUAxis;            //U轴（宽度方向，归一化）
 uniform vec3 u_RectVAxis;            //V轴（高度方向，归一化）
 uniform mat4 u_WorldToLocal;
 
-//体积纹理尺寸
-uniform ivec3 u_TextureSize;
+//体积参数
+uniform ivec3 u_VolumeSize;
+uniform vec3 u_VolumeScale;
+
+//切割模式（0=内切, 1=外切）
+uniform int u_CutMode;
 
 //标记值（1-255，0保留给未标记）
 uniform uint u_MarkValue;
+
 
 void main()
 {  
@@ -25,14 +30,14 @@ void main()
     ivec3 voxelCoord = ivec3(gl_GlobalInvocationID);
     
     //边界检查
-    if (voxelCoord.x >= u_TextureSize.x || voxelCoord.y >= u_TextureSize.y || voxelCoord.z >= u_TextureSize.z)
+    if (voxelCoord.x >= u_VolumeSize.x || voxelCoord.y >= u_VolumeSize.y || voxelCoord.z >= u_VolumeSize.z)
     {
         return;
     }
     
     //体素坐标 -> 纹理坐标（0-1范围） -> 世界坐标
-    vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_TextureSize);
-    vec3 worldPos = texCoord - 0.5;
+    vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_VolumeSize);
+    vec3 worldPos = (texCoord - 0.5) * u_VolumeScale;
 
     //应用逆变换到局部坐标
     vec4 localPos = u_WorldToLocal * vec4(worldPos, 1.0);
@@ -50,8 +55,20 @@ void main()
     float u = dot(delta, u_RectUAxis);
     float v = dot(delta, u_RectVAxis);
     
-    bool inside = (abs(u) <= u_RectHalfWidth) &&
-                  (abs(v) <= u_RectHalfHeight);    
+    //判断是否在矩形投影内
+    bool inProjection = (abs(u) <= u_RectHalfWidth) && (abs(v) <= u_RectHalfHeight);
+    bool inside = false;
+    if (u_CutMode == 0)  
+    {
+        //内切：挖掉矩形投影区域
+        inside = inProjection;
+    }
+    else  
+    {
+        //外切：挖掉矩形投影区域之外的部分
+        inside = !inProjection;
+    }
+
     if (inside)
     {
         uint oldMarkValue = imageLoad(u_MarkTexture, voxelCoord).r;
