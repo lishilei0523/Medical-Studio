@@ -76,7 +76,7 @@ namespace MedicalSharp.Controls.Commands
                     {
                         Fill = Color.Parse("#0F00FF00"),
                         Center = mousePos3D.Value.ToVector3(),
-                        Normal = this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
+                        Normal = -this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };
                     this._circleDrawnEvent?.Invoke(this._circle);
                 }

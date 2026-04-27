@@ -18,9 +18,14 @@ namespace MedicalSharp.Engine.Managers
         private static bool _Initialized;
 
         /// <summary>
-        /// 立方体计算着色器
+        /// 矩形切割计算着色器
         /// </summary>
-        private static ShaderProgram _BoxComputer;
+        private static ShaderProgram _RectCutComputer;
+
+        /// <summary>
+        /// 立方体切割计算着色器
+        /// </summary>
+        private static ShaderProgram _BoxCutComputer;
 
         /// <summary>
         /// 同步锁
@@ -40,13 +45,23 @@ namespace MedicalSharp.Engine.Managers
 
         #region # 属性
 
-        #region 只读属性 - 立方体计算着色器 —— static ShaderProgram BoxComputer
+        #region 只读属性 - 矩形切割计算着色器 —— static ShaderProgram RectCutComputer
         /// <summary>
-        /// 只读属性 - 立方体计算着色器
+        /// 只读属性 - 矩形切割计算着色器
         /// </summary>
-        public static ShaderProgram BoxComputer
+        public static ShaderProgram RectCutComputer
         {
-            get => _BoxComputer;
+            get => _RectCutComputer;
+        }
+        #endregion
+
+        #region 只读属性 - 立方体切割计算着色器 —— static ShaderProgram BoxCutComputer
+        /// <summary>
+        /// 只读属性 - 立方体切割计算着色器
+        /// </summary>
+        public static ShaderProgram BoxCutComputer
+        {
+            get => _BoxCutComputer;
         }
         #endregion
 
@@ -69,17 +84,18 @@ namespace MedicalSharp.Engine.Managers
                     return;
                 }
 
-                _BoxComputer = CreateBoxComputer();
+                _BoxCutComputer = CreateBoxCutComputer();
+                _RectCutComputer = CreateRectCutComputer();
                 _Initialized = true;
             }
         }
         #endregion
 
-        #region 调度计算着色器 —— static void DispatchCompute(int width, int height)
+        #region 调度计算着色器 —— static void DispatchCompute2D(int width, int height)
         /// <summary>
         /// 调度计算着色器
         /// </summary>
-        public static void DispatchCompute(int width, int height)
+        public static void DispatchCompute2D(int width, int height)
         {
             //计算工作组数量（每组16×16线程）
             int groupsX = (int)MathF.Ceiling(width / 16.0f);
@@ -93,11 +109,11 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
-        #region 调度计算着色器 —— static void DispatchCompute(int width, int height, int depth)
+        #region 调度计算着色器 —— static void DispatchCompute3D(int width, int height, int depth)
         /// <summary>
         /// 调度计算着色器
         /// </summary>
-        public static void DispatchCompute(int width, int height, int depth)
+        public static void DispatchCompute3D(int width, int height, int depth)
         {
             //计算工作组数量（每组8×8×8线程）
             int groupsX = (int)MathF.Ceiling(width / 8.0f);
@@ -118,26 +134,41 @@ namespace MedicalSharp.Engine.Managers
         /// </summary>
         public static void Cleanup()
         {
-            _BoxComputer.Dispose();
+            _RectCutComputer?.Dispose();
+            _BoxCutComputer?.Dispose();
         }
         #endregion
 
 
         //Private
 
-        #region 创建立方体计算着色器 —— static ShaderProgram CreateBoxComputer()
+        #region 创建矩形切割计算着色器 —— static ShaderProgram CreateRectCutComputer()
         /// <summary>
-        /// 创建立方体计算着色器
+        /// 创建矩形切割计算着色器
         /// </summary>
-        private static ShaderProgram CreateBoxComputer()
+        private static ShaderProgram CreateRectCutComputer()
         {
             ShaderProgram program = new ShaderProgram();
-            program.ReadComputeShaderFromFile("Resources/GLSLs/box_roi.comp");
+            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_rect.comp");
             program.BuildCompute();
 
             return program;
         }
         #endregion 
+
+        #region 创建立方体切割计算着色器 —— static ShaderProgram CreateBoxCutComputer()
+        /// <summary>
+        /// 创建立方体切割计算着色器
+        /// </summary>
+        private static ShaderProgram CreateBoxCutComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_box.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion
 
         #endregion
     }

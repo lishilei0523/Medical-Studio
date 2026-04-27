@@ -159,15 +159,24 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void ApplyMark(OpenTKViewport viewport)
         {
-            if (this._selectedVisual is BoundingBoxVisual3D box && viewport is VolumeViewport volumeViewport)
+            if (viewport is VolumeViewport volumeViewport)
             {
-                volumeViewport.VolumeRenderable.ApplyBoxROI(box.Minimum, box.Maximum, box.Transform.Matrix, 1);
-                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
-                volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
-
-                //请求下一帧
-                viewport.RequestNextFrameRendering();
+                if (this._selectedVisual is BoundingBoxVisual3D box)
+                {
+                    volumeViewport.VolumeRenderable.ApplyBoxCut(box.Minimum, box.Maximum, box.Transform.Matrix, 1);
+                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
+                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
+                }
+                if (this._selectedVisual is RectangleVisual3D rectangle)
+                {
+                    volumeViewport.VolumeRenderable.ApplyRectCut(rectangle.Width, rectangle.Height, rectangle.Center.ToVector3(), rectangle.Normal.ToVector3(), rectangle.UAxis, rectangle.VAxis, rectangle.Transform.Matrix, 1);
+                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
+                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
+                }
             }
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
