@@ -47,7 +47,8 @@ namespace MedicalSharp.Controls.Visuals
             WidthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Width), 1.0f);
             HeightProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Height), 1.0f);
             DepthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Depth), 1.0f);
-            CenterProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+            CenterProperty =
+                AvaloniaProperty.Register<BoundingBoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
 
             //属性改变事件
             WidthProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnWidthChanged);
@@ -70,6 +71,7 @@ namespace MedicalSharp.Controls.Visuals
         #region # 属性
 
         #region 依赖属性 - 宽度 —— float Width
+
         /// <summary>
         /// 依赖属性 - 宽度
         /// </summary>
@@ -78,9 +80,11 @@ namespace MedicalSharp.Controls.Visuals
             get => this.GetValue(WidthProperty);
             set => this.SetValue(WidthProperty, value);
         }
+
         #endregion
 
         #region 依赖属性 - 高度 —— float Height
+
         /// <summary>
         /// 依赖属性 - 高度
         /// </summary>
@@ -89,9 +93,11 @@ namespace MedicalSharp.Controls.Visuals
             get => this.GetValue(HeightProperty);
             set => this.SetValue(HeightProperty, value);
         }
+
         #endregion
 
         #region 依赖属性 - 深度 —— float Depth
+
         /// <summary>
         /// 依赖属性 - 深度
         /// </summary>
@@ -100,9 +106,11 @@ namespace MedicalSharp.Controls.Visuals
             get => this.GetValue(DepthProperty);
             set => this.SetValue(DepthProperty, value);
         }
+
         #endregion
 
         #region 依赖属性 - 中心位置 —— Vector3D Center
+
         /// <summary>
         /// 依赖属性 - 中心位置
         /// </summary>
@@ -110,6 +118,44 @@ namespace MedicalSharp.Controls.Visuals
         {
             get => this.GetValue(CenterProperty);
             set => this.SetValue(CenterProperty, value);
+        }
+
+        #endregion
+
+        #region 只读属性 - 最小点 —— Vector3 Minimum
+        /// <summary>
+        /// 只读属性 - 最小点
+        /// </summary>
+        /// <remarks>局部空间</remarks>
+        public Vector3 Minimum
+        {
+            get
+            {
+                Vector3 center = this.Center.ToVector3();
+                return new Vector3(
+                    center.X - this.Width * 0.5f,
+                    center.Y - this.Depth * 0.5f,
+                    center.Z - this.Height * 0.5f);
+            }
+        }
+        #endregion
+
+        #region 只读属性 - 最大点 —— Vector3 Maximum
+        /// <summary>
+        /// 只读属性 - 最大点
+        /// </summary>
+        /// <remarks>局部空间</remarks>
+        public Vector3 Maximum
+        {
+            get
+            {
+                Vector3 center = this.Center.ToVector3();
+                return new Vector3(
+                    center.X + this.Width * 0.5f,
+                    center.Y + this.Depth * 0.5f,
+                    center.Z + this.Height * 0.5f
+                );
+            }
         }
         #endregion
 

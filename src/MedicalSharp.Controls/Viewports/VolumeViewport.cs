@@ -232,6 +232,16 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
+        #region 只读属性 - 体积渲染对象 —— VolumeRenderable VolumeRenderable
+        /// <summary>
+        /// 只读属性 - 体积渲染对象
+        /// </summary>
+        public VolumeRenderable VolumeRenderable
+        {
+            get => this._volumeRenderable;
+        }
+        #endregion
+
         #region 只读属性 - 体积渲染器 —— VolumeRenderer VolumeRenderer
         /// <summary>
         /// 只读属性 - 体积渲染器

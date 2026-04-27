@@ -3,7 +3,9 @@ using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Commands.Arguments;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
@@ -108,6 +110,11 @@ namespace MedicalSharp.Controls.Commands
                     Header = "删除",
                     Command = () => this.RemoveVisual(viewport)
                 });
+                items.Add(new ContextMenuItem
+                {
+                    Header = "挖空",
+                    Command = () => this.ApplyMark(viewport)
+                });
             }
 
             return items;
@@ -143,6 +150,24 @@ namespace MedicalSharp.Controls.Commands
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 适用标记 —— void ApplyMark(OpenTKViewport viewport)
+        /// <summary>
+        /// 适用标记
+        /// </summary>
+        private void ApplyMark(OpenTKViewport viewport)
+        {
+            if (this._selectedVisual is BoundingBoxVisual3D box && viewport is VolumeViewport volumeViewport)
+            {
+                volumeViewport.VolumeRenderable.ApplyBoxROI(box.Minimum, box.Maximum, box.Transform.Matrix, 1);
+                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
+                volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
+
+                //请求下一帧
+                viewport.RequestNextFrameRendering();
+            }
         }
         #endregion
 
