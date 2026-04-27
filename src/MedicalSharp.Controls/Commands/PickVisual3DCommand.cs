@@ -77,6 +77,8 @@ namespace MedicalSharp.Controls.Commands
                     commandEventArgs.Normal = normal;
                     commandEventArgs.PickedVisual = visual;
                     commandEventArgs.Ray = ray;
+
+                    viewport.Camera.LookAt(point);
                 }
                 else
                 {

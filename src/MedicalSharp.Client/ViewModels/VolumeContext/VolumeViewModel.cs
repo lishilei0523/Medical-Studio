@@ -141,8 +141,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 byte? markValue = e.PickedMarkValue;
                 if (textureCoord.HasValue)
                 {
-                    this.Camera.LookAt(worldPosition.Value);
-
                     StringBuilder builder = new StringBuilder();
                     builder.AppendLine($"点击2D坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
                     builder.AppendLine($"点击纹理坐标: X:{textureCoord.Value.X}, Y:{textureCoord.Value.Y}, Z:{textureCoord.Value.Z}");
@@ -174,7 +172,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 if (e.PickedVisual is ShapeVisual3D shapeVisual3D)
                 {
                     this.SelectedShape = shapeVisual3D;
-                    this.Camera.LookAt(this.SelectedShape.Bounds.Center);
                 }
             };
             Action<Visual3D> removed = visual =>

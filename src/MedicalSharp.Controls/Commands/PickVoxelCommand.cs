@@ -67,6 +67,8 @@ namespace MedicalSharp.Controls.Commands
 
                 this._voxelPickedEvent?.Invoke(commandEventArgs);
 
+                viewport.Camera.LookAt(worldPosition);
+
                 //请求下一帧
                 viewport.RequestNextFrameRendering();
             }
