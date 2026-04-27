@@ -99,6 +99,19 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 方法
 
+        #region 绑定图像纹理 —— void BindImageTexture(int bindingPoint...
+        /// <summary>
+        /// 绑定图像纹理
+        /// </summary>
+        /// <param name="bindingPoint">绑定点索引（0-15，与着色器中的 layout(binding = N) 对应）</param>
+        /// <param name="textureAccess">访问模式</param>
+        public void BindImageTexture(int bindingPoint, TextureAccess textureAccess = TextureAccess.ReadWrite)
+        {
+            SizedInternalFormat sizedInternalFormat = (SizedInternalFormat)this.PixelInternalFormat;
+            GL.BindImageTexture(bindingPoint, this.Id, 0, true, 0, textureAccess, sizedInternalFormat);
+        }
+        #endregion
+
         #region 绑定纹理 —— abstract void Bind(int index)
         /// <summary>
         /// 绑定纹理
@@ -142,6 +155,18 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         /// <param name="pixels">像素数据</param>
         public abstract void Update(IntPtr pixels);
+        #endregion
+
+        #region 清空纹理 —— void Clear()
+        /// <summary>
+        /// 清空纹理
+        /// </summary>
+        /// <remarks>将纹理全部设为0</remarks>
+        public void Clear()
+        {
+            //使用glClearTexImage清除整个纹理（OpenGL 4.4+）
+            GL.ClearTexImage(this.Id, 0, this.PixelFormat, this.PixelType, IntPtr.Zero);
+        }
         #endregion
 
         #region 设置过滤器 —— virtual void SetFilter(TextureMinFilter minFilter...

@@ -110,14 +110,14 @@ namespace MedicalSharp.Engine.Renderables
 
             Matrix4 worldToLocal = localToWorld.Inverted();
 
-            //初始化计算着色器
+            //立方体计算着色器
             ShaderProgram boxComputer = ComputerManager.BoxComputer;
 
             //开启Shader程序
             boxComputer.Use();
 
             //绑定标记纹理为可读写
-            GL.BindImageTexture(0, this.MarkTexture.Id, 0, true, 0, TextureAccess.ReadWrite, SizedInternalFormat.R8ui);
+            this.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //设置立方体参数
             boxComputer.SetUniformVector3("u_BoxLocalMin", boxLocalMin);
@@ -134,7 +134,7 @@ namespace MedicalSharp.Engine.Renderables
             //调度执行
             ComputerManager.DispatchCompute(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
 
-            //取消使用并释放
+            //取消使用
             boxComputer.Unuse();
         }
         #endregion
@@ -323,8 +323,8 @@ namespace MedicalSharp.Engine.Renderables
         /// <remarks>将标记纹理全部设为0</remarks>
         public unsafe void ResetMarkTexture()
         {
-            //使用glClearTexImage清除整个纹理（OpenGL 4.4+）
-            GL.ClearTexImage(this.MarkTexture.Id, 0, PixelFormat.RedInteger, PixelType.UnsignedByte, IntPtr.Zero);
+            //清空标记纹理
+            this.MarkTexture.Clear();
 
             //清空CPU端内存
             if (this.VolumeData.MarkData != IntPtr.Zero)
