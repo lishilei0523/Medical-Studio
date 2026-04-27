@@ -66,6 +66,9 @@ namespace MedicalSharp.Controls.Commands
                 }
 
                 this._voxelPickedEvent?.Invoke(commandEventArgs);
+
+                //请求下一帧
+                viewport.RequestNextFrameRendering();
             }
         }
         #endregion 

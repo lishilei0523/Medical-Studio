@@ -84,6 +84,9 @@ namespace MedicalSharp.Controls.Commands
                 }
 
                 this._visual3DPickedEvent?.Invoke(commandEventArgs);
+
+                //请求下一帧
+                viewport.RequestNextFrameRendering();
             }
         }
         #endregion
