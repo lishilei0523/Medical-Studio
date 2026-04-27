@@ -50,8 +50,7 @@ void main()
     float u = dot(delta, u_RectUAxis);
     float v = dot(delta, u_RectVAxis);
     
-    bool inside = (normalDist <= 0.0) &&
-                  (abs(u) <= u_RectHalfWidth) &&
+    bool inside = (abs(u) <= u_RectHalfWidth) &&
                   (abs(v) <= u_RectHalfHeight);    
     if (inside)
     {
