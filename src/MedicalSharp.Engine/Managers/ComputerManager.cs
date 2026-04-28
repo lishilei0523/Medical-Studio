@@ -28,6 +28,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _CircleCutComputer;
 
         /// <summary>
+        /// 椭圆形切割计算着色器
+        /// </summary>
+        private static ShaderProgram _EllipseCutComputer;
+
+        /// <summary>
         /// 立方体切割计算着色器
         /// </summary>
         private static ShaderProgram _BoxCutComputer;
@@ -70,6 +75,16 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - 椭圆形切割计算着色器 —— static ShaderProgram EllipseCutComputer
+        /// <summary>
+        /// 只读属性 - 椭圆形切割计算着色器
+        /// </summary>
+        public static ShaderProgram EllipseCutComputer
+        {
+            get => _EllipseCutComputer;
+        }
+        #endregion
+
         #region 只读属性 - 立方体切割计算着色器 —— static ShaderProgram BoxCutComputer
         /// <summary>
         /// 只读属性 - 立方体切割计算着色器
@@ -101,6 +116,7 @@ namespace MedicalSharp.Engine.Managers
 
                 _BoxCutComputer = CreateBoxCutComputer();
                 _CircleCutComputer = CreateCircleCutComputer();
+                _EllipseCutComputer = CreateEllipseCutComputer();
                 _RectCutComputer = CreateRectCutComputer();
                 _Initialized = true;
             }
@@ -152,6 +168,7 @@ namespace MedicalSharp.Engine.Managers
         {
             _RectCutComputer?.Dispose();
             _CircleCutComputer?.Dispose();
+            _EllipseCutComputer.Dispose();
             _BoxCutComputer?.Dispose();
         }
         #endregion
@@ -181,6 +198,20 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/cut_circle.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion 
+
+        #region 创建椭圆形切割计算着色器 —— static ShaderProgram CreateEllipseCutComputer()
+        /// <summary>
+        /// 创建椭圆形切割计算着色器
+        /// </summary>
+        private static ShaderProgram CreateEllipseCutComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_ellipse.comp");
             program.BuildCompute();
 
             return program;
