@@ -80,7 +80,11 @@ namespace MedicalSharp.Controls.Commands
                     commandEventArgs.PickedVisual = visual;
                     commandEventArgs.Ray = ray;
 
-                    viewport.Camera.LookAt(point);
+                    //看向目标
+                    if (KeyModifiers.Shift == (eventArgs.KeyModifiers & KeyModifiers.Shift))
+                    {
+                        viewport.Camera.LookAt(point);
+                    }
                 }
                 else
                 {

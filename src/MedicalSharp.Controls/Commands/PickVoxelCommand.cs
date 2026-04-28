@@ -67,7 +67,11 @@ namespace MedicalSharp.Controls.Commands
 
                 this._voxelPickedEvent?.Invoke(commandEventArgs);
 
-                viewport.Camera.LookAt(worldPosition);
+                //看向目标
+                if (KeyModifiers.Shift == (eventArgs.KeyModifiers & KeyModifiers.Shift))
+                {
+                    viewport.Camera.LookAt(worldPosition);
+                }
 
                 //请求下一帧
                 viewport.RequestNextFrameRendering();
