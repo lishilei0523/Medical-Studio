@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -48,7 +49,8 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         /// <param name="strokeMesh">线框网格</param>
         /// <param name="fillMesh">填充网格</param>
-        public WildframeRenderable(MeshGeometry strokeMesh, MeshGeometry fillMesh)
+        /// <param name="drawVertex">是否绘制顶点</param>
+        public WildframeRenderable(MeshGeometry strokeMesh, MeshGeometry fillMesh, bool drawVertex = false)
             : this()
         {
             #region # 验证
@@ -64,6 +66,7 @@ namespace MedicalSharp.Engine.Renderables
 
             #endregion
 
+            this.DrawVertex = drawVertex;
             this._strokeBuffer = new VertexBuffer(strokeMesh);
             this._fillBuffer = new VertexBuffer(fillMesh);
             this._strokeBuffer.Setup();
@@ -96,6 +99,13 @@ namespace MedicalSharp.Engine.Renderables
         /// 填充颜色
         /// </summary>
         public Vector4 Fill { get; private set; }
+        #endregion
+
+        #region 是否绘制顶点 —— bool DrawVertex
+        /// <summary>
+        /// 是否绘制顶点
+        /// </summary>
+        public bool DrawVertex { get; private set; }
         #endregion
 
         #region 只读属性 - 三角形列表 —— IList<Triangle> Triangles
@@ -211,6 +221,27 @@ namespace MedicalSharp.Engine.Renderables
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
             this.StrokeBuffer.Draw(PrimitiveType.Lines);
+
+            if (this.DrawVertex)
+            {
+                //点尺寸
+                float pointSize = Math.Clamp(this.StrokeThickness * 3.0f, 5f, 20f);
+                GL.PointSize(pointSize);
+
+                //点颜色
+                Vector4 invertedStroke = this.Stroke.Invert();
+                float contrast = Math.Abs(invertedStroke.X - invertedStroke.X) +
+                                 Math.Abs(invertedStroke.Y - invertedStroke.Y) +
+                                 Math.Abs(invertedStroke.Z - invertedStroke.Z);
+                if (contrast < 0.5f)
+                {
+                    invertedStroke = ColorFactory.Yellow(); //固定用亮黄色
+                }
+
+                //绘制控制点
+                program.SetUniformVector4("u_Color", invertedStroke);
+                this.StrokeBuffer.Draw(PrimitiveType.Points);
+            }
         }
         #endregion
 
