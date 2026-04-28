@@ -23,6 +23,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _RectCutComputer;
 
         /// <summary>
+        /// 圆形切割计算着色器
+        /// </summary>
+        private static ShaderProgram _CircleCutComputer;
+
+        /// <summary>
         /// 立方体切割计算着色器
         /// </summary>
         private static ShaderProgram _BoxCutComputer;
@@ -52,6 +57,16 @@ namespace MedicalSharp.Engine.Managers
         public static ShaderProgram RectCutComputer
         {
             get => _RectCutComputer;
+        }
+        #endregion
+
+        #region 只读属性 - 圆形切割计算着色器 —— static ShaderProgram CircleCutComputer
+        /// <summary>
+        /// 只读属性 - 圆形切割计算着色器
+        /// </summary>
+        public static ShaderProgram CircleCutComputer
+        {
+            get => _CircleCutComputer;
         }
         #endregion
 
@@ -85,6 +100,7 @@ namespace MedicalSharp.Engine.Managers
                 }
 
                 _BoxCutComputer = CreateBoxCutComputer();
+                _CircleCutComputer = CreateCircleCutComputer();
                 _RectCutComputer = CreateRectCutComputer();
                 _Initialized = true;
             }
@@ -135,6 +151,7 @@ namespace MedicalSharp.Engine.Managers
         public static void Cleanup()
         {
             _RectCutComputer?.Dispose();
+            _CircleCutComputer?.Dispose();
             _BoxCutComputer?.Dispose();
         }
         #endregion
@@ -150,6 +167,20 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/cut_rect.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion 
+
+        #region 创建圆形切割计算着色器 —— static ShaderProgram CreateCircleCutComputer()
+        /// <summary>
+        /// 创建圆形切割计算着色器
+        /// </summary>
+        private static ShaderProgram CreateCircleCutComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_circle.comp");
             program.BuildCompute();
 
             return program;

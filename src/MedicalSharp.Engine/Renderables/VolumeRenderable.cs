@@ -107,7 +107,7 @@ namespace MedicalSharp.Engine.Renderables
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
-            //立方体计算着色器
+            //矩形切割计算着色器
             ShaderProgram cutComputer = ComputerManager.RectCutComputer;
 
             //开启Shader程序
@@ -123,6 +123,57 @@ namespace MedicalSharp.Engine.Renderables
             cutComputer.SetUniformVector3("u_RectNormal", normal);
             cutComputer.SetUniformVector3("u_RectUAxis", uAxis);
             cutComputer.SetUniformVector3("u_RectVAxis", vAxis);
+            cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
+
+            //设置体积参数
+            cutComputer.SetUniformVector3i("u_VolumeSize", this.VolumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", this.VolumeData.Metadata.VolumeScale);
+
+            //设置切割模式
+            cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
+
+            //设置标记值
+            cutComputer.SetUniformUInt("u_MarkValue", markValue);
+
+            //调度执行
+            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+
+            //取消使用
+            cutComputer.Unuse();
+        }
+        #endregion
+
+        #region 应用圆形切割 —— void ApplyCircleCut(float radius, Vector3 center...
+        /// <summary>
+        /// 应用圆形切割
+        /// </summary>
+        /// <param name="radius">半径</param>
+        /// <param name="center">中心位置</param>
+        /// <param name="normal">法向量</param>
+        /// <param name="uAxis">U轴</param>
+        /// <param name="vAxis">V轴</param>
+        /// <param name="localToWorld">局部到世界变换矩阵</param>
+        /// <param name="cutMode">切割模式</param>
+        /// <param name="markValue">标记值（1-255，0表示清除）</param>
+        public void ApplyCircleCut(float radius, Vector3 center, Vector3 normal, Vector3 uAxis, Vector3 vAxis, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        {
+            Matrix4 worldToLocal = localToWorld.Inverted();
+
+            //圆形切割计算着色器
+            ShaderProgram cutComputer = ComputerManager.CircleCutComputer;
+
+            //开启Shader程序
+            cutComputer.Use();
+
+            //绑定标记纹理为可读写
+            this.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+
+            //设置圆形参数
+            cutComputer.SetUniformFloat("u_CircleRadius", radius);
+            cutComputer.SetUniformVector3("u_CircleCenter", center);
+            cutComputer.SetUniformVector3("u_CircleNormal", normal);
+            cutComputer.SetUniformVector3("u_CircleUAxis", uAxis);
+            cutComputer.SetUniformVector3("u_CircleVAxis", vAxis);
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
@@ -165,7 +216,7 @@ namespace MedicalSharp.Engine.Renderables
 
             Matrix4 worldToLocal = localToWorld.Inverted();
 
-            //立方体计算着色器
+            //立方体切割计算着色器
             ShaderProgram cutComputer = ComputerManager.BoxCutComputer;
 
             //开启Shader程序

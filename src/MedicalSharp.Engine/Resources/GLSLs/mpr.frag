@@ -24,7 +24,7 @@ uniform float u_RescaleIntercept;
 //体积参数
 uniform vec3 u_VolumeScale;
 
-//标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Highlight）
+//标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Tinted）
 uniform int u_MarkModes[256];
 
 //常量

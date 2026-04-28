@@ -167,6 +167,12 @@ namespace MedicalSharp.Controls.Commands
                     volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Tinted);
                     volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
                 }
+                if (this._selectedVisual is CircleVisual3D circle)
+                {
+                    volumeViewport.VolumeRenderable.ApplyCircleCut(circle.Radius, circle.Center.ToVector3(), circle.Normal.ToVector3(), circle.UAxis, circle.VAxis, circle.Transform.Matrix, CutMode.Inside, 1);
+                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
+                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
+                }
                 if (this._selectedVisual is BoundingBoxVisual3D box)
                 {
                     volumeViewport.VolumeRenderable.ApplyBoxCut(box.Minimum, box.Maximum, box.Transform.Matrix, CutMode.Inside, 1);

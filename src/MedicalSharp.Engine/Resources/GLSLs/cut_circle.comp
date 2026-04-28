@@ -1,0 +1,80 @@
+#version 430 core
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+//标记纹理（可读写，R8UI格式）
+layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
+
+//圆形参数
+uniform float u_CircleRadius;            //半径
+uniform vec3 u_CircleCenter;             //圆心（局部空间）
+uniform vec3 u_CircleNormal;             //法向量（归一化）
+uniform vec3 u_CircleUAxis;              //U轴（宽度方向，归一化）
+uniform vec3 u_CircleVAxis;              //V轴（高度方向，归一化）
+uniform mat4 u_WorldToLocal;
+
+//体积参数
+uniform ivec3 u_VolumeSize;
+uniform vec3 u_VolumeScale;
+
+//切割模式（0=内切, 1=外切）
+uniform int u_CutMode;
+
+//标记值（1-255，0保留给未标记）
+uniform uint u_MarkValue;
+
+void main()
+{
+    //获取当前线程对应的体素坐标
+    ivec3 voxelCoord = ivec3(gl_GlobalInvocationID);
+    
+    //边界检查
+    if (voxelCoord.x >= u_VolumeSize.x ||
+        voxelCoord.y >= u_VolumeSize.y ||
+        voxelCoord.z >= u_VolumeSize.z)
+    {
+        return;
+    }
+    
+    //体素坐标 -> 纹理坐标（0-1范围） -> 世界坐标
+    vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_VolumeSize);
+    vec3 worldPos = (texCoord - 0.5) * u_VolumeScale;
+    
+    //应用逆变换到局部坐标
+    vec4 localPos = u_WorldToLocal * vec4(worldPos, 1.0);
+    localPos /= localPos.w;
+    vec3 pos = localPos.xyz;
+    
+    //计算相对圆心的位置
+    vec3 delta = pos - u_CircleCenter;
+    
+    //投影到圆平面上的坐标
+    float u = dot(delta, u_CircleUAxis);
+    float v = dot(delta, u_CircleVAxis);
+    
+    //圆内判断：u² + v² <= r²
+    float distSq = u * u + v * v;
+    float radiusSq = u_CircleRadius * u_CircleRadius;
+    bool inCircle = (distSq <= radiusSq);
+    
+    //根据切割模式决定
+    bool inside = false;
+    if (u_CutMode == 0)
+    {
+        //内切：挖掉圆形投影区域
+        inside = inCircle;
+    }
+    else
+    {
+        //外切：挖掉圆形投影区域之外的部分
+        inside = !inCircle;
+    }
+    
+    if (inside)
+    {
+        uint oldMarkValue = imageLoad(u_MarkTexture, voxelCoord).r;
+        if (oldMarkValue != u_MarkValue)
+        {
+            imageStore(u_MarkTexture, voxelCoord, uvec4(u_MarkValue, 0, 0, 0));
+        }
+    }
+}
