@@ -59,6 +59,9 @@
                     <sd:ToggleRadioButton cm:Message.Attach="DrawPolygon()" Classes="Transparent-Panel">
                         <PathIcon Data="{StaticResource Icon-Polygon}" />
                     </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawClosedCurve()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-ClosedCurve}" />
+                    </sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawBox()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-Cube}" />
 					</sd:ToggleRadioButton>

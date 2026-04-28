@@ -323,6 +323,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 绘制闭合曲线 —— void DrawClosedCurve()
+        /// <summary>
+        /// 绘制闭合曲线
+        /// </summary>
+        public void DrawClosedCurve()
+        {
+            DrawCurveCommand command = new DrawCurveCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape), true);
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
         #region 绘制立方体 —— void DrawBox()
         /// <summary>
         /// 绘制立方体

@@ -58,7 +58,7 @@ namespace MedicalSharp.Controls.Commands
 
         #endregion
 
-        #region 方法
+        #region # 方法
 
         //Public
 
@@ -185,7 +185,6 @@ namespace MedicalSharp.Controls.Commands
             this._previewPoint = null;
             this._curve = null;
         }
-
         #endregion
 
 
@@ -229,7 +228,6 @@ namespace MedicalSharp.Controls.Commands
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
-
         #endregion
 
         #region 取消绘制 —— void CancelDrawing(OpenTKViewport viewport)
