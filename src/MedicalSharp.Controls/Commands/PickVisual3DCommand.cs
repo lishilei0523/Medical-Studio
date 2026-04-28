@@ -191,6 +191,12 @@ namespace MedicalSharp.Controls.Commands
                     volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
                     volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
                 }
+                if (this._selectedVisual is CylinderVisual3D cylinder)
+                {
+                    volumeViewport.VolumeRenderable.ApplyCylinderCut(cylinder.Radius, cylinder.Height, cylinder.Center.ToVector3(), cylinder.Transform.Matrix, CutMode.OutSide, 1);
+                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
+                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
+                }
             }
 
             //请求下一帧

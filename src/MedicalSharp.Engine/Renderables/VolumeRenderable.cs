@@ -346,6 +346,53 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
+        #region 应用圆柱体切割 —— void ApplyCylinderCut(float radius, float height, Vector3 center...
+        /// <summary>
+        /// 应用圆柱体切割
+        /// </summary>
+        /// <param name="radius">半径</param>
+        /// <param name="height">高度（沿Z轴）</param>
+        /// <param name="center">中心位置（局部空间）</param>
+        /// <param name="localToWorld">局部到世界变换矩阵</param>
+        /// <param name="cutMode">切割模式</param>
+        /// <param name="markValue">标记值</param>
+        public void ApplyCylinderCut(float radius, float height, Vector3 center, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        {
+            Matrix4 worldToLocal = localToWorld.Inverted();
+
+            //圆柱体切割计算着色器
+            ShaderProgram cutComputer = ComputerManager.CylinderCutComputer;
+
+            //开启Shader程序
+            cutComputer.Use();
+
+            //绑定标记纹理为可读写
+            this.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+
+            //设置圆柱体参数
+            cutComputer.SetUniformFloat("u_CylinderRadius", radius);
+            cutComputer.SetUniformFloat("u_CylinderHeight", height);
+            cutComputer.SetUniformVector3("u_CylinderCenter", center);
+            cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
+
+            //设置体积参数
+            cutComputer.SetUniformVector3i("u_VolumeSize", this.VolumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", this.VolumeData.Metadata.VolumeScale);
+
+            //设置切割模式
+            cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
+
+            //设置标记值
+            cutComputer.SetUniformUInt("u_MarkValue", markValue);
+
+            //调度执行
+            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+
+            //取消使用
+            cutComputer.Unuse();
+        }
+        #endregion
+
         #region 同步标记数据GPU->CPU —— void SyncMarkDataFromGpu()
         /// <summary>
         /// 同步标记数据GPU->CPU

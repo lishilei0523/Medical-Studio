@@ -43,6 +43,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _SphereCutComputer;
 
         /// <summary>
+        /// 圆柱体切割计算着色器
+        /// </summary>
+        private static ShaderProgram _CylinderCutComputer;
+
+        /// <summary>
         /// 同步锁
         /// </summary>
         private static readonly Lock _Sync;
@@ -110,6 +115,16 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - 圆柱体切割计算着色器 —— static ShaderProgram CylinderCutComputer
+        /// <summary>
+        /// 只读属性 - 圆柱体切割计算着色器
+        /// </summary>
+        public static ShaderProgram CylinderCutComputer
+        {
+            get => _CylinderCutComputer;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -134,6 +149,7 @@ namespace MedicalSharp.Engine.Managers
                 _RectCutComputer = CreateRectCutComputer();
                 _BoxCutComputer = CreateBoxCutComputer();
                 _SphereCutComputer = CreateSphereCutComputer();
+                _CylinderCutComputer = CreateCylinderCutComputer();
                 _Initialized = true;
             }
         }
@@ -187,6 +203,7 @@ namespace MedicalSharp.Engine.Managers
             _EllipseCutComputer.Dispose();
             _BoxCutComputer?.Dispose();
             _SphereCutComputer?.Dispose();
+            _CylinderCutComputer?.Dispose();
         }
         #endregion
 
@@ -257,6 +274,20 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/cut_sphere.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion
+
+        #region 创建圆柱体切割计算着色器 —— static ShaderProgram CreateCylinderCutComputer()
+        /// <summary>
+        /// 创建圆柱体切割计算着色器
+        /// </summary>
+        private static ShaderProgram CreateCylinderCutComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_cylinder.comp");
             program.BuildCompute();
 
             return program;

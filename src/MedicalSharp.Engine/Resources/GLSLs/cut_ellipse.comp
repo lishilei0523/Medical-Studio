@@ -23,6 +23,7 @@ uniform int u_CutMode;
 //标记值（1-255，0保留给未标记）
 uniform uint u_MarkValue;
 
+
 void main()
 {
     //获取当前线程对应的体素坐标

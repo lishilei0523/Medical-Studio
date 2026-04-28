@@ -4,9 +4,10 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 //标记纹理（可读写，R8UI格式）
 layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
 
-//球体参数
-uniform float u_SphereRadius;            //半径
-uniform vec3 u_SphereCenter;             //球心（局部空间）
+//圆柱体参数
+uniform float u_CylinderRadius;          //半径
+uniform float u_CylinderHeight;          //高度（沿Z轴）
+uniform vec3 u_CylinderCenter;           //中心位置（局部空间）
 uniform mat4 u_WorldToLocal;
 
 //体积参数
@@ -42,25 +43,32 @@ void main()
     localPos /= localPos.w;
     vec3 pos = localPos.xyz;
     
-    //计算相对球心的位置
-    vec3 delta = pos - u_SphereCenter;
+    //计算相对圆柱体中心的位置
+    vec3 delta = pos - u_CylinderCenter;
     
-    //球体内判断：距离 <= 半径
-    float distSq = dot(delta, delta);
-    float radiusSq = u_SphereRadius * u_SphereRadius;
-    bool inSphere = (distSq <= radiusSq);
+    //Z-up：轴向就是Z轴
+    float halfHeight = u_CylinderHeight * 0.5;
+    
+    //轴向判断：Z方向
+    float zDist = abs(delta.z);
+    
+    //径向距离：X-Y平面距离
+    float radialDist = length(delta.xy);
+    
+    //圆柱体内判断：轴向范围 [-halfHeight, halfHeight]，径向距离 <= 半径
+    bool inCylinder = (zDist <= halfHeight) && (radialDist <= u_CylinderRadius);
     
     //根据切割模式决定
     bool inside = false;
     if (u_CutMode == 0)
     {
-        //内切：挖掉球体内部
-        inside = inSphere;
+        //内切：挖掉圆柱体内部
+        inside = inCylinder;
     }
     else
     {
-        //外切：挖掉球体外部
-        inside = !inSphere;
+        //外切：挖掉圆柱体外部
+        inside = !inCylinder;
     }
     
     if (inside)

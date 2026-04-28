@@ -19,6 +19,7 @@ uniform int u_CutMode;
 //标记值（1-255，0保留给未标记）
 uniform uint u_MarkValue;
 
+
 void main()
 {
     //获取当前线程对应的体素坐标
@@ -43,20 +44,20 @@ void main()
                   localPos.y >= u_BoxLocalMin.y && localPos.y <= u_BoxLocalMax.y &&
                   localPos.z >= u_BoxLocalMin.z && localPos.z <= u_BoxLocalMax.z);
 
-    //根据切割模式决定是否标记
-    bool shouldMark = false;
+    //根据切割模式决定
+    bool inside = false;
     if (u_CutMode == 0)
     {
-        //内切：标记立方体内部
-        shouldMark = inBox;
+        //内切：挖掉立方体内部
+        inside = inBox;
     }
     else
     {
-        //外切：标记立方体外部
-        shouldMark = !inBox;
+        //外切：挖掉立方体外部
+        inside = !inBox;
     }
 
-    if (shouldMark)
+    if (inside)
     {
         uint oldMarkValue = imageLoad(u_MarkTexture, voxelCoord).r;
         if (oldMarkValue != u_MarkValue)
