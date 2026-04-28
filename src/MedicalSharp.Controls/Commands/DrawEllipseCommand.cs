@@ -76,6 +76,8 @@ namespace MedicalSharp.Controls.Commands
                     this._ellipse = new EllipseVisual3D
                     {
                         Fill = Color.Parse("#0F00FF00"),
+                        Width = 0.01f,
+                        Height = 0.005f,
                         Center = mousePos3D.Value.ToVector3(),
                         Normal = -this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };

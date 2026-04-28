@@ -75,6 +75,7 @@ namespace MedicalSharp.Controls.Commands
                     this._circle = new CircleVisual3D
                     {
                         Fill = Color.Parse("#0F00FF00"),
+                        Radius = 0.01f,
                         Center = mousePos3D.Value.ToVector3(),
                         Normal = -this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };

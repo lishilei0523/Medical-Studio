@@ -828,206 +828,145 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建平面 —— static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f...
-        /// <summary>
-        /// 创建平面
-        /// </summary>
-        /// <param name="width">宽度</param>
-        /// <param name="height">高度</param>
-        /// <param name="widthSegments">宽度细分数量</param>
-        /// <param name="heightSegments">高度细分数量</param>
-        /// <returns>网格模型</returns>
-        public static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f, int widthSegments = 1, int heightSegments = 1)
-        {
-            float halfW = width * 0.5f;
-            float halfH = height * 0.5f;
-
-            List<Vertex> vertices = [];
-            List<uint> indices = [];
-
-            for (int y = 0; y <= heightSegments; y++)
-            {
-                for (int x = 0; x <= widthSegments; x++)
-                {
-                    float u = x / (float)widthSegments;
-                    float v = y / (float)heightSegments;
-
-                    float px = u * width - halfW;
-                    float pz = v * height - halfH;
-
-                    vertices.Add(new Vertex
-                    {
-                        Position = new Vector3(px, 0, pz),
-                        TextureCoord = new Vector2(u, 1.0f - v),
-                        Normal = Vector3.UnitY
-                    });
-                }
-            }
-
-            for (int y = 0; y < heightSegments; y++)
-            {
-                for (int x = 0; x < widthSegments; x++)
-                {
-                    int topLeft = y * (widthSegments + 1) + x;
-                    int topRight = topLeft + 1;
-                    int bottomLeft = (y + 1) * (widthSegments + 1) + x;
-                    int bottomRight = bottomLeft + 1;
-
-                    indices.Add((uint)topLeft);
-                    indices.Add((uint)bottomLeft);
-                    indices.Add((uint)topRight);
-
-                    indices.Add((uint)topRight);
-                    indices.Add((uint)bottomLeft);
-                    indices.Add((uint)bottomRight);
-                }
-            }
-
-            return new MeshGeometry(vertices, indices);
-        }
-        #endregion
-
         #region # 创建圆柱体 —— static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f...
         /// <summary>
         /// 创建圆柱体
         /// </summary>
         /// <param name="radius">半径</param>
-        /// <param name="height">高度</param>
+        /// <param name="height">高度（Z轴方向）</param>
+        /// <param name="center">中心点位置</param>
         /// <param name="segments">细分数量</param>
-        /// <param name="withCaps">是否封闭</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <param name="withCaps">是否封闭（仅填充模式有效）</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f, int segments = 32, bool withCaps = true)
+        public static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f, Vector3 center = default, int segments = 32, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Lines, bool withCaps = true)
         {
-            float halfH = height * 0.5f;
+            float halfH = height * 0.5f;  //Z轴方向的一半
             List<Vertex> vertices = [];
             List<uint> indices = [];
-
-            //侧面
-            for (int i = 0; i <= segments; i++)
+            if (primitiveType == GraphicPrimitiveType.Lines)
             {
-                float angle = 2.0f * MathHelper.Pi * i / segments;
-                float x = (float)Math.Cos(angle) * radius;
-                float z = (float)Math.Sin(angle) * radius;
-
-                vertices.Add(new Vertex
+                //==========线框模式==========
+                //上下两个圆的线段
+                for (int index = 0; index < segments; index++)
                 {
-                    Position = new Vector3(x, halfH, z),
-                    TextureCoord = new Vector2(i / (float)segments, 0),
-                    Normal = new Vector3(x, 0, z)
-                });
+                    float angle1 = 2.0f * MathHelper.Pi * index / segments;
+                    float angle2 = 2.0f * MathHelper.Pi * (index + 1) / segments;
+                    float x1 = (float)Math.Cos(angle1) * radius;
+                    float y1 = (float)Math.Sin(angle1) * radius;
+                    float x2 = (float)Math.Cos(angle2) * radius;
+                    float y2 = (float)Math.Sin(angle2) * radius;
 
-                vertices.Add(new Vertex
+                    //上圆（Z = +halfH）
+                    vertices.Add(new Vertex { Position = center + new Vector3(x1, y1, halfH), Normal = Vector3.Zero });
+                    vertices.Add(new Vertex { Position = center + new Vector3(x2, y2, halfH), Normal = Vector3.Zero });
+                    indices.Add((uint)(vertices.Count - 2));
+                    indices.Add((uint)(vertices.Count - 1));
+
+                    //下圆（Z = -halfH）
+                    vertices.Add(new Vertex { Position = center + new Vector3(x1, y1, -halfH), Normal = Vector3.Zero });
+                    vertices.Add(new Vertex { Position = center + new Vector3(x2, y2, -halfH), Normal = Vector3.Zero });
+                    indices.Add((uint)(vertices.Count - 2));
+                    indices.Add((uint)(vertices.Count - 1));
+                }
+
+                //垂直方向的线段（沿Z轴）
+                for (int index = 0; index < segments; index++)
                 {
-                    Position = new Vector3(x, -halfH, z),
-                    TextureCoord = new Vector2(i / (float)segments, 1),
-                    Normal = new Vector3(x, 0, z)
-                });
+                    float angle = 2.0f * MathHelper.Pi * index / segments;
+                    float x = (float)Math.Cos(angle) * radius;
+                    float y = (float)Math.Sin(angle) * radius;
+
+                    Vector3 top = center + new Vector3(x, y, halfH);
+                    Vector3 bottom = center + new Vector3(x, y, -halfH);
+
+                    vertices.Add(new Vertex { Position = top, Normal = Vector3.Zero });
+                    vertices.Add(new Vertex { Position = bottom, Normal = Vector3.Zero });
+                    indices.Add((uint)(vertices.Count - 2));
+                    indices.Add((uint)(vertices.Count - 1));
+                }
             }
-
-            //侧面索引
-            for (int i = 0; i < segments; i++)
+            else
             {
-                int baseIdx = i * 2;
-                indices.Add((uint)baseIdx);
-                indices.Add((uint)(baseIdx + 1));
-                indices.Add((uint)(baseIdx + 2));
-
-                indices.Add((uint)(baseIdx + 1));
-                indices.Add((uint)(baseIdx + 3));
-                indices.Add((uint)(baseIdx + 2));
-            }
-
-            if (withCaps)
-            {
-                uint topCenter = (uint)vertices.Count;
-                vertices.Add(new Vertex
+                //==========填充模式==========
+                //侧面
+                for (int index = 0; index <= segments; index++)
                 {
-                    Position = new Vector3(0, halfH, 0),
-                    TextureCoord = new Vector2(0.5f, 0.5f),
-                    Normal = Vector3.UnitY
-                });
+                    float angle = 2.0f * MathHelper.Pi * index / segments;
+                    float x = (float)Math.Cos(angle) * radius;
+                    float y = (float)Math.Sin(angle) * radius;
+                    Vector3 normal = new Vector3(x, y, 0).Normalized();
 
-                uint bottomCenter = (uint)vertices.Count;
-                vertices.Add(new Vertex
+                    vertices.Add(new Vertex
+                    {
+                        Position = center + new Vector3(x, y, halfH),
+                        TextureCoord = new Vector2(index / (float)segments, 0),
+                        Normal = normal
+                    });
+                    vertices.Add(new Vertex
+                    {
+                        Position = center + new Vector3(x, y, -halfH),
+                        TextureCoord = new Vector2(index / (float)segments, 1),
+                        Normal = normal
+                    });
+                }
+
+                //侧面索引
+                for (int index = 0; index < segments; index++)
                 {
-                    Position = new Vector3(0, -halfH, 0),
-                    TextureCoord = new Vector2(0.5f, 0.5f),
-                    Normal = -Vector3.UnitY
-                });
+                    int baseIdx = index * 2;
+                    indices.Add((uint)baseIdx);
+                    indices.Add((uint)(baseIdx + 1));
+                    indices.Add((uint)(baseIdx + 2));
 
-                for (int i = 0; i < segments; i++)
+                    indices.Add((uint)(baseIdx + 1));
+                    indices.Add((uint)(baseIdx + 3));
+                    indices.Add((uint)(baseIdx + 2));
+                }
+
+                //顶盖和底盖
+                if (withCaps)
                 {
-                    int idx1 = i * 2;
-                    int idx2 = (i + 1) % segments * 2;
+                    uint topCenter = (uint)vertices.Count;
+                    vertices.Add(new Vertex
+                    {
+                        Position = center + new Vector3(0, 0, halfH),
+                        TextureCoord = new Vector2(0.5f, 0.5f),
+                        Normal = Vector3.UnitZ
+                    });
 
-                    indices.Add(topCenter);
-                    indices.Add((uint)idx1);
-                    indices.Add((uint)idx2);
+                    uint bottomCenter = (uint)vertices.Count;
+                    vertices.Add(new Vertex
+                    {
+                        Position = center + new Vector3(0, 0, -halfH),
+                        TextureCoord = new Vector2(0.5f, 0.5f),
+                        Normal = -Vector3.UnitZ
+                    });
 
-                    indices.Add(bottomCenter);
-                    indices.Add((uint)(idx2 + 1));
-                    indices.Add((uint)(idx1 + 1));
+                    //顶盖三角形
+                    for (int index = 0; index < segments; index++)
+                    {
+                        int idx1 = index * 2;
+                        int idx2 = (index + 1) % segments * 2;
+
+                        indices.Add(topCenter);
+                        indices.Add((uint)idx1);
+                        indices.Add((uint)idx2);
+
+                        indices.Add(bottomCenter);
+                        indices.Add((uint)(idx2 + 1));
+                        indices.Add((uint)(idx1 + 1));
+                    }
                 }
             }
 
             MeshGeometry meshGeometry = new(vertices, indices);
-            MeshFactory.CalculateNormals(meshGeometry);
+            if (primitiveType != GraphicPrimitiveType.Lines)
+            {
+                CalculateNormals(meshGeometry);
+            }
 
             return meshGeometry;
-        }
-        #endregion
-
-        #region # 创建坐标轴 —— static MeshGeometry CreateAxes(float length = 1.0f)
-        /// <summary>
-        /// 创建坐标轴
-        /// </summary>
-        /// <param name="length">长度</param>
-        /// <returns>网格模型</returns>
-        public static MeshGeometry CreateAxes(float length = 1.0f)
-        {
-            List<Vertex> vertices =
-            [
-                new()
-                {
-                    Position = Vector3.Zero,
-                    TextureCoord = Vector2.Zero,
-                    Normal = Vector3.UnitX
-                },
-                new()
-                {
-                    Position = new Vector3(length, 0, 0),
-                    TextureCoord = Vector2.UnitX,
-                    Normal = Vector3.UnitX
-                },
-                new()
-                {
-                    Position = Vector3.Zero,
-                    TextureCoord = Vector2.Zero,
-                    Normal = Vector3.UnitY
-                },
-                new()
-                {
-                    Position = new Vector3(0, length, 0),
-                    TextureCoord = Vector2.UnitX,
-                    Normal = Vector3.UnitY
-                },
-                new()
-                {
-                    Position = Vector3.Zero,
-                    TextureCoord = Vector2.Zero,
-                    Normal = Vector3.UnitZ
-                },
-                new()
-                {
-                    Position = new Vector3(0, 0, length),
-                    TextureCoord = Vector2.UnitX,
-                    Normal = Vector3.UnitZ
-                }
-            ];
-
-            List<uint> indices = [0, 1, 2, 3, 4, 5];
-
-            return new MeshGeometry(vertices, indices);
         }
         #endregion
 
@@ -1155,62 +1094,6 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
-        #region # 创建线框 —— static MeshGeometry CreateWireframe(MeshGeometry meshGeometry...
-        /// <summary>
-        /// 创建线框
-        /// </summary>
-        /// <param name="meshGeometry">网格模型</param>
-        /// <returns>网格模型</returns>
-        public static MeshGeometry CreateWireframe(MeshGeometry meshGeometry)
-        {
-            List<Vertex> vertices = [];
-            List<uint> indices = [];
-            HashSet<(uint, uint)> edges = [];
-
-            for (int i = 0; i < meshGeometry.Indices.Length; i += 3)
-            {
-                uint i0 = meshGeometry.Indices[i];
-                uint i1 = meshGeometry.Indices[i + 1];
-                uint i2 = meshGeometry.Indices[i + 2];
-
-                (uint, uint)[] edgePairs =
-                [
-                    (Math.Min(i0, i1), Math.Max(i0, i1)),
-                    (Math.Min(i1, i2), Math.Max(i1, i2)),
-                    (Math.Min(i2, i0), Math.Max(i2, i0))
-                ];
-
-                foreach ((uint, uint) edge in edgePairs)
-                {
-                    if (edges.Add(edge))
-                    {
-                        Vertex v1 = meshGeometry.Vertices[(int)edge.Item1];
-                        Vertex v2 = meshGeometry.Vertices[(int)edge.Item2];
-
-                        vertices.Add(new Vertex
-                        {
-                            Position = v1.Position,
-                            TextureCoord = v1.TextureCoord,
-                            Normal = v1.Normal
-                        });
-                        vertices.Add(new Vertex
-                        {
-                            Position = v2.Position,
-                            TextureCoord = v2.TextureCoord,
-                            Normal = v2.Normal
-                        });
-
-                        uint baseIdx = (uint)(vertices.Count - 2);
-                        indices.Add(baseIdx);
-                        indices.Add(baseIdx + 1);
-                    }
-                }
-            }
-
-            return new MeshGeometry(vertices, indices);
-        }
-        #endregion
-
         #region # 创建2D容器 —— static MeshGeometry CreateContainer2D(float width, float height, Vector3 normal)
         /// <summary>
         /// 创建2D容器
@@ -1288,6 +1171,175 @@ namespace MedicalSharp.Primitives.Builders
 
             //构建索引（两个三角形）
             List<uint> indices = [0, 1, 2, 0, 2, 3];
+
+            return new MeshGeometry(vertices, indices);
+        }
+        #endregion
+
+        #region # 创建平面 —— static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f...
+        /// <summary>
+        /// 创建平面
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="widthSegments">宽度细分数量</param>
+        /// <param name="heightSegments">高度细分数量</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f, int widthSegments = 1, int heightSegments = 1)
+        {
+            float halfW = width * 0.5f;
+            float halfH = height * 0.5f;
+
+            List<Vertex> vertices = [];
+            List<uint> indices = [];
+
+            for (int y = 0; y <= heightSegments; y++)
+            {
+                for (int x = 0; x <= widthSegments; x++)
+                {
+                    float u = x / (float)widthSegments;
+                    float v = y / (float)heightSegments;
+
+                    float px = u * width - halfW;
+                    float pz = v * height - halfH;
+
+                    vertices.Add(new Vertex
+                    {
+                        Position = new Vector3(px, 0, pz),
+                        TextureCoord = new Vector2(u, 1.0f - v),
+                        Normal = Vector3.UnitY
+                    });
+                }
+            }
+
+            for (int y = 0; y < heightSegments; y++)
+            {
+                for (int x = 0; x < widthSegments; x++)
+                {
+                    int topLeft = y * (widthSegments + 1) + x;
+                    int topRight = topLeft + 1;
+                    int bottomLeft = (y + 1) * (widthSegments + 1) + x;
+                    int bottomRight = bottomLeft + 1;
+
+                    indices.Add((uint)topLeft);
+                    indices.Add((uint)bottomLeft);
+                    indices.Add((uint)topRight);
+
+                    indices.Add((uint)topRight);
+                    indices.Add((uint)bottomLeft);
+                    indices.Add((uint)bottomRight);
+                }
+            }
+
+            return new MeshGeometry(vertices, indices);
+        }
+        #endregion
+
+        #region # 创建坐标轴 —— static MeshGeometry CreateAxes(float length = 1.0f)
+        /// <summary>
+        /// 创建坐标轴
+        /// </summary>
+        /// <param name="length">长度</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreateAxes(float length = 1.0f)
+        {
+            List<Vertex> vertices =
+            [
+                new()
+                {
+                    Position = Vector3.Zero,
+                    TextureCoord = Vector2.Zero,
+                    Normal = Vector3.UnitX
+                },
+                new()
+                {
+                    Position = new Vector3(length, 0, 0),
+                    TextureCoord = Vector2.UnitX,
+                    Normal = Vector3.UnitX
+                },
+                new()
+                {
+                    Position = Vector3.Zero,
+                    TextureCoord = Vector2.Zero,
+                    Normal = Vector3.UnitY
+                },
+                new()
+                {
+                    Position = new Vector3(0, length, 0),
+                    TextureCoord = Vector2.UnitX,
+                    Normal = Vector3.UnitY
+                },
+                new()
+                {
+                    Position = Vector3.Zero,
+                    TextureCoord = Vector2.Zero,
+                    Normal = Vector3.UnitZ
+                },
+                new()
+                {
+                    Position = new Vector3(0, 0, length),
+                    TextureCoord = Vector2.UnitX,
+                    Normal = Vector3.UnitZ
+                }
+            ];
+
+            List<uint> indices = [0, 1, 2, 3, 4, 5];
+
+            return new MeshGeometry(vertices, indices);
+        }
+        #endregion
+
+        #region # 创建线框 —— static MeshGeometry CreateWireframe(MeshGeometry meshGeometry...
+        /// <summary>
+        /// 创建线框
+        /// </summary>
+        /// <param name="meshGeometry">网格模型</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreateWireframe(MeshGeometry meshGeometry)
+        {
+            List<Vertex> vertices = [];
+            List<uint> indices = [];
+            HashSet<(uint, uint)> edges = [];
+
+            for (int i = 0; i < meshGeometry.Indices.Length; i += 3)
+            {
+                uint i0 = meshGeometry.Indices[i];
+                uint i1 = meshGeometry.Indices[i + 1];
+                uint i2 = meshGeometry.Indices[i + 2];
+
+                (uint, uint)[] edgePairs =
+                [
+                    (Math.Min(i0, i1), Math.Max(i0, i1)),
+                    (Math.Min(i1, i2), Math.Max(i1, i2)),
+                    (Math.Min(i2, i0), Math.Max(i2, i0))
+                ];
+
+                foreach ((uint, uint) edge in edgePairs)
+                {
+                    if (edges.Add(edge))
+                    {
+                        Vertex v1 = meshGeometry.Vertices[(int)edge.Item1];
+                        Vertex v2 = meshGeometry.Vertices[(int)edge.Item2];
+
+                        vertices.Add(new Vertex
+                        {
+                            Position = v1.Position,
+                            TextureCoord = v1.TextureCoord,
+                            Normal = v1.Normal
+                        });
+                        vertices.Add(new Vertex
+                        {
+                            Position = v2.Position,
+                            TextureCoord = v2.TextureCoord,
+                            Normal = v2.Normal
+                        });
+
+                        uint baseIdx = (uint)(vertices.Count - 2);
+                        indices.Add(baseIdx);
+                        indices.Add(baseIdx + 1);
+                    }
+                }
+            }
 
             return new MeshGeometry(vertices, indices);
         }

@@ -69,6 +69,9 @@ namespace MedicalSharp.Controls.Commands
                     {
                         Stroke = new Vector4(0.1f, 0.3f, 0.6f, 1.0f).ToColor(),
                         Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor(),
+                        Width = 0.01f,
+                        Height = 0.01f,
+                        Depth = 0.01f,
                         Center = mousePos3D.Value.ToVector3()
                     };
                     this._boxDrawnEvent?.Invoke(this._boundingBox);

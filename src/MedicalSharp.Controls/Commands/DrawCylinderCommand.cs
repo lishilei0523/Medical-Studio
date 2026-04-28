@@ -1,20 +1,17 @@
-﻿using Avalonia;
-using Avalonia.Input;
-using Avalonia.Media;
+﻿using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using OpenTK.Mathematics;
 using System;
-using System.Linq;
 
 namespace MedicalSharp.Controls.Commands
 {
     /// <summary>
-    /// 绘制矩形3D元素命令
+    /// 绘制圆柱体3D元素命令
     /// </summary>
-    public class DrawRectangleCommand : ViewportCommand
+    public class DrawCylinderCommand : ViewportCommand
     {
         #region # 字段及构造器
 
@@ -24,29 +21,22 @@ namespace MedicalSharp.Controls.Commands
         private Vector3? _startPosition;
 
         /// <summary>
-        /// 矩形3D元素
+        /// 圆柱体3D元素
         /// </summary>
-        private RectangleVisual3D _rectangle;
+        private CylinderVisual3D _cylinder;
 
         /// <summary>
-        /// 获取法向量
+        /// 圆柱体绘制完成事件
         /// </summary>
-        private readonly Func<Vector3D> _getNormal;
+        private readonly Action<CylinderVisual3D> _cylinderDrawnEvent;
 
         /// <summary>
-        /// 矩形绘制完成事件
-        /// </summary>
-        private readonly Action<RectangleVisual3D> _rectangleDrawnEvent;
-
-        /// <summary>
-        /// 创建绘制矩形3D元素命令构造器
+        /// 创建绘制圆柱体3D元素命令构造器
         /// </summary>
         /// <param name="callback">绘制回调</param>
-        /// <param name="getNormal">获取法向量</param>
-        public DrawRectangleCommand(Action<RectangleVisual3D> callback, Func<Vector3D> getNormal = null)
+        public DrawCylinderCommand(Action<CylinderVisual3D> callback)
         {
-            this._rectangleDrawnEvent = callback;
-            this._getNormal = getNormal;
+            this._cylinderDrawnEvent = callback;
         }
 
         #endregion
@@ -73,15 +63,17 @@ namespace MedicalSharp.Controls.Commands
                 if (mousePos3D.HasValue)
                 {
                     this._startPosition = mousePos3D.Value;
-                    this._rectangle = new RectangleVisual3D
+                    this._cylinder = new CylinderVisual3D
                     {
-                        Fill = Color.Parse("#0F00FF00"),
-                        Width = 0.01f,
-                        Height = 0.005f,
+                        Stroke = new Vector4(0.1f, 0.3f, 0.6f, 1.0f).ToColor(),
+                        Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor(),
                         Center = mousePos3D.Value.ToVector3(),
-                        Normal = -this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
+                        Radius = 0.01f,
+                        Height = 0,
+                        Segments = 32,
+                        WithCaps = true
                     };
-                    this._rectangleDrawnEvent?.Invoke(this._rectangle);
+                    this._cylinderDrawnEvent?.Invoke(this._cylinder);
                 }
             }
         }
@@ -97,7 +89,7 @@ namespace MedicalSharp.Controls.Commands
             if (eventArgs.Properties.IsLeftButtonPressed &&
                 viewport is BasicViewport basicViewport &&
                 this._startPosition.HasValue &&
-                this._rectangle != null)
+                this._cylinder != null)
             {
                 //设置光标
                 viewport.Cursor = new Cursor(StandardCursorType.Cross);
@@ -106,12 +98,20 @@ namespace MedicalSharp.Controls.Commands
                 Vector3? mousePos3D = basicViewport.FindNearestPosition(mousePos2D);
                 if (mousePos3D.HasValue)
                 {
+                    //计算偏移量
                     float offsetX = Math.Abs(mousePos3D.Value.X - this._startPosition.Value.X);
                     float offsetY = Math.Abs(mousePos3D.Value.Y - this._startPosition.Value.Y);
                     float offsetZ = Math.Abs(mousePos3D.Value.Z - this._startPosition.Value.Z);
-                    float[] sides = new[] { offsetX, offsetY, offsetZ }.OrderByDescending(x => x).ToArray();
-                    this._rectangle.Width = sides[0];
-                    this._rectangle.Height = sides[1];
+
+                    //半径取水平偏移的最大值
+                    float radius = Math.Max(offsetX, offsetY);
+                    radius = Math.Max(radius, 0.01f);
+
+                    //高度取垂直偏移
+                    float height = offsetZ * 2.0f;
+
+                    this._cylinder.Radius = Math.Max(radius, 0.05f);
+                    this._cylinder.Height = Math.Max(height, 0.1f);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
@@ -133,12 +133,12 @@ namespace MedicalSharp.Controls.Commands
 
             //清空
             this._startPosition = null;
-            this._rectangle = null;
+            this._cylinder = null;
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
-        #endregion 
+        #endregion
 
         #endregion
     }

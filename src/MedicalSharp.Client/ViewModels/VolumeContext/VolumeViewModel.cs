@@ -345,6 +345,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 绘制圆柱体 —— void DrawCylinder()
+        /// <summary>
+        /// 绘制圆柱体
+        /// </summary>
+        public void DrawCylinder()
+        {
+            DrawCylinderCommand command = new DrawCylinderCommand(shape => this.Shapes.Add(shape));
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
         #endregion
     }
 }

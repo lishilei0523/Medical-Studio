@@ -65,6 +65,9 @@
 					<sd:ToggleRadioButton cm:Message.Attach="DrawSphere()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-Sphere}" />
 					</sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawCylinder()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Cylinder}" />
+                    </sd:ToggleRadioButton>
 				</WrapPanel>
 				<WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
 					<DropDownButton Content="VR" Classes="Transparent-Panel">
