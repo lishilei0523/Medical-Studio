@@ -39,13 +39,13 @@ uniform float u_StepSize;
 uniform int u_MaxStepsCount;
 uniform float u_OpacityThreshold;
 
-//标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Highlight）
+//标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Tinted）
 uniform int u_MarkModes[256];
-uniform float u_HighlightIntensity;
 
 //常量
 const float MAX_16BIT_SIGNED = 32767.0;
 const float EPSILON = 0.0001;
+
 
 //线性窗宽窗位转换
 float applyWindowLevel(float voxelValue, float windowCenter, float windowWidth)
@@ -103,8 +103,8 @@ bool shouldPick(uint markValue)
 {
     int mode = u_MarkModes[markValue];
 
-    // Visible(0)和Highlight(2)都允许拾取
-    // Collapsed(1)不允许拾取
+    //Visible(0)和Tinted(2)都允许拾取
+    //Collapsed(1)不允许拾取
     return (mode != 1);
 }
 
@@ -181,8 +181,7 @@ void main()
         accumulatedColor.rgb += (1.0 - accumulatedColor.a) * sampleColor.a * sampleColor.rgb;
         accumulatedColor.a += (1.0 - accumulatedColor.a) * sampleColor.a;
         
-        //检查是否达到不透明度阈值
-        //达到阈值意味着用户能在屏幕上看到当前体素
+        //检查是否达到不透明度阈值，达到阈值意味着用户能在屏幕上看到当前体素
         if (accumulatedColor.a > u_OpacityThreshold)
         {
             //采样标记纹理，根据标记模式决定是否返回当前体素

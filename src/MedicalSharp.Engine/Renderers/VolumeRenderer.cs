@@ -268,16 +268,17 @@ namespace MedicalSharp.Engine.Renderers
 
             //设置标记策略
             this.Program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
-            this.Program.SetUniformFloat("u_HighlightIntensity", this.MarkStrategy.HighlightIntensity);
 
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);
             this.Renderable.MarkTexture.Bind(1);
             this.TransferFunction.Texture.Bind(2);
+            this.MarkStrategy.Texture.Bind(3);
 
             this.Program.SetUniformInt("u_VolumeTexture", 0);
             this.Program.SetUniformInt("u_MarkTexture", 1);
             this.Program.SetUniformInt("u_TransferFunction", 2);
+            this.Program.SetUniformInt("u_MarkStrategy", 3);
 
             //设置渲染参数
             this.Program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
@@ -295,6 +296,7 @@ namespace MedicalSharp.Engine.Renderers
             this.Renderable.VolumeTexture.Unbind();
             this.Renderable.MarkTexture.Unbind();
             this.TransferFunction.Texture.Unbind();
+            this.MarkStrategy.Texture.Unbind();
 
             //取消使用
             this.Program.Unuse();
@@ -388,6 +390,7 @@ namespace MedicalSharp.Engine.Renderers
             this._pickProgram.Dispose();
             this._unitCube.Dispose();
             this.TransferFunction.Dispose();
+            this.MarkStrategy.Dispose();
         }
         #endregion
 
@@ -477,7 +480,6 @@ namespace MedicalSharp.Engine.Renderers
 
             //设置标记策略（与渲染一致）
             this._pickProgram.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
-            this._pickProgram.SetUniformFloat("u_HighlightIntensity", this.MarkStrategy.HighlightIntensity);
 
             //绑定纹理
             this.Renderable.VolumeTexture.Bind(0);

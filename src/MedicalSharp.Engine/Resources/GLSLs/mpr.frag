@@ -7,6 +7,7 @@ out vec4 FragColor;
 uniform sampler3D u_VolumeTexture;
 uniform usampler3D u_MarkTexture;
 uniform sampler1D u_TransferFunction;
+uniform sampler1D u_MarkStrategy;
 
 //窗宽窗位参数
 uniform float u_WindowWidth;
@@ -25,11 +26,11 @@ uniform vec3 u_VolumeScale;
 
 //标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Highlight）
 uniform int u_MarkModes[256];
-uniform float u_HighlightIntensity;
 
 //常量
 const float EPSILON = 0.0001;
 const float MAX_16BIT_SIGNED = 32767.0;
+
 
 //将R16Snorm值转换为原始像素值
 float convertR16SnormToRaw(float snormValue)
@@ -104,10 +105,15 @@ void main()
     //基础颜色
     vec3 color = vec3(grayValue);
 
-    //高亮模式下，标记区域使用高亮颜色
-    if (markMode == 2)
+    //染色模式下，标记区域混合染色颜色
+    if (markMode == 2 && markValue != 0u)
     {
-        color = min(color * u_HighlightIntensity, 1.0);
+        //从标记颜色纹理采样（纹理坐标 = 标记值 / 255）
+        float markTexCoord = float(markValue) / 255.0;
+        vec4 markColor = texture(u_MarkStrategy, markTexCoord);
+        
+        //颜色叠加：用标记颜色的Alpha作为混合系数
+        color = mix(color, markColor.rgb, markColor.a);
     }
 
     FragColor = vec4(color, 1.0);

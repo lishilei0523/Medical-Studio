@@ -7,6 +7,7 @@ out vec4 FragColor;
 uniform sampler3D u_VolumeTexture;
 uniform usampler3D u_MarkTexture; 
 uniform sampler1D u_TransferFunction;
+uniform sampler1D u_MarkStrategy;
 
 uniform vec3 u_CameraPosition;
 uniform vec3 u_VolumeScale;
@@ -22,7 +23,6 @@ uniform float u_OpacityThreshold;       //透明度阈值
 
 //标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Highlight）
 uniform int u_MarkModes[256];
-uniform float u_HighlightIntensity;
 
 
 //线性窗宽窗位转换
@@ -138,10 +138,15 @@ void main()
             continue;
         }
 
-        //Mark值高亮处理
-        if (markMode == 2) //Highlight - 高亮
+        //Mark值染色处理
+        if (markMode == 2 && markValue != 0u) //Tinted - 染色
         {
-            sampleColor.rgb = min(sampleColor.rgb * u_HighlightIntensity, 1.0);
+            //从标记颜色纹理采样（纹理坐标 = 标记值 / 255）
+            float markTexCoord = float(markValue) / 255.0;
+            vec4 markColor = texture(u_MarkStrategy, markTexCoord);
+            
+            //颜色叠加：用标记颜色的Alpha作为混合系数
+            sampleColor.rgb = mix(sampleColor.rgb, markColor.rgb, markColor.a);
         }
 
         //亮度调整

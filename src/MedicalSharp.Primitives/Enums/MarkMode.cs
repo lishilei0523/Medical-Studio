@@ -16,8 +16,8 @@
         Collapsed = 1,
 
         /// <summary>
-        /// 高亮
+        /// 染色
         /// </summary>
-        Highlight = 2
+        Tinted = 2
     }
 }

@@ -307,5 +307,89 @@ namespace MedicalSharp.Primitives.Builders
             return new Vector4(1.0f - color.X, 1.0f - color.Y, 1.0f - color.Z, color.W);
         }
         #endregion
+
+        #region # 获取默认标记颜色列表 —— static Vector4[] GetDefaultMarkColors(float opacity)
+        /// <summary>
+        /// 获取默认标记颜色列表
+        /// </summary>
+        /// <param name="opacity">不透明度(0~1)</param>
+        /// <returns>颜色列表(固定长度256)</returns>
+        public static Vector4[] GetDefaultMarkColors(float opacity = 0.6f)
+        {
+            Vector4[] colors = new Vector4[256];
+
+            //索引 0：透明
+            colors[0] = new Vector4(0, 0, 0, 0);
+
+            //1-255：使用HSV色环，保证相邻标记值颜色有明显区别
+            for (int index = 1; index < 256; index++)
+            {
+                //使用黄金角（137.5度）分布，保证颜色均匀且区分度高
+                float hue = (index * 137.5f) % 360.0f;
+                float saturation = 0.8f;
+                float value = 0.9f;
+
+                colors[index] = FromHSV(hue, saturation, value, opacity);
+            }
+
+            return colors;
+        }
+        #endregion
+
+        #region # 获取标准标记颜色列表 —— static Vector4[] GetStandardMarkColors(float opacity)
+        /// <summary>
+        /// 获取标准标记颜色列表
+        /// </summary>
+        /// <param name="opacity">不透明度(0~1)</param>
+        /// <returns>颜色列表(固定长度256)</returns>
+        /// <remarks>前几个为常用颜色，后面自动生成</remarks>
+        public static Vector4[] GetStandardMarkColors(float opacity = 0.6f)
+        {
+            Vector4[] colors = new Vector4[256];
+
+            //索引0：透明
+            colors[0] = new Vector4(0, 0, 0, 0);
+
+            //预定义前20个常用颜色
+            Vector4[] predefined =
+            [
+                Red(opacity),           //1:  红色
+                Green(opacity),         //2:  绿色
+                Blue(opacity),          //3:  蓝色
+                Yellow(opacity),        //4:  黄色
+                Cyan(opacity),          //5:  青色
+                Magenta(opacity),       //6:  品红
+                Orange(opacity),        //7:  橙色
+                Purple(opacity),        //8:  紫色
+                Lime(opacity),          //9:  酸橙
+                Teal(opacity),          //10: 蓝绿
+                Pink(opacity),          //11: 粉色
+                Brown(opacity),         //12: 棕色
+                Navy(opacity),          //13: 深蓝
+                Olive(opacity),         //14: 橄榄
+                Gold(opacity),          //15: 金色
+                new Vector4(0.8f, 0.2f, 0.6f, opacity), //16: 紫罗兰
+                new Vector4(0.2f, 0.8f, 0.3f, opacity), //17: 草绿
+                new Vector4(0.3f, 0.5f, 0.9f, opacity), //18: 天蓝
+                new Vector4(0.9f, 0.5f, 0.2f, opacity), //19: 橘红
+                new Vector4(0.5f, 0.2f, 0.8f, opacity)  //20: 紫罗兰
+            ];
+
+            //填充预定义颜色
+            for (int index = 1; index <= predefined.Length && index < 256; index++)
+            {
+                colors[index] = predefined[index - 1];
+            }
+
+            //剩余颜色用HSV色环填充
+            for (int index = predefined.Length + 1; index < 256; index++)
+            {
+                float hue = (index - predefined.Length - 1) * 360.0f / (256 - predefined.Length - 1);
+                colors[index] = FromHSV(hue, 0.8f, 0.9f, opacity);
+            }
+
+            return colors;
+        }
+        #endregion
     }
 }
