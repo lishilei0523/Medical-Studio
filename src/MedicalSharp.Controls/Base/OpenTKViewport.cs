@@ -212,7 +212,8 @@ namespace MedicalSharp.Controls.Base
 
             this._glInitialized = true;
 
-            //初始化计算着色器
+            //初始化着色器
+            ShaderManager.Initialize();
             ComputerManager.Initialize();
 
             this.OnOpenTKInit();

@@ -1,5 +1,4 @@
-﻿using MedicalSharp.Engine.Resources;
-using MedicalSharp.Primitives.Cameras;
+﻿using MedicalSharp.Primitives.Cameras;
 using System;
 
 namespace MedicalSharp.Engine.Renderers
@@ -14,7 +13,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 释放标识
         /// </summary>
-        private bool _disposed;
+        protected bool _disposed;
 
         /// <summary>
         /// 无参构造器
@@ -43,26 +42,6 @@ namespace MedicalSharp.Engine.Renderers
             this.Camera = camera;
         }
 
-        /// <summary>
-        /// 创建渲染器构造器
-        /// </summary>
-        /// <param name="camera">相机</param>
-        /// <param name="program">Shader程序</param>
-        protected Renderer(Camera camera, ShaderProgram program)
-            : this(camera)
-        {
-            #region # 验证
-
-            if (program == null)
-            {
-                throw new ArgumentNullException(nameof(program), "Shader程序不可为空！");
-            }
-
-            #endregion
-
-            this.Program = program;
-        }
-
         #endregion
 
         #region # 属性
@@ -73,13 +52,6 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         public Camera Camera { get; private set; }
         #endregion 
-
-        #region Shader程序 —— ShaderProgram Program
-        /// <summary>
-        /// Shader程序
-        /// </summary>
-        public ShaderProgram Program { get; protected set; }
-        #endregion
 
         #endregion
 
@@ -105,26 +77,6 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 设置Shader程序 —— void SetShaderProgram(ShaderProgram program)
-        /// <summary>
-        /// 设置Shader程序
-        /// </summary>
-        /// <param name="program">Shader程序</param>
-        public void SetShaderProgram(ShaderProgram program)
-        {
-            #region # 验证
-
-            if (program == null)
-            {
-                throw new ArgumentNullException(nameof(program), "Shader程序不可为空！");
-            }
-
-            #endregion
-
-            this.Program = program;
-        }
-        #endregion
-
         #region 渲染帧 —— abstract void RenderFrame(float viewportWidth, float viewportHeight)
         /// <summary>
         /// 渲染帧
@@ -140,13 +92,7 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         public virtual void Dispose()
         {
-            if (this._disposed)
-            {
-                return;
-            }
 
-            this.Program?.Dispose();
-            this._disposed = true;
         }
         #endregion 
 

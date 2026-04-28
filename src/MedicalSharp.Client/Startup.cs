@@ -72,6 +72,7 @@ namespace MedicalSharp.Client
         /// </summary>
         protected override void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs eventArgs)
         {
+            ShaderManager.Cleanup();
             ComputerManager.Cleanup();
             ResolveMediator.Dispose();
         }

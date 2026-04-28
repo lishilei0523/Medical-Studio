@@ -1,3 +1,4 @@
+using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
@@ -25,18 +26,6 @@ namespace MedicalSharp.Engine.Renderers
         /// <param name="camera">相机</param>
         public TextRenderer(Camera camera)
             : base(camera)
-        {
-            this._renderables = new HashSet<TextRenderable>();
-            this.InitShaderProgram();
-        }
-
-        /// <summary>
-        /// 创建文本渲染器构造器
-        /// </summary>
-        /// <param name="camera">相机</param>
-        /// <param name="program">Shader程序</param>
-        public TextRenderer(Camera camera, ShaderProgram program)
-            : base(camera, program)
         {
             this._renderables = new HashSet<TextRenderable>();
         }
@@ -111,10 +100,12 @@ namespace MedicalSharp.Engine.Renderers
         /// <param name="viewportHeight">视口高度</param>
         public override void RenderFrame(float viewportWidth, float viewportHeight)
         {
-            #region 验证
+            #region # 验证
 
-            if (this.Program == null) return;
-            if (this.Camera == null) return;
+            if (this.Camera == null)
+            {
+                return;
+            }
 
             #endregion
 
@@ -125,23 +116,24 @@ namespace MedicalSharp.Engine.Renderers
             RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             //开启Shader程序
-            this.Program.Use();
+            ShaderProgram program = ShaderManager.TextProgram;
+            program.Use();
 
             //设置投影矩阵、视图矩阵
-            this.Program.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
-            this.Program.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
+            program.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
+            program.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
 
             foreach (TextRenderable renderable in this._renderables)
             {
                 //渲染
-                renderable.Render(this.Program, this.Camera);
+                renderable.Render(program, this.Camera);
 
                 //触发渲染事件
                 renderable.OnRender(renderContext);
             }
 
             //取消使用
-            this.Program.Unuse();
+            program.Unuse();
         }
         #endregion
 
@@ -151,7 +143,10 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         public override void Dispose()
         {
-            base.Dispose();
+            if (this._disposed)
+            {
+                return;
+            }
 
             foreach (TextRenderable text in this._renderables)
             {
@@ -159,22 +154,8 @@ namespace MedicalSharp.Engine.Renderers
             }
 
             this._renderables.Clear();
-        }
-        #endregion
 
-
-        //Private
-
-        #region 初始化Shader程序 —— void InitShaderProgram()
-        /// <summary>
-        /// 初始化Shader程序
-        /// </summary>
-        private void InitShaderProgram()
-        {
-            this.Program = new ShaderProgram();
-            this.Program.ReadVertexShaderFromFile("Resources/GLSLs/text.vert");
-            this.Program.ReadFragmentShaderFromFile("Resources/GLSLs/text.frag");
-            this.Program.BuildDraw();
+            this._disposed = true;
         }
         #endregion
 
