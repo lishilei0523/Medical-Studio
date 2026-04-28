@@ -185,6 +185,12 @@ namespace MedicalSharp.Controls.Commands
                     volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Tinted);
                     volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
                 }
+                if (this._selectedVisual is BoundingSphereVisual3D sphere)
+                {
+                    volumeViewport.VolumeRenderable.ApplySphereCut(sphere.Radius, sphere.Center.ToVector3(), sphere.Transform.Matrix, CutMode.OutSide, 1);
+                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
+                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
+                }
             }
 
             //请求下一帧

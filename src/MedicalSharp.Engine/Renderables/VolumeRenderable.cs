@@ -301,6 +301,51 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
+        #region 应用球体切割 —— void ApplySphereCut(float radius, Vector3 center...
+        /// <summary>
+        /// 应用球体切割
+        /// </summary>
+        /// <param name="radius">半径</param>
+        /// <param name="center">中心位置（局部空间）</param>
+        /// <param name="localToWorld">局部到世界变换矩阵</param>
+        /// <param name="cutMode">切割模式</param>
+        /// <param name="markValue">标记值（1-255，0表示清除）</param>
+        public void ApplySphereCut(float radius, Vector3 center, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        {
+            Matrix4 worldToLocal = localToWorld.Inverted();
+
+            //球体切割计算着色器
+            ShaderProgram cutComputer = ComputerManager.SphereCutComputer;
+
+            //开启Shader程序
+            cutComputer.Use();
+
+            //绑定标记纹理为可读写
+            this.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+
+            //设置球体参数
+            cutComputer.SetUniformFloat("u_SphereRadius", radius);
+            cutComputer.SetUniformVector3("u_SphereCenter", center);
+            cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
+
+            //设置体积参数
+            cutComputer.SetUniformVector3i("u_VolumeSize", this.VolumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", this.VolumeData.Metadata.VolumeScale);
+
+            //设置切割模式
+            cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
+
+            //设置标记值
+            cutComputer.SetUniformUInt("u_MarkValue", markValue);
+
+            //调度执行
+            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+
+            //取消使用
+            cutComputer.Unuse();
+        }
+        #endregion
+
         #region 同步标记数据GPU->CPU —— void SyncMarkDataFromGpu()
         /// <summary>
         /// 同步标记数据GPU->CPU

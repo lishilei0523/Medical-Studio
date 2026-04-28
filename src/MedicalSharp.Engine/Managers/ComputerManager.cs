@@ -38,6 +38,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _BoxCutComputer;
 
         /// <summary>
+        /// 球体切割计算着色器
+        /// </summary>
+        private static ShaderProgram _SphereCutComputer;
+
+        /// <summary>
         /// 同步锁
         /// </summary>
         private static readonly Lock _Sync;
@@ -95,6 +100,16 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - 球体切割计算着色器 —— static ShaderProgram SphereCutComputer
+        /// <summary>
+        /// 只读属性 - 球体切割计算着色器
+        /// </summary>
+        public static ShaderProgram SphereCutComputer
+        {
+            get => _SphereCutComputer;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -114,10 +129,11 @@ namespace MedicalSharp.Engine.Managers
                     return;
                 }
 
-                _BoxCutComputer = CreateBoxCutComputer();
                 _CircleCutComputer = CreateCircleCutComputer();
                 _EllipseCutComputer = CreateEllipseCutComputer();
                 _RectCutComputer = CreateRectCutComputer();
+                _BoxCutComputer = CreateBoxCutComputer();
+                _SphereCutComputer = CreateSphereCutComputer();
                 _Initialized = true;
             }
         }
@@ -170,6 +186,7 @@ namespace MedicalSharp.Engine.Managers
             _CircleCutComputer?.Dispose();
             _EllipseCutComputer.Dispose();
             _BoxCutComputer?.Dispose();
+            _SphereCutComputer?.Dispose();
         }
         #endregion
 
@@ -226,6 +243,20 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/cut_box.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion
+
+        #region 创建球体切割计算着色器 —— static ShaderProgram CreateSphereCutComputer()
+        /// <summary>
+        /// 创建球体切割计算着色器
+        /// </summary>
+        private static ShaderProgram CreateSphereCutComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_sphere.comp");
             program.BuildCompute();
 
             return program;
