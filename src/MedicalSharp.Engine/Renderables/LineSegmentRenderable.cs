@@ -38,15 +38,6 @@ namespace MedicalSharp.Engine.Renderables
         public LineSegmentRenderable(Vector3 startPoint, Vector3 endPoint)
             : this()
         {
-            #region # 验证
-
-            if (startPoint == endPoint)
-            {
-                throw new ArgumentNullException(nameof(endPoint), "起始点与终止点不可相等！");
-            }
-
-            #endregion
-
             this.StartPoint = startPoint;
             this.EndPoint = endPoint;
 
@@ -261,7 +252,7 @@ namespace MedicalSharp.Engine.Renderables
 
                 //检查距离是否在容差内
                 float distSq = Vector3.DistanceSquared(pointOnSegment, pointOnRay);
-                if (distSq <= tolerance * tolerance)
+                if (distSq <= tolerance)
                 {
                     distance = t;
                     hitPoint = pointOnSegment;  //交点取线段上的点
@@ -275,7 +266,7 @@ namespace MedicalSharp.Engine.Renderables
                 //检查射线起点到线段所在直线的距离
                 Vector3 cross = Vector3.Cross(localRay.Direction, rayToStart);
                 float distToLineSq = cross.LengthSquared / a;
-                if (distToLineSq > tolerance * tolerance)
+                if (distToLineSq > tolerance)
                 {
                     return false;  //不共线
                 }
@@ -343,7 +334,19 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            BoundingBox boundingBox = new BoundingBox(this.StartPoint, this.EndPoint);
+            //计算最小点和最大点
+            Vector3 minimum = new Vector3(
+                Math.Min(this.StartPoint.X, this.EndPoint.X),
+                Math.Min(this.StartPoint.Y, this.EndPoint.Y),
+                Math.Min(this.StartPoint.Z, this.EndPoint.Z)
+            );
+            Vector3 maximum = new Vector3(
+                Math.Max(this.StartPoint.X, this.EndPoint.X),
+                Math.Max(this.StartPoint.Y, this.EndPoint.Y),
+                Math.Max(this.StartPoint.Z, this.EndPoint.Z)
+            );
+
+            BoundingBox boundingBox = new BoundingBox(minimum, maximum);
 
             return boundingBox;
         }

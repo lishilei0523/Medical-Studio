@@ -236,7 +236,7 @@ namespace MedicalSharp.Engine.Renderables
             IDictionary<BoundingSphere, float> hitPoints = new Dictionary<BoundingSphere, float>();
             foreach (Vector3 position in this.SampledPositions)
             {
-                BoundingSphere sphere = new BoundingSphere(position, 0.02f);
+                BoundingSphere sphere = new BoundingSphere(position, 0.05f);
                 if (sphere.Intersects(localRay, out float pointDistance))
                 {
                     hitPoints.TryAdd(sphere, pointDistance);
