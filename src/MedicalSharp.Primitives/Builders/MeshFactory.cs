@@ -1,6 +1,7 @@
 ﻿using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
+using MIConvexHull;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -176,34 +177,46 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="pointA">顶点A</param>
         /// <param name="pointB">顶点B</param>
         /// <param name="pointC">顶点C</param>
+        /// <param name="primitiveType">图元类型</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateTriangle(Vector3 pointA, Vector3 pointB, Vector3 pointC)
+        public static MeshGeometry CreateTriangle(Vector3 pointA, Vector3 pointB, Vector3 pointC, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Triangles)
         {
-            Vector3 normal = Vector3.Normalize(Vector3.Cross(pointB - pointA, pointC - pointA));
-            List<Vertex> vertices =
-            [
-                new()
-                {
-                    Position = pointA,
-                    TextureCoord = new Vector2(0, 0),
-                    Normal = normal
-                },
-                new()
-                {
-                    Position = pointB,
-                    TextureCoord = new Vector2(0.5f, 1),
-                    Normal = normal
-                },
-                new()
-                {
-                    Position = pointC,
-                    TextureCoord = new Vector2(1, 0),
-                    Normal = normal
-                }
-            ];
-            List<uint> indices = [0, 1, 2];
+            List<Vertex> vertices = [];
+            List<uint> indices = [];
+            if (primitiveType == GraphicPrimitiveType.Lines)
+            {
+                //==========线框模式：三条边==========
+                vertices.Add(new Vertex { Position = pointA, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointB, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointB, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointC, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointC, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointA, Normal = Vector3.Zero });
 
-            return new MeshGeometry(vertices, indices);
+                indices.Add(0); indices.Add(1);
+                indices.Add(2); indices.Add(3);
+                indices.Add(4); indices.Add(5);
+            }
+            else
+            {
+                //==========填充模式：一个三角形面==========
+                Vector3 normal = Vector3.Normalize(Vector3.Cross(pointB - pointA, pointC - pointA));
+
+                vertices.Add(new Vertex { Position = pointA, TextureCoord = new Vector2(0, 0), Normal = normal });
+                vertices.Add(new Vertex { Position = pointB, TextureCoord = new Vector2(1, 0), Normal = normal });
+                vertices.Add(new Vertex { Position = pointC, TextureCoord = new Vector2(0.5f, 1), Normal = normal });
+
+                indices.Add(0); indices.Add(1); indices.Add(2);
+            }
+
+            MeshGeometry meshGeometry = new(vertices, indices);
+
+            if (primitiveType != GraphicPrimitiveType.Lines)
+            {
+                CalculateNormals(meshGeometry);
+            }
+
+            return meshGeometry;
         }
         #endregion
 
@@ -466,40 +479,52 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="pointB">顶点B</param>
         /// <param name="pointC">顶点C</param>
         /// <param name="pointD">顶点D</param>
+        /// <param name="primitiveType">图元类型</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateQuadrangle(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 pointD)
+        public static MeshGeometry CreateQuadrangle(Vector3 pointA, Vector3 pointB, Vector3 pointC, Vector3 pointD, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Triangles)
         {
-            Vector3 normal = Vector3.Normalize(Vector3.Cross(pointB - pointA, pointD - pointA));
-            List<Vertex> vertices =
-            [
-                new()
-                {
-                    Position = pointA,
-                    TextureCoord = new Vector2(0, 1),
-                    Normal = normal
-                },
-                new()
-                {
-                    Position = pointB,
-                    TextureCoord = new Vector2(1, 1),
-                    Normal = normal
-                },
-                new()
-                {
-                    Position = pointC,
-                    TextureCoord = new Vector2(1, 0),
-                    Normal = normal
-                },
-                new()
-                {
-                    Position = pointD,
-                    TextureCoord = new Vector2(0, 0),
-                    Normal = normal
-                }
-            ];
-            List<uint> indices = [0, 1, 2, 0, 2, 3];
+            List<Vertex> vertices = [];
+            List<uint> indices = [];
+            if (primitiveType == GraphicPrimitiveType.Lines)
+            {
+                //==========线框模式：四条边==========
+                vertices.Add(new Vertex { Position = pointA, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointB, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointB, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointC, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointC, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointD, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointD, Normal = Vector3.Zero });
+                vertices.Add(new Vertex { Position = pointA, Normal = Vector3.Zero });
 
-            return new MeshGeometry(vertices, indices);
+                indices.Add(0); indices.Add(1);
+                indices.Add(2); indices.Add(3);
+                indices.Add(4); indices.Add(5);
+                indices.Add(6); indices.Add(7);
+            }
+            else
+            {
+                //==========填充模式：两个三角形==========
+                Vector3 normal = Vector3.Normalize(Vector3.Cross(pointB - pointA, pointD - pointA));
+
+                vertices.Add(new Vertex { Position = pointA, TextureCoord = new Vector2(0, 1), Normal = normal });
+                vertices.Add(new Vertex { Position = pointB, TextureCoord = new Vector2(1, 1), Normal = normal });
+                vertices.Add(new Vertex { Position = pointC, TextureCoord = new Vector2(1, 0), Normal = normal });
+                vertices.Add(new Vertex { Position = pointD, TextureCoord = new Vector2(0, 0), Normal = normal });
+
+                //三角形 A-B-C 和 A-C-D
+                indices.Add(0); indices.Add(1); indices.Add(2);
+                indices.Add(0); indices.Add(2); indices.Add(3);
+            }
+
+            MeshGeometry meshGeometry = new(vertices, indices);
+
+            if (primitiveType != GraphicPrimitiveType.Lines)
+            {
+                CalculateNormals(meshGeometry);
+            }
+
+            return meshGeometry;
         }
         #endregion
 
@@ -961,6 +986,125 @@ namespace MedicalSharp.Primitives.Builders
             }
 
             MeshGeometry meshGeometry = new(vertices, indices);
+            if (primitiveType != GraphicPrimitiveType.Lines)
+            {
+                CalculateNormals(meshGeometry);
+            }
+
+            return meshGeometry;
+        }
+        #endregion
+
+        #region # 创建凸多面体 —— static MeshGeometry CreateConvexPolyhedron(IReadOnlyList<Vector3> positions...
+        /// <summary>
+        /// 创建凸多面体
+        /// </summary>
+        /// <param name="positions">位置列表</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreateConvexPolyhedron(IReadOnlyList<Vector3> positions, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Triangles)
+        {
+            #region # 验证
+
+            if (positions == null || !positions.Any())
+            {
+                throw new ArgumentException("位置列表不可为空！");
+            }
+            if (positions.Count == 1)
+            {
+                return CreatePoint(positions[0]);
+            }
+            if (positions.Count == 2)
+            {
+                return CreateLineSegment(positions[0], positions[1]);
+            }
+            if (positions.Count == 3)
+            {
+                return CreateTriangle(positions[0], positions[1], positions[2], primitiveType);
+            }
+            if (positions.Count == 4)
+            {
+                return CreateQuadrangle(positions[0], positions[1], positions[2], positions[3], primitiveType);
+            }
+
+            #endregion
+
+            //需要先建立顶点到索引的映射
+            //MIConvexHull 会重新排列顶点顺序，所以不能直接使用原始索引
+            //方案：直接用 MIConvexHull 的结果，它返回的Points就是去重后的顶点列表
+            DefaultVertex[] verticesInput = positions.Select(p => new DefaultVertex { Position = [p.X, p.Y, p.Z] }).ToArray();
+            ConvexHullCreationResult<DefaultVertex, DefaultConvexFace<DefaultVertex>> convexHull = ConvexHull.Create(verticesInput);
+
+            //提取凸包顶点（已经去重）
+            Vector3[] hullVertices = convexHull.Result.Points.Select(v => new Vector3(
+                (float)v.Position[0],
+                (float)v.Position[1],
+                (float)v.Position[2])).ToArray();
+
+            //构建顶点到索引的映射（因为Points列表就是索引顺序）
+            Dictionary<DefaultVertex, int> vertexToIndex = new Dictionary<DefaultVertex, int>();
+            for (int i = 0; i < convexHull.Result.Points.Count(); i++)
+            {
+                vertexToIndex[convexHull.Result.Points.ElementAt(i)] = i;
+            }
+
+            List<Vertex> vertexList = [];
+            List<uint> indexList = [];
+            if (primitiveType == GraphicPrimitiveType.Lines)
+            {
+                //==========线框模式：提取所有边==========
+                HashSet<(int, int)> edges = [];
+                foreach (DefaultConvexFace<DefaultVertex> face in convexHull.Result.Faces)
+                {
+                    int i0 = vertexToIndex[face.Vertices[0]];
+                    int i1 = vertexToIndex[face.Vertices[1]];
+                    int i2 = vertexToIndex[face.Vertices[2]];
+
+                    edges.Add(i0 < i1 ? (i0, i1) : (i1, i0));
+                    edges.Add(i1 < i2 ? (i1, i2) : (i2, i1));
+                    edges.Add(i2 < i0 ? (i2, i0) : (i0, i2));
+                }
+
+                //添加顶点
+                foreach (Vector3 v in hullVertices)
+                {
+                    vertexList.Add(new Vertex { Position = v, Normal = Vector3.Zero });
+                }
+
+                //添加边索引
+                foreach ((int i1, int i2) in edges)
+                {
+                    indexList.Add((uint)i1);
+                    indexList.Add((uint)i2);
+                }
+            }
+            else
+            {
+                //========== 填充模式：生成三角形 ==========
+                foreach (DefaultConvexFace<DefaultVertex> face in convexHull.Result.Faces)
+                {
+                    int i0 = vertexToIndex[face.Vertices[0]];
+                    int i1 = vertexToIndex[face.Vertices[1]];
+                    int i2 = vertexToIndex[face.Vertices[2]];
+
+                    Vector3 v0 = hullVertices[i0];
+                    Vector3 v1 = hullVertices[i1];
+                    Vector3 v2 = hullVertices[i2];
+                    Vector3 normal = Vector3.Normalize(Vector3.Cross(v1 - v0, v2 - v0));
+
+                    vertexList.Add(new Vertex { Position = v0, Normal = normal });
+                    vertexList.Add(new Vertex { Position = v1, Normal = normal });
+                    vertexList.Add(new Vertex { Position = v2, Normal = normal });
+
+                    uint baseIdx = (uint)(vertexList.Count - 3);
+                    indexList.Add(baseIdx);
+                    indexList.Add(baseIdx + 1);
+                    indexList.Add(baseIdx + 2);
+                }
+            }
+
+            MeshGeometry meshGeometry = new(vertexList, indexList);
+
             if (primitiveType != GraphicPrimitiveType.Lines)
             {
                 CalculateNormals(meshGeometry);
