@@ -367,6 +367,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 绘制凸多面体 —— void DrawConvexPolyhedron()
+        /// <summary>
+        /// 绘制凸多面体
+        /// </summary>
+        public void DrawConvexPolyhedron()
+        {
+            DrawConvexPolyhedronCommand command = new DrawConvexPolyhedronCommand(
+                shape => this.Shapes.Add(shape),
+                shape => this.Shapes.Remove(shape)
+            );
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
         #endregion
     }
 }

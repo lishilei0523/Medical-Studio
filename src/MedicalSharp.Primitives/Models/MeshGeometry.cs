@@ -121,6 +121,10 @@ namespace MedicalSharp.Primitives.Models
         public IList<Triangle> ExtractTriangles()
         {
             IList<Triangle> triangles = new List<Triangle>();
+            if (this.Indices?.Length < 3)
+            {
+                return triangles;
+            }
 
             //获取顶点数据
             Vertex[] vertices = this.Vertices;

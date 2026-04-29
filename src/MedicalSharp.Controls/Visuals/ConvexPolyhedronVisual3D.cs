@@ -70,7 +70,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
-            if (this.Renderable == null && this.Positions != null && this.Positions.Count >= 4)
+            if (this.Renderable == null && this.Positions != null)
             {
                 IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
                 MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
@@ -90,7 +90,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         private void UpdateRenderable()
         {
-            if (this.Renderable != null && this.Positions != null && this.Positions.Count >= 4)
+            if (this.Renderable != null && this.Positions != null)
             {
                 IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
                 MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
