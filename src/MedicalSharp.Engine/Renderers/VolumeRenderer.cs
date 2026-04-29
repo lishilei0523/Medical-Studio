@@ -2,6 +2,7 @@
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -39,6 +40,7 @@ namespace MedicalSharp.Engine.Renderers
             //默认值
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
+            this.RenderMode = VolumeRenderMode.Raycast;
             this.TransferFunction = new TransferFunction();
             this.MarkStrategy = new MarkStrategy();
         }
@@ -46,6 +48,13 @@ namespace MedicalSharp.Engine.Renderers
         #endregion
 
         #region # 属性
+
+        #region 渲染模式 —— VolumeRenderMode RenderMode
+        /// <summary>
+        /// 渲染模式
+        /// </summary>
+        public VolumeRenderMode RenderMode { get; private set; }
+        #endregion
 
         #region 窗宽 —— float WindowWidth
         /// <summary>
@@ -120,6 +129,17 @@ namespace MedicalSharp.Engine.Renderers
         #endregion
 
         #region # 方法
+
+        #region 切换渲染模式 —— void SwitchRenderMode(VolumeRenderMode renderMode)
+        /// <summary>
+        /// 切换渲染模式
+        /// </summary>
+        /// <param name="renderMode">渲染模式</param>
+        public void SwitchRenderMode(VolumeRenderMode renderMode)
+        {
+            this.RenderMode = renderMode;
+        }
+        #endregion
 
         #region 设置窗宽窗位 —— void SetWindowLevel(float windowWidth, float windowCenter)
         /// <summary>
@@ -229,6 +249,9 @@ namespace MedicalSharp.Engine.Renderers
 
             program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
             program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
+
+            //设置渲染模式
+            program.SetUniformInt("u_RenderMode", (int)this.RenderMode);
 
             //设置标记策略
             program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);

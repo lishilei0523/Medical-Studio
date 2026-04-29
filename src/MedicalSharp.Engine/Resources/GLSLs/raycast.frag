@@ -21,6 +21,9 @@ uniform float u_DensityScale;           //密度缩放
 uniform int u_MaxStepsCount;            //最大步数
 uniform float u_OpacityThreshold;       //透明度阈值
 
+//渲染模式：0=Raycast, 1=AIP, 2=MIP, 3=MinIP, 4=SSD
+uniform int u_RenderMode;
+
 //标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Highlight）
 uniform int u_MarkModes[256];
 
@@ -97,7 +100,13 @@ void main()
     vec3 step = rayDirection * stepSize;
     vec3 currentPos = rayStart;
     
-    vec4 accumulatedColor = vec4(0.0);
+    //各渲染模式需要的累积变量
+    vec4 accumulatedColor = vec4(0.0);  //Raycast
+    float accumulatedSum = 0.0;         //AIP
+    int sampleCount = 0;                //AIP
+    float accumulatedMax = -1e20;       //MIP
+    float accumulatedMin = 1e20;        //MinIP
+    int minSampleCount = 0;             //MinIP
     
     for (int index = 0; index < numSteps && index < u_MaxStepsCount; index++) 
     {
@@ -152,22 +161,78 @@ void main()
         //亮度调整
         sampleColor.rgb *= u_Brightness;
         
-        //前向Alpha合成
-        accumulatedColor.rgb += (1.0 - accumulatedColor.a) * sampleColor.a * sampleColor.rgb;
-        accumulatedColor.a += (1.0 - accumulatedColor.a) * sampleColor.a;
-        
-        //提前终止
-        if (accumulatedColor.a > u_OpacityThreshold) 
+        //根据渲染模式累积
+        if (u_RenderMode == 0)  //Raycast
         {
-            accumulatedColor.a = 1.0;
-            break;
+            //前向Alpha合成
+            accumulatedColor.rgb += (1.0 - accumulatedColor.a) * sampleColor.a * sampleColor.rgb;
+            accumulatedColor.a += (1.0 - accumulatedColor.a) * sampleColor.a;
+        
+            //提前终止
+            if (accumulatedColor.a > u_OpacityThreshold) 
+            {
+                accumulatedColor.a = 1.0;
+                break;
+            }
         }
+        if (u_RenderMode == 1)  //AIP
+        {
+            accumulatedSum += sampleColor.a;
+            sampleCount++;
+        }
+        if (u_RenderMode == 2)  //MIP
+        {
+            float intensity = (sampleColor.r + sampleColor.g + sampleColor.b) / 3.0;
+            accumulatedMax = max(accumulatedMax, intensity);
+        }
+        if (u_RenderMode == 3)  //MinIP
+        {
+            if (density >= 0.1)  
+            {
+                //有效组织
+                float intensity = (sampleColor.r + sampleColor.g + sampleColor.b) / 3.0;
+                if (minSampleCount == 0 || intensity < accumulatedMin)
+                {
+                    accumulatedMin = intensity;
+                }
+                minSampleCount++;
+            }
+        }        
         
         //步进到下一个采样点
         currentPos += step;
     }
+
+    //根据渲染模式输出颜色
+    if (u_RenderMode == 0)  //Raycast
+    {
+        FragColor = accumulatedColor;
+    }
+    if (u_RenderMode == 1)  //AIP
+    {
+        float avg = sampleCount > 0 ? accumulatedSum / float(sampleCount) : 0.0;
+        FragColor = vec4(vec3(avg), 1.0);
+    }
+    if (u_RenderMode == 2)  //MIP
+    {
+        FragColor = vec4(vec3(accumulatedMax), 1.0);
+    }
+    if (u_RenderMode == 3)  //MinIP
+    {
+        if (minSampleCount == 0)
+        {
+            FragColor = vec4(0.0, 0.0, 0.0, 1.0);  //没有有效组织，黑色
+        }
+        else
+        {
+            FragColor = vec4(vec3(accumulatedMin), 1.0);
+        }
+    }
     
-    //应用Gamma校正
-    FragColor.rgb = pow(accumulatedColor.rgb, vec3(1.0/2.2));
-    FragColor.a = accumulatedColor.a;
+    //应用Gamma校正（仅 Raycast 模式）
+    if (u_RenderMode == 0)
+    {
+        FragColor.rgb = pow(accumulatedColor.rgb, vec3(1.0/2.2));
+        FragColor.a = accumulatedColor.a;
+    }
 }
