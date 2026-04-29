@@ -2,6 +2,7 @@
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
@@ -11,6 +12,7 @@ using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using System.Collections.Generic;
 
 namespace MedicalSharp.Controls.Viewports
 {
@@ -191,6 +193,8 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
+        //Public
+
         #region 查找最近体素 —— bool FindNearestVoxel(Vector2 position, out Vector3 textureCoord...
         /// <summary>
         /// 查找最近体素
@@ -217,7 +221,7 @@ namespace MedicalSharp.Controls.Viewports
             if (planeUV.HasValue)
             {
                 voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y, out Vector3 texCoord);
-                worldPosition = (textureCoord - new Vector3(0.5f)) * this.VolumeData.Metadata.VolumeScale;
+                worldPosition = (texCoord - new Vector3(0.5f)) * this.VolumeData.Metadata.VolumeScale;
                 textureCoord = texCoord;
                 voxelValue = this.VolumeData[voxelPosition.X, voxelPosition.Y, voxelPosition.Z];
                 markValue = this.VolumeData.GetMarkValue(voxelPosition.X, voxelPosition.Y, voxelPosition.Z);
@@ -308,7 +312,53 @@ namespace MedicalSharp.Controls.Viewports
             base.OnOpenTKDeinit();
             this._mprRenderer?.Dispose();
         }
-        #endregion 
+        #endregion
+
+
+        //Protected
+
+        #region 获取形状3D元素列表 —— override List<ShapeVisual3D> GetShapeVisual3Ds()
+        /// <summary>
+        /// 获取形状3D元素列表
+        /// </summary>
+        /// <returns>形状3D元素列表</returns>
+        protected override List<ShapeVisual3D> GetShapeVisual3Ds()
+        {
+            List<ShapeVisual3D> shapeVisual3Ds = [];
+            foreach (ShapeVisual3D shapeVisual3D in base.GetShapeVisual3Ds())
+            {
+                if (shapeVisual3D.IsOnPlane(this.Plane))
+                {
+                    shapeVisual3Ds.Add(shapeVisual3D);
+                }
+            }
+
+            return shapeVisual3Ds;
+        }
+        #endregion
+
+        #region 获取文本3D元素列表 —— override List<TextVisual3D> GetTextVisual3Ds()
+        /// <summary>
+        /// 获取文本3D元素列表
+        /// </summary>
+        /// <returns>文本3D元素列表</returns>
+        protected override List<TextVisual3D> GetTextVisual3Ds()
+        {
+            List<TextVisual3D> textVisual3Ds = [];
+            foreach (TextVisual3D textVisual3D in base.GetTextVisual3Ds())
+            {
+                if (textVisual3D.IsOnPlane(this.Plane))
+                {
+                    textVisual3Ds.Add(textVisual3D);
+                }
+            }
+
+            return textVisual3Ds;
+        }
+        #endregion
+
+
+        //Private
 
         #region 平面改变事件 —— static void OnPlaneChanged(MPRViewport viewport...
         /// <summary>

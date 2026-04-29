@@ -1,5 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Media;
+using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using System;
 
@@ -107,6 +110,40 @@ namespace MedicalSharp.Controls.Extensions
         public static System.Numerics.Vector3 ToSystemVector3(this in Vector3 vector3)
         {
             return new System.Numerics.Vector3(vector3.X, vector3.Y, vector3.Z);
+        }
+        #endregion
+
+        #region # 判断3D元素是否在MPR平面上 —— static bool IsOnPlane(this Visual3D visual3D...
+        /// <summary>
+        /// 判断3D元素是否在MPR平面上
+        /// </summary>
+        /// <param name="visual3D">3D元素</param>
+        /// <param name="plane">MPR平面</param>
+        /// <param name="epsilon">容差</param>
+        /// <returns>是否在MPR平面上</returns>
+        public static bool IsOnPlane(this Visual3D visual3D, MPRPlane plane, float epsilon = 0.002f)
+        {
+            if (visual3D is PointVisual3D)
+            {
+                float shapeDist = Vector3.Dot(visual3D.Transform.Position, plane.Normal);
+                float planeDist = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
+
+                return Math.Abs(shapeDist - planeDist) < epsilon;
+            }
+            if (visual3D is IVisual2DIn3D visual2DIn3D)
+            {
+                if (Math.Abs(Vector3.Dot(visual2DIn3D.Normal.ToVector3(), plane.Normal)) < 0.999f)
+                {
+                    return false;
+                }
+
+                float shapeDist = Vector3.Dot(visual3D.Transform.Position, plane.Normal);
+                float planeDist = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
+
+                return Math.Abs(shapeDist - planeDist) < epsilon;
+            }
+
+            return false;
         }
         #endregion
     }

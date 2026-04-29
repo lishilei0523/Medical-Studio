@@ -88,6 +88,26 @@ namespace MedicalSharp.Primitives.Cameras
         public abstract Matrix4 ViewMatrix { get; }
         #endregion
 
+        #region 只读属性 - 视口宽度 —— float ViewportWidth
+        /// <summary>
+        /// 只读属性 - 视口宽度
+        /// </summary>
+        public float ViewportWidth
+        {
+            get => this._viewportWidth;
+        }
+        #endregion
+
+        #region 只读属性 - 视口高度 —— float ViewportHeight
+        /// <summary>
+        /// 只读属性 - 视口高度
+        /// </summary>
+        public float ViewportHeight
+        {
+            get => this._viewportHeight;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法

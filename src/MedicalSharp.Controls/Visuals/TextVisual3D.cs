@@ -2,6 +2,7 @@
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
@@ -13,7 +14,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 文本3D元素
     /// </summary>
-    public class TextVisual3D : Visual3D, ITranslatable
+    public class TextVisual3D : Visual3D, IVisual2DIn3D, ITranslatable
     {
         #region # 字段及构造器
 

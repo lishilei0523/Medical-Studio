@@ -82,6 +82,8 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
+        //Public
+
         #region 看向指定位置 —— void LookAt(Vector3 targetPosition)
         /// <summary>
         /// 看向指定位置
@@ -234,53 +236,17 @@ namespace MedicalSharp.Controls.Viewports
             this._textRenderer.ClearItems();
 
             //填充渲染对象
-            foreach (Visual3D visual3D in this.Children.Where(x => x.IsVisible))
+            List<ShapeVisual3D> shapeVisual3Ds = this.GetShapeVisual3Ds();
+            List<TextVisual3D> textVisual3Ds = this.GetTextVisual3Ds();
+            foreach (ShapeVisual3D shapeVisual3D in shapeVisual3Ds)
             {
-                //形状部分
-                if (visual3D is ShapeVisual3D shapeVisual3D)
-                {
-                    shapeVisual3D.EnsureRenderable();
-                    this._shapeVisual3Ds.Add(shapeVisual3D);
-                    this._shapeRenderer.AppendItem(shapeVisual3D.Renderable);
-                }
-                if (visual3D is ShapePresenter shapePresenter && shapePresenter.Content.IsVisible)
-                {
-                    shapePresenter.Content.EnsureRenderable();
-                    this._shapeVisual3Ds.Add(shapePresenter.Content);
-                    this._shapeRenderer.AppendItem(shapePresenter.Content.Renderable);
-                }
-                if (visual3D is ShapesPresenter shapesPresenter)
-                {
-                    foreach (ShapeVisual3D item in shapesPresenter.ItemsSource.Where(x => x.IsVisible))
-                    {
-                        item.EnsureRenderable();
-                        this._shapeVisual3Ds.Add(item);
-                        this._shapeRenderer.AppendItem(item.Renderable);
-                    }
-                }
-
-                //文本部分
-                if (visual3D is TextVisual3D textVisual3D)
-                {
-                    textVisual3D.EnsureRenderable();
-                    this._textVisual3Ds.Add(textVisual3D);
-                    this._textRenderer.AppendItem(textVisual3D.Renderable);
-                }
-                if (visual3D is TextPresenter textPresenter && textPresenter.Content.IsVisible)
-                {
-                    textPresenter.Content.EnsureRenderable();
-                    this._textVisual3Ds.Add(textPresenter.Content);
-                    this._textRenderer.AppendItem(textPresenter.Content.Renderable);
-                }
-                if (visual3D is TextsPresenter textsPresenter)
-                {
-                    foreach (TextVisual3D item in textsPresenter.ItemsSource.Where(x => x.IsVisible))
-                    {
-                        item.EnsureRenderable();
-                        this._textVisual3Ds.Add(item);
-                        this._textRenderer.AppendItem(item.Renderable);
-                    }
-                }
+                this._shapeVisual3Ds.Add(shapeVisual3D);
+                this._shapeRenderer.AppendItem(shapeVisual3D.Renderable);
+            }
+            foreach (TextVisual3D textVisual3D in textVisual3Ds)
+            {
+                this._textVisual3Ds.Add(textVisual3D);
+                this._textRenderer.AppendItem(textVisual3D.Renderable);
             }
 
             this._shapeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
@@ -298,6 +264,80 @@ namespace MedicalSharp.Controls.Viewports
             this._textRenderer.Dispose();
         }
         #endregion
+
+
+        //Protected
+
+        #region 获取形状3D元素列表 —— virtual List<ShapeVisual3D> GetShapeVisual3Ds()
+        /// <summary>
+        /// 获取形状3D元素列表
+        /// </summary>
+        /// <returns>形状3D元素列表</returns>
+        protected virtual List<ShapeVisual3D> GetShapeVisual3Ds()
+        {
+            List<ShapeVisual3D> shapeVisual3Ds = [];
+            foreach (Visual3D visual3D in this.Children.Where(x => x.IsVisible))
+            {
+                if (visual3D is ShapeVisual3D shapeVisual3D)
+                {
+                    shapeVisual3D.EnsureRenderable();
+                    shapeVisual3Ds.Add(shapeVisual3D);
+                }
+                if (visual3D is ShapePresenter shapePresenter && shapePresenter.Content.IsVisible)
+                {
+                    shapePresenter.Content.EnsureRenderable();
+                    shapeVisual3Ds.Add(shapePresenter.Content);
+                }
+                if (visual3D is ShapesPresenter shapesPresenter)
+                {
+                    foreach (ShapeVisual3D item in shapesPresenter.ItemsSource.Where(x => x.IsVisible))
+                    {
+                        item.EnsureRenderable();
+                        shapeVisual3Ds.Add(item);
+                    }
+                }
+            }
+
+            return shapeVisual3Ds;
+        }
+        #endregion
+
+        #region 获取文本3D元素列表 —— virtual List<TextVisual3D> GetTextVisual3Ds()
+        /// <summary>
+        /// 获取文本3D元素列表
+        /// </summary>
+        /// <returns>文本3D元素列表</returns>
+        protected virtual List<TextVisual3D> GetTextVisual3Ds()
+        {
+            List<TextVisual3D> textVisual3Ds = [];
+            foreach (Visual3D visual3D in this.Children.Where(x => x.IsVisible))
+            {
+                if (visual3D is TextVisual3D textVisual3D)
+                {
+                    textVisual3D.EnsureRenderable();
+                    textVisual3Ds.Add(textVisual3D);
+                }
+                if (visual3D is TextPresenter textPresenter && textPresenter.Content.IsVisible)
+                {
+                    textPresenter.Content.EnsureRenderable();
+                    textVisual3Ds.Add(textPresenter.Content);
+                }
+                if (visual3D is TextsPresenter textsPresenter)
+                {
+                    foreach (TextVisual3D item in textsPresenter.ItemsSource.Where(x => x.IsVisible))
+                    {
+                        item.EnsureRenderable();
+                        textVisual3Ds.Add(item);
+                    }
+                }
+            }
+
+            return textVisual3Ds;
+        }
+        #endregion
+
+
+        //Private
 
         #region 子元素列表元素改变事件 —— void OnChildrenItemsChanged(object sender...
         /// <summary>

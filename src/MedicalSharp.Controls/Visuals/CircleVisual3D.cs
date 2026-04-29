@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
@@ -14,7 +15,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 圆形3D元素
     /// </summary>
-    public class CircleVisual3D : ShapeVisual3D, ITranslatable, IRotatable, IResizable
+    public class CircleVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable, IRotatable, IResizable
     {
         #region # 字段及构造器
 

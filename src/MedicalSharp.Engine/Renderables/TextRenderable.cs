@@ -236,8 +236,18 @@ namespace MedicalSharp.Engine.Renderables
             program.SetUniformVector4("u_Color", this.Color);
 
             //计算缩放
-            float cameraDistance = Vector3.Distance(camera.CameraPosition, this.Transform.Position);
-            this._referenceScale = BaseScale * (cameraDistance / ReferenceDistance);
+            if (camera is MPRCamera mprCamera)
+            {
+                float orthoSize = mprCamera.ZoomFactor;  //正交相机的大小
+                float screenHeight = mprCamera.ViewportHeight;
+                float targetScreenHeight = 1.2f;  //期望的屏幕像素高度
+                this._referenceScale = (targetScreenHeight / screenHeight) / orthoSize;
+            }
+            else
+            {
+                float cameraDistance = Vector3.Distance(camera.CameraPosition, this.Transform.Position);
+                this._referenceScale = BaseScale * (cameraDistance / ReferenceDistance);
+            }
             Matrix4 scaleMatrix = Matrix4.CreateScale(this._referenceScale);
 
             //重新计算包围盒
