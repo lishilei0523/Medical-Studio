@@ -1,6 +1,5 @@
 ﻿using MedicalSharp.Primitives.Enums;
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace MedicalSharp.Primitives.Models
@@ -58,11 +57,11 @@ namespace MedicalSharp.Primitives.Models
         public abstract IntPtr OriginalData { get; }
         #endregion
 
-        #region 标记数据 —— IntPtr MarkData
+        #region 标记数据 —— abstract IntPtr MarkData
         /// <summary>
         /// 标记数据
         /// </summary>
-        public IntPtr MarkData { get; protected set; }
+        public abstract IntPtr MarkData { get; }
         #endregion
 
         #region 只读属性 - 同步状态 —— MarkSyncStatus SyncStatus
@@ -223,58 +222,13 @@ namespace MedicalSharp.Primitives.Models
         }
         #endregion
 
-        #region 分配标记数据 —— void AllocMarkData()
-        /// <summary>
-        /// 分配标记数据
-        /// </summary>
-        public unsafe void AllocMarkData()
-        {
-            #region # 验证
-
-            if (this.Metadata == null)
-            {
-                throw new InvalidOperationException("体积信息未初始化");
-            }
-            if (this.MarkData != IntPtr.Zero)
-            {
-                this.FreeMarkData();
-            }
-
-            #endregion
-
-            int size = this.Metadata.VolumeSize.X * this.Metadata.VolumeSize.Y * this.Metadata.VolumeSize.Z * sizeof(byte);
-            void* pointer = NativeMemory.AllocZeroed((nuint)size);
-            this.MarkData = new IntPtr(pointer);
-        }
-        #endregion
-
-        #region 释放标记数据 —— void FreeMarkData()
-        /// <summary>
-        /// 释放标记数据
-        /// </summary>
-        protected unsafe void FreeMarkData()
-        {
-            if (this.MarkData != IntPtr.Zero)
-            {
-                NativeMemory.Free(this.MarkData.ToPointer());
-                this.MarkData = IntPtr.Zero;
-            }
-        }
-        #endregion
-
         #region 释放资源 —— virtual void Dispose()
         /// <summary>
         /// 释放资源
         /// </summary>
         public virtual void Dispose()
         {
-            if (this._disposed)
-            {
-                return;
-            }
 
-            this.FreeMarkData();
-            this._disposed = true;
         }
         #endregion
 
