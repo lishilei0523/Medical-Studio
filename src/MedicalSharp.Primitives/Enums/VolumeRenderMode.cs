@@ -23,11 +23,6 @@
         /// <summary>
         /// 最小密度投影
         /// </summary>
-        MinIP = 3,
-
-        /// <summary>
-        /// 表面阴影显示
-        /// </summary>
-        SSD = 4
+        MinIP = 3
     }
 }
