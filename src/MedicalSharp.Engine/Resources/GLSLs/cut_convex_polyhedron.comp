@@ -1,0 +1,81 @@
+#version 430 core
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+//标记纹理（可读写，R8UI格式）
+layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
+
+//凸多面体参数
+uniform int u_PlaneCount;          //平面数量
+uniform vec4 u_Planes[32];         //平面方程 (x,y,z,w)，满足 dot(normal, point) + w <= 0 为内部
+uniform mat4 u_WorldToLocal;
+
+//体积参数
+uniform ivec3 u_VolumeSize;
+uniform vec3 u_VolumeScale;
+
+//切割模式（0=内切, 1=外切）
+uniform int u_CutMode;
+
+//标记值（1-255，0保留给未标记）
+uniform uint u_MarkValue;
+
+
+void main()
+{
+    //获取当前线程对应的体素坐标
+    ivec3 voxelCoord = ivec3(gl_GlobalInvocationID);
+    
+    //边界检查
+    if (voxelCoord.x >= u_VolumeSize.x ||
+        voxelCoord.y >= u_VolumeSize.y ||
+        voxelCoord.z >= u_VolumeSize.z)
+    {
+        return;
+    }
+    
+    //体素坐标 -> 纹理坐标（0-1范围） -> 世界坐标
+    vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_VolumeSize);
+    vec3 worldPos = (texCoord - 0.5) * u_VolumeScale;
+    
+    //应用逆变换到局部坐标
+    vec4 localPos = u_WorldToLocal * vec4(worldPos, 1.0);
+    localPos /= localPos.w;
+    vec3 pos = localPos.xyz;
+    
+    //判断点是否在凸多面体内（在所有平面的内侧）
+    bool inPolyhedron = true;
+    for (int index = 0; index < u_PlaneCount; index++)
+    {
+        vec4 plane = u_Planes[index];
+
+        //平面方程：dot(normal, point) + w <= 0 为内侧
+        float dist = dot(plane.xyz, pos) + plane.w;
+        if (dist > 0.0)
+        {
+            inPolyhedron = false;
+            break;
+        }
+    }
+    
+    //根据切割模式决定
+    bool inside = false;
+    if (u_CutMode == 0)
+    {
+        //内切：标记凸多面体内部
+        inside = inPolyhedron;
+    }
+    else
+    {
+        //外切：标记凸多面体外部
+        inside = !inPolyhedron;
+    }
+    
+    if (inside)
+    {
+        uint oldMarkValue = imageLoad(u_MarkTexture, voxelCoord).r;
+        if (oldMarkValue != u_MarkValue)
+        {
+            imageStore(u_MarkTexture, voxelCoord, uvec4(u_MarkValue, 0, 0, 0));
+        }
+    }
+}

@@ -5,6 +5,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -198,6 +199,13 @@ namespace MedicalSharp.Controls.Commands
                 if (this._selectedVisual is CylinderVisual3D cylinder)
                 {
                     volumeViewport.VolumeRenderable.ApplyCylinderCut(cylinder.Radius, cylinder.Height, cylinder.Center.ToVector3(), cylinder.Transform.Matrix, CutMode.OutSide, 1);
+                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
+                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
+                }
+                if (this._selectedVisual is ConvexPolyhedronVisual3D polyhedron)
+                {
+                    ICollection<Vector4> planes = polyhedron.MeshGeometry.ExtractPlanes();
+                    volumeViewport.VolumeRenderable.ApplyConvexPolyhedronCut([.. planes], polyhedron.Transform.Matrix, CutMode.OutSide, 1);
                     volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
                     volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
                 }

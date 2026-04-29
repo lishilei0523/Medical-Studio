@@ -1042,14 +1042,14 @@ namespace MedicalSharp.Primitives.Builders
                 (float)v.Position[2])).ToArray();
 
             //构建顶点到索引的映射（因为Points列表就是索引顺序）
-            Dictionary<DefaultVertex, int> vertexToIndex = new Dictionary<DefaultVertex, int>();
+            IDictionary<DefaultVertex, int> vertexToIndex = new Dictionary<DefaultVertex, int>();
             for (int i = 0; i < convexHull.Result.Points.Count(); i++)
             {
                 vertexToIndex[convexHull.Result.Points.ElementAt(i)] = i;
             }
 
-            List<Vertex> vertexList = [];
-            List<uint> indexList = [];
+            List<Vertex> vertices = [];
+            List<uint> indices = [];
             if (primitiveType == GraphicPrimitiveType.Lines)
             {
                 //==========线框模式：提取所有边==========
@@ -1068,19 +1068,19 @@ namespace MedicalSharp.Primitives.Builders
                 //添加顶点
                 foreach (Vector3 v in hullVertices)
                 {
-                    vertexList.Add(new Vertex { Position = v, Normal = Vector3.Zero });
+                    vertices.Add(new Vertex { Position = v, Normal = Vector3.Zero });
                 }
 
                 //添加边索引
                 foreach ((int i1, int i2) in edges)
                 {
-                    indexList.Add((uint)i1);
-                    indexList.Add((uint)i2);
+                    indices.Add((uint)i1);
+                    indices.Add((uint)i2);
                 }
             }
             else
             {
-                //========== 填充模式：生成三角形 ==========
+                //==========填充模式：生成三角形==========
                 foreach (DefaultConvexFace<DefaultVertex> face in convexHull.Result.Faces)
                 {
                     int i0 = vertexToIndex[face.Vertices[0]];
@@ -1092,18 +1092,18 @@ namespace MedicalSharp.Primitives.Builders
                     Vector3 v2 = hullVertices[i2];
                     Vector3 normal = Vector3.Normalize(Vector3.Cross(v1 - v0, v2 - v0));
 
-                    vertexList.Add(new Vertex { Position = v0, Normal = normal });
-                    vertexList.Add(new Vertex { Position = v1, Normal = normal });
-                    vertexList.Add(new Vertex { Position = v2, Normal = normal });
+                    vertices.Add(new Vertex { Position = v0, Normal = normal });
+                    vertices.Add(new Vertex { Position = v1, Normal = normal });
+                    vertices.Add(new Vertex { Position = v2, Normal = normal });
 
-                    uint baseIdx = (uint)(vertexList.Count - 3);
-                    indexList.Add(baseIdx);
-                    indexList.Add(baseIdx + 1);
-                    indexList.Add(baseIdx + 2);
+                    uint baseIdx = (uint)(vertices.Count - 3);
+                    indices.Add(baseIdx);
+                    indices.Add(baseIdx + 1);
+                    indices.Add(baseIdx + 2);
                 }
             }
 
-            MeshGeometry meshGeometry = new(vertexList, indexList);
+            MeshGeometry meshGeometry = new(vertices, indices);
 
             if (primitiveType != GraphicPrimitiveType.Lines)
             {

@@ -48,6 +48,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _CylinderCutComputer;
 
         /// <summary>
+        /// 凸多面体切割计算着色器
+        /// </summary>
+        private static ShaderProgram _ConvexPolyhedronCutComputer;
+
+        /// <summary>
         /// 同步锁
         /// </summary>
         private static readonly Lock _Sync;
@@ -125,6 +130,16 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - 凸多面体切割计算着色器 —— static ShaderProgram ConvexPolyhedronCutComputer
+        /// <summary>
+        /// 只读属性 - 凸多面体切割计算着色器
+        /// </summary>
+        public static ShaderProgram ConvexPolyhedronCutComputer
+        {
+            get => _ConvexPolyhedronCutComputer;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -150,6 +165,7 @@ namespace MedicalSharp.Engine.Managers
                 _BoxCutComputer = CreateBoxCutComputer();
                 _SphereCutComputer = CreateSphereCutComputer();
                 _CylinderCutComputer = CreateCylinderCutComputer();
+                _ConvexPolyhedronCutComputer = CreateConvexPolyhedronCutComputer();
                 _Initialized = true;
             }
         }
@@ -204,6 +220,7 @@ namespace MedicalSharp.Engine.Managers
             _BoxCutComputer?.Dispose();
             _SphereCutComputer?.Dispose();
             _CylinderCutComputer?.Dispose();
+            _ConvexPolyhedronCutComputer?.Dispose();
         }
         #endregion
 
@@ -288,6 +305,20 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/cut_cylinder.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion
+
+        #region 创建凸多面体切割计算着色器 —— static ShaderProgram CreateConvexPolyhedronCutComputer()
+        /// <summary>
+        /// 创建凸多面体切割计算着色器
+        /// </summary>
+        private static ShaderProgram CreateConvexPolyhedronCutComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_convex_polyhedron.comp");
             program.BuildCompute();
 
             return program;

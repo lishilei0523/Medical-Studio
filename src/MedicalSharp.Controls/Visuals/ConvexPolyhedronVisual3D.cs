@@ -49,6 +49,13 @@ namespace MedicalSharp.Controls.Visuals
 
         #region 属性
 
+        #region 网格模型 —— MeshGeometry MeshGeometry
+        /// <summary>
+        /// 网格模型
+        /// </summary>
+        public MeshGeometry MeshGeometry { get; private set; }
+        #endregion
+
         #region 依赖属性 - 位置列表 —— AvaloniaList<Vector3D> Positions
         /// <summary>
         /// 依赖属性 - 位置列表
@@ -80,6 +87,7 @@ namespace MedicalSharp.Controls.Visuals
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
 
                 this.Renderable = renderable;
+                this.MeshGeometry = fillMesh;
             }
         }
         #endregion
@@ -99,6 +107,8 @@ namespace MedicalSharp.Controls.Visuals
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+
+                this.MeshGeometry = fillMesh;
             }
         }
         #endregion

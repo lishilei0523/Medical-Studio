@@ -161,6 +161,40 @@ namespace MedicalSharp.Primitives.Models
         }
         #endregion
 
+        #region 提取平面方程列表 —— static ICollection<Vector4> ExtractPlanes()
+        /// <summary>
+        /// 提取平面方程列表
+        /// </summary>
+        /// <returns>平面方程列表</returns>
+        public ICollection<Vector4> ExtractPlanes()
+        {
+            Vector3[] vertices = this.Vertices.Select(x => x.Position).ToArray();
+            uint[] indices = this.Indices;
+
+            ICollection<Vector4> planes = new HashSet<Vector4>();
+            for (int index = 0; index < indices.Length; index += 3)
+            {
+                Vector3 v0 = vertices[indices[index]];
+                Vector3 v1 = vertices[indices[index + 1]];
+                Vector3 v2 = vertices[indices[index + 2]];
+
+                //计算法向量（归一化）
+                Vector3 normal = Vector3.Normalize(Vector3.Cross(v1 - v0, v2 - v0));
+
+                //计算 d（满足 dot(normal, v0) + d = 0）
+                float d = -Vector3.Dot(normal, v0);
+
+                //归一化平面方程（可选，确保精度）
+                Vector4 plane = new Vector4(normal.X, normal.Y, normal.Z, d);
+
+                //去重（相同法向量+相近d视为同一平面）
+                planes.Add(plane);
+            }
+
+            return planes;
+        }
+        #endregion
+
         #endregion
     }
 }

@@ -393,6 +393,62 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
+        #region 应用凸多面体切割 —— void ApplyConvexPolyhedronCut(IReadOnlyList<Vector4> planes...
+        /// <summary>
+        /// 应用凸多面体切割
+        /// </summary>
+        /// <param name="planes">平面方程列表（法向量指向外部）</param>
+        /// <param name="localToWorld">局部到世界变换矩阵</param>
+        /// <param name="cutMode">切割模式</param>
+        /// <param name="markValue">标记值</param>
+        public void ApplyConvexPolyhedronCut(IReadOnlyList<Vector4> planes, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        {
+            #region # 验证
+
+            if (planes == null || planes.Count == 0 || planes.Count > 32)
+            {
+                throw new ArgumentException($"平面数量必须在1-32之间，当前: {planes?.Count}");
+            }
+
+            #endregion
+
+            Matrix4 worldToLocal = localToWorld.Inverted();
+
+            //凸多面体切割计算着色器
+            ShaderProgram cutComputer = ComputerManager.ConvexPolyhedronCutComputer;
+
+            //开启Shader程序
+            cutComputer.Use();
+
+            //绑定标记纹理为可读写
+            this.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+
+            //设置平面参数
+            cutComputer.SetUniformInt("u_PlaneCount", planes.Count);
+            for (int index = 0; index < planes.Count; index++)
+            {
+                cutComputer.SetUniformVector4($"u_Planes[{index}]", planes[index]);
+            }
+            cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
+
+            //设置体积参数
+            cutComputer.SetUniformVector3i("u_VolumeSize", this.VolumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", this.VolumeData.Metadata.VolumeScale);
+
+            //设置切割模式
+            cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
+
+            //设置标记值
+            cutComputer.SetUniformUInt("u_MarkValue", markValue);
+
+            //调度执行
+            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+
+            //取消使用
+            cutComputer.Unuse();
+        }
+        #endregion
+
         #region 同步标记数据GPU->CPU —— void SyncMarkDataFromGpu()
         /// <summary>
         /// 同步标记数据GPU->CPU
