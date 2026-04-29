@@ -8,6 +8,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -401,18 +402,42 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值</param>
-        public void ApplyConvexPolyhedronCut(IReadOnlyList<Vector4> planes, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public unsafe void ApplyConvexPolyhedronCut(IReadOnlyList<Vector4> planes, Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             #region # 验证
 
-            if (planes == null || planes.Count == 0 || planes.Count > 32)
+            if (planes == null || planes.Count == 0)
             {
-                throw new ArgumentException($"平面数量必须在1-32之间，当前: {planes?.Count}");
+                throw new ArgumentException($"平面方程列表不可为空！");
             }
 
             #endregion
 
             Matrix4 worldToLocal = localToWorld.Inverted();
+
+            //构建缓冲区数据
+            int planeSize = sizeof(Vector4);
+            int bufferSize = sizeof(Vector4) + planeSize * planes.Count;
+            byte[] data = new byte[bufferSize];
+            using MemoryStream stream = new MemoryStream(data);
+            using BinaryWriter writer = new BinaryWriter(stream);
+
+            //先写入平面数量
+            writer.Write(planes.Count);
+            writer.Write(0);    //补齐
+            writer.Write(0);    //补齐
+            writer.Write(0);    //补齐
+
+            //再写入所有平面
+            foreach (Vector4 plane in planes)
+            {
+                writer.Write(plane.X);
+                writer.Write(plane.Y);
+                writer.Write(plane.Z);
+                writer.Write(plane.W);
+            }
+
+            using ShaderStorageBuffer planesBuffer = new ShaderStorageBuffer(data, BufferUsageHint.DynamicDraw);
 
             //凸多面体切割计算着色器
             ShaderProgram cutComputer = ComputerManager.ConvexPolyhedronCutComputer;
@@ -423,12 +448,8 @@ namespace MedicalSharp.Engine.Renderables
             //绑定标记纹理为可读写
             this.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
-            //设置平面参数
-            cutComputer.SetUniformInt("u_PlaneCount", planes.Count);
-            for (int index = 0; index < planes.Count; index++)
-            {
-                cutComputer.SetUniformVector4($"u_Planes[{index}]", planes[index]);
-            }
+            //设置凸多面体参数
+            planesBuffer.Bind(1);
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
