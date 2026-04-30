@@ -2,6 +2,7 @@
 using Avalonia.Collections;
 using MedicalSharp.Primitives.Maths;
 using System;
+using System.Collections.Specialized;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -23,6 +24,17 @@ namespace MedicalSharp.Controls.Visuals
         static ShapesPresenter()
         {
             ItemsSourceProperty = AvaloniaProperty.Register<ShapesPresenter, AvaloniaList<ShapeVisual3D>>(nameof(ItemsSource), []);
+
+            //属性改变事件
+            ItemsSourceProperty.Changed.AddClassHandler<ShapesPresenter, AvaloniaList<ShapeVisual3D>>(OnItemsSourceChanged);
+        }
+
+        /// <summary>
+        /// 默认构造器
+        /// </summary>
+        public ShapesPresenter()
+        {
+            this.ItemsSource.CollectionChanged += this.OnItemsSourceItemChanged;
         }
 
         #endregion
@@ -57,6 +69,43 @@ namespace MedicalSharp.Controls.Visuals
         public override BoundingBox Bounds
         {
             get => throw new NotSupportedException();
+        }
+        #endregion
+
+        #endregion
+
+        #region # 方法
+
+        #region 形状3D元素列表改变事件 —— static void OnItemsSourceChanged(ShapesPresenter presenter...
+        /// <summary>
+        /// 形状3D元素列表改变事件
+        /// </summary>
+        private static void OnItemsSourceChanged(ShapesPresenter presenter, AvaloniaPropertyChangedEventArgs<AvaloniaList<ShapeVisual3D>> eventArgs)
+        {
+            if (eventArgs.OldValue.Value != null)
+            {
+                eventArgs.OldValue.Value.CollectionChanged -= presenter.OnItemsSourceItemChanged;
+            }
+            if (eventArgs.NewValue.Value != null)
+            {
+                eventArgs.NewValue.Value.CollectionChanged += presenter.OnItemsSourceItemChanged;
+            }
+        }
+        #endregion
+
+        #region 形状3D元素列表元素改变事件 —— void OnItemsSourceItemChanged(object sender...
+        /// <summary>
+        /// 形状3D元素列表元素改变事件
+        /// </summary>
+        private void OnItemsSourceItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+        {
+            if (eventArgs.Action == NotifyCollectionChangedAction.Remove && eventArgs.OldItems != null)
+            {
+                foreach (ShapeVisual3D shapeVisual3D in eventArgs.OldItems)
+                {
+                    shapeVisual3D.Renderable?.Dispose();
+                }
+            }
         }
         #endregion
 
