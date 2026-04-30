@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Interactivity;
 using Avalonia.Metadata;
 using MedicalSharp.Primitives.Maths;
 using System;
@@ -23,6 +24,9 @@ namespace MedicalSharp.Controls.Visuals
         static TextPresenter()
         {
             ContentProperty = AvaloniaProperty.Register<TextPresenter, TextVisual3D>(nameof(Content));
+
+            //属性改变事件
+            ContentProperty.Changed.AddClassHandler<TextPresenter, TextVisual3D>(OnContentChanged);
         }
 
         #endregion
@@ -58,6 +62,30 @@ namespace MedicalSharp.Controls.Visuals
         public override BoundingBox Bounds
         {
             get => throw new NotSupportedException();
+        }
+        #endregion
+
+        #endregion
+
+        #region # 方法
+
+        #region 元素卸载事件 —— override void OnUnloaded(RoutedEventArgs eventArgs)
+        /// <summary>
+        /// 元素卸载事件
+        /// </summary>
+        protected override void OnUnloaded(RoutedEventArgs eventArgs)
+        {
+            this.Content?.Renderable?.Dispose();
+        }
+        #endregion
+
+        #region 文本3D元素改变事件 —— static void OnContentChanged(TextPresenter textPresenter...
+        /// <summary>
+        /// 文本3D元素改变事件
+        /// </summary>
+        private static void OnContentChanged(TextPresenter textPresenter, AvaloniaPropertyChangedEventArgs<TextVisual3D> eventArgs)
+        {
+            eventArgs.OldValue.Value?.Renderable?.Dispose();
         }
         #endregion
 
