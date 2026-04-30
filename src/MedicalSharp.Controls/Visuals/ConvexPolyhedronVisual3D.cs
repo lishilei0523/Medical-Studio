@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
@@ -17,7 +18,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 凸多面体3D元素
     /// </summary>
-    public class ConvexPolyhedronVisual3D : ShapeVisual3D, ITranslatable, IRotatable, IVertexEditable
+    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IVertexEditable
     {
         #region # 字段及构造器
 

@@ -136,7 +136,7 @@ namespace MedicalSharp.Engine.Renderables
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+            ComputerManager.DispatchCompute3D(this.VolumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
@@ -187,7 +187,7 @@ namespace MedicalSharp.Engine.Renderables
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+            ComputerManager.DispatchCompute3D(this.VolumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
@@ -240,7 +240,7 @@ namespace MedicalSharp.Engine.Renderables
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+            ComputerManager.DispatchCompute3D(this.VolumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
@@ -294,7 +294,7 @@ namespace MedicalSharp.Engine.Renderables
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+            ComputerManager.DispatchCompute3D(this.VolumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
@@ -339,7 +339,7 @@ namespace MedicalSharp.Engine.Renderables
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+            ComputerManager.DispatchCompute3D(this.VolumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
@@ -386,7 +386,7 @@ namespace MedicalSharp.Engine.Renderables
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+            ComputerManager.DispatchCompute3D(this.VolumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
@@ -444,7 +444,7 @@ namespace MedicalSharp.Engine.Renderables
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(this.MarkTexture.Width, this.MarkTexture.Height, this.MarkTexture.Depth);
+            ComputerManager.DispatchCompute3D(this.VolumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();

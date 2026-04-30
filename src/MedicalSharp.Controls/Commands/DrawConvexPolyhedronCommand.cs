@@ -197,6 +197,16 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void CompleteDrawing(OpenTKViewport viewport)
         {
+            #region # 验证
+
+            if (this._polyhedron.Positions.Count < 6)
+            {
+                this.CancelDrawing(viewport);
+                return;
+            }
+
+            #endregion
+
             //移除预览点
             if (this._previewPoint.HasValue && this._polyhedron != null)
             {

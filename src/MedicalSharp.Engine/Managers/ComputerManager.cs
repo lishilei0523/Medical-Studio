@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Engine.Resources;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using System;
 using System.Threading;
 
@@ -171,40 +172,42 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
-        #region 调度计算着色器 —— static void DispatchCompute2D(int width, int height)
+        #region 调度计算着色器 —— static void DispatchCompute2D(Vector2i size)
         /// <summary>
         /// 调度计算着色器
         /// </summary>
-        public static void DispatchCompute2D(int width, int height)
+        /// <param name="size">数据尺寸</param>
+        public static void DispatchCompute2D(Vector2i size)
         {
             //计算工作组数量（每组16×16线程）
-            int groupsX = (int)MathF.Ceiling(width / 16.0f);
-            int groupsY = (int)MathF.Ceiling(height / 16.0f);
+            int groupsX = (int)MathF.Ceiling(size.X / 16.0f);
+            int groupsY = (int)MathF.Ceiling(size.Y / 16.0f);
 
             //调度执行计算着色器
             GL.DispatchCompute(groupsX, groupsY, 1);
 
             //内存屏障：确保计算完成后渲染能读到新数据
-            GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit);
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit | MemoryBarrierFlags.ShaderStorageBarrierBit);
         }
         #endregion
 
-        #region 调度计算着色器 —— static void DispatchCompute3D(int width, int height, int depth)
+        #region 调度计算着色器 —— static void DispatchCompute3D(Vector3i size)
         /// <summary>
         /// 调度计算着色器
         /// </summary>
-        public static void DispatchCompute3D(int width, int height, int depth)
+        /// <param name="size">数据尺寸</param>
+        public static void DispatchCompute3D(Vector3i size)
         {
             //计算工作组数量（每组8×8×8线程）
-            int groupsX = (int)MathF.Ceiling(width / 8.0f);
-            int groupsY = (int)MathF.Ceiling(height / 8.0f);
-            int groupsZ = (int)MathF.Ceiling(depth / 8.0f);
+            int groupsX = (int)MathF.Ceiling(size.X / 8.0f);
+            int groupsY = (int)MathF.Ceiling(size.Y / 8.0f);
+            int groupsZ = (int)MathF.Ceiling(size.Z / 8.0f);
 
             //调度执行计算着色器
             GL.DispatchCompute(groupsX, groupsY, groupsZ);
 
             //内存屏障：确保计算完成后渲染能读到新数据
-            GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit);
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit | MemoryBarrierFlags.ShaderStorageBarrierBit);
         }
         #endregion
 

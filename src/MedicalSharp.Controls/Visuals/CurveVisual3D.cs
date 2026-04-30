@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Interfaces;
@@ -16,7 +17,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 曲线3D元素
     /// </summary>
-    public class CurveVisual3D : ShapeVisual3D, ITranslatable, IVertexEditable
+    public class CurveVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IVertexEditable
     {
         #region # 字段及构造器
 

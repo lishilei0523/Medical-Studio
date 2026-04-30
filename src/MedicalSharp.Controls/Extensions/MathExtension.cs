@@ -123,6 +123,7 @@ namespace MedicalSharp.Controls.Extensions
         /// <returns>是否在MPR平面上</returns>
         public static bool IsOnPlane(this Visual3D visual3D, MPRPlane plane, float epsilon = 0.002f)
         {
+            //TODO 完善
             if (visual3D is PointVisual3D)
             {
                 float shapeDist = Vector3.Dot(visual3D.Transform.Position, plane.Normal);
