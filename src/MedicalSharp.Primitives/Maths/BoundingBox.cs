@@ -277,6 +277,35 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
+        #region 变换包围盒 —— BoundingBox Transform(Matrix4 matrix)
+        /// <summary>
+        /// 变换包围盒
+        /// </summary>
+        /// <param name="matrix">变换矩阵</param>
+        /// <returns>变换后的新包围盒</returns>
+        /// <remarks>将包围盒的8个角点通过矩阵变换后，重新计算最小点和最大点生成新的包围盒</remarks>
+        public BoundingBox Transform(Matrix4 matrix)
+        {
+            //变换所有角点
+            Vector3[] transformedCorners = new Vector3[8];
+            for (int i = 0; i < 8; i++)
+            {
+                transformedCorners[i] = Vector3.TransformPosition(this.Corners[i], matrix);
+            }
+
+            //重新计算最小点和最大点
+            Vector3 minimum = transformedCorners[0];
+            Vector3 maximum = transformedCorners[0];
+            for (int index = 1; index < 8; index++)
+            {
+                minimum = Vector3.ComponentMin(minimum, transformedCorners[index]);
+                maximum = Vector3.ComponentMax(maximum, transformedCorners[index]);
+            }
+
+            return new BoundingBox(minimum, maximum);
+        }
+        #endregion
+
         #region 合并包围盒 —— BoundingBox Union(BoundingBox other)
         /// <summary>
         /// 合并包围盒

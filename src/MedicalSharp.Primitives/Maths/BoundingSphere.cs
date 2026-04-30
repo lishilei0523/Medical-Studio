@@ -208,6 +208,58 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
+        #region 变换包围球 —— BoundingSphere Transform(Matrix4 matrix)
+        /// <summary>
+        /// 变换包围球
+        /// </summary>
+        /// <param name="matrix">变换矩阵</param>
+        /// <returns>变换后的新包围球</returns>
+        /// <remarks>
+        /// 对于包含平移、旋转和均匀缩放的变换，会正确变换球心和半径。
+        /// 对于非均匀缩放，会计算变换后的最大半径以保证完全包含变换后的物体。
+        /// </remarks>
+        public BoundingSphere Transform(Matrix4 matrix)
+        {
+            //变换球心
+            Vector3 center = Vector3.TransformPosition(this._center, matrix);
+
+            //提取矩阵的缩放因子
+            Vector3 scale = new Vector3(
+                matrix.Row0.Xyz.Length,
+                matrix.Row1.Xyz.Length,
+                matrix.Row2.Xyz.Length
+            );
+
+            //检查是否为均匀缩放
+            bool isUniformScale = Math.Abs(scale.X - scale.Y) < float.Epsilon && Math.Abs(scale.Y - scale.Z) < float.Epsilon;
+
+            float radius;
+            if (isUniformScale)
+            {
+                //均匀缩放：直接缩放半径
+                radius = this._radius * scale.X;
+            }
+            else
+            {
+                //非均匀缩放：需要计算变换后的最大半径
+                //变换三个主轴方向上的点
+                Vector3 xPoint = Vector3.TransformPosition(this._center + new Vector3(this._radius, 0, 0), matrix);
+                Vector3 yPoint = Vector3.TransformPosition(this._center + new Vector3(0, this._radius, 0), matrix);
+                Vector3 zPoint = Vector3.TransformPosition(this._center + new Vector3(0, 0, this._radius), matrix);
+
+                //计算变换后的半径
+                float radiusX = Vector3.Distance(center, xPoint);
+                float radiusY = Vector3.Distance(center, yPoint);
+                float radiusZ = Vector3.Distance(center, zPoint);
+
+                //取最大值以保证完全包含
+                radius = Math.Max(radiusX, Math.Max(radiusY, radiusZ));
+            }
+
+            return new BoundingSphere(center, radius);
+        }
+        #endregion
+
         #region 合并包围球 —— BoundingSphere Union(BoundingSphere other)
         /// <summary>
         /// 合并包围球

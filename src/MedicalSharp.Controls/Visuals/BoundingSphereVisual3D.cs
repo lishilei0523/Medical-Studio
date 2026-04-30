@@ -29,16 +29,30 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<Vector3D> CenterProperty;
 
         /// <summary>
+        /// 经线数量依赖属性
+        /// </summary>
+        public static readonly StyledProperty<int> SegmentsProperty;
+
+        /// <summary>
+        /// 纬线数量依赖属性
+        /// </summary>
+        public static readonly StyledProperty<int> RingsProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static BoundingSphereVisual3D()
         {
             RadiusProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, float>(nameof(Radius), 1.0f);
             CenterProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+            SegmentsProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, int>(nameof(Segments), 32);
+            RingsProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, int>(nameof(Rings), 16);
 
             //属性改变事件
             RadiusProperty.Changed.AddClassHandler<BoundingSphereVisual3D, float>(OnRadiusChanged);
             CenterProperty.Changed.AddClassHandler<BoundingSphereVisual3D, Vector3D>(OnCenterChanged);
+            SegmentsProperty.Changed.AddClassHandler<BoundingSphereVisual3D, int>(OnSegmentsChanged);
+            RingsProperty.Changed.AddClassHandler<BoundingSphereVisual3D, int>(OnRingsChanged);
         }
 
 
@@ -76,6 +90,28 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 依赖属性 - 经线数量 —— int Segments
+        /// <summary>
+        /// 依赖属性 - 经线数量
+        /// </summary>
+        public int Segments
+        {
+            get => this.GetValue(SegmentsProperty);
+            set => this.SetValue(SegmentsProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 纬线数量 —— int Rings
+        /// <summary>
+        /// 依赖属性 - 纬线数量
+        /// </summary>
+        public int Rings
+        {
+            get => this.GetValue(RingsProperty);
+            set => this.SetValue(RingsProperty, value);
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -88,8 +124,9 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable == null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
-                MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
+                Vector3 center = this.Center.ToVector3();
+                MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
+                MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
 
                 WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
@@ -107,8 +144,9 @@ namespace MedicalSharp.Controls.Visuals
         {
             if (this.Renderable != null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
-                MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, this.Center.ToVector3());
+                Vector3 center = this.Center.ToVector3();
+                MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
+                MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
 
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
@@ -179,6 +217,26 @@ namespace MedicalSharp.Controls.Visuals
         /// 中心位置改变事件
         /// </summary>
         private static void OnCenterChanged(BoundingSphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
+        {
+            visual3D.UpdateRenderable();
+        }
+        #endregion
+
+        #region 经线数量改变事件 —— static void OnSegmentsChanged(BoundingSphereVisual3D visual3D...
+        /// <summary>
+        /// 经线数量改变事件
+        /// </summary>
+        private static void OnSegmentsChanged(BoundingSphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<int> eventArgs)
+        {
+            visual3D.UpdateRenderable();
+        }
+        #endregion
+
+        #region 纬线数量改变事件 —— static void OnRingsChanged(BoundingSphereVisual3D visual3D...
+        /// <summary>
+        /// 纬线数量改变事件
+        /// </summary>
+        private static void OnRingsChanged(BoundingSphereVisual3D visual3D, AvaloniaPropertyChangedEventArgs<int> eventArgs)
         {
             visual3D.UpdateRenderable();
         }

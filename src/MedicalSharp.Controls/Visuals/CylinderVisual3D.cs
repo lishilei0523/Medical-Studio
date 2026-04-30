@@ -133,7 +133,7 @@ namespace MedicalSharp.Controls.Visuals
 
         #endregion
 
-        #region 方法
+        #region # 方法
 
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
+using Avalonia.Interactivity;
 using MedicalSharp.Primitives.Maths;
 using System;
 using System.Collections.Specialized;
@@ -75,6 +76,19 @@ namespace MedicalSharp.Controls.Visuals
         #endregion
 
         #region # 方法
+
+        #region 元素卸载事件 —— override void OnUnloaded(RoutedEventArgs eventArgs)
+        /// <summary>
+        /// 元素卸载事件
+        /// </summary>
+        protected override void OnUnloaded(RoutedEventArgs eventArgs)
+        {
+            foreach (ShapeVisual3D shapeVisual3D in this.ItemsSource)
+            {
+                shapeVisual3D.Renderable?.Dispose();
+            }
+        }
+        #endregion
 
         #region 形状3D元素列表改变事件 —— static void OnItemsSourceChanged(ShapesPresenter presenter...
         /// <summary>

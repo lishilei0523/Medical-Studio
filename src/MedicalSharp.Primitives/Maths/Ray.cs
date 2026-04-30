@@ -489,14 +489,16 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 变换射线 —— Ray Transform(Matrix4 transform)
+        #region 变换射线 —— Ray Transform(Matrix4 matrix)
         /// <summary>
         /// 变换射线
         /// </summary>
-        public Ray Transform(Matrix4 transform)
+        /// <param name="matrix">变换矩阵</param>
+        /// <returns>变换后的新射线</returns>
+        public Ray Transform(Matrix4 matrix)
         {
-            Vector3 newPosition = Vector3.TransformPosition(this._position, transform);
-            Vector3 newDirection = Vector3.TransformNormal(this._direction, transform).Normalized();
+            Vector3 newPosition = Vector3.TransformPosition(this._position, matrix);
+            Vector3 newDirection = Vector3.TransformNormal(this._direction, matrix).Normalized();
             Ray ray = new Ray(newPosition, newDirection);
 
             return ray;

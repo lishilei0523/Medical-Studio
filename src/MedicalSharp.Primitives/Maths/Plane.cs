@@ -209,6 +209,33 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
+        #region 变换平面 —— Plane Transform(Matrix4 matrix)
+        /// <summary>
+        /// 变换平面
+        /// </summary>
+        /// <param name="matrix">变换矩阵</param>
+        /// <returns>变换后的新平面</returns>
+        public Plane Transform(Matrix4 matrix)
+        {
+            //变换法向量（使用逆转置矩阵）
+            Matrix3 rotationScale = new Matrix3(
+                matrix.Row0.X, matrix.Row0.Y, matrix.Row0.Z,
+                matrix.Row1.X, matrix.Row1.Y, matrix.Row1.Z,
+                matrix.Row2.X, matrix.Row2.Y, matrix.Row2.Z
+            );
+
+            Matrix3 inverseTranspose = Matrix3.Transpose(rotationScale.Inverted());
+            Vector3 normal = Vector3.Normalize(inverseTranspose * this._normal);
+
+            //变换平面上一点并计算新距离
+            Vector3 pointOnPlane = this.GetClosestPointToOrigin();
+            Vector3 transformedPoint = Vector3.TransformPosition(pointOnPlane, matrix);
+            float distance = -Vector3.Dot(normal, transformedPoint);
+
+            return new Plane(normal, distance);
+        }
+        #endregion
+
 
         //IEquatable
 
