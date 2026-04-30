@@ -87,7 +87,7 @@ namespace MedicalSharp.Engine.Resources
 
         #region 缓冲区用途 —— BufferUsageHint Usage
         /// <summary>
-        /// 缓冲区用途提示
+        /// 缓冲区用途
         /// </summary>
         /// <remarks>
         /// 提示驱动缓冲区使用模式，便于驱动优化：
@@ -101,8 +101,6 @@ namespace MedicalSharp.Engine.Resources
         #endregion
 
         #region # 方法
-
-        //Public
 
         #region 绑定着色器存储缓冲区 —— void Bind()
         /// <summary>
@@ -217,89 +215,6 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 更新数据 —— void Update<T>(T data)
-        /// <summary>
-        /// 更新数据
-        /// </summary>
-        /// <typeparam name="T">结构体类型</typeparam>
-        /// <param name="data">数据</param>
-        /// <remarks>
-        /// 单个结构体
-        /// 适用于缓冲区只存储一个结构体的场景。
-        /// </remarks>
-        public void Update<T>(T data) where T : unmanaged
-        {
-            int size = Marshal.SizeOf<T>();
-
-            #region # 验证
-
-            if (size > this.BufferSize)
-            {
-                throw new ArgumentException($"数据尺寸 {size} 超过缓冲区尺寸 {this.BufferSize}");
-            }
-
-            #endregion
-
-            byte[] bytes = new byte[size];
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-            try
-            {
-                Marshal.StructureToPtr(data, ptr, false);
-                Marshal.Copy(ptr, bytes, 0, size);
-                this.Update(bytes);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
-            }
-        }
-        #endregion
-
-        #region 批量更新数据 —— void UpdateRange<T>(T[] data)
-        /// <summary>
-        /// 批量更新数据
-        /// </summary>
-        /// <typeparam name="T">结构体类型</typeparam>
-        /// <param name="data">数据数组</param>
-        /// <remarks>
-        /// 泛型数组全量
-        /// 自动计算结构体大小并转换字节数组上传。
-        /// T 必须是 blittable 类型（结构体只包含值类型，无引用）。
-        /// </remarks>
-        public void UpdateRange<T>(T[] data) where T : unmanaged
-        {
-            int byteSize = data.Length * Marshal.SizeOf<T>();
-
-            #region # 验证
-
-            if (byteSize > this.BufferSize)
-            {
-                throw new ArgumentException($"数据尺寸 {byteSize} 超过缓冲区尺寸 {this.BufferSize}");
-            }
-
-            #endregion
-
-            byte[] bytes = new byte[byteSize];
-            IntPtr ptr = Marshal.AllocHGlobal(byteSize);
-            try
-            {
-                //将结构体数组复制到非托管内存
-                for (int index = 0; index < data.Length; index++)
-                {
-                    Marshal.StructureToPtr(data[index], ptr + index * Marshal.SizeOf<T>(), false);
-                }
-
-                //复制到托管数组
-                Marshal.Copy(ptr, bytes, 0, byteSize);
-                this.Update(bytes);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
-            }
-        }
-        #endregion
-
         #region 部分更新数据 —— void UpdateSub(byte[] data, int offset)
         /// <summary>
         /// 部分更新数据
@@ -324,6 +239,77 @@ namespace MedicalSharp.Engine.Resources
 
             this.Bind();
             GL.BufferSubData(BufferTarget.ShaderStorageBuffer, offset, data.Length, data);
+            this.Unbind();
+        }
+        #endregion
+
+        #region 更新类型数据 —— void Update<T>(T instance)
+        /// <summary>
+        /// 更新类型数据
+        /// </summary>
+        /// <typeparam name="T">结构体类型</typeparam>
+        /// <param name="instance">结构体实例</param>
+        /// <remarks>
+        /// 单个结构体
+        /// 适用于缓冲区只存储一个结构体的场景。
+        /// </remarks>
+        public unsafe void Update<T>(T instance) where T : unmanaged
+        {
+            int bufferSize = Marshal.SizeOf<T>();
+
+            #region # 验证
+
+            if (bufferSize > this.BufferSize)
+            {
+                throw new ArgumentException($"数据尺寸 {bufferSize} 超过缓冲区尺寸 {this.BufferSize}");
+            }
+
+            #endregion
+
+            this.Bind();
+            GL.BufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, bufferSize, new IntPtr(&instance));
+            this.Unbind();
+        }
+        #endregion
+
+        #region 批量更新类型数据 —— void UpdateRange<T>(T[] array)
+        /// <summary>
+        /// 批量更新类型数据
+        /// </summary>
+        /// <typeparam name="T">结构体类型</typeparam>
+        /// <param name="array">结构体列表</param>
+        /// <remarks>
+        /// 泛型数组全量
+        /// 自动计算结构体大小并转换字节数组上传。
+        /// T 必须是 blittable 类型（结构体只包含值类型，无引用）。
+        /// </remarks>
+        public unsafe void UpdateRange<T>(T[] array) where T : unmanaged
+        {
+            #region # 验证
+
+            if (array == null || array.Length == 0)
+            {
+                return;
+            }
+
+            #endregion
+
+            int bufferSize = array.Length * sizeof(T);
+
+            #region # 验证
+
+            if (bufferSize > this.BufferSize)
+            {
+                throw new ArgumentException($"数据尺寸 {bufferSize} 超过缓冲区尺寸 {this.BufferSize}");
+            }
+
+            #endregion
+
+            this.Bind();
+            fixed (T* pointer = array)
+            {
+                GL.BufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, bufferSize, new IntPtr(pointer));
+            }
             this.Unbind();
         }
         #endregion
@@ -361,12 +347,12 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 读取数据 —— T Read<T>()
+        #region 读取类型数据 —— T Read<T>()
         /// <summary>
-        /// 读取数据
+        /// 读取类型数据
         /// </summary>
         /// <typeparam name="T">结构体类型</typeparam>
-        /// <returns>单个结构体</returns>
+        /// <returns>结构体实例</returns>
         /// <remarks>适用于缓冲区只存储一个结构体的情况。</remarks>
         public T Read<T>() where T : unmanaged
         {
@@ -395,35 +381,27 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 批量读取数据 —— T[] ReadRange<T>()
+        #region 批量读取类型数据 —— T[] ReadRange<T>()
         /// <summary>
-        /// 批量读取数据
+        /// 批量读取类型数据
         /// </summary>
         /// <typeparam name="T">结构体类型</typeparam>
-        /// <returns>结构体数组</returns>
+        /// <returns>结构体列表</returns>
         /// <remarks>
         /// 自动解析字节数组为结构体数组。
         /// T 必须是 blittable 类型，且缓冲区大小必须与 T[] 对齐。
         /// </remarks>
-        public T[] ReadRange<T>() where T : unmanaged
+        public unsafe T[] ReadRange<T>() where T : unmanaged
         {
-            byte[] data = this.Read();
+            byte[] buffer = this.Read();
             int elementSize = Marshal.SizeOf<T>();
-            int elementCount = data.Length / elementSize;
+            int elementsCount = buffer.Length / elementSize;
 
-            T[] result = new T[elementCount];
-            IntPtr ptr = Marshal.AllocHGlobal(data.Length);
-            try
+            T[] result = new T[elementsCount];
+            fixed (byte* bufferPtr = buffer)
+            fixed (T* resultPtr = result)
             {
-                Marshal.Copy(data, 0, ptr, data.Length);
-                for (int index = 0; index < elementCount; index++)
-                {
-                    result[index] = Marshal.PtrToStructure<T>(ptr + index * elementSize);
-                }
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
+                System.Buffer.MemoryCopy(bufferPtr, resultPtr, buffer.Length, buffer.Length);
             }
 
             return result;
@@ -438,21 +416,7 @@ namespace MedicalSharp.Engine.Resources
         public void Clear()
         {
             this.Bind();
-
-            IntPtr ptr = GL.MapBuffer(BufferTarget.ShaderStorageBuffer, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
-            {
-                unsafe
-                {
-                    byte* pointer = (byte*)ptr.ToPointer();
-                    for (int index = 0; index < this.BufferSize; index++)
-                    {
-                        pointer[index] = 0;
-                    }
-                }
-                GL.UnmapBuffer(BufferTarget.ShaderStorageBuffer);
-            }
-
+            GL.BufferData(BufferTarget.ShaderStorageBuffer, this.BufferSize, IntPtr.Zero, this.Usage);
             this.Unbind();
         }
         #endregion

@@ -416,19 +416,10 @@ namespace MedicalSharp.Engine.Renderables
             Matrix4 worldToLocal = localToWorld.Inverted();
 
             //构建缓冲区数据
-            int planeSize = sizeof(Vector4);
-            int bufferSize = sizeof(Vector4) + planeSize * planes.Count;
+            int bufferSize = sizeof(Vector4) * planes.Count;
             byte[] data = new byte[bufferSize];
             using MemoryStream stream = new MemoryStream(data);
             using BinaryWriter writer = new BinaryWriter(stream);
-
-            //先写入平面数量
-            writer.Write(planes.Count);
-            writer.Write(0);    //补齐
-            writer.Write(0);    //补齐
-            writer.Write(0);    //补齐
-
-            //再写入所有平面
             foreach (Vector4 plane in planes)
             {
                 writer.Write(plane.X);
@@ -436,7 +427,6 @@ namespace MedicalSharp.Engine.Renderables
                 writer.Write(plane.Z);
                 writer.Write(plane.W);
             }
-
             using ShaderStorageBuffer planesBuffer = new ShaderStorageBuffer(data, BufferUsageHint.DynamicDraw);
 
             //凸多面体切割计算着色器
@@ -450,6 +440,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //设置凸多面体参数
             planesBuffer.Bind(1);
+            cutComputer.SetUniformInt("u_PlaneCount", planes.Count);
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数

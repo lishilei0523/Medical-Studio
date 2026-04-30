@@ -122,7 +122,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="size">尺寸（字节）</param>
         public void Bind(int bindingPoint, int offset, int size)
         {
-            GL.BindBufferRange(BufferRangeTarget.UniformBuffer, bindingPoint, this.Id, (IntPtr)offset, size);
+            GL.BindBufferRange(BufferRangeTarget.UniformBuffer, bindingPoint, this.Id, offset, size);
         }
         #endregion
 
@@ -150,9 +150,9 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 更新统一缓冲区 —— void Update(byte[] data)
+        #region 更新数据 —— void Update(byte[] data)
         /// <summary>
-        /// 更新统一缓冲区
+        /// 更新数据
         /// </summary>
         /// <param name="data">数据数组</param>
         public void Update(byte[] data)
@@ -171,55 +171,18 @@ namespace MedicalSharp.Engine.Resources
             #endregion
 
             this.Bind();
-
-            //使用BufferSubData更新数据（不重新分配）
             GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, data.Length, data);
-
             this.Unbind();
         }
         #endregion
 
-        #region 更新统一缓冲区 —— void Update<T>(T data)
+        #region 部分更新数据 —— void UploadSub(byte[] data, int offset)
         /// <summary>
-        /// 更新统一缓冲区
-        /// </summary>
-        /// <typeparam name="T">结构体类型</typeparam>
-        /// <param name="data">结构体数据</param>
-        public void Update<T>(T data) where T : unmanaged
-        {
-            int size = Marshal.SizeOf<T>();
-
-            #region # 验证
-
-            if (size > this.BufferSize)
-            {
-                throw new ArgumentException($"数据尺寸\"{size}\"超过缓冲区尺寸\"{this.BufferSize}\"！");
-            }
-
-            #endregion
-
-            byte[] bytes = new byte[size];
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-            try
-            {
-                Marshal.StructureToPtr(data, ptr, false);
-                Marshal.Copy(ptr, bytes, 0, size);
-                this.Update(bytes);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
-            }
-        }
-        #endregion
-
-        #region 部分更新统一缓冲区 —— void UploadPartially(byte[] data, int offset)
-        /// <summary>
-        /// 部分更新统一缓冲区
+        /// 部分更新数据
         /// </summary>
         /// <param name="data">数据数组</param>
         /// <param name="offset">偏移量（字节）</param>
-        public void UploadPartially(byte[] data, int offset)
+        public void UploadSub(byte[] data, int offset)
         {
             #region # 验证
 
@@ -235,22 +198,45 @@ namespace MedicalSharp.Engine.Resources
             #endregion
 
             this.Bind();
-
-            GL.BufferSubData(BufferTarget.UniformBuffer, (IntPtr)offset, data.Length, data);
-
+            GL.BufferSubData(BufferTarget.UniformBuffer, offset, data.Length, data);
             this.Unbind();
         }
         #endregion
 
-        #region 映射更新统一缓冲区 —— void MapAndUpdate<T>(T data, int offset)
+        #region 更新类型数据 —— void Update<T>(T instance)
         /// <summary>
-        /// 映射更新统一缓冲区
+        /// 更新类型数据
         /// </summary>
         /// <typeparam name="T">结构体类型</typeparam>
-        /// <param name="data">结构体数据</param>
+        /// <param name="instance">结构体实例</param>
+        public unsafe void Update<T>(T instance) where T : unmanaged
+        {
+            int size = Marshal.SizeOf<T>();
+
+            #region # 验证
+
+            if (size > this.BufferSize)
+            {
+                throw new ArgumentException($"数据尺寸\"{size}\"超过缓冲区尺寸\"{this.BufferSize}\"！");
+            }
+
+            #endregion
+
+            this.Bind();
+            GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, size, (IntPtr)(&instance));
+            this.Unbind();
+        }
+        #endregion
+
+        #region 映射更新类型数据 —— void MapAndUpdate<T>(T instance, int offset)
+        /// <summary>
+        /// 映射更新类型数据
+        /// </summary>
+        /// <typeparam name="T">结构体类型</typeparam>
+        /// <param name="instance">结构体实例</param>
         /// <param name="offset">偏移量（字节）</param>
         /// <remarks>适合频繁更新</remarks>
-        public void MapAndUpdate<T>(T data, int offset = 0) where T : unmanaged
+        public unsafe void MapAndUpdate<T>(T instance, int offset = 0) where T : unmanaged
         {
             int size = Marshal.SizeOf<T>();
 
@@ -266,17 +252,15 @@ namespace MedicalSharp.Engine.Resources
             this.Bind();
 
             //映射缓冲区
-            IntPtr ptr = GL.MapBufferRange(BufferTarget.UniformBuffer, (IntPtr)offset, size, MapBufferAccessMask.MapInvalidateRangeBit);
+            IntPtr ptr = GL.MapBufferRange(BufferTarget.UniformBuffer, offset, size, MapBufferAccessMask.MapInvalidateRangeBit);
             if (ptr != IntPtr.Zero)
             {
                 try
                 {
-                    //写入数据
-                    Marshal.StructureToPtr(data, ptr, false);
+                    *(T*)ptr = instance;
                 }
                 finally
                 {
-                    //取消映射
                     GL.UnmapBuffer(BufferTarget.UniformBuffer);
                 }
             }
@@ -285,43 +269,48 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 清空统一缓冲区 —— void Clear()
+        #region 批量更新类型数据 —— void UpdateRange<T>(T[] array)
         /// <summary>
-        /// 清空统一缓冲区
+        /// 批量更新类型数据
         /// </summary>
-        /// <remarks>填充0</remarks>
-        public void Clear()
+        /// <typeparam name="T">结构体类型</typeparam>
+        /// <param name="array">数据数组</param>
+        /// <remarks>数组长度需固定</remarks>
+        public unsafe void UpdateRange<T>(T[] array) where T : unmanaged
         {
-            this.Bind();
+            #region # 验证
 
-            //映射并清空
-            IntPtr ptr = GL.MapBufferRange(BufferTarget.UniformBuffer, IntPtr.Zero, this.BufferSize, MapBufferAccessMask.MapInvalidateRangeBit);
-            if (ptr != IntPtr.Zero)
+            if (array == null || array.Length == 0)
             {
-                try
-                {
-                    unsafe
-                    {
-                        byte* p = (byte*)ptr.ToPointer();
-                        for (int i = 0; i < this.BufferSize; i++)
-                        {
-                            p[i] = 0;
-                        }
-                    }
-                }
-                finally
-                {
-                    GL.UnmapBuffer(BufferTarget.UniformBuffer);
-                }
+                return;
             }
 
+            #endregion
+
+            int elementSize = sizeof(T);
+            int bufferSize = array.Length * elementSize;
+
+            #region # 验证
+
+            if (bufferSize > this.BufferSize)
+            {
+                throw new ArgumentException($"数据尺寸 {bufferSize} 超过缓冲区尺寸 {this.BufferSize}");
+            }
+
+            #endregion
+
+            this.Bind();
+            fixed (T* pointer = array)
+            {
+                GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, bufferSize, (IntPtr)pointer);
+            }
             this.Unbind();
         }
         #endregion
 
-        #region 读取统一缓冲区 —— byte[] Read()
+        #region 读取数据 —— byte[] Read()
         /// <summary>
-        /// 读取统一缓冲区
+        /// 读取数据
         /// </summary>
         /// <returns>缓冲区数据</returns>
         /// <remarks>仅用于调试</remarks>
@@ -349,14 +338,14 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 读取统一缓冲区 —— T Read<T>()
+        #region 读取类型数据 —— T Read<T>()
         /// <summary>
-        /// 读取统一缓冲区
+        /// 读取类型数据
         /// </summary>
         /// <typeparam name="T">结构体类型</typeparam>
-        /// <returns>结构体数据</returns>
+        /// <returns>结构体实例</returns>
         /// <remarks>仅用于调试</remarks>
-        public T Read<T>() where T : unmanaged
+        public unsafe T Read<T>() where T : unmanaged
         {
             byte[] data = this.Read();
             int size = Marshal.SizeOf<T>();
@@ -366,17 +355,23 @@ namespace MedicalSharp.Engine.Resources
                 throw new InvalidOperationException($"缓冲区大小({data.Length})小于结构体大小({size})");
             }
 
-            IntPtr ptr = Marshal.AllocHGlobal(size);
+            fixed (byte* dataPointer = data)
+            {
+                return *(T*)dataPointer;
+            }
+        }
+        #endregion
 
-            try
-            {
-                Marshal.Copy(data, 0, ptr, size);
-                return Marshal.PtrToStructure<T>(ptr);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(ptr);
-            }
+        #region 清空缓冲区 —— void Clear()
+        /// <summary>
+        /// 清空缓冲区
+        /// </summary>
+        /// <remarks>填充0</remarks>
+        public void Clear()
+        {
+            this.Bind();
+            GL.BufferData(BufferTarget.UniformBuffer, this.BufferSize, IntPtr.Zero, this.Usage);
+            this.Unbind();
         }
         #endregion
 

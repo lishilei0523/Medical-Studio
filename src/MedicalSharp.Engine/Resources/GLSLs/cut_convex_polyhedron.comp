@@ -7,10 +7,9 @@ layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
 //凸多面体参数
 layout(std430, binding = 1) buffer PlaneBuffer
 {
-    int u_PlaneCount;   //平面数量
-    vec4 u_Planes[];    //平面方程 (x,y,z,w)，满足 dot(normal, point) + w <= 0 为内部
+    vec4 u_Planes[];        //平面方程 (x,y,z,w)，满足 dot(normal, point) + w <= 0 为内部
 };
-
+uniform int u_PlaneCount;   //平面数量
 uniform mat4 u_WorldToLocal;
 
 //体积参数
