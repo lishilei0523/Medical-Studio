@@ -8,7 +8,6 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -415,20 +414,6 @@ namespace MedicalSharp.Engine.Renderables
 
             Matrix4 worldToLocal = localToWorld.Inverted();
 
-            //构建缓冲区数据
-            int bufferSize = sizeof(Vector4) * planes.Count;
-            byte[] data = new byte[bufferSize];
-            using MemoryStream stream = new MemoryStream(data);
-            using BinaryWriter writer = new BinaryWriter(stream);
-            foreach (Vector4 plane in planes)
-            {
-                writer.Write(plane.X);
-                writer.Write(plane.Y);
-                writer.Write(plane.Z);
-                writer.Write(plane.W);
-            }
-            using ShaderStorageBuffer planesBuffer = new ShaderStorageBuffer(data, BufferUsageHint.DynamicDraw);
-
             //凸多面体切割计算着色器
             ShaderProgram cutComputer = ComputerManager.ConvexPolyhedronCutComputer;
 
@@ -437,6 +422,11 @@ namespace MedicalSharp.Engine.Renderables
 
             //绑定标记纹理为可读写
             this.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+
+            //构建SSBO数据
+            int bufferSize = sizeof(Vector4) * planes.Count;
+            using ShaderStorageBuffer planesBuffer = new ShaderStorageBuffer(bufferSize, BufferUsageHint.DynamicDraw);
+            planesBuffer.UpdateRange([.. planes]);
 
             //设置凸多面体参数
             planesBuffer.Bind(1);
