@@ -78,6 +78,24 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 只读属性 - 采样点列表 —— IReadOnlyList<Vector3> SampledPositions
+        /// <summary>
+        /// 只读属性 - 采样点列表
+        /// </summary>
+        public IReadOnlyList<Vector3> SampledPositions
+        {
+            get
+            {
+                if (this.Renderable is CurveRenderable curveRenderable)
+                {
+                    return curveRenderable.SampledPositions;
+                }
+
+                return [];
+            }
+        }
+        #endregion
+
         #endregion
 
         #region # 方法

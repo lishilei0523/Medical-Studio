@@ -90,7 +90,7 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 方法
 
-        #region 应用矩形切割 —— void ApplyRectCut(float width, float height...
+        #region 应用矩形切割 —— void ApplyRectangleCut(float width, float height...
         /// <summary>
         /// 应用矩形切割
         /// </summary>
@@ -103,12 +103,12 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public void ApplyRectCut(float width, float height, Vector3 center, Vector3 normal, Vector3 uAxis, Vector3 vAxis, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public void ApplyRectangleCut(float width, float height, Vector3 center, Vector3 normal, Vector3 uAxis, Vector3 vAxis, Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
             //矩形切割计算着色器
-            ShaderProgram cutComputer = ComputerManager.RectCutComputer;
+            ShaderProgram cutComputer = ComputerManager.RectangleCutComputer;
 
             //开启Shader程序
             cutComputer.Use();

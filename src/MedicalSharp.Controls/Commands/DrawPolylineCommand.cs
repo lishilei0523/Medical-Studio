@@ -205,6 +205,16 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void CompleteDrawing(OpenTKViewport viewport)
         {
+            #region # 验证
+
+            if (this._polyline.Positions.Count < 4)
+            {
+                this.CancelDrawing(viewport);
+                return;
+            }
+
+            #endregion
+
             //移除预览点
             if (this._previewPoint.HasValue && this._polyline != null)
             {

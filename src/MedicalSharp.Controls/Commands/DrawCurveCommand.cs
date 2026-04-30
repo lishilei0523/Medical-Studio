@@ -58,6 +58,12 @@ namespace MedicalSharp.Controls.Commands
 
         #endregion
 
+        #region # 属性
+
+        //
+
+        #endregion
+
         #region # 方法
 
         //Public
@@ -196,6 +202,16 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void CompleteDrawing(OpenTKViewport viewport)
         {
+            #region # 验证
+
+            if (this._curve.ControlPositions.Count < 4)
+            {
+                this.CancelDrawing(viewport);
+                return;
+            }
+
+            #endregion
+
             //移除预览点
             if (this._previewPoint.HasValue && this._curve != null)
             {

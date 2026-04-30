@@ -165,9 +165,9 @@ namespace MedicalSharp.Controls.Commands
         {
             if (viewport is VolumeViewport volumeViewport)
             {
-                if (this._selectedVisual is RectangleVisual3D rect)
+                if (this._selectedVisual is RectangleVisual3D rectangle)
                 {
-                    volumeViewport.VolumeRenderable.ApplyRectCut(rect.Width, rect.Height, rect.Center.ToVector3(), rect.Normal.ToVector3(), rect.UAxis, rect.VAxis, rect.Transform.Matrix, CutMode.Inside, 1);
+                    volumeViewport.VolumeRenderable.ApplyRectangleCut(rectangle.Width, rectangle.Height, rectangle.Center.ToVector3(), rectangle.Normal.ToVector3(), rectangle.UAxis, rectangle.VAxis, rectangle.Transform.Matrix, CutMode.Inside, 1);
                     volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Tinted);
                     volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
                 }

@@ -21,7 +21,7 @@ namespace MedicalSharp.Engine.Managers
         /// <summary>
         /// 矩形切割计算着色器
         /// </summary>
-        private static ShaderProgram _RectCutComputer;
+        private static ShaderProgram _RectangleCutComputer;
 
         /// <summary>
         /// 圆形切割计算着色器
@@ -71,13 +71,13 @@ namespace MedicalSharp.Engine.Managers
 
         #region # 属性
 
-        #region 只读属性 - 矩形切割计算着色器 —— static ShaderProgram RectCutComputer
+        #region 只读属性 - 矩形切割计算着色器 —— static ShaderProgram RectangleCutComputer
         /// <summary>
         /// 只读属性 - 矩形切割计算着色器
         /// </summary>
-        public static ShaderProgram RectCutComputer
+        public static ShaderProgram RectangleCutComputer
         {
-            get => _RectCutComputer;
+            get => _RectangleCutComputer;
         }
         #endregion
 
@@ -162,7 +162,7 @@ namespace MedicalSharp.Engine.Managers
 
                 _CircleCutComputer = CreateCircleCutComputer();
                 _EllipseCutComputer = CreateEllipseCutComputer();
-                _RectCutComputer = CreateRectCutComputer();
+                _RectangleCutComputer = CreateRectangleCutComputer();
                 _BoxCutComputer = CreateBoxCutComputer();
                 _SphereCutComputer = CreateSphereCutComputer();
                 _CylinderCutComputer = CreateCylinderCutComputer();
@@ -217,7 +217,7 @@ namespace MedicalSharp.Engine.Managers
         /// </summary>
         public static void Cleanup()
         {
-            _RectCutComputer?.Dispose();
+            _RectangleCutComputer?.Dispose();
             _CircleCutComputer?.Dispose();
             _EllipseCutComputer.Dispose();
             _BoxCutComputer?.Dispose();
@@ -230,14 +230,14 @@ namespace MedicalSharp.Engine.Managers
 
         //Private
 
-        #region 创建矩形切割计算着色器 —— static ShaderProgram CreateRectCutComputer()
+        #region 创建矩形切割计算着色器 —— static ShaderProgram CreateRectangleCutComputer()
         /// <summary>
         /// 创建矩形切割计算着色器
         /// </summary>
-        private static ShaderProgram CreateRectCutComputer()
+        private static ShaderProgram CreateRectangleCutComputer()
         {
             ShaderProgram program = new ShaderProgram();
-            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_rect.comp");
+            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_rectangle.comp");
             program.BuildCompute();
 
             return program;
