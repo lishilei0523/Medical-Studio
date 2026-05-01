@@ -48,7 +48,7 @@ namespace MedicalSharp.Controls.Visuals
 
         #endregion
 
-        #region 属性
+        #region # 属性
 
         #region 网格模型 —— MeshGeometry MeshGeometry
         /// <summary>
@@ -70,7 +70,7 @@ namespace MedicalSharp.Controls.Visuals
 
         #endregion
 
-        #region 私有方法
+        #region # 方法
 
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
