@@ -146,7 +146,7 @@ namespace MedicalSharp.Controls.Visuals
                 float distance = localRay.CalculateDistanceToPoint(point);
 
                 //拾取半径：固定值，可根据需要调整
-                const float pickRadius = 0.3f;
+                const float pickRadius = 0.05f;
                 if (distance < pickRadius && distance < minDistance)
                 {
                     minDistance = distance;

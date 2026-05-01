@@ -125,7 +125,7 @@ namespace MedicalSharp.Controls.Visuals
             Vector3 end = this.EndPoint.ToVector3();
             float distanceToStart = localRay.CalculateDistanceToPoint(start);
             float distanceToEnd = localRay.CalculateDistanceToPoint(end);
-            const float pickRadius = 0.3f;
+            const float pickRadius = 0.05f;
 
             //优先选择距离更近的顶点
             if (distanceToStart < pickRadius && distanceToStart <= distanceToEnd)

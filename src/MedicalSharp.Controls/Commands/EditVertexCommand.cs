@@ -1,5 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Input;
+﻿using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
@@ -56,18 +55,38 @@ namespace MedicalSharp.Controls.Commands
             base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is IPickVisual3D pickVisual3D)
             {
-                Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = pickVisual3D.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out Ray ray);
+                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                bool success = pickVisual3D.FindNearest(mousePos2D, out Vector3 visualHitPoint, out _, out Visual3D visual3D, out Ray ray);
                 if (success && visual3D is IVertexEditable vertexEditable)
                 {
                     Matrix4 modelMatrix = visual3D.Transform.Matrix;
                     Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
                     Ray localRay = ray.Transform(worldToLocal);
                     Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
-                    if (vertexEditable.TryGetVertexDrag(localRay, localLookDirection, out VertexDragConstraint constraint))
+
+                    //找最近顶点
+                    if (vertexEditable.TryGetVertexDrag(localRay, localLookDirection, out VertexDragConstraint dragConstraint))
                     {
                         this._selectedVisual = vertexEditable;
-                        this._selectedVertexConstraint = constraint;
+                        this._selectedVertexConstraint = dragConstraint;
+                    }
+                    //插入新顶点
+                    else
+                    {
+                        Vector3 localHitPoint = Vector3.TransformPosition(visualHitPoint, worldToLocal);
+                        if (viewport is IPickVoxel pickVoxel)
+                        {
+                            bool pickedVoxel = pickVoxel.FindNearestVoxel(mousePos2D, out _, out Vector3 voxelHitPoint, out _, out _, out _, out _);
+                            if (pickedVoxel)
+                            {
+                                localHitPoint = Vector3.TransformPosition(voxelHitPoint, worldToLocal);
+                            }
+                        }
+                        if (vertexEditable.TryInsertVertex(localRay, localLookDirection, localHitPoint, out VertexDragConstraint insertConstraint))
+                        {
+                            this._selectedVisual = vertexEditable;
+                            this._selectedVertexConstraint = insertConstraint;
+                        }
                     }
                 }
             }
