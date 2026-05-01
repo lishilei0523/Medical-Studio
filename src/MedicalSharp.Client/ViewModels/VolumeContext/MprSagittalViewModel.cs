@@ -36,27 +36,27 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public MprSagittalViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
-            this.SagittalCamera = new MPRCamera();
+            this.Camera = new MPRCamera();
         }
 
         #endregion
 
         #region # 属性
 
-        #region MPR矢状面 —— MPRPlane SagittalPlane
+        #region MPR平面 —— MPRPlane Plane
         /// <summary>
-        /// MPR矢状面
+        /// MPR平面
         /// </summary>
         [DependencyProperty]
-        public MPRPlane SagittalPlane { get; set; }
+        public MPRPlane Plane { get; set; }
         #endregion
 
-        #region MPR矢状位相机 —— MPRCamera SagittalCamera
+        #region MPR相机 —— MPRCamera Camera
         /// <summary>
-        /// MPR矢状位相机
+        /// MPR相机
         /// </summary>
         [DependencyProperty]
-        public MPRCamera SagittalCamera { get; set; }
+        public MPRCamera Camera { get; set; }
         #endregion
 
         #region 体积数据 —— VolumeData VolumeData
@@ -72,7 +72,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this.NotifyOfPropertyChange();
                 if (value != null)
                 {
-                    this.SagittalPlane = MPRPlane.CreateSagittalPlane(value.Metadata);
+                    this.Plane = MPRPlane.CreateSagittalPlane(value.Metadata);
                 }
             }
         }
@@ -97,11 +97,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
         //Actions
 
-        #region MPR矢状位视口鼠标按下事件 —— void OnSagittalViewportPointerPressed(MPRViewport viewport...
+        #region MPR视口鼠标按下事件 —— void OnViewportPointerPressed(MPRViewport viewport...
         /// <summary>
-        /// MPR矢状位视口鼠标按下事件
+        /// MPR视口鼠标按下事件
         /// </summary>
-        public void OnSagittalViewportPointerPressed(MPRViewport viewport, PointerPressedEventArgs eventArgs)
+        public void OnViewportPointerPressed(MPRViewport viewport, PointerPressedEventArgs eventArgs)
         {
             if (this.VolumeData != null && eventArgs.Properties.IsLeftButtonPressed)
             {

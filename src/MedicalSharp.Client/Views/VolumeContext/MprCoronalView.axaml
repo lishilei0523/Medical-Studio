@@ -9,10 +9,10 @@
 
 	<sd:GroupBox Header="MPR-Coronal">
         <sd:MPRViewport Background="Black"
-                        Plane="{Binding CoronalPlane}"
-                        Camera="{Binding CoronalCamera}"
+                        Plane="{Binding Plane}"
+                        Camera="{Binding Camera}"
                         VolumeData="{Binding VolumeData}"
-                        cm:Message.Attach="[Event PointerPressed] = [Action OnCoronalViewportPointerPressed($source, $eventArgs)];">
+                        cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
             <sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />
             <sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="0,1,0" />
             <sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="0,1,0" />

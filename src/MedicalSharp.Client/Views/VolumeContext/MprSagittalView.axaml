@@ -9,10 +9,10 @@
 
 	<sd:GroupBox Header="MPR-Sagittal">
 		<sd:MPRViewport Background="Black"
-						Plane="{Binding SagittalPlane}"
-						Camera="{Binding SagittalCamera}"
+						Plane="{Binding Plane}"
+						Camera="{Binding Camera}"
 						VolumeData="{Binding VolumeData}"
-						cm:Message.Attach="[Event PointerPressed] = [Action OnSagittalViewportPointerPressed($source, $eventArgs)];">
+						cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
 			<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />
 			<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="1,0,0" />
 			<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="1,0,0" />
