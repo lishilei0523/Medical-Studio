@@ -43,6 +43,13 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 属性
 
+        #region 形状渲染对象 —— ShapeRenderable Renderable
+        /// <summary>
+        /// 形状渲染对象
+        /// </summary>
+        public ShapeRenderable Renderable { get; protected set; }
+        #endregion
+
         #region 依赖属性 - 线框颜色 —— Color Stroke
         /// <summary>
         /// 依赖属性 - 线框颜色
@@ -74,13 +81,6 @@ namespace MedicalSharp.Controls.Visuals
             get => this.GetValue(FillProperty);
             set => this.SetValue(FillProperty, value);
         }
-        #endregion
-
-        #region 形状渲染对象 —— ShapeRenderable Renderable
-        /// <summary>
-        /// 形状渲染对象
-        /// </summary>
-        public ShapeRenderable Renderable { get; protected set; }
         #endregion
 
         #region 只读属性 - 变换 —— override Transform Transform

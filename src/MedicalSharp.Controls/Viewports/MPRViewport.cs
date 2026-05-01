@@ -250,6 +250,9 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
+
+        //Protected
+
         #region OpenTK初始化事件 —— override void OnOpenTKInit()
         /// <summary>
         /// OpenTK初始化事件
@@ -314,9 +317,6 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-
-        //Protected
-
         #region 获取形状3D元素列表 —— override List<ShapeVisual3D> GetShapeVisual3Ds()
         /// <summary>
         /// 获取形状3D元素列表
@@ -358,7 +358,7 @@ namespace MedicalSharp.Controls.Viewports
         #endregion
 
 
-        //Private
+        //Events
 
         #region 平面改变事件 —— static void OnPlaneChanged(MPRViewport viewport...
         /// <summary>

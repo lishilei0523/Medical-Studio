@@ -80,6 +80,8 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
+        //Public
+
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象
@@ -242,6 +244,9 @@ namespace MedicalSharp.Controls.Visuals
             this.Positions[constraint.VertexIndex] = localHitPoint.ToVector3();
         }
         #endregion
+
+
+        //Events
 
         #region 位置列表改变事件 —— static void OnPositionsChanged(PointCloudVisual3D visual3D...
         /// <summary>

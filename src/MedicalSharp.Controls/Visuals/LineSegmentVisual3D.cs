@@ -78,6 +78,8 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
+        //Public
+
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象
@@ -201,6 +203,9 @@ namespace MedicalSharp.Controls.Visuals
             }
         }
         #endregion
+
+
+        //Events
 
         #region 起始点改变事件 —— static void OnStartPointChanged(LineSegmentVisual3D visual3D...
         /// <summary>

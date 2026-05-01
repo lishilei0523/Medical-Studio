@@ -337,7 +337,7 @@ namespace MedicalSharp.Controls.Viewports
         #endregion
 
 
-        //Private
+        //Events
 
         #region 子元素列表元素改变事件 —— void OnChildrenItemsChanged(object sender...
         /// <summary>

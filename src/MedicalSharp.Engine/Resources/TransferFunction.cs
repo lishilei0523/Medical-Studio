@@ -32,7 +32,7 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 控制点列表
         /// </summary>
-        private readonly IList<TFControlPoint> _controlPoints;
+        private readonly List<TFControlPoint> _controlPoints;
 
         /// <summary>
         /// 创建传输函数构造器
@@ -55,25 +55,34 @@ namespace MedicalSharp.Engine.Resources
         internal Texture1D Texture { get; private set; }
         #endregion
 
+        #region 只读属性 - 控制点列表 —— IReadOnlyList<TFControlPoint> ControlPoints
+        /// <summary>
+        /// 只读属性 - 控制点列表
+        /// </summary>
+        public IReadOnlyList<TFControlPoint> ControlPoints
+        {
+            get => this._controlPoints;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
 
         //Public
 
-        #region 从控制点集初始化 —— void InitFromControlPoints(IEnumerable<TFControlPoint>...
+        #region 从控制点列表初始化 —— void InitFromControlPoints(IReadOnlyList<TFControlPoint>...
         /// <summary>
-        /// 从控制点集初始化
+        /// 从控制点列表初始化
         /// </summary>
-        /// <param name="controlPoints">控制点集</param>
-        public void InitFromControlPoints(IEnumerable<TFControlPoint> controlPoints)
+        /// <param name="controlPoints">控制点列表</param>
+        public void InitFromControlPoints(IReadOnlyList<TFControlPoint> controlPoints)
         {
             #region # 验证
 
-            controlPoints = controlPoints?.ToArray() ?? [];
             if (controlPoints == null || !controlPoints.Any())
             {
-                throw new ArgumentNullException(nameof(controlPoints), "控制点集不可为空！");
+                throw new ArgumentNullException(nameof(controlPoints), "控制点列表不可为空！");
             }
 
             #endregion

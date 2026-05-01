@@ -6,6 +6,7 @@ using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -20,6 +21,11 @@ namespace MedicalSharp.Controls.Viewports
     public class VolumeViewport : BasicViewport, IPickVoxel
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 渲染模式依赖属性
+        /// </summary>
+        public static readonly StyledProperty<VolumeRenderMode> RenderModeProperty;
 
         /// <summary>
         /// 窗宽依赖属性
@@ -76,6 +82,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         static VolumeViewport()
         {
+            RenderModeProperty = AvaloniaProperty.Register<VolumeViewport, VolumeRenderMode>(nameof(RenderMode));
             WindowWidthProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(WindowWidth), 400.0f);
             WindowCenterProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(WindowCenter), 40.0f);
             BrightnessProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(Brightness), 1.0f);
@@ -88,6 +95,7 @@ namespace MedicalSharp.Controls.Viewports
             VolumeDataProperty = AvaloniaProperty.Register<VolumeViewport, VolumeData>(nameof(VolumeData));
 
             //属性改变事件
+            RenderModeProperty.Changed.AddClassHandler<VolumeViewport, VolumeRenderMode>(OnRenderModeChanged);
             WindowWidthProperty.Changed.AddClassHandler<VolumeViewport, float>(OnWindowWidthChanged);
             WindowCenterProperty.Changed.AddClassHandler<VolumeViewport, float>(OnWindowCenterChanged);
             BrightnessProperty.Changed.AddClassHandler<VolumeViewport, float>(OnBrightnessChanged);
@@ -121,6 +129,17 @@ namespace MedicalSharp.Controls.Viewports
         #endregion
 
         #region # 属性
+
+        #region 依赖属性 - 渲染模式 —— VolumeRenderMode RenderMode
+        /// <summary>
+        /// 依赖属性 - 渲染模式
+        /// </summary>
+        public VolumeRenderMode RenderMode
+        {
+            get => this.GetValue(RenderModeProperty);
+            set => this.SetValue(RenderModeProperty, value);
+        }
+        #endregion
 
         #region 依赖属性 - 窗宽 —— float WindowWidth
         /// <summary>
@@ -256,6 +275,8 @@ namespace MedicalSharp.Controls.Viewports
 
         #region # 方法
 
+        //Public
+
         #region 查找最近体素 —— bool FindNearestVoxel(Vector2 position, out Vector3 textureCoord...
         /// <summary>
         /// 查找最近体素
@@ -312,6 +333,9 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
+
+        //Protected
+
         #region OpenTK初始化事件 —— override void OnOpenTKInit()
         /// <summary>
         /// OpenTK初始化事件
@@ -367,7 +391,20 @@ namespace MedicalSharp.Controls.Viewports
             base.OnOpenTKDeinit();
             this._volumeRenderer?.Dispose();
         }
-        #endregion 
+        #endregion
+
+
+        //Events
+
+        #region 渲染模式改变事件 —— static void OnRenderModeChanged(VolumeViewport viewport...
+        /// <summary>
+        /// 渲染模式改变事件
+        /// </summary>
+        private static void OnRenderModeChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<VolumeRenderMode> eventArgs)
+        {
+            viewport._volumeRenderer?.SwitchRenderMode(eventArgs.NewValue.Value);
+        }
+        #endregion
 
         #region 窗宽改变事件 —— static void OnWindowWidthChanged(VolumeViewport viewport...
         /// <summary>

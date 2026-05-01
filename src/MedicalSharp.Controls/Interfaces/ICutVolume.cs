@@ -4,7 +4,7 @@ using MedicalSharp.Primitives.Enums;
 namespace MedicalSharp.Controls.Interfaces
 {
     /// <summary>
-    /// 可切割体积
+    /// 可切割体积接口
     /// </summary>
     public interface ICutVolume
     {

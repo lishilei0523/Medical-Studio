@@ -90,7 +90,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 文本3D元素列表改变事件 —— static void OnItemsSourceChanged(TextsPresenter presenter...
+        #region 文本3D元素列表改变事件 —— static void OnItemsSourceChanged(TextsPresenter...
         /// <summary>
         /// 文本3D元素列表改变事件
         /// </summary>

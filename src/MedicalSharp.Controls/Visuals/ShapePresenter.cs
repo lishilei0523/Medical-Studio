@@ -79,7 +79,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 形状3D元素改变事件 —— static void OnContentChanged(ShapePresenter shapePresenter...
+        #region 形状3D元素改变事件 —— static void OnContentChanged(ShapePresenter...
         /// <summary>
         /// 形状3D元素改变事件
         /// </summary>

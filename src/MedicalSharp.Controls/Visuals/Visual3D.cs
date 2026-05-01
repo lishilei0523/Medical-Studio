@@ -8,6 +8,20 @@ namespace MedicalSharp.Controls.Visuals
     /// </summary>
     public abstract class Visual3D : Control
     {
+        #region # 字段及构造器
+
+        /// <summary>
+        /// 默认构造器
+        /// </summary>
+        protected Visual3D()
+        {
+
+        }
+
+        #endregion
+
+        #region # 属性
+
         #region 只读属性 - 变换 —— abstract Transform Transform
         /// <summary>
         /// 只读属性 - 变换
@@ -20,6 +34,14 @@ namespace MedicalSharp.Controls.Visuals
         /// 只读属性 - 包围盒
         /// </summary>
         public new abstract BoundingBox Bounds { get; }
+        #endregion
+
+        #endregion
+
+        #region # 方法
+
+        //
+
         #endregion
     }
 }
