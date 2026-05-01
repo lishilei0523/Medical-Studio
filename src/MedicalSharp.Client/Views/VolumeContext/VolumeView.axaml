@@ -87,6 +87,7 @@
 				</WrapPanel>
 			</Grid>
 		</sd:GroupBox.Header>
+        <!--Content-->
 		<sd:VolumeViewport Background="Black"
 						   Camera="{Binding Camera}"
 						   InputManager="{Binding InputManager}"

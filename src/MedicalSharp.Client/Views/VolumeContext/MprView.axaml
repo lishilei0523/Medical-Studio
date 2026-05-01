@@ -1,0 +1,53 @@
+<UserControl x:Class="MedicalSharp.Client.Views.VolumeContext.MprView"
+			 xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:cm="http://caliburnmicro.com"
+			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			 mc:Ignorable="d">
+
+	<sd:GroupBox>
+        <!--Header-->
+        <sd:GroupBox.Header>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+                <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <DropDownButton Content="{Binding Title}" Classes="Transparent-Panel">
+                        <DropDownButton.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Header="Option 1" />
+                                <MenuItem Header="Option 2" />
+                                <MenuItem Header="Option 3" />
+                            </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+                </WrapPanel>
+			</Grid>
+		</sd:GroupBox.Header>
+		<!--Content-->
+		<sd:MPRViewport Background="Black"
+						Plane="{Binding Plane}"
+						Camera="{Binding Camera}"
+						VolumeData="{Binding VolumeData}"
+						cm:Message.Attach="[Event PointerPressed] = [Action OnViewportPointerPressed($source, $eventArgs)];">
+			<!--Axial Tests-->
+			<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />
+			<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="0,0,1" />
+			<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="0,0,1" />
+
+			<!--Coronal Tests-->
+			<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />
+			<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="0,1,0" />
+			<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="0,1,0" />
+
+			<!--Sagittal Tests-->
+			<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />
+			<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="1,0,0" />
+			<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="1,0,0" />
+		</sd:MPRViewport>
+	</sd:GroupBox>
+</UserControl>
