@@ -54,7 +54,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 this._volumeData = value;
                 this.MprViewModel.VolumeData = value;
-                this.MprViewModel.Plane = MPRPlane.CreateCoronalPlane(this.VolumeData.Metadata);
+                if (value != null)
+                {
+                    this.MprViewModel.Plane = MPRPlane.CreateAxialPlane(value.Metadata);
+                }
             }
         }
         #endregion

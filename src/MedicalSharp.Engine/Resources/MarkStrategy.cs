@@ -42,19 +42,12 @@ namespace MedicalSharp.Engine.Resources
             this._markColors = new Vector4[MarkLength];
             this._markModes = new MarkMode[MarkLength];
 
-            //默认Mark模式
-            for (int index = 0; index < MarkLength; index++)
-            {
-                this._markModes[index] = MarkMode.Visible;
-            }
-
             //初始化纹理
             this.Texture = new Texture1D(MarkLength, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float);
             this.Texture.SetFilter(TextureMinFilter.Linear, TextureMagFilter.Linear);
 
-            //标准颜色
-            this.Opacity = 0.6f;
-            this.ApplyStandardMarkColors(this.Opacity);
+            //重置
+            this.Initialize();
         }
 
         #endregion
@@ -91,6 +84,26 @@ namespace MedicalSharp.Engine.Resources
         #region # 方法
 
         //Public
+
+        #region 初始化 —— void Initialize()
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        public void Initialize()
+        {
+            //默认透明度
+            this.Opacity = 0.6f;
+
+            //标记值全部可见
+            for (int index = 0; index < MarkLength; index++)
+            {
+                this._markModes[index] = MarkMode.Visible;
+            }
+
+            //适用标准标记颜色
+            this.ApplyStandardMarkColors(this.Opacity);
+        }
+        #endregion
 
         #region 切换标记模式 —— void SwitchMarkMode(byte markValue, MarkMode markMode)
         /// <summary>
