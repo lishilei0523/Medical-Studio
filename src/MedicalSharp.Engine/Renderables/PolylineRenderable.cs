@@ -6,7 +6,6 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MedicalSharp.Engine.Renderables
 {
@@ -194,26 +193,9 @@ namespace MedicalSharp.Engine.Renderables
             Ray localRay = ray.Transform(worldToLocal);
 
             //快速剔除：先检测包围盒
-            if (!this.BoundingBox.Intersects(localRay, out _))
+            if (this.BoundingBox.Intersects(localRay, out distance))
             {
-                return false;
-            }
-
-            //精确检测
-            IDictionary<BoundingSphere, float> hitPoints = new Dictionary<BoundingSphere, float>();
-            foreach (Vector3 position in this.Positions)
-            {
-                BoundingSphere sphere = new BoundingSphere(position, 0.05f);
-                if (sphere.Intersects(localRay, out float pointDistance))
-                {
-                    hitPoints[sphere] = pointDistance;
-                }
-            }
-            if (hitPoints.Any())
-            {
-                KeyValuePair<BoundingSphere, float> hit = hitPoints.MinBy(x => x.Value);
-                distance = hit.Value;
-                hitPoint = hit.Key.Center;
+                hitPoint = ray.GetPoint(distance);
 
                 return true;
             }
