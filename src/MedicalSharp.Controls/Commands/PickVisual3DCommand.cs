@@ -51,11 +51,27 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        //
+        #region 获取标记值委托 —— Func<byte> GetMarkValue
+        /// <summary>
+        /// 获取标记值委托
+        /// </summary>
+        public Func<byte> GetMarkValue { get; private set; }
+        #endregion
 
         #endregion
 
         #region # 方法
+
+        #region 设置获取标记值委托 —— void SetGetMarkValue(Func<byte> getMarkValue)
+        /// <summary>
+        /// 设置获取标记值委托
+        /// </summary>
+        /// <param name="getMarkValue">获取标记值委托</param>
+        public void SetGetMarkValue(Func<byte> getMarkValue)
+        {
+            this.GetMarkValue = getMarkValue;
+        }
+        #endregion
 
         #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
@@ -116,8 +132,21 @@ namespace MedicalSharp.Controls.Commands
                 });
                 items.Add(new ContextMenuItem
                 {
-                    Header = "挖空",
-                    Command = () => this.ApplyMark(viewport)
+                    Header = "染色",
+                    Command = () => this.ApplyTint(viewport),
+                    IsEnabled = this._selectedVisual is ICutVolume
+                });
+                items.Add(new ContextMenuItem
+                {
+                    Header = "内切",
+                    Command = () => this.ApplyCutInside(viewport),
+                    IsEnabled = this._selectedVisual is ICutVolume
+                });
+                items.Add(new ContextMenuItem
+                {
+                    Header = "外切",
+                    Command = () => this.ApplyCutOutSide(viewport),
+                    IsEnabled = this._selectedVisual is ICutVolume
                 });
             }
 
@@ -157,16 +186,53 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion
 
-        #region 适用标记 —— void ApplyMark(OpenTKViewport viewport)
+        #region 适用染色 —— void ApplyTint(OpenTKViewport viewport)
         /// <summary>
-        /// 适用标记
+        /// 适用染色
         /// </summary>
-        private void ApplyMark(OpenTKViewport viewport)
+        private void ApplyTint(OpenTKViewport viewport)
         {
             if (viewport is VolumeViewport volumeViewport && this._selectedVisual is ICutVolume cutVolume)
             {
-                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.OutSide, 2);
-                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(2, MarkMode.Collapsed);
+                byte markValue = this.GetMarkValue?.Invoke() ?? 1;
+                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
+                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Tinted);
+
+                //请求下一帧
+                viewport.RequestNextFrameRendering();
+            }
+        }
+        #endregion
+
+        #region 适用内切 —— void ApplyCutInside(OpenTKViewport viewport)
+        /// <summary>
+        /// 适用内切
+        /// </summary>
+        private void ApplyCutInside(OpenTKViewport viewport)
+        {
+            if (viewport is VolumeViewport volumeViewport && this._selectedVisual is ICutVolume cutVolume)
+            {
+                byte markValue = this.GetMarkValue?.Invoke() ?? 1;
+                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
+                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
+
+                //请求下一帧
+                viewport.RequestNextFrameRendering();
+            }
+        }
+        #endregion
+
+        #region 适用外切 —— void ApplyCutOutSide(OpenTKViewport viewport)
+        /// <summary>
+        /// 适用外切
+        /// </summary>
+        private void ApplyCutOutSide(OpenTKViewport viewport)
+        {
+            if (viewport is VolumeViewport volumeViewport && this._selectedVisual is ICutVolume cutVolume)
+            {
+                byte markValue = this.GetMarkValue?.Invoke() ?? 1;
+                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.OutSide, markValue);
+                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
 
                 //请求下一帧
                 viewport.RequestNextFrameRendering();
