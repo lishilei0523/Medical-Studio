@@ -113,18 +113,23 @@ namespace MedicalSharp.Primitives.Models
         }
         #endregion
 
-        #region 提取三角形面 —— IList<Triangle> ExtractTriangles()
+        #region 提取三角形面列表 —— Triangle[] ExtractTriangles()
         /// <summary>
-        /// 提取三角形面
+        /// 提取三角形面列表
         /// </summary>
         /// <returns>三角形面列表</returns>
-        public IList<Triangle> ExtractTriangles()
+        public Triangle[] ExtractTriangles()
         {
-            IList<Triangle> triangles = new List<Triangle>();
+            #region # 验证
+
             if (this.Indices?.Length < 3)
             {
-                return triangles;
+                return [];
             }
+
+            #endregion
+
+            IList<Triangle> triangles = new List<Triangle>();
 
             //获取顶点数据
             Vertex[] vertices = this.Vertices;
@@ -157,16 +162,16 @@ namespace MedicalSharp.Primitives.Models
                 }
             }
 
-            return triangles;
+            return [.. triangles];
         }
         #endregion
 
-        #region 提取平面方程列表 —— static ICollection<Vector4> ExtractPlanes()
+        #region 提取平面方程列表 —— Vector4[] ExtractPlanes()
         /// <summary>
         /// 提取平面方程列表
         /// </summary>
         /// <returns>平面方程列表</returns>
-        public ICollection<Vector4> ExtractPlanes()
+        public Vector4[] ExtractPlanes()
         {
             Vector3[] vertices = this.Vertices.Select(x => x.Position).ToArray();
             uint[] indices = this.Indices;
@@ -181,17 +186,17 @@ namespace MedicalSharp.Primitives.Models
                 //计算法向量（归一化）
                 Vector3 normal = Vector3.Normalize(Vector3.Cross(v1 - v0, v2 - v0));
 
-                //计算 d（满足 dot(normal, v0) + d = 0）
-                float d = -Vector3.Dot(normal, v0);
+                //计算距离（满足 dot(normal, v0) + distance = 0）
+                float distance = -Vector3.Dot(normal, v0);
 
                 //归一化平面方程（可选，确保精度）
-                Vector4 plane = new Vector4(normal.X, normal.Y, normal.Z, d);
+                Vector4 plane = new Vector4(normal.X, normal.Y, normal.Z, distance);
 
                 //去重（相同法向量+相近d视为同一平面）
                 planes.Add(plane);
             }
 
-            return planes;
+            return planes.ToArray();
         }
         #endregion
 

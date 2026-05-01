@@ -1,8 +1,10 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -14,7 +16,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 包围球3D元素
     /// </summary>
-    public class BoundingSphereVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IResizable
+    public class BoundingSphereVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IResizable, ICutVolume
     {
         #region # 字段及构造器
 
@@ -116,6 +118,8 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
+        //Public
+
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象
@@ -201,6 +205,25 @@ namespace MedicalSharp.Controls.Visuals
             this.Radius = Math.Max(newRadius, 0.01f);
         }
         #endregion
+
+        #region 适用切割体积 —— void ApplyCutVolume(VolumeRenderable renderable...
+        /// <summary>
+        /// 适用切割体积
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="cutMode">切割模式</param>
+        /// <param name="markValue">标记值</param>
+        public void ApplyCutVolume(VolumeRenderable renderable, CutMode cutMode, byte markValue)
+        {
+            Vector3 center = this.Center.ToVector3();
+            Matrix4 localToWorld = this.Transform.Matrix;
+            renderable.ApplySphereCut(this.Radius, center, localToWorld, cutMode, markValue);
+            renderable.SyncMarkDataFromGpu();
+        }
+        #endregion
+
+
+        //Events
 
         #region 半径改变事件 —— static void OnRadiusChanged(BoundingSphereVisual3D visual3D...
         /// <summary>

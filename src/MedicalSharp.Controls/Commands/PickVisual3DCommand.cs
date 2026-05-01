@@ -5,7 +5,6 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
-using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -164,55 +163,14 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void ApplyMark(OpenTKViewport viewport)
         {
-            if (viewport is VolumeViewport volumeViewport)
+            if (viewport is VolumeViewport volumeViewport && this._selectedVisual is ICutVolume cutVolume)
             {
-                if (this._selectedVisual is RectangleVisual3D rectangle)
-                {
-                    volumeViewport.VolumeRenderable.ApplyRectangleCut(rectangle.Width, rectangle.Height, rectangle.Center.ToVector3(), rectangle.Normal.ToVector3(), rectangle.UAxis, rectangle.VAxis, rectangle.Transform.Matrix, CutMode.Inside, 1);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Tinted);
-                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
-                }
-                if (this._selectedVisual is CircleVisual3D circle)
-                {
-                    volumeViewport.VolumeRenderable.ApplyCircleCut(circle.Radius, circle.Center.ToVector3(), circle.Normal.ToVector3(), circle.UAxis, circle.VAxis, circle.Transform.Matrix, CutMode.Inside, 1);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
-                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
-                }
-                if (this._selectedVisual is EllipseVisual3D ellipse)
-                {
-                    volumeViewport.VolumeRenderable.ApplyEllipseCut(ellipse.Width, ellipse.Height, ellipse.Center.ToVector3(), ellipse.Normal.ToVector3(), ellipse.UAxis, ellipse.VAxis, ellipse.Transform.Matrix, CutMode.Inside, 1);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
-                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
-                }
-                if (this._selectedVisual is BoundingBoxVisual3D box)
-                {
-                    volumeViewport.VolumeRenderable.ApplyBoxCut(box.Minimum, box.Maximum, box.Transform.Matrix, CutMode.Inside, 1);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Tinted);
-                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
-                }
-                if (this._selectedVisual is BoundingSphereVisual3D sphere)
-                {
-                    volumeViewport.VolumeRenderable.ApplySphereCut(sphere.Radius, sphere.Center.ToVector3(), sphere.Transform.Matrix, CutMode.OutSide, 1);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
-                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
-                }
-                if (this._selectedVisual is CylinderVisual3D cylinder)
-                {
-                    volumeViewport.VolumeRenderable.ApplyCylinderCut(cylinder.Radius, cylinder.Height, cylinder.Center.ToVector3(), cylinder.Transform.Matrix, CutMode.OutSide, 1);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
-                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
-                }
-                if (this._selectedVisual is ConvexPolyhedronVisual3D polyhedron)
-                {
-                    ICollection<Vector4> planes = polyhedron.MeshGeometry.ExtractPlanes();
-                    volumeViewport.VolumeRenderable.ApplyConvexPolyhedronCut([.. planes], polyhedron.Transform.Matrix, CutMode.OutSide, 1);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(1, MarkMode.Collapsed);
-                    volumeViewport.VolumeRenderable.SyncMarkDataFromGpu();
-                }
-            }
+                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.OutSide, 2);
+                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(2, MarkMode.Collapsed);
 
-            //请求下一帧
-            viewport.RequestNextFrameRendering();
+                //请求下一帧
+                viewport.RequestNextFrameRendering();
+            }
         }
         #endregion
 

@@ -5,7 +5,6 @@ using MedicalSharp.Primitives.Enums;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
-using System.Collections.Generic;
 
 namespace MedicalSharp.Engine.Algorithms
 {
@@ -323,13 +322,13 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值</param>
-        public static unsafe void ApplyConvexPolyhedronCut(this VolumeRenderable renderable, IReadOnlyList<Vector4> planes, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static unsafe void ApplyConvexPolyhedronCut(this VolumeRenderable renderable, Vector4[] planes, Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             #region # 验证
 
-            if (planes == null || planes.Count == 0)
+            if (planes == null || planes.Length == 0)
             {
-                throw new ArgumentException($"平面方程列表不可为空！");
+                throw new ArgumentException("平面方程列表不可为空！");
             }
 
             #endregion
@@ -346,13 +345,13 @@ namespace MedicalSharp.Engine.Algorithms
             renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //构建SSBO数据
-            int bufferSize = sizeof(Vector4) * planes.Count;
+            int bufferSize = sizeof(Vector4) * planes.Length;
             using ShaderStorageBuffer planesBuffer = new ShaderStorageBuffer(bufferSize, BufferUsageHint.DynamicDraw);
-            planesBuffer.UpdateRange([.. planes]);
+            planesBuffer.UpdateRange(planes);
 
             //设置凸多面体参数
             planesBuffer.Bind(1);
-            cutComputer.SetUniformInt("u_PlaneCount", planes.Count);
+            cutComputer.SetUniformInt("u_PlaneCount", planes.Length);
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
@@ -15,7 +16,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 圆形3D元素
     /// </summary>
-    public class CircleVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable, IRotatable, IResizable
+    public class CircleVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable, IRotatable, IResizable, ICutVolume
     {
         #region # 字段及构造器
 
@@ -113,6 +114,8 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
+        //Public
+
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象
@@ -199,6 +202,25 @@ namespace MedicalSharp.Controls.Visuals
         {
             float newRadius = Vector3.Distance(resizeContext.Anchor, localHitPoint);
             this.Radius = Math.Max(newRadius, 0.01f);
+        }
+        #endregion
+
+        #region 适用切割体积 —— void ApplyCutVolume(VolumeRenderable renderable...
+        /// <summary>
+        /// 适用切割体积
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="cutMode">切割模式</param>
+        /// <param name="markValue">标记值</param>
+        public void ApplyCutVolume(VolumeRenderable renderable, CutMode cutMode, byte markValue)
+        {
+            Vector3 center = this.Center.ToVector3();
+            Vector3 normal = this.Normal.ToVector3();
+            Vector3 uAxis = this.UAxis;
+            Vector3 vAxis = this.VAxis;
+            Matrix4 localToWorld = this.Transform.Matrix;
+            renderable.ApplyCircleCut(this.Radius, center, normal, uAxis, vAxis, localToWorld, cutMode, markValue);
+            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 

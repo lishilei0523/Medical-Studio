@@ -2,6 +2,7 @@
 using Avalonia.Collections;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
@@ -18,7 +19,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 凸多面体3D元素
     /// </summary>
-    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IVertexEditable
+    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IVertexEditable, ICutVolume
     {
         #region # 字段及构造器
 
@@ -71,6 +72,8 @@ namespace MedicalSharp.Controls.Visuals
         #endregion
 
         #region # 方法
+
+        //Public
 
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
@@ -262,6 +265,25 @@ namespace MedicalSharp.Controls.Visuals
             this.Positions[constraint.VertexIndex] = localHitPoint.ToVector3();
         }
         #endregion
+
+        #region 适用切割体积 —— void ApplyCutVolume(VolumeRenderable renderable...
+        /// <summary>
+        /// 适用切割体积
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="cutMode">切割模式</param>
+        /// <param name="markValue">标记值</param>
+        public void ApplyCutVolume(VolumeRenderable renderable, CutMode cutMode, byte markValue)
+        {
+            Matrix4 localToWorld = this.Transform.Matrix;
+            Vector4[] planes = this.MeshGeometry.ExtractPlanes();
+            renderable.ApplyConvexPolyhedronCut(planes, localToWorld, cutMode, markValue);
+            renderable.SyncMarkDataFromGpu();
+        }
+        #endregion
+
+
+        //Events
 
         #region 位置列表改变事件 —— static void OnControlPositionsChanged(ConvexPolyhedronVisual3D visual3D...
         /// <summary>

@@ -31,7 +31,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 三角形列表
         /// </summary>
-        private IList<Triangle> _triangles;
+        private Triangle[] _triangles;
 
         /// <summary>
         /// 默认构造器
@@ -256,9 +256,8 @@ namespace MedicalSharp.Engine.Renderables
                 return;
             }
 
-            this._triangles.Clear();
-            this._strokeBuffer.Dispose();
-            this._fillBuffer.Dispose();
+            this._strokeBuffer?.Dispose();
+            this._fillBuffer?.Dispose();
 
             this._disposed = true;
         }
