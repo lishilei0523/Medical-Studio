@@ -39,6 +39,13 @@ namespace MedicalSharp.Primitives.Interfaces
         bool TryInsertVertex(Ray localRay, Vector3 localLookDirection, Vector3 localHitPoint, out VertexDragConstraint constraint);
 
         /// <summary>
+        /// 尝试删除顶点
+        /// </summary>
+        /// <param name="vertexIndex">顶点索引</param>
+        /// <returns>是否删除成功</returns>
+        bool TryRemoveVertex(int vertexIndex);
+
+        /// <summary>
         /// 移动命中顶点
         /// </summary>
         /// <param name="constraint">拖拽约束</param>

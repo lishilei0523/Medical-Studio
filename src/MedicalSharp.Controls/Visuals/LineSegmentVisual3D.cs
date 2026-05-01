@@ -171,6 +171,18 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 尝试删除顶点 —— bool TryRemoveVertex(int vertexIndex)
+        /// <summary>
+        /// 尝试删除顶点
+        /// </summary>
+        /// <param name="vertexIndex">顶点索引</param>
+        /// <returns>是否删除成功</returns>
+        public bool TryRemoveVertex(int vertexIndex)
+        {
+            return false;
+        }
+        #endregion
+
         #region 移动命中顶点 —— void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
         /// <summary>
         /// 移动命中顶点

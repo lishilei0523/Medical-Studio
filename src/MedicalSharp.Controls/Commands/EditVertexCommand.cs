@@ -7,6 +7,7 @@ using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using System.Collections.Generic;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -45,6 +46,8 @@ namespace MedicalSharp.Controls.Commands
         #endregion
 
         #region # 方法
+
+        //Public
 
         #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
@@ -156,6 +159,61 @@ namespace MedicalSharp.Controls.Commands
             viewport.RequestNextFrameRendering();
         }
         #endregion 
+
+        #region 获取上下文菜单项列表 —— override IReadOnlyList<ContextMenuItem> GetContextMenuItems(...
+        /// <summary>
+        /// 获取上下文菜单项列表
+        /// </summary>
+        /// <returns>上下文菜单项列表</returns>
+        public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
+        {
+            List<ContextMenuItem> items =
+            [
+                new ContextMenuItem
+                {
+                    Header = "删除顶点",
+                    Command = () => this.RemoveVertex(viewport, eventArgs),
+                    IsEnabled = true
+                }
+            ];
+
+            return items;
+        }
+        #endregion
+
+
+        //Private
+
+        #region 删除顶点 —— void RemoveVertex(OpenTKViewport viewport...
+        /// <summary>
+        /// 删除顶点
+        /// </summary>
+        private void RemoveVertex(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
+        {
+            if (viewport is IPickVisual3D pickVisual3D)
+            {
+                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                bool success = pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual3D, out Ray ray);
+                if (success && visual3D is IVertexEditable vertexEditable)
+                {
+                    Matrix4 modelMatrix = visual3D.Transform.Matrix;
+                    Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
+                    Ray localRay = ray.Transform(worldToLocal);
+                    Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
+
+                    //找最近顶点
+                    if (vertexEditable.TryGetVertexDrag(localRay, localLookDirection, out VertexDragConstraint constraint))
+                    {
+                        if (vertexEditable.TryRemoveVertex(constraint.VertexIndex))
+                        {
+                            //请求下一帧
+                            viewport.RequestNextFrameRendering();
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
 
         #endregion
     }
