@@ -587,8 +587,16 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             viewport._volumeRenderable = new VolumeRenderable(volumeTexture, markTexture, volumeData);
-            viewport.WindowWidth = volumeData.Metadata.WindowWidth;
-            viewport.WindowCenter = volumeData.Metadata.WindowCenter;
+            if (volumeData.Metadata.WindowWidth.HasValue)
+            {
+                viewport.WindowWidth = volumeData.Metadata.WindowWidth.Value;
+            }
+            if (volumeData.Metadata.WindowCenter.HasValue)
+            {
+                viewport.WindowCenter = volumeData.Metadata.WindowCenter.Value;
+            }
+
+            //请求下一帧
             viewport.RequestNextFrameRendering();
         }
         #endregion

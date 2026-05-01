@@ -47,11 +47,11 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         static ResourceManager()
         {
-            ResourceManager._UnitCube = ResourceManager.GetUnitCube();
-            ResourceManager._UnitPlane = ResourceManager.GetUnitPlane();
-            ResourceManager._GrayControlPoints = ResourceManager.GetGrayControlPoints();
-            ResourceManager._RainbowControlPoints = ResourceManager.GetRainbowControlPoints();
-            ResourceManager._BoneControlPoints = ResourceManager.GetBoneControlPoints();
+            _UnitCube = GetUnitCube();
+            _UnitPlane = GetUnitPlane();
+            _GrayControlPoints = GetGrayControlPoints();
+            _RainbowControlPoints = GetRainbowControlPoints();
+            _BoneControlPoints = GetBoneControlPoints();
         }
 
         #endregion
@@ -64,7 +64,7 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         public static MeshGeometry UnitCube
         {
-            get => ResourceManager._UnitCube;
+            get => _UnitCube;
         }
         #endregion 
 
@@ -74,7 +74,7 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         public static MeshGeometry UnitPlane
         {
-            get => ResourceManager._UnitPlane;
+            get => _UnitPlane;
         }
         #endregion 
 
@@ -84,7 +84,7 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         public static IReadOnlyList<TFControlPoint> GrayControlPoints
         {
-            get => ResourceManager._GrayControlPoints.AsReadOnly();
+            get => _GrayControlPoints.AsReadOnly();
         }
         #endregion 
 
@@ -94,7 +94,7 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         public static IReadOnlyList<TFControlPoint> RainbowControlPoints
         {
-            get => ResourceManager._RainbowControlPoints.AsReadOnly();
+            get => _RainbowControlPoints.AsReadOnly();
         }
         #endregion 
 
@@ -104,7 +104,7 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         public static IReadOnlyList<TFControlPoint> BoneControlPoints
         {
-            get => ResourceManager._BoneControlPoints.AsReadOnly();
+            get => _BoneControlPoints.AsReadOnly();
         }
         #endregion 
 
@@ -203,8 +203,8 @@ namespace MedicalSharp.Primitives.Managers
         {
             TFControlPoint[] controlPoints =
             [
-                new TFControlPoint(0.0f, new Vector4(0.0f, 0.0f, 0.0f, 0.0f)),
-                new TFControlPoint(1.0f, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))
+                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.0f)),
+                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))
             ];
 
             return controlPoints;
@@ -220,11 +220,11 @@ namespace MedicalSharp.Primitives.Managers
         {
             TFControlPoint[] controlPoints =
             [
-                new TFControlPoint(0.0f, new Vector4(0.0f, 0.0f, 0.5f, 0.0f)),
-                new TFControlPoint(0.25f, new Vector4(0.0f, 0.5f, 1.0f, 0.3f)),
-                new TFControlPoint(0.5f, new Vector4(0.0f, 1.0f, 0.5f, 0.6f)),
-                new TFControlPoint(0.75f, new Vector4(1.0f, 1.0f, 0.0f, 0.8f)),
-                new TFControlPoint(1.0f, new Vector4(1.0f, 0.0f, 0.0f, 1.0f))
+                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.5f, 0.0f)),
+                new TFControlPoint(0, new Vector4(0.0f, 0.5f, 1.0f, 0.3f)),
+                new TFControlPoint(512, new Vector4(0.0f, 1.0f, 0.5f, 0.6f)),
+                new TFControlPoint(1536, new Vector4(1.0f, 1.0f, 0.0f, 0.8f)),
+                new TFControlPoint(3071, new Vector4(1.0f, 0.0f, 0.0f, 1.0f))
             ];
 
             return controlPoints;
@@ -241,29 +241,29 @@ namespace MedicalSharp.Primitives.Managers
             TFControlPoint[] controlPoints =
             [
                 //完全透明背景（空气/背景）
-                new TFControlPoint(0.00f, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),
-                new TFControlPoint(0.30f, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),   //保持透明到30%
+                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),
+                new TFControlPoint(200, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)), //Position≈0.30
 
                 //软组织：极低透明度（几乎透明）
-                new TFControlPoint(0.35f, new Vector4(0.3f, 0.3f, 0.3f, 0.005f)),  //0.5%透明度
-                new TFControlPoint(0.40f, new Vector4(0.4f, 0.4f, 0.4f, 0.008f)),  //0.8%透明度
-                new TFControlPoint(0.45f, new Vector4(0.5f, 0.5f, 0.5f, 0.010f)),  //1.0%透明度
+                new TFControlPoint(409, new Vector4(0.3f, 0.3f, 0.3f, 0.005f)), //Position≈0.35
+                new TFControlPoint(614, new Vector4(0.4f, 0.4f, 0.4f, 0.008f)), //Position≈0.40
+                new TFControlPoint(818, new Vector4(0.5f, 0.5f, 0.5f, 0.010f)), //Position≈0.45
 
                 //骨骼开始：陡峭变化
-                new TFControlPoint(0.48f, new Vector4(0.7f, 0.6f, 0.5f, 0.02f)),   //过渡开始
-                new TFControlPoint(0.50f, new Vector4(0.8f, 0.7f, 0.6f, 0.50f)),   //快速变不透明！
-                new TFControlPoint(0.52f, new Vector4(0.9f, 0.8f, 0.7f, 0.85f)),   //非常不透明
+                new TFControlPoint(941, new Vector4(0.7f, 0.6f, 0.5f, 0.02f)), //Position≈0.48
+                new TFControlPoint(1023, new Vector4(0.8f, 0.7f, 0.6f, 0.50f)), //Position≈0.50 骨骼！
+                new TFControlPoint(1105, new Vector4(0.9f, 0.8f, 0.7f, 0.85f)), //Position≈0.52
 
                 //标准骨骼：高不透明度
-                new TFControlPoint(0.55f, new Vector4(1.0f, 0.9f, 0.8f, 0.92f)),
-                new TFControlPoint(0.60f, new Vector4(1.0f, 0.95f, 0.85f, 0.95f)),
-                new TFControlPoint(0.65f, new Vector4(1.0f, 0.97f, 0.90f, 0.97f)),
+                new TFControlPoint(1228, new Vector4(1.0f, 0.9f, 0.8f, 0.92f)), //Position≈0.55
+                new TFControlPoint(1433, new Vector4(1.0f, 0.95f, 0.85f, 0.95f)), //Position≈0.60
+                new TFControlPoint(1637, new Vector4(1.0f, 0.97f, 0.90f, 0.97f)), //Position≈0.65
 
                 //高密度骨骼：完全不透明
-                new TFControlPoint(0.70f, new Vector4(1.0f, 0.98f, 0.93f, 0.98f)),
-                new TFControlPoint(0.80f, new Vector4(1.0f, 1.0f, 0.96f, 0.99f)),
-                new TFControlPoint(0.90f, new Vector4(1.0f, 1.0f, 0.98f, 0.995f)),
-                new TFControlPoint(1.00f, new Vector4(1.0f, 1.0f, 1.0f, 1.000f))
+                new TFControlPoint(1842, new Vector4(1.0f, 0.98f, 0.93f, 0.98f)), //Position≈0.70
+                new TFControlPoint(2252, new Vector4(1.0f, 1.0f, 0.96f, 0.99f)), //Position≈0.80
+                new TFControlPoint(2661, new Vector4(1.0f, 1.0f, 0.98f, 0.995f)), //Position≈0.90
+                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.000f)) //Position≈1.00
             ];
 
             return controlPoints;

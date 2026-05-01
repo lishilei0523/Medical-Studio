@@ -10,15 +10,9 @@ namespace MedicalSharp.Primitives.Models
     public record struct TFControlPoint
     {
         /// <summary>
-        /// 位置
-        /// </summary>
-        /// <remarks>值域: [0, 1]</remarks>
-        public float Position;
-
-        /// <summary>
         /// HU值
         /// </summary>
-        public short HU;//TODO 实现HU控制
+        public short HU;
 
         /// <summary>
         /// 颜色
@@ -26,15 +20,22 @@ namespace MedicalSharp.Primitives.Models
         public Vector4 Color;
 
         /// <summary>
+        /// 位置
+        /// </summary>
+        /// <remarks>值域: [0, 1]</remarks>
+        public float Position;
+
+        /// <summary>
         /// 创建传递函数控制点构造器
         /// </summary>
-        /// <param name="position">位置</param>
         /// <param name="color">颜色</param>
-        public TFControlPoint(float position, Vector4 color)
+        /// <param name="huValue">HU值(可选)</param>
+        public TFControlPoint(short huValue, Vector4 color)
             : this()
         {
-            this.Position = MathHelper.Clamp(position, 0.0f, 1.0f);
             this.Color = color;
+            this.HU = huValue;
+            this.Position = float.Epsilon;
         }
     }
 }
