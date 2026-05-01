@@ -40,7 +40,7 @@ namespace MedicalSharp.Engine.Renderers
             //默认值
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
-            this.RenderMode = VolumeRenderMode.AIP;
+            this.RenderMode = VolumeRenderMode.Raycast;
             this.TransferFunction = new TransferFunction();
             this.MarkStrategy = new MarkStrategy();
         }
@@ -105,9 +105,9 @@ namespace MedicalSharp.Engine.Renderers
         public float OpacityThreshold { get; private set; }
         #endregion
 
-        #region 传输函数 —— TransferFunction TransferFunction
+        #region 传递函数 —— TransferFunction TransferFunction
         /// <summary>
-        /// 传输函数
+        /// 传递函数
         /// </summary>
         public TransferFunction TransferFunction { get; }
         #endregion

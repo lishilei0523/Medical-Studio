@@ -137,7 +137,7 @@ void main()
         //应用密度缩放
         density = clamp(density * u_DensityScale, 0.0, 1.0);
         
-        //采样传输函数
+        //采样传递函数
         vec4 sampleColor = texture(u_TransferFunction, density);
 
         //如果透明度很低，跳过

@@ -63,7 +63,7 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<float> OpacityThresholdProperty;
 
         /// <summary>
-        /// 传输函数控制列表依赖属性
+        /// 传递函数控制列表依赖属性
         /// </summary>
         public static readonly StyledProperty<AvaloniaList<TFControlPoint>> TFControlPointsProperty;
 
@@ -218,9 +218,9 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 传输函数控制列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        #region 依赖属性 - 传递函数控制列表 —— AvaloniaList<TFControlPoint> TFControlPoints
         /// <summary>
-        /// 依赖属性 - 传输函数控制列表
+        /// 依赖属性 - 传递函数控制列表
         /// </summary>
         public AvaloniaList<TFControlPoint> TFControlPoints
         {
@@ -476,9 +476,9 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 传输函数控制点列表改变事件 —— static void OnTFControlPointsChanged(VolumeViewport viewport...
+        #region 传递函数控制点列表改变事件 —— static void OnTFControlPointsChanged(VolumeViewport viewport...
         /// <summary>
-        /// 传输函数控制点列表改变事件
+        /// 传递函数控制点列表改变事件
         /// </summary>
         private static void OnTFControlPointsChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<AvaloniaList<TFControlPoint>> eventArgs)
         {
@@ -509,9 +509,9 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 传输函数控制点列表元素改变事件 —— void OnTFControlPointsItemChanged(object sender...
+        #region 传递函数控制点列表元素改变事件 —— void OnTFControlPointsItemChanged(object sender...
         /// <summary>
-        /// 传输函数控制点列表元素改变事件
+        /// 传递函数控制点列表元素改变事件
         /// </summary>
         private void OnTFControlPointsItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {

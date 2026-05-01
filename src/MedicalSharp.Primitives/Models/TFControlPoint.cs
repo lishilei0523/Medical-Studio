@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
-    /// 传输函数控制点
+    /// 传递函数控制点
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public record struct TFControlPoint
@@ -26,7 +26,7 @@ namespace MedicalSharp.Primitives.Models
         public Vector4 Color;
 
         /// <summary>
-        /// 创建传输函数控制点构造器
+        /// 创建传递函数控制点构造器
         /// </summary>
         /// <param name="position">位置</param>
         /// <param name="color">颜色</param>

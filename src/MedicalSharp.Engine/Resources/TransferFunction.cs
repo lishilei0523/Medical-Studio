@@ -8,7 +8,7 @@ using System.Linq;
 namespace MedicalSharp.Engine.Resources
 {
     /// <summary>
-    /// 传输函数
+    /// 传递函数
     /// </summary>
     public class TransferFunction : IDisposable
     {
@@ -35,7 +35,7 @@ namespace MedicalSharp.Engine.Resources
         private readonly List<TFControlPoint> _controlPoints;
 
         /// <summary>
-        /// 创建传输函数构造器
+        /// 创建传递函数构造器
         /// </summary>
         internal TransferFunction()
         {
@@ -48,9 +48,9 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 属性
 
-        #region 传输函数纹理 —— Texture1D Texture
+        #region 传递函数纹理 —— Texture1D Texture
         /// <summary>
-        /// 传输函数纹理
+        /// 传递函数纹理
         /// </summary>
         internal Texture1D Texture { get; private set; }
         #endregion

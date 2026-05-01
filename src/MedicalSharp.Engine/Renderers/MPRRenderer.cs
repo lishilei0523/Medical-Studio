@@ -83,9 +83,9 @@ namespace MedicalSharp.Engine.Renderers
         public float Contrast { get; private set; }
         #endregion
 
-        #region 传输函数 —— TransferFunction TransferFunction
+        #region 传递函数 —— TransferFunction TransferFunction
         /// <summary>
-        /// 传输函数
+        /// 传递函数
         /// </summary>
         public TransferFunction TransferFunction { get; }
         #endregion

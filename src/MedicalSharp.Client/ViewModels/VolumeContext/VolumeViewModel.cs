@@ -82,9 +82,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public VolumeData VolumeData { get; set; }
         #endregion
 
-        #region 传输函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        #region 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
         /// <summary>
-        /// 传输函数控制点列表
+        /// 传递函数控制点列表
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
