@@ -166,6 +166,43 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 尝试获取插入顶点拖拽约束 —— bool TryInsertVertex(Ray localRay, Vector3 localLookDirection...
+        /// <summary>
+        /// 尝试获取插入顶点拖拽约束
+        /// </summary>
+        /// <param name="localRay">射线（局部空间）</param>
+        /// <param name="localLookDirection">视角方向（局部空间）</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        /// <param name="constraint">拖拽约束</param>
+        /// <returns>是否插入顶点</returns>
+        public bool TryInsertVertex(Ray localRay, Vector3 localLookDirection, Vector3 localHitPoint, out VertexDragConstraint constraint)
+        {
+            constraint = default;
+
+            #region # 验证
+
+            if (this.Positions == null)
+            {
+                return false;
+            }
+
+            #endregion
+
+            //直接添加新点
+            int newIndex = this.Positions.Count;
+            this.Positions.Add(localHitPoint.ToVector3());
+
+            constraint = new VertexDragConstraint
+            {
+                VertexIndex = newIndex,
+                Anchor = localHitPoint,
+                Normal = localLookDirection
+            };
+
+            return true;
+        }
+        #endregion
+
         #region 移动命中顶点 —— void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
         /// <summary>
         /// 移动命中顶点

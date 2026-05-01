@@ -27,7 +27,12 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<AvaloniaList<Vector3D>> ControlPositionsProperty;
 
         /// <summary>
-        /// 点尺寸依赖属性
+        /// 采样密度依赖属性
+        /// </summary>
+        public static readonly StyledProperty<int> TessellationProperty;
+
+        /// <summary>
+        /// 是否闭合依赖属性
         /// </summary>
         public static readonly StyledProperty<bool> ClosedProperty;
 
@@ -37,10 +42,12 @@ namespace MedicalSharp.Controls.Visuals
         static CurveVisual3D()
         {
             ControlPositionsProperty = AvaloniaProperty.Register<CurveVisual3D, AvaloniaList<Vector3D>>(nameof(ControlPositions), []);
+            TessellationProperty = AvaloniaProperty.Register<CurveVisual3D, int>(nameof(Tessellation), 20);
             ClosedProperty = AvaloniaProperty.Register<CurveVisual3D, bool>(nameof(Closed), false);
 
             //属性改变事件
             ControlPositionsProperty.Changed.AddClassHandler<CurveVisual3D, AvaloniaList<Vector3D>>(OnControlPositionsChanged);
+            TessellationProperty.Changed.AddClassHandler<CurveVisual3D, int>(OnTessellationChanged);
         }
 
 
@@ -64,6 +71,17 @@ namespace MedicalSharp.Controls.Visuals
         {
             get => this.GetValue(ControlPositionsProperty);
             set => this.SetValue(ControlPositionsProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 采样密度 —— int Tessellation
+        /// <summary>
+        /// 依赖属性 - 采样密度
+        /// </summary>
+        public int Tessellation
+        {
+            get => this.GetValue(TessellationProperty);
+            set => this.SetValue(TessellationProperty, value);
         }
         #endregion
 
@@ -109,7 +127,7 @@ namespace MedicalSharp.Controls.Visuals
             if (this.Renderable == null && this.ControlPositions != null)
             {
                 IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
-                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed);
+                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
 
                 CurveRenderable renderable = new CurveRenderable(controlPositions, sampledPositions, this.Closed);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
@@ -128,7 +146,7 @@ namespace MedicalSharp.Controls.Visuals
             if (this.Renderable != null && this.ControlPositions != null)
             {
                 IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
-                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed);
+                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
 
                 CurveRenderable renderable = (CurveRenderable)this.Renderable;
                 renderable.Update(controlPositions, sampledPositions);
@@ -190,6 +208,77 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 尝试获取插入顶点拖拽约束 —— bool TryInsertVertex(Ray localRay, Vector3 localLookDirection...
+        /// <summary>
+        /// 尝试获取插入顶点拖拽约束
+        /// </summary>
+        /// <param name="localRay">射线（局部空间）</param>
+        /// <param name="localLookDirection">视角方向（局部空间）</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        /// <param name="constraint">拖拽约束</param>
+        /// <returns>是否插入顶点</returns>
+        public bool TryInsertVertex(Ray localRay, Vector3 localLookDirection, Vector3 localHitPoint, out VertexDragConstraint constraint)
+        {
+            constraint = default;
+
+            #region # 验证
+
+            if (this.ControlPositions == null || this.ControlPositions.Count < 2)
+            {
+                return false;
+            }
+            if (this.SampledPositions == null || this.SampledPositions.Count == 0)
+            {
+                return false;
+            }
+
+            #endregion
+
+            //找到离命中点最近的采样点
+            int nearestSampleIndex = -1;
+            float nearestDistance = float.MaxValue;
+            for (int i = 0; i < this.SampledPositions.Count; i++)
+            {
+                Vector3 samplePoint = this.SampledPositions[i];
+                float distance = Vector3.Distance(localHitPoint, samplePoint);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestSampleIndex = i;
+                }
+            }
+
+            if (nearestSampleIndex < 0)
+            {
+                return false;
+            }
+
+            //将采样点索引转换为控制点之间的段索引
+            int segmentIndex = nearestSampleIndex / this.Tessellation;
+
+            //插入到 segmentIndex 和 segmentIndex + 1 之间
+            int insertIndex = segmentIndex + 1;
+
+            //边界检查
+            if (insertIndex < 1 || insertIndex >= this.ControlPositions.Count)
+            {
+                return false;
+            }
+
+            //插入新控制点
+            this.ControlPositions.Insert(insertIndex, localHitPoint.ToVector3());
+
+            constraint = new VertexDragConstraint
+            {
+                VertexIndex = insertIndex,
+                Anchor = localHitPoint,
+                Normal = localLookDirection
+            };
+
+            return true;
+        }
+        #endregion
+
         #region 移动命中顶点 —— void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
         /// <summary>
         /// 移动命中顶点
@@ -234,6 +323,16 @@ namespace MedicalSharp.Controls.Visuals
         private void OnControlPositionsItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
             this.UpdateRenderable();
+        }
+        #endregion
+
+        #region 采样密度改变事件 —— static void OnTessellationChanged(CurveVisual3D visual3D...
+        /// <summary>
+        /// 采样密度改变事件
+        /// </summary>
+        private static void OnTessellationChanged(CurveVisual3D visual3D, AvaloniaPropertyChangedEventArgs<int> eventArgs)
+        {
+            visual3D.UpdateRenderable();
         }
         #endregion
 

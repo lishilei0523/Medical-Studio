@@ -166,6 +166,62 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 尝试获取插入顶点拖拽约束 —— bool TryInsertVertex(Ray localRay, Vector3 localLookDirection...
+        /// <summary>
+        /// 尝试获取插入顶点拖拽约束
+        /// </summary>
+        /// <param name="localRay">射线（局部空间）</param>
+        /// <param name="localLookDirection">视角方向（局部空间）</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        /// <param name="constraint">拖拽约束</param>
+        /// <returns>是否插入顶点</returns>
+        public bool TryInsertVertex(Ray localRay, Vector3 localLookDirection, Vector3 localHitPoint, out VertexDragConstraint constraint)
+        {
+            constraint = default;
+
+            #region # 验证
+
+            if (this.Positions == null || this.Positions.Count == 0)
+            {
+                return false;
+            }
+
+            #endregion
+
+            //找到离命中点最近的顶点
+            int nearestIndex = -1;
+            float nearestDistance = float.MaxValue;
+            for (int index = 0; index < this.Positions.Count; index++)
+            {
+                Vector3 point = this.Positions[index].ToVector3();
+                float distance = Vector3.Distance(localHitPoint, point);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestIndex = index;
+                }
+            }
+
+            if (nearestIndex < 0)
+            {
+                return false;
+            }
+
+            //插入新顶点（最近点之后）
+            int newIndex = nearestIndex + 1;
+            this.Positions.Insert(newIndex, localHitPoint.ToVector3());
+
+            constraint = new VertexDragConstraint
+            {
+                VertexIndex = newIndex,
+                Anchor = localHitPoint,
+                Normal = localLookDirection
+            };
+
+            return true;
+        }
+        #endregion
+
         #region 移动命中顶点 —— void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
         /// <summary>
         /// 移动命中顶点
