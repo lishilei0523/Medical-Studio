@@ -51,7 +51,6 @@ namespace MedicalSharp.Engine.Resources
             //初始化纹理
             this.Texture = new Texture1D(MarkLength, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float);
             this.Texture.SetFilter(TextureMinFilter.Linear, TextureMagFilter.Linear);
-            this.Texture.SetWrapMode(TextureWrapMode.ClampToEdge);
 
             //标准颜色
             this.Opacity = 0.6f;
