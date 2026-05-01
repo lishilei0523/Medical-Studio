@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Primitives.Models
 {
@@ -14,9 +15,17 @@ namespace MedicalSharp.Primitives.Models
         internal VolumeMetadata()
         {
             //默认值
+            this.Id = Guid.NewGuid().ToString();
             this.RescaleSlope = 1.0f;
             this.RescaleIntercept = 0.0f;
         }
+        #endregion
+
+        #region 标识Id —— string Id
+        /// <summary>
+        /// 标识Id
+        /// </summary>
+        public string Id { get; private set; }
         #endregion
 
         #region 体素数量 —— long VoxelsCount

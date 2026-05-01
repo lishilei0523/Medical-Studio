@@ -185,9 +185,9 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
                 if (this.VolumeData != null)
                 {
-                    DicomManager.RemoveVolumeData(this.VolumeData.Id);
-                    TextureManager.RemoveTexture3D(this.VolumeData.Id);
-                    TextureManager.RemoveTexture3D(TextureManager.GetMarkTextureId(this.VolumeData.Id));
+                    DicomManager.RemoveVolumeData(this.VolumeData.Metadata.Id);
+                    TextureManager.RemoveTexture3D(this.VolumeData.Metadata.Id);
+                    TextureManager.RemoveTexture3D(TextureManager.GetMarkTextureId(this.VolumeData.Metadata.Id));
                 }
 
                 this.VolumeData = volumeData;
@@ -213,9 +213,9 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             #endregion
 
-            DicomManager.RemoveVolumeData(this.VolumeData.Id);
-            TextureManager.RemoveTexture3D(this.VolumeData.Id);
-            TextureManager.RemoveTexture3D(TextureManager.GetMarkTextureId(this.VolumeData.Id));
+            DicomManager.RemoveVolumeData(this.VolumeData.Metadata.Id);
+            TextureManager.RemoveTexture3D(this.VolumeData.Metadata.Id);
+            TextureManager.RemoveTexture3D(TextureManager.GetMarkTextureId(this.VolumeData.Metadata.Id));
             this.LayoutViewModel.ClearVolumeData();
         }
         #endregion

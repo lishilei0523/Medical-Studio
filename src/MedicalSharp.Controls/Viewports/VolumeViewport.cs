@@ -559,8 +559,8 @@ namespace MedicalSharp.Controls.Viewports
             VolumeData volumeData = eventArgs.NewValue.Value;
             Texture3D volumeTexture;
             Texture3D markTexture;
-            string markTextureId = TextureManager.GetMarkTextureId(volumeData.Id);
-            if (!TextureManager.Texture3Ds.ContainsKey(volumeData.Id))
+            string markTextureId = TextureManager.GetMarkTextureId(volumeData.Metadata.Id);
+            if (!TextureManager.Texture3Ds.ContainsKey(volumeData.Metadata.Id))
             {
                 viewport.GlContext.MakeCurrent();
 
@@ -570,7 +570,7 @@ namespace MedicalSharp.Controls.Viewports
                     volumeData.Metadata.VolumeSize.Y,
                     volumeData.Metadata.VolumeSize.Z,
                     volumeData.OriginalData);
-                TextureManager.AddTexture3D(volumeData.Id, volumeTexture);
+                TextureManager.AddTexture3D(volumeData.Metadata.Id, volumeTexture);
 
                 //创建标记纹理
                 markTexture = Texture3D.CreateFromMark(
@@ -582,7 +582,7 @@ namespace MedicalSharp.Controls.Viewports
             }
             else
             {
-                volumeTexture = TextureManager.Texture3Ds[volumeData.Id];
+                volumeTexture = TextureManager.Texture3Ds[volumeData.Metadata.Id];
                 markTexture = TextureManager.Texture3Ds[markTextureId];
             }
 

@@ -28,20 +28,12 @@ namespace MedicalSharp.Primitives.Models
         {
             //默认值
             this._syncStatus = (int)MarkSyncStatus.Idle;
-            this.Id = Guid.NewGuid().ToString();
             this.Metadata = new VolumeMetadata();
         }
 
         #endregion
 
         #region # 属性
-
-        #region 标识Id —— string Id
-        /// <summary>
-        /// 标识Id
-        /// </summary>
-        public string Id { get; protected set; }
-        #endregion
 
         #region 体积信息 —— VolumeInfo Metadata
         /// <summary>

@@ -49,7 +49,7 @@ namespace MedicalSharp.Primitives.Managers
         /// <param name="volumeData">体积数据</param>
         public static void AddVolumeData(VolumeData volumeData)
         {
-            _VolumeDatas.Add(volumeData.Id, volumeData);
+            _VolumeDatas.Add(volumeData.Metadata.Id, volumeData);
         }
         #endregion
 
