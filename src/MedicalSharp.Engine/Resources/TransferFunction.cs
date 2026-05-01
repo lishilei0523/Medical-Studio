@@ -1,4 +1,5 @@
-﻿using MedicalSharp.Primitives.Models;
+﻿using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -41,12 +42,20 @@ namespace MedicalSharp.Engine.Resources
         {
             this._textureData = new Vector4[TextureWidth];
             this._controlPoints = new List<TFControlPoint>();
+            this.InterpolationMode = InterpolationMode.Linear;
             this.Texture = new Texture1D(TextureWidth, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float);
         }
 
         #endregion
 
         #region # 属性
+
+        #region 插值模式 —— InterpolationMode InterpolationMode
+        /// <summary>
+        /// 插值模式
+        /// </summary>
+        public InterpolationMode InterpolationMode { get; private set; }
+        #endregion
 
         #region 传递函数纹理 —— Texture1D Texture
         /// <summary>
@@ -70,6 +79,18 @@ namespace MedicalSharp.Engine.Resources
         #region # 方法
 
         //Public
+
+        #region 切换插值模式 —— void SwitchInterpolationMode(InterpolationMode interpolationMode)
+        /// <summary>
+        /// 切换插值模式
+        /// </summary>
+        /// <param name="interpolationMode">插值模式</param>
+        public void SwitchInterpolationMode(InterpolationMode interpolationMode)
+        {
+            this.InterpolationMode = interpolationMode;
+            this.UpdateTexture();
+        }
+        #endregion
 
         #region 从控制点列表初始化 —— void InitFromControlPoints(IReadOnlyList<TFControlPoint>...
         /// <summary>
@@ -152,16 +173,23 @@ namespace MedicalSharp.Engine.Resources
 
         //Private
 
-        #region 更新纹理 —— unsafe void UpdateTexture()
+        #region 更新纹理 —— void UpdateTexture()
         /// <summary>
         /// 更新纹理
         /// </summary>
         private unsafe void UpdateTexture()
         {
+            #region # 验证
+
             if (!this._controlPoints.Any())
             {
                 return;
             }
+
+            #endregion
+
+            //确保控制点按位置排序
+            this._controlPoints.Sort((a, b) => a.Position.CompareTo(b.Position));
 
             for (int index = 0; index < TextureWidth; index++)
             {
@@ -184,31 +212,46 @@ namespace MedicalSharp.Engine.Resources
         /// <returns>颜色</returns>
         private Vector4 InterpolateControlPoints(float position)
         {
+            #region # 验证
+
             if (this._controlPoints.Count == 0)
             {
                 return new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
             }
-
             if (position <= this._controlPoints[0].Position)
             {
                 return this._controlPoints[0].Color;
             }
-
             if (position >= this._controlPoints[^1].Position)
             {
                 return this._controlPoints[^1].Color;
             }
 
+            #endregion
+
             for (int index = 0; index < this._controlPoints.Count - 1; index++)
             {
-                if (position >= this._controlPoints[index].Position && position <= this._controlPoints[index + 1].Position)
+                float position1 = this._controlPoints[index].Position;
+                float position2 = this._controlPoints[index + 1].Position;
+                Vector4 color1 = this._controlPoints[index].Color;
+                Vector4 color2 = this._controlPoints[index + 1].Color;
+                if ((position >= position1 && position <= position2) || (position >= position2 && position <= position1))
                 {
-                    //颜色插值
-                    float t = (position - this._controlPoints[index].Position) /
-                              (this._controlPoints[index + 1].Position - this._controlPoints[index].Position);
-                    Vector4 result = Vector4.Lerp(this._controlPoints[index].Color, this._controlPoints[index + 1].Color, t);
+                    float t = (position - position1) / (position2 - position1);
 
-                    return new Vector4(result.X, result.Y, result.Z, result.W);
+                    //根据插值模式调整t值
+                    t = this.InterpolationMode switch
+                    {
+                        InterpolationMode.Linear => t,
+                        InterpolationMode.Step => t < 0.5f ? 0.0f : 1.0f,
+                        InterpolationMode.SmoothStep => t * t * (3 - 2 * t), //Hermite平滑
+                        _ => t
+                    };
+
+                    //颜色插值
+                    Vector4 color = Vector4.Lerp(color1, color2, t);
+
+                    return color;
                 }
             }
 
