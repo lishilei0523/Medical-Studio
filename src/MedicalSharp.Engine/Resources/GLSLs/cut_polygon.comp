@@ -7,15 +7,13 @@ layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
 //多边形参数
 layout(std430, binding = 1) buffer PolygonVertexBuffer
 {
-    vec4 u_PolygonVertices[];   //2D顶点坐标（x, y, 0, 0）
+    vec4 u_PolygonVertices[];        //2D顶点坐标（x, y, 0, 0）
 };
-uniform int u_VertexCount;           //顶点数量
-uniform vec3 u_FitPlaneNormal;       //拟合平面的法向量（归一化）
-uniform vec3 u_FitPlanePoint;        //拟合平面上的一点
+uniform int u_VerticesCount;         //顶点数量
+uniform vec3 u_FitPlaneNormal;       //拟合平面法向量（归一化）
+uniform vec3 u_FitCenter;            //拟合中心位置
 uniform vec3 u_UAixs;                //U轴（归一化）
 uniform vec3 u_VAixs;                //V轴（归一化）
-
-//变换矩阵
 uniform mat4 u_WorldToLocal;
 
 //体积参数
@@ -33,7 +31,7 @@ uniform uint u_MarkValue;
 bool PointInPolygon2D(vec2 point)
 {
     bool inside = false;
-    for (int i = 0, j = u_VertexCount - 1; i < u_VertexCount; j = i++)
+    for (int i = 0, j = u_VerticesCount - 1; i < u_VerticesCount; j = i++)
     {
         vec4 vertexI = u_PolygonVertices[i];
         vec4 vertexJ = u_PolygonVertices[j];
@@ -59,7 +57,7 @@ void main()
         return;
     }
     
-    //体素坐标 -> 世界坐标
+    //体素坐标 -> 纹理坐标（0-1范围） -> 世界坐标
     vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_VolumeSize);
     vec3 worldPos = (texCoord - 0.5) * u_VolumeScale;
     
@@ -68,8 +66,8 @@ void main()
     localPos /= localPos.w;
     vec3 pos = localPos.xyz;
     
-    //将体素点投影到拟合平面上（使用CPU传入的UV轴）
-    vec3 delta = pos - u_FitPlanePoint;
+    //将体素点投影到拟合平面上（使用CPU传入的U/V轴）
+    vec3 delta = pos - u_FitCenter;
     float projectedU = dot(delta, u_UAixs);
     float projectedV = dot(delta, u_VAixs);
     vec2 projectedPoint = vec2(projectedU, projectedV);
@@ -78,7 +76,18 @@ void main()
     bool inPolygon = PointInPolygon2D(projectedPoint);
     
     //根据切割模式决定
-    bool inside = (u_CutMode == 0) ? inPolygon : !inPolygon;    
+    bool inside = false;
+    if (u_CutMode == 0)
+    {
+        //内切：挖掉多边形投影区域
+        inside = inPolygon;
+    }
+    else
+    {
+        //外切：挖掉多边形投影区域之外的部分
+        inside = !inPolygon;
+    }
+
     if (inside)
     {
         uint oldMarkValue = imageLoad(u_MarkTexture, voxelCoord).r;

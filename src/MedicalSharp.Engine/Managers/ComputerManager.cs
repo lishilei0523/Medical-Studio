@@ -34,6 +34,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _EllipseCutComputer;
 
         /// <summary>
+        /// 多边形切割计算着色器
+        /// </summary>
+        private static ShaderProgram _PolygonCutComputer;
+
+        /// <summary>
         /// 立方体切割计算着色器
         /// </summary>
         private static ShaderProgram _BoxCutComputer;
@@ -101,6 +106,16 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - 多边形切割计算着色器 —— static ShaderProgram PolygonCutComputer
+        /// <summary>
+        /// 只读属性 - 多边形切割计算着色器
+        /// </summary>
+        public static ShaderProgram PolygonCutComputer
+        {
+            get => _PolygonCutComputer;
+        }
+        #endregion
+
         #region 只读属性 - 立方体切割计算着色器 —— static ShaderProgram BoxCutComputer
         /// <summary>
         /// 只读属性 - 立方体切割计算着色器
@@ -163,6 +178,7 @@ namespace MedicalSharp.Engine.Managers
                 _CircleCutComputer = CreateCircleCutComputer();
                 _EllipseCutComputer = CreateEllipseCutComputer();
                 _RectangleCutComputer = CreateRectangleCutComputer();
+                _PolygonCutComputer = CreatePolygonCutComputer();
                 _BoxCutComputer = CreateBoxCutComputer();
                 _SphereCutComputer = CreateSphereCutComputer();
                 _CylinderCutComputer = CreateCylinderCutComputer();
@@ -219,7 +235,8 @@ namespace MedicalSharp.Engine.Managers
         {
             _RectangleCutComputer?.Dispose();
             _CircleCutComputer?.Dispose();
-            _EllipseCutComputer.Dispose();
+            _EllipseCutComputer?.Dispose();
+            _PolygonCutComputer?.Dispose();
             _BoxCutComputer?.Dispose();
             _SphereCutComputer?.Dispose();
             _CylinderCutComputer?.Dispose();
@@ -266,6 +283,20 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/cut_ellipse.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion 
+
+        #region 创建多边形切割计算着色器 —— static ShaderProgram CreatePolygonCutComputer()
+        /// <summary>
+        /// 创建多边形切割计算着色器
+        /// </summary>
+        private static ShaderProgram CreatePolygonCutComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/cut_polygon.comp");
             program.BuildCompute();
 
             return program;

@@ -2,9 +2,12 @@
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Maths;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Engine.Algorithms
 {
@@ -153,6 +156,72 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformVector3("u_EllipseNormal", normal);
             cutComputer.SetUniformVector3("u_EllipseUAxis", uAxis);
             cutComputer.SetUniformVector3("u_EllipseVAxis", vAxis);
+            cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
+
+            //设置体积参数
+            cutComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", renderable.VolumeData.Metadata.VolumeScale);
+
+            //设置切割模式
+            cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
+
+            //设置标记值
+            cutComputer.SetUniformUInt("u_MarkValue", markValue);
+
+            //调度执行
+            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
+
+            //取消使用
+            cutComputer.Unuse();
+        }
+        #endregion
+
+        #region # 应用多边形切割 —— static void ApplyPolygonCut(this VolumeRenderable renderable...
+        /// <summary>
+        /// 应用多边形切割
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="vertices3D">3D顶点列表（按顺序）</param>
+        /// <param name="localToWorld">局部到世界变换矩阵</param>
+        /// <param name="cutMode">切割模式</param>
+        /// <param name="markValue">标记值（1-255，0表示清除）</param>
+        public static unsafe void ApplyPolygonCut(this VolumeRenderable renderable, IReadOnlyList<Vector3> vertices3D, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        {
+            PolygonFit2D polygon = new PolygonFit2D(vertices3D);
+
+            #region # 验证
+
+            if (!polygon.IsValid)
+            {
+                throw new InvalidOperationException("多边形无效，至少需要3个顶点！");
+            }
+
+            #endregion
+
+            Matrix4 worldToLocal = localToWorld.Inverted();
+
+            //多边形切割计算着色器
+            ShaderProgram cutComputer = ComputerManager.PolygonCutComputer;
+
+            //开启Shader程序
+            cutComputer.Use();
+
+            //绑定标记纹理为可读写
+            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+
+            //构建SSBO数据
+            Vector4[] vertices = polygon.Vertices2D.Select(vertex => new Vector4(vertex.X, vertex.Y, 0, 0)).ToArray();
+            int bufferSize = sizeof(Vector4) * vertices.Length;
+            using ShaderStorageBuffer verticesBuffer = new ShaderStorageBuffer(bufferSize, BufferUsageHint.DynamicDraw);
+            verticesBuffer.UpdateRange(vertices);
+
+            //设置多边形参数
+            verticesBuffer.Bind(1);
+            cutComputer.SetUniformInt("u_VerticesCount", polygon.Vertices2D.Length);
+            cutComputer.SetUniformVector3("u_FitPlaneNormal", polygon.FitPlaneNormal);
+            cutComputer.SetUniformVector3("u_FitCenter", polygon.FitCenter);
+            cutComputer.SetUniformVector3("u_UAixs", polygon.UAxis);
+            cutComputer.SetUniformVector3("u_VAixs", polygon.VAxis);
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
