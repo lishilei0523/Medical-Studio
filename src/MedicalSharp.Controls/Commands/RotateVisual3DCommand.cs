@@ -104,6 +104,7 @@ namespace MedicalSharp.Controls.Commands
                     this._selectedVisual.Transform.Rotate(deltaX, axisY);
                     this._selectedVisual.Transform.Rotate(deltaY, axisX);
 
+                    //请求下一帧
                     viewport.RequestNextFrameRendering();
 
                     this._mousePos2D = mousePos2D;

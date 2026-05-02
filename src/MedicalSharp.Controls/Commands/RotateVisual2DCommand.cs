@@ -90,6 +90,7 @@ namespace MedicalSharp.Controls.Commands
                     Vector3 axis = viewport.Camera.LookDirection.Normalized();
                     this._selectedVisual.Transform.Rotate(deltaY, axis);
 
+                    //请求下一帧
                     viewport.RequestNextFrameRendering();
 
                     this._mousePos2D = mousePos2D;
