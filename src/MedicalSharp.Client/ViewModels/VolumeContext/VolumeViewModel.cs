@@ -17,8 +17,6 @@ using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using System;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
@@ -109,21 +107,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #endregion
 
         #region # 方法
-
-        //Initializations
-
-        #region 初始化 —— override Task OnInitializedAsync(CancellationToken...
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override Task OnInitializedAsync(CancellationToken cancellationToken)
-        {
-            return base.OnInitializedAsync(cancellationToken);
-        }
-        #endregion
-
-
-        //Actions
 
         #region 拾取体素 —— void PickVoxel()
         /// <summary>

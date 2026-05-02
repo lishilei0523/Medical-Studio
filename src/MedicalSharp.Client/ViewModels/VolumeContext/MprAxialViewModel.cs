@@ -1,10 +1,10 @@
 ﻿using Caliburn.Micro;
+using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
-using SD.IOC.Core.Mediators;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,9 +29,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             this._windowManager = windowManager;
 
-            this.MprViewModel = ResolveMediator.Resolve<MprViewModel>();
-            this.MprViewModel.Title = "MPR-Axial";
-            this.MprViewModel.Camera = new MPRCamera();
+            const string title = "MPR-Axial";
+            MPRCamera camera = new MPRCamera();
+            MPRInputManager inputManager = new MPRInputManager(camera);
+            this.MprViewModel = new MprViewModel(windowManager, title, camera, inputManager);
         }
 
         #endregion
