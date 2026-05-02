@@ -28,7 +28,7 @@ namespace MedicalSharp.Engine.Algorithms
             }
             if (!renderable.VolumeData.TryBeginGpuToCpu())
             {
-                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.SyncStatus}\"");
+                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.MarkSyncStatus}\"");
             }
 
             #endregion
@@ -76,7 +76,7 @@ namespace MedicalSharp.Engine.Algorithms
             }
             if (!renderable.VolumeData.TryBeginGpuToCpu())
             {
-                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.SyncStatus}\"");
+                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.MarkSyncStatus}\"");
             }
 
             #endregion
@@ -125,7 +125,7 @@ namespace MedicalSharp.Engine.Algorithms
             }
             if (!renderable.VolumeData.TryBeginCpuToGpu())
             {
-                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.SyncStatus}\"");
+                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.MarkSyncStatus}\"");
             }
 
             #endregion
@@ -166,7 +166,7 @@ namespace MedicalSharp.Engine.Algorithms
             }
             if (!renderable.VolumeData.TryBeginCpuToGpu())
             {
-                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.SyncStatus}\"");
+                throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.MarkSyncStatus}\"");
             }
 
             #endregion

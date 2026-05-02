@@ -56,34 +56,34 @@ namespace MedicalSharp.Primitives.Models
         public abstract IntPtr MarkData { get; }
         #endregion
 
-        #region 只读属性 - 同步状态 —— MarkSyncStatus SyncStatus
+        #region 只读属性 - 标记同步状态 —— MarkSyncStatus MarkSyncStatus
         /// <summary>
-        /// 只读属性 - 同步状态
+        /// 只读属性 - 标记同步状态
         /// </summary>
-        public MarkSyncStatus SyncStatus
+        public MarkSyncStatus MarkSyncStatus
         {
             get => (MarkSyncStatus)Interlocked.CompareExchange(ref this._syncStatus, 0, 0);
         }
         #endregion
 
-        #region 只读属性 - 是否可安全读取 —— bool CanReadMarkData
+        #region 只读属性 - 是否可读取标记 —— bool CanReadMarkData
         /// <summary>
-        /// 只读属性 - 是否可安全读取
+        /// 只读属性 - 是否可读取标记
         /// </summary>
         public bool CanReadMarkData
         {
-            get => this.SyncStatus == MarkSyncStatus.Idle;
+            get => this.MarkSyncStatus == MarkSyncStatus.Idle;
         }
 
         #endregion
 
-        #region 只读属性 - 是否可安全写入 —— bool CanWriteMarkData
+        #region 只读属性 - 是否可写入标记 —— bool CanWriteMarkData
         /// <summary>
-        /// 只读属性 - 是否可安全写入
+        /// 只读属性 - 是否可写入标记
         /// </summary>
         public bool CanWriteMarkData
         {
-            get => this.SyncStatus == MarkSyncStatus.Idle;
+            get => this.MarkSyncStatus == MarkSyncStatus.Idle;
         }
         #endregion
 
@@ -152,7 +152,7 @@ namespace MedicalSharp.Primitives.Models
             //调试模式下检查状态（Release时可移除）
             if (previous != (int)MarkSyncStatus.Idle)
             {
-                string message = $"同步状态异常：当前状态为 {this.SyncStatus}，无法开始GPU->CPU同步。这通常是由于UI层未正确防止重复操作所致。";
+                string message = $"同步状态异常：当前状态为 {this.MarkSyncStatus}，无法开始GPU->CPU同步。这通常是由于UI层未正确防止重复操作所致。";
                 throw new InvalidOperationException(message);
             }
 #endif
@@ -171,7 +171,7 @@ namespace MedicalSharp.Primitives.Models
             //调试模式下检查状态（Release 时可移除）
             if (previous != (int)MarkSyncStatus.Idle)
             {
-                string message = $"同步状态异常：当前状态为 {this.SyncStatus}，无法开始CPU->GPU同步。这通常是由于UI层未正确防止重复操作所致。";
+                string message = $"同步状态异常：当前状态为 {this.MarkSyncStatus}，无法开始CPU->GPU同步。这通常是由于UI层未正确防止重复操作所致。";
                 throw new InvalidOperationException(message);
             }
 #endif
