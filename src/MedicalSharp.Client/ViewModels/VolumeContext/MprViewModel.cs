@@ -202,7 +202,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Resize()
         {
-            ResizeVisual3DCommand command = new ResizeVisual3DCommand();
+            ResizeVisual2DCommand command = new ResizeVisual2DCommand();
             this.InputManager.SwitchCommand(command);
         }
         #endregion

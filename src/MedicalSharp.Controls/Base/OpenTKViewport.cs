@@ -158,6 +158,16 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
+        #region 只读属性 - 视口尺寸 —— PixelSize ViewportSize
+        /// <summary>
+        /// 只读属性 - 视口尺寸
+        /// </summary>
+        public PixelSize ViewportSize
+        {
+            get => this._viewportSize;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法

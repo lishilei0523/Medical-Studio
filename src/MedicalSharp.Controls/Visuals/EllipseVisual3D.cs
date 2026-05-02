@@ -16,7 +16,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 椭圆形3D元素
     /// </summary>
-    public class EllipseVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable, IRotatable, IResizable3D, ICutVolume
+    public class EllipseVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable, IRotatable, IResizable2D, IResizable3D, ICutVolume
     {
         #region # 字段及构造器
 
@@ -57,6 +57,21 @@ namespace MedicalSharp.Controls.Visuals
             NormalProperty.Changed.AddClassHandler<EllipseVisual3D, Vector3D>(OnNormalChanged);
         }
 
+
+        /// <summary>
+        /// 起始位置（UV空间）
+        /// </summary>
+        private Vector2 _startPos2D;
+
+        /// <summary>
+        /// 起始宽度
+        /// </summary>
+        private float _startWidth;
+
+        /// <summary>
+        /// 起始高度
+        /// </summary>
+        private float _startHeight;
 
         /// <summary>
         /// 默认构造器
@@ -170,6 +185,39 @@ namespace MedicalSharp.Controls.Visuals
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
                 this.BuildBasis();
             }
+        }
+        #endregion
+
+        #region 开始调整尺寸 —— void BeginResize(Vector2 startPos2D)
+        /// <summary>
+        /// 开始调整尺寸
+        /// </summary>
+        /// <param name="startPos2D">起始位置（UV空间）</param>
+        public void BeginResize(Vector2 startPos2D)
+        {
+            this._startPos2D = startPos2D;
+            this._startWidth = this.Width;
+            this._startHeight = this.Height;
+        }
+        #endregion
+
+        #region 适用调整尺寸 —— void ApplyResize(Vector2 currentPos2D)
+        /// <summary>
+        /// 适用调整尺寸
+        /// </summary>
+        /// <param name="currentPos2D">当前位置（UV空间）</param>
+        public void ApplyResize(Vector2 currentPos2D)
+        {
+            float deltaX = currentPos2D.X - this._startPos2D.X;
+            float deltaY = this._startPos2D.Y - currentPos2D.Y;
+
+            //水平移动 -> 改变宽度
+            float width = this._startWidth + deltaX;
+            this.Width = Math.Max(width, 0.02f);
+
+            //垂直移动 -> 改变高度
+            float height = this._startHeight + deltaY;
+            this.Height = Math.Max(height, 0.02f);
         }
         #endregion
 

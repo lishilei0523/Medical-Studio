@@ -1,8 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Input;
+﻿using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
-using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
@@ -11,23 +10,29 @@ using OpenTK.Mathematics;
 namespace MedicalSharp.Controls.Commands
 {
     /// <summary>
-    /// 旋转2D元素命令
+    /// 调整2D元素尺寸命令
     /// </summary>
     /// <remarks>MPR视图使用</remarks>
-    public class RotateVisual2DCommand : ViewportCommand
+    public class ResizeVisual2DCommand : ViewportCommand
     {
         #region # 字段及构造器
 
         /// <summary>
-        /// 选中的3D元素
+        /// MPR平面
         /// </summary>
-        private IRotatable _selectedVisual;
+        private MPRPlane _mprPlane;
 
         /// <summary>
-        /// 创建旋转2D元素命令构造器
+        /// 选中的3D元素
         /// </summary>
-        public RotateVisual2DCommand()
+        private IResizable2D _selectedVisual;
+
+        /// <summary>
+        /// 创建调整2D图形尺寸命令构造器
+        /// </summary>
+        public ResizeVisual2DCommand()
         {
+            this._mprPlane = null;
             this._selectedVisual = null;
         }
 
@@ -48,13 +53,21 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
             base.OnMouseDown(viewport, eventArgs);
-            if (eventArgs.Properties.IsLeftButtonPressed && viewport is IPickVisual3D pickVisual3D)
+            if (eventArgs.Properties.IsLeftButtonPressed && viewport is MPRViewport mprViewport)
             {
-                Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = pickVisual3D.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out _);
-                if (success && visual3D is IRotatable rotatable)
+                //获取MPR平面
+                this._mprPlane = mprViewport.Plane;
+
+                //获取鼠标在平面上的UV坐标
+                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2? planeUV = this._mprPlane.ScreenToPlaneUV(mousePos2D, mprViewport.Camera.LookDirection, mprViewport.ViewportSize.ToVector2(), mprViewport.Camera.ProjectionMatrix, mprViewport.Camera.ViewMatrix, out _);
+                if (planeUV.HasValue && mprViewport.FindNearest(mousePos2D, out _, out _, out Visual3D visual3D, out _))
                 {
-                    this._selectedVisual = rotatable;
+                    if (visual3D is IResizable2D resizable2D)
+                    {
+                        this._selectedVisual = resizable2D;
+                        this._selectedVisual.BeginResize(planeUV.Value);
+                    }
                 }
             }
         }
@@ -67,34 +80,20 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
             base.OnMouseMove(viewport, eventArgs);
-            if (eventArgs.Properties.IsLeftButtonPressed && this._selectedVisual != null)
+            if (eventArgs.Properties.IsLeftButtonPressed && this._selectedVisual != null && viewport is MPRViewport mprViewport)
             {
-                //计算模型位置
-                Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
-                Vector3 localCenter = this._selectedVisual.Bounds.Center;
-                Vector3 worldCenter = Vector3.TransformPosition(localCenter, modelMatrix);
+                //设置光标
+                viewport.Cursor = new Cursor(StandardCursorType.Cross);
 
-                //获取鼠标射线
+                //获取鼠标在平面上的UV坐标
                 Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
-                Ray ray = viewport.UnProject(mousePos2D);
-
-                //移动平面上的交点
-                bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out _, out _);
-                if (success)
+                Vector2? planeUV = this._mprPlane.ScreenToPlaneUV(mousePos2D, mprViewport.Camera.LookDirection, mprViewport.ViewportSize.ToVector2(), mprViewport.Camera.ProjectionMatrix, mprViewport.Camera.ViewMatrix, out _);
+                if (planeUV.HasValue)
                 {
-                    float deltaY = mousePos2D.Y - this._mousePos2D!.Value.Y;
-
-                    //设置光标
-                    viewport.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
-
-                    //旋转轴
-                    Vector3 axis = viewport.Camera.LookDirection.Normalized();
-                    this._selectedVisual.Transform.Rotate(deltaY, axis);
+                    this._selectedVisual.ApplyResize(planeUV.Value);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
-
-                    this._mousePos2D = mousePos2D;
                 }
             }
         }
@@ -112,12 +111,13 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //清空选中
+            this._mprPlane = null;
             this._selectedVisual = null;
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
-        #endregion 
+        #endregion
 
         #endregion
     }

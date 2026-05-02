@@ -118,6 +118,8 @@ namespace MedicalSharp.Controls.Commands
                         if (localRay.IntersectsPlane(resizeContext.Anchor, planeNormal, out Vector3 localHitPoint, out _))
                         {
                             this._selectedVisual.ApplyResize(resizeContext, localHitPoint);
+
+                            //请求下一帧
                             viewport.RequestNextFrameRendering();
                         }
                     }

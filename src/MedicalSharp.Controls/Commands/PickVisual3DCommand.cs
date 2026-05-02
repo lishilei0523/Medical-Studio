@@ -192,11 +192,19 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void ApplyTint(OpenTKViewport viewport)
         {
-            if (viewport is VolumeViewport volumeViewport && this._selectedVisual is ICutVolume cutVolume)
+            if (this._selectedVisual is ICutVolume cutVolume)
             {
                 byte markValue = this.GetMarkValue?.Invoke() ?? 1;
-                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
-                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Tinted);
+                if (viewport is VolumeViewport volumeViewport)
+                {
+                    cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
+                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Tinted);
+                }
+                if (viewport is MPRViewport mprViewport)
+                {
+                    cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, CutMode.Inside, markValue);
+                    mprViewport.MPRRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Tinted);
+                }
 
                 //请求下一帧
                 viewport.RequestNextFrameRendering();
@@ -210,11 +218,19 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void ApplyCutInside(OpenTKViewport viewport)
         {
-            if (viewport is VolumeViewport volumeViewport && this._selectedVisual is ICutVolume cutVolume)
+            if (this._selectedVisual is ICutVolume cutVolume)
             {
                 byte markValue = this.GetMarkValue?.Invoke() ?? 1;
-                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
-                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
+                if (viewport is VolumeViewport volumeViewport)
+                {
+                    cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
+                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
+                }
+                if (viewport is MPRViewport mprViewport)
+                {
+                    cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, CutMode.Inside, markValue);
+                    mprViewport.MPRRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
+                }
 
                 //请求下一帧
                 viewport.RequestNextFrameRendering();
@@ -228,11 +244,19 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void ApplyCutOutSide(OpenTKViewport viewport)
         {
-            if (viewport is VolumeViewport volumeViewport && this._selectedVisual is ICutVolume cutVolume)
+            if (this._selectedVisual is ICutVolume cutVolume)
             {
                 byte markValue = this.GetMarkValue?.Invoke() ?? 1;
-                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.OutSide, markValue);
-                volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
+                if (viewport is VolumeViewport volumeViewport)
+                {
+                    cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.OutSide, markValue);
+                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
+                }
+                if (viewport is MPRViewport mprViewport)
+                {
+                    cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, CutMode.OutSide, markValue);
+                    mprViewport.MPRRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
+                }
 
                 //请求下一帧
                 viewport.RequestNextFrameRendering();

@@ -28,7 +28,7 @@ namespace MedicalSharp.Primitives.Interfaces
         bool TryGetResizeAxis(Ray localRay, out ResizeContext3D resizeContext);
 
         /// <summary>
-        /// 应用调整尺寸
+        /// 适用调整尺寸
         /// </summary>
         /// <param name="resizeContext">调整尺寸上下文</param>
         /// <param name="localHitPoint">命中点（局部空间）</param>
