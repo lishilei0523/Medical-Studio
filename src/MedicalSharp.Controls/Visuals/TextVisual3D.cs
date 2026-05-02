@@ -169,6 +169,16 @@ namespace MedicalSharp.Controls.Visuals
         public TextRenderable Renderable { get; protected set; }
         #endregion
 
+        #region 只读属性 - 平面上一点 —— Vector3D PointOnPlane
+        /// <summary>
+        /// 只读属性 - 平面上一点
+        /// </summary>
+        public Vector3D PointOnPlane
+        {
+            get => this.Position;
+        }
+        #endregion
+
         #region 只读属性 - 变换 —— override Transform Transform
         /// <summary>
         /// 只读属性 - 变换

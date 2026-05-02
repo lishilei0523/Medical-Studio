@@ -143,6 +143,16 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 只读属性 - 平面上一点 —— Vector3D PointOnPlane
+        /// <summary>
+        /// 只读属性 - 平面上一点
+        /// </summary>
+        public Vector3D PointOnPlane
+        {
+            get => this.Center;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法

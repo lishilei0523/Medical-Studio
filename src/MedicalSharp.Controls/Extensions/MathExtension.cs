@@ -121,18 +121,19 @@ namespace MedicalSharp.Controls.Extensions
         /// <param name="plane">MPR平面</param>
         /// <param name="epsilon">容差</param>
         /// <returns>是否在MPR平面上</returns>
-        public static bool IsOnPlane(this Visual3D visual3D, MPRPlane plane, float epsilon = 0.002f)
+        public static bool IsOnPlane(this Visual3D visual3D, MPRPlane plane, float epsilon = 0.001f)
         {
             if (visual3D is ILineBasedVisual3D)
             {
                 return true;
             }
-            if (visual3D is PointVisual3D)
+            if (visual3D is PointVisual3D pointVisual3D)
             {
-                float shapeDist = Vector3.Dot(visual3D.Transform.Position, plane.Normal);
-                float planeDist = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
+                float shapeDistance = Vector3.Dot(pointVisual3D.Position.ToVector3(), plane.Normal);
+                float planeDistance = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
+                float diffDistance = Math.Abs(shapeDistance - planeDistance);
 
-                return Math.Abs(shapeDist - planeDist) < epsilon;
+                return diffDistance < epsilon;
             }
             if (visual3D is IVisual2DIn3D visual2DIn3D)
             {
@@ -141,10 +142,11 @@ namespace MedicalSharp.Controls.Extensions
                     return false;
                 }
 
-                float shapeDist = Vector3.Dot(visual3D.Transform.Position, plane.Normal);
-                float planeDist = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
+                float shapeDistance = Vector3.Dot(visual2DIn3D.PointOnPlane.ToVector3(), plane.Normal);
+                float planeDistance = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
+                float diffDistance = Math.Abs(shapeDistance - planeDistance);
 
-                return Math.Abs(shapeDist - planeDist) < epsilon;
+                return diffDistance < epsilon;
             }
 
             //TODO 3D图形求切面

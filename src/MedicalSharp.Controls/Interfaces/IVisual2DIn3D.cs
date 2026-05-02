@@ -11,5 +11,10 @@ namespace MedicalSharp.Controls.Interfaces
         /// 法向量
         /// </summary>
         Vector3D Normal { get; }
+
+        /// <summary>
+        /// 平面上一点
+        /// </summary>
+        Vector3D PointOnPlane { get; }
     }
 }
