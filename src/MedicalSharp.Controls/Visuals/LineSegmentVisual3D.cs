@@ -12,7 +12,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 线段3D元素
     /// </summary>
-    public class LineSegmentVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IVertexEditable
+    public class LineSegmentVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable, IVertexEditable
     {
         #region # 字段及构造器
 
