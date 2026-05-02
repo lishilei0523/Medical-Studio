@@ -159,7 +159,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 尝试获取伸缩方向 —— bool TryGetResizeAxis(Ray localRay, out ResizeContext resizeContext)
+        #region 尝试获取伸缩方向 —— bool TryGetResizeAxis(Ray localRay, out ResizeContext3D resizeContext)
         /// <summary>
         /// 尝试获取伸缩方向
         /// </summary>
@@ -193,7 +193,7 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 适用调整尺寸 —— void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
+        #region 适用调整尺寸 —— void ApplyResize(ResizeContext3D resizeContext, Vector3 localHitPoint)
         /// <summary>
         /// 适用调整尺寸
         /// </summary>
