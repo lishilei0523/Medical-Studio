@@ -29,11 +29,6 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<MPRPlane> PlaneProperty;
 
         /// <summary>
-        /// 相机依赖属性
-        /// </summary>
-        public new static readonly StyledProperty<MPRCamera> CameraProperty;
-
-        /// <summary>
         /// 窗宽依赖属性
         /// </summary>
         public static readonly StyledProperty<float> WindowWidthProperty;
@@ -64,7 +59,6 @@ namespace MedicalSharp.Controls.Viewports
         static MPRViewport()
         {
             PlaneProperty = AvaloniaProperty.Register<MPRViewport, MPRPlane>(nameof(Plane));
-            CameraProperty = AvaloniaProperty.Register<MPRViewport, MPRCamera>(nameof(Camera));
             WindowWidthProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(WindowWidth), 400.0f);
             WindowCenterProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(WindowCenter), 40.0f);
             BrightnessProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Brightness), 1.0f);
@@ -110,17 +104,6 @@ namespace MedicalSharp.Controls.Viewports
         {
             get => this.GetValue(PlaneProperty);
             set => this.SetValue(PlaneProperty, value);
-        }
-        #endregion
-
-        #region 依赖属性 - 相机 —— new MPRCamera Camera
-        /// <summary>
-        /// 依赖属性 - 相机
-        /// </summary>
-        public new MPRCamera Camera
-        {
-            get => this.GetValue(CameraProperty);
-            set => this.SetValue(CameraProperty, value);
         }
         #endregion
 
@@ -179,7 +162,17 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 只读属性 - MPR渲染器 —— MPRRenderer2 MPRRenderer
+        #region 只读属性 - MPR相机 —— MPRCamera MPRCamera
+        /// <summary>
+        /// 只读属性 - MPR相机
+        /// </summary>
+        public MPRCamera MPRCamera
+        {
+            get => (MPRCamera)this.Camera;
+        }
+        #endregion
+
+        #region 只读属性 - MPR渲染器 —— MPRRenderer MPRRenderer
         /// <summary>
         /// 只读属性 - MPR渲染器
         /// </summary>
@@ -194,6 +187,24 @@ namespace MedicalSharp.Controls.Viewports
         #region # 方法
 
         //Public
+
+        #region 反投影 —— override Ray UnProject(Vector2 screenPos2D)
+        /// <summary>
+        /// 反投影
+        /// </summary>
+        /// <param name="screenPos2D">屏幕2D位置</param>
+        /// <returns>射线</returns>
+        public override Ray UnProject(Vector2 screenPos2D)
+        {
+            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(screenPos2D, this.Camera.LookDirection, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, out Ray ray);
+            if (planeUV.HasValue)
+            {
+                return ray;
+            }
+
+            return base.UnProject(screenPos2D);
+        }
+        #endregion
 
         #region 查找最近体素 —— bool FindNearestVoxel(Vector2 position, out Vector3 textureCoord...
         /// <summary>
@@ -221,8 +232,8 @@ namespace MedicalSharp.Controls.Viewports
             if (planeUV.HasValue)
             {
                 voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y, out Vector3 texCoord);
-                worldPosition = (texCoord - new Vector3(0.5f)) * this.VolumeData.Metadata.VolumeScale;
                 textureCoord = texCoord;
+                worldPosition = (textureCoord - new Vector3(0.5f)) * this.VolumeData.Metadata.VolumeScale;
                 voxelValue = this.VolumeData[voxelPosition.X, voxelPosition.Y, voxelPosition.Z];
                 markValue = this.VolumeData.GetMarkValue(voxelPosition.X, voxelPosition.Y, voxelPosition.Z);
 
@@ -262,15 +273,15 @@ namespace MedicalSharp.Controls.Viewports
             //InputManger默认值
             if (this.InputManager == null)
             {
-                this.InputManager = new MPRInputManager(this.Camera);
+                this.InputManager = new MPRInputManager(this.MPRCamera);
             }
 
             //初始化形状、文本渲染器
-            this._shapeRenderer = new ShapeRenderer(this.Camera);
-            this._textRenderer = new TextRenderer(this.Camera);
+            this._shapeRenderer = new ShapeRenderer(this.MPRCamera);
+            this._textRenderer = new TextRenderer(this.MPRCamera);
 
             //初始化MPR渲染器
-            this._mprRenderer = new MPRRenderer(this.Camera);
+            this._mprRenderer = new MPRRenderer(this.MPRCamera);
             this._mprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._mprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
         }

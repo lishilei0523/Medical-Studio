@@ -2,7 +2,6 @@
 using Avalonia.Collections;
 using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
-using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visuals;
@@ -109,7 +108,7 @@ namespace MedicalSharp.Controls.Viewports
         {
             this.GlContext.MakeCurrent();
 
-            ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            ray = this.UnProject(position);
 
             //快速检测
             IDictionary<Visual3D, float> hitResults = new Dictionary<Visual3D, float>();
