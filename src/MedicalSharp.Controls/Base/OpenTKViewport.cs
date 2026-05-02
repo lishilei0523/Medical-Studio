@@ -24,6 +24,11 @@ namespace MedicalSharp.Controls.Base
         #region # 字段及构造器
 
         /// <summary>
+        /// 帧令牌依赖属性
+        /// </summary>
+        public static readonly StyledProperty<int> FrameTokenProperty;
+
+        /// <summary>
         /// 背景颜色依赖属性
         /// </summary>
         public static readonly StyledProperty<Color> BackgroundProperty;
@@ -43,10 +48,15 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         static OpenTKViewport()
         {
+            FrameTokenProperty = AvaloniaProperty.Register<OpenTKViewport, int>(nameof(FrameToken));
             BackgroundProperty = AvaloniaProperty.Register<OpenTKViewport, Color>(nameof(Background), Colors.Black);
             CameraProperty = AvaloniaProperty.Register<OpenTKViewport, Camera>(nameof(Camera));
             InputManagerProperty = AvaloniaProperty.Register<OpenTKViewport, IInputManager>(nameof(InputManager));
+
+            //属性改变事件
+            FrameTokenProperty.Changed.AddClassHandler<OpenTKViewport, int>(OnFrameTokenChanged);
         }
+
 
         /// <summary>
         /// FBO
@@ -81,6 +91,17 @@ namespace MedicalSharp.Controls.Base
         #endregion
 
         #region # 属性
+
+        #region 依赖属性 - 帧令牌 —— int FrameToken
+        /// <summary>
+        /// 依赖属性 - 帧令牌
+        /// </summary>
+        public int FrameToken
+        {
+            get => this.GetValue(FrameTokenProperty);
+            set => this.SetValue(FrameTokenProperty, value);
+        }
+        #endregion
 
         #region 依赖属性 - 背景颜色 —— Color Background
         /// <summary>
@@ -352,6 +373,17 @@ namespace MedicalSharp.Controls.Base
             base.OnKeyUp(eventArgs);
 
             this.InputManager.OnKeyUp(this, eventArgs);
+        }
+        #endregion
+
+        #region 帧令牌改变事件 —— static void OnFrameTokenChanged(OpenTKViewport viewport...
+        /// <summary>
+        /// 帧令牌改变事件
+        /// </summary>
+        private static void OnFrameTokenChanged(OpenTKViewport viewport, AvaloniaPropertyChangedEventArgs<int> eventArgs)
+        {
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
