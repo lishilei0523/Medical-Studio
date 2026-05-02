@@ -150,6 +150,12 @@ namespace MedicalSharp.Insight
             volumeData.Metadata.ColDirection = new Vector3((float)direction[3], (float)direction[4], (float)direction[5]);
             volumeData.Metadata.SliceDirection = new Vector3((float)direction[6], (float)direction[7], (float)direction[8]);
 
+            //获取SeriesInstanceUId
+            if (image.HasMetaDataKey(DicomTags.SeriesInstanceUID))
+            {
+                volumeData.Metadata.SeriesInstanceUId = image.GetMetaData(DicomTags.SeriesInstanceUID);
+            }
+
             //获取窗宽窗位
             if (image.HasMetaDataKey(DicomTags.WindowWidth))
             {

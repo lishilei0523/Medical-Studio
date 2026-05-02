@@ -28,6 +28,13 @@ namespace MedicalSharp.Primitives.Models
         public string Id { get; private set; }
         #endregion
 
+        #region 序列实例UID —— string SeriesInstanceUId
+        /// <summary>
+        /// 序列实例UID
+        /// </summary>
+        public string SeriesInstanceUId { get; set; }
+        #endregion
+
         #region 体素数量 —— long VoxelsCount
         /// <summary>
         /// 体素数量
