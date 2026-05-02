@@ -25,6 +25,12 @@ namespace MedicalSharp.Engine.Resources
 
         #endregion
 
+        #region # 属性
+
+        //
+
+        #endregion
+
         #region # 方法
 
         //Static

@@ -39,8 +39,9 @@ namespace MedicalSharp.Engine.Resources
         /// 读取帧缓冲区
         /// </summary>
         /// <param name="frameBuffer">帧缓冲区(null表示读取默认帧缓冲)</param>
+        /// <param name="defaultFrameBufferId">默认帧缓冲区Id</param>
         /// <param name="useFence">是否使用栅栏同步</param>
-        public void ReadFrameBuffer(FrameBuffer frameBuffer, bool useFence = true)
+        public void ReadFrameBuffer(FrameBuffer frameBuffer, int defaultFrameBufferId = 0, bool useFence = true)
         {
             //绑定帧缓冲区
             if (frameBuffer != null)
@@ -49,7 +50,7 @@ namespace MedicalSharp.Engine.Resources
             }
             else
             {
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, defaultFrameBufferId);
             }
 
             this.Bind();

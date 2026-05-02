@@ -6,10 +6,12 @@ using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Managers;
+using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using SkiaSharp;
 using System;
 using System.Reflection;
 using IInputManager = MedicalSharp.Controls.Interfaces.IInputManager;
@@ -170,6 +172,43 @@ namespace MedicalSharp.Controls.Base
         {
             return point.X >= 0 && point.X <= this.Bounds.Width &&
                    point.Y >= 0 && point.Y <= this.Bounds.Height;
+        }
+        #endregion
+
+        #region 截屏 —— SKBitmap Capture()
+        /// <summary>
+        /// 截屏
+        /// </summary>
+        /// <returns>截屏图像</returns>
+        public SKBitmap Capture()
+        {
+            int width = this._viewportSize.Width;
+            int height = this._viewportSize.Height;
+            using ReadPixelBuffer2D pixelBuffer = new ReadPixelBuffer2D(width, height);
+            pixelBuffer.ReadFrameBuffer(null, this.FrameBufferId);
+            byte[] buffer = pixelBuffer.GetCpuBuffer();
+
+            SKBitmap bitmap = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+            IntPtr pixels = bitmap.GetPixels();
+            unsafe
+            {
+                byte* targetPtr = (byte*)pixels.ToPointer();
+                fixed (byte* sourcePtr = buffer)
+                {
+                    int stride = width * 4;
+                    for (int y = 0; y < height; y++)
+                    {
+                        int srcY = height - 1 - y;  //翻转Y轴
+                        byte* srcRow = sourcePtr + srcY * stride;
+                        byte* dstRow = targetPtr + y * stride;
+
+                        //复制整行（RGB -> RGBA，顺序相同）
+                        System.Buffer.MemoryCopy(srcRow, dstRow, stride, stride);
+                    }
+                }
+            }
+
+            return bitmap;
         }
         #endregion
 
