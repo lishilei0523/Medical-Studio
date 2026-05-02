@@ -81,20 +81,21 @@
 						Camera="{Binding Camera}"
 						InputManager="{Binding InputManager}"
 						VolumeData="{Binding VolumeData}">
+            <sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
 			<!--Axial Tests-->
-			<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />
-			<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="0,0,1" />
-			<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="0,0,1" />
+			<!--<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />-->
+			<!--<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="0,0,1" />-->
+			<!--<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="0,0,1" />-->
 
 			<!--Coronal Tests-->
-			<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />
-			<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="0,1,0" />
-			<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="0,1,0" />
+			<!--<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />-->
+			<!--<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="0,1,0" />-->
+			<!--<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="0,1,0" />-->
 
 			<!--Sagittal Tests-->
-			<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />
-			<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="1,0,0" />
-			<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="1,0,0" />
+			<!--<sd:PointVisual3D Position="0,0,0" PointSize="5" Fill="Cyan" />-->
+			<!--<sd:RectangleVisual3D Width="0.3" Height="0.1" Center="0,0,0" Normal="1,0,0" />-->
+			<!--<sd:TextVisual3D Text="Hello World" Position="0,0,0" Color="Yellow" FontSize="14" RenderMode="Fixed" Normal="1,0,0" />-->
 		</sd:MPRViewport>
 	</sd:GroupBox>
 </UserControl>

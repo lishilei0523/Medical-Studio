@@ -1,8 +1,10 @@
-﻿using Avalonia.Collections;
+﻿using Avalonia;
+using Avalonia.Collections;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Commands.Arguments;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
@@ -39,6 +41,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Title = title;
             this.Camera = camera;
             this.InputManager = inputManager;
+
+            //默认值
+            this.Shapes = [];
             this.PickVoxel();
         }
 
@@ -165,6 +170,153 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             PickVisual3DCommand command = new PickVisual3DCommand(picked, removed);
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 平移 —— void Translate()
+        /// <summary>
+        /// 平移
+        /// </summary>
+        public void Translate()
+        {
+            TranslateVisual3DCommand command = new TranslateVisual3DCommand();
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 旋转 —— void Rotate()
+        /// <summary>
+        /// 旋转
+        /// </summary>
+        public void Rotate()
+        {
+            RotateVisual3DCommand command = new RotateVisual3DCommand();
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 调整尺寸 —— void Resize()
+        /// <summary>
+        /// 调整尺寸
+        /// </summary>
+        public void Resize()
+        {
+            ResizeVisual3DCommand command = new ResizeVisual3DCommand();
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 编辑顶点 —— void EditVertex()
+        /// <summary>
+        /// 编辑顶点
+        /// </summary>
+        public void EditVertex()
+        {
+            EditVertexCommand command = new EditVertexCommand();
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制点 —— void DrawPoint()
+        /// <summary>
+        /// 绘制点
+        /// </summary>
+        public void DrawPoint()
+        {
+            DrawPointCommand command = new DrawPointCommand(shape => this.Shapes.Add(shape));
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制线段 —— void DrawLineSegment()
+        /// <summary>
+        /// 绘制线段
+        /// </summary>
+        public void DrawLineSegment()
+        {
+            DrawLineSegmentCommand command = new DrawLineSegmentCommand(shape => this.Shapes.Add(shape));
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制矩形 —— void DrawRectangle()
+        /// <summary>
+        /// 绘制矩形
+        /// </summary>
+        public void DrawRectangle()
+        {
+            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            Action<ShapeVisual3D> ss = shape => this.Shapes.Add(shape);
+            DrawRectangleCommand command = new DrawRectangleCommand(ss, getNormal);
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制圆形 —— void DrawCircle()
+        /// <summary>
+        /// 绘制圆形
+        /// </summary>
+        public void DrawCircle()
+        {
+            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            DrawCircleCommand command = new DrawCircleCommand(shape => this.Shapes.Add(shape), getNormal);
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制椭圆形 —— void DrawEllipse()
+        /// <summary>
+        /// 绘制椭圆形
+        /// </summary>
+        public void DrawEllipse()
+        {
+            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            DrawEllipseCommand command = new DrawEllipseCommand(shape => this.Shapes.Add(shape), getNormal);
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制折线 —— void DrawPolyline()
+        /// <summary>
+        /// 绘制折线
+        /// </summary>
+        public void DrawPolyline()
+        {
+            DrawPolylineCommand command = new DrawPolylineCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape));
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制曲线 —— void DrawCurve()
+        /// <summary>
+        /// 绘制曲线
+        /// </summary>
+        public void DrawCurve()
+        {
+            DrawCurveCommand command = new DrawCurveCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape));
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制多边形 —— void DrawPolyline()
+        /// <summary>
+        /// 绘制多边形
+        /// </summary>
+        public void DrawPolygon()
+        {
+            DrawPolylineCommand command = new DrawPolylineCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape), true);
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 绘制闭合曲线 —— void DrawClosedCurve()
+        /// <summary>
+        /// 绘制闭合曲线
+        /// </summary>
+        public void DrawClosedCurve()
+        {
+            DrawCurveCommand command = new DrawCurveCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape), true);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
