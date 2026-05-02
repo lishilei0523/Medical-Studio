@@ -39,7 +39,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// <summary>
         /// 选中改变尺寸上下文
         /// </summary>
-        private ResizeContext? _selectedResizeContext;
+        private ResizeContext3D? _selectedResizeContext;
 
         /// <summary>
         /// 选中的顶点拖拽约束
@@ -179,9 +179,9 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
 
                     //可改变尺寸对象
-                    if (visual3D is IResizable resizable)
+                    if (visual3D is IResizable3D resizable)
                     {
-                        if (resizable.TryGetResizeAxis(localRay, out ResizeContext resizeContext))
+                        if (resizable.TryGetResizeAxis(localRay, out ResizeContext3D resizeContext))
                         {
                             this._selectedResizeContext = resizeContext;
                             this._selectedVertexConstraint = null;
@@ -238,10 +238,10 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
                     Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
 
                     //可调整尺寸类型
-                    if (this._selectedVisual is IResizable resizable && this._selectedResizeContext.HasValue)
+                    if (this._selectedVisual is IResizable3D resizable && this._selectedResizeContext.HasValue)
                     {
                         //构造平面法向量：包含伸缩轴，且面向相机
-                        ResizeContext resizeContext = this._selectedResizeContext.Value;
+                        ResizeContext3D resizeContext = this._selectedResizeContext.Value;
                         Vector3 planeNormal = Vector3.Cross(resizeContext.Axis, Vector3.Cross(localLookDirection, resizeContext.Axis));
                         if (planeNormal.LengthSquared < 0.001f)
                         {

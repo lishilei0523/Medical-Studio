@@ -16,7 +16,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 圆柱体3D元素
     /// </summary>
-    public class CylinderVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IResizable, ICutVolume
+    public class CylinderVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IResizable3D, ICutVolume
     {
         #region # 字段及构造器
 
@@ -179,7 +179,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 尝试获取伸缩方向
         /// </summary>
-        public bool TryGetResizeAxis(Ray localRay, out ResizeContext resizeContext)
+        public bool TryGetResizeAxis(Ray localRay, out ResizeContext3D resizeContext)
         {
             resizeContext = default;
             Vector3 center = this.Center.ToVector3();
@@ -237,7 +237,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 应用调整尺寸
         /// </summary>
-        public void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
+        public void ApplyResize(ResizeContext3D resizeContext, Vector3 localHitPoint)
         {
             Vector3 delta = localHitPoint - resizeContext.Anchor;
             float dotX = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitX));

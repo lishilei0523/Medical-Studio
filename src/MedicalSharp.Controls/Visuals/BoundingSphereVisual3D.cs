@@ -16,7 +16,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 包围球3D元素
     /// </summary>
-    public class BoundingSphereVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IResizable, ICutVolume
+    public class BoundingSphereVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IResizable3D, ICutVolume
     {
         #region # 字段及构造器
 
@@ -166,7 +166,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <param name="localRay">射线（局部空间）</param>
         /// <param name="resizeContext">调整尺寸上下文</param>
         /// <returns>是否成功</returns>
-        public bool TryGetResizeAxis(Ray localRay, out ResizeContext resizeContext)
+        public bool TryGetResizeAxis(Ray localRay, out ResizeContext3D resizeContext)
         {
             resizeContext = default;
             Vector3 center = this.Center.ToVector3();
@@ -199,7 +199,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         /// <param name="resizeContext">调整尺寸上下文</param>
         /// <param name="localHitPoint">命中点（局部空间）</param>
-        public void ApplyResize(ResizeContext resizeContext, Vector3 localHitPoint)
+        public void ApplyResize(ResizeContext3D resizeContext, Vector3 localHitPoint)
         {
             float newRadius = Vector3.Distance(resizeContext.Anchor, localHitPoint);
             this.Radius = Math.Max(newRadius, 0.01f);

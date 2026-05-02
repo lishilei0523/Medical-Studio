@@ -21,12 +21,12 @@ namespace MedicalSharp.Controls.Commands
         /// <summary>
         /// 选中的3D元素
         /// </summary>
-        private IResizable _selectedVisual;
+        private IResizable3D _selectedVisual;
 
         /// <summary>
         /// 选中改变尺寸上下文
         /// </summary>
-        private ResizeContext? _selectedResizeContext;
+        private ResizeContext3D? _selectedResizeContext;
 
         /// <summary>
         /// 创建调整3D元素尺寸命令构造器
@@ -58,12 +58,12 @@ namespace MedicalSharp.Controls.Commands
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
                 bool success = pickVisual3D.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out Ray ray);
-                if (success && visual3D is IResizable resizable)
+                if (success && visual3D is IResizable3D resizable)
                 {
                     Matrix4 modelMatrix = visual3D.Transform.Matrix;
                     Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
                     Ray localRay = ray.Transform(worldToLocal);
-                    if (resizable.TryGetResizeAxis(localRay, out ResizeContext resizeContext))
+                    if (resizable.TryGetResizeAxis(localRay, out ResizeContext3D resizeContext))
                     {
                         this._selectedVisual = resizable;
                         this._selectedResizeContext = resizeContext;
@@ -107,7 +107,7 @@ namespace MedicalSharp.Controls.Commands
                     if (this._selectedResizeContext.HasValue)
                     {
                         //构造平面法向量：包含伸缩轴，且面向相机
-                        ResizeContext resizeContext = this._selectedResizeContext.Value;
+                        ResizeContext3D resizeContext = this._selectedResizeContext.Value;
                         Vector3 planeNormal = Vector3.Cross(resizeContext.Axis, Vector3.Cross(localLookDirection, resizeContext.Axis));
                         if (planeNormal.LengthSquared < 0.001f)
                         {

@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
-    /// 调整尺寸上下文
+    /// 调整尺寸上下文(3D)
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct ResizeContext
+    public struct ResizeContext3D
     {
         /// <summary>
         /// 锚点
