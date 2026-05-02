@@ -26,7 +26,7 @@
                         <PathIcon Data="{StaticResource Icon-Translate}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Rotate()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-Rotate}" />
+                        <PathIcon Data="{StaticResource Icon-Rotate3D}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Resize()" Classes="Transparent-Panel">
                         <PathIcon Data="{StaticResource Icon-Resize}" />

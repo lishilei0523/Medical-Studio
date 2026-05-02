@@ -191,7 +191,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Rotate()
         {
-            RotateVisual3DCommand command = new RotateVisual3DCommand();
+            RotateVisual2DCommand command = new RotateVisual2DCommand();
             this.InputManager.SwitchCommand(command);
         }
         #endregion
