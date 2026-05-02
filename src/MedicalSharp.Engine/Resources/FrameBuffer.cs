@@ -12,6 +12,11 @@ namespace MedicalSharp.Engine.Resources
         #region # 字段及构造器
 
         /// <summary>
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
         /// 创建帧缓冲区构造器
         /// </summary>
         /// <param name="width">宽度</param>
@@ -178,9 +183,15 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Dispose()
         {
+            if (this._disposed)
+            {
+                return;
+            }
+
             GL.DeleteFramebuffer(this.Id);
             this.OutputTexture?.Dispose();
             this.DepthBuffer?.Dispose();
+            this._disposed = true;
         }
         #endregion
 

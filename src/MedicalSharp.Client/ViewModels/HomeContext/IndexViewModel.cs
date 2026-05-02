@@ -4,7 +4,6 @@ using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Client.ViewModels.ShapeContext;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Primitives.Interfaces;
-using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
@@ -181,13 +180,9 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 string dicomFolder = folders[0].Path.AbsolutePath;
                 VolumeData volumeData = await Task.Run(() => this._dicomLoader.LoadSeries(dicomFolder));
-                DicomManager.AddVolumeData(volumeData);
-
                 if (this.VolumeData != null)
                 {
-                    DicomManager.RemoveVolumeData(this.VolumeData.Metadata.Id);
-                    TextureManager.RemoveTexture3D(this.VolumeData.Metadata.Id);
-                    TextureManager.RemoveTexture3D(TextureManager.GetMarkTextureId(this.VolumeData.Metadata.Id));
+                    SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
                 }
 
                 this.VolumeData = volumeData;
@@ -213,9 +208,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             #endregion
 
-            DicomManager.RemoveVolumeData(this.VolumeData.Metadata.Id);
-            TextureManager.RemoveTexture3D(this.VolumeData.Metadata.Id);
-            TextureManager.RemoveTexture3D(TextureManager.GetMarkTextureId(this.VolumeData.Metadata.Id));
+            SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
+            this.VolumeData = null;
             this.LayoutViewModel.ClearVolumeData();
         }
         #endregion

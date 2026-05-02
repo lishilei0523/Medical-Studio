@@ -428,36 +428,22 @@ namespace MedicalSharp.Controls.Viewports
             #endregion
 
             VolumeData volumeData = eventArgs.NewValue.Value;
-            Texture3D volumeTexture;
-            Texture3D markTexture;
-            string markTextureId = TextureManager.GetMarkTextureId(volumeData.Metadata.Id);
-            if (!TextureManager.Texture3Ds.ContainsKey(volumeData.Metadata.Id))
+            VolumeSession volumeSession;
+            if (!SessionManager.VolumeSessions.ContainsKey(volumeData.Metadata.Id))
             {
                 viewport.GlContext.MakeCurrent();
-
-                //创建体积纹理
-                volumeTexture = Texture3D.CreateFromVolume(
-                   volumeData.Metadata.VolumeSize.X,
-                   volumeData.Metadata.VolumeSize.Y,
-                   volumeData.Metadata.VolumeSize.Z,
-                   volumeData.OriginalData);
-                TextureManager.AddTexture3D(volumeData.Metadata.Id, volumeTexture);
-
-                //创建标记纹理
-                markTexture = Texture3D.CreateFromMark(
-                    volumeData.Metadata.VolumeSize.X,
-                    volumeData.Metadata.VolumeSize.Y,
-                    volumeData.Metadata.VolumeSize.Z,
-                    volumeData.MarkData);
-                TextureManager.AddTexture3D(markTextureId, markTexture);
+                volumeSession = new VolumeSession(volumeData);
+                SessionManager.AddVolumeSession(volumeSession.Id, volumeSession);
             }
             else
             {
-                volumeTexture = TextureManager.Texture3Ds[volumeData.Metadata.Id];
-                markTexture = TextureManager.Texture3Ds[markTextureId];
+                volumeSession = SessionManager.VolumeSessions[volumeData.Metadata.Id];
             }
 
-            viewport._volumeRenderable = new VolumeRenderable(volumeTexture, markTexture, volumeData);
+            viewport._volumeRenderable = new VolumeRenderable(volumeSession.VolumeTexture, volumeSession.MarkTexture, volumeData);
+            viewport._mprRenderer.SetTransferFunction(volumeSession.MPRTransferFunction);
+            viewport._mprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
+            //viewport._mprRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints); TODO 伪彩
             if (volumeData.Metadata.WindowWidth.HasValue)
             {
                 viewport.WindowWidth = volumeData.Metadata.WindowWidth.Value;

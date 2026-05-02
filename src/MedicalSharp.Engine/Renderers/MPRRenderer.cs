@@ -47,8 +47,6 @@ namespace MedicalSharp.Engine.Renderers
             this.WindowCenter = 40;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
-            this.TransferFunction = new TransferFunction();
-            this.MarkStrategy = new MarkStrategy();
         }
 
         #endregion
@@ -87,7 +85,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 传递函数
         /// </summary>
-        public TransferFunction TransferFunction { get; }
+        public TransferFunction TransferFunction { get; private set; }
         #endregion
 
         #region 标记策略 —— MarkStrategy MarkStrategy
@@ -104,16 +102,6 @@ namespace MedicalSharp.Engine.Renderers
         public VolumeRenderable Renderable { get; private set; }
         #endregion
 
-        #region 只读属性 - MPR相机 —— MPRCamera MPRCamera
-        /// <summary>
-        /// 只读属性 - MPR相机
-        /// </summary>
-        public MPRCamera MPRCamera
-        {
-            get => base.Camera as MPRCamera;
-        }
-        #endregion
-
         #region 只读属性 - MPR平面 —— MPRPlane Plane
         /// <summary>
         /// 只读属性 - MPR平面
@@ -121,6 +109,16 @@ namespace MedicalSharp.Engine.Renderers
         public MPRPlane Plane
         {
             get => this._plane;
+        }
+        #endregion
+
+        #region 只读属性 - MPR相机 —— MPRCamera MPRCamera
+        /// <summary>
+        /// 只读属性 - MPR相机
+        /// </summary>
+        public MPRCamera MPRCamera
+        {
+            get => base.Camera as MPRCamera;
         }
         #endregion
 
@@ -187,6 +185,28 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
+        #region 设置传递函数 —— void SetTransferFunction(TransferFunction transferFunction)
+        /// <summary>
+        /// 设置传递函数
+        /// </summary>
+        /// <param name="transferFunction">传递函数</param>
+        public void SetTransferFunction(TransferFunction transferFunction)
+        {
+            this.TransferFunction = transferFunction;
+        }
+        #endregion
+
+        #region 设置标记策略 —— void SetMarkStrategy(MarkStrategy markStrategy)
+        /// <summary>
+        /// 设置标记策略
+        /// </summary>
+        /// <param name="markStrategy">标记策略</param>
+        public void SetMarkStrategy(MarkStrategy markStrategy)
+        {
+            this.MarkStrategy = markStrategy;
+        }
+        #endregion
+
         #region 设置渲染对象 —— void SetRenderable(VolumeRenderable renderable)
         /// <summary>
         /// 设置渲染对象
@@ -225,17 +245,25 @@ namespace MedicalSharp.Engine.Renderers
             {
                 return;
             }
+            if (this.Plane == null)
+            {
+                throw new InvalidOperationException("MPR平面不可为空！");
+            }
             if (this.Camera == null)
             {
-                throw new InvalidOperationException("相机不可为空！");
+                throw new InvalidOperationException("MPR相机不可为空！");
             }
-            if (this.Renderable?.VolumeTexture == null)
+            if (this.TransferFunction == null)
             {
-                return;
+                throw new InvalidOperationException("传递函数不可为空！");
             }
-            if (this._plane == null)
+            if (this.MarkStrategy == null)
             {
-                return;
+                throw new InvalidOperationException("标记策略不可为空！");
+            }
+            if (this.Renderable == null)
+            {
+                throw new InvalidOperationException("渲染对象不可为空！");
             }
 
             #endregion
@@ -311,9 +339,6 @@ namespace MedicalSharp.Engine.Renderers
             }
 
             this._unitPlane.Dispose();
-            this.TransferFunction.Dispose();
-            this.MarkStrategy.Dispose();
-
             this._disposed = true;
         }
         #endregion

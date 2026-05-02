@@ -41,8 +41,6 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
             this.RenderMode = VolumeRenderMode.Raycast;
-            this.TransferFunction = new TransferFunction();
-            this.MarkStrategy = new MarkStrategy();
         }
 
         #endregion
@@ -109,7 +107,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 传递函数
         /// </summary>
-        public TransferFunction TransferFunction { get; }
+        public TransferFunction TransferFunction { get; private set; }
         #endregion
 
         #region 标记策略 —— MarkStrategy MarkStrategy
@@ -184,6 +182,28 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
+        #region 设置传递函数 —— void SetTransferFunction(TransferFunction transferFunction)
+        /// <summary>
+        /// 设置传递函数
+        /// </summary>
+        /// <param name="transferFunction">传递函数</param>
+        public void SetTransferFunction(TransferFunction transferFunction)
+        {
+            this.TransferFunction = transferFunction;
+        }
+        #endregion
+
+        #region 设置标记策略 —— void SetMarkStrategy(MarkStrategy markStrategy)
+        /// <summary>
+        /// 设置标记策略
+        /// </summary>
+        /// <param name="markStrategy">标记策略</param>
+        public void SetMarkStrategy(MarkStrategy markStrategy)
+        {
+            this.MarkStrategy = markStrategy;
+        }
+        #endregion
+
         #region 设置渲染对象 —— void SetRenderable(VolumeRenderable renderable)
         /// <summary>
         /// 设置渲染对象
@@ -225,6 +245,18 @@ namespace MedicalSharp.Engine.Renderers
             if (this.Camera == null)
             {
                 throw new InvalidOperationException("相机不可为空！");
+            }
+            if (this.TransferFunction == null)
+            {
+                throw new InvalidOperationException("传递函数不可为空！");
+            }
+            if (this.MarkStrategy == null)
+            {
+                throw new InvalidOperationException("标记策略不可为空！");
+            }
+            if (this.Renderable == null)
+            {
+                throw new InvalidOperationException("渲染对象不可为空！");
             }
 
             #endregion
@@ -375,9 +407,6 @@ namespace MedicalSharp.Engine.Renderers
 
             this._pickFrameBuffer?.Dispose();
             this._unitCube.Dispose();
-            this.TransferFunction.Dispose();
-            this.MarkStrategy.Dispose();
-
             this._disposed = true;
         }
         #endregion
@@ -396,9 +425,25 @@ namespace MedicalSharp.Engine.Renderers
         {
             #region # 验证
 
-            if (this.Renderable == null)
+            if (viewportWidth <= 0 || viewportHeight <= 0)
             {
                 return;
+            }
+            if (this.Camera == null)
+            {
+                throw new InvalidOperationException("相机不可为空！");
+            }
+            if (this.TransferFunction == null)
+            {
+                throw new InvalidOperationException("传递函数不可为空！");
+            }
+            if (this.MarkStrategy == null)
+            {
+                throw new InvalidOperationException("标记策略不可为空！");
+            }
+            if (this.Renderable == null)
+            {
+                throw new InvalidOperationException("渲染对象不可为空！");
             }
 
             #endregion
