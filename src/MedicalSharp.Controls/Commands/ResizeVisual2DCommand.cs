@@ -6,6 +6,7 @@ using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -28,10 +29,17 @@ namespace MedicalSharp.Controls.Commands
         private IResizable2D _selectedVisual;
 
         /// <summary>
+        /// 调整尺寸结束事件
+        /// </summary>
+        private readonly Action<IResizable2D> _resizeEndEvent;
+
+        /// <summary>
         /// 创建调整2D图形尺寸命令构造器
         /// </summary>
-        public ResizeVisual2DCommand()
+        /// <param name="resizeEnd">调整尺寸结束回调</param>
+        public ResizeVisual2DCommand(Action<IResizable2D> resizeEnd)
         {
+            this._resizeEndEvent = resizeEnd;
             this._mprPlane = null;
             this._selectedVisual = null;
         }
@@ -109,6 +117,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //调整尺寸结束
+            this._resizeEndEvent?.Invoke(this._selectedVisual);
 
             //清空选中
             this._mprPlane = null;

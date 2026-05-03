@@ -8,6 +8,7 @@ using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -29,10 +30,17 @@ namespace MedicalSharp.Controls.Commands
         private ResizeContext3D? _selectedResizeContext;
 
         /// <summary>
+        /// 调整尺寸结束事件
+        /// </summary>
+        private readonly Action<IResizable3D> _resizeEndEvent;
+
+        /// <summary>
         /// 创建调整3D元素尺寸命令构造器
         /// </summary>
-        public ResizeVisual3DCommand()
+        /// <param name="resizeEnd">调整尺寸结束回调</param>
+        public ResizeVisual3DCommand(Action<IResizable3D> resizeEnd)
         {
+            this._resizeEndEvent = resizeEnd;
             this._selectedVisual = null;
             this._selectedResizeContext = null;
         }
@@ -138,6 +146,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //调整尺寸结束
+            this._resizeEndEvent?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

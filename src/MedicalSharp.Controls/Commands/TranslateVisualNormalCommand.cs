@@ -7,6 +7,7 @@ using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -23,10 +24,17 @@ namespace MedicalSharp.Controls.Commands
         private ITranslatable _selectedVisual;
 
         /// <summary>
+        /// 平移结束事件
+        /// </summary>
+        private readonly Action<ITranslatable> _translateEndEvent;
+
+        /// <summary>
         /// 创建沿法向量平移元素命令构造器
         /// </summary>
-        public TranslateVisualNormalCommand()
+        /// <param name="translateEnd">平移结束回调</param>
+        public TranslateVisualNormalCommand(Action<ITranslatable> translateEnd)
         {
+            this._translateEndEvent = translateEnd;
             this._selectedVisual = null;
         }
 
@@ -110,6 +118,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //平移结束
+            this._translateEndEvent?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

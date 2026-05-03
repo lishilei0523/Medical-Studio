@@ -9,6 +9,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
@@ -17,6 +18,7 @@ using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,7 +28,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// MPR视图模型
     /// </summary>
-    public class MprViewModel : ScreenBase, IHandle<ShapeDrawEndEvent>
+    public class MprViewModel : ScreenBase, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>
     {
         #region # 字段及构造器
 
@@ -198,7 +200,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Translate3D()
         {
-            TranslateVisual3DCommand command = new TranslateVisual3DCommand();
+            Action<ITranslatable> translateEnd = translatable =>
+            {
+                if (translatable is ShapeVisual3D shape)
+                {
+                    ShapeSyncEvent message = new ShapeSyncEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+
+            TranslateVisual3DCommand command = new TranslateVisual3DCommand(translateEnd);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -209,7 +224,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Rotate2D()
         {
-            RotateVisual2DCommand command = new RotateVisual2DCommand();
+            Action<IRotatable> rotateEnd = rotatable =>
+            {
+                if (rotatable is ShapeVisual3D shape)
+                {
+                    ShapeSyncEvent message = new ShapeSyncEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+
+            RotateVisual2DCommand command = new RotateVisual2DCommand(rotateEnd);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -220,7 +248,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Resize()
         {
-            ResizeVisual2DCommand command = new ResizeVisual2DCommand();
+            Action<IResizable2D> resizeEnd = resizable =>
+            {
+                if (resizable is ShapeVisual3D shape)
+                {
+                    ShapeSyncEvent message = new ShapeSyncEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+
+            ResizeVisual2DCommand command = new ResizeVisual2DCommand(resizeEnd);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -231,7 +272,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void EditVertex()
         {
-            EditVertexCommand command = new EditVertexCommand();
+            Action<IVertexEditable> vertexEditEnd = vertexEditable =>
+            {
+                if (vertexEditable is ShapeVisual3D shape)
+                {
+                    ShapeSyncEvent message = new ShapeSyncEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+
+            EditVertexCommand command = new EditVertexCommand(vertexEditEnd);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -462,6 +516,39 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             this.Shapes.Add(message.Shape.Clone());
             this.FrameToken++;
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理形状同步事件 —— Task HandleAsync(ShapeSyncEvent message...
+        /// <summary>
+        /// 处理形状同步事件
+        /// </summary>
+        public Task HandleAsync(ShapeSyncEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.Shape == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            ShapeVisual3D shape = this.Shapes.SingleOrDefault(shape => shape.Id == message.Shape.Id);
+            if (shape != null)
+            {
+                this.OnUIThread(() =>
+                {
+                    shape.Copy(message.Shape);
+                });
+                this.FrameToken++;
+            }
 
             return Task.CompletedTask;
         }

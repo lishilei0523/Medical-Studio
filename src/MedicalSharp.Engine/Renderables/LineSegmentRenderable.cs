@@ -121,7 +121,7 @@ namespace MedicalSharp.Engine.Renderables
             //先释放旧的
             this._vertexBuffer.Dispose();
 
-            MeshGeometry lineGeometry = MeshFactory.CreateLineSegment(startPoint, endPoint);
+            MeshGeometry lineGeometry = MeshFactory.CreateLineSegment(this.StartPoint, this.EndPoint);
             this._vertexBuffer = new VertexBuffer(lineGeometry);
             this._vertexBuffer.Setup();
 

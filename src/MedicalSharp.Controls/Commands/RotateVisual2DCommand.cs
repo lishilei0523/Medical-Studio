@@ -7,6 +7,7 @@ using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -24,10 +25,17 @@ namespace MedicalSharp.Controls.Commands
         private IRotatable _selectedVisual;
 
         /// <summary>
+        /// 旋转结束事件
+        /// </summary>
+        private readonly Action<IRotatable> _rotateEndEvent;
+
+        /// <summary>
         /// 创建旋转2D元素命令构造器
         /// </summary>
-        public RotateVisual2DCommand()
+        /// <param name="rotateEnd">旋转结束回调</param>
+        public RotateVisual2DCommand(Action<IRotatable> rotateEnd)
         {
+            this._rotateEndEvent = rotateEnd;
             this._selectedVisual = null;
         }
 
@@ -110,6 +118,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //旋转结束
+            this._rotateEndEvent?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

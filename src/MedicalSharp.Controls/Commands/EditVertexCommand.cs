@@ -7,6 +7,7 @@ using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 
 namespace MedicalSharp.Controls.Commands
@@ -29,10 +30,17 @@ namespace MedicalSharp.Controls.Commands
         private VertexDragConstraint? _selectedVertexConstraint;
 
         /// <summary>
+        /// 编辑顶点结束事件
+        /// </summary>
+        private readonly Action<IVertexEditable> _editVertexEndEvent;
+
+        /// <summary>
         /// 创建编辑顶点命令构造器
         /// </summary>
-        public EditVertexCommand()
+        /// <param name="editVertexEnd">编辑顶点结束回调</param>
+        public EditVertexCommand(Action<IVertexEditable> editVertexEnd)
         {
+            this._editVertexEndEvent = editVertexEnd;
             this._selectedVisual = null;
             this._selectedVertexConstraint = null;
         }
@@ -132,6 +140,8 @@ namespace MedicalSharp.Controls.Commands
                         if (localRay.IntersectsPlane(constraint.Anchor, constraint.Normal, out Vector3 localHitPoint, out _))
                         {
                             this._selectedVisual.MoveVertex(constraint, localHitPoint);
+
+                            //请求下一帧
                             viewport.RequestNextFrameRendering();
                         }
                     }
@@ -150,6 +160,10 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //编辑顶点结束
+            viewport.GlContext.MakeCurrent();
+            this._editVertexEndEvent?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

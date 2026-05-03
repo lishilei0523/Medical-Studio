@@ -49,7 +49,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
 
             //初始化输入管理器
             this.InputManager = new OrbitInputManager(this.OrbitCamera);
-            this.InputManager.SwitchCommand(new TranslateVisual3DCommand());
+            this.InputManager.SwitchCommand(new TranslateVisual3DCommand(null));
         }
 
         #endregion
