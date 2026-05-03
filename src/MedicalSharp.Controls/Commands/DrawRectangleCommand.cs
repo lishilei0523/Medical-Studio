@@ -79,7 +79,7 @@ namespace MedicalSharp.Controls.Commands
                         Width = 0.01f,
                         Height = 0.005f,
                         Center = mousePos3D.Value.ToVector3(),
-                        Normal = -this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
+                        Normal = this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };
                     this._rectangleDrawnEvent?.Invoke(this._rectangle);
                 }

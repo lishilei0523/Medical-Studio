@@ -114,6 +114,13 @@ namespace MedicalSharp.Controls.Visuals
         internal abstract void EnsureRenderable();
         #endregion
 
+        #region 更新渲染对象 —— abstract void UpdateRenderable()
+        /// <summary>
+        /// 更新渲染对象
+        /// </summary>
+        internal abstract void UpdateRenderable();
+        #endregion
+
         #region 元素卸载事件 —— override void OnUnloaded(RoutedEventArgs eventArgs)
         /// <summary>
         /// 元素卸载事件

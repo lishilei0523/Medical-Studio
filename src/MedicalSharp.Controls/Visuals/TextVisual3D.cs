@@ -241,7 +241,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 更新渲染对象
         /// </summary>
-        private void UpdateRenderable()
+        internal void UpdateRenderable()
         {
             if (this.Renderable != null)
             {

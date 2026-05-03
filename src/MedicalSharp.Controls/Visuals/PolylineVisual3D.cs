@@ -102,11 +102,11 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 更新渲染对象 —— void UpdateRenderable()
+        #region 更新渲染对象 —— override void UpdateRenderable()
         /// <summary>
         /// 更新渲染对象
         /// </summary>
-        private void UpdateRenderable()
+        internal override void UpdateRenderable()
         {
             if (this.Renderable != null && this.Positions != null)
             {
