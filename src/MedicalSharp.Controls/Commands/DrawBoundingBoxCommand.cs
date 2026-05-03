@@ -1,5 +1,4 @@
 ﻿using Avalonia.Input;
-using Avalonia.Media;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
@@ -28,17 +27,24 @@ namespace MedicalSharp.Controls.Commands
         private BoundingBoxVisual3D _boundingBox;
 
         /// <summary>
-        /// 包围盒绘制完成事件
+        /// 包围盒绘制开始事件
         /// </summary>
-        private readonly Action<BoundingBoxVisual3D> _boxDrawnEvent;
+        private readonly Action<BoundingBoxVisual3D> _boxDrawStartEvent;
+
+        /// <summary>
+        /// 包围盒绘制结束事件
+        /// </summary>
+        private readonly Action<BoundingBoxVisual3D> _boxDrawEndEvent;
 
         /// <summary>
         /// 创建绘制包围盒3D元素命令构造器
         /// </summary>
-        /// <param name="callback">绘制回调</param>
-        public DrawBoundingBoxCommand(Action<BoundingBoxVisual3D> callback)
+        /// <param name="drawStart">绘制开始回调</param>
+        /// <param name="drawEnd">绘制结束回调</param>
+        public DrawBoundingBoxCommand(Action<BoundingBoxVisual3D> drawStart, Action<BoundingBoxVisual3D> drawEnd)
         {
-            this._boxDrawnEvent = callback;
+            this._boxDrawStartEvent = drawStart;
+            this._boxDrawEndEvent = drawEnd;
         }
 
         #endregion
@@ -74,7 +80,7 @@ namespace MedicalSharp.Controls.Commands
                         Depth = 0.01f,
                         Center = mousePos3D.Value.ToVector3()
                     };
-                    this._boxDrawnEvent?.Invoke(this._boundingBox);
+                    this._boxDrawStartEvent?.Invoke(this._boundingBox);
                 }
             }
         }
@@ -124,6 +130,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //绘制结束
+            this._boxDrawEndEvent?.Invoke(this._boundingBox);
 
             //清空
             this._startPosition = null;

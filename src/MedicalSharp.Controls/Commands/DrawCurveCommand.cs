@@ -34,26 +34,33 @@ namespace MedicalSharp.Controls.Commands
         private readonly bool _closed;
 
         /// <summary>
-        /// 曲线绘制完成事件
+        /// 曲线绘制开始事件
         /// </summary>
-        private readonly Action<CurveVisual3D> _curveDrawnEvent;
+        private readonly Action<CurveVisual3D> _curveDrawStartEvent;
+
+        /// <summary>
+        /// 曲线绘制结束事件
+        /// </summary>
+        private readonly Action<CurveVisual3D> _curveDrawEndEvent;
 
         /// <summary>
         /// 曲线绘制取消事件
         /// </summary>
-        private readonly Action<CurveVisual3D> _curveCancelledEvent;
+        private readonly Action<CurveVisual3D> _curveDrawCancelEvent;
 
         /// <summary>
         /// 创建绘制曲线3D元素命令构造器
         /// </summary>
-        /// <param name="completed">完成回调</param>
-        /// <param name="cancelled">取消回调</param>
+        /// <param name="drawStart">绘制开始回调</param>
+        /// <param name="drawEnd">绘制结束回调</param>
+        /// <param name="drawCancel">绘制取消回调</param>
         /// <param name="closed">是否闭合</param>
-        public DrawCurveCommand(Action<CurveVisual3D> completed, Action<CurveVisual3D> cancelled, bool closed = false)
+        public DrawCurveCommand(Action<CurveVisual3D> drawStart, Action<CurveVisual3D> drawEnd, Action<CurveVisual3D> drawCancel, bool closed)
         {
             this._closed = closed;
-            this._curveDrawnEvent = completed;
-            this._curveCancelledEvent = cancelled;
+            this._curveDrawStartEvent = drawStart;
+            this._curveDrawEndEvent = drawEnd;
+            this._curveDrawCancelEvent = drawCancel;
         }
 
         #endregion
@@ -90,7 +97,7 @@ namespace MedicalSharp.Controls.Commands
                             ControlPositions = [position],
                             Closed = this._closed
                         };
-                        this._curveDrawnEvent?.Invoke(this._curve);
+                        this._curveDrawStartEvent?.Invoke(this._curve);
                     }
                     else
                     {
@@ -237,6 +244,9 @@ namespace MedicalSharp.Controls.Commands
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
+            //绘制结束
+            this._curveDrawEndEvent?.Invoke(this._curve);
+
             //清空引用
             this._previewPoint = null;
             this._curve = null;
@@ -254,7 +264,7 @@ namespace MedicalSharp.Controls.Commands
         {
             if (this._curve != null)
             {
-                this._curveCancelledEvent?.Invoke(this._curve);
+                this._curveDrawCancelEvent?.Invoke(this._curve);
             }
 
             //设置光标

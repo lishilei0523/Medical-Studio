@@ -17,17 +17,17 @@ namespace MedicalSharp.Controls.Commands
         #region # 字段及构造器
 
         /// <summary>
-        /// 点绘制完成事件
+        /// 点绘制结束事件
         /// </summary>
-        private readonly Action<PointVisual3D> _pointDrawnEvent;
+        private readonly Action<PointVisual3D> _pointDrawEndEvent;
 
         /// <summary>
         /// 创建绘制点3D元素命令构造器
         /// </summary>
-        /// <param name="callback">绘制回调</param>
-        public DrawPointCommand(Action<PointVisual3D> callback)
+        /// <param name="drawEnd">绘制结束回调</param>
+        public DrawPointCommand(Action<PointVisual3D> drawEnd)
         {
-            this._pointDrawnEvent = callback;
+            this._pointDrawEndEvent = drawEnd;
         }
 
         #endregion
@@ -59,7 +59,7 @@ namespace MedicalSharp.Controls.Commands
                         Position = mousePos3D.Value.ToVector3(),
                         PointSize = 5
                     };
-                    this._pointDrawnEvent?.Invoke(point);
+                    this._pointDrawEndEvent?.Invoke(point);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();

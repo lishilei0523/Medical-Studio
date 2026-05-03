@@ -21,17 +21,24 @@ namespace MedicalSharp.Controls.Commands
         private LineSegmentVisual3D _lineSegment;
 
         /// <summary>
-        /// 线段绘制完成事件
+        /// 线段绘制开始事件
         /// </summary>
-        private readonly Action<LineSegmentVisual3D> _lineSegmentDrawnEvent;
+        private readonly Action<LineSegmentVisual3D> _lineSegmentDrawStartEvent;
+
+        /// <summary>
+        /// 线段绘制结束事件
+        /// </summary>
+        private readonly Action<LineSegmentVisual3D> _lineSegmentDrawEndEvent;
 
         /// <summary>
         /// 创建绘制线段3D元素命令构造器
         /// </summary>
-        /// <param name="callback">绘制回调</param>
-        public DrawLineSegmentCommand(Action<LineSegmentVisual3D> callback)
+        /// <param name="drawStart">绘制开始回调</param>
+        /// <param name="drawEnd">绘制结束回调</param>
+        public DrawLineSegmentCommand(Action<LineSegmentVisual3D> drawStart, Action<LineSegmentVisual3D> drawEnd)
         {
-            this._lineSegmentDrawnEvent = callback;
+            this._lineSegmentDrawStartEvent = drawStart;
+            this._lineSegmentDrawEndEvent = drawEnd;
         }
 
         #endregion
@@ -61,7 +68,7 @@ namespace MedicalSharp.Controls.Commands
                     {
                         StartPoint = mousePos3D.Value.ToVector3()
                     };
-                    this._lineSegmentDrawnEvent?.Invoke(this._lineSegment);
+                    this._lineSegmentDrawStartEvent?.Invoke(this._lineSegment);
                 }
             }
         }
@@ -102,6 +109,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //绘制结束
+            this._lineSegmentDrawEndEvent?.Invoke(this._lineSegment);
 
             //清空
             this._lineSegment = null;

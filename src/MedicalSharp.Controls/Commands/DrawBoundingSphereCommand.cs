@@ -26,17 +26,24 @@ namespace MedicalSharp.Controls.Commands
         private BoundingSphereVisual3D _boundingSphere;
 
         /// <summary>
-        /// 包围球绘制完成事件
+        /// 包围球绘制开始事件
         /// </summary>
-        private readonly Action<BoundingSphereVisual3D> _sphereDrawnEvent;
+        private readonly Action<BoundingSphereVisual3D> _sphereDrawStartEvent;
+
+        /// <summary>
+        /// 包围球绘制结束事件
+        /// </summary>
+        private readonly Action<BoundingSphereVisual3D> _sphereDrawEndEvent;
 
         /// <summary>
         /// 创建绘制包围球3D元素命令构造器
         /// </summary>
-        /// <param name="callback">绘制回调</param>
-        public DrawBoundingSphereCommand(Action<BoundingSphereVisual3D> callback)
+        /// <param name="drawStart">绘制开始回调</param>
+        /// <param name="drawEnd">绘制结束回调</param>
+        public DrawBoundingSphereCommand(Action<BoundingSphereVisual3D> drawStart, Action<BoundingSphereVisual3D> drawEnd)
         {
-            this._sphereDrawnEvent = callback;
+            this._sphereDrawStartEvent = drawStart;
+            this._sphereDrawEndEvent = drawEnd;
         }
 
         #endregion
@@ -70,7 +77,7 @@ namespace MedicalSharp.Controls.Commands
                         Radius = 0.01f,
                         Center = mousePos3D.Value.ToVector3()
                     };
-                    this._sphereDrawnEvent?.Invoke(this._boundingSphere);
+                    this._sphereDrawStartEvent?.Invoke(this._boundingSphere);
                 }
             }
         }
@@ -118,6 +125,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //绘制结束
+            this._sphereDrawEndEvent?.Invoke(this._boundingSphere);
 
             //清空
             this._startPosition = null;

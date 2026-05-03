@@ -34,26 +34,33 @@ namespace MedicalSharp.Controls.Commands
         private readonly bool _closed;
 
         /// <summary>
-        /// 折线绘制完成事件
+        /// 折线绘制开始事件
         /// </summary>
-        private readonly Action<PolylineVisual3D> _polylineDrawnEvent;
+        private readonly Action<PolylineVisual3D> _polylineDrawStartEvent;
+
+        /// <summary>
+        /// 折线绘制结束事件
+        /// </summary>
+        private readonly Action<PolylineVisual3D> _polylineDrawEndEvent;
 
         /// <summary>
         /// 折线绘制取消事件
         /// </summary>
-        private readonly Action<PolylineVisual3D> _polylineCancelledEvent;
+        private readonly Action<PolylineVisual3D> _polylineDrawCancelEvent;
 
         /// <summary>
         /// 创建绘制折线3D元素命令构造器
         /// </summary>
-        /// <param name="completed">完成回调</param>
-        /// <param name="cancelled">取消回调</param>
+        /// <param name="drawStart">绘制开始回调</param>
+        /// <param name="drawEnd">绘制结束回调</param>
+        /// <param name="drawCancel">绘制取消回调</param>
         /// <param name="closed">是否闭合</param>
-        public DrawPolylineCommand(Action<PolylineVisual3D> completed, Action<PolylineVisual3D> cancelled, bool closed = false)
+        public DrawPolylineCommand(Action<PolylineVisual3D> drawStart, Action<PolylineVisual3D> drawEnd, Action<PolylineVisual3D> drawCancel, bool closed)
         {
             this._closed = closed;
-            this._polylineDrawnEvent = completed;
-            this._polylineCancelledEvent = cancelled;
+            this._polylineDrawStartEvent = drawStart;
+            this._polylineDrawEndEvent = drawEnd;
+            this._polylineDrawCancelEvent = drawCancel;
         }
 
         #endregion
@@ -90,7 +97,7 @@ namespace MedicalSharp.Controls.Commands
                             Positions = [position],
                             Closed = this._closed
                         };
-                        this._polylineDrawnEvent?.Invoke(this._polyline);
+                        this._polylineDrawStartEvent?.Invoke(this._polyline);
                     }
                     else
                     {
@@ -242,6 +249,9 @@ namespace MedicalSharp.Controls.Commands
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
+            //绘制结束
+            this._polylineDrawEndEvent?.Invoke(this._polyline);
+
             //清空引用，绘制完成
             this._previewPoint = null;
             this._polyline = null;
@@ -259,7 +269,7 @@ namespace MedicalSharp.Controls.Commands
         {
             if (this._polyline != null)
             {
-                this._polylineCancelledEvent?.Invoke(this._polyline);
+                this._polylineDrawCancelEvent?.Invoke(this._polyline);
             }
 
             //设置光标

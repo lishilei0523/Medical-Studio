@@ -232,7 +232,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawPoint()
         {
-            DrawPointCommand command = new DrawPointCommand(shape => this.Shapes.Add(shape));
+            Action<PointVisual3D> drawEnd = shape =>
+            {
+                this.Shapes.Add(shape);
+                //TODO 同步
+            };
+
+            DrawPointCommand command = new DrawPointCommand(drawEnd);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -243,7 +249,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawLineSegment()
         {
-            DrawLineSegmentCommand command = new DrawLineSegmentCommand(shape => this.Shapes.Add(shape));
+            Action<LineSegmentVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<LineSegmentVisual3D> drawEnd = shape =>
+            {
+                //TODO 同步
+            };
+
+            DrawLineSegmentCommand command = new DrawLineSegmentCommand(drawStart, drawEnd);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -255,12 +267,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawRectangle()
         {
             Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
-            Action<ShapeVisual3D> drawStart = shape =>
+            Action<RectangleVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<RectangleVisual3D> drawEnd = shape =>
             {
-                this.Shapes.Add(shape);
                 this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
             };
-            DrawRectangleCommand command = new DrawRectangleCommand(drawStart, getNormal);
+
+            DrawRectangleCommand command = new DrawRectangleCommand(drawStart, drawEnd, getNormal);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -272,7 +285,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawCircle()
         {
             Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
-            DrawCircleCommand command = new DrawCircleCommand(shape => this.Shapes.Add(shape), getNormal);
+            Action<CircleVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<CircleVisual3D> drawEnd = shape =>
+            {
+                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+            };
+
+            DrawCircleCommand command = new DrawCircleCommand(drawStart, drawEnd, getNormal);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -284,7 +303,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawEllipse()
         {
             Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
-            DrawEllipseCommand command = new DrawEllipseCommand(shape => this.Shapes.Add(shape), getNormal);
+            Action<EllipseVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<EllipseVisual3D> drawEnd = shape =>
+            {
+                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+            };
+
+            DrawEllipseCommand command = new DrawEllipseCommand(drawStart, drawEnd, getNormal);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -295,7 +320,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawPolyline()
         {
-            DrawPolylineCommand command = new DrawPolylineCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape));
+            Action<PolylineVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<PolylineVisual3D> drawEnd = shape =>
+            {
+                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+            };
+            Action<PolylineVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
+
+            DrawPolylineCommand command = new DrawPolylineCommand(drawStart, drawEnd, drawCancel, false);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -306,7 +338,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawCurve()
         {
-            DrawCurveCommand command = new DrawCurveCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape));
+            Action<CurveVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<CurveVisual3D> drawEnd = shape =>
+            {
+                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+            };
+            Action<CurveVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
+
+            DrawCurveCommand command = new DrawCurveCommand(drawStart, drawEnd, drawCancel, false);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -317,7 +356,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawPolygon()
         {
-            DrawPolylineCommand command = new DrawPolylineCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape), true);
+            Action<PolylineVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<PolylineVisual3D> drawEnd = shape =>
+            {
+                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+            };
+            Action<PolylineVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
+
+            DrawPolylineCommand command = new DrawPolylineCommand(drawStart, drawEnd, drawCancel, true);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -328,7 +374,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawClosedCurve()
         {
-            DrawCurveCommand command = new DrawCurveCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape), true);
+            Action<CurveVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<CurveVisual3D> drawEnd = shape =>
+            {
+                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+            };
+            Action<CurveVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
+
+            DrawCurveCommand command = new DrawCurveCommand(drawStart, drawEnd, drawCancel, true);
             this.InputManager.SwitchCommand(command);
         }
         #endregion

@@ -33,18 +33,25 @@ namespace MedicalSharp.Controls.Commands
         private readonly Func<Vector3D> _getNormal;
 
         /// <summary>
-        /// 圆形绘制完成事件
+        /// 圆形绘制开始事件
         /// </summary>
-        private readonly Action<CircleVisual3D> _circleDrawnEvent;
+        private readonly Action<CircleVisual3D> _circleDrawStartEvent;
+
+        /// <summary>
+        /// 圆形绘制结束事件
+        /// </summary>
+        private readonly Action<CircleVisual3D> _circleDrawEndEvent;
 
         /// <summary>
         /// 创建绘制圆形3D元素命令构造器
         /// </summary>
-        /// <param name="callback">绘制回调</param>
+        /// <param name="drawStart">绘制开始回调</param>
+        /// <param name="drawEnd">绘制结束回调</param>
         /// <param name="getNormal">获取法向量</param>
-        public DrawCircleCommand(Action<CircleVisual3D> callback, Func<Vector3D> getNormal = null)
+        public DrawCircleCommand(Action<CircleVisual3D> drawStart, Action<CircleVisual3D> drawEnd, Func<Vector3D> getNormal)
         {
-            this._circleDrawnEvent = callback;
+            this._circleDrawStartEvent = drawStart;
+            this._circleDrawEndEvent = drawEnd;
             this._getNormal = getNormal;
         }
 
@@ -79,7 +86,7 @@ namespace MedicalSharp.Controls.Commands
                         Center = mousePos3D.Value.ToVector3(),
                         Normal = this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };
-                    this._circleDrawnEvent?.Invoke(this._circle);
+                    this._circleDrawStartEvent?.Invoke(this._circle);
                 }
             }
         }
@@ -127,6 +134,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //绘制结束
+            this._circleDrawEndEvent?.Invoke(this._circle);
 
             //清空
             this._startPosition = null;

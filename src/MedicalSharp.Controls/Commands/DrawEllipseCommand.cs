@@ -34,18 +34,25 @@ namespace MedicalSharp.Controls.Commands
         private readonly Func<Vector3D> _getNormal;
 
         /// <summary>
-        /// 椭圆形绘制完成事件
+        /// 椭圆形绘制开始事件
         /// </summary>
-        private readonly Action<EllipseVisual3D> _ellipseDrawnEvent;
+        private readonly Action<EllipseVisual3D> _ellipseDrawStartEvent;
+
+        /// <summary>
+        /// 椭圆形绘制结束事件
+        /// </summary>
+        private readonly Action<EllipseVisual3D> _ellipseDrawEndEvent;
 
         /// <summary>
         /// 创建绘制椭圆形3D元素命令构造器
         /// </summary>
-        /// <param name="callback">绘制回调</param>
+        /// <param name="drawStart">绘制开始回调</param>
+        /// <param name="drawEnd">绘制结束回调</param>
         /// <param name="getNormal">获取法向量</param>
-        public DrawEllipseCommand(Action<EllipseVisual3D> callback, Func<Vector3D> getNormal = null)
+        public DrawEllipseCommand(Action<EllipseVisual3D> drawStart, Action<EllipseVisual3D> drawEnd, Func<Vector3D> getNormal)
         {
-            this._ellipseDrawnEvent = callback;
+            this._ellipseDrawStartEvent = drawStart;
+            this._ellipseDrawEndEvent = drawEnd;
             this._getNormal = getNormal;
         }
 
@@ -81,7 +88,7 @@ namespace MedicalSharp.Controls.Commands
                         Center = mousePos3D.Value.ToVector3(),
                         Normal = this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };
-                    this._ellipseDrawnEvent?.Invoke(this._ellipse);
+                    this._ellipseDrawStartEvent?.Invoke(this._ellipse);
                 }
             }
         }
@@ -130,6 +137,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //绘制结束
+            this._ellipseDrawEndEvent?.Invoke(this._ellipse);
 
             //清空
             this._startPosition = null;

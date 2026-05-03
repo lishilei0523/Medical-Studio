@@ -34,18 +34,25 @@ namespace MedicalSharp.Controls.Commands
         private readonly Func<Vector3D> _getNormal;
 
         /// <summary>
-        /// 矩形绘制完成事件
+        /// 矩形绘制开始事件
         /// </summary>
-        private readonly Action<RectangleVisual3D> _rectangleDrawnEvent;
+        private readonly Action<RectangleVisual3D> _rectangleDrawStartEvent;
+
+        /// <summary>
+        /// 矩形绘制结束事件
+        /// </summary>
+        private readonly Action<RectangleVisual3D> _rectangleDrawEndEvent;
 
         /// <summary>
         /// 创建绘制矩形3D元素命令构造器
         /// </summary>
-        /// <param name="callback">绘制回调</param>
+        /// <param name="drawStart">绘制开始回调</param>
+        /// <param name="drawEnd">绘制结束回调</param>
         /// <param name="getNormal">获取法向量</param>
-        public DrawRectangleCommand(Action<RectangleVisual3D> callback, Func<Vector3D> getNormal = null)
+        public DrawRectangleCommand(Action<RectangleVisual3D> drawStart, Action<RectangleVisual3D> drawEnd, Func<Vector3D> getNormal)
         {
-            this._rectangleDrawnEvent = callback;
+            this._rectangleDrawStartEvent = drawStart;
+            this._rectangleDrawEndEvent = drawEnd;
             this._getNormal = getNormal;
         }
 
@@ -81,7 +88,7 @@ namespace MedicalSharp.Controls.Commands
                         Center = mousePos3D.Value.ToVector3(),
                         Normal = this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };
-                    this._rectangleDrawnEvent?.Invoke(this._rectangle);
+                    this._rectangleDrawStartEvent?.Invoke(this._rectangle);
                 }
             }
         }
@@ -130,6 +137,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //绘制结束
+            this._rectangleDrawEndEvent?.Invoke(this._rectangle);
 
             //清空
             this._startPosition = null;

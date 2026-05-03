@@ -46,7 +46,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
             //DrawCircleCommand command = new DrawCircleCommand(new Vector3D(0, 1, 0), shape => this.Shapes.Add(shape));
             //DrawLineSegmentCommand command = new DrawLineSegmentCommand(shape => this.Shapes.Add(shape));
             //DrawPolylineCommand command = new DrawPolylineCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape));
-            DrawCurveCommand command = new DrawCurveCommand(shape => this.Shapes.Add(shape), shape => this.Shapes.Remove(shape));
+            DrawCurveCommand command = new DrawCurveCommand(shape => this.Shapes.Add(shape), null, shape => this.Shapes.Remove(shape), false);
             this.InputManager = new OrbitInputManager(this.OrbitCamera);
             this.InputManager.SwitchCommand(command);
         }

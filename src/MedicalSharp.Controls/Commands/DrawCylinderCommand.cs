@@ -26,17 +26,24 @@ namespace MedicalSharp.Controls.Commands
         private CylinderVisual3D _cylinder;
 
         /// <summary>
-        /// 圆柱体绘制完成事件
+        /// 圆柱体绘制开始事件
         /// </summary>
-        private readonly Action<CylinderVisual3D> _cylinderDrawnEvent;
+        private readonly Action<CylinderVisual3D> _cylinderDrawStartEvent;
+
+        /// <summary>
+        /// 圆柱体绘制结束事件
+        /// </summary>
+        private readonly Action<CylinderVisual3D> _cylinderDrawEndEvent;
 
         /// <summary>
         /// 创建绘制圆柱体3D元素命令构造器
         /// </summary>
-        /// <param name="callback">绘制回调</param>
-        public DrawCylinderCommand(Action<CylinderVisual3D> callback)
+        /// <param name="drawStart">绘制开始回调</param>
+        /// <param name="drawEnd">绘制结束回调</param>
+        public DrawCylinderCommand(Action<CylinderVisual3D> drawStart, Action<CylinderVisual3D> drawEnd)
         {
-            this._cylinderDrawnEvent = callback;
+            this._cylinderDrawStartEvent = drawStart;
+            this._cylinderDrawEndEvent = drawEnd;
         }
 
         #endregion
@@ -73,7 +80,7 @@ namespace MedicalSharp.Controls.Commands
                         Segments = 32,
                         WithCaps = true
                     };
-                    this._cylinderDrawnEvent?.Invoke(this._cylinder);
+                    this._cylinderDrawStartEvent?.Invoke(this._cylinder);
                 }
             }
         }
@@ -130,6 +137,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //绘制结束
+            this._cylinderDrawEndEvent?.Invoke(this._cylinder);
 
             //清空
             this._startPosition = null;
