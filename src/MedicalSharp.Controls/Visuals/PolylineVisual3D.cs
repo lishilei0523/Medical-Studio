@@ -10,7 +10,6 @@ using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 
 namespace MedicalSharp.Controls.Visuals
@@ -39,9 +38,6 @@ namespace MedicalSharp.Controls.Visuals
         {
             PositionsProperty = AvaloniaProperty.Register<PolylineVisual3D, AvaloniaList<Vector3D>>(nameof(Positions), []);
             ClosedProperty = AvaloniaProperty.Register<PolylineVisual3D, bool>(nameof(Closed), false);
-
-            //属性改变事件
-            PositionsProperty.Changed.AddClassHandler<PolylineVisual3D, AvaloniaList<Vector3D>>(OnPositionsChanged);
         }
 
 
@@ -50,7 +46,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         public PolylineVisual3D()
         {
-            this.Positions.CollectionChanged += this.OnPositionsItemChanged;
+
         }
 
         #endregion
@@ -83,7 +79,29 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
-        //Public
+        #region 确保渲染对象 —— override void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal override void EnsureRenderable()
+        {
+            if (this.Renderable == null && this.Positions != null)
+            {
+                IEnumerable<Vector3> positions = this.Positions.Select(x => x.ToVector3());
+                PolylineRenderable renderable = new PolylineRenderable([.. positions], this.Closed);
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+
+                this.Renderable = renderable;
+            }
+            if (this.Renderable != null && this.Positions != null)
+            {
+                IEnumerable<Vector3> positions = this.Positions.Select(x => x.ToVector3());
+                PolylineRenderable renderable = (PolylineRenderable)this.Renderable;
+                renderable.Update([.. positions]);
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+            }
+        }
+        #endregion
 
         #region 克隆 —— override ShapeVisual3D Clone()
         /// <summary>
@@ -121,39 +139,6 @@ namespace MedicalSharp.Controls.Visuals
                 this.Positions = shape.Positions;
                 this.Closed = shape.Closed;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
-        #region 确保渲染对象 —— override void EnsureRenderable()
-        /// <summary>
-        /// 确保渲染对象
-        /// </summary>
-        internal override void EnsureRenderable()
-        {
-            if (this.Renderable == null && this.Positions != null)
-            {
-                IEnumerable<Vector3> positions = this.Positions.Select(x => x.ToVector3());
-                PolylineRenderable renderable = new PolylineRenderable([.. positions], this.Closed);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
-
-                this.Renderable = renderable;
-            }
-        }
-        #endregion
-
-        #region 更新渲染对象 —— override void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal override void UpdateRenderable()
-        {
-            if (this.Renderable != null && this.Positions != null)
-            {
-                IEnumerable<Vector3> positions = this.Positions.Select(x => x.ToVector3());
-                PolylineRenderable renderable = (PolylineRenderable)this.Renderable;
-                renderable.Update([.. positions]);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
             }
         }
         #endregion
@@ -335,38 +320,6 @@ namespace MedicalSharp.Controls.Visuals
             Vector3[] vertices = this.Positions.Select(position => position.ToVector3()).ToArray();
             renderable.ApplyPolygonCut(vertices, localToWorld, cutMode, markValue);
             renderable.SyncMarkDataFromGpu();
-        }
-        #endregion
-
-
-        //Events
-
-        #region 位置列表改变事件 —— static void OnPositionsChanged(PolylineVisual3D visual3D...
-        /// <summary>
-        /// 位置列表改变事件
-        /// </summary>
-        private static void OnPositionsChanged(PolylineVisual3D visual3D, AvaloniaPropertyChangedEventArgs<AvaloniaList<Vector3D>> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-            if (eventArgs.OldValue.Value != null)
-            {
-                eventArgs.OldValue.Value.CollectionChanged -= visual3D.OnPositionsItemChanged;
-            }
-            if (eventArgs.NewValue.Value != null)
-            {
-                eventArgs.NewValue.Value.CollectionChanged += visual3D.OnPositionsItemChanged;
-            }
-
-        }
-        #endregion
-
-        #region 位置列表元素改变事件 —— void OnPositionsItemChanged(object sender...
-        /// <summary>
-        /// 位置列表元素改变事件
-        /// </summary>
-        private void OnPositionsItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
-        {
-            this.UpdateRenderable();
         }
         #endregion
 

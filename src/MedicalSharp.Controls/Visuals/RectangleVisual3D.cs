@@ -49,12 +49,6 @@ namespace MedicalSharp.Controls.Visuals
             HeightProperty = AvaloniaProperty.Register<RectangleVisual3D, float>(nameof(Height), 1.0f);
             CenterProperty = AvaloniaProperty.Register<RectangleVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
             NormalProperty = AvaloniaProperty.Register<RectangleVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 0, 1));
-
-            //属性改变事件
-            WidthProperty.Changed.AddClassHandler<RectangleVisual3D, float>(OnWidthChanged);
-            HeightProperty.Changed.AddClassHandler<RectangleVisual3D, float>(OnHeightChanged);
-            CenterProperty.Changed.AddClassHandler<RectangleVisual3D, Vector3D>(OnCenterChanged);
-            NormalProperty.Changed.AddClassHandler<RectangleVisual3D, Vector3D>(OnNormalChanged);
         }
 
 
@@ -159,6 +153,36 @@ namespace MedicalSharp.Controls.Visuals
 
         //Public
 
+        #region 确保渲染对象 —— override void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal override void EnsureRenderable()
+        {
+            if (this.Renderable == null)
+            {
+                MeshGeometry strokeMesh = MeshFactory.CreateRectangle(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateRectangle(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
+
+                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+
+                this.Renderable = renderable;
+                this.BuildBasis();
+            }
+            else
+            {
+                MeshGeometry strokeMesh = MeshFactory.CreateRectangle(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateRectangle(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
+
+                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
+                renderable.Update(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                this.BuildBasis();
+            }
+        }
+        #endregion
+
         #region 克隆 —— override ShapeVisual3D Clone()
         /// <summary>
         /// 克隆
@@ -203,45 +227,6 @@ namespace MedicalSharp.Controls.Visuals
                 this.Center = shape.Center;
                 this.Normal = shape.Normal;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
-        #region 确保渲染对象 —— override void EnsureRenderable()
-        /// <summary>
-        /// 确保渲染对象
-        /// </summary>
-        internal override void EnsureRenderable()
-        {
-            if (this.Renderable == null)
-            {
-                MeshGeometry strokeMesh = MeshFactory.CreateRectangle(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateRectangle(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
-
-                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
-                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
-                this.Renderable = renderable;
-                this.BuildBasis();
-            }
-        }
-        #endregion
-
-        #region 更新渲染对象 —— override void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal override void UpdateRenderable()
-        {
-            if (this.Renderable != null)
-            {
-                MeshGeometry strokeMesh = MeshFactory.CreateRectangle(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateRectangle(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
-
-                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
-                renderable.Update(strokeMesh, fillMesh);
-                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-                this.BuildBasis();
             }
         }
         #endregion
@@ -398,49 +383,6 @@ namespace MedicalSharp.Controls.Visuals
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyRectangleCut(this.Width, this.Height, center, normal, uAxis, vAxis, localToWorld, cutMode, markValue);
             renderable.SyncMarkDataFromGpu();
-        }
-        #endregion
-
-
-        //Events
-
-        #region 宽度改变事件 —— static void OnWidthChanged(RectangleVisual3D visual3D...
-        /// <summary>
-        /// 宽度改变事件
-        /// </summary>
-        private static void OnWidthChanged(RectangleVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 高度改变事件 —— static void OnHeightChanged(RectangleVisual3D visual3D...
-        /// <summary>
-        /// 高度改变事件
-        /// </summary>
-        private static void OnHeightChanged(RectangleVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 中心位置改变事件 —— static void OnCenterChanged(RectangleVisual3D visual3D...
-        /// <summary>
-        /// 中心位置改变事件
-        /// </summary>
-        private static void OnCenterChanged(RectangleVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 法向量改变事件 —— static void OnNormalChanged(RectangleVisual3D visual3D...
-        /// <summary>
-        /// 法向量改变事件
-        /// </summary>
-        private static void OnNormalChanged(RectangleVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
-        {
-            visual3D.UpdateRenderable();
         }
         #endregion
 

@@ -49,14 +49,7 @@ namespace MedicalSharp.Controls.Visuals
             WidthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Width), 1.0f);
             HeightProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Height), 1.0f);
             DepthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Depth), 1.0f);
-            CenterProperty =
-                AvaloniaProperty.Register<BoundingBoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
-
-            //属性改变事件
-            WidthProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnWidthChanged);
-            HeightProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnHeightChanged);
-            DepthProperty.Changed.AddClassHandler<BoundingBoxVisual3D, float>(OnDepthChanged);
-            CenterProperty.Changed.AddClassHandler<BoundingBoxVisual3D, Vector3D>(OnCenterChanged);
+            CenterProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
         }
 
 
@@ -165,7 +158,33 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
-        //Public
+        #region 确保渲染对象 —— override void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal override void EnsureRenderable()
+        {
+            if (this.Renderable == null)
+            {
+                MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
+
+                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+
+                this.Renderable = renderable;
+            }
+            else
+            {
+                MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
+
+                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
+                renderable.Update(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+            }
+        }
+        #endregion
 
         #region 克隆 —— override ShapeVisual3D Clone()
         /// <summary>
@@ -207,43 +226,6 @@ namespace MedicalSharp.Controls.Visuals
                 this.Depth = shape.Depth;
                 this.Center = shape.Center;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
-        #region 确保渲染对象 —— override void EnsureRenderable()
-        /// <summary>
-        /// 确保渲染对象
-        /// </summary>
-        internal override void EnsureRenderable()
-        {
-            if (this.Renderable == null)
-            {
-                MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
-
-                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
-                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
-                this.Renderable = renderable;
-            }
-        }
-        #endregion
-
-        #region 更新渲染对象 —— override void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal override void UpdateRenderable()
-        {
-            if (this.Renderable != null)
-            {
-                MeshGeometry strokeMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateBoundingBox(this.Width, this.Height, this.Depth, this.Center.ToVector3(), (GraphicPrimitiveType)PrimitiveType.Triangles);
-
-                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
-                renderable.Update(strokeMesh, fillMesh);
-                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }
         #endregion
@@ -351,49 +333,6 @@ namespace MedicalSharp.Controls.Visuals
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyBoxCut(this.Minimum, this.Maximum, localToWorld, cutMode, markValue);
             renderable.SyncMarkDataFromGpu();
-        }
-        #endregion
-
-
-        //Events
-
-        #region 宽度改变事件 —— static void OnWidthChanged(BoundingBoxVisual3D visual3D...
-        /// <summary>
-        /// 宽度改变事件
-        /// </summary>
-        private static void OnWidthChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 高度改变事件 —— static void OnHeightChanged(BoundingBoxVisual3D visual3D...
-        /// <summary>
-        /// 高度改变事件
-        /// </summary>
-        private static void OnHeightChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 深度改变事件 —— static void OnDepthChanged(BoundingBoxVisual3D visual3D...
-        /// <summary>
-        /// 深度改变事件
-        /// </summary>
-        private static void OnDepthChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 中心位置改变事件 —— static void OnCenterChanged(BoundingBoxVisual3D visual3D...
-        /// <summary>
-        /// 中心位置改变事件
-        /// </summary>
-        private static void OnCenterChanged(BoundingBoxVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
-        {
-            visual3D.UpdateRenderable();
         }
         #endregion
 

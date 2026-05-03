@@ -107,6 +107,13 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
+        #region 确保渲染对象 —— abstract void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal abstract void EnsureRenderable();
+        #endregion
+
         #region 克隆 —— abstract ShapeVisual3D Clone()
         /// <summary>
         /// 克隆
@@ -121,20 +128,6 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         /// <param name="shapeVisual3D">形状</param>
         public abstract void Copy(ShapeVisual3D shapeVisual3D);
-        #endregion
-
-        #region 确保渲染对象 —— abstract void EnsureRenderable()
-        /// <summary>
-        /// 确保渲染对象
-        /// </summary>
-        internal abstract void EnsureRenderable();
-        #endregion
-
-        #region 更新渲染对象 —— abstract void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal abstract void UpdateRenderable();
         #endregion
 
         #region 元素卸载事件 —— override void OnUnloaded(RoutedEventArgs eventArgs)

@@ -597,11 +597,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             ShapeVisual3D shape = this.Shapes.SingleOrDefault(shape => shape.Id == message.Shape.Id);
             if (shape != null)
             {
-                this.OnUIThread(() =>
-                {
-                    shape.Copy(message.Shape);
-                });
-
+                shape.Copy(message.Shape);
                 this.FrameToken++;
             }
 

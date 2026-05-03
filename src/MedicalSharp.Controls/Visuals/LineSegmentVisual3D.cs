@@ -33,10 +33,6 @@ namespace MedicalSharp.Controls.Visuals
         {
             StartPointProperty = AvaloniaProperty.Register<LineSegmentVisual3D, Vector3D>(nameof(StartPoint));
             EndPointProperty = AvaloniaProperty.Register<LineSegmentVisual3D, Vector3D>(nameof(EndPoint));
-
-            //属性改变事件
-            StartPointProperty.Changed.AddClassHandler<LineSegmentVisual3D, Vector3D>(OnStartPointChanged);
-            EndPointProperty.Changed.AddClassHandler<LineSegmentVisual3D, Vector3D>(OnEndPointChanged);
         }
 
 
@@ -78,7 +74,26 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
-        //Public
+        #region 确保渲染对象 —— override void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal override void EnsureRenderable()
+        {
+            if (this.Renderable == null)
+            {
+                LineSegmentRenderable renderable = new LineSegmentRenderable(this.StartPoint.ToVector3(), this.EndPoint.ToVector3());
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+                this.Renderable = renderable;
+            }
+            else
+            {
+                LineSegmentRenderable renderable = (LineSegmentRenderable)this.Renderable;
+                renderable.Update(this.StartPoint.ToVector3(), this.EndPoint.ToVector3());
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+            }
+        }
+        #endregion
 
         #region 克隆 —— override ShapeVisual3D Clone()
         /// <summary>
@@ -116,37 +131,6 @@ namespace MedicalSharp.Controls.Visuals
                 this.StartPoint = shape.StartPoint;
                 this.EndPoint = shape.EndPoint;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
-        #region 确保渲染对象 —— override void EnsureRenderable()
-        /// <summary>
-        /// 确保渲染对象
-        /// </summary>
-        internal override void EnsureRenderable()
-        {
-            if (this.Renderable == null)
-            {
-                LineSegmentRenderable renderable = new LineSegmentRenderable(this.StartPoint.ToVector3(), this.EndPoint.ToVector3());
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
-
-                this.Renderable = renderable;
-            }
-        }
-        #endregion
-
-        #region 更新渲染对象 —— override void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal override void UpdateRenderable()
-        {
-            if (this.Renderable != null)
-            {
-                LineSegmentRenderable renderable = (LineSegmentRenderable)this.Renderable;
-                renderable.Update(this.StartPoint.ToVector3(), this.EndPoint.ToVector3());
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
             }
         }
         #endregion
@@ -241,29 +225,6 @@ namespace MedicalSharp.Controls.Visuals
             {
                 this.EndPoint = localHitPoint.ToVector3();
             }
-        }
-        #endregion
-
-
-        //Events
-
-        #region 起始点改变事件 —— static void OnStartPointChanged(LineSegmentVisual3D visual3D...
-        /// <summary>
-        /// 起始点改变事件
-        /// </summary>
-        private static void OnStartPointChanged(LineSegmentVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 终止点改变事件 —— static void OnEndPointChanged(LineSegmentVisual3D visual3D...
-        /// <summary>
-        /// 终止点改变事件
-        /// </summary>
-        private static void OnEndPointChanged(LineSegmentVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
-        {
-            visual3D.UpdateRenderable();
         }
         #endregion
 

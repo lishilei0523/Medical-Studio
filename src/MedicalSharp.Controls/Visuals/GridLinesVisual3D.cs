@@ -40,11 +40,6 @@ namespace MedicalSharp.Controls.Visuals
             SizeProperty = AvaloniaProperty.Register<GridLinesVisual3D, float>(nameof(Size), 10.0f);
             DivisionsProperty = AvaloniaProperty.Register<GridLinesVisual3D, int>(nameof(Divisions), 10);
             NormalProperty = AvaloniaProperty.Register<GridLinesVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 0, 1));
-
-            //属性改变事件
-            SizeProperty.Changed.AddClassHandler<GridLinesVisual3D, float>(OnSizeChanged);
-            DivisionsProperty.Changed.AddClassHandler<GridLinesVisual3D, int>(OnDivisionsChanged);
-            NormalProperty.Changed.AddClassHandler<GridLinesVisual3D, Vector3D>(OnNormalChanged);
         }
 
 
@@ -123,6 +118,36 @@ namespace MedicalSharp.Controls.Visuals
 
         //Public
 
+        #region 确保渲染对象 —— override void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal override void EnsureRenderable()
+        {
+            if (this.Renderable == null)
+            {
+                MeshGeometry strokeMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
+
+                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+
+                this.Renderable = renderable;
+                this.BuildBasis();
+            }
+            else
+            {
+                MeshGeometry strokeMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
+
+                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
+                renderable.Update(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                this.BuildBasis();
+            }
+        }
+        #endregion
+
         #region 克隆 —— override ShapeVisual3D Clone()
         /// <summary>
         /// 克隆
@@ -166,78 +191,6 @@ namespace MedicalSharp.Controls.Visuals
                 this.Normal = shape.Normal;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
             }
-        }
-        #endregion
-
-        #region 确保渲染对象 —— override void EnsureRenderable()
-        /// <summary>
-        /// 确保渲染对象
-        /// </summary>
-        internal override void EnsureRenderable()
-        {
-            if (this.Renderable == null)
-            {
-                MeshGeometry strokeMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
-
-                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
-                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
-                this.Renderable = renderable;
-                this.BuildBasis();
-            }
-        }
-        #endregion
-
-        #region 更新渲染对象 —— override void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal override void UpdateRenderable()
-        {
-            if (this.Renderable != null)
-            {
-                MeshGeometry strokeMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
-
-                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
-                renderable.Update(strokeMesh, fillMesh);
-                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-                this.BuildBasis();
-            }
-        }
-        #endregion
-
-
-        //Events
-
-        #region 尺寸改变事件 —— static void OnSizeChanged(GridLinesVisual3D visual3D...
-        /// <summary>
-        /// 尺寸改变事件
-        /// </summary>
-        private static void OnSizeChanged(GridLinesVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 分隔数量改变事件 —— static void OnDivisionsChanged(GridLinesVisual3D visual3D...
-        /// <summary>
-        /// 分隔数量改变事件
-        /// </summary>
-        private static void OnDivisionsChanged(GridLinesVisual3D visual3D, AvaloniaPropertyChangedEventArgs<int> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 法向量改变事件 —— static void OnNormalChanged(GridLinesVisual3D visual3D...
-        /// <summary>
-        /// 法向量改变事件
-        /// </summary>
-        private static void OnNormalChanged(GridLinesVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
-        {
-            visual3D.UpdateRenderable();
         }
         #endregion
 

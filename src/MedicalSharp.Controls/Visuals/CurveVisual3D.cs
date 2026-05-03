@@ -11,7 +11,6 @@ using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 
 namespace MedicalSharp.Controls.Visuals
@@ -46,10 +45,6 @@ namespace MedicalSharp.Controls.Visuals
             ControlPositionsProperty = AvaloniaProperty.Register<CurveVisual3D, AvaloniaList<Vector3D>>(nameof(ControlPositions), []);
             TessellationProperty = AvaloniaProperty.Register<CurveVisual3D, int>(nameof(Tessellation), 20);
             ClosedProperty = AvaloniaProperty.Register<CurveVisual3D, bool>(nameof(Closed), false);
-
-            //属性改变事件
-            ControlPositionsProperty.Changed.AddClassHandler<CurveVisual3D, AvaloniaList<Vector3D>>(OnControlPositionsChanged);
-            TessellationProperty.Changed.AddClassHandler<CurveVisual3D, int>(OnTessellationChanged);
         }
 
 
@@ -58,7 +53,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         public CurveVisual3D()
         {
-            this.ControlPositions.CollectionChanged += this.OnControlPositionsItemChanged;
+
         }
 
         #endregion
@@ -120,7 +115,33 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
-        //Public
+        #region 确保渲染对象 —— override void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal override void EnsureRenderable()
+        {
+            if (this.Renderable == null && this.ControlPositions != null)
+            {
+                IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
+                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
+
+                CurveRenderable renderable = new CurveRenderable(controlPositions, sampledPositions, this.Closed);
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+
+                this.Renderable = renderable;
+            }
+            if (this.Renderable != null && this.ControlPositions != null)
+            {
+                IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
+                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
+
+                CurveRenderable renderable = (CurveRenderable)this.Renderable;
+                renderable.Update(controlPositions, sampledPositions);
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+            }
+        }
+        #endregion
 
         #region 克隆 —— override ShapeVisual3D Clone()
         /// <summary>
@@ -160,43 +181,6 @@ namespace MedicalSharp.Controls.Visuals
                 this.Tessellation = shape.Tessellation;
                 this.Closed = shape.Closed;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
-        #region 确保渲染对象 —— override void EnsureRenderable()
-        /// <summary>
-        /// 确保渲染对象
-        /// </summary>
-        internal override void EnsureRenderable()
-        {
-            if (this.Renderable == null && this.ControlPositions != null)
-            {
-                IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
-                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
-
-                CurveRenderable renderable = new CurveRenderable(controlPositions, sampledPositions, this.Closed);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
-
-                this.Renderable = renderable;
-            }
-        }
-        #endregion
-
-        #region 更新渲染对象 —— override void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal override void UpdateRenderable()
-        {
-            if (this.Renderable != null && this.ControlPositions != null)
-            {
-                IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
-                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
-
-                CurveRenderable renderable = (CurveRenderable)this.Renderable;
-                renderable.Update(controlPositions, sampledPositions);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
             }
         }
         #endregion
@@ -391,48 +375,6 @@ namespace MedicalSharp.Controls.Visuals
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyPolygonCut(this.SampledPositions, localToWorld, cutMode, markValue);
             renderable.SyncMarkDataFromGpu();
-        }
-        #endregion
-
-
-        //Events
-
-        #region 控制点列表改变事件 —— static void OnControlPositionsChanged(CurveVisual3D visual3D...
-        /// <summary>
-        /// 控制点列表改变事件
-        /// </summary>
-        private static void OnControlPositionsChanged(CurveVisual3D visual3D, AvaloniaPropertyChangedEventArgs<AvaloniaList<Vector3D>> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-            if (eventArgs.OldValue.Value != null)
-            {
-                eventArgs.OldValue.Value.CollectionChanged -= visual3D.OnControlPositionsItemChanged;
-            }
-            if (eventArgs.NewValue.Value != null)
-            {
-                eventArgs.NewValue.Value.CollectionChanged += visual3D.OnControlPositionsItemChanged;
-            }
-
-        }
-        #endregion
-
-        #region 控制点列表元素改变事件 —— void OnControlPositionsItemChanged(object sender...
-        /// <summary>
-        /// 控制点列表元素改变事件
-        /// </summary>
-        private void OnControlPositionsItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
-        {
-            this.UpdateRenderable();
-        }
-        #endregion
-
-        #region 采样密度改变事件 —— static void OnTessellationChanged(CurveVisual3D visual3D...
-        /// <summary>
-        /// 采样密度改变事件
-        /// </summary>
-        private static void OnTessellationChanged(CurveVisual3D visual3D, AvaloniaPropertyChangedEventArgs<int> eventArgs)
-        {
-            visual3D.UpdateRenderable();
         }
         #endregion
 

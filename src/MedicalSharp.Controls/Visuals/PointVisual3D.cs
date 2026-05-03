@@ -30,9 +30,6 @@ namespace MedicalSharp.Controls.Visuals
         {
             PositionProperty = AvaloniaProperty.Register<PointVisual3D, Vector3D>(nameof(Position), new Vector3D(0, 0, 0));
             PointSizeProperty = AvaloniaProperty.Register<PointVisual3D, float>(nameof(PointSize), 2.0f);
-
-            //属性改变事件
-            PositionProperty.Changed.AddClassHandler<PointVisual3D, Vector3D>(OnPositionChanged);
         }
 
 
@@ -74,6 +71,28 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
+        #region 确保渲染对象 —— override void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal override void EnsureRenderable()
+        {
+            if (this.Renderable == null)
+            {
+                PointRenderable renderable = new PointRenderable(this.Position.ToVector3());
+                renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
+
+                this.Renderable = renderable;
+            }
+            else
+            {
+                PointRenderable renderable = (PointRenderable)this.Renderable;
+                renderable.Update(this.Position.ToVector3());
+                renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
+            }
+        }
+        #endregion
+
         #region 克隆 —— override ShapeVisual3D Clone()
         /// <summary>
         /// 克隆
@@ -111,47 +130,6 @@ namespace MedicalSharp.Controls.Visuals
                 this.PointSize = shape.PointSize;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
             }
-        }
-        #endregion
-
-        #region 确保渲染对象 —— override void EnsureRenderable()
-        /// <summary>
-        /// 确保渲染对象
-        /// </summary>
-        internal override void EnsureRenderable()
-        {
-            if (this.Renderable == null)
-            {
-                PointRenderable renderable = new PointRenderable(this.Position.ToVector3());
-                renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
-
-                this.Renderable = renderable;
-            }
-        }
-        #endregion
-
-        #region 更新渲染对象 —— override void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal override void UpdateRenderable()
-        {
-            if (this.Renderable != null)
-            {
-                PointRenderable renderable = (PointRenderable)this.Renderable;
-                renderable.Update(this.Position.ToVector3());
-                renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
-            }
-        }
-        #endregion
-
-        #region 位置改变事件 —— static void OnPositionChanged(PointVisual3D visual3D...
-        /// <summary>
-        /// 位置改变事件
-        /// </summary>
-        private static void OnPositionChanged(PointVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
-        {
-            visual3D.UpdateRenderable();
         }
         #endregion
 

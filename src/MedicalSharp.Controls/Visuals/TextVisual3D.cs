@@ -67,11 +67,6 @@ namespace MedicalSharp.Controls.Visuals
             RenderModeProperty = AvaloniaProperty.Register<TextVisual3D, TextRenderMode>(nameof(RenderMode), TextRenderMode.Billboard);
             NormalProperty = AvaloniaProperty.Register<TextVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 1, 0));
             LockYAxisProperty = AvaloniaProperty.Register<TextVisual3D, bool>(nameof(LockYAxis), true);
-
-            //属性改变事件
-            TextProperty.Changed.AddClassHandler<TextVisual3D, string>(OnTextChanged);
-            FontSizeProperty.Changed.AddClassHandler<TextVisual3D, float>(OnFontSizeChanged);
-            ColorProperty.Changed.AddClassHandler<TextVisual3D, Color>(OnColorChanged);
         }
 
 
@@ -234,16 +229,7 @@ namespace MedicalSharp.Controls.Visuals
                 this.Renderable = renderable;
                 this.BuildBasis();
             }
-        }
-        #endregion
-
-        #region 更新渲染对象 —— void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal void UpdateRenderable()
-        {
-            if (this.Renderable != null)
+            else
             {
                 TextRenderable renderable = (TextRenderable)this.Renderable;
                 renderable.Update(this.Text, this.FontSize);
@@ -260,36 +246,6 @@ namespace MedicalSharp.Controls.Visuals
         protected override void OnUnloaded(RoutedEventArgs eventArgs)
         {
             this.Renderable?.Dispose();
-        }
-        #endregion
-
-        #region 文本内容改变事件 —— static void OnTextChanged(TextVisual3D visual3D...
-        /// <summary>
-        /// 文本内容改变事件
-        /// </summary>
-        private static void OnTextChanged(TextVisual3D visual3D, AvaloniaPropertyChangedEventArgs<string> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 字体大小改变事件 —— static void OnFontSizeChanged(TextVisual3D visual3D...
-        /// <summary>
-        /// 字体大小改变事件
-        /// </summary>
-        private static void OnFontSizeChanged(TextVisual3D visual3D, AvaloniaPropertyChangedEventArgs<float> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-        }
-        #endregion
-
-        #region 文本颜色改变事件 —— static void OnColorChanged(TextVisual3D visual3D...
-        /// <summary>
-        /// 文本颜色改变事件
-        /// </summary>
-        private static void OnColorChanged(TextVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Color> eventArgs)
-        {
-            visual3D.Renderable?.SetColor(eventArgs.NewValue.Value.ToVector4());
         }
         #endregion
 

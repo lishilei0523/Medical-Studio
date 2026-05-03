@@ -11,7 +11,6 @@ using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 
 namespace MedicalSharp.Controls.Visuals
@@ -34,9 +33,6 @@ namespace MedicalSharp.Controls.Visuals
         static ConvexPolyhedronVisual3D()
         {
             PositionsProperty = AvaloniaProperty.Register<ConvexPolyhedronVisual3D, AvaloniaList<Vector3D>>(nameof(Positions), []);
-
-            //属性改变事件
-            PositionsProperty.Changed.AddClassHandler<ConvexPolyhedronVisual3D, AvaloniaList<Vector3D>>(OnControlPositionsChanged);
         }
 
         /// <summary>
@@ -44,7 +40,7 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         public ConvexPolyhedronVisual3D()
         {
-            this.Positions.CollectionChanged += this.OnPositionsItemChanged;
+
         }
 
         #endregion
@@ -73,7 +69,38 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
-        //Public
+        #region 确保渲染对象 —— override void EnsureRenderable()
+        /// <summary>
+        /// 确保渲染对象
+        /// </summary>
+        internal override void EnsureRenderable()
+        {
+            if (this.Renderable == null && this.Positions != null)
+            {
+                IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
+                MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Triangles);
+
+                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh, true);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+
+                this.Renderable = renderable;
+                this.MeshGeometry = fillMesh;
+            }
+            if (this.Renderable != null && this.Positions != null)
+            {
+                IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
+                MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
+                MeshGeometry fillMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Triangles);
+
+                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
+                renderable.Update(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+
+                this.MeshGeometry = fillMesh;
+            }
+        }
+        #endregion
 
         #region 克隆 —— override ShapeVisual3D Clone()
         /// <summary>
@@ -111,48 +138,6 @@ namespace MedicalSharp.Controls.Visuals
                 this.MeshGeometry = shape.MeshGeometry;
                 this.Positions = shape.Positions;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
-        #region 确保渲染对象 —— override void EnsureRenderable()
-        /// <summary>
-        /// 确保渲染对象
-        /// </summary>
-        internal override void EnsureRenderable()
-        {
-            if (this.Renderable == null && this.Positions != null)
-            {
-                IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
-                MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Triangles);
-
-                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh, true);
-                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
-                this.Renderable = renderable;
-                this.MeshGeometry = fillMesh;
-            }
-        }
-        #endregion
-
-        #region 更新渲染对象 —— override void UpdateRenderable()
-        /// <summary>
-        /// 更新渲染对象
-        /// </summary>
-        internal override void UpdateRenderable()
-        {
-            if (this.Renderable != null && this.Positions != null)
-            {
-                IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
-                MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Triangles);
-
-                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
-                renderable.Update(strokeMesh, fillMesh);
-                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
-                this.MeshGeometry = fillMesh;
             }
         }
         #endregion
@@ -319,37 +304,6 @@ namespace MedicalSharp.Controls.Visuals
             Vector4[] planes = this.MeshGeometry.ExtractPlanes();
             renderable.ApplyConvexPolyhedronCut(planes, localToWorld, cutMode, markValue);
             renderable.SyncMarkDataFromGpu();
-        }
-        #endregion
-
-
-        //Events
-
-        #region 位置列表改变事件 —— static void OnControlPositionsChanged(ConvexPolyhedronVisual3D visual3D...
-        /// <summary>
-        /// 位置列表改变事件
-        /// </summary>
-        private static void OnControlPositionsChanged(ConvexPolyhedronVisual3D visual3D, AvaloniaPropertyChangedEventArgs<AvaloniaList<Vector3D>> eventArgs)
-        {
-            visual3D.UpdateRenderable();
-            if (eventArgs.OldValue.Value != null)
-            {
-                eventArgs.OldValue.Value.CollectionChanged -= visual3D.OnPositionsItemChanged;
-            }
-            if (eventArgs.NewValue.Value != null)
-            {
-                eventArgs.NewValue.Value.CollectionChanged += visual3D.OnPositionsItemChanged;
-            }
-        }
-        #endregion
-
-        #region 位置列表元素改变事件 —— void OnPositionsItemChanged(object sender...
-        /// <summary>
-        /// 位置列表元素改变事件
-        /// </summary>
-        private void OnPositionsItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
-        {
-            this.UpdateRenderable();
         }
         #endregion
 

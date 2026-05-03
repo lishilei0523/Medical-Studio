@@ -162,7 +162,6 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //编辑顶点结束
-            viewport.GlContext.MakeCurrent();
             this._editVertexEndEvent?.Invoke(this._selectedVisual);
 
             //清空选中
