@@ -115,6 +115,14 @@ namespace MedicalSharp.Controls.Visuals
         public abstract ShapeVisual3D Clone();
         #endregion
 
+        #region 复制 —— abstract void Copy(ShapeVisual3D shapeVisual3D)
+        /// <summary>
+        /// 复制
+        /// </summary>
+        /// <param name="shapeVisual3D">形状</param>
+        public abstract void Copy(ShapeVisual3D shapeVisual3D);
+        #endregion
+
         #region 确保渲染对象 —— abstract void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象

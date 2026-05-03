@@ -101,6 +101,25 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 复制 —— override void Copy(ShapeVisual3D shapeVisual3D)
+        /// <summary>
+        /// 复制
+        /// </summary>
+        /// <param name="shapeVisual3D">形状</param>
+        public override void Copy(ShapeVisual3D shapeVisual3D)
+        {
+            if (shapeVisual3D is LineSegmentVisual3D shape)
+            {
+                this.Stroke = shape.Stroke;
+                this.StrokeThickness = shape.StrokeThickness;
+                this.Fill = shape.Fill;
+                this.StartPoint = shape.StartPoint;
+                this.EndPoint = shape.EndPoint;
+                this.Transform.SetMatrix(shape.Transform.Matrix);
+            }
+        }
+        #endregion
+
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象
