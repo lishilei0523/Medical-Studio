@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using MedicalSharp.Primitives.Maths;
+using System;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -15,12 +16,19 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         protected Visual3D()
         {
-
+            this.Id = Guid.NewGuid().ToString();
         }
 
         #endregion
 
         #region # 属性
+
+        #region 标识Id —— string Id
+        /// <summary>
+        /// 标识Id
+        /// </summary>
+        public string Id { get; protected set; }
+        #endregion
 
         #region 只读属性 - 变换 —— abstract Transform Transform
         /// <summary>

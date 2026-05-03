@@ -107,6 +107,14 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
+        #region 克隆 —— abstract ShapeVisual3D Clone()
+        /// <summary>
+        /// 克隆
+        /// </summary>
+        /// <returns>形状副本</returns>
+        public abstract ShapeVisual3D Clone();
+        #endregion
+
         #region 确保渲染对象 —— abstract void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象

@@ -18,13 +18,15 @@ using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
     /// <summary>
     /// MPR视图模型
     /// </summary>
-    public class MprViewModel : ScreenBase
+    public class MprViewModel : ScreenBase, IHandle<ShapeDrawEndEvent>
     {
         #region # 字段及构造器
 
@@ -58,6 +60,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #endregion
 
         #region # 属性
+
+        #region 帧令牌 —— int FrameToken
+        /// <summary>
+        /// 帧令牌
+        /// </summary>
+        [DependencyProperty]
+        public int FrameToken { get; set; }
+        #endregion
 
         #region 标题 —— string Title
         /// <summary>
@@ -235,7 +245,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<PointVisual3D> drawEnd = shape =>
             {
                 this.Shapes.Add(shape);
-                //TODO 同步
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             DrawPointCommand command = new DrawPointCommand(drawEnd);
@@ -252,7 +267,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<LineSegmentVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<LineSegmentVisual3D> drawEnd = shape =>
             {
-                //TODO 同步
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             DrawLineSegmentCommand command = new DrawLineSegmentCommand(drawStart, drawEnd);
@@ -270,7 +290,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<RectangleVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<RectangleVisual3D> drawEnd = shape =>
             {
-                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             DrawRectangleCommand command = new DrawRectangleCommand(drawStart, drawEnd, getNormal);
@@ -288,7 +313,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<CircleVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<CircleVisual3D> drawEnd = shape =>
             {
-                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             DrawCircleCommand command = new DrawCircleCommand(drawStart, drawEnd, getNormal);
@@ -306,7 +336,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<EllipseVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<EllipseVisual3D> drawEnd = shape =>
             {
-                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             DrawEllipseCommand command = new DrawEllipseCommand(drawStart, drawEnd, getNormal);
@@ -323,7 +358,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<PolylineVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<PolylineVisual3D> drawEnd = shape =>
             {
-                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
             Action<PolylineVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
 
@@ -341,7 +381,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<CurveVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<CurveVisual3D> drawEnd = shape =>
             {
-                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
             Action<CurveVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
 
@@ -359,7 +404,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<PolylineVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<PolylineVisual3D> drawEnd = shape =>
             {
-                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
             Action<PolylineVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
 
@@ -377,12 +427,58 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<CurveVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<CurveVisual3D> drawEnd = shape =>
             {
-                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
             Action<CurveVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
 
             DrawCurveCommand command = new DrawCurveCommand(drawStart, drawEnd, drawCancel, true);
             this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 处理形状绘制结束事件 —— Task HandleAsync(ShapeDrawEndEvent message...
+        /// <summary>
+        /// 处理形状绘制结束事件
+        /// </summary>
+        public Task HandleAsync(ShapeDrawEndEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.Shape == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.Shapes.Add(message.Shape.Clone());
+            this.FrameToken++;
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 失活事件 —— override Task OnDeactivateAsync(bool close...
+        /// <summary>
+        /// 失活事件
+        /// </summary>
+        protected override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
+        {
+            if (close)
+            {
+                this._eventAggregator.Unsubscribe(this);
+            }
+
+            return base.OnDeactivateAsync(close, cancellationToken);
         }
         #endregion
 

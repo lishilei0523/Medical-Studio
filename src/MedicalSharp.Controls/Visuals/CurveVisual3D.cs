@@ -122,6 +122,28 @@ namespace MedicalSharp.Controls.Visuals
 
         //Public
 
+        #region 克隆 —— override ShapeVisual3D Clone()
+        /// <summary>
+        /// 克隆
+        /// </summary>
+        /// <returns>形状副本</returns>
+        public override ShapeVisual3D Clone()
+        {
+            CurveVisual3D copy = new CurveVisual3D
+            {
+                Id = this.Id,
+                Stroke = this.Stroke,
+                StrokeThickness = this.StrokeThickness,
+                Fill = this.Fill,
+                ControlPositions = this.ControlPositions,
+                Tessellation = this.Tessellation,
+                Closed = this.Closed
+            };
+
+            return copy;
+        }
+        #endregion
+
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象
