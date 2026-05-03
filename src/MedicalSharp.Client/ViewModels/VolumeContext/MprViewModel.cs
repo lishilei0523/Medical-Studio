@@ -174,22 +174,22 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region 平移 —— void Translate()
+        #region 3D平移 —— void Translate3D()
         /// <summary>
-        /// 平移
+        /// 3D平移
         /// </summary>
-        public void Translate()
+        public void Translate3D()
         {
             TranslateVisual3DCommand command = new TranslateVisual3DCommand();
             this.InputManager.SwitchCommand(command);
         }
         #endregion
 
-        #region 旋转 —— void Rotate()
+        #region 2D旋转 —— void Rotate2D()
         /// <summary>
-        /// 旋转
+        /// 2D旋转
         /// </summary>
-        public void Rotate()
+        public void Rotate2D()
         {
             RotateVisual2DCommand command = new RotateVisual2DCommand();
             this.InputManager.SwitchCommand(command);

@@ -84,7 +84,10 @@ namespace MedicalSharp.Controls.Commands
                     //设置光标
                     viewport.Cursor = new Cursor(StandardCursorType.Hand);
 
+                    //设置位置
                     this._selectedVisual.Transform.SetPosition(hitPoint - localCenter);
+
+                    //请求下一帧
                     viewport.RequestNextFrameRendering();
                 }
             }

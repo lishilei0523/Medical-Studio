@@ -22,10 +22,13 @@
                     <sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel">
                         <PathIcon Data="{StaticResource Icon-PickShape}" />
                     </sd:ToggleRadioButton>
-                    <sd:ToggleRadioButton cm:Message.Attach="Translate()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-Translate}" />
+                    <sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-Translate3D}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="Rotate()" Classes="Transparent-Panel">
+                    <sd:ToggleRadioButton cm:Message.Attach="TranslateNormal()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-TranslateNormal}" />
+                    </sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="Rotate3D()" Classes="Transparent-Panel">
                         <PathIcon Data="{StaticResource Icon-Rotate3D}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Resize()" Classes="Transparent-Panel">

@@ -5,6 +5,8 @@ using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
+using System;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -57,6 +59,20 @@ namespace MedicalSharp.Controls.Visuals
         #endregion
 
         #region # 属性
+
+        #region U轴 —— Vector3 UAxis
+        /// <summary>
+        /// U轴
+        /// </summary>
+        public Vector3 UAxis { get; private set; }
+        #endregion
+
+        #region V轴 —— Vector3 VAxis
+        /// <summary>
+        /// V轴
+        /// </summary>
+        public Vector3 VAxis { get; private set; }
+        #endregion
 
         #region 依赖属性 - 尺寸 —— float Size
         /// <summary>
@@ -122,6 +138,7 @@ namespace MedicalSharp.Controls.Visuals
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
 
                 this.Renderable = renderable;
+                this.BuildBasis();
             }
         }
         #endregion
@@ -140,6 +157,7 @@ namespace MedicalSharp.Controls.Visuals
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                this.BuildBasis();
             }
         }
         #endregion
@@ -174,6 +192,44 @@ namespace MedicalSharp.Controls.Visuals
         private static void OnNormalChanged(GridLinesVisual3D visual3D, AvaloniaPropertyChangedEventArgs<Vector3D> eventArgs)
         {
             visual3D.UpdateRenderable();
+        }
+        #endregion
+
+
+        //Private
+
+        #region 构建UV正交基 —— void BuildBasis()
+        /// <summary>
+        /// 构建UV正交基
+        /// </summary>
+        private void BuildBasis()
+        {
+            Vector3 normal = this.Normal.ToVector3();
+
+            //法向量接近Z轴
+            if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitX;
+                this.VAxis = Vector3.UnitY;
+            }
+            //法向量接近Y轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitX;
+                this.VAxis = Vector3.UnitZ;
+            }
+            //法向量接近X轴
+            else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitX)) > 0.99f)
+            {
+                this.UAxis = Vector3.UnitY;
+                this.VAxis = Vector3.UnitZ;
+            }
+            else
+            {
+                //如果法线被旋转过，重新构造正交基（保证U在XY平面内优先）
+                this.UAxis = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, normal));
+                this.VAxis = Vector3.Normalize(Vector3.Cross(normal, this.UAxis));
+            }
         }
         #endregion
 

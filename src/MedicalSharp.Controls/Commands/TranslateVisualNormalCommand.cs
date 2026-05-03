@@ -11,21 +11,21 @@ using OpenTK.Mathematics;
 namespace MedicalSharp.Controls.Commands
 {
     /// <summary>
-    /// 旋转3D元素命令
+    /// 沿法向量平移元素命令
     /// </summary>
-    public class RotateVisual3DCommand : ViewportCommand
+    public class TranslateVisualNormalCommand : ViewportCommand
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 选中的3D元素
         /// </summary>
-        private IRotatable _selectedVisual;
+        private ITranslatable _selectedVisual;
 
         /// <summary>
-        /// 创建旋转3D元素命令构造器
+        /// 创建沿法向量平移元素命令构造器
         /// </summary>
-        public RotateVisual3DCommand()
+        public TranslateVisualNormalCommand()
         {
             this._selectedVisual = null;
         }
@@ -51,9 +51,9 @@ namespace MedicalSharp.Controls.Commands
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
                 bool success = pickVisual3D.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out _);
-                if (success && visual3D is IRotatable rotatable)
+                if (success && visual3D is ITranslatable translatable)
                 {
-                    this._selectedVisual = rotatable;
+                    this._selectedVisual = translatable;
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
             base.OnMouseMove(viewport, eventArgs);
-            if (eventArgs.Properties.IsLeftButtonPressed && this._selectedVisual != null)
+            if (eventArgs.Properties.IsLeftButtonPressed && this._selectedVisual is IVisual2DIn3D visual2DIn3D)
             {
                 //计算模型位置
                 Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
@@ -78,39 +78,18 @@ namespace MedicalSharp.Controls.Commands
                 Ray ray = viewport.UnProject(mousePos2D);
 
                 //移动平面上的交点
-                bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out _, out _);
+                bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out Vector3 hitPoint, out _);
                 if (success)
                 {
+                    //设置光标
+                    viewport.Cursor = new Cursor(StandardCursorType.Hand);
+
+                    //沿法向量平移
                     float deltaX = mousePos2D.X - this._mousePos2D!.Value.X;
                     float deltaY = mousePos2D.Y - this._mousePos2D!.Value.Y;
-
-                    //设置光标
-                    if (deltaX != 0 && deltaY == 0)
-                    {
-                        viewport.Cursor = new Cursor(StandardCursorType.SizeWestEast);
-                    }
-                    if (deltaX == 0 && deltaY != 0)
-                    {
-                        viewport.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
-                    }
-                    if (deltaX != 0 && deltaY != 0)
-                    {
-                        viewport.Cursor = new Cursor(StandardCursorType.SizeAll);
-                    }
-
-                    //旋转轴
-                    Vector3 axisY = viewport.Camera.UpDirection.Normalized();
-                    Vector3 axisX = viewport.Camera.RightDirection.Normalized();
-
-                    //2D图形用U/V轴旋转
-                    if (this._selectedVisual is IVisual2DIn3D visual2DIn3D)
-                    {
-                        axisY = visual2DIn3D.VAxis.Normalized();
-                        axisX = visual2DIn3D.UAxis.Normalized();
-                    }
-
-                    this._selectedVisual.Transform.Rotate(deltaX, axisY);
-                    this._selectedVisual.Transform.Rotate(deltaY, axisX);
+                    float delta = deltaX + deltaY;
+                    Vector3 translation = visual2DIn3D.Normal.ToVector3() * -delta * 0.003f;
+                    this._selectedVisual.Transform.Translate(translation);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
