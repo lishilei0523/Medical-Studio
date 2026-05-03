@@ -2,6 +2,7 @@
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
@@ -111,40 +112,20 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
             base.OnMouseMove(viewport, eventArgs);
-            if (eventArgs.Properties.IsLeftButtonPressed && this._selectedVisual != null)
+            if (eventArgs.Properties.IsLeftButtonPressed && viewport is BasicViewport basicViewport &&
+                this._selectedVisual != null && this._selectedVertexConstraint.HasValue)
             {
-                //计算模型位置
-                Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
-                Vector3 localCenter = this._selectedVisual.Bounds.Center;
-                Vector3 worldCenter = Vector3.TransformPosition(localCenter, modelMatrix);
-
-                //获取鼠标射线
                 Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
-                Ray ray = viewport.UnProject(mousePos2D);
-
-                //移动平面上的交点
-                bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out _, out _);
-                if (success)
+                Vector3? hitPoint = basicViewport.FindNearestPosition(mousePos2D);
+                if (hitPoint.HasValue)
                 {
-                    //设置光标
-                    viewport.Cursor = new Cursor(StandardCursorType.Cross);
+                    Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
+                    Vector3 localHitPoint = Vector3.TransformPosition(hitPoint.Value, modelMatrix);
+                    VertexDragConstraint constraint = this._selectedVertexConstraint.Value;
+                    this._selectedVisual.MoveVertex(constraint, localHitPoint);
 
-                    //构造局部射线
-                    Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
-                    Ray localRay = ray.Transform(worldToLocal);
-
-                    //可顶点编辑类型
-                    if (this._selectedVertexConstraint.HasValue)
-                    {
-                        VertexDragConstraint constraint = this._selectedVertexConstraint.Value;
-                        if (localRay.IntersectsPlane(constraint.Anchor, constraint.Normal, out Vector3 localHitPoint, out _))
-                        {
-                            this._selectedVisual.MoveVertex(constraint, localHitPoint);
-
-                            //请求下一帧
-                            viewport.RequestNextFrameRendering();
-                        }
-                    }
+                    //请求下一帧
+                    viewport.RequestNextFrameRendering();
                 }
             }
         }
