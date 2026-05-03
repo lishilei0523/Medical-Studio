@@ -77,6 +77,7 @@
 		</sd:GroupBox.Header>
 		<!--Content-->
 		<sd:MPRViewport Background="Black"
+                        FrameToken="{Binding FrameToken}"
 						Plane="{Binding Plane}"
 						Camera="{Binding Camera}"
 						InputManager="{Binding InputManager}"

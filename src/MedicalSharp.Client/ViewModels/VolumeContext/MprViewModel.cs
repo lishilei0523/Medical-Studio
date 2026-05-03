@@ -2,6 +2,7 @@
 using Avalonia.Collections;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
+using MedicalSharp.Client.Events;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Commands.Arguments;
 using MedicalSharp.Controls.Extensions;
@@ -33,11 +34,18 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         private readonly IWindowManager _windowManager;
 
         /// <summary>
+        /// 事件聚合器
+        /// </summary>
+        private readonly IEventAggregator _eventAggregator;
+
+        /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public MprViewModel(IWindowManager windowManager, string title, MPRCamera camera, MPRInputManager inputManager)
+        public MprViewModel(IWindowManager windowManager, IEventAggregator eventAggregator, string title, MPRCamera camera, MPRInputManager inputManager)
         {
             this._windowManager = windowManager;
+            this._eventAggregator = eventAggregator;
+            this._eventAggregator.SubscribeOnUIThread(this);
             this.Title = title;
             this.Camera = camera;
             this.InputManager = inputManager;
@@ -246,9 +254,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawRectangle()
         {
-            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
-            Action<ShapeVisual3D> ss = shape => this.Shapes.Add(shape);
-            DrawRectangleCommand command = new DrawRectangleCommand(ss, getNormal);
+            Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
+            Action<ShapeVisual3D> drawStart = shape =>
+            {
+                this.Shapes.Add(shape);
+                this._eventAggregator.PublishOnUIThreadAsync(new ShapeCreatedEvent(shape));
+            };
+            DrawRectangleCommand command = new DrawRectangleCommand(drawStart, getNormal);
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -259,7 +271,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawCircle()
         {
-            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
             DrawCircleCommand command = new DrawCircleCommand(shape => this.Shapes.Add(shape), getNormal);
             this.InputManager.SwitchCommand(command);
         }
@@ -271,7 +283,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawEllipse()
         {
-            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
             DrawEllipseCommand command = new DrawEllipseCommand(shape => this.Shapes.Add(shape), getNormal);
             this.InputManager.SwitchCommand(command);
         }

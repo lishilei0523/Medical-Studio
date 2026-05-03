@@ -2,6 +2,7 @@
 using Avalonia.Collections;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
+using MedicalSharp.Client.Events;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Commands.Arguments;
 using MedicalSharp.Controls.Extensions;
@@ -17,13 +18,15 @@ using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase
+    public class VolumeViewModel : ScreenBase, IHandle<ShapeCreatedEvent>
     {
         #region # 字段及构造器
 
@@ -33,11 +36,18 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         private readonly IWindowManager _windowManager;
 
         /// <summary>
+        /// 事件聚合器
+        /// </summary>
+        private readonly IEventAggregator _eventAggregator;
+
+        /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public VolumeViewModel(IWindowManager windowManager)
+        public VolumeViewModel(IWindowManager windowManager, IEventAggregator eventAggregator)
         {
             this._windowManager = windowManager;
+            this._eventAggregator = eventAggregator;
+            this._eventAggregator.SubscribeOnUIThread(this);
             this.Shapes = [];
 
             //初始化相机
@@ -55,6 +65,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #endregion
 
         #region # 属性
+
+        #region 帧令牌 —— int FrameToken
+        /// <summary>
+        /// 帧令牌
+        /// </summary>
+        [DependencyProperty]
+        public int FrameToken { get; set; }
+        #endregion
 
         #region 轨道相机 —— OrbitCamera Camera
         /// <summary>
@@ -254,7 +272,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawRectangle()
         {
-            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
             DrawRectangleCommand command = new DrawRectangleCommand(shape => this.Shapes.Add(shape), getNormal);
             this.InputManager.SwitchCommand(command);
         }
@@ -266,7 +284,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawCircle()
         {
-            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
             DrawCircleCommand command = new DrawCircleCommand(shape => this.Shapes.Add(shape), getNormal);
             this.InputManager.SwitchCommand(command);
         }
@@ -278,7 +296,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawEllipse()
         {
-            Func<Vector3D> getNormal = () => this.Camera.LookDirection.ToVector3();
+            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
             DrawEllipseCommand command = new DrawEllipseCommand(shape => this.Shapes.Add(shape), getNormal);
             this.InputManager.SwitchCommand(command);
         }
@@ -372,6 +390,33 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape => this.Shapes.Remove(shape)
             );
             this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region 处理形状创建事件 —— Task HandleAsync(ShapeCreatedEvent message...
+        /// <summary>
+        /// 处理形状创建事件
+        /// </summary>
+        public Task HandleAsync(ShapeCreatedEvent message, CancellationToken cancellationToken)
+        {
+            if (message.Shape is RectangleVisual3D rectangle)
+            {
+                //TODO 实现；
+                RectangleVisual3D newRectangle = new RectangleVisual3D
+                {
+                    Stroke = rectangle.Stroke,
+                    StrokeThickness = rectangle.StrokeThickness,
+                    Fill = rectangle.Fill,
+                    Width = rectangle.Width,
+                    Height = rectangle.Height,
+                    Center = rectangle.Center,
+                    Normal = rectangle.Normal
+                };
+
+                this.Shapes.Add(newRectangle);
+            }
+
+            return Task.CompletedTask;
         }
         #endregion
 

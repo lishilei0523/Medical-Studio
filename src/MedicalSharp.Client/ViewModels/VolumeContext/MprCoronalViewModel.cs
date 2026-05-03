@@ -23,16 +23,23 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         private readonly IWindowManager _windowManager;
 
         /// <summary>
+        /// 事件聚合器
+        /// </summary>
+        private readonly IEventAggregator _eventAggregator;
+
+        /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public MprCoronalViewModel(IWindowManager windowManager)
+        public MprCoronalViewModel(IWindowManager windowManager, IEventAggregator eventAggregator)
         {
             this._windowManager = windowManager;
+            this._eventAggregator = eventAggregator;
+            this._eventAggregator.SubscribeOnUIThread(this);
 
             const string title = "MPR-Coronal";
             MPRCamera camera = new MPRCamera();
             MPRInputManager inputManager = new MPRInputManager(camera);
-            this.MprViewModel = new MprViewModel(windowManager, title, camera, inputManager);
+            this.MprViewModel = new MprViewModel(windowManager, eventAggregator, title, camera, inputManager);
         }
 
         #endregion
