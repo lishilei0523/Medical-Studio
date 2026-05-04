@@ -129,7 +129,9 @@ namespace MedicalSharp.Controls.Extensions
             }
             if (visual3D is PointVisual3D pointVisual3D)
             {
-                float shapeDistance = Vector3.Dot(pointVisual3D.Position.ToVector3(), plane.Normal);
+                Vector3 localPosition = pointVisual3D.Position.ToVector3();
+                Vector3 worldPosition = Vector3.TransformPosition(localPosition, visual3D.Transform.Matrix);
+                float shapeDistance = Vector3.Dot(worldPosition, plane.Normal);
                 float planeDistance = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
                 float diffDistance = Math.Abs(shapeDistance - planeDistance);
 
@@ -137,12 +139,17 @@ namespace MedicalSharp.Controls.Extensions
             }
             if (visual3D is IVisual2DIn3D visual2DIn3D)
             {
-                if (Math.Abs(Vector3.Dot(visual2DIn3D.Normal.ToVector3(), plane.Normal)) < 0.999f)
+                Vector3 localNormal = visual2DIn3D.Normal.ToVector3();
+                Vector3 worldNormal = Vector3.TransformNormal(localNormal, visual3D.Transform.Matrix);
+                worldNormal = Vector3.Normalize(worldNormal);
+                if (Math.Abs(Vector3.Dot(worldNormal, plane.Normal)) < 0.999f)
                 {
                     return false;
                 }
 
-                float shapeDistance = Vector3.Dot(visual2DIn3D.PointOnPlane.ToVector3(), plane.Normal);
+                Vector3 localPoint = visual2DIn3D.PointOnPlane.ToVector3();
+                Vector3 worldPoint = Vector3.TransformPosition(localPoint, visual3D.Transform.Matrix);
+                float shapeDistance = Vector3.Dot(worldPoint, plane.Normal);
                 float planeDistance = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
                 float diffDistance = Math.Abs(shapeDistance - planeDistance);
 
