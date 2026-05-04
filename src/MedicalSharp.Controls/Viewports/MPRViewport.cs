@@ -353,8 +353,11 @@ namespace MedicalSharp.Controls.Viewports
                     if (shapeVisual3D is IPureVisual3D pureVisual3D)
                     {
                         PolylineVisual3D polygon = pureVisual3D.CreateSectionPolygon(this.Plane);
-                        polygon.EnsureRenderable();
-                        shapeVisual3Ds.Add(polygon);
+                        if (polygon != null)
+                        {
+                            polygon.EnsureRenderable();
+                            shapeVisual3Ds.Add(polygon);
+                        }
                     }
                     else
                     {
