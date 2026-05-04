@@ -4,7 +4,9 @@ using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Engine.Renderables
 {
@@ -96,7 +98,15 @@ namespace MedicalSharp.Engine.Renderables
         {
             #region # 验证
 
-            if (this.Positions.Equals(positions))
+            if (positions == null || !positions.Any())
+            {
+                throw new ArgumentNullException(nameof(positions), "位置列表不可为空！");
+            }
+            if (ReferenceEquals(positions, this.Positions))
+            {
+                return;
+            }
+            if (this.Positions.SequenceEqual(positions))
             {
                 return;
             }
@@ -140,7 +150,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制点模型
             GL.PointSize(this.PointSize);
             program.SetUniformVector4("u_Color", this.Fill);
-            this.VertexBuffer.Draw(PrimitiveType.Points);
+            this._vertexBuffer.Draw(PrimitiveType.Points);
         }
         #endregion
 

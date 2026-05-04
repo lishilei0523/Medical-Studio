@@ -139,7 +139,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制点模型
             GL.PointSize(this.PointSize);
             program.SetUniformVector4("u_Color", this.Fill);
-            this.VertexBuffer.Draw(PrimitiveType.Points);
+            this._vertexBuffer.Draw(PrimitiveType.Points);
         }
         #endregion
 

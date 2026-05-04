@@ -225,17 +225,16 @@ namespace MedicalSharp.Controls.Visuals
                 TextRenderable renderable = this.RenderMode == TextRenderMode.Fixed
                     ? new TextRenderable(this.Text, this.Position.ToVector3(), this.FontSize, this.Color.ToVector4(), this.Normal.ToVector3())
                     : new TextRenderable(this.Text, this.Position.ToVector3(), this.FontSize, this.Color.ToVector4(), this.LockYAxis);
-
                 this.Renderable = renderable;
-                this.BuildBasis();
             }
             else
             {
                 TextRenderable renderable = (TextRenderable)this.Renderable;
                 renderable.Update(this.Text, this.FontSize);
                 renderable.SetColor(this.Color.ToVector4());
-                this.BuildBasis();
             }
+
+            this.BuildBasis();
         }
         #endregion
 

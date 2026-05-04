@@ -85,19 +85,26 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
-            if (this.Renderable == null && this.Positions != null)
-            {
-                IEnumerable<Vector3> positions = this.Positions.Select(x => x.ToVector3());
-                PolylineRenderable renderable = new PolylineRenderable([.. positions], this.Closed);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+            #region # 验证
 
+            if (this.Positions == null || !this.Positions.Any())
+            {
+                return;
+            }
+
+            #endregion
+
+            IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
+            if (this.Renderable == null)
+            {
+                PolylineRenderable renderable = new PolylineRenderable(positions, this.Closed);
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
                 this.Renderable = renderable;
             }
-            if (this.Renderable != null && this.Positions != null)
+            else
             {
-                IEnumerable<Vector3> positions = this.Positions.Select(x => x.ToVector3());
                 PolylineRenderable renderable = (PolylineRenderable)this.Renderable;
-                renderable.Update([.. positions]);
+                renderable.Update(positions);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
             }
         }

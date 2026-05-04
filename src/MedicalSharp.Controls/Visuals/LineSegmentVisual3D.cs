@@ -80,16 +80,18 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
+            Vector3 startPoint = this.StartPoint.ToVector3();
+            Vector3 endPoint = this.EndPoint.ToVector3();
             if (this.Renderable == null)
             {
-                LineSegmentRenderable renderable = new LineSegmentRenderable(this.StartPoint.ToVector3(), this.EndPoint.ToVector3());
+                LineSegmentRenderable renderable = new LineSegmentRenderable(startPoint, endPoint);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
                 this.Renderable = renderable;
             }
             else
             {
                 LineSegmentRenderable renderable = (LineSegmentRenderable)this.Renderable;
-                renderable.Update(this.StartPoint.ToVector3(), this.EndPoint.ToVector3());
+                renderable.Update(startPoint, endPoint);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
             }
         }

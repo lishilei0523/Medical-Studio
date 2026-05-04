@@ -41,6 +41,11 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<Vector3D> NormalProperty;
 
         /// <summary>
+        /// 细分数量依赖属性
+        /// </summary>
+        public static readonly StyledProperty<int> SegmentsProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static EllipseVisual3D()
@@ -49,6 +54,7 @@ namespace MedicalSharp.Controls.Visuals
             HeightProperty = AvaloniaProperty.Register<EllipseVisual3D, float>(nameof(Height), 1.0f);
             CenterProperty = AvaloniaProperty.Register<EllipseVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
             NormalProperty = AvaloniaProperty.Register<EllipseVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 0, 1));
+            SegmentsProperty = AvaloniaProperty.Register<EllipseVisual3D, int>(nameof(Segments), 64);
         }
 
 
@@ -137,6 +143,18 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 依赖属性 - 细分数量 —— int Segments
+        /// <summary>
+        /// 依赖属性 - 细分数量
+        /// </summary>
+        /// <remarks>圆周分段数</remarks>
+        public int Segments
+        {
+            get => this.GetValue(SegmentsProperty);
+            set => this.SetValue(SegmentsProperty, value);
+        }
+        #endregion
+
         #region 只读属性 - 平面上一点 —— Vector3D PointOnPlane
         /// <summary>
         /// 只读属性 - 平面上一点
@@ -159,27 +177,24 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
+            Vector3 center = this.Center.ToVector3();
+            Vector3 normal = this.Normal.ToVector3();
+            MeshGeometry strokeMesh = MeshFactory.CreateEllipse(center, this.Width, this.Height, normal, this.Segments, GraphicPrimitiveType.Lines);
+            MeshGeometry fillMesh = MeshFactory.CreateEllipse(center, this.Width, this.Height, normal, this.Segments, GraphicPrimitiveType.Triangles);
             if (this.Renderable == null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
-
                 WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
                 this.Renderable = renderable;
-                this.BuildBasis();
             }
             else
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateEllipse(this.Center.ToVector3(), this.Width, this.Height, this.Normal.ToVector3(), 64, GraphicPrimitiveType.Triangles);
-
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-                this.BuildBasis();
             }
+
+            this.BuildBasis();
         }
         #endregion
 

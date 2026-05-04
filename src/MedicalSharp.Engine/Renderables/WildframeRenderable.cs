@@ -73,7 +73,7 @@ namespace MedicalSharp.Engine.Renderables
             this._fillBuffer.Setup();
 
             //提取三角形面
-            this._triangles = this.FillBuffer.MeshGeometry.ExtractTriangles();
+            this._triangles = this._fillBuffer.MeshGeometry.ExtractTriangles();
         }
 
         #endregion
@@ -162,6 +162,14 @@ namespace MedicalSharp.Engine.Renderables
             {
                 throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
             }
+            if (ReferenceEquals(strokeMesh, this._strokeBuffer.MeshGeometry) && ReferenceEquals(fillMesh, this._fillBuffer.MeshGeometry))
+            {
+                return;
+            }
+            if (strokeMesh.Equals(this._strokeBuffer.MeshGeometry) && fillMesh.Equals(this._fillBuffer.MeshGeometry))
+            {
+                return;
+            }
 
             #endregion
 
@@ -175,7 +183,7 @@ namespace MedicalSharp.Engine.Renderables
             this._fillBuffer.Setup();
 
             //提取三角形面
-            this._triangles = this.FillBuffer.MeshGeometry.ExtractTriangles();
+            this._triangles = this._fillBuffer.MeshGeometry.ExtractTriangles();
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();
@@ -211,7 +219,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //绘制填充模型	
             program.SetUniformVector4("u_Color", this.Fill);
-            this.FillBuffer.Draw(PrimitiveType.Triangles);
+            this._fillBuffer.Draw(PrimitiveType.Triangles);
 
             //恢复状态
             GL.DepthMask(true);
@@ -220,7 +228,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
-            this.StrokeBuffer.Draw(PrimitiveType.Lines);
+            this._strokeBuffer.Draw(PrimitiveType.Lines);
 
             if (this.DrawVertex)
             {
@@ -240,7 +248,7 @@ namespace MedicalSharp.Engine.Renderables
 
                 //绘制控制点
                 program.SetUniformVector4("u_Color", invertedStroke);
-                this.StrokeBuffer.Draw(PrimitiveType.Points);
+                this._strokeBuffer.Draw(PrimitiveType.Points);
             }
         }
         #endregion
@@ -272,7 +280,7 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            IEnumerable<Vector3> positions = this.StrokeBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
+            IEnumerable<Vector3> positions = this._strokeBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
             BoundingBox boundingBox = BoundingBox.FromPoints([.. positions]);
 
             return boundingBox;

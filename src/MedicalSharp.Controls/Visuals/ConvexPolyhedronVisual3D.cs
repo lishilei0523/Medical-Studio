@@ -75,30 +75,32 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
-            if (this.Renderable == null && this.Positions != null)
-            {
-                IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
-                MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Triangles);
+            #region # 验证
 
+            if (this.Positions == null || !this.Positions.Any())
+            {
+                return;
+            }
+
+            #endregion
+
+            IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
+            MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
+            MeshGeometry fillMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Triangles);
+            if (this.Renderable == null)
+            {
                 WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh, true);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
                 this.Renderable = renderable;
-                this.MeshGeometry = fillMesh;
             }
-            if (this.Renderable != null && this.Positions != null)
+            else
             {
-                IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
-                MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Triangles);
-
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
-                this.MeshGeometry = fillMesh;
             }
+
+            this.MeshGeometry = fillMesh;
         }
         #endregion
 

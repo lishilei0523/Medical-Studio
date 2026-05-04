@@ -82,19 +82,26 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
-            if (this.Renderable == null && this.Positions != null)
-            {
-                IEnumerable<Vector3> positions = this.Positions.Select(x => x.ToVector3());
-                PointCloudRenderable renderable = new PointCloudRenderable([.. positions]);
-                renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
+            #region # 验证
 
+            if (this.Positions == null || !this.Positions.Any())
+            {
+                return;
+            }
+
+            #endregion
+
+            IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
+            if (this.Renderable == null)
+            {
+                PointCloudRenderable renderable = new PointCloudRenderable(positions);
+                renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
                 this.Renderable = renderable;
             }
-            if (this.Renderable != null && this.Positions != null)
+            else
             {
-                IEnumerable<Vector3> positions = this.Positions.Select(x => x.ToVector3());
                 PointCloudRenderable renderable = (PointCloudRenderable)this.Renderable;
-                renderable.Update([.. positions]);
+                renderable.Update(positions);
                 renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
             }
         }

@@ -62,7 +62,7 @@ namespace MedicalSharp.Engine.Renderables
             this._vertexBuffer.Setup();
 
             //提取三角形面
-            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
+            this._triangles = this._vertexBuffer.MeshGeometry.ExtractTriangles();
         }
 
         #endregion
@@ -122,6 +122,14 @@ namespace MedicalSharp.Engine.Renderables
             {
                 throw new ArgumentNullException(nameof(strokeMesh), "线框网格不可为空！");
             }
+            if (ReferenceEquals(strokeMesh, this._vertexBuffer.MeshGeometry))
+            {
+                return;
+            }
+            if (strokeMesh.Equals(this._vertexBuffer.MeshGeometry))
+            {
+                return;
+            }
 
             #endregion
 
@@ -132,7 +140,7 @@ namespace MedicalSharp.Engine.Renderables
             this._vertexBuffer.Setup();
 
             //提取三角形面
-            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
+            this._triangles = this._vertexBuffer.MeshGeometry.ExtractTriangles();
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();
@@ -162,7 +170,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
-            this.VertexBuffer.Draw(PrimitiveType.LineStrip);
+            this._vertexBuffer.Draw(PrimitiveType.LineStrip);
 
             //点尺寸
             float pointSize = Math.Clamp(this.StrokeThickness * 3.0f, 5f, 20f);
@@ -170,9 +178,9 @@ namespace MedicalSharp.Engine.Renderables
 
             //点颜色
             Vector4 invertedStroke = this.Stroke.Invert();
-            float contrast = Math.Abs(invertedStroke.X - invertedStroke.X) +
-                             Math.Abs(invertedStroke.Y - invertedStroke.Y) +
-                             Math.Abs(invertedStroke.Z - invertedStroke.Z);
+            float contrast = Math.Abs(invertedStroke.X - this.Stroke.X) +
+                             Math.Abs(invertedStroke.Y - this.Stroke.Y) +
+                             Math.Abs(invertedStroke.Z - this.Stroke.Z);
             if (contrast < 0.5f)
             {
                 invertedStroke = ColorFactory.Yellow(); //固定用亮黄色
@@ -180,7 +188,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //绘制控制点
             program.SetUniformVector4("u_Color", invertedStroke);
-            this.VertexBuffer.Draw(PrimitiveType.Points);
+            this._vertexBuffer.Draw(PrimitiveType.Points);
         }
         #endregion
 
@@ -210,7 +218,7 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            IEnumerable<Vector3> positions = this.VertexBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
+            IEnumerable<Vector3> positions = this._vertexBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
             BoundingBox boundingBox = BoundingBox.FromPoints([.. positions]);
 
             return boundingBox;

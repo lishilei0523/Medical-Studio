@@ -135,21 +135,16 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
+            MeshGeometry strokeMesh = MeshFactory.CreateCylinder(this.Radius, this.Height, this.Center.ToVector3(), this.Segments, GraphicPrimitiveType.Lines, this.WithCaps);
+            MeshGeometry fillMesh = MeshFactory.CreateCylinder(this.Radius, this.Height, this.Center.ToVector3(), this.Segments, GraphicPrimitiveType.Triangles, this.WithCaps);
             if (this.Renderable == null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateCylinder(this.Radius, this.Height, this.Center.ToVector3(), this.Segments, GraphicPrimitiveType.Lines, this.WithCaps);
-                MeshGeometry fillMesh = MeshFactory.CreateCylinder(this.Radius, this.Height, this.Center.ToVector3(), this.Segments, GraphicPrimitiveType.Triangles, this.WithCaps);
-
                 WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
                 this.Renderable = renderable;
             }
             else
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateCylinder(this.Radius, this.Height, this.Center.ToVector3(), this.Segments, GraphicPrimitiveType.Lines, this.WithCaps);
-                MeshGeometry fillMesh = MeshFactory.CreateCylinder(this.Radius, this.Height, this.Center.ToVector3(), this.Segments, GraphicPrimitiveType.Triangles, this.WithCaps);
-
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());

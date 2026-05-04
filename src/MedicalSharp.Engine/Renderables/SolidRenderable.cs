@@ -56,7 +56,7 @@ namespace MedicalSharp.Engine.Renderables
             this._vertexBuffer.Setup();
 
             //提取三角形面
-            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
+            this._triangles = this._vertexBuffer.MeshGeometry.ExtractTriangles();
         }
 
         #endregion
@@ -109,6 +109,14 @@ namespace MedicalSharp.Engine.Renderables
             {
                 throw new ArgumentNullException(nameof(fillMesh), "填充网格不可为空！");
             }
+            if (ReferenceEquals(fillMesh, this._vertexBuffer.MeshGeometry))
+            {
+                return;
+            }
+            if (fillMesh.Equals(this._vertexBuffer.MeshGeometry))
+            {
+                return;
+            }
 
             #endregion
 
@@ -119,7 +127,7 @@ namespace MedicalSharp.Engine.Renderables
             this._vertexBuffer.Setup();
 
             //提取三角形面
-            this._triangles = this.VertexBuffer.MeshGeometry.ExtractTriangles();
+            this._triangles = this._vertexBuffer.MeshGeometry.ExtractTriangles();
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();
@@ -146,7 +154,7 @@ namespace MedicalSharp.Engine.Renderables
         {
             //绘制填充模型	
             program.SetUniformVector4("u_Color", this.Fill);
-            this.VertexBuffer.Draw(PrimitiveType.Triangles);
+            this._vertexBuffer.Draw(PrimitiveType.Triangles);
         }
         #endregion
 
@@ -176,7 +184,7 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            IEnumerable<Vector3> positions = this.VertexBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
+            IEnumerable<Vector3> positions = this._vertexBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
             BoundingBox boundingBox = BoundingBox.FromPoints([.. positions]);
 
             return boundingBox;

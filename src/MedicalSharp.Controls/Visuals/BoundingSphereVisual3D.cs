@@ -118,23 +118,17 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
+            Vector3 center = this.Center.ToVector3();
+            MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
+            MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
             if (this.Renderable == null)
             {
-                Vector3 center = this.Center.ToVector3();
-                MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
-                MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
-
                 WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
                 this.Renderable = renderable;
             }
             else
             {
-                Vector3 center = this.Center.ToVector3();
-                MeshGeometry strokeMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
-                MeshGeometry fillMesh = MeshFactory.CreateSphere(this.Radius, center, this.Segments, this.Rings);
-
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());

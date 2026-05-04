@@ -185,6 +185,19 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="fontSize">字体大小</param>
         public void Update(string text, float fontSize)
         {
+            #region # 验证
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                throw new ArgumentNullException(nameof(text), "文本不可为空！");
+            }
+            if (this.Text == text && this.FontSize.Equals(fontSize))
+            {
+                return;
+            }
+
+            #endregion
+
             this.Text = text;
             this.FontSize = fontSize;
 

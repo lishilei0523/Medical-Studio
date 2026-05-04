@@ -104,13 +104,13 @@ namespace MedicalSharp.Engine.Renderables
         {
             #region # 验证
 
-            if (this.StartPoint == startPoint && this.EndPoint == endPoint)
-            {
-                return;
-            }
             if (startPoint == endPoint)
             {
                 throw new ArgumentNullException(nameof(endPoint), "起始点与终止点不可相等！");
+            }
+            if (this.StartPoint == startPoint && this.EndPoint == endPoint)
+            {
+                return;
             }
 
             #endregion
@@ -153,7 +153,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
-            this.VertexBuffer.Draw(PrimitiveType.Lines);
+            this._vertexBuffer.Draw(PrimitiveType.Lines);
 
             //点尺寸
             float pointSize = Math.Clamp(this.StrokeThickness * 3.0f, 5f, 20f);
@@ -161,9 +161,9 @@ namespace MedicalSharp.Engine.Renderables
 
             //点颜色
             Vector4 invertedStroke = this.Stroke.Invert();
-            float contrast = Math.Abs(invertedStroke.X - invertedStroke.X) +
-                             Math.Abs(invertedStroke.Y - invertedStroke.Y) +
-                             Math.Abs(invertedStroke.Z - invertedStroke.Z);
+            float contrast = Math.Abs(invertedStroke.X - this.Stroke.X) +
+                             Math.Abs(invertedStroke.Y - this.Stroke.Y) +
+                             Math.Abs(invertedStroke.Z - this.Stroke.Z);
             if (contrast < 0.5f)
             {
                 invertedStroke = ColorFactory.Yellow(); //固定用亮黄色
@@ -171,7 +171,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //绘制控制点
             program.SetUniformVector4("u_Color", invertedStroke);
-            this.VertexBuffer.Draw(PrimitiveType.Points);
+            this._vertexBuffer.Draw(PrimitiveType.Points);
         }
         #endregion
 

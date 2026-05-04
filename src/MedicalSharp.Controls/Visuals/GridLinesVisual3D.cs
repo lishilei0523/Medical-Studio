@@ -124,27 +124,22 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
+            MeshGeometry strokeMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
+            MeshGeometry fillMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
             if (this.Renderable == null)
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
-
                 WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-
                 this.Renderable = renderable;
-                this.BuildBasis();
             }
             else
             {
-                MeshGeometry strokeMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Lines);
-                MeshGeometry fillMesh = MeshFactory.CreateGridLines(this.Size, this.Divisions, this.Normal.ToVector3(), GraphicPrimitiveType.Triangles);
-
                 WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
                 renderable.Update(strokeMesh, fillMesh);
                 renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
-                this.BuildBasis();
             }
+
+            this.BuildBasis();
         }
         #endregion
 

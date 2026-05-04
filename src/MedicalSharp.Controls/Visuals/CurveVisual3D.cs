@@ -121,21 +121,25 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
-            if (this.Renderable == null && this.ControlPositions != null)
-            {
-                IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
-                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
+            #region # 验证
 
+            if (this.ControlPositions == null || !this.ControlPositions.Any())
+            {
+                return;
+            }
+
+            #endregion
+
+            IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
+            IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
+            if (this.Renderable == null)
+            {
                 CurveRenderable renderable = new CurveRenderable(controlPositions, sampledPositions, this.Closed);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
-
                 this.Renderable = renderable;
             }
-            if (this.Renderable != null && this.ControlPositions != null)
+            else
             {
-                IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
-                IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
-
                 CurveRenderable renderable = (CurveRenderable)this.Renderable;
                 renderable.Update(controlPositions, sampledPositions);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);

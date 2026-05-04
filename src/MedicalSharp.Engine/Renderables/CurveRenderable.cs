@@ -6,6 +6,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Engine.Renderables
 {
@@ -97,16 +98,6 @@ namespace MedicalSharp.Engine.Renderables
         public float StrokeThickness { get; private set; }
         #endregion
 
-        #region 只读属性 - 控制点缓冲区 —— VertexBuffer PointBuffer
-        /// <summary>
-        /// 只读属性 - 控制点缓冲区
-        /// </summary>
-        internal VertexBuffer PointBuffer
-        {
-            get => this._pointBuffer;
-        }
-        #endregion
-
         #region 只读属性 - 曲线缓冲区 —— VertexBuffer CurveBuffer
         /// <summary>
         /// 只读属性 - 曲线缓冲区
@@ -133,7 +124,19 @@ namespace MedicalSharp.Engine.Renderables
         {
             #region # 验证
 
-            if (this.ControlPositions.Equals(controlPositions) && Equals(this.SampledPositions, sampledPositions))
+            if (controlPositions == null || !controlPositions.Any())
+            {
+                throw new ArgumentNullException(nameof(controlPositions), "控制点列表不可为空！");
+            }
+            if (sampledPositions == null || !sampledPositions.Any())
+            {
+                throw new ArgumentNullException(nameof(sampledPositions), "采样点列表不可为空！");
+            }
+            if (ReferenceEquals(controlPositions, this.ControlPositions) && ReferenceEquals(sampledPositions, this.SampledPositions))
+            {
+                return;
+            }
+            if (this.ControlPositions.SequenceEqual(controlPositions) && this.SampledPositions.SequenceEqual(sampledPositions))
             {
                 return;
             }
@@ -190,9 +193,9 @@ namespace MedicalSharp.Engine.Renderables
 
             //点颜色
             Vector4 invertedStroke = this.Stroke.Invert();
-            float contrast = Math.Abs(invertedStroke.X - invertedStroke.X) +
-                             Math.Abs(invertedStroke.Y - invertedStroke.Y) +
-                             Math.Abs(invertedStroke.Z - invertedStroke.Z);
+            float contrast = Math.Abs(invertedStroke.X - this.Stroke.X) +
+                             Math.Abs(invertedStroke.Y - this.Stroke.Y) +
+                             Math.Abs(invertedStroke.Z - this.Stroke.Z);
             if (contrast < 0.5f)
             {
                 invertedStroke = ColorFactory.Yellow(); //固定用亮黄色

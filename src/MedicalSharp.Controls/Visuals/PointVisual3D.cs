@@ -3,6 +3,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Interfaces;
+using OpenTK.Mathematics;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -77,17 +78,17 @@ namespace MedicalSharp.Controls.Visuals
         /// </summary>
         internal override void EnsureRenderable()
         {
+            Vector3 position = this.Position.ToVector3();
             if (this.Renderable == null)
             {
-                PointRenderable renderable = new PointRenderable(this.Position.ToVector3());
+                PointRenderable renderable = new PointRenderable(position);
                 renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
-
                 this.Renderable = renderable;
             }
             else
             {
                 PointRenderable renderable = (PointRenderable)this.Renderable;
-                renderable.Update(this.Position.ToVector3());
+                renderable.Update(position);
                 renderable.SetFill(this.Fill.ToVector4(), this.PointSize);
             }
         }
