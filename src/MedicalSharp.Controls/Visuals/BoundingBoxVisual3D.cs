@@ -11,6 +11,7 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -222,6 +223,40 @@ namespace MedicalSharp.Controls.Visuals
                 this.Center = shape.Center;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
             }
+        }
+        #endregion
+
+        #region 获取凸包位置列表 —— IReadOnlyList<Vector3> GetConvexHullPositions()
+        /// <summary>
+        /// 获取凸包位置列表
+        /// </summary>
+        /// <returns>位置列表（世界空间）</returns>
+        public IReadOnlyList<Vector3> GetConvexHullPositions()
+        {
+            Vector3 minimum = this.Minimum;
+            Vector3 maximum = this.Maximum;
+            List<Vector3> localHull =
+            [
+                new Vector3(minimum.X, minimum.Y, minimum.Z),
+                new Vector3(minimum.X, minimum.Y, maximum.Z),
+                new Vector3(minimum.X, maximum.Y, minimum.Z),
+                new Vector3(minimum.X, maximum.Y, maximum.Z),
+                new Vector3(maximum.X, minimum.Y, minimum.Z),
+                new Vector3(maximum.X, minimum.Y, maximum.Z),
+                new Vector3(maximum.X, maximum.Y, minimum.Z),
+                new Vector3(maximum.X, maximum.Y, maximum.Z)
+            ];
+
+            //转换到世界空间
+            Matrix4 localToWorld = this.Transform.Matrix;
+            List<Vector3> convexHullPositions = new List<Vector3>(8);
+            for (int index = 0; index < 8; index++)
+            {
+                Vector3 transformed = Vector3.TransformPosition(localHull[index], localToWorld);
+                convexHullPositions.Add(transformed);
+            }
+
+            return convexHullPositions;
         }
         #endregion
 

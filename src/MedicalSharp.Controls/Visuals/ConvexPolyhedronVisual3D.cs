@@ -144,6 +144,35 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 获取凸包位置列表 —— IReadOnlyList<Vector3> GetConvexHullPositions()
+        /// <summary>
+        /// 获取凸包位置列表
+        /// </summary>
+        /// <returns>位置列表（世界空间）</returns>
+        public IReadOnlyList<Vector3> GetConvexHullPositions()
+        {
+            #region # 验证
+
+            if (this.Positions == null || !this.Positions.Any())
+            {
+                return [];
+            }
+
+            #endregion
+
+            Matrix4 localToWorld = this.Transform.Matrix;
+            Vector3[] convexHullPositions = new Vector3[this.Positions.Count];
+            for (int index = 0; index < this.Positions.Count; index++)
+            {
+                Vector3 localPosition = this.Positions[index].ToVector3();
+                Vector3 worldPostion = Vector3.TransformPosition(localPosition, localToWorld);
+                convexHullPositions[index] = worldPostion;
+            }
+
+            return convexHullPositions;
+        }
+        #endregion
+
         #region 尝试获取顶点拖拽约束 —— bool TryGetVertexDrag(Ray localRay, Vector3 localLookDirection...
         /// <summary>
         /// 尝试获取顶点拖拽约束

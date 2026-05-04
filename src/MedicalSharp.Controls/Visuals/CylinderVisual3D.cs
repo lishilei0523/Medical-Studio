@@ -10,6 +10,7 @@ using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -193,6 +194,46 @@ namespace MedicalSharp.Controls.Visuals
                 this.WithCaps = shape.WithCaps;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
             }
+        }
+        #endregion
+
+        #region 获取凸包位置列表 —— IReadOnlyList<Vector3> GetConvexHullPositions()
+        /// <summary>
+        /// 获取凸包位置列表
+        /// </summary>
+        /// <returns>位置列表（世界空间）</returns>
+        public IReadOnlyList<Vector3> GetConvexHullPositions()
+        {
+            Vector3 center = this.Center.ToVector3();
+            float radius = this.Radius;
+            float halfHeight = this.Height * 0.5f;
+            int segments = Math.Max(this.Segments, 16);  //最低16段
+
+            List<Vector3> localHull = new List<Vector3>(segments * 2);
+            for (int segment = 0; segment < segments; segment++)
+            {
+                float angle = 2.0f * MathHelper.Pi * segment / segments;
+                float x = radius * MathF.Cos(angle);
+                float y = radius * MathF.Sin(angle);
+
+                //上圆环顶点
+                localHull.Add(new Vector3(center.X + x, center.Y + y, center.Z + halfHeight));
+
+                //下圆环顶点
+                localHull.Add(new Vector3(center.X + x, center.Y + y, center.Z - halfHeight));
+            }
+
+            //转换到世界空间（注意：Transform 包含旋转，圆柱轴可能不是Z轴）
+            Matrix4 localToWorld = this.Transform.Matrix;
+            Vector3[] convexHullPositions = new Vector3[localHull.Count];
+            for (int index = 0; index < localHull.Count; index++)
+            {
+                Vector3 localPosition = localHull[index];
+                Vector3 worldPosition = Vector3.TransformPosition(localPosition, localToWorld);
+                convexHullPositions[index] = worldPosition;
+            }
+
+            return convexHullPositions;
         }
         #endregion
 

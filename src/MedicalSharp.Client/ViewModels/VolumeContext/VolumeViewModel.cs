@@ -499,7 +499,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawBox()
         {
             Action<BoundingBoxVisual3D> drawStart = shape => this.Shapes.Add(shape);
-            Action<BoundingBoxVisual3D> drawEnd = null;//暂不同步
+            Action<BoundingBoxVisual3D> drawEnd = shape =>
+            {
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
 
             DrawBoundingBoxCommand command = new DrawBoundingBoxCommand(drawStart, drawEnd);
             this.InputManager.SwitchCommand(command);
@@ -513,7 +521,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawSphere()
         {
             Action<BoundingSphereVisual3D> drawStart = shape => this.Shapes.Add(shape);
-            Action<BoundingSphereVisual3D> drawEnd = null;//暂不同步
+            Action<BoundingSphereVisual3D> drawEnd = shape =>
+            {
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
 
             DrawBoundingSphereCommand command = new DrawBoundingSphereCommand(drawStart, drawEnd);
             this.InputManager.SwitchCommand(command);
@@ -527,7 +543,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawCylinder()
         {
             Action<CylinderVisual3D> drawStart = shape => this.Shapes.Add(shape);
-            Action<CylinderVisual3D> drawEnd = null;//暂不同步
+            Action<CylinderVisual3D> drawEnd = shape =>
+            {
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
 
             DrawCylinderCommand command = new DrawCylinderCommand(drawStart, drawEnd);
             this.InputManager.SwitchCommand(command);
@@ -541,7 +565,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawConvexPolyhedron()
         {
             Action<ConvexPolyhedronVisual3D> drawStart = shape => this.Shapes.Add(shape);
-            Action<ConvexPolyhedronVisual3D> drawEnd = null;//暂不同步
+            Action<ConvexPolyhedronVisual3D> drawEnd = shape =>
+            {
+                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
             Action<ConvexPolyhedronVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
 
             DrawConvexPolyhedronCommand command = new DrawConvexPolyhedronCommand(drawStart, drawEnd, drawCancel);

@@ -10,6 +10,7 @@ using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 
 namespace MedicalSharp.Controls.Visuals
 {
@@ -177,6 +178,55 @@ namespace MedicalSharp.Controls.Visuals
                 this.Rings = shape.Rings;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
             }
+        }
+        #endregion
+
+        #region 获取凸包位置列表 —— IReadOnlyList<Vector3> GetConvexHullPositions()
+        /// <summary>
+        /// 获取凸包位置列表
+        /// </summary>
+        /// <returns>位置列表（世界空间）</returns>
+        public IReadOnlyList<Vector3> GetConvexHullPositions()
+        {
+            Vector3 center = this.Center.ToVector3();
+            float radius = this.Radius;
+            int segments = Math.Max(this.Segments, 12);  // 最低12段
+            int rings = Math.Max(this.Rings, 6);         // 最低6环
+
+            List<Vector3> localHull = [];
+
+            //上极点
+            localHull.Add(new Vector3(center.X, center.Y, center.Z + radius));
+
+            //中间环
+            for (int ring = 1; ring < rings; ring++)
+            {
+                float phi = MathHelper.Pi * ring / rings;
+                float z = radius * MathF.Cos(phi);
+                float r = radius * MathF.Sin(phi);
+                for (int segment = 0; segment < segments; segment++)
+                {
+                    float theta = 2.0f * MathHelper.Pi * segment / segments;
+                    float x = r * MathF.Cos(theta);
+                    float y = r * MathF.Sin(theta);
+                    localHull.Add(new Vector3(center.X + x, center.Y + y, center.Z + z));
+                }
+            }
+
+            //下极点
+            localHull.Add(new Vector3(center.X, center.Y, center.Z - radius));
+
+            //转换到世界空间
+            Matrix4 localToWorld = this.Transform.Matrix;
+            Vector3[] convexHullPositions = new Vector3[localHull.Count];
+            for (int index = 0; index < localHull.Count; index++)
+            {
+                Vector3 localPosition = localHull[index];
+                Vector3 worldPosition = Vector3.TransformPosition(localPosition, localToWorld);
+                convexHullPositions[index] = worldPosition;
+            }
+
+            return convexHullPositions;
         }
         #endregion
 
