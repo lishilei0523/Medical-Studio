@@ -135,14 +135,14 @@ namespace MedicalSharp.Controls.Visuals
             if (this.Renderable == null)
             {
                 CurveRenderable renderable = new CurveRenderable(controlPositions, sampledPositions, this.Closed);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
                 this.Renderable = renderable;
             }
             else
             {
                 CurveRenderable renderable = (CurveRenderable)this.Renderable;
                 renderable.Update(controlPositions, sampledPositions);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }
         #endregion

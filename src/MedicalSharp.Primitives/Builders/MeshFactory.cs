@@ -170,6 +170,83 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
+        #region # 创建多边形 —— static MeshGeometry CreatePolygon(IReadOnlyList<Vector3> positions)
+        /// <summary>
+        /// 创建多边形
+        /// </summary>
+        /// <param name="positions">位置列表</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreatePolygon(IReadOnlyList<Vector3> positions)
+        {
+            #region # 验证
+
+            if (positions == null || positions.Count < 3)
+            {
+                return new MeshGeometry([]);  //空网格（少于3个点无法形成面）
+            }
+
+            #endregion
+
+            //计算中心点
+            Vector3 center = Vector3.Zero;
+            foreach (Vector3 pos in positions)
+            {
+                center += pos;
+            }
+            center /= positions.Count;
+
+            //计算法向量（Newell's method，适用于非平面多边形）
+            Vector3 normal = Vector3.Zero;
+            for (int index = 0; index < positions.Count; index++)
+            {
+                Vector3 current = positions[index];
+                Vector3 next = positions[(index + 1) % positions.Count];
+                normal.X += (current.Y - next.Y) * (current.Z + next.Z);
+                normal.Y += (current.Z - next.Z) * (current.X + next.X);
+                normal.Z += (current.X - next.X) * (current.Y + next.Y);
+            }
+            normal = Vector3.Normalize(normal);
+
+            //构建顶点列表
+            List<Vertex> vertices = [];
+
+            //添加中心顶点
+            vertices.Add(new Vertex
+            {
+                Position = center,
+                TextureCoord = new Vector2(0.5f, 0.5f),
+                Normal = normal,
+                Color = Vector4.One
+            });
+
+            //添加边界顶点
+            for (int i = 0; i < positions.Count; i++)
+            {
+                float angle = (float)i / positions.Count * MathHelper.TwoPi;
+                vertices.Add(new Vertex
+                {
+                    Position = positions[i],
+                    TextureCoord = new Vector2(
+                        0.5f + 0.5f * MathF.Cos(angle),
+                        0.5f + 0.5f * MathF.Sin(angle)),
+                    Normal = normal,
+                    Color = Vector4.One
+                });
+            }
+
+            //构建索引列表（三角形扇）
+            List<uint> indices = [];
+            for (int i = 0; i < positions.Count; i++)
+            {
+                indices.Add(0);                                          //中心点
+                indices.Add((uint)(i + 1));                              //当前边界点
+                indices.Add((uint)((i + 1) % positions.Count + 1));      //下一个边界点
+            }
+
+            return new MeshGeometry(vertices, indices);
+        }
+        #endregion
+
         #region # 创建三角形 —— static MeshGeometry CreateTriangle(Vector3 pointA, Vector3 pointB...
         /// <summary>
         /// 创建三角形

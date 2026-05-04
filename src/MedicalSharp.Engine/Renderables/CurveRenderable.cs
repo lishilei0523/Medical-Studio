@@ -28,6 +28,11 @@ namespace MedicalSharp.Engine.Renderables
         private VertexBuffer _curveBuffer;
 
         /// <summary>
+        /// 填充缓冲区
+        /// </summary>
+        private VertexBuffer _fillBuffer;
+
+        /// <summary>
         /// 默认构造器
         /// </summary>
         private CurveRenderable()
@@ -35,6 +40,7 @@ namespace MedicalSharp.Engine.Renderables
             //默认值
             this.Stroke = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
             this.StrokeThickness = 1.0f;
+            this.Fill = new Vector4(1.0f, 0.0f, 0.0f, 0.1f);
         }
 
         /// <summary>
@@ -57,6 +63,12 @@ namespace MedicalSharp.Engine.Renderables
             this._curveBuffer = new VertexBuffer(curveGeometry);
             this._pointBuffer.Setup();
             this._curveBuffer.Setup();
+            if (this.Closed && this.SampledPositions.Count >= 3)
+            {
+                MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.SampledPositions);
+                this._fillBuffer = new VertexBuffer(polygonGeometry);
+                this._fillBuffer.Setup();
+            }
         }
 
         #endregion
@@ -96,6 +108,13 @@ namespace MedicalSharp.Engine.Renderables
         /// 线框粗细
         /// </summary>
         public float StrokeThickness { get; private set; }
+        #endregion
+
+        #region 填充颜色 —— Vector4 Fill
+        /// <summary>
+        /// 填充颜色
+        /// </summary>
+        public Vector4 Fill { get; private set; }
         #endregion
 
         #region 只读属性 - 曲线缓冲区 —— VertexBuffer CurveBuffer
@@ -149,6 +168,7 @@ namespace MedicalSharp.Engine.Renderables
             //先释放旧的
             this._pointBuffer.Dispose();
             this._curveBuffer.Dispose();
+            this._fillBuffer?.Dispose();
 
             MeshGeometry pointGeometry = MeshFactory.CreatePointCloud(this.ControlPositions);
             MeshGeometry curveGeometry = MeshFactory.CreatePolyline(this.SampledPositions, this.Closed);
@@ -156,22 +176,30 @@ namespace MedicalSharp.Engine.Renderables
             this._curveBuffer = new VertexBuffer(curveGeometry);
             this._pointBuffer.Setup();
             this._curveBuffer.Setup();
+            if (this.Closed && this.SampledPositions.Count >= 3)
+            {
+                MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.SampledPositions);
+                this._fillBuffer = new VertexBuffer(polygonGeometry);
+                this._fillBuffer.Setup();
+            }
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();
         }
         #endregion
 
-        #region 设置线框 —— void SetStroke(Vector4 stroke, float strokeThickness)
+        #region 设置线框 —— void SetStroke(Vector4 stroke, float strokeThickness...
         /// <summary>
         /// 设置线框
         /// </summary>
         /// <param name="stroke">线框颜色</param>
         /// <param name="strokeThickness">线框粗细</param>
-        public void SetStroke(Vector4 stroke, float strokeThickness)
+        /// <param name="fill">填充颜色</param>
+        public void SetStroke(Vector4 stroke, float strokeThickness, Vector4 fill)
         {
             this.Stroke = stroke;
             this.StrokeThickness = strokeThickness;
+            this.Fill = fill;
         }
         #endregion
 
@@ -182,6 +210,22 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="program">Shader程序</param>
         public override void Render(ShaderProgram program)
         {
+            if (this.Closed && this.SampledPositions.Count >= 3)
+            {
+                //禁用深度写入、让透明面可以互相混合
+                GL.DepthMask(false);
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+                //绘制填充模型	
+                program.SetUniformVector4("u_Color", this.Fill);
+                this._fillBuffer.Draw(PrimitiveType.Triangles);
+
+                //恢复状态
+                GL.DepthMask(true);
+                GL.Disable(EnableCap.Blend);
+            }
+
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformVector4("u_Color", this.Stroke);
@@ -253,6 +297,7 @@ namespace MedicalSharp.Engine.Renderables
 
             this._pointBuffer.Dispose();
             this._curveBuffer.Dispose();
+            this._fillBuffer?.Dispose();
 
             this._disposed = true;
         }

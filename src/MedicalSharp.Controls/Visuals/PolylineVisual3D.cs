@@ -115,14 +115,14 @@ namespace MedicalSharp.Controls.Visuals
             if (this.Renderable == null)
             {
                 PolylineRenderable renderable = new PolylineRenderable(positions, this.Closed, !this.Fixed);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
                 this.Renderable = renderable;
             }
             else
             {
                 PolylineRenderable renderable = (PolylineRenderable)this.Renderable;
                 renderable.Update(positions);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
+                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }
         #endregion
