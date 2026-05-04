@@ -308,7 +308,6 @@ namespace MedicalSharp.Controls.Extensions
             PolylineVisual3D polyline = new PolylineVisual3D
             {
                 Stroke = new Vector4(0.1f, 0.3f, 0.6f, 1.0f).ToColor(),
-                StrokeThickness = 1.5f,
                 Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor(),
                 Positions = new AvaloniaList<Vector3D>(intersectionPoints),
                 Closed = true,
