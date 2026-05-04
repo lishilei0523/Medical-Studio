@@ -4,6 +4,7 @@ using Avalonia.Media;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Maths;
+using MIConvexHull;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -210,6 +211,20 @@ namespace MedicalSharp.Controls.Extensions
 
             #endregion
 
+            //提取凸包的真实棱边
+            HashSet<(int, int)> edges;
+            bool useFullConnection;
+            if (hullPositions.Count <= 8)
+            {
+                edges = EnumerateAllEdges(hullPositions.Count);
+                useFullConnection = true;
+            }
+            else
+            {
+                edges = ComputeConvexHullEdges(hullPositions);
+                useFullConnection = false;
+            }
+
             List<Vector3> intersections = [];
             Vector3 planeNormal = plane.Normal;
             Vector3 planePoint = plane.GetPointOnPlane(0, 0);
@@ -222,49 +237,41 @@ namespace MedicalSharp.Controls.Extensions
                 distances[index] = Vector3.Dot(planeNormal, hullPositions[index]) + planeD;
             }
 
-            //遍历所有边（全连接，避免依赖凸包拓扑）
-            float epsilon = 1e-6f;
-            HashSet<(int, int)> processedEdges = [];
-            for (int i = 0; i < hullPositions.Count; i++)
+            //遍历凸包的真实棱边
+            const float epsilon = 1e-6f;
+            foreach ((int i, int j) in edges)
             {
-                for (int j = i + 1; j < hullPositions.Count; j++)
+                float distance1 = distances[i];
+                float distance2 = distances[j];
+
+                //边与平面平行或不相交，跳过
+                if (Math.Abs(distance1 - distance2) < epsilon)
                 {
-                    float d1 = distances[i];
-                    float d2 = distances[j];
+                    continue;
+                }
 
-                    //边与平面平行或不相交，跳过
-                    if (Math.Abs(d1 - d2) < epsilon)
-                    {
-                        continue;
-                    }
+                //边跨越平面
+                if (distance1 * distance2 > 0)
+                {
+                    continue;
+                }
 
-                    //边跨越平面
-                    if (d1 * d2 > 0)
-                    {
-                        continue;
-                    }
+                //插值求交点
+                float t = distance1 / (distance1 - distance2);
+                Vector3 intersection = Lerp(hullPositions[i], hullPositions[j], t);
 
-                    //防止重复处理同一条边
-                    (int, int) edge = (Math.Min(i, j), Math.Max(i, j));
-                    if (!processedEdges.Add(edge))
-                    {
-                        continue;
-                    }
-
-                    //插值求交点
-                    float t = d1 / (d1 - d2);
-                    Vector3 intersection = Lerp(hullPositions[i], hullPositions[j], t);
-
-                    //去重
-                    if (!ContainsPoint(intersections, intersection, epsilon))
-                    {
-                        intersections.Add(intersection);
-                    }
+                //去重
+                if (!ContainsPoint(intersections, intersection, epsilon))
+                {
+                    intersections.Add(intersection);
                 }
             }
 
-            // 剔除内部点（落在其他两点连线上的点）
-            intersections = RemoveInteriorPoints(intersections, 1e-4f);
+            //全连接路径：剔除体对角线产生的共线内部点
+            if (useFullConnection)
+            {
+                intersections = RemoveInteriorPoints(intersections, 1e-4f);
+            }
 
             #region # 验证
 
@@ -414,28 +421,94 @@ namespace MedicalSharp.Controls.Extensions
         }
         #endregion
 
-        #region # 剔除内部点 —— static List<Vector3> RemoveInteriorPoints(...
+        #region # 计算凸包真实棱边 —— static HashSet<(int, int)> ComputeConvexHullEdges(...
+        /// <summary>
+        /// 计算凸包真实棱边
+        /// </summary>
+        /// <param name="hullPositions">凸包位置列表</param>
+        /// <returns>去重后的边列表（顶点索引对）</returns>
+        private static HashSet<(int, int)> ComputeConvexHullEdges(IReadOnlyList<Vector3> hullPositions)
+        {
+            try
+            {
+                //转成MIConvexHull的输入格式
+                DefaultVertex[] vertices = hullPositions.Select(position => new DefaultVertex
+                {
+                    Position = [position.X, position.Y, position.Z]
+                }).ToArray();
+                ConvexHullCreationResult<DefaultVertex, DefaultConvexFace<DefaultVertex>> result = ConvexHull.Create(vertices);
+
+                //从凸包面中提取边并去重
+                HashSet<(int, int)> edges = [];
+                foreach (DefaultConvexFace<DefaultVertex> face in result.Result.Faces)
+                {
+                    DefaultVertex[] faceVertices = face.Vertices;
+                    for (int index = 0; index < faceVertices.Length; index++)
+                    {
+                        int indexA = Array.IndexOf(vertices, faceVertices[(index)]);
+                        int indexB = Array.IndexOf(vertices, faceVertices[(index + 1) % faceVertices.Length]);
+                        edges.Add((Math.Min(indexA, indexB), Math.Max(indexA, indexB)));
+                    }
+                }
+
+                return edges;
+            }
+            catch
+            {
+                //MIConvexHull失败（如共面点），回退到全连接
+                return EnumerateAllEdges(hullPositions.Count);
+            }
+        }
+        #endregion
+
+        #region # 全连接枚举边 —— static HashSet<(int, int)> EnumerateAllEdges(int count)
+        /// <summary>
+        /// 全连接枚举边
+        /// </summary>
+        /// <param name="count">顶点数</param>
+        /// <returns>所有点对</returns>
+        private static HashSet<(int, int)> EnumerateAllEdges(int count)
+        {
+            HashSet<(int, int)> edges = [];
+            for (int i = 0; i < count; i++)
+            {
+                for (int j = i + 1; j < count; j++)
+                {
+                    edges.Add((i, j));
+                }
+            }
+            return edges;
+        }
+        #endregion
+
+        #region # 剔除内部点 —— static List<Vector3> RemoveInteriorPoints(List<Vector3>...
         /// <summary>
         /// 剔除内部点：如果某点落在其他两点的连线上（共线），则它是内部点，丢弃
         /// </summary>
         private static List<Vector3> RemoveInteriorPoints(List<Vector3> points, float epsilon)
         {
             if (points.Count <= 3)
+            {
                 return points;
+            }
 
             bool[] isInterior = new bool[points.Count];
-
             for (int i = 0; i < points.Count; i++)
             {
                 for (int j = 0; j < points.Count; j++)
                 {
-                    if (i == j || isInterior[i]) continue;
-
+                    if (i == j || isInterior[i])
+                    {
+                        continue;
+                    }
                     for (int k = j + 1; k < points.Count; k++)
                     {
-                        if (i == k || isInterior[i]) continue;
+                        if (i == k || isInterior[i])
+                        {
+                            continue;
+                        }
 
-                        // 判断点 i 是否在线段 jk 上
+                        //判断点i是否在线段jk上
                         if (IsPointOnSegment(points[i], points[j], points[k], epsilon))
                         {
                             isInterior[i] = true;
@@ -445,18 +518,20 @@ namespace MedicalSharp.Controls.Extensions
                 }
             }
 
-            List<Vector3> boundary = new List<Vector3>();
-            for (int i = 0; i < points.Count; i++)
+            List<Vector3> boundary = [];
+            for (int index = 0; index < points.Count; index++)
             {
-                if (!isInterior[i])
-                    boundary.Add(points[i]);
+                if (!isInterior[index])
+                {
+                    boundary.Add(points[index]);
+                }
             }
 
             return boundary;
         }
         #endregion
 
-        #region # 判断点是否在线段上 —— static bool IsPointOnSegment(...
+        #region # 判断点是否在线段上 —— static bool IsPointOnSegment(Vector3 p, Vector3 a...
         /// <summary>
         /// 判断点p是否在线段ab上
         /// </summary>
@@ -467,21 +542,27 @@ namespace MedicalSharp.Controls.Extensions
 
             float abLengthSq = ab.LengthSquared;
             if (abLengthSq < epsilon * epsilon)
-                return false;  // a和b重合
+            {
+                return false;  //a和b重合
+            }
 
-            // 投影参数 t = (ap·ab) / |ab|²
+            //投影参数 t = (ap·ab) / |ab|²
             float t = Vector3.Dot(ap, ab) / abLengthSq;
 
-            // t 必须在 [0, 1] 之间
+            //t必须在[0, 1]之间
             if (t < 0 || t > 1)
+            {
                 return false;
+            }
 
-            // 投影点
+            //投影点
             Vector3 projection = a + t * ab;
 
-            // 距离判断
-            float distSq = (p - projection).LengthSquared;
-            return distSq < epsilon * epsilon;
+            //距离判断
+            float squaredDistance = (p - projection).LengthSquared;
+            bool isOnSegment = squaredDistance < epsilon * epsilon;
+
+            return isOnSegment;
         }
         #endregion
     }
