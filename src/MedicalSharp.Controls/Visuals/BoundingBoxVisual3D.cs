@@ -252,8 +252,8 @@ namespace MedicalSharp.Controls.Visuals
             List<Vector3> convexHullPositions = new List<Vector3>(8);
             for (int index = 0; index < 8; index++)
             {
-                Vector3 transformed = Vector3.TransformPosition(localHull[index], localToWorld);
-                convexHullPositions.Add(transformed);
+                Vector3 worldPosition = Vector3.TransformPosition(localHull[index], localToWorld);
+                convexHullPositions.Add(worldPosition);
             }
 
             return convexHullPositions;
