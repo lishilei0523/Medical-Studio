@@ -9,7 +9,7 @@ namespace MedicalSharp.Primitives.Models
     /// <summary>
     /// 网格几何
     /// </summary>
-    public sealed class MeshGeometry
+    public sealed class MeshGeometry : IEquatable<MeshGeometry>
     {
         #region # 字段及构造器
 
@@ -79,6 +79,8 @@ namespace MedicalSharp.Primitives.Models
         #endregion
 
         #region # 方法
+
+        //Public
 
         #region 设置顶点列表 —— void SetVertices(ICollection<Vertex> vertices)
         /// <summary>
@@ -197,6 +199,97 @@ namespace MedicalSharp.Primitives.Models
             }
 
             return planes.ToArray();
+        }
+        #endregion
+
+
+        //IEquatable
+
+        #region 是否相等 —— bool Equals(MeshGeometry other)
+        /// <summary>
+        /// 是否相等
+        /// </summary>
+        public bool Equals(MeshGeometry other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+
+            //比较顶点列表
+            if (!this.Vertices.SequenceEqual(other.Vertices))
+            {
+                return false;
+            }
+
+            //比较索引列表
+            if (!this.Indices.SequenceEqual(other.Indices))
+            {
+                return false;
+            }
+
+            return true;
+        }
+        #endregion
+
+        #region 是否相等 —— override bool Equals(object obj)
+        /// <summary>
+        /// 是否相等
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            bool equals = obj is MeshGeometry other && this.Equals(other);
+
+            return equals;
+        }
+        #endregion
+
+        #region 获取哈希码 —— override int GetHashCode()
+        /// <summary>
+        /// 获取哈希码
+        /// </summary>
+        public override int GetHashCode()
+        {
+            int hash = 17;
+
+            //基于顶点列表计算哈希
+            foreach (Vertex vertex in this.Vertices)
+            {
+                hash = hash * 31 + vertex.GetHashCode();
+            }
+
+            //基于索引列表计算哈希
+            foreach (uint index in this.Indices)
+            {
+                hash = hash * 31 + index.GetHashCode();
+            }
+
+            return hash;
+        }
+        #endregion
+
+        #region 相等运算符 —— static bool operator ==(MeshGeometry left, MeshGeometry right)
+        /// <summary>
+        /// 相等运算符
+        /// </summary>
+        public static bool operator ==(MeshGeometry left, MeshGeometry right)
+        {
+            if (left is null)
+            {
+                return right is null;
+            }
+
+            return left.Equals(right);
+        }
+        #endregion
+
+        #region 不等运算符 —— static bool operator !=(MeshGeometry left, MeshGeometry right)
+        /// <summary>
+        /// 不等运算符
+        /// </summary>
+        public static bool operator !=(MeshGeometry left, MeshGeometry right)
+        {
+            return !(left == right);
         }
         #endregion
 
