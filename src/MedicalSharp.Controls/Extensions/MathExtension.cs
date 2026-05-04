@@ -212,18 +212,9 @@ namespace MedicalSharp.Controls.Extensions
             #endregion
 
             //提取凸包的真实棱边
-            HashSet<(int, int)> edges;
-            bool useFullConnection;
-            if (hullPositions.Count <= 8)
-            {
-                edges = EnumerateAllEdges(hullPositions.Count);
-                useFullConnection = true;
-            }
-            else
-            {
-                edges = ComputeConvexHullEdges(hullPositions);
-                useFullConnection = false;
-            }
+            HashSet<(int, int)> edges = hullPositions.Count <= 8
+                ? EnumerateAllEdges(hullPositions.Count)
+                : ComputeConvexHullEdges(hullPositions);
 
             List<Vector3> intersections = [];
             Vector3 planeNormal = plane.Normal;
@@ -267,11 +258,8 @@ namespace MedicalSharp.Controls.Extensions
                 }
             }
 
-            //全连接路径：剔除体对角线产生的共线内部点
-            if (useFullConnection)
-            {
-                intersections = RemoveInteriorPoints(intersections, 1e-4f);
-            }
+            //剔除共线内部点
+            intersections = RemoveInteriorPoints(intersections, 1e-4f);
 
             #region # 验证
 
@@ -319,9 +307,9 @@ namespace MedicalSharp.Controls.Extensions
 
             PolylineVisual3D polyline = new PolylineVisual3D
             {
-                Stroke = Color.Parse("#00E5FF"),      //青色描边
-                StrokeThickness = 2,
-                Fill = Color.Parse("#4000E5FF"),      //25%透明度填充
+                Stroke = new Vector4(0.1f, 0.3f, 0.6f, 1.0f).ToColor(),
+                StrokeThickness = 1.5f,
+                Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor(),
                 Positions = new AvaloniaList<Vector3D>(intersectionPoints),
                 Closed = true,
                 Fixed = true

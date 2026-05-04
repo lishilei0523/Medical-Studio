@@ -28,7 +28,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeRemovedEvent>
     {
         #region # 字段及构造器
 
@@ -183,6 +183,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 {
                     this.SelectedShape = null;
                     this.Shapes.Remove(shapeVisual3D);
+
+                    ShapeRemovedEvent message = new ShapeRemovedEvent
+                    {
+                        Publisher = this,
+                        Shape = shapeVisual3D
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
 
@@ -581,6 +588,27 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 处理同步视口事件 —— Task HandleAsync(SyncViewportEvent message...
+        /// <summary>
+        /// 处理同步视口事件
+        /// </summary>
+        public Task HandleAsync(SyncViewportEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.FrameToken++;
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
         #region 处理形状绘制结束事件 —— Task HandleAsync(ShapeDrawEndEvent message...
         /// <summary>
         /// 处理形状绘制结束事件
@@ -630,6 +658,36 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             if (shape != null)
             {
                 shape.Copy(message.Shape);
+                this.FrameToken++;
+            }
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理形状已删除事件 —— Task HandleAsync(ShapeRemovedEvent message...
+        /// <summary>
+        /// 处理形状已删除事件
+        /// </summary>
+        public Task HandleAsync(ShapeRemovedEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.Shape == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            ShapeVisual3D shape = this.Shapes.SingleOrDefault(shape => shape.Id == message.Shape.Id);
+            if (shape != null)
+            {
+                this.Shapes.Remove(shape);
                 this.FrameToken++;
             }
 

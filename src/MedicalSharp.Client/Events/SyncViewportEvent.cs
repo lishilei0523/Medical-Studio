@@ -1,15 +1,12 @@
-﻿using Caliburn.Micro;
+﻿using SD.Infrastructure.Avalonia.Caliburn.Base;
 
 namespace MedicalSharp.Client.Events
 {
     /// <summary>
     /// 同步视口事件
     /// </summary>
-    public class SyncViewportEvent
+    public class SyncViewportEvent : CaliburnEvent
     {
-        /// <summary>
-        /// 事件发布者
-        /// </summary>
-        public Screen Publisher { get; set; }
+
     }
 }

@@ -1,18 +1,13 @@
-﻿using Caliburn.Micro;
-using MedicalSharp.Controls.Visuals;
+﻿using MedicalSharp.Controls.Visuals;
+using SD.Infrastructure.Avalonia.Caliburn.Base;
 
 namespace MedicalSharp.Client.Events
 {
     /// <summary>
     /// 形状绘制完成事件
     /// </summary>
-    public class ShapeDrawEndEvent
+    public class ShapeDrawEndEvent : CaliburnEvent
     {
-        /// <summary>
-        /// 事件发布者
-        /// </summary>
-        public Screen Publisher { get; set; }
-
         /// <summary>
         /// 形状
         /// </summary>

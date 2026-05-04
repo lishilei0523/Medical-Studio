@@ -27,7 +27,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 标识Id
         /// </summary>
-        public string Id { get; protected set; }
+        public string Id { get; internal set; }
         #endregion
 
         #region 只读属性 - 变换 —— abstract Transform Transform
