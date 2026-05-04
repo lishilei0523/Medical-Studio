@@ -61,6 +61,15 @@ namespace MedicalSharp.Controls.Commands
                 bool success = pickVisual3D.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out _);
                 if (success && visual3D is IRotatable rotatable)
                 {
+                    #region # 验证
+
+                    if (visual3D is IFixable { Fixed: true })
+                    {
+                        return;
+                    }
+
+                    #endregion
+
                     this._selectedVisual = rotatable;
                 }
             }

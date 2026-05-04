@@ -71,6 +71,15 @@ namespace MedicalSharp.Controls.Commands
                 bool success = pickVisual3D.FindNearest(mousePos2D, out Vector3 visualHitPoint, out _, out Visual3D visual3D, out Ray ray);
                 if (success && visual3D is IVertexEditable vertexEditable)
                 {
+                    #region # 验证
+
+                    if (visual3D is IFixable { Fixed: true })
+                    {
+                        return;
+                    }
+
+                    #endregion
+
                     Matrix4 modelMatrix = visual3D.Transform.Matrix;
                     Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
                     Ray localRay = ray.Transform(worldToLocal);

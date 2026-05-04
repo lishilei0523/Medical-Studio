@@ -71,6 +71,15 @@ namespace MedicalSharp.Controls.Commands
                 Vector2? planeUV = this._mprPlane.ScreenToPlaneUV(mousePos2D, mprViewport.Camera.LookDirection, mprViewport.ViewportSize.ToVector2(), mprViewport.Camera.ProjectionMatrix, mprViewport.Camera.ViewMatrix, out _);
                 if (planeUV.HasValue && mprViewport.FindNearest(mousePos2D, out _, out _, out Visual3D visual3D, out _))
                 {
+                    #region # 验证
+
+                    if (visual3D is IFixable { Fixed: true })
+                    {
+                        return;
+                    }
+
+                    #endregion
+
                     if (visual3D is IResizable2D resizable2D)
                     {
                         this._selectedVisual = resizable2D;

@@ -37,11 +37,13 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         /// <param name="positions">位置列表</param>
         /// <param name="closed">是否闭合</param>
-        public PolylineRenderable(IReadOnlyList<Vector3> positions, bool closed = false)
+        /// <param name="drawVertex">是否绘制顶点</param>
+        public PolylineRenderable(IReadOnlyList<Vector3> positions, bool closed = false, bool drawVertex = true)
             : this()
         {
             this.Positions = positions;
             this.Closed = closed;
+            this.DrawVertex = drawVertex;
 
             //初始化缓冲区
             MeshGeometry polylineGeometry = MeshFactory.CreatePolyline(positions, this.Closed);
@@ -79,6 +81,13 @@ namespace MedicalSharp.Engine.Renderables
         /// 线框粗细
         /// </summary>
         public float StrokeThickness { get; private set; }
+        #endregion
+
+        #region 是否绘制顶点 —— bool DrawVertex
+        /// <summary>
+        /// 是否绘制顶点
+        /// </summary>
+        public bool DrawVertex { get; private set; }
         #endregion
 
         #region 只读属性 - 顶点缓冲区 —— VertexBuffer VertexBuffer
@@ -160,23 +169,26 @@ namespace MedicalSharp.Engine.Renderables
             program.SetUniformVector4("u_Color", this.Stroke);
             this._vertexBuffer.Draw(PrimitiveType.Lines);
 
-            //点尺寸
-            float pointSize = Math.Clamp(this.StrokeThickness * 3.0f, 5f, 20f);
-            GL.PointSize(pointSize);
-
-            //点颜色
-            Vector4 invertedStroke = this.Stroke.Invert();
-            float contrast = Math.Abs(invertedStroke.X - this.Stroke.X) +
-                             Math.Abs(invertedStroke.Y - this.Stroke.Y) +
-                             Math.Abs(invertedStroke.Z - this.Stroke.Z);
-            if (contrast < 0.5f)
+            if (this.DrawVertex)
             {
-                invertedStroke = ColorFactory.Yellow(); //固定用亮黄色
-            }
+                //点尺寸
+                float pointSize = Math.Clamp(this.StrokeThickness * 3.0f, 5f, 20f);
+                GL.PointSize(pointSize);
 
-            //绘制控制点
-            program.SetUniformVector4("u_Color", invertedStroke);
-            this._vertexBuffer.Draw(PrimitiveType.Points);
+                //点颜色
+                Vector4 invertedStroke = this.Stroke.Invert();
+                float contrast = Math.Abs(invertedStroke.X - this.Stroke.X) +
+                                 Math.Abs(invertedStroke.Y - this.Stroke.Y) +
+                                 Math.Abs(invertedStroke.Z - this.Stroke.Z);
+                if (contrast < 0.5f)
+                {
+                    invertedStroke = ColorFactory.Yellow(); //固定用亮黄色
+                }
+
+                //绘制控制点
+                program.SetUniformVector4("u_Color", invertedStroke);
+                this._vertexBuffer.Draw(PrimitiveType.Points);
+            }
         }
         #endregion
 

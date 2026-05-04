@@ -17,7 +17,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 折线3D元素
     /// </summary>
-    public class PolylineVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable, IVertexEditable, ICutVolume
+    public class PolylineVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable, IVertexEditable, IFixable, ICutVolume
     {
         #region # 字段及构造器
 
@@ -27,9 +27,14 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<AvaloniaList<Vector3D>> PositionsProperty;
 
         /// <summary>
-        /// 点尺寸依赖属性
+        /// 是否闭合依赖属性
         /// </summary>
         public static readonly StyledProperty<bool> ClosedProperty;
+
+        /// <summary>
+        /// 是否固定依赖属性
+        /// </summary>
+        public static readonly StyledProperty<bool> FixedProperty;
 
         /// <summary>
         /// 静态构造器
@@ -38,6 +43,7 @@ namespace MedicalSharp.Controls.Visuals
         {
             PositionsProperty = AvaloniaProperty.Register<PolylineVisual3D, AvaloniaList<Vector3D>>(nameof(Positions), []);
             ClosedProperty = AvaloniaProperty.Register<PolylineVisual3D, bool>(nameof(Closed), false);
+            FixedProperty = AvaloniaProperty.Register<PolylineVisual3D, bool>(nameof(Fixed), false);
         }
 
 
@@ -75,6 +81,17 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 依赖属性 - 是否固定 —— bool Fixed
+        /// <summary>
+        /// 依赖属性 - 是否固定
+        /// </summary>
+        public bool Fixed
+        {
+            get => this.GetValue(FixedProperty);
+            set => this.SetValue(FixedProperty, value);
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -97,7 +114,7 @@ namespace MedicalSharp.Controls.Visuals
             IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
             if (this.Renderable == null)
             {
-                PolylineRenderable renderable = new PolylineRenderable(positions, this.Closed);
+                PolylineRenderable renderable = new PolylineRenderable(positions, this.Closed, !this.Fixed);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness);
                 this.Renderable = renderable;
             }
@@ -124,7 +141,8 @@ namespace MedicalSharp.Controls.Visuals
                 StrokeThickness = this.StrokeThickness,
                 Fill = this.Fill,
                 Positions = this.Positions,
-                Closed = this.Closed
+                Closed = this.Closed,
+                Fixed = this.Fixed
             };
 
             return copy;
@@ -145,6 +163,7 @@ namespace MedicalSharp.Controls.Visuals
                 this.Fill = shape.Fill;
                 this.Positions = shape.Positions;
                 this.Closed = shape.Closed;
+                this.Fixed = shape.Fixed;
                 this.Transform.SetMatrix(shape.Transform.Matrix);
             }
         }
