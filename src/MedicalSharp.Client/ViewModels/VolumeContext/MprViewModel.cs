@@ -559,8 +559,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Crosshair.Center = Vector3.TransformPosition(plane.Center, modelMatrix).ToVector3();
             this.Crosshair.UAxis = worldUAxis.ToVector3();
             this.Crosshair.VAxis = worldVAxis.ToVector3();
-
-            this.Crosshair.IsVisible = true;
         }
         #endregion
 
