@@ -261,6 +261,70 @@ namespace MedicalSharp.Primitives.Maths
 
         //Public
 
+        #region 重定位平面 —— void Relocate(Vector3 worldUAxis, Vector3 worldVAxis...
+        /// <summary>
+        /// 重定位平面
+        /// </summary>
+        /// <param name="worldUAxis">世界U轴</param>
+        /// <param name="worldVAxis">世界V轴</param>
+        /// <param name="worldCenter">世界中心位置</param>
+        /// <param name="worldNormal">世界法向量</param>
+        public void Relocate(Vector3 worldUAxis, Vector3 worldVAxis, Vector3 worldCenter, Vector3 worldNormal)
+        {
+            //将世界坐标转换到逻辑空间
+            Vector3 localCenter = new Vector3(
+                worldCenter.X / this.VolumeMetadata.VolumeScale.X,
+                worldCenter.Y / this.VolumeMetadata.VolumeScale.Y,
+                worldCenter.Z / this.VolumeMetadata.VolumeScale.Z
+            );
+
+            //更新MPR平面U/V轴
+            this.UAxis = worldUAxis.Normalized();
+            this.VAxis = worldVAxis.Normalized();
+            this.Normal = worldNormal.Normalized();
+
+            //更新平面类型（如果法向量不是标准轴，则为斜切面）
+            if (Math.Abs(this.Normal.Z) > 0.99f)
+            {
+                this.PlaneType = MPRPlaneType.Axial;
+            }
+            else if (Math.Abs(this.Normal.Y) > 0.99f)
+            {
+                this.PlaneType = MPRPlaneType.Coronal;
+            }
+            else if (Math.Abs(this.Normal.X) > 0.99f)
+            {
+                this.PlaneType = MPRPlaneType.Sagittal;
+            }
+            else
+            {
+                this.PlaneType = MPRPlaneType.Oblique;
+            }
+
+            //斜切面重新计算投影范围和切片数量
+            if (this.PlaneType == MPRPlaneType.Oblique)
+            {
+                this.CalculateProjectionRange();
+                this.CalculateObliqueSlicesCount();
+            }
+
+            //计算切片索引
+            float sliceOffset = Vector3.Dot(localCenter, this.Normal);
+            float t = this.PlaneType switch
+            {
+                MPRPlaneType.Oblique => (sliceOffset - this._minProjection) / (this._maxProjection - this._minProjection),
+                MPRPlaneType.Axial => localCenter.Z + 0.5f,
+                MPRPlaneType.Coronal => localCenter.Y + 0.5f,
+                MPRPlaneType.Sagittal => localCenter.X + 0.5f,
+                _ => throw new NotSupportedException()
+            };
+            this.SliceIndex = (int)Math.Round(t * (this.SlicesCount - 1));
+
+            //触发变化事件
+            this.OnChanged();
+        }
+        #endregion
+
         #region 旋转平面 —— void Rotate(float deltaU, float deltaV)
         /// <summary>
         /// 旋转平面
