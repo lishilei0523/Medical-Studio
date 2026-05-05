@@ -55,6 +55,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
+            this.Crosshair = new CrosshairVisual3D();
             this.Shapes = [];
             this.PickVoxel();
         }
@@ -83,8 +84,30 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// MPR平面
         /// </summary>
-        [DependencyProperty]
-        public MPRPlane Plane { get; set; }
+        private MPRPlane _plane;
+
+        /// <summary>
+        /// MPR平面
+        /// </summary>
+        public MPRPlane Plane
+        {
+            get => this._plane;
+            set
+            {
+                if (this._plane != null)
+                {
+                    this._plane.PlaneChangedEvent -= this.OnMPRPlaneChanged;
+                }
+                if (value != null)
+                {
+                    value.PlaneChangedEvent += this.OnMPRPlaneChanged;
+                    this.OnMPRPlaneChanged(value);
+                }
+
+                this._plane = value;
+                this.NotifyOfPropertyChange();
+            }
+        }
         #endregion
 
         #region MPR相机 —— MPRCamera Camera
@@ -109,6 +132,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public VolumeData VolumeData { get; set; }
+        #endregion
+
+        #region 十字线 —— CrosshairVisual3D Crosshair
+        /// <summary>
+        /// 十字线
+        /// </summary>
+        [DependencyProperty]
+        public CrosshairVisual3D Crosshair { get; set; }
         #endregion
 
         #region 选中的形状 —— ShapeVisual3D SelectedShape
@@ -499,6 +530,37 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             DrawCurveCommand command = new DrawCurveCommand(drawStart, drawEnd, drawCancel, true);
             this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region MPR平面变化事件 —— void OnMPRPlaneChanged(MPRPlane plane)
+        /// <summary>
+        /// MPR平面变化事件
+        /// </summary>
+        /// <param name="plane">MPR平面</param>
+        private void OnMPRPlaneChanged(MPRPlane plane)
+        {
+            Matrix4 modelMatrix = plane.GetModelMatrix();
+            Vector3 worldUAxis = new Vector3(
+                plane.UAxis.X * plane.VolumeMetadata.VolumeScale.X,
+                plane.UAxis.Y * plane.VolumeMetadata.VolumeScale.Y,
+                plane.UAxis.Z * plane.VolumeMetadata.VolumeScale.Z
+            ).Normalized();
+            Vector3 worldVAxis = new Vector3(
+                plane.VAxis.X * plane.VolumeMetadata.VolumeScale.X,
+                plane.VAxis.Y * plane.VolumeMetadata.VolumeScale.Y,
+                plane.VAxis.Z * plane.VolumeMetadata.VolumeScale.Z
+            ).Normalized();
+            Vector3 worldNormal = Vector3.Cross(worldUAxis, worldVAxis).Normalized();
+            worldVAxis = Vector3.Cross(worldNormal, worldUAxis).Normalized();
+            worldNormal = Vector3.Cross(worldUAxis, worldVAxis).Normalized();
+            worldVAxis = Vector3.Cross(worldNormal, worldUAxis).Normalized();
+
+            this.Crosshair.Center = Vector3.TransformPosition(plane.Center, modelMatrix).ToVector3();
+            this.Crosshair.UAxis = worldUAxis.ToVector3();
+            this.Crosshair.VAxis = worldVAxis.ToVector3();
+
+            this.Crosshair.IsVisible = true;
         }
         #endregion
 

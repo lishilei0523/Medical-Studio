@@ -1,4 +1,5 @@
-﻿using Caliburn.Micro;
+﻿using Avalonia.Media;
+using Caliburn.Micro;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
@@ -40,6 +41,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             MPRCamera camera = new MPRCamera();
             MPRInputManager inputManager = new MPRInputManager(camera);
             this.MprViewModel = new MprViewModel(windowManager, eventAggregator, title, camera, inputManager);
+            this.MprViewModel.Crosshair.HorizontalStroke = Colors.Green;
+            this.MprViewModel.Crosshair.VerticalStroke = Colors.DeepSkyBlue;
         }
 
         #endregion

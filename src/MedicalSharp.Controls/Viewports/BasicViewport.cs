@@ -112,7 +112,7 @@ namespace MedicalSharp.Controls.Viewports
 
             //快速检测
             IDictionary<Visual3D, float> hitResults = new Dictionary<Visual3D, float>();
-            foreach (ShapeVisual3D shapeVisual3D in this._shapeVisual3Ds)
+            foreach (ShapeVisual3D shapeVisual3D in this._shapeVisual3Ds.Where(x => x.IsVisible))
             {
                 bool intersects = shapeVisual3D.Renderable.IntersectsRay(ray, out float distance);
                 if (intersects)
@@ -120,7 +120,7 @@ namespace MedicalSharp.Controls.Viewports
                     hitResults.Add(shapeVisual3D, distance);
                 }
             }
-            foreach (TextVisual3D textVisual3D in this._textVisual3Ds)
+            foreach (TextVisual3D textVisual3D in this._textVisual3Ds.Where(x => x.IsVisible))
             {
                 bool intersects = textVisual3D.Renderable.IntersectsRay(ray, out float distance, out _, out _, out _);
                 if (intersects)

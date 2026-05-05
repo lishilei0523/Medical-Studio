@@ -77,13 +77,13 @@
 		</sd:GroupBox.Header>
 		<!--Content-->
 		<sd:MPRViewport Background="Black"
-                        FrameToken="{Binding FrameToken}"
+						FrameToken="{Binding FrameToken}"
 						Plane="{Binding Plane}"
 						Camera="{Binding Camera}"
 						InputManager="{Binding InputManager}"
 						VolumeData="{Binding VolumeData}">
-            <sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
-			<!--<sd:CrosshairVisual3D Center="0,0,0" UAxis="1, 0, 0" VAxis="0, -1, 0" />-->
+			<sd:ShapePresenter Content="{Binding Crosshair}" />
+			<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
 		</sd:MPRViewport>
 	</sd:GroupBox>
 </UserControl>
