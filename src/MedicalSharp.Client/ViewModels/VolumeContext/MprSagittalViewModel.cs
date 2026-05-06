@@ -41,8 +41,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             MPRCamera camera = new MPRCamera();
             MPRInputManager inputManager = new MPRInputManager(camera);
             this.MprViewModel = new MprViewModel(windowManager, eventAggregator, title, camera, inputManager);
-            this.MprViewModel.Crosshair.HorizontalStroke = Colors.Red;
-            this.MprViewModel.Crosshair.VerticalStroke = Colors.LimeGreen;
+            this.MprViewModel.Crosshair.HorizontalStroke = Colors.LimeGreen;
+            this.MprViewModel.Crosshair.VerticalStroke = Colors.Red;
         }
 
         #endregion
