@@ -21,6 +21,11 @@ namespace MedicalSharp.Primitives.Maths
         public event Action<MPRPlane> PlaneChangedEvent;
 
         /// <summary>
+        /// 上次切片偏移量
+        /// </summary>
+        private float _previousSliceOffset;
+
+        /// <summary>
         /// 最小投影（斜切平面使用）
         /// </summary>
         private float _minProjection;
@@ -116,6 +121,13 @@ namespace MedicalSharp.Primitives.Maths
                 }
             }
         }
+        #endregion
+
+        #region 切片偏移差分量 —— float SliceOffsetDelta
+        /// <summary>
+        /// 切片偏移差分量
+        /// </summary>
+        public float SliceOffsetDelta { get; private set; }
         #endregion
 
         #region 体积元数据 —— VolumeMetadata VolumeMetadata
@@ -694,6 +706,10 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         private void OnChanged()
         {
+            float currentOffset = this.GetSliceOffset();
+            this.SliceOffsetDelta = currentOffset - this._previousSliceOffset;
+            this._previousSliceOffset = currentOffset;
+
             this.PlaneChangedEvent?.Invoke(this);
         }
         #endregion 
