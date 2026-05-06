@@ -42,7 +42,12 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        //
+        #region 平移中事件 —— Action<ITranslatable> TranslatingEvent
+        /// <summary>
+        /// 平移中事件
+        /// </summary>
+        public Action<ITranslatable> TranslatingEvent { get; set; }
+        #endregion
 
         #endregion
 
@@ -103,6 +108,9 @@ namespace MedicalSharp.Controls.Commands
 
                     //设置位置
                     this._selectedVisual.Transform.SetPosition(hitPoint - localCenter);
+
+                    //平移中
+                    this.TranslatingEvent?.Invoke(this._selectedVisual);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();

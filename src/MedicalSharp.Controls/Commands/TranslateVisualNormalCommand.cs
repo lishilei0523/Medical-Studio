@@ -42,7 +42,12 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        //
+        #region 平移中事件 —— Action<ITranslatable> TranslatingEvent
+        /// <summary>
+        /// 平移中事件
+        /// </summary>
+        public Action<ITranslatable> TranslatingEvent { get; set; }
+        #endregion
 
         #endregion
 
@@ -107,6 +112,9 @@ namespace MedicalSharp.Controls.Commands
                     float delta = deltaX + deltaY;
                     Vector3 translation = visual2DIn3D.Normal.ToVector3() * -delta * 0.003f;
                     this._selectedVisual.Transform.Translate(translation);
+
+                    //平移中
+                    this.TranslatingEvent?.Invoke(this._selectedVisual);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
