@@ -79,8 +79,8 @@ namespace MedicalSharp.Primitives.Cameras
             this._maxDistance = 100.0f;
             this._minPitch = -89.0f;
             this._maxPitch = 89.0f;
-            this._moveSpeed = 2.0f;
-            this._rotateSpeed = 0.1f;
+            this._moveSpeed = 3.0f;
+            this._rotateSpeed = 0.15f;
             this._zoomSpeed = 0.5f;
 
             //设置世界坐标系上方向（默认Y-up）
@@ -129,8 +129,8 @@ namespace MedicalSharp.Primitives.Cameras
             this._maxDistance = 100.0f;
             this._minPitch = -89.0f;
             this._maxPitch = 89.0f;
-            this._moveSpeed = 2.0f;
-            this._rotateSpeed = 0.1f;
+            this._moveSpeed = 3.0f;
+            this._rotateSpeed = 0.15f;
             this._zoomSpeed = 0.5f;
 
             //设置世界坐标系上方向
