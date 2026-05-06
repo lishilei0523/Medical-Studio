@@ -21,6 +21,11 @@ namespace MedicalSharp.Primitives.Maths
         public event Action<MPRPlane> PlaneChangedEvent;
 
         /// <summary>
+        /// 首次变化
+        /// </summary>
+        private bool _firstChanged;
+
+        /// <summary>
         /// 上次切片偏移量
         /// </summary>
         private float _previousSliceOffset;
@@ -42,6 +47,9 @@ namespace MedicalSharp.Primitives.Maths
         private MPRPlane(VolumeMetadata volumeMetadata)
         {
             this.VolumeMetadata = volumeMetadata;
+
+            //默认值
+            this._firstChanged = true;
         }
 
         #endregion
@@ -55,17 +63,17 @@ namespace MedicalSharp.Primitives.Maths
         public Vector3 Center { get; private set; }
         #endregion
 
-        #region U轴方向 —— Vector3 UAxis
+        #region U轴 —— Vector3 UAxis
         /// <summary>
-        /// U轴方向
+        /// U轴
         /// </summary>
         /// <remarks>水平</remarks>
         public Vector3 UAxis { get; private set; }
         #endregion
 
-        #region V轴方向 —— Vector3 VAxis
+        #region V轴 —— Vector3 VAxis
         /// <summary>
-        /// V轴方向
+        /// V轴
         /// </summary>
         /// <remarks>垂直</remarks>
         public Vector3 VAxis { get; private set; }
@@ -135,6 +143,82 @@ namespace MedicalSharp.Primitives.Maths
         /// 体积元数据
         /// </summary>
         public VolumeMetadata VolumeMetadata { get; private set; }
+        #endregion
+
+        #region 只读属性 - 平面世界中心 —— Vector3 WorldCenter
+        /// <summary>
+        /// 只读属性 - 平面世界中心
+        /// </summary>
+        public Vector3 WorldCenter
+        {
+            get => this.GetModelMatrix().ExtractTranslation();
+        }
+        #endregion
+
+        #region 只读属性 - 世界U轴 —— Vector3 WorldUAxis
+        /// <summary>
+        /// 只读属性 - 世界U轴
+        /// </summary>
+        public Vector3 WorldUAxis
+        {
+            get => new Vector3(
+                this.UAxis.X * this.VolumeMetadata.VolumeScale.X,
+                this.UAxis.Y * this.VolumeMetadata.VolumeScale.Y,
+                this.UAxis.Z * this.VolumeMetadata.VolumeScale.Z
+            ).Normalized();
+        }
+        #endregion
+
+        #region 只读属性 - 世界V轴 —— Vector3 WorldVAxis
+        /// <summary>
+        /// 只读属性 - 世界V轴
+        /// </summary>
+        public Vector3 WorldVAxis
+        {
+            get => new Vector3(
+                this.VAxis.X * this.VolumeMetadata.VolumeScale.X,
+                this.VAxis.Y * this.VolumeMetadata.VolumeScale.Y,
+                this.VAxis.Z * this.VolumeMetadata.VolumeScale.Z
+            ).Normalized();
+        }
+        #endregion
+
+        #region 只读属性 - 世界法向量 —— Vector3 WorldNormal
+        /// <summary>
+        /// 只读属性 - 世界法向量
+        /// </summary>
+        public Vector3 WorldNormal
+        {
+            get => new Vector3(
+                this.Normal.X * this.VolumeMetadata.VolumeScale.X,
+                this.Normal.Y * this.VolumeMetadata.VolumeScale.Y,
+                this.Normal.Z * this.VolumeMetadata.VolumeScale.Z
+            ).Normalized();
+        }
+        #endregion
+
+        #region 只读属性 - 世界切片间距 —— Vector3 WorldSliceSpacing
+        /// <summary>
+        /// 只读属性 - 世界切片间距
+        /// </summary>
+        /// <remarks>沿世界法向量方向移动一个切片的世界位移（不含方向/数量）</remarks>
+        public float WorldSliceSpacing
+        {
+            get
+            {
+                if (this.PlaneType == MPRPlaneType.Oblique)
+                {
+                    return Math.Abs(this.Normal.X) * this.VolumeMetadata.VolumeScale.X +
+                           Math.Abs(this.Normal.Y) * this.VolumeMetadata.VolumeScale.Y +
+                           Math.Abs(this.Normal.Z) * this.VolumeMetadata.VolumeScale.Z;
+                }
+
+                //标准平面保留方向符号
+                return this.Normal.X * this.VolumeMetadata.VolumeScale.X +
+                       this.Normal.Y * this.VolumeMetadata.VolumeScale.Y +
+                       this.Normal.Z * this.VolumeMetadata.VolumeScale.Z;
+            }
+        }
         #endregion
 
         #endregion
@@ -707,7 +791,15 @@ namespace MedicalSharp.Primitives.Maths
         private void OnChanged()
         {
             float currentOffset = this.GetSliceOffset();
-            this.SliceOffsetDelta = currentOffset - this._previousSliceOffset;
+            if (this._firstChanged)
+            {
+                this._firstChanged = false;
+                this.SliceOffsetDelta = 0;
+            }
+            else
+            {
+                this.SliceOffsetDelta = currentOffset - this._previousSliceOffset;
+            }
             this._previousSliceOffset = currentOffset;
 
             this.PlaneChangedEvent?.Invoke(this);

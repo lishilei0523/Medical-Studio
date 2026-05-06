@@ -559,33 +559,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <param name="plane">MPR平面</param>
         private void OnMPRPlaneChanged(MPRPlane plane)
         {
-            Matrix4 modelMatrix = plane.GetModelMatrix();
-            Vector3 worldCenter = Vector3.TransformPosition(plane.Center, modelMatrix);
-            Vector3 worldUAxis = new Vector3(
-                plane.UAxis.X * plane.VolumeMetadata.VolumeScale.X,
-                plane.UAxis.Y * plane.VolumeMetadata.VolumeScale.Y,
-                plane.UAxis.Z * plane.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
-            Vector3 worldVAxis = new Vector3(
-                plane.VAxis.X * plane.VolumeMetadata.VolumeScale.X,
-                plane.VAxis.Y * plane.VolumeMetadata.VolumeScale.Y,
-                plane.VAxis.Z * plane.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
-            Vector3 worldNormal = plane.Normal;
-
-            this.Crosshair.Center = worldCenter.ToVector3();
-            this.Crosshair.UAxis = worldUAxis.ToVector3();
-            this.Crosshair.VAxis = worldVAxis.ToVector3();
-
+            this.Crosshair.Center = plane.WorldCenter.ToVector3();
+            this.Crosshair.UAxis = plane.WorldUAxis.ToVector3();
+            this.Crosshair.VAxis = plane.WorldVAxis.ToVector3();
             if (this.Crosshair.Transform != null)
             {
                 //逻辑空间偏移 -> 世界空间偏移
-                float worldDelta = plane.SliceOffsetDelta * (
-                    Math.Abs(worldNormal.X) * plane.VolumeMetadata.VolumeScale.X +
-                    Math.Abs(worldNormal.Y) * plane.VolumeMetadata.VolumeScale.Y +
-                    Math.Abs(worldNormal.Z) * plane.VolumeMetadata.VolumeScale.Z);
-                Vector3 step = worldNormal * worldDelta;
-                this.Crosshair.Transform.Translate(step);
+                float worldDelta = plane.SliceOffsetDelta * plane.WorldSliceSpacing;
+                Vector3 worldStep = plane.WorldNormal * worldDelta;
+                this.Crosshair.Transform.Translate(worldStep);
             }
 
             MPRPlaneChangedEvent message = new MPRPlaneChangedEvent
