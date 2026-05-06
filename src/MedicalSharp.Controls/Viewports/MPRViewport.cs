@@ -410,7 +410,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         private static void OnWindowWidthChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
-            viewport._mprRenderer?.SetWindowLevel(eventArgs.NewValue.Value, viewport.WindowWidth);
+            viewport._mprRenderer?.SetWindowLevel(eventArgs.NewValue.Value, viewport.WindowCenter);
         }
         #endregion
 
@@ -420,7 +420,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         private static void OnWindowCenterChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
-            viewport._mprRenderer?.SetWindowLevel(viewport.WindowCenter, eventArgs.NewValue.Value);
+            viewport._mprRenderer?.SetWindowLevel(viewport.WindowWidth, eventArgs.NewValue.Value);
         }
         #endregion
 

@@ -140,8 +140,8 @@ namespace MedicalSharp.Controls.Extensions
             {
                 Vector3 localPosition = pointVisual3D.Position.ToVector3();
                 Vector3 worldPosition = Vector3.TransformPosition(localPosition, visual3D.Transform.Matrix);
-                float shapeDistance = Vector3.Dot(worldPosition, plane.Normal);
-                float planeDistance = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
+                float shapeDistance = Vector3.Dot(worldPosition, plane.WorldNormal);
+                float planeDistance = Vector3.Dot(plane.WorldCenter, plane.WorldNormal);
                 float diffDistance = Math.Abs(shapeDistance - planeDistance);
 
                 return diffDistance < epsilon;
@@ -153,15 +153,15 @@ namespace MedicalSharp.Controls.Extensions
                 Vector3 localNormal = visual2DIn3D.Normal.ToVector3();
                 Vector3 worldNormal = Vector3.TransformNormal(localNormal, visual3D.Transform.Matrix);
                 worldNormal = Vector3.Normalize(worldNormal);
-                if (Math.Abs(Vector3.Dot(worldNormal, plane.Normal)) < 0.999f)
+                if (Math.Abs(Vector3.Dot(worldNormal, plane.WorldNormal)) < 0.999f)
                 {
                     return false;
                 }
 
                 Vector3 localPoint = visual2DIn3D.PointOnPlane.ToVector3();
                 Vector3 worldPoint = Vector3.TransformPosition(localPoint, visual3D.Transform.Matrix);
-                float shapeDistance = Vector3.Dot(worldPoint, plane.Normal);
-                float planeDistance = Vector3.Dot(plane.GetPointOnPlane(0, 0), plane.Normal);
+                float shapeDistance = Vector3.Dot(worldPoint, plane.WorldNormal);
+                float planeDistance = Vector3.Dot(plane.WorldCenter, plane.WorldNormal);
                 float diffDistance = Math.Abs(shapeDistance - planeDistance);
 
                 return diffDistance < epsilon;
@@ -171,8 +171,8 @@ namespace MedicalSharp.Controls.Extensions
             if (visual3D is IPureVisual3D)
             {
                 BoundingBox worldBox = visual3D.Bounds.Transform(visual3D.Transform.Matrix);
-                Vector3 normal = plane.Normal;
-                Vector3 planePoint = plane.GetPointOnPlane(0, 0);
+                Vector3 normal = plane.WorldNormal;
+                Vector3 planePoint = plane.WorldCenter;
                 float planeDistance = -Vector3.Dot(normal, planePoint);
 
                 //包围盒相对于平面的最小/最大有符号距离
@@ -217,15 +217,15 @@ namespace MedicalSharp.Controls.Extensions
                 : ComputeConvexHullEdges(hullPositions);
 
             List<Vector3> intersections = [];
-            Vector3 planeNormal = plane.Normal;
-            Vector3 planePoint = plane.GetPointOnPlane(0, 0);
-            float planeD = -Vector3.Dot(planeNormal, planePoint);
+            Vector3 planeNormal = plane.WorldNormal;
+            Vector3 planePoint = plane.WorldCenter;
+            float planeDistance = -Vector3.Dot(planeNormal, planePoint);
 
             //计算每个顶点到平面的有符号距离
             float[] distances = new float[hullPositions.Count];
             for (int index = 0; index < hullPositions.Count; index++)
             {
-                distances[index] = Vector3.Dot(planeNormal, hullPositions[index]) + planeD;
+                distances[index] = Vector3.Dot(planeNormal, hullPositions[index]) + planeDistance;
             }
 
             //遍历凸包的真实棱边

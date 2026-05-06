@@ -635,47 +635,6 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 获取平面上的点（逻辑空间） —— Vector3 GetPointOnPlane(float u, float v)
-        /// <summary>
-        /// 获取平面上的点（逻辑空间）
-        /// </summary>
-        /// <param name="u">U坐标，范围 -1 到 1</param>
-        /// <param name="v">V坐标，范围 -1 到 1</param>
-        /// <returns>逻辑空间中的点，范围 -0.5 到 0.5</returns>
-        public Vector3 GetPointOnPlane(float u, float v)
-        {
-            const float halfSize = 0.5f;
-            float sliceOffset = this.GetSliceOffset();
-
-            //平面上的点 = 中心 + 法线方向偏移 + U方向偏移 + V方向偏移
-            Vector3 point = this.Center + this.Normal * sliceOffset + this.UAxis * u * halfSize + this.VAxis * v * halfSize;
-
-            return point;
-        }
-        #endregion
-
-        #region 将点投影到平面（逻辑空间） —— Vector2 ProjectPoint(Vector3 point)
-        /// <summary>
-        /// 将点投影到平面（逻辑空间）
-        /// </summary>
-        /// <param name="point">逻辑空间中的点，范围 -0.5 到 0.5</param>
-        /// <returns>平面UV坐标，范围 -1 到 1</returns>
-        public Vector2 ProjectPoint(Vector3 point)
-        {
-            const float halfSize = 0.5f;
-            float sliceOffset = this.GetSliceOffset();
-
-            //计算相对于平面中心的偏移
-            Vector3 relative = point - (this.Center + this.Normal * sliceOffset);
-
-            //投影到U轴和V轴
-            float u = Vector3.Dot(relative, this.UAxis) / halfSize;
-            float v = Vector3.Dot(relative, this.VAxis) / halfSize;
-
-            return new Vector2(u, v);
-        }
-        #endregion
-
         #region 获取平面上的体素坐标 —— Vector3i GetVoxelPosition(float u, float v...
         /// <summary>
         /// 获取平面上的体素坐标
@@ -781,6 +740,47 @@ namespace MedicalSharp.Primitives.Maths
                 this.VolumeMetadata.VolumeSize.Z * absNormal.Z;
 
             this.SlicesCount = (int)Math.Floor(Math.Max(projection, 2));
+        }
+        #endregion
+
+        #region 获取平面上的点（逻辑空间） —— Vector3 GetPointOnPlane(float u, float v)
+        /// <summary>
+        /// 获取平面上的点（逻辑空间）
+        /// </summary>
+        /// <param name="u">U坐标，范围 -1 到 1</param>
+        /// <param name="v">V坐标，范围 -1 到 1</param>
+        /// <returns>逻辑空间中的点，范围 -0.5 到 0.5</returns>
+        private Vector3 GetPointOnPlane(float u, float v)
+        {
+            const float halfSize = 0.5f;
+            float sliceOffset = this.GetSliceOffset();
+
+            //平面上的点 = 中心 + 法线方向偏移 + U方向偏移 + V方向偏移
+            Vector3 point = this.Center + this.Normal * sliceOffset + this.UAxis * u * halfSize + this.VAxis * v * halfSize;
+
+            return point;
+        }
+        #endregion
+
+        #region 将点投影到平面（逻辑空间） —— Vector2 ProjectPoint(Vector3 point)
+        /// <summary>
+        /// 将点投影到平面（逻辑空间）
+        /// </summary>
+        /// <param name="point">逻辑空间中的点，范围 -0.5 到 0.5</param>
+        /// <returns>平面UV坐标，范围 -1 到 1</returns>
+        private Vector2 ProjectPoint(Vector3 point)
+        {
+            const float halfSize = 0.5f;
+            float sliceOffset = this.GetSliceOffset();
+
+            //计算相对于平面中心的偏移
+            Vector3 relative = point - (this.Center + this.Normal * sliceOffset);
+
+            //投影到U轴和V轴
+            float u = Vector3.Dot(relative, this.UAxis) / halfSize;
+            float v = Vector3.Dot(relative, this.VAxis) / halfSize;
+
+            return new Vector2(u, v);
         }
         #endregion
 
