@@ -28,9 +28,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// MPR视图模型
     /// </summary>
-    public class MprViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeRemovedEvent>
+    public class MprViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 是否处于同步中
+        /// </summary>
+        private bool _isSyncing;
 
         /// <summary>
         /// 窗口管理器
@@ -55,6 +60,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
+            this._isSyncing = false;
             this.Crosshair = new CrosshairVisual3D();
             this.Shapes = [];
             this.PickVoxel();
@@ -238,6 +244,18 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Translate3D()
         {
+            Action<ITranslatable> translating = translatable =>
+            {
+                if (translatable is ShapeVisual3D shape)
+                {
+                    ShapeTranslatingEvent message = new ShapeTranslatingEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
             Action<ITranslatable> translateEnd = translatable =>
             {
                 if (translatable is ShapeVisual3D shape)
@@ -252,6 +270,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             TranslateVisual3DCommand command = new TranslateVisual3DCommand(translateEnd);
+            command.TranslatingEvent = translating;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -541,6 +560,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         private void OnMPRPlaneChanged(MPRPlane plane)
         {
             Matrix4 modelMatrix = plane.GetModelMatrix();
+            Vector3 worldCenter = Vector3.TransformPosition(plane.Center, modelMatrix);
             Vector3 worldUAxis = new Vector3(
                 plane.UAxis.X * plane.VolumeMetadata.VolumeScale.X,
                 plane.UAxis.Y * plane.VolumeMetadata.VolumeScale.Y,
@@ -551,14 +571,30 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 plane.VAxis.Y * plane.VolumeMetadata.VolumeScale.Y,
                 plane.VAxis.Z * plane.VolumeMetadata.VolumeScale.Z
             ).Normalized();
-            Vector3 worldNormal = Vector3.Cross(worldUAxis, worldVAxis).Normalized();
-            worldVAxis = Vector3.Cross(worldNormal, worldUAxis).Normalized();
-            worldNormal = Vector3.Cross(worldUAxis, worldVAxis).Normalized();
-            worldVAxis = Vector3.Cross(worldNormal, worldUAxis).Normalized();
+            Vector3 worldNormal = plane.Normal;
 
-            this.Crosshair.Center = Vector3.TransformPosition(plane.Center, modelMatrix).ToVector3();
+            this.Crosshair.Center = worldCenter.ToVector3();
             this.Crosshair.UAxis = worldUAxis.ToVector3();
             this.Crosshair.VAxis = worldVAxis.ToVector3();
+
+            if (this.Crosshair.Transform != null)
+            {
+                //逻辑空间偏移 -> 世界空间偏移
+                float worldDelta = plane.SliceOffsetDelta * (
+                    Math.Abs(worldNormal.X) * plane.VolumeMetadata.VolumeScale.X +
+                    Math.Abs(worldNormal.Y) * plane.VolumeMetadata.VolumeScale.Y +
+                    Math.Abs(worldNormal.Z) * plane.VolumeMetadata.VolumeScale.Z);
+                Vector3 step = worldNormal * worldDelta;
+                this.Crosshair.Transform.Translate(step);
+            }
+
+            MPRPlaneChangedEvent message = new MPRPlaneChangedEvent
+            {
+                Publisher = this,
+                Crosshair = this.Crosshair,
+                IsSyncTriggered = this._isSyncing
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(message);
         }
         #endregion
 
@@ -639,6 +675,46 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 处理形状平移中事件 —— Task HandleAsync(ShapeTranslatingEvent message...
+        /// <summary>
+        /// 处理形状平移中事件
+        /// </summary>
+        public Task HandleAsync(ShapeTranslatingEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.Shape == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this._isSyncing = true;
+            try
+            {
+                if (message.Shape is CrosshairVisual3D crosshair)
+                {
+                    Matrix4 localToWorld = crosshair.Transform.Matrix;
+                    this.Crosshair.Transform.SetMatrix(localToWorld);
+                    this.Plane.Relocate(this.Plane.UAxis, this.Plane.VAxis, crosshair.Transform.Position, this.Plane.Normal);
+
+                    this.FrameToken++;
+                }
+            }
+            finally
+            {
+                this._isSyncing = false;
+            }
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
         #region 处理形状已删除事件 —— Task HandleAsync(ShapeRemovedEvent message...
         /// <summary>
         /// 处理形状已删除事件
@@ -663,6 +739,45 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 this.Shapes.Remove(shape);
                 this.FrameToken++;
+            }
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理MPR平面变化事件 —— Task HandleAsync(MPRPlaneChangedEvent message...
+        /// <summary>
+        /// 处理MPR平面变化事件
+        /// </summary>
+        public Task HandleAsync(MPRPlaneChangedEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.Crosshair == null)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.IsSyncTriggered)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this._isSyncing = true;
+            try
+            {
+                this.Crosshair.Transform.SetPosition(message.Crosshair.Transform.Position);
+
+                this.FrameToken++;
+            }
+            finally
+            {
+                this._isSyncing = false;
             }
 
             return Task.CompletedTask;
