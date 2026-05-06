@@ -90,27 +90,23 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// MPR平面
         /// </summary>
-        private MPRPlane _plane;
-
-        /// <summary>
-        /// MPR平面
-        /// </summary>
         public MPRPlane Plane
         {
-            get => this._plane;
+            get;
             set
             {
-                if (this._plane != null)
+                if (field != null)
                 {
-                    this._plane.PlaneChangedEvent -= this.OnMPRPlaneChanged;
+                    field.PlaneChangedEvent -= this.OnMPRPlaneChanged;
                 }
+
                 if (value != null)
                 {
                     value.PlaneChangedEvent += this.OnMPRPlaneChanged;
                     this.OnMPRPlaneChanged(value);
                 }
 
-                this._plane = value;
+                field = value;
                 this.NotifyOfPropertyChange();
             }
         }

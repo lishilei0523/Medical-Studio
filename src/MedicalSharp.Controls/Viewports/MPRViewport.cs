@@ -324,6 +324,11 @@ namespace MedicalSharp.Controls.Viewports
                 //形状、文本渲染
                 base.OnOpenTKRender(viewportSize);
             }
+            else
+            {
+                this._shapeVisual3Ds.Clear();
+                this._textVisual3Ds.Clear();
+            }
         }
         #endregion
 

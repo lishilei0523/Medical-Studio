@@ -53,17 +53,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// 体积数据
         /// </summary>
-        private VolumeData _volumeData;
-
-        /// <summary>
-        /// 体积数据
-        /// </summary>
         public VolumeData VolumeData
         {
-            get => this._volumeData;
+            get;
             set
             {
-                this._volumeData = value;
+                field = value;
                 this.MprViewModel.VolumeData = value;
                 if (value != null)
                 {

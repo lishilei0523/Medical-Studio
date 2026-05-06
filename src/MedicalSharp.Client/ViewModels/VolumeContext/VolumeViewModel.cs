@@ -96,8 +96,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// 体积数据
         /// </summary>
-        [DependencyProperty]
-        public VolumeData VolumeData { get; set; }
+        public VolumeData VolumeData
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+            }
+        }
         #endregion
 
         #region 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints

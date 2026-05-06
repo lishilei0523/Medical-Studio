@@ -129,6 +129,11 @@ namespace MedicalSharp.Primitives.Models
                 return [];
             }
 
+            if (this.Indices?.Length % 3 != 0)
+            {
+                return [];
+            }
+
             #endregion
 
             IList<Triangle> triangles = new List<Triangle>();

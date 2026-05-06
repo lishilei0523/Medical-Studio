@@ -259,6 +259,8 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         protected override void OnOpenTKDeinit()
         {
+            this._shapeVisual3Ds.Clear();
+            this._textVisual3Ds.Clear();
             this._shapeRenderer.Dispose();
             this._textRenderer.Dispose();
         }

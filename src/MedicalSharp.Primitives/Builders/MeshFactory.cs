@@ -1112,6 +1112,12 @@ namespace MedicalSharp.Primitives.Builders
             DefaultVertex[] verticesInput = positions.Select(p => new DefaultVertex { Position = [p.X, p.Y, p.Z] }).ToArray();
             ConvexHullCreationResult<DefaultVertex, DefaultConvexFace<DefaultVertex>> convexHull = ConvexHull.Create(verticesInput);
 
+            //共面或其他状况返回多边形
+            if (convexHull == null || convexHull.Result == null)
+            {
+                return CreatePolyline(positions, true);
+            }
+
             //提取凸包顶点（已经去重）
             Vector3[] hullVertices = convexHull.Result.Points.Select(v => new Vector3(
                 (float)v.Position[0],
