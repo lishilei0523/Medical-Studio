@@ -33,9 +33,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #region # 字段及构造器
 
         /// <summary>
-        /// 是否处于同步中
+        /// 是否十字线同步中
         /// </summary>
-        private bool _isSyncing;
+        private bool _isCrossSyncing;
 
         /// <summary>
         /// 窗口管理器
@@ -60,7 +60,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
-            this._isSyncing = false;
+            this._isCrossSyncing = false;
             this.Crosshair = new CrosshairVisual3D();
             this.Shapes = [];
             this.PickVoxel();
@@ -574,7 +574,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 Publisher = this,
                 Crosshair = this.Crosshair,
-                IsSyncTriggered = this._isSyncing
+                IsSyncTriggered = this._isCrossSyncing
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
         }
@@ -676,21 +676,19 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             #endregion
 
-            this._isSyncing = true;
+            this._isCrossSyncing = true;
             try
             {
                 if (message.Shape is CrosshairVisual3D crosshair)
                 {
-                    Matrix4 localToWorld = crosshair.Transform.Matrix;
-                    this.Crosshair.Transform.SetMatrix(localToWorld);
-                    this.Plane.Relocate(this.Plane.UAxis, this.Plane.VAxis, crosshair.Transform.Position, this.Plane.Normal);
-
+                    this.Crosshair.Transform.SetPosition(crosshair.Transform.Position);
+                    this.Plane.Relocate(crosshair.Transform.Position);
                     this.FrameToken++;
                 }
             }
             finally
             {
-                this._isSyncing = false;
+                this._isCrossSyncing = false;
             }
 
             return Task.CompletedTask;
@@ -750,16 +748,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             #endregion
 
-            this._isSyncing = true;
+            this._isCrossSyncing = true;
             try
             {
                 this.Crosshair.Transform.SetPosition(message.Crosshair.Transform.Position);
-
                 this.FrameToken++;
             }
             finally
             {
-                this._isSyncing = false;
+                this._isCrossSyncing = false;
             }
 
             return Task.CompletedTask;
