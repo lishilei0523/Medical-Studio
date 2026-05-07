@@ -63,7 +63,7 @@
 					<ColumnDefinition Width="260" />
 				</Grid.ColumnDefinitions>
 				<!--Left Pannel-->
-				<sd:GroupBox Grid.Column="0" Header="患者信息" Margin="4,0,2,4">
+				<sd:GroupBox Grid.Column="0" Header="患者信息" Margin="4,1,2,5">
 
 				</sd:GroupBox>
 				<!--Viewer Pannel-->
@@ -71,7 +71,7 @@
 					<ContentControl cm:View.Model="{Binding LayoutViewModel}" />
 				</Grid>
 				<!--Right Pannel-->
-				<sd:GroupBox Grid.Column="2" Header="控制面板" Margin="2,0,4,4">
+				<sd:GroupBox Grid.Column="2" Header="控制面板" Margin="2,1,4,5">
 
                 </sd:GroupBox>
 			</Grid>

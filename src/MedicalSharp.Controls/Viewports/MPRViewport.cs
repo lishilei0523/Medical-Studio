@@ -237,6 +237,12 @@ namespace MedicalSharp.Controls.Viewports
             voxelPosition = Vector3i.Zero;
             voxelValue = -1;
             markValue = 0;
+            ray = default;
+
+            if (this.Plane == null)
+            {
+                return false;
+            }
 
             Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera.LookDirection, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, out ray);
             if (planeUV.HasValue)

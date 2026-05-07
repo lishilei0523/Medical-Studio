@@ -2,26 +2,25 @@
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
-using SD.IOC.Core.Mediators;
 
 namespace MedicalSharp.Client.ViewModels.LayoutContext
 {
     /// <summary>
     /// 布局视图模型
     /// </summary>
-    public abstract class LayoutViewModel : ScreenBase
+    public class LayoutViewModel : ScreenBase
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        protected LayoutViewModel()
+        public LayoutViewModel(VolumeViewModel volumeViewModel, MprAxialViewModel mprAxialViewModel, MprCoronalViewModel mprCoronalViewModel, MprSagittalViewModel mprSagittalViewModel)
         {
-            this.VolumeViewModel = ResolveMediator.Resolve<VolumeViewModel>();
-            this.MprAxialViewModel = ResolveMediator.Resolve<MprAxialViewModel>();
-            this.MprCoronalViewModel = ResolveMediator.Resolve<MprCoronalViewModel>();
-            this.MprSagittalViewModel = ResolveMediator.Resolve<MprSagittalViewModel>();
+            this.VolumeViewModel = volumeViewModel;
+            this.MprAxialViewModel = mprAxialViewModel;
+            this.MprCoronalViewModel = mprCoronalViewModel;
+            this.MprSagittalViewModel = mprSagittalViewModel;
         }
 
         #endregion

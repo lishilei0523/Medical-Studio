@@ -1,0 +1,43 @@
+<UserControl x:Class="MedicalSharp.Client.Views.LayoutContext.LayoutView"
+			 xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:cm="http://caliburnmicro.com"
+			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			 mc:Ignorable="d">
+
+    <UserControl.Styles>
+        <Style Selector="Border.Focusable">
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Border.Focusable:focus-within">
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </UserControl.Styles>
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition />
+			<ColumnDefinition />
+		</Grid.ColumnDefinitions>
+		<Border Grid.Row="0" Grid.Column="0" Margin="0,0,1,1" Focusable="True" Classes="Focusable" sd:GridExpander.CanExpand="True">
+			<ContentControl cm:View.Model="{Binding VolumeViewModel}" />
+		</Border>
+		<Border Grid.Row="0" Grid.Column="1" Margin="1,0,0,1" Focusable="True" Classes="Focusable" sd:GridExpander.CanExpand="True">
+			<ContentControl cm:View.Model="{Binding MprAxialViewModel}" />
+		</Border>
+		<Border Grid.Row="1" Grid.Column="0" Margin="0,1,1,0" Focusable="True" Classes="Focusable" sd:GridExpander.CanExpand="True">
+			<ContentControl cm:View.Model="{Binding MprCoronalViewModel}" />
+		</Border>
+		<Border Grid.Row="1" Grid.Column="1" Margin="1,1,0,0" Focusable="True" Classes="Focusable" sd:GridExpander.CanExpand="True">
+			<ContentControl cm:View.Model="{Binding MprSagittalViewModel}" />
+		</Border>
+	</Grid>
+</UserControl>

@@ -747,11 +747,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this._isCrossSyncing = true;
             try
             {
-                if (message.Crosshair.Transform != null)
-                {
-                    this.Crosshair.Transform.SetPosition(message.Crosshair.Transform.Position);
-                    this.FrameToken++;
-                }
+                this.Crosshair.Transform.SetPosition(message.Crosshair.Transform.Position);
+                this.FrameToken++;
             }
             finally
             {

@@ -25,16 +25,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         #region # 字段及构造器
 
         /// <summary>
-        /// 布局13
-        /// </summary>
-        private readonly Layout13ViewModel _layout13;
-
-        /// <summary>
-        /// 布局22
-        /// </summary>
-        private readonly Layout22ViewModel _layout22;
-
-        /// <summary>
         /// 窗口管理器
         /// </summary>
         private readonly IWindowManager _windowManager;
@@ -51,11 +41,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         {
             this._windowManager = windowManager;
             this._dicomLoader = dicomLoader;
-
-            //初始化布局
-            this._layout13 = ResolveMediator.Resolve<Layout13ViewModel>();
-            this._layout22 = ResolveMediator.Resolve<Layout22ViewModel>();
-            this.LayoutViewModel = this._layout22;
+            this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
         }
 
         #endregion
@@ -68,19 +54,13 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 体积数据
         /// </summary>
-        private VolumeData _volumeData;
-
-        /// <summary>
-        /// 体积数据
-        /// </summary>
         public VolumeData VolumeData
         {
-            get => this._volumeData;
+            get;
             set
             {
-                this._volumeData = value;
-                this._layout13.SetVolumeData(value);
-                this._layout22.SetVolumeData(value);
+                field = value;
+                this.LayoutViewModel.SetVolumeData(value);
             }
         }
         #endregion
@@ -116,16 +96,16 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand Layout13Command => new RelayCommand(_ =>
         {
-            #region # 验证
+            //#region # 验证
 
-            if (this.LayoutViewModel is Layout13ViewModel)
-            {
-                return;
-            }
+            //if (this.LayoutViewModel is Layout13ViewModel)
+            //{
+            //    return;
+            //}
 
-            #endregion
+            //#endregion
 
-            this.LayoutViewModel = this._layout13;
+            //this.LayoutViewModel = ResolveMediator.Resolve<Layout13ViewModel>();
         });
         #endregion
 
@@ -135,16 +115,16 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand Layout22Command => new RelayCommand(_ =>
         {
-            #region # 验证
+            //#region # 验证
 
-            if (this.LayoutViewModel is Layout22ViewModel)
-            {
-                return;
-            }
+            //if (this.LayoutViewModel is LayoutViewModel)
+            //{
+            //    return;
+            //}
 
-            #endregion
+            //#endregion
 
-            this.LayoutViewModel = this._layout22;
+            //this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
         });
         #endregion
 
@@ -210,9 +190,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 {
                     SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
                 }
-
                 this.VolumeData = volumeData;
-                this.LayoutViewModel.SetVolumeData(volumeData);
             }
 
             this.Idle();
@@ -235,8 +213,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             #endregion
 
             SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
-            this._layout13.ClearVolumeData();
-            this._layout22.ClearVolumeData();
             this.VolumeData = null;
         }
         #endregion
