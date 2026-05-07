@@ -473,11 +473,6 @@ namespace MedicalSharp.Controls.Viewports
                 viewport.GlContext.MakeCurrent();
                 volumeSession = new VolumeSession(volumeData);
                 SessionManager.AddVolumeSession(volumeSession.Id, volumeSession);
-
-                //初始化传递函数、标记策略
-                viewport._mprRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
-                viewport._mprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
-                //viewport._mprRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints); TODO 伪彩
             }
             else
             {
@@ -493,6 +488,11 @@ namespace MedicalSharp.Controls.Viewports
             {
                 viewport.WindowCenter = volumeData.Metadata.WindowCenter.Value;
             }
+
+            //初始化传递函数、标记策略
+            viewport._mprRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
+            viewport._mprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
+            //viewport._mprRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints); TODO 伪彩
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
