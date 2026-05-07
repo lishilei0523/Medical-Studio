@@ -41,7 +41,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         {
             this._windowManager = windowManager;
             this._dicomLoader = dicomLoader;
-            this.LayoutViewModel = ResolveMediator.Resolve<Layout22ViewModel>();
+            this.LayoutViewModel = ResolveMediator.Resolve<Layout13ViewModel>();
         }
 
         #endregion
