@@ -25,6 +25,16 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         #region # 字段及构造器
 
         /// <summary>
+        /// 布局13
+        /// </summary>
+        private readonly Layout13ViewModel _layout13;
+
+        /// <summary>
+        /// 布局22
+        /// </summary>
+        private readonly Layout22ViewModel _layout22;
+
+        /// <summary>
         /// 窗口管理器
         /// </summary>
         private readonly IWindowManager _windowManager;
@@ -41,7 +51,11 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         {
             this._windowManager = windowManager;
             this._dicomLoader = dicomLoader;
-            this.LayoutViewModel = ResolveMediator.Resolve<Layout13ViewModel>();
+
+            //初始化布局
+            this._layout13 = ResolveMediator.Resolve<Layout13ViewModel>();
+            this._layout22 = ResolveMediator.Resolve<Layout22ViewModel>();
+            this.LayoutViewModel = this._layout22;
         }
 
         #endregion
@@ -54,7 +68,21 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 体积数据
         /// </summary>
-        public VolumeData VolumeData { get; set; }
+        private VolumeData _volumeData;
+
+        /// <summary>
+        /// 体积数据
+        /// </summary>
+        public VolumeData VolumeData
+        {
+            get => this._volumeData;
+            set
+            {
+                this._volumeData = value;
+                this._layout13.SetVolumeData(value);
+                this._layout22.SetVolumeData(value);
+            }
+        }
         #endregion
 
         #region 布局视图模型 —— LayoutViewModel LayoutViewModel
@@ -97,8 +125,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             #endregion
 
-            this.LayoutViewModel = ResolveMediator.Resolve<Layout13ViewModel>();
-            this.LayoutViewModel.SetVolumeData(this.VolumeData);
+            this.LayoutViewModel = this._layout13;
         });
         #endregion
 
@@ -117,8 +144,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             #endregion
 
-            this.LayoutViewModel = ResolveMediator.Resolve<Layout22ViewModel>();
-            this.LayoutViewModel.SetVolumeData(this.VolumeData);
+            this.LayoutViewModel = this._layout22;
         });
         #endregion
 
@@ -209,8 +235,9 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             #endregion
 
             SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
+            this._layout13.ClearVolumeData();
+            this._layout22.ClearVolumeData();
             this.VolumeData = null;
-            this.LayoutViewModel.ClearVolumeData();
         }
         #endregion
 
