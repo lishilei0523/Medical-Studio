@@ -567,6 +567,11 @@ namespace MedicalSharp.Controls.Viewports
                 viewport.GlContext.MakeCurrent();
                 volumeSession = new VolumeSession(volumeData);
                 SessionManager.AddVolumeSession(volumeSession.Id, volumeSession);
+
+                //初始化传递函数、标记策略
+                viewport._volumeRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
+                viewport._volumeRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
+                viewport._volumeRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
             }
             else
             {
@@ -574,9 +579,6 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             viewport._volumeRenderable = new VolumeRenderable(volumeSession.VolumeTexture, volumeSession.MarkTexture, volumeData);
-            viewport._volumeRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
-            viewport._volumeRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
-            viewport._volumeRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
             if (volumeData.Metadata.WindowWidth.HasValue)
             {
                 viewport.WindowWidth = volumeData.Metadata.WindowWidth.Value;
