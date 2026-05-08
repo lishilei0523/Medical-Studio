@@ -35,12 +35,12 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// U轴依赖属性
         /// </summary>
-        public static readonly StyledProperty<Vector3> UAxisProperty;
+        public static readonly StyledProperty<Vector3D> UAxisProperty;
 
         /// <summary>
         /// V轴依赖属性
         /// </summary>
-        public static readonly StyledProperty<Vector3> VAxisProperty;
+        public static readonly StyledProperty<Vector3D> VAxisProperty;
 
         /// <summary>
         /// 法向量依赖属性
@@ -60,8 +60,8 @@ namespace MedicalSharp.Controls.Visuals
             WidthProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, float>(nameof(Width), 1.0f);
             HeightProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, float>(nameof(Height), 1.0f);
             CenterProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
-            UAxisProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3>(nameof(UAxis), new Vector3(1, 0, 0));
-            VAxisProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3>(nameof(VAxis), new Vector3(0, 0, 1));
+            UAxisProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3D>(nameof(UAxis), new Vector3D(1, 0, 0));
+            VAxisProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3D>(nameof(VAxis), new Vector3D(0, 0, 1));
             NormalProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 1, 0));
             PlaneTypeProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, MPRPlaneType>(nameof(PlaneType), MPRPlaneType.Axial);
         }
@@ -112,22 +112,22 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 依赖属性 - U轴 —— Vector3 UAxis
+        #region 依赖属性 - U轴 —— Vector3D UAxis
         /// <summary>
         /// 依赖属性 - U轴
         /// </summary>
-        public Vector3 UAxis
+        public Vector3D UAxis
         {
             get => this.GetValue(UAxisProperty);
             set => this.SetValue(UAxisProperty, value);
         }
         #endregion
 
-        #region 依赖属性 - V轴 —— Vector3 VAxis
+        #region 依赖属性 - V轴 —— Vector3D VAxis
         /// <summary>
         /// 依赖属性 - V轴
         /// </summary>
-        public Vector3 VAxis
+        public Vector3D VAxis
         {
             get => this.GetValue(VAxisProperty);
             set => this.SetValue(VAxisProperty, value);

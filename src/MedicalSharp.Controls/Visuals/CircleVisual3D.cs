@@ -74,18 +74,18 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 属性
 
-        #region U轴 —— Vector3 UAxis
+        #region U轴 —— Vector3D UAxis
         /// <summary>
         /// U轴
         /// </summary>
-        public Vector3 UAxis { get; private set; }
+        public Vector3D UAxis { get; private set; }
         #endregion
 
-        #region V轴 —— Vector3 VAxis
+        #region V轴 —— Vector3D VAxis
         /// <summary>
         /// V轴
         /// </summary>
-        public Vector3 VAxis { get; private set; }
+        public Vector3D VAxis { get; private set; }
         #endregion
 
         #region 依赖属性 - 半径 —— float Radius
@@ -262,7 +262,7 @@ namespace MedicalSharp.Controls.Visuals
         {
             resizeContext = default;
             Vector3 center = this.Center.ToVector3();
-            Vector3 normal = Vector3.Cross(this.UAxis, this.VAxis).Normalized();
+            Vector3 normal = Vector3.Cross(this.UAxis.ToVector3(), this.VAxis.ToVector3()).Normalized();
 
             //射线与圆所在平面求交
             if (!localRay.IntersectsPlane(center, normal, out Vector3 hitPoint, out _))
@@ -312,8 +312,8 @@ namespace MedicalSharp.Controls.Visuals
         {
             Vector3 center = this.Center.ToVector3();
             Vector3 normal = this.Normal.ToVector3();
-            Vector3 uAxis = this.UAxis;
-            Vector3 vAxis = this.VAxis;
+            Vector3 uAxis = this.UAxis.ToVector3();
+            Vector3 vAxis = this.VAxis.ToVector3();
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyCircleCut(this.Radius, center, normal, uAxis, vAxis, localToWorld, cutMode, markValue);
             renderable.SyncMarkDataFromGpu();
@@ -334,26 +334,26 @@ namespace MedicalSharp.Controls.Visuals
             //法向量接近Z轴
             if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.99f)
             {
-                this.UAxis = Vector3.UnitX;
-                this.VAxis = Vector3.UnitY;
+                this.UAxis = Vector3.UnitX.ToVector3();
+                this.VAxis = Vector3.UnitY.ToVector3();
             }
             //法向量接近Y轴
             else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.99f)
             {
-                this.UAxis = Vector3.UnitX;
-                this.VAxis = Vector3.UnitZ;
+                this.UAxis = Vector3.UnitX.ToVector3();
+                this.VAxis = Vector3.UnitZ.ToVector3();
             }
             //法向量接近X轴
             else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitX)) > 0.99f)
             {
-                this.UAxis = Vector3.UnitY;
-                this.VAxis = Vector3.UnitZ;
+                this.UAxis = Vector3.UnitY.ToVector3();
+                this.VAxis = Vector3.UnitZ.ToVector3();
             }
             else
             {
                 //如果法线被旋转过，重新构造正交基（保证U在XY平面内优先）
-                this.UAxis = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, normal));
-                this.VAxis = Vector3.Normalize(Vector3.Cross(normal, this.UAxis));
+                this.UAxis = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, normal)).ToVector3();
+                this.VAxis = Vector3.Normalize(Vector3.Cross(normal, this.UAxis.ToVector3())).ToVector3();
             }
         }
         #endregion

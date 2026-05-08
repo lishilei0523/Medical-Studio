@@ -85,18 +85,18 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 属性
 
-        #region U轴 —— Vector3 UAxis
+        #region U轴 —— Vector3D UAxis
         /// <summary>
         /// U轴
         /// </summary>
-        public Vector3 UAxis { get; private set; }
+        public Vector3D UAxis { get; private set; }
         #endregion
 
-        #region V轴 —— Vector3 VAxis
+        #region V轴 —— Vector3D VAxis
         /// <summary>
         /// V轴
         /// </summary>
-        public Vector3 VAxis { get; private set; }
+        public Vector3D VAxis { get; private set; }
         #endregion
 
         #region 依赖属性 - 宽度 —— new float Width
@@ -290,15 +290,17 @@ namespace MedicalSharp.Controls.Visuals
         {
             resizeContext = default;
             Vector3 center = this.Center.ToVector3();
+            Vector3 uAxis = this.UAxis.ToVector3();
+            Vector3 vAxis = this.VAxis.ToVector3();
             float halfW = this.Width * 0.5f;
             float halfH = this.Height * 0.5f;
 
             (HitFace face, Vector3 point, Vector3 normal)[] planes =
             [
-                (HitFace.Right,  center + this.UAxis * halfW,  this.UAxis),
-                (HitFace.Left,   center - this.UAxis * halfW, -this.UAxis),
-                (HitFace.Top,    center + this.VAxis * halfH,  this.VAxis),
-                (HitFace.Bottom, center - this.VAxis * halfH, -this.VAxis)
+                (HitFace.Right,  center + uAxis * halfW,  uAxis),
+                (HitFace.Left,   center - uAxis * halfW, -uAxis),
+                (HitFace.Top,    center + vAxis * halfH,  vAxis),
+                (HitFace.Bottom, center - vAxis * halfH, -vAxis)
             ];
 
             HitFace nearestFace = HitFace.None;
@@ -309,8 +311,8 @@ namespace MedicalSharp.Controls.Visuals
                 if (localRay.IntersectsPlane(point, normal, out Vector3 hitPoint, out float distance))
                 {
                     Vector3 localHit = hitPoint - center;
-                    float u = Vector3.Dot(localHit, this.UAxis);
-                    float v = Vector3.Dot(localHit, this.VAxis);
+                    float u = Vector3.Dot(localHit, uAxis);
+                    float v = Vector3.Dot(localHit, vAxis);
 
                     bool inBounds = (face == HitFace.Right || face == HitFace.Left)
                         ? Math.Abs(v) <= Math.Max(this.Height * 0.5f, 0.5f) + 0.1f  // ✅ 用 Height 的一半
@@ -327,22 +329,22 @@ namespace MedicalSharp.Controls.Visuals
             {
                 case HitFace.Right:
                     resizeContext.Anchor = center;
-                    resizeContext.Axis = this.UAxis;
+                    resizeContext.Axis = uAxis;
                     resizeContext.CurrentValue = halfW;
                     return true;
                 case HitFace.Left:
                     resizeContext.Anchor = center;
-                    resizeContext.Axis = -this.UAxis;
+                    resizeContext.Axis = -uAxis;
                     resizeContext.CurrentValue = halfW;
                     return true;
                 case HitFace.Top:
                     resizeContext.Anchor = center;
-                    resizeContext.Axis = this.VAxis;
+                    resizeContext.Axis = vAxis;
                     resizeContext.CurrentValue = halfH;
                     return true;
                 case HitFace.Bottom:
                     resizeContext.Anchor = center;
-                    resizeContext.Axis = -this.VAxis;
+                    resizeContext.Axis = -vAxis;
                     resizeContext.CurrentValue = halfH;
                     return true;
             }
@@ -363,7 +365,7 @@ namespace MedicalSharp.Controls.Visuals
             float newHalf = Math.Abs(Vector3.Dot(delta, resizeContext.Axis));
             newHalf = Math.Max(newHalf, 0.01f);
 
-            if (Vector3.Dot(resizeContext.Axis, this.UAxis) > 0.99f)
+            if (Vector3.Dot(resizeContext.Axis, this.UAxis.ToVector3()) > 0.99f)
             {
                 this.Width = newHalf * 2.0f;
             }
@@ -385,8 +387,8 @@ namespace MedicalSharp.Controls.Visuals
         {
             Vector3 center = this.Center.ToVector3();
             Vector3 normal = this.Normal.ToVector3();
-            Vector3 uAxis = this.UAxis;
-            Vector3 vAxis = this.VAxis;
+            Vector3 uAxis = this.UAxis.ToVector3();
+            Vector3 vAxis = this.VAxis.ToVector3();
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyEllipseCut(this.Width, this.Height, center, normal, uAxis, vAxis, localToWorld, cutMode, markValue);
             renderable.SyncMarkDataFromGpu();
@@ -407,26 +409,26 @@ namespace MedicalSharp.Controls.Visuals
             //法向量接近Z轴
             if (Math.Abs(Vector3.Dot(normal, Vector3.UnitZ)) > 0.99f)
             {
-                this.UAxis = Vector3.UnitX;
-                this.VAxis = Vector3.UnitY;
+                this.UAxis = Vector3.UnitX.ToVector3();
+                this.VAxis = Vector3.UnitY.ToVector3();
             }
             //法向量接近Y轴
             else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitY)) > 0.99f)
             {
-                this.UAxis = Vector3.UnitX;
-                this.VAxis = Vector3.UnitZ;
+                this.UAxis = Vector3.UnitX.ToVector3();
+                this.VAxis = Vector3.UnitZ.ToVector3();
             }
             //法向量接近X轴
             else if (Math.Abs(Vector3.Dot(normal, Vector3.UnitX)) > 0.99f)
             {
-                this.UAxis = Vector3.UnitY;
-                this.VAxis = Vector3.UnitZ;
+                this.UAxis = Vector3.UnitY.ToVector3();
+                this.VAxis = Vector3.UnitZ.ToVector3();
             }
             else
             {
                 //如果法线被旋转过，重新构造正交基（保证U在XY平面内优先）
-                this.UAxis = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, normal));
-                this.VAxis = Vector3.Normalize(Vector3.Cross(normal, this.UAxis));
+                this.UAxis = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, normal)).ToVector3();
+                this.VAxis = Vector3.Normalize(Vector3.Cross(normal, this.UAxis.ToVector3())).ToVector3();
             }
         }
         #endregion

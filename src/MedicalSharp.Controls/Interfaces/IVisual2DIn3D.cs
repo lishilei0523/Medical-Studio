@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using OpenTK.Mathematics;
 
 namespace MedicalSharp.Controls.Interfaces
 {
@@ -9,6 +8,16 @@ namespace MedicalSharp.Controls.Interfaces
     public interface IVisual2DIn3D
     {
         /// <summary>
+        /// U轴
+        /// </summary>
+        Vector3D UAxis { get; }
+
+        /// <summary>
+        /// V轴
+        /// </summary>
+        Vector3D VAxis { get; }
+
+        /// <summary>
         /// 法向量
         /// </summary>
         Vector3D Normal { get; }
@@ -17,15 +26,5 @@ namespace MedicalSharp.Controls.Interfaces
         /// 平面上一点
         /// </summary>
         Vector3D PointOnPlane { get; }
-
-        /// <summary>
-        /// U轴
-        /// </summary>
-        Vector3 UAxis { get; }
-
-        /// <summary>
-        /// V轴
-        /// </summary>
-        Vector3 VAxis { get; }
     }
 }

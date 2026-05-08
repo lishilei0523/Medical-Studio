@@ -127,8 +127,8 @@ namespace MedicalSharp.Controls.Commands
                     //2D图形用U/V轴旋转
                     if (this._selectedVisual is IVisual2DIn3D visual2DIn3D)
                     {
-                        axisY = visual2DIn3D.VAxis.Normalized();
-                        axisX = visual2DIn3D.UAxis.Normalized();
+                        axisY = visual2DIn3D.VAxis.ToVector3().Normalized();
+                        axisX = visual2DIn3D.UAxis.ToVector3().Normalized();
                     }
 
                     this._selectedVisual.Transform.Rotate(deltaX, axisY);

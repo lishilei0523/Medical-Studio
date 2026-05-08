@@ -838,8 +838,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 Width = 1,
                 Height = 1,
                 Center = new Vector3D(0, 0, 0),
-                UAxis = new Vector3(1, 0, 0),
-                VAxis = new Vector3(0, -1, 0),
+                UAxis = new Vector3D(1, 0, 0),
+                VAxis = new Vector3D(0, -1, 0),
                 Normal = new Vector3D(0, 0, 1),
                 PlaneType = MPRPlaneType.Axial
             };
@@ -851,8 +851,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 Width = 1,
                 Height = 1,
                 Center = new Vector3D(0, 0, 0),
-                UAxis = new Vector3(1, 0, 0),
-                VAxis = new Vector3(0, 0, 1),
+                UAxis = new Vector3D(1, 0, 0),
+                VAxis = new Vector3D(0, 0, 1),
                 Normal = new Vector3D(0, 1, 0),
                 PlaneType = MPRPlaneType.Coronal
             };
@@ -864,8 +864,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 Width = 1,
                 Height = 1,
                 Center = new Vector3D(0, 0, 0),
-                UAxis = new Vector3(0, 1, 0),
-                VAxis = new Vector3(0, 0, 1),
+                UAxis = new Vector3D(0, 1, 0),
+                VAxis = new Vector3D(0, 0, 1),
                 Normal = new Vector3D(-1, 0, 0),
                 PlaneType = MPRPlaneType.Sagittal
             };
