@@ -166,6 +166,46 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 只读属性 - 世界中心位置 —— Vector3 WorldCenter
+        /// <summary>
+        /// 只读属性 - 世界中心位置
+        /// </summary>
+        public Vector3 WorldCenter
+        {
+            get => this.Transform.Position;
+        }
+        #endregion
+
+        #region 只读属性 - 世界U轴 —— Vector3 WorldUAxis
+        /// <summary>
+        /// 只读属性 - 世界U轴
+        /// </summary>
+        public Vector3 WorldUAxis
+        {
+            get => this.Transform.ApplyToDirection(this.UAxis.ToVector3());
+        }
+        #endregion
+
+        #region 只读属性 - 世界V轴 —— Vector3 WorldVAxis
+        /// <summary>
+        /// 只读属性 - 世界V轴
+        /// </summary>
+        public Vector3 WorldVAxis
+        {
+            get => this.Transform.ApplyToDirection(this.VAxis.ToVector3());
+        }
+        #endregion
+
+        #region 只读属性 - 世界法向量 —— Vector3 WorldNormal
+        /// <summary>
+        /// 只读属性 - 世界法向量
+        /// </summary>
+        public Vector3 WorldNormal
+        {
+            get => this.Transform.ApplyToDirection(this.Normal.ToVector3());
+        }
+        #endregion
+
         #endregion
 
         #region # 方法

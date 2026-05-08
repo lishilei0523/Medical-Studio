@@ -678,23 +678,28 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             #endregion
 
-            this._isCrossSyncing = true;
-            try
+            //十字线平移
+            if (message.Shape is CrosshairVisual3D crosshair)
             {
-                if (message.Shape is CrosshairVisual3D crosshair)
+                this._isCrossSyncing = true;
+                try
                 {
+
                     this.Crosshair.Transform.SetPosition(crosshair.Transform.Position);
                     this.Plane.Relocate(crosshair.Transform.Position);
                     this.FrameToken++;
                 }
-                if (message.Shape is MPRPlaneVisual3D mprPlane && mprPlane.PlaneType == this.Plane.OriginalPlaneType)
+                finally
                 {
-                    //TODO 实现平移
+                    this._isCrossSyncing = false;
                 }
             }
-            finally
+
+            //面平移
+            if (message.Shape is MPRPlaneVisual3D mprPlane && mprPlane.PlaneType == this.Plane.OriginalPlaneType)
             {
-                this._isCrossSyncing = false;
+                this.Plane.Relocate(mprPlane.WorldUAxis, mprPlane.WorldVAxis, mprPlane.WorldCenter, mprPlane.WorldNormal);
+                this.FrameToken++;
             }
 
             return Task.CompletedTask;
@@ -720,9 +725,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             #endregion
 
+            //面旋转
             if (message.Shape is MPRPlaneVisual3D mprPlane && mprPlane.PlaneType == this.Plane.OriginalPlaneType)
             {
-                //TODO 实现旋转
+                this.Plane.Relocate(mprPlane.WorldUAxis, mprPlane.WorldVAxis, mprPlane.WorldCenter, mprPlane.WorldNormal);
+                this.FrameToken++;
             }
 
             return Task.CompletedTask;
