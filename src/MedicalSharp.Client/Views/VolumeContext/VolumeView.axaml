@@ -12,9 +12,9 @@
 		<sd:GroupBox.Header>
 			<Grid>
 				<Grid.ColumnDefinitions>
-                    <!--Toolbar-->
-                    <ColumnDefinition Width="*" />
-                    <!--More-->
+					<!--Toolbar-->
+					<ColumnDefinition Width="*" />
+					<!--More-->
 					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 				<!--Toolbar-->
@@ -25,9 +25,9 @@
 					<sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-PickShape}" />
 					</sd:ToggleRadioButton>
-                    <sd:ToggleRadioButton cm:Message.Attach="TranslateNormal()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-TranslateNormal}" />
-                    </sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="TranslateNormal()" Classes="Transparent-Panel">
+						<PathIcon Data="{StaticResource Icon-TranslateNormal}" />
+					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-Translate3D}" />
 					</sd:ToggleRadioButton>
@@ -46,12 +46,12 @@
 					<sd:ToggleRadioButton cm:Message.Attach="DrawLineSegment()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-LineSegment}" />
 					</sd:ToggleRadioButton>
-                    <sd:ToggleRadioButton cm:Message.Attach="DrawPolyline()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-Polyline}" />
-                    </sd:ToggleRadioButton>
-                    <sd:ToggleRadioButton cm:Message.Attach="DrawCurve()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-Curve}" />
-                    </sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="DrawPolyline()" Classes="Transparent-Panel">
+						<PathIcon Data="{StaticResource Icon-Polyline}" />
+					</sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="DrawCurve()" Classes="Transparent-Panel">
+						<PathIcon Data="{StaticResource Icon-Curve}" />
+					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawRectangle()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-Rectangle}" />
 					</sd:ToggleRadioButton>
@@ -96,14 +96,14 @@
 		</sd:GroupBox.Header>
 		<!--Content-->
 		<sd:VolumeViewport FrameToken="{Binding FrameToken}"
-                           Camera="{Binding Camera}"
-                           InputManager="{Binding InputManager}"
-                           VolumeData="{Binding VolumeData}"
-                           TFControlPoints="{Binding TFControlPoints}">
-            <sd:ShapePresenter Content="{Binding AxialPlane}" />
-            <sd:ShapePresenter Content="{Binding CoronalPlane}" />
-            <sd:ShapePresenter Content="{Binding SagittalPlane}" />
-            <sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
+						   Camera="{Binding Camera}"
+						   InputManager="{Binding InputManager}"
+						   VolumeData="{Binding VolumeData}"
+						   TFControlPoints="{Binding TFControlPoints}">
+			<sd:ShapePresenter Content="{Binding AxialPlane}" />
+			<sd:ShapePresenter Content="{Binding CoronalPlane}" />
+			<sd:ShapePresenter Content="{Binding SagittalPlane}" />
+			<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
 		</sd:VolumeViewport>
 	</sd:GroupBox>
 </UserControl>
