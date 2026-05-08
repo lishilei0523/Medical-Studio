@@ -9,7 +9,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 点3D元素
     /// </summary>
-    public class PointVisual3D : ShapeVisual3D, ITranslatable
+    public class PointVisual3D : ShapeVisual3D, ITranslatable3D
     {
         #region # 字段及构造器
 

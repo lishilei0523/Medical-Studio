@@ -18,7 +18,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 凸多面体3D元素
     /// </summary>
-    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IVertexEditable, ICutVolume
+    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IVertexEditable, ICutVolume
     {
         #region # 字段及构造器
 

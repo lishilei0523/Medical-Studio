@@ -18,7 +18,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 包围盒3D元素
     /// </summary>
-    public class BoundingBoxVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable, IRotatable, IResizable3D, ICutVolume
+    public class BoundingBoxVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IResizable3D, ICutVolume
     {
         #region # 字段及构造器
 

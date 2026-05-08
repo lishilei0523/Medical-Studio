@@ -240,7 +240,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Translate3D()
         {
-            Action<ITranslatable> translating = translatable =>
+            Action<ITranslatable3D> translating = translatable =>
             {
                 if (translatable is ShapeVisual3D shape)
                 {
@@ -252,7 +252,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
-            Action<ITranslatable> translateEnd = translatable =>
+            Action<ITranslatable3D> translateEnd = translatable =>
             {
                 if (translatable is ShapeVisual3D shape)
                 {

@@ -18,7 +18,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 曲线3D元素
     /// </summary>
-    public class CurveVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable, IVertexEditable, ICutVolume
+    public class CurveVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable, ICutVolume
     {
         #region # 字段及构造器
 

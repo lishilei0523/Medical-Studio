@@ -14,7 +14,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 点云3D元素
     /// </summary>
-    public class PointCloudVisual3D : ShapeVisual3D, ITranslatable, IVertexEditable
+    public class PointCloudVisual3D : ShapeVisual3D, ITranslatable3D, IVertexEditable
     {
         #region # 字段及构造器
 

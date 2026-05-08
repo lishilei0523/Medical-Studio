@@ -1,5 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Input;
+﻿using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
@@ -21,18 +20,18 @@ namespace MedicalSharp.Controls.Commands
         /// <summary>
         /// 选中的3D元素
         /// </summary>
-        private ITranslatable _selectedVisual;
+        private ITranslatable3D _selectedVisual;
 
         /// <summary>
         /// 平移结束事件
         /// </summary>
-        private readonly Action<ITranslatable> _translateEndEvent;
+        private readonly Action<ITranslatable3D> _translateEndEvent;
 
         /// <summary>
         /// 创建平移3D元素命令构造器
         /// </summary>
         /// <param name="translateEnd">平移结束回调</param>
-        public TranslateVisual3DCommand(Action<ITranslatable> translateEnd)
+        public TranslateVisual3DCommand(Action<ITranslatable3D> translateEnd)
         {
             this._translateEndEvent = translateEnd;
             this._selectedVisual = null;
@@ -42,11 +41,11 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 平移中事件 —— Action<ITranslatable> TranslatingEvent
+        #region 平移中事件 —— Action<ITranslatable3D> TranslatingEvent
         /// <summary>
         /// 平移中事件
         /// </summary>
-        public Action<ITranslatable> TranslatingEvent { get; set; }
+        public Action<ITranslatable3D> TranslatingEvent { get; set; }
         #endregion
 
         #endregion
@@ -62,9 +61,9 @@ namespace MedicalSharp.Controls.Commands
             base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is IPickVisual3D pickVisual3D)
             {
-                Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = pickVisual3D.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out _);
-                if (success && visual3D is ITranslatable translatable)
+                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                bool success = pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual3D, out _);
+                if (success && visual3D is ITranslatable3D translatable)
                 {
                     #region # 验证
 

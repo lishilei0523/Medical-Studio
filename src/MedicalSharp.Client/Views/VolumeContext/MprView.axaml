@@ -12,9 +12,12 @@
 		<sd:GroupBox.Header>
 			<Grid>
 				<Grid.ColumnDefinitions>
+                    <!--Toolbar-->
 					<ColumnDefinition Width="*" />
+                    <!--More-->
 					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
+                <!--Toolbar-->
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
 					<sd:ToggleRadioButton cm:Message.Attach="PickVoxel()" Classes="Transparent-Panel" IsChecked="True">
 						<PathIcon Data="{StaticResource Icon-PickVoxel}" />
@@ -62,6 +65,7 @@
 						<PathIcon Data="{StaticResource Icon-ClosedCurve}" />
 					</sd:ToggleRadioButton>
 				</WrapPanel>
+                <!--More-->
 				<WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
 					<DropDownButton Content="{Binding Title}" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
@@ -76,12 +80,11 @@
 			</Grid>
 		</sd:GroupBox.Header>
 		<!--Content-->
-		<sd:MPRViewport Background="Black"
-						FrameToken="{Binding FrameToken}"
-						Plane="{Binding Plane}"
-						Camera="{Binding Camera}"
-						InputManager="{Binding InputManager}"
-						VolumeData="{Binding VolumeData}">
+		<sd:MPRViewport FrameToken="{Binding FrameToken}"
+                        Plane="{Binding Plane}"
+                        Camera="{Binding Camera}"
+                        InputManager="{Binding InputManager}"
+                        VolumeData="{Binding VolumeData}">
 			<sd:ShapePresenter Content="{Binding Crosshair}" />
 			<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
 		</sd:MPRViewport>

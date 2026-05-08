@@ -3,9 +3,9 @@
 namespace MedicalSharp.Primitives.Interfaces
 {
     /// <summary>
-    /// 可平移接口
+    /// 可3D平移接口
     /// </summary>
-    public interface ITranslatable
+    public interface ITranslatable3D
     {
         /// <summary>
         /// 变换

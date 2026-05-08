@@ -1,5 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Input;
+﻿using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
@@ -19,20 +18,30 @@ namespace MedicalSharp.Controls.Commands
         #region # 字段及构造器
 
         /// <summary>
+        /// 拖拽起始点（世界坐标）
+        /// </summary>
+        private Vector3? _dragStartPoint;
+
+        /// <summary>
+        /// 物体起始位置
+        /// </summary>
+        private Vector3? _dragStartPosition;
+
+        /// <summary>
         /// 选中的3D元素
         /// </summary>
-        private ITranslatable _selectedVisual;
+        private ITranslatableNormal _selectedVisual;
 
         /// <summary>
         /// 平移结束事件
         /// </summary>
-        private readonly Action<ITranslatable> _translateEndEvent;
+        private readonly Action<ITranslatableNormal> _translateEndEvent;
 
         /// <summary>
         /// 创建沿法向量平移元素命令构造器
         /// </summary>
         /// <param name="translateEnd">平移结束回调</param>
-        public TranslateVisualNormalCommand(Action<ITranslatable> translateEnd)
+        public TranslateVisualNormalCommand(Action<ITranslatableNormal> translateEnd)
         {
             this._translateEndEvent = translateEnd;
             this._selectedVisual = null;
@@ -42,11 +51,11 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 平移中事件 —— Action<ITranslatable> TranslatingEvent
+        #region 平移中事件 —— Action<ITranslatableNormal> TranslatingEvent
         /// <summary>
         /// 平移中事件
         /// </summary>
-        public Action<ITranslatable> TranslatingEvent { get; set; }
+        public Action<ITranslatableNormal> TranslatingEvent { get; set; }
         #endregion
 
         #endregion
@@ -62,9 +71,9 @@ namespace MedicalSharp.Controls.Commands
             base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is IPickVisual3D pickVisual3D)
             {
-                Point mousePos2D = eventArgs.GetPosition(viewport);
-                bool success = pickVisual3D.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out _);
-                if (success && visual3D is ITranslatable translatable)
+                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                bool success = pickVisual3D.FindNearest(mousePos2D, out Vector3 hitPoint, out _, out Visual3D visual3D, out _);
+                if (success && visual3D is ITranslatableNormal translatable)
                 {
                     #region # 验证
 
@@ -76,6 +85,8 @@ namespace MedicalSharp.Controls.Commands
                     #endregion
 
                     this._selectedVisual = translatable;
+                    this._dragStartPoint = hitPoint;                            //物体上被点击的点
+                    this._dragStartPosition = translatable.Transform.Position;  //物体起始位置
                 }
             }
         }
@@ -90,36 +101,39 @@ namespace MedicalSharp.Controls.Commands
             base.OnMouseMove(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && this._selectedVisual is IVisual2DIn3D visual2DIn3D)
             {
-                //计算模型位置
-                Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
-                Vector3 localCenter = this._selectedVisual.Bounds.Center;
-                Vector3 worldCenter = Vector3.TransformPosition(localCenter, modelMatrix);
+                if (!this._dragStartPoint.HasValue || !this._dragStartPosition.HasValue)
+                {
+                    return;
+                }
 
                 //获取鼠标射线
                 Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
                 Ray ray = viewport.UnProject(mousePos2D);
 
                 //移动平面上的交点
-                bool success = ray.IntersectsPlane(worldCenter, viewport.Camera.LookDirection, out Vector3 hitPoint, out _);
+                bool success = ray.IntersectsPlane(this._dragStartPoint.Value, viewport.Camera.LookDirection, out Vector3 hitPoint, out _);
                 if (success)
                 {
                     //设置光标
                     viewport.Cursor = new Cursor(StandardCursorType.Hand);
 
-                    //沿法向量平移
-                    float deltaX = mousePos2D.X - this._mousePos2D!.Value.X;
-                    float deltaY = mousePos2D.Y - this._mousePos2D!.Value.Y;
-                    float delta = deltaX + deltaY;
-                    Vector3 translation = visual2DIn3D.Normal.ToVector3() * -delta * 0.003f;
-                    this._selectedVisual.Transform.Translate(translation);
+                    //计算移动向量
+                    Vector3 deltaWorld = hitPoint - this._dragStartPoint.Value;
+
+                    //投影到法向量方向
+                    Vector3 normal = visual2DIn3D.Normal.ToVector3().Normalized();
+                    float dot = Vector3.Dot(deltaWorld, normal);
+                    Vector3 translation = normal * dot;
+
+                    //应用平移（从起始位置计算，避免累积误差）
+                    Vector3 newPosition = this._dragStartPosition.Value + translation;
+                    this._selectedVisual.Transform.SetPosition(newPosition);
 
                     //平移中
                     this.TranslatingEvent?.Invoke(this._selectedVisual);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
-
-                    this._mousePos2D = mousePos2D;
                 }
             }
         }
@@ -141,6 +155,8 @@ namespace MedicalSharp.Controls.Commands
 
             //清空选中
             this._selectedVisual = null;
+            this._dragStartPoint = null;
+            this._dragStartPosition = null;
 
             //请求下一帧
             viewport.RequestNextFrameRendering();

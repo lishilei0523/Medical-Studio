@@ -16,7 +16,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 文本3D元素
     /// </summary>
-    public class TextVisual3D : Visual3D, IVisual2DIn3D, ITranslatable
+    public class TextVisual3D : Visual3D, IVisual2DIn3D, ITranslatable3D
     {
         #region # 字段及构造器
 

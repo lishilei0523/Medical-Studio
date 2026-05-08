@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
+using Avalonia.Media;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Client.Events;
@@ -62,6 +63,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             //初始化输入管理器
             this.InputManager = new OrbitInputManager(this.Camera);
             this.PickVoxel();
+
+            //初始化MPR平面
+            this.InitMprPlanes();
         }
 
         #endregion
@@ -103,6 +107,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 field = value;
                 this.NotifyOfPropertyChange();
+                this.ResetMprPlanes(value);
             }
         }
         #endregion
@@ -113,6 +118,30 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
+        #endregion
+
+        #region 横断面 —— PlaneVisual3D AxialPlane
+        /// <summary>
+        /// 横断面
+        /// </summary>
+        [DependencyProperty]
+        public PlaneVisual3D AxialPlane { get; set; }
+        #endregion
+
+        #region 冠状面 —— PlaneVisual3D CoronalPlane
+        /// <summary>
+        /// 冠状面
+        /// </summary>
+        [DependencyProperty]
+        public PlaneVisual3D CoronalPlane { get; set; }
+        #endregion
+
+        #region 矢状面 —— PlaneVisual3D SagittalPlane
+        /// <summary>
+        /// 矢状面
+        /// </summary>
+        [DependencyProperty]
+        public PlaneVisual3D SagittalPlane { get; set; }
         #endregion
 
         #region 选中的形状 —— ShapeVisual3D SelectedShape
@@ -134,6 +163,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #endregion
 
         #region # 方法
+
+        //Actions
 
         #region 拾取体素 —— void PickVoxel()
         /// <summary>
@@ -211,7 +242,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Translate3D()
         {
-            Action<ITranslatable> translateEnd = translatable =>
+            Action<ITranslatable3D> translateEnd = translatable =>
             {
                 if (translatable is ShapeVisual3D shape)
                 {
@@ -235,7 +266,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void TranslateNormal()
         {
-            Action<ITranslatable> translateEnd = translatable =>
+            Action<ITranslatableNormal> translateEnd = translatable =>
             {
                 if (translatable is ShapeVisual3D shape)
                 {
@@ -595,6 +626,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+
+        //Events
+
         #region 处理同步视口事件 —— Task HandleAsync(SyncViewportEvent message...
         /// <summary>
         /// 处理同步视口事件
@@ -714,6 +748,75 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             }
 
             return base.OnDeactivateAsync(close, cancellationToken);
+        }
+        #endregion
+
+
+        //Private
+
+        #region 初始化MPR三平面 —— void InitMprPlanes()
+        /// <summary>
+        /// 初始化MPR三平面
+        /// </summary>
+        private void InitMprPlanes()
+        {
+            this.AxialPlane = new PlaneVisual3D
+            {
+                Width = 1,
+                Height = 1,
+                Center = new Vector3D(0, 0, 0),
+                UAxis = new Vector3(1, 0, 0),
+                VAxis = new Vector3(0, -1, 0),
+                Normal = new Vector3D(0, 0, 1),
+                Stroke = Colors.LimeGreen,
+                StrokeThickness = 1,
+                Fill = Color.Parse("#2032CD32")
+            };
+            this.CoronalPlane = new PlaneVisual3D
+            {
+                Width = 1,
+                Height = 1,
+                Center = new Vector3D(0, 0, 0),
+                UAxis = new Vector3(1, 0, 0),
+                VAxis = new Vector3(0, 0, 1),
+                Normal = new Vector3D(0, 1, 0),
+                Stroke = Colors.Red,
+                StrokeThickness = 1,
+                Fill = Color.Parse("#20FF0000")
+            };
+            this.SagittalPlane = new PlaneVisual3D
+            {
+                Width = 1,
+                Height = 1,
+                Center = new Vector3D(0, 0, 0),
+                UAxis = new Vector3(0, 1, 0),
+                VAxis = new Vector3(0, 0, 1),
+                Normal = new Vector3D(-1, 0, 0),
+                Stroke = Colors.DeepSkyBlue,
+                StrokeThickness = 1,
+                Fill = Color.Parse("#2000BFFF")
+            };
+        }
+        #endregion
+
+        #region 重置MPR三平面 —— void ResetMprPlanes(VolumeData volumeData)
+        /// <summary>
+        /// 重置MPR三平面
+        /// </summary>
+        private void ResetMprPlanes(VolumeData volumeData)
+        {
+            #region # 验证
+
+            if (volumeData == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            this.AxialPlane.Transform?.SetMatrix(Matrix4.Identity);
+            this.CoronalPlane.Transform?.SetMatrix(Matrix4.Identity);
+            this.SagittalPlane.Transform?.SetMatrix(Matrix4.Identity);
         }
         #endregion
 

@@ -16,7 +16,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 矩形3D元素
     /// </summary>
-    public class RectangleVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable, IRotatable, IResizable2D, IResizable3D, ICutVolume
+    public class RectangleVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D, IRotatable, IResizable2D, IResizable3D, ICutVolume
     {
         #region # 字段及构造器
 
