@@ -28,7 +28,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// MPR视图模型
     /// </summary>
-    public class MprViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
+    public class MprViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -163,6 +163,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #endregion
 
         #region # 方法
+
+        //Actions
 
         #region 拾取体素 —— void PickVoxel()
         /// <summary>
@@ -548,6 +550,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+
+        //Events
+
         #region MPR平面变化事件 —— void OnMPRPlaneChanged(MPRPlane plane)
         /// <summary>
         /// MPR平面变化事件
@@ -569,6 +574,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             MPRPlaneChangedEvent message = new MPRPlaneChangedEvent
             {
                 Publisher = this,
+                Plane = plane,
                 Crosshair = this.Crosshair,
                 IsSyncTriggered = this._isCrossSyncing
             };
@@ -681,10 +687,42 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this.Plane.Relocate(crosshair.Transform.Position);
                     this.FrameToken++;
                 }
+                if (message.Shape is MPRPlaneVisual3D mprPlane && mprPlane.PlaneType == this.Plane.OriginalPlaneType)
+                {
+                    //TODO 实现平移
+                }
             }
             finally
             {
                 this._isCrossSyncing = false;
+            }
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理形状旋转中事件 —— Task HandleAsync(ShapeRotatingEvent message...
+        /// <summary>
+        /// 处理形状旋转中事件
+        /// </summary>
+        public Task HandleAsync(ShapeRotatingEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.Shape == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            if (message.Shape is MPRPlaneVisual3D mprPlane && mprPlane.PlaneType == this.Plane.OriginalPlaneType)
+            {
+                //TODO 实现旋转
             }
 
             return Task.CompletedTask;

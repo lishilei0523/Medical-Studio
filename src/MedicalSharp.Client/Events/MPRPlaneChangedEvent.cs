@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Primitives.Maths;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 
 namespace MedicalSharp.Client.Events
@@ -8,6 +9,11 @@ namespace MedicalSharp.Client.Events
     /// </summary>
     public class MPRPlaneChangedEvent : CaliburnEvent
     {
+        /// <summary>
+        /// MPR平面
+        /// </summary>
+        public MPRPlane Plane { get; set; }
+
         /// <summary>
         /// 十字线
         /// </summary>

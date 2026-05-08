@@ -11,9 +11,9 @@ using OpenTK.Mathematics;
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
-    /// 平面3D元素
+    /// MPR平面3D元素
     /// </summary>
-    public class PlaneVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatableNormal, IRotatable
+    public class MPRPlaneVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatableNormal, IRotatable
     {
         #region # 字段及构造器
 
@@ -48,23 +48,29 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<Vector3D> NormalProperty;
 
         /// <summary>
+        /// MPR平面类型依赖属性
+        /// </summary>
+        public static readonly StyledProperty<MPRPlaneType> PlaneTypeProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
-        static PlaneVisual3D()
+        static MPRPlaneVisual3D()
         {
-            WidthProperty = AvaloniaProperty.Register<PlaneVisual3D, float>(nameof(Width), 1.0f);
-            HeightProperty = AvaloniaProperty.Register<PlaneVisual3D, float>(nameof(Height), 1.0f);
-            CenterProperty = AvaloniaProperty.Register<PlaneVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
-            UAxisProperty = AvaloniaProperty.Register<PlaneVisual3D, Vector3>(nameof(UAxis), new Vector3(1, 0, 0));
-            VAxisProperty = AvaloniaProperty.Register<PlaneVisual3D, Vector3>(nameof(VAxis), new Vector3(0, 0, 1));
-            NormalProperty = AvaloniaProperty.Register<PlaneVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 1, 0));
+            WidthProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, float>(nameof(Width), 1.0f);
+            HeightProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, float>(nameof(Height), 1.0f);
+            CenterProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+            UAxisProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3>(nameof(UAxis), new Vector3(1, 0, 0));
+            VAxisProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3>(nameof(VAxis), new Vector3(0, 0, 1));
+            NormalProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 1, 0));
+            PlaneTypeProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, MPRPlaneType>(nameof(PlaneType), MPRPlaneType.Axial);
         }
 
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public PlaneVisual3D()
+        public MPRPlaneVisual3D()
         {
 
         }
@@ -139,6 +145,17 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
+        #region 依赖属性 - MPR平面类型 —— MPRPlaneType PlaneType
+        /// <summary>
+        /// 依赖属性 - MPR平面类型
+        /// </summary>
+        public MPRPlaneType PlaneType
+        {
+            get => this.GetValue(PlaneTypeProperty);
+            set => this.SetValue(PlaneTypeProperty, value);
+        }
+        #endregion
+
         #region 只读属性 - 平面上一点 —— Vector3D PointOnPlane
         /// <summary>
         /// 只读属性 - 平面上一点
@@ -185,7 +202,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <returns>形状副本</returns>
         public override ShapeVisual3D Clone()
         {
-            PlaneVisual3D copy = new PlaneVisual3D
+            MPRPlaneVisual3D copy = new MPRPlaneVisual3D
             {
                 Id = this.Id,
                 Stroke = this.Stroke,
@@ -210,7 +227,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <param name="shapeVisual3D">形状</param>
         public override void Copy(ShapeVisual3D shapeVisual3D)
         {
-            if (shapeVisual3D is PlaneVisual3D shape)
+            if (shapeVisual3D is MPRPlaneVisual3D shape)
             {
                 this.Stroke = shape.Stroke;
                 this.StrokeThickness = shape.StrokeThickness;

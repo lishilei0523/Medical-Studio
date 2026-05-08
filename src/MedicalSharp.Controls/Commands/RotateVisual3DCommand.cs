@@ -42,7 +42,12 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        //
+        #region 旋转中事件 —— Action<IRotatable> RotatingEvent
+        /// <summary>
+        /// 旋转中事件
+        /// </summary>
+        public Action<IRotatable> RotatingEvent { get; set; }
+        #endregion
 
         #endregion
 
@@ -128,6 +133,9 @@ namespace MedicalSharp.Controls.Commands
 
                     this._selectedVisual.Transform.Rotate(deltaX, axisY);
                     this._selectedVisual.Transform.Rotate(deltaY, axisX);
+
+                    //旋转中
+                    this.RotatingEvent?.Invoke(this._selectedVisual);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();

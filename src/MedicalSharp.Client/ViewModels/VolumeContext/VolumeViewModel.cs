@@ -10,6 +10,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
@@ -29,7 +30,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeRemovedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -125,7 +126,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// 横断面
         /// </summary>
         [DependencyProperty]
-        public PlaneVisual3D AxialPlane { get; set; }
+        public MPRPlaneVisual3D AxialPlane { get; set; }
         #endregion
 
         #region 冠状面 —— PlaneVisual3D CoronalPlane
@@ -133,7 +134,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// 冠状面
         /// </summary>
         [DependencyProperty]
-        public PlaneVisual3D CoronalPlane { get; set; }
+        public MPRPlaneVisual3D CoronalPlane { get; set; }
         #endregion
 
         #region 矢状面 —— PlaneVisual3D SagittalPlane
@@ -141,7 +142,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// 矢状面
         /// </summary>
         [DependencyProperty]
-        public PlaneVisual3D SagittalPlane { get; set; }
+        public MPRPlaneVisual3D SagittalPlane { get; set; }
         #endregion
 
         #region 选中的形状 —— ShapeVisual3D SelectedShape
@@ -266,6 +267,18 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void TranslateNormal()
         {
+            Action<ITranslatableNormal> translating = translatable =>
+            {
+                if (translatable is ShapeVisual3D shape)
+                {
+                    ShapeTranslatingEvent message = new ShapeTranslatingEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
             Action<ITranslatableNormal> translateEnd = translatable =>
             {
                 if (translatable is ShapeVisual3D shape)
@@ -280,6 +293,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             TranslateVisualNormalCommand command = new TranslateVisualNormalCommand(translateEnd);
+            command.TranslatingEvent = translating;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -290,6 +304,18 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Rotate3D()
         {
+            Action<IRotatable> rotating = rotatable =>
+            {
+                if (rotatable is ShapeVisual3D shape)
+                {
+                    ShapeRotatingEvent message = new ShapeRotatingEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
             Action<IRotatable> rotateEnd = rotatable =>
             {
                 if (rotatable is ShapeVisual3D shape)
@@ -304,6 +330,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             RotateVisual3DCommand command = new RotateVisual3DCommand(rotateEnd);
+            command.RotatingEvent = rotating;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -736,6 +763,49 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 处理MPR平面变化事件 —— Task HandleAsync(MPRPlaneChangedEvent message...
+        /// <summary>
+        /// 处理MPR平面变化事件
+        /// </summary>
+        public Task HandleAsync(MPRPlaneChangedEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.Plane == null)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.IsSyncTriggered)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            if (message.Plane.OriginalPlaneType == MPRPlaneType.Axial)
+            {
+                //TODO 同步横断面
+                //this.AxialPlane
+            }
+            if (message.Plane.OriginalPlaneType == MPRPlaneType.Coronal)
+            {
+                //TODO 同步冠状面
+                //this.CoronalPlane
+            }
+            if (message.Plane.OriginalPlaneType == MPRPlaneType.Sagittal)
+            {
+                //TODO 同步矢状面
+                //this.SagittalPlane
+            }
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
         #region 失活事件 —— override Task OnDeactivateAsync(bool close...
         /// <summary>
         /// 失活事件
@@ -760,41 +830,44 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         private void InitMprPlanes()
         {
-            this.AxialPlane = new PlaneVisual3D
+            this.AxialPlane = new MPRPlaneVisual3D
             {
+                Stroke = Colors.LimeGreen,
+                StrokeThickness = 1,
+                Fill = Color.Parse("#2032CD32"),
                 Width = 1,
                 Height = 1,
                 Center = new Vector3D(0, 0, 0),
                 UAxis = new Vector3(1, 0, 0),
                 VAxis = new Vector3(0, -1, 0),
                 Normal = new Vector3D(0, 0, 1),
-                Stroke = Colors.LimeGreen,
-                StrokeThickness = 1,
-                Fill = Color.Parse("#2032CD32")
+                PlaneType = MPRPlaneType.Axial
             };
-            this.CoronalPlane = new PlaneVisual3D
+            this.CoronalPlane = new MPRPlaneVisual3D
             {
+                Stroke = Colors.Red,
+                StrokeThickness = 1,
+                Fill = Color.Parse("#20FF0000"),
                 Width = 1,
                 Height = 1,
                 Center = new Vector3D(0, 0, 0),
                 UAxis = new Vector3(1, 0, 0),
                 VAxis = new Vector3(0, 0, 1),
                 Normal = new Vector3D(0, 1, 0),
-                Stroke = Colors.Red,
-                StrokeThickness = 1,
-                Fill = Color.Parse("#20FF0000")
+                PlaneType = MPRPlaneType.Coronal
             };
-            this.SagittalPlane = new PlaneVisual3D
+            this.SagittalPlane = new MPRPlaneVisual3D
             {
+                Stroke = Colors.DeepSkyBlue,
+                StrokeThickness = 1,
+                Fill = Color.Parse("#2000BFFF"),
                 Width = 1,
                 Height = 1,
                 Center = new Vector3D(0, 0, 0),
                 UAxis = new Vector3(0, 1, 0),
                 VAxis = new Vector3(0, 0, 1),
                 Normal = new Vector3D(-1, 0, 0),
-                Stroke = Colors.DeepSkyBlue,
-                StrokeThickness = 1,
-                Fill = Color.Parse("#2000BFFF")
+                PlaneType = MPRPlaneType.Sagittal
             };
         }
         #endregion
