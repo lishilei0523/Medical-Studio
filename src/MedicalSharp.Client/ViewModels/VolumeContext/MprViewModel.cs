@@ -571,6 +571,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 Vector3 worldStep = plane.WorldNormal * worldDelta;
                 this.Crosshair.Transform?.Translate(worldStep);
             }
+            if (eventArgs.TriggerSource == MPRPlaneChangeSource.ExternalSync)
+            {
+                this.Crosshair.UAxis = plane.WorldUAxis.ToVector3();
+                this.Crosshair.VAxis = plane.WorldVAxis.ToVector3();
+                this.Crosshair.Center = plane.WorldCenter.ToVector3();
+                this.Crosshair.Transform?.SetPosition(plane.WorldCenter);
+            }
 
             MPRPlaneChangedEvent message = new MPRPlaneChangedEvent
             {

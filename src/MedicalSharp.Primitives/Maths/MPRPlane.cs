@@ -347,8 +347,6 @@ namespace MedicalSharp.Primitives.Maths
                 MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(triggerSource);
                 this.OnChanged(this, eventArgs);
             }
-
-            this.SliceIndex = sliceIndex;
         }
         #endregion
 
@@ -374,7 +372,7 @@ namespace MedicalSharp.Primitives.Maths
                 MPRPlaneType.Oblique => (sliceOffset - this._minProjection) / (this._maxProjection - this._minProjection),
                 MPRPlaneType.Axial => localCenter.Z + 0.5f,
                 MPRPlaneType.Coronal => localCenter.Y + 0.5f,
-                MPRPlaneType.Sagittal => localCenter.X + 0.5f,
+                MPRPlaneType.Sagittal => -localCenter.X + 0.5f,
                 _ => throw new NotSupportedException()
             };
             int sliceIndex = (int)Math.Round(t * (this.SlicesCount - 1));
