@@ -18,7 +18,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 平面变化事件
         /// </summary>
-        public event Action<MPRPlane> PlaneChangedEvent;
+        public event EventHandler<MPRPlaneChangedEventArgs> PlaneChangedEvent;
 
         /// <summary>
         /// 首次变化
@@ -125,7 +125,10 @@ namespace MedicalSharp.Primitives.Maths
                 if (this._sliceIndex != sliceIndex)
                 {
                     this._sliceIndex = sliceIndex;
-                    this.OnChanged();
+
+                    //触发变化事件
+                    MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(MPRPlaneChangeSource.SliceScroll);
+                    this.OnChanged(this, eventArgs);
                 }
             }
         }
@@ -357,12 +360,13 @@ namespace MedicalSharp.Primitives.Maths
 
         //Public
 
-        #region 重定位平面 —— void Relocate(Vector3 worldCenter)
+        #region 重定位平面 —— void Relocate(Vector3 worldCenter...
         /// <summary>
         /// 重定位平面
         /// </summary>
         /// <param name="worldCenter">世界中心位置</param>
-        public void Relocate(Vector3 worldCenter)
+        /// <param name="triggerSource">触发源</param>
+        public void Relocate(Vector3 worldCenter, MPRPlaneChangeSource triggerSource = MPRPlaneChangeSource.CrosshairDrag)
         {
             //将世界坐标转换到逻辑空间
             Vector3 localCenter = new Vector3(
@@ -384,7 +388,8 @@ namespace MedicalSharp.Primitives.Maths
             this.SliceIndex = (int)Math.Round(t * (this.SlicesCount - 1));
 
             //触发变化事件
-            this.OnChanged();
+            MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(triggerSource);
+            this.OnChanged(this, eventArgs);
         }
         #endregion
 
@@ -429,7 +434,7 @@ namespace MedicalSharp.Primitives.Maths
             }
 
             //复用中心定位
-            this.Relocate(worldCenter);
+            this.Relocate(worldCenter, MPRPlaneChangeSource.ExternalSync);
         }
         #endregion
 
@@ -464,7 +469,9 @@ namespace MedicalSharp.Primitives.Maths
             //重新计算切片数量
             this.CalculateObliqueSlicesCount();
 
-            this.OnChanged();
+            //触发变化事件
+            MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(MPRPlaneChangeSource.ExternalSync);
+            this.OnChanged(this, eventArgs);
         }
         #endregion
 
@@ -492,7 +499,9 @@ namespace MedicalSharp.Primitives.Maths
             this._minProjection = standardPlane._minProjection;
             this._maxProjection = standardPlane._maxProjection;
 
-            this.OnChanged();
+            //触发变化事件
+            MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(MPRPlaneChangeSource.ExternalSync);
+            this.OnChanged(this, eventArgs);
         }
         #endregion
 
@@ -796,11 +805,11 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 触发平面变化事件 —— void OnChanged()
+        #region 触发平面变化事件 —— void OnChanged(object sender...
         /// <summary>
         /// 触发平面变化事件
         /// </summary>
-        private void OnChanged()
+        private void OnChanged(object sender, MPRPlaneChangedEventArgs eventArgs)
         {
             float currentOffset = this.GetSliceOffset();
             if (this._firstChanged)
@@ -814,10 +823,31 @@ namespace MedicalSharp.Primitives.Maths
             }
             this._previousSliceOffset = currentOffset;
 
-            this.PlaneChangedEvent?.Invoke(this);
+            this.PlaneChangedEvent?.Invoke(this, eventArgs);
         }
         #endregion 
 
         #endregion
+    }
+
+
+    /// <summary>
+    /// MPR平面变化事件参数
+    /// </summary>
+    public class MPRPlaneChangedEventArgs
+    {
+        /// <summary>
+        /// 默认构造器
+        /// </summary>
+        /// <param name="triggerSource">触发源</param>
+        public MPRPlaneChangedEventArgs(MPRPlaneChangeSource triggerSource)
+        {
+            this.TriggerSource = triggerSource;
+        }
+
+        /// <summary>
+        /// 触发源
+        /// </summary>
+        public MPRPlaneChangeSource TriggerSource { get; private set; }
     }
 }

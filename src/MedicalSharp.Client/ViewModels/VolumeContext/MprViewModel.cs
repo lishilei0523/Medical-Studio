@@ -9,6 +9,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -103,7 +104,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 if (value != null)
                 {
                     value.PlaneChangedEvent += this.OnMPRPlaneChanged;
-                    this.OnMPRPlaneChanged(value);
+
+                    MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(MPRPlaneChangeSource.ExternalSync);
+                    this.OnMPRPlaneChanged(value, eventArgs);
                 }
 
                 field = value;
@@ -553,22 +556,22 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
         //Events
 
-        #region MPR平面变化事件 —— void OnMPRPlaneChanged(MPRPlane plane)
+        #region MPR平面变化事件 —— void OnMPRPlaneChanged(object sender...
         /// <summary>
         /// MPR平面变化事件
         /// </summary>
-        /// <param name="plane">MPR平面</param>
-        private void OnMPRPlaneChanged(MPRPlane plane)
+        private void OnMPRPlaneChanged(object sender, MPRPlaneChangedEventArgs eventArgs)
         {
+            MPRPlane plane = (MPRPlane)sender;
             this.Crosshair.Center = plane.WorldCenter.ToVector3();
             this.Crosshair.UAxis = plane.WorldUAxis.ToVector3();
             this.Crosshair.VAxis = plane.WorldVAxis.ToVector3();
-            if (this.Crosshair.Transform != null)
+            if (eventArgs.TriggerSource == MPRPlaneChangeSource.SliceScroll)
             {
                 //逻辑空间偏移 -> 世界空间偏移
                 float worldDelta = plane.SliceOffsetDelta * plane.WorldSliceSpacing;
                 Vector3 worldStep = plane.WorldNormal * worldDelta;
-                this.Crosshair.Transform.Translate(worldStep);
+                this.Crosshair.Transform?.Translate(worldStep);
             }
 
             MPRPlaneChangedEvent message = new MPRPlaneChangedEvent
@@ -684,7 +687,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._isCrossSyncing = true;
                 try
                 {
-
                     this.Crosshair.Transform.SetPosition(crosshair.Transform.Position);
                     this.Plane.Relocate(crosshair.Transform.Position);
                     this.FrameToken++;

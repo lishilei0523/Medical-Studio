@@ -359,12 +359,11 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region MPR平面变化事件 —— void OnPlaneChanged(MPRPlane plane)
+        #region MPR平面变化事件 —— void OnPlaneChanged(object sender...
         /// <summary>
         /// MPR平面变化事件
         /// </summary>
-        /// <param name="plane">MPR平面</param>
-        private void OnPlaneChanged(MPRPlane plane)
+        private void OnPlaneChanged(object sender, MPRPlaneChangedEventArgs eventArgs)
         {
             this.UpdateModelMatrix();
         }
