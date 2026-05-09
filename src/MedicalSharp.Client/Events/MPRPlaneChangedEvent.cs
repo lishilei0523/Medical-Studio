@@ -24,5 +24,10 @@ namespace MedicalSharp.Client.Events
         /// 十字线
         /// </summary>
         public CrosshairVisual3D Crosshair { get; set; }
+
+        /// <summary>
+        /// 跳过体积视图同步
+        /// </summary>
+        public bool SkipVolumeSync { get; set; }
     }
 }

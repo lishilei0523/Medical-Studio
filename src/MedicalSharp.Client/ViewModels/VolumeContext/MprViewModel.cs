@@ -584,7 +584,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 Publisher = this,
                 Plane = plane,
                 TriggerSource = eventArgs.TriggerSource,
-                Crosshair = this.Crosshair
+                Crosshair = this.Crosshair,
+                SkipVolumeSync = eventArgs.TriggerSource == MPRPlaneChangeSource.ExternalSync
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
         }

@@ -779,24 +779,33 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 return Task.CompletedTask;
             }
+            if (message.SkipVolumeSync)
+            {
+                return Task.CompletedTask;
+            }
 
             #endregion
 
-            if (message.Plane.OriginalPlaneType == MPRPlaneType.Axial)
+            MPRPlaneVisual3D targetPlane = message.Plane.OriginalPlaneType switch
             {
-                //TODO 同步横断面
-                //this.AxialPlane
-            }
-            if (message.Plane.OriginalPlaneType == MPRPlaneType.Coronal)
+                MPRPlaneType.Axial => this.AxialPlane,
+                MPRPlaneType.Coronal => this.CoronalPlane,
+                MPRPlaneType.Sagittal => this.SagittalPlane,
+                _ => null
+            };
+
+            #region # 验证
+
+            if (targetPlane == null)
             {
-                //TODO 同步冠状面
-                //this.CoronalPlane
+                return Task.CompletedTask;
             }
-            if (message.Plane.OriginalPlaneType == MPRPlaneType.Sagittal)
-            {
-                //TODO 同步矢状面
-                //this.SagittalPlane
-            }
+
+            #endregion
+
+            //同步位置
+            targetPlane.Transform.SetPosition(message.Plane.WorldCenter);
+            this.FrameToken++;
 
             return Task.CompletedTask;
         }
