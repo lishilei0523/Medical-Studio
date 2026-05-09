@@ -105,8 +105,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 {
                     value.PlaneChangedEvent += this.OnMPRPlaneChanged;
 
-                    MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(MPRPlaneChangeSource.ExternalSync);
-                    this.OnMPRPlaneChanged(value, eventArgs);
+                    //初始化十字线方向和位置
+                    this.Crosshair.UAxis = value.WorldUAxis.ToVector3();
+                    this.Crosshair.VAxis = value.WorldVAxis.ToVector3();
+                    this.Crosshair.Center = value.WorldCenter.ToVector3();
                 }
 
                 field = value;
@@ -563,21 +565,30 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         private void OnMPRPlaneChanged(object sender, MPRPlaneChangedEventArgs eventArgs)
         {
             MPRPlane plane = (MPRPlane)sender;
-            this.Crosshair.Center = plane.WorldCenter.ToVector3();
-            this.Crosshair.UAxis = plane.WorldUAxis.ToVector3();
-            this.Crosshair.VAxis = plane.WorldVAxis.ToVector3();
             if (eventArgs.TriggerSource == MPRPlaneChangeSource.SliceScroll)
             {
+                this.Crosshair.UAxis = plane.WorldUAxis.ToVector3();
+                this.Crosshair.VAxis = plane.WorldVAxis.ToVector3();
+                this.Crosshair.Center = plane.WorldCenter.ToVector3();
+
                 //逻辑空间偏移 -> 世界空间偏移
                 float worldDelta = plane.SliceOffsetDelta * plane.WorldSliceSpacing;
                 Vector3 worldStep = plane.WorldNormal * worldDelta;
                 this.Crosshair.Transform?.Translate(worldStep);
+            }
+            if (eventArgs.TriggerSource == MPRPlaneChangeSource.ExternalSync)
+            {
+                this.Crosshair.UAxis = plane.WorldUAxis.ToVector3();
+                this.Crosshair.VAxis = plane.WorldVAxis.ToVector3();
+                this.Crosshair.Center = plane.WorldCenter.ToVector3();
+                this.Crosshair.Transform?.SetPosition(plane.WorldCenter);
             }
 
             MPRPlaneChangedEvent message = new MPRPlaneChangedEvent
             {
                 Publisher = this,
                 Plane = plane,
+                TriggerSource = eventArgs.TriggerSource,
                 Crosshair = this.Crosshair,
                 IsSyncTriggered = this._isCrossSyncing
             };
