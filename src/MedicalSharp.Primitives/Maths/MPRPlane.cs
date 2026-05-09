@@ -1,6 +1,7 @@
 ﻿using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
+using MedicalSharp.Primitives.Models.Arguments;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -831,26 +832,5 @@ namespace MedicalSharp.Primitives.Maths
         #endregion 
 
         #endregion
-    }
-
-
-    /// <summary>
-    /// MPR平面变化事件参数
-    /// </summary>
-    public class MPRPlaneChangedEventArgs
-    {
-        /// <summary>
-        /// 默认构造器
-        /// </summary>
-        /// <param name="triggerSource">触发源</param>
-        public MPRPlaneChangedEventArgs(MPRPlaneChangeSource triggerSource)
-        {
-            this.TriggerSource = triggerSource;
-        }
-
-        /// <summary>
-        /// 触发源
-        /// </summary>
-        public MPRPlaneChangeSource TriggerSource { get; private set; }
     }
 }

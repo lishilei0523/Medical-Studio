@@ -5,6 +5,7 @@ using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
+using MedicalSharp.Primitives.Models.Arguments;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
