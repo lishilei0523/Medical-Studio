@@ -779,10 +779,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 return Task.CompletedTask;
             }
-            if (message.IsSyncTriggered)
-            {
-                return Task.CompletedTask;
-            }
 
             #endregion
 

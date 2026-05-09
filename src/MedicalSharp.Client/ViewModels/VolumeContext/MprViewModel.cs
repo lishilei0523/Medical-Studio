@@ -34,11 +34,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #region # 字段及构造器
 
         /// <summary>
-        /// 是否十字线同步中
-        /// </summary>
-        private bool _isCrossSyncing;
-
-        /// <summary>
         /// 窗口管理器
         /// </summary>
         private readonly IWindowManager _windowManager;
@@ -61,7 +56,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
-            this._isCrossSyncing = false;
             this.Crosshair = new CrosshairVisual3D();
             this.Shapes = [];
             this.PickVoxel();
@@ -576,21 +570,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 Vector3 worldStep = plane.WorldNormal * worldDelta;
                 this.Crosshair.Transform?.Translate(worldStep);
             }
-            if (eventArgs.TriggerSource == MPRPlaneChangeSource.ExternalSync)
-            {
-                this.Crosshair.UAxis = plane.WorldUAxis.ToVector3();
-                this.Crosshair.VAxis = plane.WorldVAxis.ToVector3();
-                this.Crosshair.Center = plane.WorldCenter.ToVector3();
-                this.Crosshair.Transform?.SetPosition(plane.WorldCenter);
-            }
 
             MPRPlaneChangedEvent message = new MPRPlaneChangedEvent
             {
                 Publisher = this,
                 Plane = plane,
                 TriggerSource = eventArgs.TriggerSource,
-                Crosshair = this.Crosshair,
-                IsSyncTriggered = this._isCrossSyncing
+                Crosshair = this.Crosshair
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
         }
@@ -695,17 +681,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             //十字线平移
             if (message.Shape is CrosshairVisual3D crosshair)
             {
-                this._isCrossSyncing = true;
-                try
-                {
-                    this.Crosshair.Transform.SetPosition(crosshair.Transform.Position);
-                    this.Plane.Relocate(crosshair.Transform.Position);
-                    this.FrameToken++;
-                }
-                finally
-                {
-                    this._isCrossSyncing = false;
-                }
+                this.Crosshair.Transform.SetPosition(crosshair.Transform.Position);
+                this.Plane.Relocate(crosshair.Transform.Position);
+                this.FrameToken++;
             }
 
             //面平移
@@ -795,22 +773,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 return Task.CompletedTask;
             }
-            if (message.IsSyncTriggered)
-            {
-                return Task.CompletedTask;
-            }
 
             #endregion
 
-            this._isCrossSyncing = true;
-            try
+            if (message.TriggerSource is MPRPlaneChangeSource.SliceScroll or MPRPlaneChangeSource.ExternalSync)
             {
                 this.Crosshair.Transform.SetPosition(message.Crosshair.Transform.Position);
                 this.FrameToken++;
-            }
-            finally
-            {
-                this._isCrossSyncing = false;
             }
 
             return Task.CompletedTask;

@@ -111,27 +111,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 切片索引
         /// </summary>
-        private int _sliceIndex;
-
-        /// <summary>
-        /// 切片索引
-        /// </summary>
-        public int SliceIndex
-        {
-            get => this._sliceIndex;
-            set
-            {
-                int sliceIndex = Math.Clamp(value, 0, this.SlicesCount - 1);
-                if (this._sliceIndex != sliceIndex)
-                {
-                    this._sliceIndex = sliceIndex;
-
-                    //触发变化事件
-                    MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(MPRPlaneChangeSource.SliceScroll);
-                    this.OnChanged(this, eventArgs);
-                }
-            }
-        }
+        public int SliceIndex { get; private set; }
         #endregion
 
         #region 切片偏移差分量 —— float SliceOffsetDelta
@@ -248,9 +228,9 @@ namespace MedicalSharp.Primitives.Maths
                 Normal = new Vector3(0, 0, 1),
                 PlaneType = MPRPlaneType.Axial,
                 OriginalPlaneType = MPRPlaneType.Axial,
-                SlicesCount = volumeMetadata.VolumeSize.Z,
-                SliceIndex = volumeMetadata.VolumeSize.Z / 2,
+                SlicesCount = volumeMetadata.VolumeSize.Z
             };
+            plane.SetSliceIndex(volumeMetadata.VolumeSize.Z / 2);
 
             return plane;
         }
@@ -274,9 +254,9 @@ namespace MedicalSharp.Primitives.Maths
                 Normal = new Vector3(0, 1, 0),
                 PlaneType = MPRPlaneType.Coronal,
                 OriginalPlaneType = MPRPlaneType.Coronal,
-                SlicesCount = volumeMetadata.VolumeSize.Y,
-                SliceIndex = volumeMetadata.VolumeSize.Y / 2
+                SlicesCount = volumeMetadata.VolumeSize.Y
             };
+            plane.SetSliceIndex(volumeMetadata.VolumeSize.Y / 2);
 
             return plane;
         }
@@ -300,9 +280,9 @@ namespace MedicalSharp.Primitives.Maths
                 Normal = new Vector3(-1, 0, 0),
                 PlaneType = MPRPlaneType.Sagittal,
                 OriginalPlaneType = MPRPlaneType.Sagittal,
-                SlicesCount = volumeMetadata.VolumeSize.X,
-                SliceIndex = volumeMetadata.VolumeSize.X / 2
+                SlicesCount = volumeMetadata.VolumeSize.X
             };
+            plane.SetSliceIndex(volumeMetadata.VolumeSize.X / 2);
 
             return plane;
         }
@@ -351,7 +331,7 @@ namespace MedicalSharp.Primitives.Maths
             plane.CalculateObliqueSlicesCount();
 
             //保持切片索引比例
-            plane.SliceIndex = originalPlane.SliceIndex;
+            plane.SetSliceIndex(originalPlane.SliceIndex);
 
             return plane;
         }
@@ -359,6 +339,28 @@ namespace MedicalSharp.Primitives.Maths
 
 
         //Public
+
+        #region 设置切片索引 —— void SetSliceIndex(int sliceIndex...
+        /// <summary>
+        /// 设置切片索引
+        /// </summary>
+        /// <param name="sliceIndex">切片索引</param>
+        /// <param name="triggerSource">触发源</param>
+        public void SetSliceIndex(int sliceIndex, MPRPlaneChangeSource triggerSource = MPRPlaneChangeSource.SliceScroll)
+        {
+            sliceIndex = Math.Clamp(sliceIndex, 0, this.SlicesCount - 1);
+            if (this.SliceIndex != sliceIndex)
+            {
+                this.SliceIndex = sliceIndex;
+
+                //触发变化事件
+                MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(triggerSource);
+                this.OnChanged(this, eventArgs);
+            }
+
+            this.SliceIndex = sliceIndex;
+        }
+        #endregion
 
         #region 重定位平面 —— void Relocate(Vector3 worldCenter...
         /// <summary>
@@ -385,7 +387,8 @@ namespace MedicalSharp.Primitives.Maths
                 MPRPlaneType.Sagittal => localCenter.X + 0.5f,
                 _ => throw new NotSupportedException()
             };
-            this.SliceIndex = (int)Math.Round(t * (this.SlicesCount - 1));
+            int sliceIndex = (int)Math.Round(t * (this.SlicesCount - 1));
+            this.SetSliceIndex(sliceIndex);
 
             //触发变化事件
             MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(triggerSource);
@@ -495,9 +498,9 @@ namespace MedicalSharp.Primitives.Maths
             this.Normal = standardPlane.Normal;
             this.PlaneType = standardPlane.PlaneType;
             this.SlicesCount = standardPlane.SlicesCount;
-            this._sliceIndex = standardPlane._sliceIndex;
             this._minProjection = standardPlane._minProjection;
             this._maxProjection = standardPlane._maxProjection;
+            this.SetSliceIndex(standardPlane.SliceIndex);
 
             //触发变化事件
             MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(MPRPlaneChangeSource.ExternalSync);
@@ -575,7 +578,7 @@ namespace MedicalSharp.Primitives.Maths
             if (this.PlaneType == MPRPlaneType.Oblique)
             {
                 //斜切平面：根据投影范围映射
-                float t = this._sliceIndex * 1.0f / (this.SlicesCount - 1);
+                float t = this.SliceIndex * 1.0f / (this.SlicesCount - 1);
                 sliceOffset = this._minProjection + t * (this._maxProjection - this._minProjection);
             }
             else

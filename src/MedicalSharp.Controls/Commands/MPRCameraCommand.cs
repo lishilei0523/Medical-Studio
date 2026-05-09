@@ -77,7 +77,8 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         {
-            this._camera.TargetPlane.SliceIndex += (int)Math.Ceiling(eventArgs.Delta.Y);
+            int sliceIndex = this._camera.TargetPlane.SliceIndex + (int)Math.Ceiling(eventArgs.Delta.Y);
+            this._camera.TargetPlane.SetSliceIndex(sliceIndex);
             viewport.RequestNextFrameRendering();
         }
         #endregion
