@@ -188,20 +188,9 @@ namespace MedicalSharp.Primitives.Maths
         /// <remarks>沿世界法向量方向移动一个切片的世界位移（不含方向/数量）</remarks>
         public float WorldSliceSpacing
         {
-            get
-            {
-                if (this.PlaneType == MPRPlaneType.Oblique)
-                {
-                    return Math.Abs(this.Normal.X) * this.VolumeMetadata.VolumeScale.X +
-                           Math.Abs(this.Normal.Y) * this.VolumeMetadata.VolumeScale.Y +
-                           Math.Abs(this.Normal.Z) * this.VolumeMetadata.VolumeScale.Z;
-                }
-
-                //标准平面保留方向符号
-                return this.Normal.X * this.VolumeMetadata.VolumeScale.X +
-                       this.Normal.Y * this.VolumeMetadata.VolumeScale.Y +
-                       this.Normal.Z * this.VolumeMetadata.VolumeScale.Z;
-            }
+            get => Math.Abs(this.Normal.X) * this.VolumeMetadata.VolumeScale.X +
+                   Math.Abs(this.Normal.Y) * this.VolumeMetadata.VolumeScale.Y +
+                   Math.Abs(this.Normal.Z) * this.VolumeMetadata.VolumeScale.Z;
         }
         #endregion
 
@@ -389,11 +378,7 @@ namespace MedicalSharp.Primitives.Maths
                 _ => throw new NotSupportedException()
             };
             int sliceIndex = (int)Math.Round(t * (this.SlicesCount - 1));
-            this.SetSliceIndex(sliceIndex);
-
-            //触发变化事件
-            MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(triggerSource);
-            this.OnChanged(this, eventArgs);
+            this.SetSliceIndex(sliceIndex, triggerSource);
         }
         #endregion
 
