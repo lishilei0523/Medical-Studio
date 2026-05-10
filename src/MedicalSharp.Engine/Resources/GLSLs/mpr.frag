@@ -9,20 +9,16 @@ uniform usampler3D u_MarkTexture;
 uniform sampler1D u_TransferFunction;
 uniform sampler1D u_MarkStrategy;
 
-//窗宽窗位参数
-uniform float u_WindowWidth;
-uniform float u_WindowCenter;
-
-//材质参数
-uniform float u_Brightness;
-uniform float u_Contrast;
-
-//DICOM重缩放参数
+uniform vec3 u_VolumeScale;
 uniform float u_RescaleSlope;
 uniform float u_RescaleIntercept;
+uniform float u_WindowWidth;
+uniform float u_WindowCenter;
+uniform float u_Brightness;             //亮度
+uniform float u_Contrast;               //对比度
 
-//体积参数
-uniform vec3 u_VolumeScale;
+//渲染模式：0=Gray, 1=PseudoColor
+uniform int u_RenderMode;
 
 //标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Tinted）
 uniform int u_MarkModes[256];
@@ -38,7 +34,7 @@ float convertR16SnormToRaw(float snormValue)
     return snormValue * MAX_16BIT_SIGNED;
 }
 
-//应用窗宽窗位
+//线性窗宽窗位转换
 float applyWindowLevel(float value, float windowCenter, float windowWidth)
 {
     if (windowWidth < EPSILON)

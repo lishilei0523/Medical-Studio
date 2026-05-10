@@ -275,31 +275,18 @@ namespace MedicalSharp.Engine.Renderers
             Matrix4 volumeScaleMatrix = Matrix4.CreateScale(this.Renderable.VolumeMetadata.VolumeScale);
 
             //设置MVP矩阵、相机位置、缩放
-            program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
-            program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
             program.SetUniformMatrix4("u_ModelMatrix", this.Renderable.ModelMatrix * volumeScaleMatrix);
+            program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
+            program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             program.SetUniformVector3("u_CameraPosition", renderContext.CameraPosition);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
+            //设置DICOM重缩放参数
             program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
             program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
             //设置渲染模式
             program.SetUniformInt("u_RenderMode", (int)this.RenderMode);
-
-            //设置标记策略
-            program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
-
-            //绑定纹理
-            this.Renderable.VolumeTexture.Bind(0);
-            this.Renderable.MarkTexture.Bind(1);
-            this.TransferFunction.Texture.Bind(2);
-            this.MarkStrategy.Texture.Bind(3);
-
-            program.SetUniformInt("u_VolumeTexture", 0);
-            program.SetUniformInt("u_MarkTexture", 1);
-            program.SetUniformInt("u_TransferFunction", 2);
-            program.SetUniformInt("u_MarkStrategy", 3);
 
             //设置渲染参数
             program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
@@ -309,6 +296,19 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformFloat("u_DensityScale", this.DensityScale);
             program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
             program.SetUniformFloat("u_OpacityThreshold", this.OpacityThreshold);
+
+            //设置标记策略
+            program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
+
+            //绑定纹理
+            this.Renderable.VolumeTexture.Bind(0);
+            this.Renderable.MarkTexture.Bind(1);
+            this.TransferFunction.Texture.Bind(2);
+            this.MarkStrategy.Texture.Bind(3);
+            program.SetUniformInt("u_VolumeTexture", 0);
+            program.SetUniformInt("u_MarkTexture", 1);
+            program.SetUniformInt("u_TransferFunction", 2);
+            program.SetUniformInt("u_MarkStrategy", 3);
 
             //绘制模型
             this._unitCube.Draw(PrimitiveType.Triangles);

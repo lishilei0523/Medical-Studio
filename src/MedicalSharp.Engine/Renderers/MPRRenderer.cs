@@ -2,6 +2,7 @@
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
@@ -44,6 +45,7 @@ namespace MedicalSharp.Engine.Renderers
         {
             this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
             this._unitPlane.Setup();
+            this.RenderMode = MPRRenderMode.Gray;
             this.WindowWidth = 400;
             this.WindowCenter = 40;
             this.Brightness = 1.0f;
@@ -53,6 +55,13 @@ namespace MedicalSharp.Engine.Renderers
         #endregion
 
         #region # 属性
+
+        #region 渲染模式 —— MPRRenderMode RenderMode
+        /// <summary>
+        /// 渲染模式
+        /// </summary>
+        public MPRRenderMode RenderMode { get; private set; }
+        #endregion
 
         #region 窗宽 —— float WindowWidth
         /// <summary>
@@ -128,6 +137,17 @@ namespace MedicalSharp.Engine.Renderers
         #region # 方法
 
         //Public
+
+        #region 切换渲染模式 —— void SwitchRenderMode(MPRRenderMode renderMode)
+        /// <summary>
+        /// 切换渲染模式
+        /// </summary>
+        /// <param name="renderMode">渲染模式</param>
+        public void SwitchRenderMode(MPRRenderMode renderMode)
+        {
+            this.RenderMode = renderMode;
+        }
+        #endregion
 
         #region 绑定MPR平面 —— void BindPlane(MPRPlane plane)
         /// <summary>
@@ -269,27 +289,34 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
-            //设置相机视口
+            //设置相机视口尺寸
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
-            //使用Shader
+            //渲染上下文
+            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+
+            //开启Shader程序
             ShaderProgram program = ShaderManager.MPRProgram;
             program.Use();
 
-            //设置Uniform变量
+            //设置MVP矩阵、相机位置、缩放
             program.SetUniformMatrix4("u_ModelMatrix", this._modelMatrix);
-            program.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
-            program.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
+            program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
+            program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
+            program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
+            //设置DICOM重缩放参数
+            program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
+            program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
+
+            //设置渲染模式
+            program.SetUniformInt("u_RenderMode", (int)this.RenderMode);
+
+            //设置渲染参数
             program.SetUniformFloat("u_WindowWidth", this.WindowWidth);
             program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
             program.SetUniformFloat("u_Brightness", this.Brightness);
             program.SetUniformFloat("u_Contrast", this.Contrast);
-
-            program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
-            program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
-
-            program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
             //设置标记策略
             program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
@@ -299,7 +326,6 @@ namespace MedicalSharp.Engine.Renderers
             this.Renderable.MarkTexture.Bind(1);
             this.TransferFunction.Texture.Bind(2);
             this.MarkStrategy.Texture.Bind(3);
-
             program.SetUniformInt("u_VolumeTexture", 0);
             program.SetUniformInt("u_MarkTexture", 1);
             program.SetUniformInt("u_TransferFunction", 2);
@@ -312,14 +338,13 @@ namespace MedicalSharp.Engine.Renderers
             this.Renderable.VolumeTexture.Unbind();
             this.Renderable.MarkTexture.Unbind();
             this.TransferFunction.Texture.Unbind();
+            this.MarkStrategy.Texture.Unbind();
 
-            //取消使用Shader
+            //取消使用
             program.Unuse();
 
             //触发渲染事件
-            RenderContext context = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
-
-            this.Renderable.OnRender(context);
+            this.Renderable.OnRender(renderContext);
         }
         #endregion
 

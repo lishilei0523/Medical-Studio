@@ -13,8 +13,8 @@ uniform vec3 u_CameraPosition;
 uniform vec3 u_VolumeScale;
 uniform float u_RescaleSlope;
 uniform float u_RescaleIntercept;
-uniform float u_WindowCenter;
 uniform float u_WindowWidth;
+uniform float u_WindowCenter;
 uniform float u_StepSize;               //步长
 uniform float u_Brightness;             //亮度
 uniform float u_DensityScale;           //密度缩放
@@ -24,7 +24,7 @@ uniform float u_OpacityThreshold;       //透明度阈值
 //渲染模式：0=Raycast, 1=AIP, 2=MIP, 3=MinIP, 4=SSD
 uniform int u_RenderMode;
 
-//标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Highlight）
+//标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Tinted）
 uniform int u_MarkModes[256];
 
 
