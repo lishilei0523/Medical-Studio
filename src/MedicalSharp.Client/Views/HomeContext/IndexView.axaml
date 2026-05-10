@@ -143,11 +143,11 @@
 			<!--Footer-->
 			<Grid Grid.Row="2" Background="#FF6C6C6C">
 				<WrapPanel Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<TextBlock Text="Volume size: " FontSize="12" />
+					<TextBlock Text="Volume Size : " FontSize="12" />
 					<TextBlock Text="{Binding VolumeInfo.VolumeSize}" FontSize="12" />
 				</WrapPanel>
 				<WrapPanel Margin="0,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Center">
-					<TextBlock Text="Series Instance UId: " FontSize="12" />
+					<TextBlock Text="Series Instance UID : " FontSize="12" />
 					<TextBlock Text="{Binding VolumeInfo.SeriesInstanceUId}" FontSize="12" />
 				</WrapPanel>
 			</Grid>

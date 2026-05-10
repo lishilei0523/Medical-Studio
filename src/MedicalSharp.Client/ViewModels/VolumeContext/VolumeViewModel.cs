@@ -62,7 +62,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Vector3 targetPosition = new Vector3(0.0f);
             Vector3 upDirection = new Vector3(0, 0, 1);
             this.Camera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
-            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.GrayControlPoints);
+            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ProtocolManager.GrayControlPoints);
 
             //初始化输入管理器
             this.InputManager = new OrbitInputManager(this.Camera);

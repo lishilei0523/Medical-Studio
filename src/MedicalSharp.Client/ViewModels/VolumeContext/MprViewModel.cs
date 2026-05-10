@@ -62,7 +62,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
-            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.RainbowControlPoints);
+            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ProtocolManager.RainbowControlPoints);
             this.Shapes = [];
             this.GrayModeChecked = true;
             this.Crosshair = new CrosshairVisual3D();
