@@ -29,17 +29,25 @@ namespace MedicalSharp.Primitives.Models
             //默认值
             this._syncStatus = (int)MarkSyncStatus.Idle;
             this.Metadata = new VolumeMetadata();
+            this.PatientInfo = new PatientInfo();
         }
 
         #endregion
 
         #region # 属性
 
-        #region 体积信息 —— VolumeInfo Metadata
+        #region 体积元数据 —— VolumeMetadata Metadata
         /// <summary>
-        /// 体积信息
+        /// 体积元数据
         /// </summary>
         public VolumeMetadata Metadata { get; private set; }
+        #endregion
+
+        #region 患者信息 —— PatientInfo PatientInfo
+        /// <summary>
+        /// 患者信息
+        /// </summary>
+        public PatientInfo PatientInfo { get; private set; }
         #endregion
 
         #region 原始数据 —— abstract IntPtr OriginalData

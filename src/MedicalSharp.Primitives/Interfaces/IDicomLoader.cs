@@ -20,6 +20,6 @@ namespace MedicalSharp.Primitives.Interfaces
         /// </summary>
         /// <param name="dicomPaths">DICOM文件路径集</param>
         /// <returns>体积数据</returns>
-        VolumeData LoadSeries(ICollection<string> dicomPaths);
+        VolumeData LoadSeries(IReadOnlyList<string> dicomPaths);
     }
 }

@@ -45,13 +45,13 @@ namespace MedicalSharp.Insight
         }
         #endregion
 
-        #region # 加载DICOM序列 —— VolumeData LoadSeries(ICollection<string> dicomPaths)
+        #region # 加载DICOM序列 —— VolumeData LoadSeries(IReadOnlyList<string> dicomPaths)
         /// <summary>
         /// 加载DICOM序列
         /// </summary>
-        /// <param name="dicomPaths">DICOM文件路径集</param>
+        /// <param name="dicomPaths">DICOM文件路径列表</param>
         /// <returns>体积数据</returns>
-        public VolumeData LoadSeries(ICollection<string> dicomPaths)
+        public VolumeData LoadSeries(IReadOnlyList<string> dicomPaths)
         {
             #region # 验证
 
@@ -77,6 +77,7 @@ namespace MedicalSharp.Insight
             //创建体积数据
             SitkVolumeData volumeData = new SitkVolumeData();
             this.ExtractData(volumeData, image);
+            this.ExtractExtraData(volumeData, dicomPaths);
 
             return volumeData;
         }
@@ -132,16 +133,6 @@ namespace MedicalSharp.Insight
                 Z = volumeData.Metadata.PhysicalSize.Z / maxSide
             };
 
-            //获取斜率和截距
-            if (image.HasMetaDataKey(DicomTags.RescaleSlope))
-            {
-                volumeData.Metadata.RescaleSlope = float.Parse(image.GetMetaData(DicomTags.RescaleSlope));
-            }
-            if (image.HasMetaDataKey(DicomTags.RescaleIntercept))
-            {
-                volumeData.Metadata.RescaleIntercept = float.Parse(image.GetMetaData(DicomTags.RescaleIntercept));
-            }
-
             //获取图像原点和方向
             VectorDouble origin = image.GetOrigin();
             VectorDouble direction = image.GetDirection();
@@ -149,22 +140,6 @@ namespace MedicalSharp.Insight
             volumeData.Metadata.RowDirection = new Vector3((float)direction[0], (float)direction[1], (float)direction[2]);
             volumeData.Metadata.ColDirection = new Vector3((float)direction[3], (float)direction[4], (float)direction[5]);
             volumeData.Metadata.SliceDirection = new Vector3((float)direction[6], (float)direction[7], (float)direction[8]);
-
-            //获取SeriesInstanceUId
-            if (image.HasMetaDataKey(DicomTags.SeriesInstanceUID))
-            {
-                volumeData.Metadata.SeriesInstanceUId = image.GetMetaData(DicomTags.SeriesInstanceUID);
-            }
-
-            //获取窗宽窗位
-            if (image.HasMetaDataKey(DicomTags.WindowWidth))
-            {
-                volumeData.Metadata.WindowWidth = float.Parse(image.GetMetaData(DicomTags.WindowWidth));
-            }
-            if (image.HasMetaDataKey(DicomTags.WindowCenter))
-            {
-                volumeData.Metadata.WindowCenter = float.Parse(image.GetMetaData(DicomTags.WindowCenter));
-            }
 
             //转换像素类型为short
             Image normalizedImage = image.GetPixelID() != PixelIDValueEnum.sitkInt16
@@ -192,6 +167,60 @@ namespace MedicalSharp.Insight
             }
 #endif
         }
-        #endregion 
+        #endregion
+
+        #region # 提取扩展数据 —— void ExtractExtraData(SitkVolumeData volumeData...
+        /// <summary>
+        /// 提取扩展数据
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="dicomPaths">DICOM文件路径列表</param>
+        private void ExtractExtraData(SitkVolumeData volumeData, IReadOnlyList<string> dicomPaths)
+        {
+            Func<Image, string, string> getTagValue = (image, tag) =>
+            {
+                if (image.HasMetaDataKey(tag))
+                {
+                    return image.GetMetaData(tag)?.Trim();
+                }
+                return null;
+            };
+
+            //拿第一张切片单独读元数据
+            using Image slice = SimpleITK.ReadImage(dicomPaths[0]);
+
+            //解析扩展元数据
+            volumeData.Metadata.SeriesInstanceUId = getTagValue(slice, DicomTags.SeriesInstanceUID);
+            string rescaleSlope = getTagValue(slice, DicomTags.RescaleSlope);
+            string rescaleIntercept = getTagValue(slice, DicomTags.RescaleIntercept);
+            string windowWidth = getTagValue(slice, DicomTags.WindowWidth);
+            string windowCenter = getTagValue(slice, DicomTags.WindowCenter);
+            if (!string.IsNullOrWhiteSpace(rescaleSlope))
+            {
+                volumeData.Metadata.RescaleSlope = float.Parse(rescaleSlope);
+            }
+            if (!string.IsNullOrWhiteSpace(rescaleIntercept))
+            {
+                volumeData.Metadata.RescaleIntercept = float.Parse(rescaleIntercept);
+            }
+            if (!string.IsNullOrWhiteSpace(windowWidth))
+            {
+                volumeData.Metadata.WindowWidth = float.Parse(windowWidth);
+            }
+            if (!string.IsNullOrWhiteSpace(windowCenter))
+            {
+                volumeData.Metadata.WindowCenter = float.Parse(windowCenter);
+            }
+
+            //解析患者信息
+            volumeData.PatientInfo.PatientId = getTagValue(slice, DicomTags.PatientID);
+            volumeData.PatientInfo.Name = getTagValue(slice, DicomTags.PatientName);
+            volumeData.PatientInfo.BirthDate = getTagValue(slice, DicomTags.PatientBirthDate);
+            volumeData.PatientInfo.Sex = getTagValue(slice, DicomTags.PatientSex);
+            volumeData.PatientInfo.Age = getTagValue(slice, DicomTags.PatientAge);
+            volumeData.PatientInfo.Height = getTagValue(slice, DicomTags.PatientSize);
+            volumeData.PatientInfo.Weight = getTagValue(slice, DicomTags.PatientWeight);
+        }
+        #endregion
     }
 }
