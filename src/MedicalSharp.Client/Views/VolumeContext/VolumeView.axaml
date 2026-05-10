@@ -31,12 +31,12 @@
 					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-Translate3D}" />
 					</sd:ToggleRadioButton>
-                    <sd:ToggleRadioButton cm:Message.Attach="RotateU()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-RotateU}" />
-                    </sd:ToggleRadioButton>
-                    <sd:ToggleRadioButton cm:Message.Attach="RotateV()" Classes="Transparent-Panel">
-                        <PathIcon Data="{StaticResource Icon-RotateV}" />
-                    </sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="RotateU()" Classes="Transparent-Panel">
+						<PathIcon Data="{StaticResource Icon-RotateU}" />
+					</sd:ToggleRadioButton>
+					<sd:ToggleRadioButton cm:Message.Attach="RotateV()" Classes="Transparent-Panel">
+						<PathIcon Data="{StaticResource Icon-RotateV}" />
+					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Rotate3D()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-Rotate3D}" />
 					</sd:ToggleRadioButton>
@@ -92,17 +92,45 @@
 						<DropDownButton.Flyout>
 							<MenuFlyout>
 								<MenuItem Header="渲染模式">
-									<MenuItem Header="Raycast" ToggleType="Radio" />
-									<MenuItem Header="AIP" ToggleType="Radio" />
-									<MenuItem Header="MIP" ToggleType="Radio" />
-									<MenuItem Header="MinIP" ToggleType="Radio" />
-                                </MenuItem>
-                                <MenuItem Header="MPR平面">
-                                    <MenuItem Header="横断面" ToggleType="CheckBox" />
-                                    <MenuItem Header="冠状面" ToggleType="CheckBox" />
-                                    <MenuItem Header="矢状面" ToggleType="CheckBox" />
-                                    <MenuItem Header="复位" />
-                                </MenuItem>
+									<MenuItem >
+										<MenuItem.Header>
+											<RadioButton Content="Raycast" GroupName="RenderMode" IsChecked="{Binding RaycastChecked}" />
+										</MenuItem.Header>
+									</MenuItem>
+									<MenuItem >
+										<MenuItem.Header>
+											<RadioButton Content="AIP" GroupName="RenderMode" IsChecked="{Binding AIPChecked}" />
+										</MenuItem.Header>
+								</MenuItem>
+									<MenuItem >
+										<MenuItem.Header>
+											<RadioButton Content="MIP" GroupName="RenderMode" IsChecked="{Binding MIPChecked}" />
+										</MenuItem.Header>
+									</MenuItem>
+									<MenuItem >
+										<MenuItem.Header>
+											<RadioButton Content="MinIP" GroupName="RenderMode" IsChecked="{Binding MinIPChecked}" />
+										</MenuItem.Header>
+									</MenuItem>
+								</MenuItem>
+								<MenuItem Header="MPR平面">
+                                    <MenuItem >
+                                        <MenuItem.Header>
+                                            <CheckBox Content="横断面" IsChecked="{Binding AxialPlaneVisible}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                    <MenuItem >
+                                        <MenuItem.Header>
+                                            <CheckBox Content="冠状面" IsChecked="{Binding CoronalPlaneVisible}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                    <MenuItem >
+                                        <MenuItem.Header>
+                                            <CheckBox Content="矢状面" IsChecked="{Binding SagittalPlaneVisible}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+									<MenuItem Header="复位" Command="{Binding ResetMprPlanesCommand}" />
+								</MenuItem>
 								<MenuItem Header="调节协议" />
 							</MenuFlyout>
 						</DropDownButton.Flyout>
@@ -111,11 +139,13 @@
 			</Grid>
 		</sd:GroupBox.Header>
 		<!--Content-->
-		<sd:VolumeViewport FrameToken="{Binding FrameToken}"
+		<sd:VolumeViewport x:Name="VolumeViewport"
+                           FrameToken="{Binding FrameToken}"
 						   Camera="{Binding Camera}"
 						   InputManager="{Binding InputManager}"
 						   VolumeData="{Binding VolumeData}"
-						   TFControlPoints="{Binding TFControlPoints}">
+						   TFControlPoints="{Binding TFControlPoints}"
+						   RenderMode="{Binding RenderMode}">
 			<sd:ShapePresenter Content="{Binding AxialPlane}" />
 			<sd:ShapePresenter Content="{Binding CoronalPlane}" />
 			<sd:ShapePresenter Content="{Binding SagittalPlane}" />

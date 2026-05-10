@@ -407,6 +407,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnRenderModeChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<VolumeRenderMode> eventArgs)
         {
             viewport._volumeRenderer?.SwitchRenderMode(eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -417,6 +420,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnWindowWidthChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._volumeRenderer?.SetWindowLevel(eventArgs.NewValue.Value, viewport.WindowWidth);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -427,6 +433,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnWindowCenterChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._volumeRenderer?.SetWindowLevel(viewport.WindowCenter, eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -437,6 +446,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnBrightnessChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._volumeRenderer?.SetMaterialOptions(eventArgs.NewValue.Value, viewport.DensityScale);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -447,6 +459,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnDensityScaleChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._volumeRenderer?.SetMaterialOptions(viewport.Brightness, eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -457,6 +472,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnStepSizeChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._volumeRenderer?.SetSamplingOptions(eventArgs.NewValue.Value, viewport.MaxStepsCount, viewport.OpacityThreshold);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -467,6 +485,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnMaxStepsCountChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<int> eventArgs)
         {
             viewport._volumeRenderer?.SetSamplingOptions(viewport.StepSize, eventArgs.NewValue.Value, viewport.OpacityThreshold);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -477,6 +498,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnOpacityThresholdChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._volumeRenderer?.SetSamplingOptions(viewport.StepSize, viewport.MaxStepsCount, eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -510,6 +534,9 @@ namespace MedicalSharp.Controls.Viewports
                 //清空旧元素
                 viewport._volumeRenderer?.TransferFunction.ClearControlPoints();
             }
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -540,6 +567,9 @@ namespace MedicalSharp.Controls.Viewports
                 //清空元素
                 this._volumeRenderer?.TransferFunction.ClearControlPoints();
             }
+
+            //请求下一帧
+            this.RequestNextFrameRendering();
         }
         #endregion
 

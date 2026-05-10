@@ -4,10 +4,12 @@ using Avalonia.Media;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Client.Events;
+using MedicalSharp.Client.Views.VolumeContext;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Commands.Arguments;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
@@ -17,6 +19,7 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
+using SD.Infrastructure.Avalonia.Commands;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using System;
@@ -24,6 +27,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
@@ -52,7 +56,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this._windowManager = windowManager;
             this._eventAggregator = eventAggregator;
             this._eventAggregator.SubscribeOnUIThread(this);
-            this.Shapes = [];
 
             //初始化相机
             Vector3 cameraPosition = new Vector3(0, 2, 0);
@@ -67,11 +70,135 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             //初始化MPR平面
             this.InitMprPlanes();
+
+            //默认值
+            this.Shapes = [];
+            this.RaycastChecked = true;
+            this.AxialPlaneVisible = true;
+            this.CoronalPlaneVisible = true;
+            this.SagittalPlaneVisible = true;
         }
 
         #endregion
 
         #region # 属性
+
+        //通知属性
+
+        #region Raycast渲染模式选中 —— bool RaycastChecked
+        /// <summary>
+        /// Raycast渲染模式选中
+        /// </summary>
+        public bool RaycastChecked
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.RenderMode = VolumeRenderMode.Raycast;
+            }
+        }
+        #endregion
+
+        #region AIP渲染模式选中 —— bool AIPChecked
+        /// <summary>
+        /// AIP渲染模式选中
+        /// </summary>
+        public bool AIPChecked
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.RenderMode = VolumeRenderMode.AIP;
+            }
+        }
+        #endregion
+
+        #region MIP渲染模式选中 —— bool MIPChecked
+        /// <summary>
+        /// MIP渲染模式选中
+        /// </summary>
+        public bool MIPChecked
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.RenderMode = VolumeRenderMode.MIP;
+            }
+        }
+        #endregion
+
+        #region MinIP渲染模式选中 —— bool MinIPChecked
+        /// <summary>
+        /// MinIP渲染模式选中
+        /// </summary>
+        public bool MinIPChecked
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.RenderMode = VolumeRenderMode.MinIP;
+            }
+        }
+        #endregion
+
+        #region 横断面是否可见 —— bool AxialPlaneVisible
+        /// <summary>
+        /// 横断面是否可见
+        /// </summary>
+        public bool AxialPlaneVisible
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.AxialPlane.IsVisible = value;
+                this.VolumeViewport?.RequestNextFrameRendering();
+            }
+        }
+        #endregion
+
+        #region 冠状面是否可见 —— bool CoronalPlaneVisible
+        /// <summary>
+        /// 冠状面是否可见
+        /// </summary>
+        public bool CoronalPlaneVisible
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.CoronalPlane.IsVisible = value;
+                this.VolumeViewport?.RequestNextFrameRendering();
+            }
+        }
+        #endregion
+
+        #region 矢状面是否可见 —— bool SagittalPlaneVisible
+        /// <summary>
+        /// 矢状面是否可见
+        /// </summary>
+        public bool SagittalPlaneVisible
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.SagittalPlane.IsVisible = value;
+                this.VolumeViewport?.RequestNextFrameRendering();
+            }
+        }
+        #endregion
 
         #region 帧令牌 —— int FrameToken
         /// <summary>
@@ -121,6 +248,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
         #endregion
 
+        #region 体积渲染模式 —— VolumeRenderMode RenderMode
+        /// <summary>
+        /// 体积渲染模式
+        /// </summary>
+        [DependencyProperty]
+        public VolumeRenderMode RenderMode { get; set; }
+        #endregion
+
         #region 横断面 —— PlaneVisual3D AxialPlane
         /// <summary>
         /// 横断面
@@ -159,6 +294,56 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<ShapeVisual3D> Shapes { get; set; }
+        #endregion
+
+        #region 只读属性 - 体积渲染视口 —— VolumeViewport VolumeViewport
+        /// <summary>
+        /// 只读属性 - 体积渲染视口
+        /// </summary>
+        public VolumeViewport VolumeViewport
+        {
+            get
+            {
+                VolumeView view = (VolumeView)this.GetView();
+                return view?.VolumeViewport;
+            }
+        }
+        #endregion
+
+
+        //命令
+
+        #region 复位MPR平面命令 —— ICommand ResetMprPlanesCommand
+        /// <summary>
+        /// 复位MPR平面命令
+        /// </summary>
+        public ICommand ResetMprPlanesCommand => new RelayCommand(_ =>
+        {
+            this.AxialPlane.Transform.SetMatrix(Matrix4.Identity);
+            this.CoronalPlane.Transform.SetMatrix(Matrix4.Identity);
+            this.SagittalPlane.Transform.SetMatrix(Matrix4.Identity);
+            this.VolumeViewport.RequestNextFrameRendering();
+
+            //发布事件
+            ShapeTranslatingEvent messageAxial = new ShapeTranslatingEvent
+            {
+                Publisher = this,
+                Shape = this.AxialPlane
+            };
+            ShapeTranslatingEvent messageCoronal = new ShapeTranslatingEvent
+            {
+                Publisher = this,
+                Shape = this.SagittalPlane
+            };
+            ShapeTranslatingEvent messageSagittal = new ShapeTranslatingEvent
+            {
+                Publisher = this,
+                Shape = this.SagittalPlane
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(messageAxial);
+            this._eventAggregator.PublishOnUIThreadAsync(messageCoronal);
+            this._eventAggregator.PublishOnUIThreadAsync(messageSagittal);
+        });
         #endregion
 
         #endregion
