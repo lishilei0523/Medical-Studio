@@ -28,17 +28,22 @@ namespace MedicalSharp.Primitives.Managers
         private static readonly MeshGeometry _UnitPlane;
 
         /// <summary>
-        /// 灰度控制点集
+        /// 灰度控制点列表
         /// </summary>
         private static readonly TFControlPoint[] _GrayControlPoints;
 
         /// <summary>
-        /// 彩虹控制点集
+        /// 彩虹控制点列表
         /// </summary>
         private static readonly TFControlPoint[] _RainbowControlPoints;
 
         /// <summary>
-        /// 骨骼控制点集
+        /// 热金属控制点列表
+        /// </summary>
+        private static readonly TFControlPoint[] _HotMetalControlPoints;
+
+        /// <summary>
+        /// 骨骼控制点列表
         /// </summary>
         private static readonly TFControlPoint[] _BoneControlPoints;
 
@@ -51,6 +56,7 @@ namespace MedicalSharp.Primitives.Managers
             _UnitPlane = GetUnitPlane();
             _GrayControlPoints = GetGrayControlPoints();
             _RainbowControlPoints = GetRainbowControlPoints();
+            _HotMetalControlPoints = GetHotMetalControlPoints();
             _BoneControlPoints = GetBoneControlPoints();
         }
 
@@ -84,7 +90,7 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         public static IReadOnlyList<TFControlPoint> GrayControlPoints
         {
-            get => _GrayControlPoints.AsReadOnly();
+            get => _GrayControlPoints;
         }
         #endregion 
 
@@ -94,7 +100,17 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         public static IReadOnlyList<TFControlPoint> RainbowControlPoints
         {
-            get => _RainbowControlPoints.AsReadOnly();
+            get => _RainbowControlPoints;
+        }
+        #endregion 
+
+        #region 只读属性 - 热金属控制点列表 —— static IReadOnlyList<TFControlPoint> HotMetalControlPoints
+        /// <summary>
+        /// 只读属性 - 热金属控制点列表
+        /// </summary>
+        public static IReadOnlyList<TFControlPoint> HotMetalControlPoints
+        {
+            get => _HotMetalControlPoints;
         }
         #endregion 
 
@@ -104,7 +120,7 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         public static IReadOnlyList<TFControlPoint> BoneControlPoints
         {
-            get => _BoneControlPoints.AsReadOnly();
+            get => _BoneControlPoints;
         }
         #endregion 
 
@@ -220,11 +236,37 @@ namespace MedicalSharp.Primitives.Managers
         {
             TFControlPoint[] controlPoints =
             [
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.5f, 0.0f)),
-                new TFControlPoint(0, new Vector4(0.0f, 0.5f, 1.0f, 0.3f)),
-                new TFControlPoint(512, new Vector4(0.0f, 1.0f, 0.5f, 0.6f)),
-                new TFControlPoint(1536, new Vector4(1.0f, 1.0f, 0.0f, 0.8f)),
-                new TFControlPoint(3071, new Vector4(1.0f, 0.0f, 0.0f, 1.0f))
+                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.5f, 1.0f)),  //深蓝 - 空气
+                new TFControlPoint(-800, new Vector4(0.0f, 0.0f, 1.0f, 1.0f)),   //蓝 - 肺
+                new TFControlPoint(-400, new Vector4(0.0f, 0.8f, 0.8f, 1.0f)),   //青 - 肺纹理
+                new TFControlPoint(0, new Vector4(0.0f, 1.0f, 0.0f, 1.0f)),      //绿 - 水/软组织
+                new TFControlPoint(100, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),    //黄 - 肌肉
+                new TFControlPoint(400, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 松质骨
+                new TFControlPoint(1000, new Vector4(1.0f, 0.0f, 0.0f, 1.0f)),   //红 - 密质骨
+                new TFControlPoint(3071, new Vector4(0.8f, 0.0f, 0.0f, 1.0f))    //深红 - 致密骨/金属
+            ];
+
+            return controlPoints;
+        }
+        #endregion
+
+        #region 获取热金属控制点列表 —— static TFControlPoint[] GetHotMetalControlPoints()
+        /// <summary>
+        /// 获取热金属控制点列表
+        /// </summary>
+        /// <returns>控制点列表</returns>
+        private static TFControlPoint[] GetHotMetalControlPoints()
+        {
+            TFControlPoint[] controlPoints =
+            [
+                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 1.0f)),  //黑 - 空气
+                new TFControlPoint(-400, new Vector4(0.3f, 0.0f, 0.0f, 1.0f)),   //暗红 - 肺
+                new TFControlPoint(0, new Vector4(0.8f, 0.2f, 0.0f, 1.0f)),      //红 - 软组织
+                new TFControlPoint(200, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 肌肉
+                new TFControlPoint(500, new Vector4(1.0f, 0.8f, 0.0f, 1.0f)),    //橙黄 - 松质骨
+                new TFControlPoint(1000, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),   //黄 - 密质骨
+                new TFControlPoint(2000, new Vector4(1.0f, 1.0f, 0.5f, 1.0f)),   //浅黄 - 致密骨
+                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))    //白 - 金属
             ];
 
             return controlPoints;

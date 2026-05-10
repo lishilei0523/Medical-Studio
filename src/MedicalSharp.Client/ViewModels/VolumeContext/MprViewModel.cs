@@ -13,6 +13,7 @@ using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
+using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using MedicalSharp.Primitives.Models.Arguments;
@@ -61,9 +62,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
+            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ResourceManager.RainbowControlPoints);
+            this.Shapes = [];
+            this.GrayModeChecked = true;
             this.Crosshair = new CrosshairVisual3D();
             this.CrosshairVisible = true;
-            this.Shapes = [];
             this.Translate3D();
         }
 
@@ -72,6 +75,38 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #region # 属性
 
         //属性
+
+        #region 灰度渲染模式选中 —— bool GrayModeChecked
+        /// <summary>
+        /// 灰度渲染模式选中
+        /// </summary>
+        public bool GrayModeChecked
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.RenderMode = MPRRenderMode.Gray;
+            }
+        }
+        #endregion
+
+        #region 伪彩渲染模式选中 —— bool PseudoColorChecked
+        /// <summary>
+        /// 伪彩渲染模式选中
+        /// </summary>
+        public bool PseudoColorChecked
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.RenderMode = MPRRenderMode.PseudoColor;
+            }
+        }
+        #endregion
 
         #region 十字线是否可见 —— bool CrosshairVisible
         /// <summary>
@@ -158,6 +193,22 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public VolumeData VolumeData { get; set; }
+        #endregion
+
+        #region 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        /// <summary>
+        /// 传递函数控制点列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
+        #endregion
+
+        #region MPR渲染模式 —— MPRRenderMode RenderMode
+        /// <summary>
+        /// MPR渲染模式
+        /// </summary>
+        [DependencyProperty]
+        public MPRRenderMode RenderMode { get; set; }
         #endregion
 
         #region 十字线 —— CrosshairVisual3D Crosshair

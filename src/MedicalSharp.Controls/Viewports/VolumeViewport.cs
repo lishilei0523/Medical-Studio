@@ -63,7 +63,7 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<float> OpacityThresholdProperty;
 
         /// <summary>
-        /// 传递函数控制列表依赖属性
+        /// 传递函数控制点列表依赖属性
         /// </summary>
         public static readonly StyledProperty<AvaloniaList<TFControlPoint>> TFControlPointsProperty;
 
@@ -218,9 +218,9 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 传递函数控制列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        #region 依赖属性 - 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
         /// <summary>
-        /// 依赖属性 - 传递函数控制列表
+        /// 依赖属性 - 传递函数控制点列表
         /// </summary>
         public AvaloniaList<TFControlPoint> TFControlPoints
         {

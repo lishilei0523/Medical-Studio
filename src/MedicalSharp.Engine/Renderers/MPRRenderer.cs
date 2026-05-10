@@ -317,6 +317,8 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
             program.SetUniformFloat("u_Brightness", this.Brightness);
             program.SetUniformFloat("u_Contrast", this.Contrast);
+            program.SetUniformFloat("u_HUMin", this.TransferFunction.HUMin);
+            program.SetUniformFloat("u_HUMax", this.TransferFunction.HUMax);
 
             //设置标记策略
             program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);

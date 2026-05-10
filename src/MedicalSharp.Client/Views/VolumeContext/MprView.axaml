@@ -71,8 +71,16 @@
 						<DropDownButton.Flyout>
 							<MenuFlyout>
 								<MenuItem Header="渲染模式">
-									<MenuItem Header="灰度" ToggleType="Radio" />
-									<MenuItem Header="伪彩" ToggleType="Radio" />
+                                    <MenuItem >
+                                        <MenuItem.Header>
+                                            <RadioButton Content="灰度" GroupName="RenderMode" IsChecked="{Binding GrayModeChecked}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                    <MenuItem >
+                                        <MenuItem.Header>
+                                            <RadioButton Content="伪彩" GroupName="RenderMode" IsChecked="{Binding PseudoColorChecked}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
 								</MenuItem>
 								<MenuItem Header="十字线" >
                                     <MenuItem >
@@ -95,7 +103,9 @@
                         Plane="{Binding Plane}"
                         Camera="{Binding Camera}"
                         InputManager="{Binding InputManager}"
-                        VolumeData="{Binding VolumeData}">
+                        VolumeData="{Binding VolumeData}"
+                        TFControlPoints="{Binding TFControlPoints}"
+                        RenderMode="{Binding RenderMode}">
 			<sd:ShapePresenter Content="{Binding Crosshair}" />
 			<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
 		</sd:MPRViewport>

@@ -101,7 +101,7 @@
 										<MenuItem.Header>
 											<RadioButton Content="AIP" GroupName="RenderMode" IsChecked="{Binding AIPChecked}" />
 										</MenuItem.Header>
-								</MenuItem>
+									</MenuItem>
 									<MenuItem >
 										<MenuItem.Header>
 											<RadioButton Content="MIP" GroupName="RenderMode" IsChecked="{Binding MIPChecked}" />
@@ -114,21 +114,21 @@
 									</MenuItem>
 								</MenuItem>
 								<MenuItem Header="MPR平面">
-                                    <MenuItem >
-                                        <MenuItem.Header>
-                                            <CheckBox Content="横断面" IsChecked="{Binding AxialPlaneVisible}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                    <MenuItem >
-                                        <MenuItem.Header>
-                                            <CheckBox Content="冠状面" IsChecked="{Binding CoronalPlaneVisible}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                    <MenuItem >
-                                        <MenuItem.Header>
-                                            <CheckBox Content="矢状面" IsChecked="{Binding SagittalPlaneVisible}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
+									<MenuItem >
+										<MenuItem.Header>
+											<CheckBox Content="横断面" IsChecked="{Binding AxialPlaneVisible}" />
+										</MenuItem.Header>
+									</MenuItem>
+									<MenuItem >
+										<MenuItem.Header>
+											<CheckBox Content="冠状面" IsChecked="{Binding CoronalPlaneVisible}" />
+										</MenuItem.Header>
+									</MenuItem>
+									<MenuItem >
+										<MenuItem.Header>
+											<CheckBox Content="矢状面" IsChecked="{Binding SagittalPlaneVisible}" />
+										</MenuItem.Header>
+									</MenuItem>
 									<MenuItem Header="复位" Command="{Binding ResetMprPlanesCommand}" />
 								</MenuItem>
 								<MenuItem Header="调节协议" />
@@ -140,7 +140,7 @@
 		</sd:GroupBox.Header>
 		<!--Content-->
 		<sd:VolumeViewport x:Name="VolumeViewport"
-                           FrameToken="{Binding FrameToken}"
+						   FrameToken="{Binding FrameToken}"
 						   Camera="{Binding Camera}"
 						   InputManager="{Binding InputManager}"
 						   VolumeData="{Binding VolumeData}"

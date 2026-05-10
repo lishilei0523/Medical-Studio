@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Collections;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Interfaces;
@@ -8,11 +9,13 @@ using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace MedicalSharp.Controls.Viewports
 {
@@ -22,6 +25,11 @@ namespace MedicalSharp.Controls.Viewports
     public class MPRViewport : BasicViewport, IPickVoxel
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 渲染模式依赖属性
+        /// </summary>
+        public static readonly StyledProperty<MPRRenderMode> RenderModeProperty;
 
         /// <summary>
         /// 平面依赖属性
@@ -49,6 +57,11 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<float> ContrastProperty;
 
         /// <summary>
+        /// 传递函数控制点列表依赖属性
+        /// </summary>
+        public static readonly StyledProperty<AvaloniaList<TFControlPoint>> TFControlPointsProperty;
+
+        /// <summary>
         /// 体积数据依赖属性
         /// </summary>
         public static readonly StyledProperty<VolumeData> VolumeDataProperty;
@@ -58,19 +71,23 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         static MPRViewport()
         {
+            RenderModeProperty = AvaloniaProperty.Register<MPRViewport, MPRRenderMode>(nameof(RenderMode));
             PlaneProperty = AvaloniaProperty.Register<MPRViewport, MPRPlane>(nameof(Plane));
             WindowWidthProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(WindowWidth), 400.0f);
             WindowCenterProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(WindowCenter), 40.0f);
             BrightnessProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Brightness), 1.0f);
             ContrastProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Contrast), 1.0f);
+            TFControlPointsProperty = AvaloniaProperty.Register<MPRViewport, AvaloniaList<TFControlPoint>>(nameof(TFControlPoints));
             VolumeDataProperty = AvaloniaProperty.Register<MPRViewport, VolumeData>(nameof(VolumeData));
 
             //属性改变事件
+            RenderModeProperty.Changed.AddClassHandler<MPRViewport, MPRRenderMode>(OnRenderModeChanged);
             PlaneProperty.Changed.AddClassHandler<MPRViewport, MPRPlane>(OnPlaneChanged);
             WindowWidthProperty.Changed.AddClassHandler<MPRViewport, float>(OnWindowWidthChanged);
             WindowCenterProperty.Changed.AddClassHandler<MPRViewport, float>(OnWindowCenterChanged);
             BrightnessProperty.Changed.AddClassHandler<MPRViewport, float>(OnBrightnessChanged);
             ContrastProperty.Changed.AddClassHandler<MPRViewport, float>(OnContrastChanged);
+            TFControlPointsProperty.Changed.AddClassHandler<MPRViewport, AvaloniaList<TFControlPoint>>(OnTFControlPointsChanged);
             VolumeDataProperty.Changed.AddClassHandler<MPRViewport, VolumeData>(OnVolumeDataChanged);
         }
 
@@ -95,6 +112,17 @@ namespace MedicalSharp.Controls.Viewports
         #endregion
 
         #region # 属性
+
+        #region 依赖属性 - 渲染模式 —— MPRRenderMode RenderMode
+        /// <summary>
+        /// 依赖属性 - 渲染模式
+        /// </summary>
+        public MPRRenderMode RenderMode
+        {
+            get => this.GetValue(RenderModeProperty);
+            set => this.SetValue(RenderModeProperty, value);
+        }
+        #endregion
 
         #region 依赖属性 - 平面 —— MPRPlane Plane
         /// <summary>
@@ -148,6 +176,17 @@ namespace MedicalSharp.Controls.Viewports
         {
             get => this.GetValue(ContrastProperty);
             set => this.SetValue(ContrastProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        /// <summary>
+        /// 依赖属性 - 传递函数控制点列表
+        /// </summary>
+        public AvaloniaList<TFControlPoint> TFControlPoints
+        {
+            get => this.GetValue(TFControlPointsProperty);
+            set => this.SetValue(TFControlPointsProperty, value);
         }
         #endregion
 
@@ -405,6 +444,19 @@ namespace MedicalSharp.Controls.Viewports
 
         //Events
 
+        #region 渲染模式改变事件 —— static void OnRenderModeChanged(MPRViewport viewport...
+        /// <summary>
+        /// 渲染模式改变事件
+        /// </summary>
+        private static void OnRenderModeChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<MPRRenderMode> eventArgs)
+        {
+            viewport._mprRenderer?.SwitchRenderMode(eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
         #region 平面改变事件 —— static void OnPlaneChanged(MPRViewport viewport...
         /// <summary>
         /// 平面改变事件
@@ -412,6 +464,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnPlaneChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<MPRPlane> eventArgs)
         {
             viewport._mprRenderer?.BindPlane(eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -422,6 +477,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnWindowWidthChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._mprRenderer?.SetWindowLevel(eventArgs.NewValue.Value, viewport.WindowCenter);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -432,6 +490,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnWindowCenterChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._mprRenderer?.SetWindowLevel(viewport.WindowWidth, eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -442,6 +503,9 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnBrightnessChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._mprRenderer?.SetMaterialOptions(eventArgs.NewValue.Value, viewport.Contrast);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
         }
         #endregion
 
@@ -452,6 +516,78 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnContrastChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._mprRenderer?.SetMaterialOptions(viewport.Brightness, eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 传递函数控制点列表改变事件 —— static void OnTFControlPointsChanged(MPRViewport viewport...
+        /// <summary>
+        /// 传递函数控制点列表改变事件
+        /// </summary>
+        private static void OnTFControlPointsChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<AvaloniaList<TFControlPoint>> eventArgs)
+        {
+            if (eventArgs.OldValue.Value != null)
+            {
+                //清除旧元素
+                foreach (TFControlPoint controlPoint in eventArgs.OldValue.Value)
+                {
+                    viewport._mprRenderer?.TransferFunction.RemoveControlPoint(controlPoint);
+                }
+                eventArgs.OldValue.Value.CollectionChanged -= viewport.OnTFControlPointsItemChanged;
+            }
+            if (eventArgs.NewValue.Value != null)
+            {
+                //添加新元素
+                foreach (TFControlPoint controlPoint in eventArgs.NewValue.Value)
+                {
+                    viewport._mprRenderer?.TransferFunction.AddControlPoint(controlPoint);
+                }
+
+                eventArgs.NewValue.Value.CollectionChanged += viewport.OnTFControlPointsItemChanged;
+            }
+            if (eventArgs.NewValue.Value == null)
+            {
+                //清空旧元素
+                viewport._mprRenderer?.TransferFunction.ClearControlPoints();
+            }
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 传递函数控制点列表元素改变事件 —— void OnTFControlPointsItemChanged(object sender...
+        /// <summary>
+        /// 传递函数控制点列表元素改变事件
+        /// </summary>
+        private void OnTFControlPointsItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+        {
+            if (eventArgs.OldItems != null)
+            {
+                //清除旧元素
+                foreach (TFControlPoint controlPoint in eventArgs.OldItems)
+                {
+                    this._mprRenderer?.TransferFunction.RemoveControlPoint(controlPoint);
+                }
+            }
+            if (eventArgs.NewItems != null)
+            {
+                //添加新元素
+                foreach (TFControlPoint controlPoint in eventArgs.NewItems)
+                {
+                    this._mprRenderer?.TransferFunction.AddControlPoint(controlPoint);
+                }
+            }
+            if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
+            {
+                //清空元素
+                this._mprRenderer?.TransferFunction.ClearControlPoints();
+            }
+
+            //请求下一帧
+            this.RequestNextFrameRendering();
         }
         #endregion
 
@@ -496,9 +632,9 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             //初始化传递函数、标记策略
-            viewport._mprRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
+            viewport._mprRenderer.SetTransferFunction(volumeSession.MPRTransferFunction);
             viewport._mprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
-            //viewport._mprRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints); TODO 伪彩
+            viewport._mprRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();

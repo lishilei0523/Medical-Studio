@@ -16,6 +16,8 @@ uniform float u_WindowWidth;
 uniform float u_WindowCenter;
 uniform float u_Brightness;             //亮度
 uniform float u_Contrast;               //对比度
+uniform float u_HUMin;
+uniform float u_HUMax;
 
 //渲染模式：0=Gray, 1=PseudoColor
 uniform int u_RenderMode;
@@ -90,16 +92,39 @@ void main()
     //应用重缩放
     float medicalValue = rawValue * u_RescaleSlope + u_RescaleIntercept;
 
-    //应用窗宽窗位
-    float grayValue = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
-    
-    //应用亮度和对比度
-    grayValue = (grayValue - 0.5) * u_Contrast + 0.5;
-    grayValue *= u_Brightness;
-    grayValue = clamp(grayValue, 0.0, 1.0);
-    
     //基础颜色
-    vec3 color = vec3(grayValue);
+    vec3 color;
+
+    //Gray - 灰度模式
+    if (u_RenderMode == 0) 
+    {
+        //应用窗宽窗位
+        float grayValue = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
+        
+        //应用亮度和对比度
+        grayValue = (grayValue - 0.5) * u_Contrast + 0.5;
+        grayValue *= u_Brightness;
+        grayValue = clamp(grayValue, 0.0, 1.0);
+        
+        color = vec3(grayValue);
+    }
+    //PseudoColor - 伪彩模式
+    else
+    {
+        //将HU值映射到传递函数的归一化位置
+        float normalizedPosition = (medicalValue - u_HUMin) / (u_HUMax - u_HUMin);
+        normalizedPosition = clamp(normalizedPosition, 0.0, 1.0);
+        
+        //采样传递函数获取伪彩色
+        vec4 pseudoColor = texture(u_TransferFunction, normalizedPosition);
+        
+        //应用亮度和对比度
+        pseudoColor.rgb = (pseudoColor.rgb - 0.5) * u_Contrast + 0.5;
+        pseudoColor.rgb *= u_Brightness;
+        pseudoColor.rgb = clamp(pseudoColor.rgb, 0.0, 1.0);
+        
+        color = pseudoColor.rgb;
+    }
 
     //染色模式下，标记区域混合染色颜色
     if (markMode == 2 && markValue != 0u)
