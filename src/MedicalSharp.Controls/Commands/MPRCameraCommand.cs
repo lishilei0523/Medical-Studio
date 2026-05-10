@@ -83,35 +83,6 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion
 
-        #region 键盘按下事件 —— override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
-        /// <summary>
-        /// 键盘按下事件
-        /// </summary>
-        public override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
-        {
-            if (eventArgs.Key == Key.Up)
-            {
-                this._camera.TargetPlane.Rotate(-3, 0);
-                viewport.RequestNextFrameRendering();
-            }
-            if (eventArgs.Key == Key.Down)
-            {
-                this._camera.TargetPlane.Rotate(3, 0);
-                viewport.RequestNextFrameRendering();
-            }
-            if (eventArgs.Key == Key.Left)
-            {
-                this._camera.TargetPlane.Rotate(0, 3);
-                viewport.RequestNextFrameRendering();
-            }
-            if (eventArgs.Key == Key.Right)
-            {
-                this._camera.TargetPlane.Rotate(0, -3);
-                viewport.RequestNextFrameRendering();
-            }
-        }
-        #endregion
-
         #endregion
     }
 }
