@@ -43,6 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MedicalSharp.Presentation\MedicalSharp.Presentation.csproj" />
     <ProjectReference Include="..\MedicalSharp.Controls\MedicalSharp.Controls.csproj" />
     <ProjectReference Include="..\MedicalSharp.Engine\MedicalSharp.Engine.csproj" />
     <ProjectReference Include="..\MedicalSharp.Insight\MedicalSharp.Insight.csproj" />

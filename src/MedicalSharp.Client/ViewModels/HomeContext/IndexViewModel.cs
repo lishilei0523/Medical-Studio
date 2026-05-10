@@ -2,6 +2,8 @@
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Engine.Managers;
+using MedicalSharp.Presentation.Maps;
+using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
@@ -47,7 +49,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
         #region # 属性
 
-        //通知属性
+        //属性
 
         #region 体积数据 —— VolumeData VolumeData
         /// <summary>
@@ -60,8 +62,29 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 field = value;
                 this.LayoutViewModel.SetVolumeData(value);
+                if (value != null)
+                {
+                    this.VolumeInfo = value.Metadata.ToVolumeInfo();
+                    this.PatientInfo = value.PatientData.ToPatientInfo();
+                }
             }
         }
+        #endregion
+
+        #region 体积信息 —— VolumeInfo VolumeInfo
+        /// <summary>
+        /// 体积信息
+        /// </summary>
+        [DependencyProperty]
+        public VolumeInfo VolumeInfo { get; set; }
+        #endregion
+
+        #region 患者信息 —— PatientInfo PatientInfo
+        /// <summary>
+        /// 患者信息
+        /// </summary>
+        [DependencyProperty]
+        public PatientInfo PatientInfo { get; set; }
         #endregion
 
         #region 布局视图模型 —— LayoutViewModel LayoutViewModel

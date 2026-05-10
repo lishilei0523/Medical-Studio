@@ -1,12 +1,12 @@
 ﻿using MedicalSharp.Controls.Visuals;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 
-namespace MedicalSharp.Client.Events
+namespace MedicalSharp.Presentation.Events
 {
     /// <summary>
-    /// 形状同步事件
+    /// 形状已删除事件
     /// </summary>
-    public class ShapeSyncEvent : CaliburnEvent
+    public class ShapeRemovedEvent : CaliburnEvent
     {
         /// <summary>
         /// 形状

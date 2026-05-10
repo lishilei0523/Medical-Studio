@@ -1,9 +1,9 @@
 ﻿namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
-    /// 患者信息
+    /// 体积患者数据
     /// </summary>
-    public class PatientInfo
+    public class VolumePatientData
     {
         #region 患者ID —— string PatientId
         /// <summary>

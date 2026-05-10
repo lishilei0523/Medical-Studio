@@ -2,7 +2,6 @@
 using Avalonia.Collections;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
-using MedicalSharp.Client.Events;
 using MedicalSharp.Client.Views.VolumeContext;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Commands.Arguments;
@@ -10,6 +9,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Presentation.Events;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;

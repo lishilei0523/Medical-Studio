@@ -186,10 +186,10 @@ namespace MedicalSharp.Insight
                 return null;
             };
 
-            //拿第一张切片单独读元数据
+            //取第一张切片单独读元数据
             using Image slice = SimpleITK.ReadImage(dicomPaths[0]);
 
-            //解析扩展元数据
+            //提取扩展元数据
             volumeData.Metadata.SeriesInstanceUId = getTagValue(slice, DicomTags.SeriesInstanceUID);
             string rescaleSlope = getTagValue(slice, DicomTags.RescaleSlope);
             string rescaleIntercept = getTagValue(slice, DicomTags.RescaleIntercept);
@@ -212,14 +212,23 @@ namespace MedicalSharp.Insight
                 volumeData.Metadata.WindowCenter = float.Parse(windowCenter);
             }
 
-            //解析患者信息
-            volumeData.PatientInfo.PatientId = getTagValue(slice, DicomTags.PatientID);
-            volumeData.PatientInfo.Name = getTagValue(slice, DicomTags.PatientName);
-            volumeData.PatientInfo.BirthDate = getTagValue(slice, DicomTags.PatientBirthDate);
-            volumeData.PatientInfo.Sex = getTagValue(slice, DicomTags.PatientSex);
-            volumeData.PatientInfo.Age = getTagValue(slice, DicomTags.PatientAge);
-            volumeData.PatientInfo.Height = getTagValue(slice, DicomTags.PatientSize);
-            volumeData.PatientInfo.Weight = getTagValue(slice, DicomTags.PatientWeight);
+            //提取患者信息
+            volumeData.PatientData.PatientId = getTagValue(slice, DicomTags.PatientID);
+            volumeData.PatientData.Name = getTagValue(slice, DicomTags.PatientName);
+            volumeData.PatientData.BirthDate = getTagValue(slice, DicomTags.PatientBirthDate);
+            volumeData.PatientData.Sex = getTagValue(slice, DicomTags.PatientSex);
+            volumeData.PatientData.Age = getTagValue(slice, DicomTags.PatientAge);
+            volumeData.PatientData.Height = getTagValue(slice, DicomTags.PatientSize);
+            volumeData.PatientData.Weight = getTagValue(slice, DicomTags.PatientWeight);
+
+            //提取检查数据
+            volumeData.StudyData.StudyInstanceUId = getTagValue(slice, DicomTags.StudyInstanceUID);
+            volumeData.StudyData.StudyDate = getTagValue(slice, DicomTags.StudyDate);
+            volumeData.StudyData.StudyTime = getTagValue(slice, DicomTags.StudyTime);
+            volumeData.StudyData.StudyDescription = getTagValue(slice, DicomTags.StudyDescription);
+            volumeData.StudyData.StudyId = getTagValue(slice, DicomTags.StudyID);
+            volumeData.StudyData.AccessionNumber = getTagValue(slice, DicomTags.AccessionNumber);
+            volumeData.StudyData.ReferringPhysician = getTagValue(slice, DicomTags.ReferringPhysicianName);
         }
         #endregion
     }

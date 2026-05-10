@@ -73,6 +73,16 @@ namespace MedicalSharp.Primitives.Constants
         /// </summary>
         public const string StudyID = "0020|0010";
 
+        /// <summary>
+        /// 登记号 (SH)
+        /// </summary>
+        public const string AccessionNumber = "0008|0050";
+
+        /// <summary>
+        /// 转诊医生姓名 (PN)
+        /// </summary>
+        public const string ReferringPhysicianName = "0008|0090";
+
         #endregion
 
         #region # 序列模块 (Series Module)

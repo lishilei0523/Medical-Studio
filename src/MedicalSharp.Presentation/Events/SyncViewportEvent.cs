@@ -1,6 +1,6 @@
 ﻿using SD.Infrastructure.Avalonia.Caliburn.Base;
 
-namespace MedicalSharp.Client.Events
+namespace MedicalSharp.Presentation.Events
 {
     /// <summary>
     /// 同步视口事件

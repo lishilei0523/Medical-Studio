@@ -3,7 +3,7 @@ using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 
-namespace MedicalSharp.Client.Events
+namespace MedicalSharp.Presentation.Events
 {
     /// <summary>
     /// MPR平面变化事件

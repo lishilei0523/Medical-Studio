@@ -7,10 +7,17 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
   </Folder>
-  <Project Path="src/MedicalSharp.Client/MedicalSharp.Client.csproj" />
-  <Project Path="src/MedicalSharp.Controls/MedicalSharp.Controls.csproj" />
-  <Project Path="src/MedicalSharp.Engine/MedicalSharp.Engine.csproj" />
-  <Project Path="src/MedicalSharp.Insight/MedicalSharp.Insight.csproj" />
-  <Project Path="src/MedicalSharp.Primitives/MedicalSharp.Primitives.csproj" />
-  <Project Path="src/MedicalSharp.Tests/MedicalSharp.Tests.csproj" />
+  <Folder Name="/01 - Clients/">
+    <Project Path="src/MedicalSharp.Client/MedicalSharp.Client.csproj" />
+    <Project Path="src/MedicalSharp.Presentation/MedicalSharp.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/02 - Engines/">
+    <Project Path="src/MedicalSharp.Controls/MedicalSharp.Controls.csproj" />
+    <Project Path="src/MedicalSharp.Engine/MedicalSharp.Engine.csproj" />
+    <Project Path="src/MedicalSharp.Insight/MedicalSharp.Insight.csproj" />
+    <Project Path="src/MedicalSharp.Primitives/MedicalSharp.Primitives.csproj" />
+  </Folder>
+  <Folder Name="/03 - Tests/">
+    <Project Path="src/MedicalSharp.Tests/MedicalSharp.Tests.csproj" />
+  </Folder>
 </Solution>

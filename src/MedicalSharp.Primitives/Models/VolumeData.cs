@@ -29,7 +29,8 @@ namespace MedicalSharp.Primitives.Models
             //默认值
             this._syncStatus = (int)MarkSyncStatus.Idle;
             this.Metadata = new VolumeMetadata();
-            this.PatientInfo = new PatientInfo();
+            this.PatientData = new VolumePatientData();
+            this.StudyData = new VolumeStudyData();
         }
 
         #endregion
@@ -43,11 +44,18 @@ namespace MedicalSharp.Primitives.Models
         public VolumeMetadata Metadata { get; private set; }
         #endregion
 
-        #region 患者信息 —— PatientInfo PatientInfo
+        #region 患者数据 —— VolumePatientData PatientData
         /// <summary>
-        /// 患者信息
+        /// 患者数据
         /// </summary>
-        public PatientInfo PatientInfo { get; private set; }
+        public VolumePatientData PatientData { get; private set; }
+        #endregion
+
+        #region 检查数据 —— VolumeStudyData StudyData
+        /// <summary>
+        /// 检查数据
+        /// </summary>
+        public VolumeStudyData StudyData { get; private set; }
         #endregion
 
         #region 原始数据 —— abstract IntPtr OriginalData
