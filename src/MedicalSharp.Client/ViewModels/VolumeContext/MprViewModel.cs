@@ -690,7 +690,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             //十字线平移
             if (message.Shape is CrosshairVisual3D crosshair)
             {
-                this.Crosshair.Transform.SetPosition(crosshair.Transform.Position);
+                this.Crosshair.Transform?.SetPosition(crosshair.Transform.Position);
                 this.Plane.Relocate(crosshair.Transform.Position);
                 this.FrameToken++;
             }
@@ -787,7 +787,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             if (message.TriggerSource is MPRPlaneChangeSource.SliceScroll or MPRPlaneChangeSource.ExternalSync)
             {
-                this.Crosshair.Transform.SetPosition(message.Crosshair.Transform.Position);
+                this.Crosshair.Transform?.SetPosition(message.Crosshair.Transform.Position);
                 this.FrameToken++;
             }
 

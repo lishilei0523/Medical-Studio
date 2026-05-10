@@ -870,7 +870,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             #region # 验证
 
-            if (targetPlane == null)
+            if (targetPlane == null || targetPlane.Transform == null)
             {
                 return Task.CompletedTask;
             }
