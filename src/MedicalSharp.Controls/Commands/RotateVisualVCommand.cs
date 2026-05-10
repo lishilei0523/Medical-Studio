@@ -12,9 +12,9 @@ using System;
 namespace MedicalSharp.Controls.Commands
 {
     /// <summary>
-    /// 旋转3D元素命令
+    /// 旋转V轴元素命令
     /// </summary>
-    public class RotateVisual3DCommand : ViewportCommand
+    public class RotateVisualVCommand : ViewportCommand
     {
         #region # 字段及构造器
 
@@ -29,10 +29,10 @@ namespace MedicalSharp.Controls.Commands
         private readonly Action<IRotatable> _rotateEndEvent;
 
         /// <summary>
-        /// 创建旋转3D元素命令构造器
+        /// 创建旋转V轴元素命令构造器
         /// </summary>
         /// <param name="rotateEnd">旋转结束回调</param>
-        public RotateVisual3DCommand(Action<IRotatable> rotateEnd)
+        public RotateVisualVCommand(Action<IRotatable> rotateEnd)
         {
             this._rotateEndEvent = rotateEnd;
             this._selectedVisual = null;
@@ -88,7 +88,7 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
             base.OnMouseMove(viewport, eventArgs);
-            if (eventArgs.Properties.IsLeftButtonPressed && this._selectedVisual != null)
+            if (eventArgs.Properties.IsLeftButtonPressed && this._selectedVisual is IVisual2DIn3D visual2DIn3D)
             {
                 //计算模型位置
                 Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
@@ -104,27 +104,16 @@ namespace MedicalSharp.Controls.Commands
                 if (success)
                 {
                     float deltaX = mousePos2D.X - this._mousePos2D!.Value.X;
-                    float deltaY = mousePos2D.Y - this._mousePos2D!.Value.Y;
 
                     //设置光标
-                    if (deltaX != 0 && deltaY == 0)
+                    if (deltaX != 0)
                     {
                         viewport.Cursor = new Cursor(StandardCursorType.SizeWestEast);
                     }
-                    if (deltaX == 0 && deltaY != 0)
-                    {
-                        viewport.Cursor = new Cursor(StandardCursorType.SizeNorthSouth);
-                    }
-                    if (deltaX != 0 && deltaY != 0)
-                    {
-                        viewport.Cursor = new Cursor(StandardCursorType.SizeAll);
-                    }
 
                     //旋转轴
-                    Vector3 axisY = viewport.Camera.UpDirection.Normalized();
-                    Vector3 axisX = viewport.Camera.RightDirection.Normalized();
-                    this._selectedVisual.Transform.Rotate(deltaX, axisY);
-                    this._selectedVisual.Transform.Rotate(deltaY, axisX);
+                    Vector3 axisV = visual2DIn3D.VAxis.ToVector3().Normalized();
+                    this._selectedVisual.Transform.Rotate(deltaX, axisV);
 
                     //旋转中
                     this.RotatingEvent?.Invoke(this._selectedVisual);

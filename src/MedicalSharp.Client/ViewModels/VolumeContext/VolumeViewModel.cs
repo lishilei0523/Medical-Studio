@@ -298,6 +298,80 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region U轴旋转 —— void RotateU()
+        /// <summary>
+        /// U轴旋转
+        /// </summary>
+        public void RotateU()
+        {
+            Action<IRotatable> rotating = rotatable =>
+            {
+                if (rotatable is ShapeVisual3D shape)
+                {
+                    ShapeRotatingEvent message = new ShapeRotatingEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+            Action<IRotatable> rotateEnd = rotatable =>
+            {
+                if (rotatable is ShapeVisual3D shape)
+                {
+                    ShapeSyncEvent message = new ShapeSyncEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+
+            RotateVisualUCommand command = new RotateVisualUCommand(rotateEnd);
+            command.RotatingEvent = rotating;
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
+        #region V轴旋转 —— void RotateV()
+        /// <summary>
+        /// V轴旋转
+        /// </summary>
+        public void RotateV()
+        {
+            Action<IRotatable> rotating = rotatable =>
+            {
+                if (rotatable is ShapeVisual3D shape)
+                {
+                    ShapeRotatingEvent message = new ShapeRotatingEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+            Action<IRotatable> rotateEnd = rotatable =>
+            {
+                if (rotatable is ShapeVisual3D shape)
+                {
+                    ShapeSyncEvent message = new ShapeSyncEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+
+            RotateVisualVCommand command = new RotateVisualVCommand(rotateEnd);
+            command.RotatingEvent = rotating;
+            this.InputManager.SwitchCommand(command);
+        }
+        #endregion
+
         #region 3D旋转 —— void Rotate3D()
         /// <summary>
         /// 3D旋转

@@ -31,6 +31,12 @@
 					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-Translate3D}" />
 					</sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="RotateU()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-RotateU}" />
+                    </sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="RotateV()" Classes="Transparent-Panel">
+                        <PathIcon Data="{StaticResource Icon-RotateV}" />
+                    </sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Rotate3D()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-Rotate3D}" />
 					</sd:ToggleRadioButton>
@@ -95,6 +101,7 @@
                                     <MenuItem Header="横断面" ToggleType="CheckBox" />
                                     <MenuItem Header="冠状面" ToggleType="CheckBox" />
                                     <MenuItem Header="矢状面" ToggleType="CheckBox" />
+                                    <MenuItem Header="复位" />
                                 </MenuItem>
 								<MenuItem Header="调节协议" />
 							</MenuFlyout>
