@@ -34,7 +34,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawEndEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -651,7 +651,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<PointVisual3D> drawEnd = shape =>
             {
                 this.Shapes.Add(shape);
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -673,7 +673,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<LineSegmentVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<LineSegmentVisual3D> drawEnd = shape =>
             {
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -740,7 +740,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<PolylineVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<PolylineVisual3D> drawEnd = shape =>
             {
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -763,7 +763,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<CurveVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<CurveVisual3D> drawEnd = shape =>
             {
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -786,7 +786,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<PolylineVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<PolylineVisual3D> drawEnd = shape =>
             {
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -809,7 +809,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<CurveVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<CurveVisual3D> drawEnd = shape =>
             {
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -832,7 +832,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<BoundingBoxVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<BoundingBoxVisual3D> drawEnd = shape =>
             {
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -854,7 +854,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<BoundingSphereVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<BoundingSphereVisual3D> drawEnd = shape =>
             {
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -876,7 +876,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<CylinderVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<CylinderVisual3D> drawEnd = shape =>
             {
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -898,7 +898,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Action<ConvexPolyhedronVisual3D> drawStart = shape => this.Shapes.Add(shape);
             Action<ConvexPolyhedronVisual3D> drawEnd = shape =>
             {
-                ShapeDrawEndEvent message = new ShapeDrawEndEvent
+                ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
                     Shape = shape
@@ -936,11 +936,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region 处理形状绘制结束事件 —— Task HandleAsync(ShapeDrawEndEvent message...
+        #region 处理形状绘制结束事件 —— Task HandleAsync(ShapeDrawnEvent message...
         /// <summary>
         /// 处理形状绘制结束事件
         /// </summary>
-        public Task HandleAsync(ShapeDrawEndEvent message, CancellationToken cancellationToken)
+        public Task HandleAsync(ShapeDrawnEvent message, CancellationToken cancellationToken)
         {
             #region # 验证
 

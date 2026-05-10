@@ -6,7 +6,7 @@ namespace MedicalSharp.Client.Events
     /// <summary>
     /// 形状绘制完成事件
     /// </summary>
-    public class ShapeDrawEndEvent : CaliburnEvent
+    public class ShapeDrawnEvent : CaliburnEvent
     {
         /// <summary>
         /// 形状
