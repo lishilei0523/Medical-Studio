@@ -19,13 +19,13 @@
 				</Grid.ColumnDefinitions>
 				<!--Toolbar-->
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<sd:ToggleRadioButton cm:Message.Attach="PickVoxel()" Classes="Transparent-Panel" IsChecked="True">
+					<sd:ToggleRadioButton cm:Message.Attach="PickVoxel()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-PickVoxel}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel">
 						<PathIcon Data="{StaticResource Icon-PickShape}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="TranslateNormal()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="TranslateNormal()" Classes="Transparent-Panel" IsChecked="True">
 						<PathIcon Data="{StaticResource Icon-TranslateNormal}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel">
@@ -85,9 +85,18 @@
 					<DropDownButton Content="VR" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
 							<MenuFlyout>
-								<MenuItem Header="Option 1" />
-								<MenuItem Header="Option 2" />
-								<MenuItem Header="Option 3" />
+								<MenuItem Header="渲染模式">
+									<MenuItem Header="Raycast" ToggleType="Radio" />
+									<MenuItem Header="AIP" ToggleType="Radio" />
+									<MenuItem Header="MIP" ToggleType="Radio" />
+									<MenuItem Header="MinIP" ToggleType="Radio" />
+                                </MenuItem>
+                                <MenuItem Header="MPR平面">
+                                    <MenuItem Header="横断面" ToggleType="CheckBox" />
+                                    <MenuItem Header="冠状面" ToggleType="CheckBox" />
+                                    <MenuItem Header="矢状面" ToggleType="CheckBox" />
+                                </MenuItem>
+								<MenuItem Header="调节协议" />
 							</MenuFlyout>
 						</DropDownButton.Flyout>
 					</DropDownButton>

@@ -63,7 +63,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             //初始化输入管理器
             this.InputManager = new OrbitInputManager(this.Camera);
-            this.PickVoxel();
+            this.TranslateNormal();
 
             //初始化MPR平面
             this.InitMprPlanes();

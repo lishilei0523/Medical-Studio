@@ -8,6 +8,7 @@
 			  xmlns:cm="http://caliburnmicro.com"
 			  mc:Ignorable="d"
 			  Width="1440" Height="900"
+			  WindowState="Maximized"
 			  WindowStartupLocation="CenterScreen">
 
 	<sd:BusyMask IsBusy="{Binding IsBusy}">

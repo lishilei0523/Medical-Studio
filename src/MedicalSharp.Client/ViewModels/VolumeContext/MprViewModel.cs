@@ -59,7 +59,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             //默认值
             this.Crosshair = new CrosshairVisual3D();
             this.Shapes = [];
-            this.PickVoxel();
+            this.Translate3D();
         }
 
         #endregion
