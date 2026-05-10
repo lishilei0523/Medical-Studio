@@ -32,8 +32,8 @@ namespace MedicalSharp.Presentation.Maps
                 PhysicalSize = $"{metadata.PhysicalSize.X:F0}×{metadata.PhysicalSize.Y:F0}×{metadata.PhysicalSize.Z:F0}",
                 RescaleSlope = metadata.RescaleSlope.ToString("F2"),
                 RescaleIntercept = metadata.RescaleIntercept.ToString("F2"),
-                WindowWidth = metadata.WindowWidth?.ToString("F0"),
-                WindowCenter = metadata.WindowCenter?.ToString("F0")
+                WindowWidth = metadata.WindowWidth.ToString("F0"),
+                WindowCenter = metadata.WindowCenter.ToString("F0")
             };
 
             return volumeInfo;

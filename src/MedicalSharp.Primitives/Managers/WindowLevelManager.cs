@@ -10,6 +10,11 @@ namespace MedicalSharp.Primitives.Managers
         #region # 字段及构造器
 
         /// <summary>
+        /// 默认窗
+        /// </summary>
+        private static WindowLevel _Default;
+
+        /// <summary>
         /// 脑窗
         /// </summary>
         private static readonly WindowLevel _Brain;
@@ -67,6 +72,16 @@ namespace MedicalSharp.Primitives.Managers
         #endregion
 
         #region # 属性
+
+        #region 只读属性 - 默认窗 —— static WindowLevel Default
+        /// <summary>
+        /// 只读属性 - 默认窗
+        /// </summary>
+        public static WindowLevel Default
+        {
+            get => _Default;
+        }
+        #endregion
 
         #region 只读属性 - 脑窗 —— static WindowLevel Brain
         /// <summary>
@@ -145,6 +160,22 @@ namespace MedicalSharp.Primitives.Managers
         public static WindowLevel Mediastinum
         {
             get => _Mediastinum;
+        }
+        #endregion
+
+        #endregion
+
+        #region # 方法
+
+        #region 设置默认窗 —— static void SetDefault(int windowWidth, int windowCenter)
+        /// <summary>
+        /// 设置默认窗
+        /// </summary>
+        /// <param name="windowWidth">窗宽</param>
+        /// <param name="windowCenter">窗位</param>
+        public static void SetDefault(int windowWidth, int windowCenter)
+        {
+            _Default = new WindowLevel("默认窗", windowWidth, windowCenter);
         }
         #endregion
 

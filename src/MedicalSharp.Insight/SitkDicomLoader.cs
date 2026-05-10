@@ -205,11 +205,11 @@ namespace MedicalSharp.Insight
             }
             if (!string.IsNullOrWhiteSpace(windowWidth))
             {
-                volumeData.Metadata.WindowWidth = float.Parse(windowWidth);
+                volumeData.Metadata.WindowWidth = int.Parse(windowWidth);
             }
             if (!string.IsNullOrWhiteSpace(windowCenter))
             {
-                volumeData.Metadata.WindowCenter = float.Parse(windowCenter);
+                volumeData.Metadata.WindowCenter = int.Parse(windowCenter);
             }
 
             //提取患者信息

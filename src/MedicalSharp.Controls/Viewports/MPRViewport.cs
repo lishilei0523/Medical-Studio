@@ -10,6 +10,7 @@ using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -39,12 +40,12 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 窗宽依赖属性
         /// </summary>
-        public static readonly StyledProperty<float> WindowWidthProperty;
+        public static readonly StyledProperty<int> WindowWidthProperty;
 
         /// <summary>
         /// 窗位依赖属性
         /// </summary>
-        public static readonly StyledProperty<float> WindowCenterProperty;
+        public static readonly StyledProperty<int> WindowCenterProperty;
 
         /// <summary>
         /// 亮度依赖属性
@@ -73,8 +74,8 @@ namespace MedicalSharp.Controls.Viewports
         {
             RenderModeProperty = AvaloniaProperty.Register<MPRViewport, MPRRenderMode>(nameof(RenderMode));
             PlaneProperty = AvaloniaProperty.Register<MPRViewport, MPRPlane>(nameof(Plane));
-            WindowWidthProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(WindowWidth), 400.0f);
-            WindowCenterProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(WindowCenter), 40.0f);
+            WindowWidthProperty = AvaloniaProperty.Register<MPRViewport, int>(nameof(WindowWidth), 400);
+            WindowCenterProperty = AvaloniaProperty.Register<MPRViewport, int>(nameof(WindowCenter), 40);
             BrightnessProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Brightness), 1.0f);
             ContrastProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Contrast), 1.0f);
             TFControlPointsProperty = AvaloniaProperty.Register<MPRViewport, AvaloniaList<TFControlPoint>>(nameof(TFControlPoints));
@@ -83,8 +84,8 @@ namespace MedicalSharp.Controls.Viewports
             //属性改变事件
             RenderModeProperty.Changed.AddClassHandler<MPRViewport, MPRRenderMode>(OnRenderModeChanged);
             PlaneProperty.Changed.AddClassHandler<MPRViewport, MPRPlane>(OnPlaneChanged);
-            WindowWidthProperty.Changed.AddClassHandler<MPRViewport, float>(OnWindowWidthChanged);
-            WindowCenterProperty.Changed.AddClassHandler<MPRViewport, float>(OnWindowCenterChanged);
+            WindowWidthProperty.Changed.AddClassHandler<MPRViewport, int>(OnWindowWidthChanged);
+            WindowCenterProperty.Changed.AddClassHandler<MPRViewport, int>(OnWindowCenterChanged);
             BrightnessProperty.Changed.AddClassHandler<MPRViewport, float>(OnBrightnessChanged);
             ContrastProperty.Changed.AddClassHandler<MPRViewport, float>(OnContrastChanged);
             TFControlPointsProperty.Changed.AddClassHandler<MPRViewport, AvaloniaList<TFControlPoint>>(OnTFControlPointsChanged);
@@ -135,22 +136,22 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 窗宽 —— float WindowWidth
+        #region 依赖属性 - 窗宽 —— int WindowWidth
         /// <summary>
         /// 依赖属性 - 窗宽
         /// </summary>
-        public float WindowWidth
+        public int WindowWidth
         {
             get => this.GetValue(WindowWidthProperty);
             set => this.SetValue(WindowWidthProperty, value);
         }
         #endregion
 
-        #region 依赖属性 - 窗位 —— float WindowCenter
+        #region 依赖属性 - 窗位 —— int WindowCenter
         /// <summary>
         /// 依赖属性 - 窗位
         /// </summary>
-        public float WindowCenter
+        public int WindowCenter
         {
             get => this.GetValue(WindowCenterProperty);
             set => this.SetValue(WindowCenterProperty, value);
@@ -478,7 +479,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 窗宽改变事件
         /// </summary>
-        private static void OnWindowWidthChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnWindowWidthChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<int> eventArgs)
         {
             viewport._mprRenderer?.SetWindowLevel(eventArgs.NewValue.Value, viewport.WindowCenter);
 
@@ -491,7 +492,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 窗位改变事件
         /// </summary>
-        private static void OnWindowCenterChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnWindowCenterChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<int> eventArgs)
         {
             viewport._mprRenderer?.SetWindowLevel(viewport.WindowWidth, eventArgs.NewValue.Value);
 
@@ -619,6 +620,9 @@ namespace MedicalSharp.Controls.Viewports
                 viewport.GlContext.MakeCurrent();
                 volumeSession = new VolumeSession(volumeData);
                 SessionManager.AddVolumeSession(volumeSession.Id, volumeSession);
+
+                //设置默认窗
+                WindowLevelManager.SetDefault(volumeData.Metadata.WindowWidth, volumeData.Metadata.WindowCenter);
             }
             else
             {
@@ -626,14 +630,6 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             viewport._volumeRenderable = new VolumeRenderable(volumeSession.VolumeTexture, volumeSession.MarkTexture, volumeData);
-            if (volumeData.Metadata.WindowWidth.HasValue)
-            {
-                viewport.WindowWidth = volumeData.Metadata.WindowWidth.Value;
-            }
-            if (volumeData.Metadata.WindowCenter.HasValue)
-            {
-                viewport.WindowCenter = volumeData.Metadata.WindowCenter.Value;
-            }
 
             //初始化传递函数、标记策略
             viewport._mprRenderer.SetTransferFunction(volumeSession.MPRTransferFunction);
