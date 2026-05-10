@@ -163,6 +163,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this.Crosshair.UAxis = value.WorldUAxis.ToVector3();
                     this.Crosshair.VAxis = value.WorldVAxis.ToVector3();
                     this.Crosshair.Center = value.WorldCenter.ToVector3();
+                    this.Crosshair.Transform?.SetPosition(value.WorldCenter);
                 }
 
                 field = value;
@@ -191,8 +192,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// 体积数据
         /// </summary>
-        [DependencyProperty]
-        public VolumeData VolumeData { get; set; }
+        public VolumeData VolumeData
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                if (value == null)
+                {
+                    this.SelectedShape = null;
+                    this.Shapes.Clear();
+                }
+            }
+        }
         #endregion
 
         #region 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints

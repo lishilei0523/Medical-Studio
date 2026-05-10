@@ -59,11 +59,15 @@ namespace MedicalSharp.Controls.Commands
                 if (eventArgs.Properties.IsMiddleButtonPressed)
                 {
                     this._camera.Pan(deltaX / 50.0f, deltaY / 50.0f);
+
+                    //请求下一帧
                     viewport.RequestNextFrameRendering();
                 }
                 if (eventArgs.Properties.IsRightButtonPressed)
                 {
                     this._camera.Rotate(deltaX, -deltaY);
+
+                    //请求下一帧
                     viewport.RequestNextFrameRendering();
                 }
             }
@@ -78,6 +82,8 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         {
             this._camera.Zoom((float)eventArgs.Delta.Y);
+
+            //请求下一帧
             viewport.RequestNextFrameRendering();
         }
         #endregion 

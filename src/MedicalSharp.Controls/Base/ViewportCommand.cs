@@ -72,16 +72,6 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region 鼠标松开事件 —— virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
-        /// <summary>
-        /// 鼠标松开事件
-        /// </summary>
-        public virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
-        {
-            this._mousePos2D = null;
-        }
-        #endregion
-
         #region 鼠标移动事件 —— virtual void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         /// <summary>
         /// 鼠标移动事件
@@ -89,6 +79,16 @@ namespace MedicalSharp.Controls.Base
         public virtual void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
 
+        }
+        #endregion
+
+        #region 鼠标松开事件 —— virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
+        /// <summary>
+        /// 鼠标松开事件
+        /// </summary>
+        public virtual void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
+        {
+            this._mousePos2D = null;
         }
         #endregion
 

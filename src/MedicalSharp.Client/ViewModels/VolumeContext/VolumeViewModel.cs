@@ -236,6 +236,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 field = value;
                 this.NotifyOfPropertyChange();
                 this.ResetMprPlanes(value);
+                if (value == null)
+                {
+                    this.SelectedShape = null;
+                    this.Shapes.Clear();
+                }
             }
         }
         #endregion

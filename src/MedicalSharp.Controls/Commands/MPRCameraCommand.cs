@@ -59,11 +59,15 @@ namespace MedicalSharp.Controls.Commands
                 if (eventArgs.Properties.IsMiddleButtonPressed)
                 {
                     this._camera.Pan(deltaX, deltaY);
+
+                    //请求下一帧
                     viewport.RequestNextFrameRendering();
                 }
                 if (eventArgs.Properties.IsRightButtonPressed)
                 {
                     this._camera.Zoom(-deltaY);
+
+                    //请求下一帧
                     viewport.RequestNextFrameRendering();
                 }
             }
@@ -77,8 +81,19 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         {
+            #region # 验证
+
+            if (this._camera.TargetPlane == null)
+            {
+                return;
+            }
+
+            #endregion
+
             int sliceIndex = this._camera.TargetPlane.SliceIndex + (int)Math.Ceiling(eventArgs.Delta.Y);
             this._camera.TargetPlane.SetSliceIndex(sliceIndex);
+
+            //请求下一帧
             viewport.RequestNextFrameRendering();
         }
         #endregion

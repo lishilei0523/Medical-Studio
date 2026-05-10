@@ -32,7 +32,7 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<MPRRenderMode> RenderModeProperty;
 
         /// <summary>
-        /// 平面依赖属性
+        /// MPR平面依赖属性
         /// </summary>
         public static readonly StyledProperty<MPRPlane> PlaneProperty;
 
@@ -124,9 +124,9 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 平面 —— MPRPlane Plane
+        #region 依赖属性 - MPR平面 —— MPRPlane Plane
         /// <summary>
-        /// 依赖属性 - 平面
+        /// 依赖属性 - MPR平面
         /// </summary>
         public MPRPlane Plane
         {
@@ -245,6 +245,15 @@ namespace MedicalSharp.Controls.Viewports
         /// <returns>射线</returns>
         public override Ray UnProject(Vector2 screenPos2D)
         {
+            #region # 验证
+
+            if (this.Plane == null)
+            {
+                return default;
+            }
+
+            #endregion
+
             Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(screenPos2D, this.Camera.LookDirection, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, out Ray ray);
             if (planeUV.HasValue)
             {
@@ -269,20 +278,18 @@ namespace MedicalSharp.Controls.Viewports
         /// <returns>是否成功</returns>
         public bool FindNearestVoxel(Vector2 position, out Vector3 textureCoord, out Vector3 worldPosition, out Vector3i voxelPosition, out short voxelValue, out byte markValue, out Ray ray)
         {
-            this.GlContext.MakeCurrent();
-
             textureCoord = Vector3.Zero;
             worldPosition = Vector3.Zero;
             voxelPosition = Vector3i.Zero;
             voxelValue = -1;
             markValue = 0;
             ray = default;
-
             if (this.Plane == null)
             {
                 return false;
             }
 
+            this.GlContext.MakeCurrent();
             Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera.LookDirection, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, out ray);
             if (planeUV.HasValue)
             {
@@ -326,10 +333,7 @@ namespace MedicalSharp.Controls.Viewports
         protected override void OnOpenTKInit()
         {
             //InputManger默认值
-            if (this.InputManager == null)
-            {
-                this.InputManager = new MPRInputManager(this.MPRCamera);
-            }
+            this.InputManager ??= new MPRInputManager(this.MPRCamera);
 
             //初始化形状、文本渲染器
             this._shapeRenderer = new ShapeRenderer(this.MPRCamera);
@@ -457,9 +461,9 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 平面改变事件 —— static void OnPlaneChanged(MPRViewport viewport...
+        #region MPR平面改变事件 —— static void OnPlaneChanged(MPRViewport viewport...
         /// <summary>
-        /// 平面改变事件
+        /// MPR平面改变事件
         /// </summary>
         private static void OnPlaneChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<MPRPlane> eventArgs)
         {
