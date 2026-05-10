@@ -8,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using Vector3 = OpenTK.Mathematics.Vector3;
 
 namespace MedicalSharp.Insight
 {
@@ -154,18 +157,13 @@ namespace MedicalSharp.Insight
                 throw new InvalidCastException("Failed to get pixel buffer");
             }
 
+            //计算HU最小值、最大值
+            CalculateMinMaxHU(volumeData.OriginalData, volumeData.Metadata.VoxelsCount, out short minHU, out short maxHU);
+            volumeData.Metadata.MinHU = minHU;
+            volumeData.Metadata.MaxHU = maxHU;
+
             //分配标记数据内存
             volumeData.AllocMarkData();
-#if DEBUG
-            unsafe
-            {
-                //Span<short> span = new Span<short>(volumeData.OriginalData.ToPointer(), (int)volumeData.VoxelsCount);
-                //short[] voxels = span.ToArray();
-                //short minVal = voxels.Min();
-                //short maxVal = voxels.Max();
-                //System.Diagnostics.Trace.WriteLine($"Loaded {volumeData.VoxelsCount} voxels, min={minVal}, max={maxVal}");
-            }
-#endif
         }
         #endregion
 
@@ -229,6 +227,52 @@ namespace MedicalSharp.Insight
             volumeData.StudyData.StudyId = getTagValue(slice, DicomTags.StudyID);
             volumeData.StudyData.AccessionNumber = getTagValue(slice, DicomTags.AccessionNumber);
             volumeData.StudyData.ReferringPhysician = getTagValue(slice, DicomTags.ReferringPhysicianName);
+        }
+        #endregion
+
+        #region # 计算体素HU最小最大值 —— static unsafe void CalculateMinMaxHU(IntPtr originalData...
+        /// <summary>
+        /// 计算体素HU最小最大值
+        /// </summary>
+        /// <remarks>SIMD加速</remarks>
+        private static unsafe void CalculateMinMaxHU(IntPtr originalData, long voxelsCount, out short minHU, out short maxHU)
+        {
+            short* pointer = (short*)originalData.ToPointer();
+
+            int vectorSize = Vector<short>.Count;
+            Vector<short> vecMin = new Vector<short>(short.MaxValue);
+            Vector<short> vecMax = new Vector<short>(short.MinValue);
+
+            long index = 0;
+            long simdEnd = voxelsCount - vectorSize;
+            for (; index <= simdEnd; index += vectorSize)
+            {
+                Vector<short> vec = Unsafe.Read<Vector<short>>(pointer + index);
+                vecMin = Vector.Min(vecMin, vec);
+                vecMax = Vector.Max(vecMax, vec);
+            }
+
+            minHU = short.MaxValue;
+            maxHU = short.MinValue;
+            for (int j = 0; j < vectorSize; j++)
+            {
+                minHU = Math.Min(minHU, vecMin[j]);
+                maxHU = Math.Max(maxHU, vecMax[j]);
+            }
+
+            for (; index < voxelsCount; index++)
+            {
+                short val = pointer[index];
+                if (val < minHU)
+                {
+                    minHU = val;
+                }
+
+                if (val > maxHU)
+                {
+                    maxHU = val;
+                }
+            }
         }
         #endregion
     }

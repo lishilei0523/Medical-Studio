@@ -86,6 +86,20 @@ namespace MedicalSharp.Primitives.Models
         public float RescaleIntercept { get; set; }
         #endregion
 
+        #region 最小HU值 —— short MinHU
+        /// <summary>
+        /// 最小HU值
+        /// </summary>
+        public short MinHU { get; set; }
+        #endregion
+
+        #region 最大HU值 —— short MaxHU
+        /// <summary>
+        /// 最大HU值
+        /// </summary>
+        public short MaxHU { get; set; }
+        #endregion
+
         #region 图像原点 —— Vector3 Origin
         /// <summary>
         /// 图像原点

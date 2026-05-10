@@ -144,8 +144,10 @@
 						   Camera="{Binding Camera}"
 						   InputManager="{Binding InputManager}"
 						   VolumeData="{Binding VolumeData}"
-						   TFControlPoints="{Binding TFControlPoints}"
-						   RenderMode="{Binding RenderMode}">
+                           RenderMode="{Binding RenderMode}"
+						   WindowWidth="{Binding WindowWidth}"
+						   WindowCenter="{Binding WindowCenter}"
+						   TFControlPoints="{Binding TFControlPoints}">
 			<sd:ShapePresenter Content="{Binding AxialPlane}" />
 			<sd:ShapePresenter Content="{Binding CoronalPlane}" />
 			<sd:ShapePresenter Content="{Binding SagittalPlane}" />

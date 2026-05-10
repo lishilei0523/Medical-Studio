@@ -133,7 +133,7 @@ void main()
             currentPos += step;
             continue;
         }
-
+         
         //应用密度缩放
         density = clamp(density * u_DensityScale, 0.0, 1.0);
         

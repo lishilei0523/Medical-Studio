@@ -87,7 +87,7 @@ namespace MedicalSharp.Controls.Viewports
             WindowWidthProperty = AvaloniaProperty.Register<VolumeViewport, int>(nameof(WindowWidth), 400);
             WindowCenterProperty = AvaloniaProperty.Register<VolumeViewport, int>(nameof(WindowCenter), 40);
             BrightnessProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(Brightness), 1.0f);
-            DensityScaleProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(DensityScale), 1.5f);
+            DensityScaleProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(DensityScale), 1.0f);
             StepSizeProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(StepSize), 0.0012f);
             MaxStepsCountProperty = AvaloniaProperty.Register<VolumeViewport, int>(nameof(MaxStepsCount), 1000);
             OpacityThresholdProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(OpacityThreshold), 0.99f);
@@ -420,7 +420,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         private static void OnWindowWidthChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<int> eventArgs)
         {
-            viewport._volumeRenderer?.SetWindowLevel(eventArgs.NewValue.Value, viewport.WindowWidth);
+            viewport._volumeRenderer?.SetWindowLevel(eventArgs.NewValue.Value, viewport.WindowCenter);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
@@ -433,7 +433,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         private static void OnWindowCenterChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<int> eventArgs)
         {
-            viewport._volumeRenderer?.SetWindowLevel(viewport.WindowCenter, eventArgs.NewValue.Value);
+            viewport._volumeRenderer?.SetWindowLevel(viewport.WindowWidth, eventArgs.NewValue.Value);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
@@ -612,6 +612,7 @@ namespace MedicalSharp.Controls.Viewports
             //初始化传递函数、标记策略
             viewport._volumeRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
             viewport._volumeRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
+            viewport._volumeRenderer.TransferFunction.SetHURange(volumeData.Metadata.MinHU, volumeData.Metadata.MaxHU);
             viewport._volumeRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
 
             //请求下一帧

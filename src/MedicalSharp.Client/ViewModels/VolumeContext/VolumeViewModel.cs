@@ -243,16 +243,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this.SelectedShape = null;
                     this.Shapes.Clear();
                 }
+                else
+                {
+                    this.WindowWidth = WindowLevelManager.Default.WindowWidth;
+                    this.WindowCenter = WindowLevelManager.Default.WindowCenter;
+                }
             }
         }
-        #endregion
-
-        #region 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
-        /// <summary>
-        /// 传递函数控制点列表
-        /// </summary>
-        [DependencyProperty]
-        public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
         #endregion
 
         #region 体积渲染模式 —— VolumeRenderMode RenderMode
@@ -261,6 +258,30 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public VolumeRenderMode RenderMode { get; set; }
+        #endregion
+
+        #region 窗宽 —— int WindowWidth
+        /// <summary>
+        /// 窗宽
+        /// </summary>
+        [DependencyProperty]
+        public int WindowWidth { get; set; }
+        #endregion
+
+        #region 窗位 —— int WindowCenter
+        /// <summary>
+        /// 窗位
+        /// </summary>
+        [DependencyProperty]
+        public int WindowCenter { get; set; }
+        #endregion
+
+        #region 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        /// <summary>
+        /// 传递函数控制点列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
         #endregion
 
         #region 横断面 —— PlaneVisual3D AxialPlane

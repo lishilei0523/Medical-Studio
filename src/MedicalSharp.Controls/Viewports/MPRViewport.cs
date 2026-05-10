@@ -634,6 +634,7 @@ namespace MedicalSharp.Controls.Viewports
             //初始化传递函数、标记策略
             viewport._mprRenderer.SetTransferFunction(volumeSession.MPRTransferFunction);
             viewport._mprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
+            viewport._mprRenderer.TransferFunction.SetHURange(volumeData.Metadata.MinHU, volumeData.Metadata.MaxHU);
             viewport._mprRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
 
             //请求下一帧
