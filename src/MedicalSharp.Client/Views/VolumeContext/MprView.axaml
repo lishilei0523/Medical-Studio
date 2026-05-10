@@ -75,8 +75,12 @@
 									<MenuItem Header="伪彩" ToggleType="Radio" />
 								</MenuItem>
 								<MenuItem Header="十字线" >
-									<MenuItem Header="显示" ToggleType="CheckBox" />
-									<MenuItem Header="复位" />
+                                    <MenuItem >
+                                        <MenuItem.Header>
+                                            <CheckBox Content="显示" IsChecked="{Binding CrosshairVisible}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+									<MenuItem Header="复位" Command="{Binding ResetCrosshairCommand}" />
 								</MenuItem>
 								<MenuItem Header="调节协议" />
 							</MenuFlyout>
@@ -86,11 +90,12 @@
 			</Grid>
 		</sd:GroupBox.Header>
 		<!--Content-->
-		<sd:MPRViewport FrameToken="{Binding FrameToken}"
-						Plane="{Binding Plane}"
-						Camera="{Binding Camera}"
-						InputManager="{Binding InputManager}"
-						VolumeData="{Binding VolumeData}">
+		<sd:MPRViewport x:Name="MPRViewport"
+                        FrameToken="{Binding FrameToken}"
+                        Plane="{Binding Plane}"
+                        Camera="{Binding Camera}"
+                        InputManager="{Binding InputManager}"
+                        VolumeData="{Binding VolumeData}">
 			<sd:ShapePresenter Content="{Binding Crosshair}" />
 			<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
 		</sd:MPRViewport>

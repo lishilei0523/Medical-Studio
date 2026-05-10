@@ -83,7 +83,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
         #region # 属性
 
-        //通知属性
+        //属性
 
         #region Raycast渲染模式选中 —— bool RaycastChecked
         /// <summary>

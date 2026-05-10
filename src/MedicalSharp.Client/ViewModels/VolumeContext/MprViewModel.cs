@@ -3,10 +3,12 @@ using Avalonia.Collections;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Client.Events;
+using MedicalSharp.Client.Views.VolumeContext;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Commands.Arguments;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
@@ -17,6 +19,7 @@ using MedicalSharp.Primitives.Models.Arguments;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
+using SD.Infrastructure.Avalonia.Commands;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using System;
@@ -24,6 +27,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
@@ -58,6 +62,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             //默认值
             this.Crosshair = new CrosshairVisual3D();
+            this.CrosshairVisible = true;
             this.Shapes = [];
             this.Translate3D();
         }
@@ -65,6 +70,25 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #endregion
 
         #region # 属性
+
+        //属性
+
+        #region 十字线是否可见 —— bool CrosshairVisible
+        /// <summary>
+        /// 十字线是否可见
+        /// </summary>
+        public bool CrosshairVisible
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.Crosshair.IsVisible = value;
+                this.MPRViewport?.RequestNextFrameRendering();
+            }
+        }
+        #endregion
 
         #region 帧令牌 —— int FrameToken
         /// <summary>
@@ -158,6 +182,46 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<ShapeVisual3D> Shapes { get; set; }
+        #endregion
+
+        #region 只读属性 - MPR渲染视口 —— MPRViewport MPRViewport
+        /// <summary>
+        /// 只读属性 - MPR渲染视口
+        /// </summary>
+        public MPRViewport MPRViewport
+        {
+            get
+            {
+                MprView view = (MprView)this.GetView();
+                return view?.MPRViewport;
+            }
+        }
+        #endregion
+
+
+        //命令
+
+        #region 复位十字线命令 —— ICommand ResetCrosshairCommand
+        /// <summary>
+        /// 复位十字线命令
+        /// </summary>
+        public ICommand ResetCrosshairCommand => new RelayCommand(_ =>
+        {
+            this.Crosshair.UAxis = this.Plane.WorldUAxis.ToVector3();
+            this.Crosshair.VAxis = this.Plane.WorldVAxis.ToVector3();
+            this.Crosshair.Center = this.Plane.WorldCenter.ToVector3();
+            this.Crosshair.Transform.SetMatrix(Matrix4.Identity);
+            this.Crosshair.Transform.SetPosition(this.Plane.WorldCenter);
+            this.MPRViewport.RequestNextFrameRendering();
+
+            //发布事件
+            ShapeTranslatingEvent message = new ShapeTranslatingEvent
+            {
+                Publisher = this,
+                Shape = this.Crosshair
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(message);
+        });
         #endregion
 
         #endregion
