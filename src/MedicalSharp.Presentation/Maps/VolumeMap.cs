@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Models;
+using SD.Toolkits.Mapper;
 
 namespace MedicalSharp.Presentation.Maps
 {
@@ -26,9 +27,13 @@ namespace MedicalSharp.Presentation.Maps
             VolumeInfo volumeInfo = new VolumeInfo
             {
                 SeriesInstanceUId = metadata.SeriesInstanceUId,
-                VolumeWidth = metadata.VolumeSize.X,
-                VolumeHeight = metadata.VolumeSize.Y,
-                VolumeDepth = metadata.VolumeSize.Z
+                VolumeSize = $"{metadata.VolumeSize.X}×{metadata.VolumeSize.Y}×{metadata.VolumeSize.Z}",
+                Spacing = $"{metadata.Spacing.X:F2}×{metadata.Spacing.Y:F2}×{metadata.Spacing.Z:F2}",
+                PhysicalSize = $"{metadata.PhysicalSize.X:F0}×{metadata.PhysicalSize.Y:F0}×{metadata.PhysicalSize.Z:F0}",
+                RescaleSlope = metadata.RescaleSlope.ToString("F2"),
+                RescaleIntercept = metadata.RescaleIntercept.ToString("F2"),
+                WindowWidth = metadata.WindowWidth?.ToString("F0"),
+                WindowCenter = metadata.WindowCenter?.ToString("F0")
             };
 
             return volumeInfo;
@@ -50,18 +55,30 @@ namespace MedicalSharp.Presentation.Maps
 
             #endregion
 
-            PatientInfo patientInfo = new PatientInfo
-            {
-                PatientId = patientData.PatientId,
-                Name = patientData.Name,
-                BirthDate = patientData.BirthDate,
-                Sex = patientData.Sex,
-                Age = patientData.Age,
-                Height = patientData.Height,
-                Weight = patientData.Weight
-            };
+            PatientInfo patientInfo = patientData.Map<VolumePatientData, PatientInfo>();
 
             return patientInfo;
+        }
+        #endregion
+
+        #region # 体积检查数据映射检查信息 —— static StudyInfo ToStudyInfo(this VolumeStudyData studyData)
+        /// <summary>
+        /// 体积检查数据映射检查信息
+        /// </summary>
+        public static StudyInfo ToStudyInfo(this VolumeStudyData studyData)
+        {
+            #region # 验证
+
+            if (studyData == null)
+            {
+                return null;
+            }
+
+            #endregion
+
+            StudyInfo studyInfo = studyData.Map<VolumeStudyData, StudyInfo>();
+
+            return studyInfo;
         }
         #endregion
     }

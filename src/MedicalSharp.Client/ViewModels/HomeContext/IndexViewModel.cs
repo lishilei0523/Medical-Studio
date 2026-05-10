@@ -66,6 +66,13 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 {
                     this.VolumeInfo = value.Metadata.ToVolumeInfo();
                     this.PatientInfo = value.PatientData.ToPatientInfo();
+                    this.StudyInfo = value.StudyData.ToStudyInfo();
+                }
+                else
+                {
+                    this.VolumeInfo = null;
+                    this.PatientInfo = null;
+                    this.StudyInfo = null;
                 }
             }
         }
@@ -85,6 +92,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         [DependencyProperty]
         public PatientInfo PatientInfo { get; set; }
+        #endregion
+
+        #region 检查信息 —— StudyInfo StudyInfo
+        /// <summary>
+        /// 检查信息
+        /// </summary>
+        [DependencyProperty]
+        public StudyInfo StudyInfo { get; set; }
         #endregion
 
         #region 布局视图模型 —— LayoutViewModel LayoutViewModel

@@ -56,7 +56,7 @@ namespace MedicalSharp.Primitives.Models
         public Vector3 Spacing { get; set; }
         #endregion
 
-        #region 物理尺寸 —— Size3F PhysicalSize
+        #region 物理尺寸 —— Vector3 PhysicalSize
         /// <summary>
         /// 物理尺寸
         /// </summary>
