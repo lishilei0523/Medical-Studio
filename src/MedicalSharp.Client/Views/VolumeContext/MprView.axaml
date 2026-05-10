@@ -90,7 +90,7 @@
                                     </MenuItem>
 									<MenuItem Header="复位" Command="{Binding ResetCrosshairCommand}" />
 								</MenuItem>
-								<MenuItem Header="调节协议" />
+								<MenuItem Header="调节协议" Command="{Binding TuneProtocolCommand}" />
 							</MenuFlyout>
 						</DropDownButton.Flyout>
 					</DropDownButton>

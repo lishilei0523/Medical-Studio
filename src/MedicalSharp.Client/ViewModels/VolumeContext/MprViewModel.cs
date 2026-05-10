@@ -2,6 +2,7 @@
 using Avalonia.Collections;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
+using MedicalSharp.Client.ViewModels.ProtocolContext;
 using MedicalSharp.Client.Views.VolumeContext;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Commands.Arguments;
@@ -23,6 +24,7 @@ using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.Commands;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
+using SD.IOC.Core.Mediators;
 using System;
 using System.Linq;
 using System.Text;
@@ -285,6 +287,18 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 Shape = this.Crosshair
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
+        });
+        #endregion
+
+        #region 调节协议命令 —— ICommand TuneProtocolCommand
+        /// <summary>
+        /// 调节协议命令
+        /// </summary>
+        public ICommand TuneProtocolCommand => new AsyncRelayCommand(async _ =>
+        {
+            MprProtocolViewModel viewModel = ResolveMediator.Resolve<MprProtocolViewModel>();
+            viewModel.MprViewModel = this;
+            await this._windowManager.ShowWindowAsync(viewModel);
         });
         #endregion
 
