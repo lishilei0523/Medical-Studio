@@ -54,14 +54,14 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         static WindowLevelManager()
         {
+            _Brain = new WindowLevel("脑窗", 80, 40);
+            _Cardiac = new WindowLevel("心脏窗", 550, 60);
+            _Liver = new WindowLevel("肝脏窗", 320, 60);
             _Lung = new WindowLevel("肺窗", 1500, -600);
             _Abdomen = new WindowLevel("腹部窗", 400, 40);
             _Bone = new WindowLevel("骨骼窗", 1200, 500);
-            _Brain = new WindowLevel("脑窗", 80, 40);
-            _Mediastinum = new WindowLevel("纵膈窗", 400, 40);
             _Vascular = new WindowLevel("血管窗", 600, 300);
-            _Liver = new WindowLevel("肝脏窗", 320, 60);
-            _Cardiac = new WindowLevel("心脏窗", 550, 60);
+            _Mediastinum = new WindowLevel("纵膈窗", 400, 40);
         }
 
         #endregion
