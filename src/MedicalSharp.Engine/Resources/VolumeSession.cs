@@ -1,4 +1,5 @@
-﻿using MedicalSharp.Primitives.Models;
+﻿using MedicalSharp.Engine.Protocols;
+using MedicalSharp.Primitives.Models;
 using System;
 
 namespace MedicalSharp.Engine.Resources
@@ -39,8 +40,8 @@ namespace MedicalSharp.Engine.Resources
             int depth = this.VolumeData.Metadata.VolumeSize.Z;
             this.VolumeTexture = Texture3D.CreateFromVolume(width, height, depth, this.VolumeData.OriginalData);
             this.MarkTexture = Texture3D.CreateFromMark(width, height, depth, this.VolumeData.MarkData);
-            this.VRTransferFunction = new TransferFunction();
-            this.MPRTransferFunction = new TransferFunction();
+            this.VRTransferFunction = new DensityTransferFunction();
+            this.MPRTransferFunction = new HUTransferFunction();
             this.MarkStrategy = new MarkStrategy();
         }
 
@@ -76,18 +77,18 @@ namespace MedicalSharp.Engine.Resources
         public Texture3D MarkTexture { get; private set; }
         #endregion
 
-        #region 体积渲染传递函数 —— TransferFunction VRTransferFunction
+        #region 体积渲染传递函数 —— DensityTransferFunction VRTransferFunction
         /// <summary>
         /// 体积渲染传递函数
         /// </summary>
-        public TransferFunction VRTransferFunction { get; private set; }
+        public DensityTransferFunction VRTransferFunction { get; private set; }
         #endregion
 
-        #region MPR渲染传递函数 —— TransferFunction MPRTransferFunction
+        #region MPR渲染传递函数 —— HUTransferFunction MPRTransferFunction
         /// <summary>
         /// MPR渲染传递函数
         /// </summary>
-        public TransferFunction MPRTransferFunction { get; private set; }
+        public HUTransferFunction MPRTransferFunction { get; private set; }
         #endregion
 
         #region 标记策略 —— TransferFunction MarkStrategy

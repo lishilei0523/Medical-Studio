@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Engine.Managers;
+using MedicalSharp.Engine.Protocols;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
@@ -103,11 +104,11 @@ namespace MedicalSharp.Engine.Renderers
         public float OpacityThreshold { get; private set; }
         #endregion
 
-        #region 传递函数 —— TransferFunction TransferFunction
+        #region 传递函数 —— DensityTransferFunction TransferFunction
         /// <summary>
         /// 传递函数
         /// </summary>
-        public TransferFunction TransferFunction { get; private set; }
+        public DensityTransferFunction TransferFunction { get; private set; }
         #endregion
 
         #region 标记策略 —— MarkStrategy MarkStrategy
@@ -182,12 +183,12 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 设置传递函数 —— void SetTransferFunction(TransferFunction transferFunction)
+        #region 设置传递函数 —— void SetTransferFunction(DensityTransferFunction transferFunction)
         /// <summary>
         /// 设置传递函数
         /// </summary>
         /// <param name="transferFunction">传递函数</param>
-        public void SetTransferFunction(TransferFunction transferFunction)
+        public void SetTransferFunction(DensityTransferFunction transferFunction)
         {
             this.TransferFunction = transferFunction;
         }

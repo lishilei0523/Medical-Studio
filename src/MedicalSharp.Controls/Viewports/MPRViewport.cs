@@ -60,7 +60,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 传递函数控制点列表依赖属性
         /// </summary>
-        public static readonly StyledProperty<AvaloniaList<TFControlPoint>> TFControlPointsProperty;
+        public static readonly StyledProperty<AvaloniaList<HUControlPoint>> TFControlPointsProperty;
 
         /// <summary>
         /// 体积数据依赖属性
@@ -78,7 +78,7 @@ namespace MedicalSharp.Controls.Viewports
             WindowCenterProperty = AvaloniaProperty.Register<MPRViewport, int>(nameof(WindowCenter), 40);
             BrightnessProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Brightness), 1.0f);
             ContrastProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Contrast), 1.0f);
-            TFControlPointsProperty = AvaloniaProperty.Register<MPRViewport, AvaloniaList<TFControlPoint>>(nameof(TFControlPoints));
+            TFControlPointsProperty = AvaloniaProperty.Register<MPRViewport, AvaloniaList<HUControlPoint>>(nameof(TFControlPoints));
             VolumeDataProperty = AvaloniaProperty.Register<MPRViewport, VolumeData>(nameof(VolumeData));
 
             //属性改变事件
@@ -88,7 +88,7 @@ namespace MedicalSharp.Controls.Viewports
             WindowCenterProperty.Changed.AddClassHandler<MPRViewport, int>(OnWindowCenterChanged);
             BrightnessProperty.Changed.AddClassHandler<MPRViewport, float>(OnBrightnessChanged);
             ContrastProperty.Changed.AddClassHandler<MPRViewport, float>(OnContrastChanged);
-            TFControlPointsProperty.Changed.AddClassHandler<MPRViewport, AvaloniaList<TFControlPoint>>(OnTFControlPointsChanged);
+            TFControlPointsProperty.Changed.AddClassHandler<MPRViewport, AvaloniaList<HUControlPoint>>(OnTFControlPointsChanged);
             VolumeDataProperty.Changed.AddClassHandler<MPRViewport, VolumeData>(OnVolumeDataChanged);
         }
 
@@ -180,11 +180,11 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        #region 依赖属性 - 传递函数控制点列表 —— AvaloniaList<HUControlPoint> TFControlPoints
         /// <summary>
         /// 依赖属性 - 传递函数控制点列表
         /// </summary>
-        public AvaloniaList<TFControlPoint> TFControlPoints
+        public AvaloniaList<HUControlPoint> TFControlPoints
         {
             get => this.GetValue(TFControlPointsProperty);
             set => this.SetValue(TFControlPointsProperty, value);
@@ -509,12 +509,12 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 传递函数控制点列表改变事件
         /// </summary>
-        private static void OnTFControlPointsChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<AvaloniaList<TFControlPoint>> eventArgs)
+        private static void OnTFControlPointsChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<AvaloniaList<HUControlPoint>> eventArgs)
         {
             if (eventArgs.OldValue.Value != null)
             {
                 //清除旧元素
-                foreach (TFControlPoint controlPoint in eventArgs.OldValue.Value)
+                foreach (HUControlPoint controlPoint in eventArgs.OldValue.Value)
                 {
                     viewport._mprRenderer?.TransferFunction.RemoveControlPoint(controlPoint);
                 }
@@ -523,7 +523,7 @@ namespace MedicalSharp.Controls.Viewports
             if (eventArgs.NewValue.Value != null)
             {
                 //添加新元素
-                foreach (TFControlPoint controlPoint in eventArgs.NewValue.Value)
+                foreach (HUControlPoint controlPoint in eventArgs.NewValue.Value)
                 {
                     viewport._mprRenderer?.TransferFunction.AddControlPoint(controlPoint);
                 }
@@ -550,7 +550,7 @@ namespace MedicalSharp.Controls.Viewports
             if (eventArgs.OldItems != null)
             {
                 //清除旧元素
-                foreach (TFControlPoint controlPoint in eventArgs.OldItems)
+                foreach (HUControlPoint controlPoint in eventArgs.OldItems)
                 {
                     this._mprRenderer?.TransferFunction.RemoveControlPoint(controlPoint);
                 }
@@ -558,7 +558,7 @@ namespace MedicalSharp.Controls.Viewports
             if (eventArgs.NewItems != null)
             {
                 //添加新元素
-                foreach (TFControlPoint controlPoint in eventArgs.NewItems)
+                foreach (HUControlPoint controlPoint in eventArgs.NewItems)
                 {
                     this._mprRenderer?.TransferFunction.AddControlPoint(controlPoint);
                 }

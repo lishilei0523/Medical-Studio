@@ -1,11 +1,12 @@
-﻿using MedicalSharp.Primitives.Builders;
+﻿using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 
-namespace MedicalSharp.Engine.Resources
+namespace MedicalSharp.Engine.Protocols
 {
     /// <summary>
     /// 标记策略

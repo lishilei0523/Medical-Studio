@@ -12,63 +12,63 @@ namespace MedicalSharp.Primitives.Managers
         #region # 字段及构造器
 
         /// <summary>
-        /// 灰度控制点列表
-        /// </summary>
-        private static readonly TFControlPoint[] _GrayControlPoints;
-
-        /// <summary>
         /// 彩虹控制点列表
         /// </summary>
-        private static readonly TFControlPoint[] _RainbowControlPoints;
+        private static readonly HUControlPoint[] _RainbowControlPoints;
 
         /// <summary>
         /// 热金属控制点列表
         /// </summary>
-        private static readonly TFControlPoint[] _HotMetalControlPoints;
+        private static readonly HUControlPoint[] _HotMetalControlPoints;
+
+        /// <summary>
+        /// 灰度控制点列表
+        /// </summary>
+        private static readonly DensityControlPoint[] _GrayControlPoints;
 
         /// <summary>
         /// 脑控制点列表
         /// </summary>
-        private static readonly TFControlPoint[] _BrainControlPoints;
+        private static readonly DensityControlPoint[] _BrainControlPoints;
 
         /// <summary>
         /// 心脏控制点列表
         /// </summary>
-        private static readonly TFControlPoint[] _CardiacControlPoints;
+        private static readonly DensityControlPoint[] _CardiacControlPoints;
 
         /// <summary>
         /// 肝脏控制点列表
         /// </summary>
-        private static readonly TFControlPoint[] _LiverControlPoints;
+        private static readonly DensityControlPoint[] _LiverControlPoints;
 
         /// <summary>
         /// 肺控制点列表
         /// </summary>
-        private static readonly TFControlPoint[] _LungControlPoints;
+        private static readonly DensityControlPoint[] _LungControlPoints;
 
         /// <summary>
         /// 腹部控制点列表
         /// </summary>
-        private static readonly TFControlPoint[] _AbdomenControlPoints;
+        private static readonly DensityControlPoint[] _AbdomenControlPoints;
 
         /// <summary>
         /// 骨骼控制点列表
         /// </summary>
-        private static readonly TFControlPoint[] _BoneControlPoints;
+        private static readonly DensityControlPoint[] _BoneControlPoints;
 
         /// <summary>
         /// 血管控制点列表
         /// </summary>
-        private static readonly TFControlPoint[] _VascularControlPoints;
+        private static readonly DensityControlPoint[] _VascularControlPoints;
 
         /// <summary>
         /// 静态构造器
         /// </summary>
         static ProtocolManager()
         {
-            _GrayControlPoints = GetGrayControlPoints();
             _RainbowControlPoints = GetRainbowControlPoints();
             _HotMetalControlPoints = GetHotMetalControlPoints();
+            _GrayControlPoints = GetGrayControlPoints();
             _BrainControlPoints = GetBrainControlPoints();
             _CardiacControlPoints = GetCardiacControlPoints();
             _LiverControlPoints = GetLiverControlPoints();
@@ -82,101 +82,101 @@ namespace MedicalSharp.Primitives.Managers
 
         #region # 属性
 
-        #region 只读属性 - 灰度控制点列表 —— static IReadOnlyList<TFControlPoint> GrayControlPoints
-        /// <summary>
-        /// 只读属性 - 灰度控制点列表
-        /// </summary>
-        public static IReadOnlyList<TFControlPoint> GrayControlPoints
-        {
-            get => _GrayControlPoints;
-        }
-        #endregion 
-
-        #region 只读属性 - 彩虹控制点列表 —— static IReadOnlyList<TFControlPoint> RainbowControlPoints
+        #region 只读属性 - 彩虹控制点列表 —— static IReadOnlyList<HUControlPoint> RainbowControlPoints
         /// <summary>
         /// 只读属性 - 彩虹控制点列表
         /// </summary>
-        public static IReadOnlyList<TFControlPoint> RainbowControlPoints
+        public static IReadOnlyList<HUControlPoint> RainbowControlPoints
         {
             get => _RainbowControlPoints;
         }
         #endregion 
 
-        #region 只读属性 - 热金属控制点列表 —— static IReadOnlyList<TFControlPoint> HotMetalControlPoints
+        #region 只读属性 - 热金属控制点列表 —— static IReadOnlyList<HUControlPoint> HotMetalControlPoints
         /// <summary>
         /// 只读属性 - 热金属控制点列表
         /// </summary>
-        public static IReadOnlyList<TFControlPoint> HotMetalControlPoints
+        public static IReadOnlyList<HUControlPoint> HotMetalControlPoints
         {
             get => _HotMetalControlPoints;
         }
         #endregion 
 
-        #region 只读属性 - 脑控制点列表 —— static IReadOnlyList<TFControlPoint> BrainControlPoints
+        #region 只读属性 - 灰度控制点列表 —— static IReadOnlyList<DensityControlPoint> GrayControlPoints
+        /// <summary>
+        /// 只读属性 - 灰度控制点列表
+        /// </summary>
+        public static IReadOnlyList<DensityControlPoint> GrayControlPoints
+        {
+            get => _GrayControlPoints;
+        }
+        #endregion 
+
+        #region 只读属性 - 脑控制点列表 —— static IReadOnlyList<DensityControlPoint> BrainControlPoints
         /// <summary>
         /// 只读属性 - 脑控制点列表
         /// </summary>
-        public static IReadOnlyList<TFControlPoint> BrainControlPoints
+        public static IReadOnlyList<DensityControlPoint> BrainControlPoints
         {
             get => _BrainControlPoints;
         }
         #endregion
 
-        #region 只读属性 - 心脏控制点列表 —— static IReadOnlyList<TFControlPoint> CardiacControlPoints
+        #region 只读属性 - 心脏控制点列表 —— static IReadOnlyList<DensityControlPoint> CardiacControlPoints
         /// <summary>
         /// 只读属性 - 心脏控制点列表
         /// </summary>
-        public static IReadOnlyList<TFControlPoint> CardiacControlPoints
+        public static IReadOnlyList<DensityControlPoint> CardiacControlPoints
         {
             get => _CardiacControlPoints;
         }
         #endregion
 
-        #region 只读属性 - 肝脏控制点列表 —— static IReadOnlyList<TFControlPoint> LiverControlPoints
+        #region 只读属性 - 肝脏控制点列表 —— static IReadOnlyList<DensityControlPoint> LiverControlPoints
         /// <summary>
         /// 只读属性 - 肝脏控制点列表
         /// </summary>
-        public static IReadOnlyList<TFControlPoint> LiverControlPoints
+        public static IReadOnlyList<DensityControlPoint> LiverControlPoints
         {
             get => _LiverControlPoints;
         }
         #endregion
 
-        #region 只读属性 - 肺控制点列表 —— static IReadOnlyList<TFControlPoint> LungControlPoints
+        #region 只读属性 - 肺控制点列表 —— static IReadOnlyList<DensityControlPoint> LungControlPoints
         /// <summary>
         /// 只读属性 - 肺控制点列表
         /// </summary>
-        public static IReadOnlyList<TFControlPoint> LungControlPoints
+        public static IReadOnlyList<DensityControlPoint> LungControlPoints
         {
             get => _LungControlPoints;
         }
         #endregion
 
-        #region 只读属性 - 腹部控制点列表 —— static IReadOnlyList<TFControlPoint> AbdomenControlPoints
+        #region 只读属性 - 腹部控制点列表 —— static IReadOnlyList<DensityControlPoint> AbdomenControlPoints
         /// <summary>
         /// 只读属性 - 腹部控制点列表
         /// </summary>
-        public static IReadOnlyList<TFControlPoint> AbdomenControlPoints
+        public static IReadOnlyList<DensityControlPoint> AbdomenControlPoints
         {
             get => _AbdomenControlPoints;
         }
         #endregion
 
-        #region 只读属性 - 骨骼控制点列表 —— static IReadOnlyList<TFControlPoint> BoneControlPoints
+        #region 只读属性 - 骨骼控制点列表 —— static IReadOnlyList<DensityControlPoint> BoneControlPoints
         /// <summary>
         /// 只读属性 - 骨骼控制点列表
         /// </summary>
-        public static IReadOnlyList<TFControlPoint> BoneControlPoints
+        public static IReadOnlyList<DensityControlPoint> BoneControlPoints
         {
             get => _BoneControlPoints;
         }
         #endregion
 
-        #region 只读属性 - 血管控制点列表 —— static IReadOnlyList<TFControlPoint> VascularControlPoints
+        #region 只读属性 - 血管控制点列表 —— static IReadOnlyList<DensityControlPoint> VascularControlPoints
         /// <summary>
         /// 只读属性 - 血管控制点列表
         /// </summary>
-        public static IReadOnlyList<TFControlPoint> VascularControlPoints
+        public static IReadOnlyList<DensityControlPoint> VascularControlPoints
         {
             get => _VascularControlPoints;
         }
@@ -186,371 +186,348 @@ namespace MedicalSharp.Primitives.Managers
 
         #region # 方法
 
-        #region 获取灰度控制点列表 —— static TFControlPoint[] GetGrayControlPoints()
-        /// <summary>
-        /// 获取灰度控制点列表
-        /// </summary>
-        /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetGrayControlPoints()
-        {
-            TFControlPoint[] controlPoints =
-            [
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.0f)),
-                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))
-            ];
-
-            return controlPoints;
-        }
-        #endregion
-
-        #region 获取彩虹控制点列表 —— static TFControlPoint[] GetRainbowControlPoints()
+        #region 获取彩虹控制点列表 —— static HUControlPoint[] GetRainbowControlPoints()
         /// <summary>
         /// 获取彩虹控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetRainbowControlPoints()
+        private static HUControlPoint[] GetRainbowControlPoints()
         {
-            TFControlPoint[] controlPoints =
+            HUControlPoint[] controlPoints =
             [
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.5f, 1.0f)),  //深蓝 - 空气
-                new TFControlPoint(-800, new Vector4(0.0f, 0.0f, 1.0f, 1.0f)),   //蓝 - 肺
-                new TFControlPoint(-400, new Vector4(0.0f, 0.8f, 0.8f, 1.0f)),   //青 - 肺纹理
-                new TFControlPoint(0, new Vector4(0.0f, 1.0f, 0.0f, 1.0f)),      //绿 - 水/软组织
-                new TFControlPoint(100, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),    //黄 - 肌肉
-                new TFControlPoint(400, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 松质骨
-                new TFControlPoint(1000, new Vector4(1.0f, 0.0f, 0.0f, 1.0f)),   //红 - 密质骨
-                new TFControlPoint(3071, new Vector4(0.8f, 0.0f, 0.0f, 1.0f))    //深红 - 致密骨/金属
+                new(-1024, new Vector4(0.0f, 0.0f, 0.5f, 1.0f)),  //深蓝 - 空气
+                new(-800, new Vector4(0.0f, 0.0f, 1.0f, 1.0f)),   //蓝 - 肺
+                new(-400, new Vector4(0.0f, 0.8f, 0.8f, 1.0f)),   //青 - 肺纹理
+                new(0, new Vector4(0.0f, 1.0f, 0.0f, 1.0f)),      //绿 - 水/软组织
+                new(100, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),    //黄 - 肌肉
+                new(400, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 松质骨
+                new(1000, new Vector4(1.0f, 0.0f, 0.0f, 1.0f)),   //红 - 密质骨
+                new(3071, new Vector4(0.8f, 0.0f, 0.0f, 1.0f))    //深红 - 致密骨/金属
             ];
 
             return controlPoints;
         }
         #endregion
 
-        #region 获取热金属控制点列表 —— static TFControlPoint[] GetHotMetalControlPoints()
+        #region 获取热金属控制点列表 —— static HUControlPoint[] GetHotMetalControlPoints()
         /// <summary>
         /// 获取热金属控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetHotMetalControlPoints()
+        private static HUControlPoint[] GetHotMetalControlPoints()
         {
-            TFControlPoint[] controlPoints =
+            HUControlPoint[] controlPoints =
             [
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 1.0f)),  //黑 - 空气
-                new TFControlPoint(-400, new Vector4(0.3f, 0.0f, 0.0f, 1.0f)),   //暗红 - 肺
-                new TFControlPoint(0, new Vector4(0.8f, 0.2f, 0.0f, 1.0f)),      //红 - 软组织
-                new TFControlPoint(200, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 肌肉
-                new TFControlPoint(500, new Vector4(1.0f, 0.8f, 0.0f, 1.0f)),    //橙黄 - 松质骨
-                new TFControlPoint(1000, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),   //黄 - 密质骨
-                new TFControlPoint(2000, new Vector4(1.0f, 1.0f, 0.5f, 1.0f)),   //浅黄 - 致密骨
-                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))    //白 - 金属
+                new(-1024, new Vector4(0.0f, 0.0f, 0.0f, 1.0f)),  //黑 - 空气
+                new(-400, new Vector4(0.3f, 0.0f, 0.0f, 1.0f)),   //暗红 - 肺
+                new(0, new Vector4(0.8f, 0.2f, 0.0f, 1.0f)),      //红 - 软组织
+                new(200, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 肌肉
+                new(500, new Vector4(1.0f, 0.8f, 0.0f, 1.0f)),    //橙黄 - 松质骨
+                new(1000, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),   //黄 - 密质骨
+                new(2000, new Vector4(1.0f, 1.0f, 0.5f, 1.0f)),   //浅黄 - 致密骨
+                new(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))    //白 - 金属
             ];
 
             return controlPoints;
         }
         #endregion
 
-        #region 获取脑控制点列表 —— static TFControlPoint[] GetBrainControlPoints()
+        #region 获取灰度控制点列表 —— static DensityControlPoint[] GetGrayControlPoints()
+        /// <summary>
+        /// 获取灰度控制点列表
+        /// </summary>
+        /// <returns>控制点列表</returns>
+        private static DensityControlPoint[] GetGrayControlPoints()
+        {
+            DensityControlPoint[] controlPoints =
+            [
+                new(0.0f, new Vector4(0.0f, 0.0f, 0.0f, 0.0f)),
+                new(1.0f, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))
+            ];
+
+            return controlPoints;
+        }
+        #endregion
+
+        #region 获取脑控制点列表 —— static DensityControlPoint[] GetBrainControlPoints()
         /// <summary>
         /// 获取脑控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetBrainControlPoints()
+        /// <remarks>配套窗宽80/窗位40</remarks>
+        private static DensityControlPoint[] GetBrainControlPoints()
         {
-            TFControlPoint[] controlPoints =
+            DensityControlPoint[] controlPoints =
             [
-                //空气/背景：完全透明
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),
-                new TFControlPoint(-100, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),    //Position≈0.226
+                //背景/脑脊液：全透明
+                new(0.00f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
+                new(0.15f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
 
-                //脑脊液：极低透明度
-                new TFControlPoint(-20, new Vector4(0.20f, 0.22f, 0.25f, 0.005f)),  //Position≈0.245
-                new TFControlPoint(0, new Vector4(0.25f, 0.28f, 0.30f, 0.010f)),    //Position≈0.250
+                //灰质：开始浮现
+                new(0.25f, new Vector4(0.30f, 0.30f, 0.35f, 0.020f)),
+                new(0.35f, new Vector4(0.40f, 0.40f, 0.45f, 0.060f)),
 
-                //灰质：中透明度
-                new TFControlPoint(20, new Vector4(0.35f, 0.35f, 0.38f, 0.030f)),   //Position≈0.255
-                new TFControlPoint(30, new Vector4(0.45f, 0.45f, 0.48f, 0.080f)),   //Position≈0.257
-                new TFControlPoint(40, new Vector4(0.55f, 0.55f, 0.58f, 0.200f)),   //Position≈0.260
+                //透明凹陷
+                new(0.42f, new Vector4(0.45f, 0.45f, 0.50f, 0.000f)),
 
                 //白质：明显不透明
-                new TFControlPoint(50, new Vector4(0.65f, 0.65f, 0.68f, 0.450f)),   //Position≈0.262
-                new TFControlPoint(60, new Vector4(0.75f, 0.75f, 0.78f, 0.700f)),   //Position≈0.265
-                new TFControlPoint(70, new Vector4(0.85f, 0.85f, 0.88f, 0.880f)),   //Position≈0.267
+                new(0.55f, new Vector4(0.60f, 0.60f, 0.65f, 0.250f)),
+                new(0.65f, new Vector4(0.75f, 0.75f, 0.80f, 0.550f)),
 
-                //血管/钙化：高不透明度
-                new TFControlPoint(80, new Vector4(0.92f, 0.92f, 0.93f, 0.940f)),   //Position≈0.270
-                new TFControlPoint(100, new Vector4(0.96f, 0.96f, 0.97f, 0.970f)),  //Position≈0.274
+                //血管/钙化
+                new(0.75f, new Vector4(0.85f, 0.85f, 0.88f, 0.780f)),
+                new(0.85f, new Vector4(0.92f, 0.92f, 0.94f, 0.900f)),
 
                 //骨骼
-                new TFControlPoint(200, new Vector4(0.98f, 0.98f, 0.98f, 0.980f)),  //Position≈0.299
-                new TFControlPoint(500, new Vector4(1.00f, 1.00f, 1.00f, 0.990f)),  //Position≈0.372
-
-                //窗外锚点
-                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.000f))    //Position≈1.00
+                new(0.95f, new Vector4(0.97f, 0.97f, 0.98f, 0.960f)),
+                new(1.00f, new Vector4(1.00f, 1.00f, 1.00f, 1.000f))
             ];
 
             return controlPoints;
         }
         #endregion
 
-        #region 获取心脏控制点列表 —— static TFControlPoint[] GetCardiacControlPoints()
+        #region 获取心脏控制点列表 —— static DensityControlPoint[] GetCardiacControlPoints()
         /// <summary>
         /// 获取心脏控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetCardiacControlPoints()
+        /// <remarks>配套窗宽550/窗位60</remarks>
+        private static DensityControlPoint[] GetCardiacControlPoints()
         {
-            TFControlPoint[] controlPoints =
+            DensityControlPoint[] controlPoints =
             [
-                //空气/肺：完全透明
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),
-                new TFControlPoint(-200, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)), //Position≈0.201
+                //肺/背景：全透明
+                new(0.00f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
+                new(0.20f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
 
-                //肺实质：极低透明度
-                new TFControlPoint(-100, new Vector4(0.10f, 0.12f, 0.15f, 0.002f)), //Position≈0.226
-                new TFControlPoint(-50, new Vector4(0.15f, 0.18f, 0.20f, 0.004f)), //Position≈0.238
+                //脂肪/心包：极淡
+                new(0.30f, new Vector4(0.20f, 0.20f, 0.22f, 0.005f)),
 
-                //脂肪/心包脂肪：低透明度
-                new TFControlPoint(-30, new Vector4(0.20f, 0.22f, 0.22f, 0.006f)), //Position≈0.243
-                new TFControlPoint(0, new Vector4(0.25f, 0.25f, 0.28f, 0.010f)), //Position≈0.250
+                //透明凹陷
+                new(0.38f, new Vector4(0.25f, 0.25f, 0.28f, 0.000f)),
 
-                //心肌：中透明度
-                new TFControlPoint(20, new Vector4(0.35f, 0.35f, 0.38f, 0.025f)), //Position≈0.255
-                new TFControlPoint(40, new Vector4(0.50f, 0.50f, 0.52f, 0.060f)), //Position≈0.260
-                new TFControlPoint(60, new Vector4(0.65f, 0.65f, 0.68f, 0.150f)), //Position≈0.265
+                //心肌：开始可见
+                new(0.45f, new Vector4(0.40f, 0.40f, 0.45f, 0.040f)),
+                new(0.55f, new Vector4(0.55f, 0.55f, 0.60f, 0.120f)),
 
-                //心肌/室间隔核心：明显不透明
-                new TFControlPoint(80, new Vector4(0.75f, 0.75f, 0.78f, 0.350f)), //Position≈0.270
-                new TFControlPoint(100, new Vector4(0.82f, 0.82f, 0.85f, 0.550f)), //Position≈0.274
+                //室间隔/乳头肌
+                new(0.65f, new Vector4(0.70f, 0.70f, 0.75f, 0.350f)),
 
-                //血管/增强心脏：高不透明度
-                new TFControlPoint(150, new Vector4(0.88f, 0.88f, 0.90f, 0.750f)), //Position≈0.287
-                new TFControlPoint(200, new Vector4(0.92f, 0.92f, 0.94f, 0.880f)), //Position≈0.299
+                //增强血管
+                new(0.75f, new Vector4(0.82f, 0.82f, 0.85f, 0.600f)),
 
-                //冠状动脉钙化：极高不透明度
-                new TFControlPoint(300, new Vector4(0.95f, 0.95f, 0.96f, 0.940f)), //Position≈0.323
-                new TFControlPoint(400, new Vector4(0.97f, 0.97f, 0.98f, 0.970f)), //Position≈0.348
+                //冠脉钙化
+                new(0.85f, new Vector4(0.92f, 0.92f, 0.94f, 0.820f)),
 
-                //骨骼/金属
-                new TFControlPoint(600, new Vector4(0.99f, 0.99f, 0.99f, 0.980f)), //Position≈0.396
-
-                //窗外锚点
-                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.000f)) //Position≈1.00
+                //骨骼
+                new(0.95f, new Vector4(0.97f, 0.97f, 0.98f, 0.940f)),
+                new(1.00f, new Vector4(1.00f, 1.00f, 1.00f, 1.000f))
             ];
 
             return controlPoints;
         }
         #endregion
 
-        #region 获取肺控制点列表 —— static TFControlPoint[] GetLungControlPoints()
+        #region 获取肺控制点列表 —— static DensityControlPoint[] GetLungControlPoints()
         /// <summary>
         /// 获取肺控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetLungControlPoints()
+        /// <remarks>配套窗宽1500/窗位-600</remarks>
+        private static DensityControlPoint[] GetLungControlPoints()
         {
-            TFControlPoint[] controlPoints =
+            DensityControlPoint[] controlPoints =
             [
-                //空气/背景：完全透明
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),
-                new TFControlPoint(-950, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),   //Position≈0.018
+                //空气：全透明黑色
+                new(0.00f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
+                new(0.08f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
 
-                //肺实质：淡蓝灰，极低透明度
-                new TFControlPoint(-900, new Vector4(0.15f, 0.18f, 0.22f, 0.003f)), //Position≈0.030
-                new TFControlPoint(-850, new Vector4(0.20f, 0.24f, 0.28f, 0.008f)), //Position≈0.042
+                //肺实质开始：淡蓝灰
+                new(0.12f, new Vector4(0.12f, 0.15f, 0.20f, 0.008f)),
+                new(0.18f, new Vector4(0.18f, 0.22f, 0.28f, 0.020f)),
 
-                //肺纹理/支气管：中灰蓝，低透明度
-                new TFControlPoint(-800, new Vector4(0.25f, 0.30f, 0.35f, 0.020f)), //Position≈0.055
-                new TFControlPoint(-700, new Vector4(0.30f, 0.35f, 0.40f, 0.040f)), //Position≈0.079
+                //透明凹陷
+                new(0.25f, new Vector4(0.22f, 0.26f, 0.32f, 0.000f)),
 
-                //肺门/血管过渡
-                new TFControlPoint(-500, new Vector4(0.40f, 0.42f, 0.45f, 0.080f)), //Position≈0.128
-                new TFControlPoint(-300, new Vector4(0.50f, 0.50f, 0.50f, 0.150f)), //Position≈0.177
+                //肺纹理
+                new(0.35f, new Vector4(0.28f, 0.32f, 0.38f, 0.050f)),
+                new(0.45f, new Vector4(0.35f, 0.38f, 0.42f, 0.100f)),
 
-                //软组织/胸壁
-                new TFControlPoint(-100, new Vector4(0.55f, 0.52f, 0.48f, 0.250f)), //Position≈0.226
-                new TFControlPoint(0, new Vector4(0.60f, 0.55f, 0.50f, 0.400f)),    //Position≈0.250
-                new TFControlPoint(50, new Vector4(0.65f, 0.60f, 0.55f, 0.550f)),   //Position≈0.262
+                //透明凹陷
+                new(0.52f, new Vector4(0.40f, 0.42f, 0.45f, 0.000f)),
 
-                //纵隔结构
-                new TFControlPoint(100, new Vector4(0.75f, 0.70f, 0.65f, 0.700f)),  //Position≈0.274
-                new TFControlPoint(200, new Vector4(0.85f, 0.80f, 0.75f, 0.850f)),  //Position≈0.299
+                //肺门/血管
+                new(0.60f, new Vector4(0.48f, 0.50f, 0.52f, 0.180f)),
 
-                //骨骼/钙化
-                new TFControlPoint(400, new Vector4(0.92f, 0.88f, 0.82f, 0.920f)),  //Position≈0.348
-                new TFControlPoint(600, new Vector4(0.96f, 0.93f, 0.88f, 0.960f)),  //Position≈0.396
+                //软组织
+                new(0.72f, new Vector4(0.60f, 0.55f, 0.50f, 0.350f)),
 
-                //窗外锚点
-                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.000f))    //Position≈1.00
+                //纵隔
+                new(0.82f, new Vector4(0.75f, 0.70f, 0.65f, 0.650f)),
+
+                //骨骼
+                new(0.92f, new Vector4(0.90f, 0.88f, 0.82f, 0.880f)),
+                new(1.00f, new Vector4(1.00f, 1.00f, 1.00f, 1.000f))
             ];
 
             return controlPoints;
         }
         #endregion
 
-        #region 获取肝脏控制点列表 —— static TFControlPoint[] GetLiverControlPoints()
+        #region 获取肝脏控制点列表 —— static DensityControlPoint[] GetLiverControlPoints()
         /// <summary>
         /// 获取肝脏控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetLiverControlPoints()
+        /// <remarks>配套窗宽320/窗位60</remarks>
+        private static DensityControlPoint[] GetLiverControlPoints()
         {
-            TFControlPoint[] controlPoints =
+            DensityControlPoint[] controlPoints =
             [
-                //空气/背景：完全透明
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),
-                new TFControlPoint(-160, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),    //Position≈0.211
+                //背景：全透明
+                new(0.00f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
+                new(0.15f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
 
-                //脂肪/腹水：极低透明度
-                new TFControlPoint(-80, new Vector4(0.15f, 0.15f, 0.18f, 0.003f)),  //Position≈0.231
-                new TFControlPoint(-20, new Vector4(0.20f, 0.20f, 0.22f, 0.005f)),  //Position≈0.245
+                //脂肪/腹水：极淡
+                new(0.25f, new Vector4(0.18f, 0.18f, 0.20f, 0.005f)),
 
-                //正常肝脏：低中透明度
-                new TFControlPoint(20, new Vector4(0.30f, 0.28f, 0.25f, 0.012f)),   //Position≈0.255
-                new TFControlPoint(40, new Vector4(0.45f, 0.40f, 0.35f, 0.030f)),   //Position≈0.260
-                new TFControlPoint(60, new Vector4(0.55f, 0.50f, 0.42f, 0.080f)),   //Position≈0.265
+                //正常肝脏：开始着色
+                new(0.40f, new Vector4(0.35f, 0.32f, 0.28f, 0.025f)),
+                new(0.55f, new Vector4(0.50f, 0.45f, 0.38f, 0.070f)),
 
-                //肝脏/脾脏：中透明度
-                new TFControlPoint(80, new Vector4(0.65f, 0.58f, 0.48f, 0.180f)),   //Position≈0.270
-                new TFControlPoint(100, new Vector4(0.75f, 0.65f, 0.55f, 0.350f)),  //Position≈0.274
+                //透明凹陷
+                new(0.62f, new Vector4(0.55f, 0.50f, 0.42f, 0.000f)),
 
-                //血管/增强肝脏：明显不透明
-                new TFControlPoint(120, new Vector4(0.82f, 0.72f, 0.60f, 0.550f)),  //Position≈0.279
-                new TFControlPoint(150, new Vector4(0.88f, 0.80f, 0.68f, 0.750f)),  //Position≈0.287
+                //增强肝脏/血管
+                new(0.72f, new Vector4(0.70f, 0.62f, 0.52f, 0.200f)),
+                new(0.82f, new Vector4(0.82f, 0.72f, 0.60f, 0.500f)),
 
                 //钙化/结石
-                new TFControlPoint(200, new Vector4(0.92f, 0.88f, 0.80f, 0.880f)),  //Position≈0.299
-                new TFControlPoint(300, new Vector4(0.96f, 0.93f, 0.88f, 0.940f)),  //Position≈0.323
+                new(0.90f, new Vector4(0.92f, 0.88f, 0.80f, 0.800f)),
 
                 //骨骼
-                new TFControlPoint(400, new Vector4(0.98f, 0.96f, 0.92f, 0.970f)),  //Position≈0.348
-
-                //窗外锚点
-                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.000f))    //Position≈1.00
+                new(0.96f, new Vector4(0.97f, 0.95f, 0.90f, 0.930f)),
+                new(1.00f, new Vector4(1.00f, 1.00f, 1.00f, 1.000f))
             ];
 
             return controlPoints;
         }
         #endregion
 
-        #region 获取腹部控制点列表 —— static TFControlPoint[] GetAbdomenControlPoints()
+        #region 获取腹部控制点列表 —— static DensityControlPoint[] GetAbdomenControlPoints()
         /// <summary>
         /// 获取腹部控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetAbdomenControlPoints()
+        /// <remarks>配套窗宽400/窗位40</remarks>
+        private static DensityControlPoint[] GetAbdomenControlPoints()
         {
-            TFControlPoint[] controlPoints =
+            DensityControlPoint[] controlPoints =
             [
-                //空气/背景：完全透明
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),
-                new TFControlPoint(-200, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),    //Position≈0.201
+                //背景：全透明
+                new(0.00f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
+                new(0.10f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
 
-                //脂肪：微透明灰色
-                new TFControlPoint(-100, new Vector4(0.20f, 0.18f, 0.15f, 0.003f)), //Position≈0.226
-                new TFControlPoint(-50, new Vector4(0.25f, 0.22f, 0.18f, 0.005f)),  //Position≈0.238
+                //脂肪：微透明灰
+                new(0.22f, new Vector4(0.20f, 0.18f, 0.15f, 0.008f)),
 
-                //软组织/肌肉：低透明灰褐色
-                new TFControlPoint(0, new Vector4(0.30f, 0.25f, 0.20f, 0.008f)),    //Position≈0.250
-                new TFControlPoint(40, new Vector4(0.35f, 0.30f, 0.25f, 0.012f)),   //Position≈0.260
-                new TFControlPoint(80, new Vector4(0.40f, 0.35f, 0.30f, 0.020f)),   //Position≈0.270
+                //透明凹陷
+                new(0.30f, new Vector4(0.25f, 0.22f, 0.20f, 0.000f)),
 
-                //肝脏/实质器官：中透明度
-                new TFControlPoint(120, new Vector4(0.50f, 0.45f, 0.35f, 0.040f)),  //Position≈0.279
-                new TFControlPoint(160, new Vector4(0.60f, 0.50f, 0.40f, 0.080f)),  //Position≈0.289
+                //软组织/肌肉
+                new(0.45f, new Vector4(0.40f, 0.35f, 0.30f, 0.030f)),
 
-                //血管/增强区域
-                new TFControlPoint(200, new Vector4(0.70f, 0.60f, 0.50f, 0.200f)),  //Position≈0.299
-                new TFControlPoint(240, new Vector4(0.80f, 0.70f, 0.60f, 0.400f)),  //Position≈0.309
+                //实质器官
+                new(0.60f, new Vector4(0.55f, 0.48f, 0.38f, 0.080f)),
+
+                //血管/增强
+                new(0.75f, new Vector4(0.70f, 0.60f, 0.50f, 0.250f)),
 
                 //骨骼边缘
-                new TFControlPoint(300, new Vector4(0.90f, 0.80f, 0.70f, 0.650f)),  //Position≈0.323
-                new TFControlPoint(400, new Vector4(0.95f, 0.90f, 0.80f, 0.850f)),  //Position≈0.348
+                new(0.88f, new Vector4(0.85f, 0.80f, 0.70f, 0.600f)),
 
-                //窗外锚点
-                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.000f))    //Position≈1.00
+                //骨骼
+                new(0.96f, new Vector4(0.95f, 0.92f, 0.85f, 0.900f)),
+                new(1.00f, new Vector4(1.00f, 1.00f, 1.00f, 1.000f))
             ];
 
             return controlPoints;
         }
         #endregion
 
-        #region 获取骨骼控制点列表 —— static TFControlPoint[] GetBoneControlPoints()
+        #region 获取骨骼控制点列表 —— static DensityControlPoint[] GetBoneControlPoints()
         /// <summary>
         /// 获取骨骼控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetBoneControlPoints()
+        /// <remarks>配套窗宽1200/窗位500</remarks>
+        private static DensityControlPoint[] GetBoneControlPoints()
         {
-            TFControlPoint[] controlPoints =
+            DensityControlPoint[] controlPoints =
             [
-                //完全透明背景（空气/背景）
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),
-                new TFControlPoint(200, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)), //Position≈0.30
+                //空气/软组织：全透明
+                new(0.00f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
+                new(0.25f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
 
-                //软组织：极低透明度（几乎透明）
-                new TFControlPoint(409, new Vector4(0.3f, 0.3f, 0.3f, 0.005f)), //Position≈0.35
-                new TFControlPoint(614, new Vector4(0.4f, 0.4f, 0.4f, 0.008f)), //Position≈0.40
-                new TFControlPoint(818, new Vector4(0.5f, 0.5f, 0.5f, 0.010f)), //Position≈0.45
+                //松质骨过渡：开始着色
+                new(0.35f, new Vector4(0.55f, 0.45f, 0.35f, 0.030f)),
+                new(0.42f, new Vector4(0.70f, 0.58f, 0.42f, 0.080f)),
 
-                //骨骼开始：陡峭变化
-                new TFControlPoint(941, new Vector4(0.7f, 0.6f, 0.5f, 0.02f)), //Position≈0.48
-                new TFControlPoint(1023, new Vector4(0.8f, 0.7f, 0.6f, 0.50f)), //Position≈0.50 骨骼！
-                new TFControlPoint(1105, new Vector4(0.9f, 0.8f, 0.7f, 0.85f)), //Position≈0.52
+                //透明凹陷
+                new(0.48f, new Vector4(0.78f, 0.68f, 0.50f, 0.000f)),
 
-                //标准骨骼：高不透明度
-                new TFControlPoint(1228, new Vector4(1.0f, 0.9f, 0.8f, 0.92f)), //Position≈0.55
-                new TFControlPoint(1433, new Vector4(1.0f, 0.95f, 0.85f, 0.95f)), //Position≈0.60
-                new TFControlPoint(1637, new Vector4(1.0f, 0.97f, 0.90f, 0.97f)), //Position≈0.65
+                //密质骨：陡峭上升
+                new(0.52f, new Vector4(0.85f, 0.78f, 0.62f, 0.250f)),
+                new(0.58f, new Vector4(0.92f, 0.88f, 0.72f, 0.550f)),
 
-                //高密度骨骼：完全不透明
-                new TFControlPoint(1842, new Vector4(1.0f, 0.98f, 0.93f, 0.98f)), //Position≈0.70
-                new TFControlPoint(2252, new Vector4(1.0f, 1.0f, 0.96f, 0.99f)), //Position≈0.80
-                new TFControlPoint(2661, new Vector4(1.0f, 1.0f, 0.98f, 0.995f)), //Position≈0.90
-                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.000f)) //Position≈1.00
+                //高密度骨
+                new(0.68f, new Vector4(0.95f, 0.92f, 0.80f, 0.800f)),
+                new(0.80f, new Vector4(0.98f, 0.96f, 0.88f, 0.930f)),
+
+                //致密骨/金属
+                new(0.92f, new Vector4(1.00f, 1.00f, 0.96f, 0.980f)),
+                new(1.00f, new Vector4(1.00f, 1.00f, 1.00f, 1.000f))
             ];
 
             return controlPoints;
         }
         #endregion
 
-        #region 获取血管控制点列表 —— static TFControlPoint[] GetVascularControlPoints()
+        #region 获取血管控制点列表 —— static DensityControlPoint[] GetVascularControlPoints()
         /// <summary>
         /// 获取血管控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static TFControlPoint[] GetVascularControlPoints()
+        /// <remarks>配套窗宽600/窗位300</remarks>
+        private static DensityControlPoint[] GetVascularControlPoints()
         {
-            TFControlPoint[] controlPoints =
+            DensityControlPoint[] controlPoints =
             [
-                //空气/背景：完全透明
-                new TFControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),
-                new TFControlPoint(-100, new Vector4(0.0f, 0.0f, 0.0f, 0.00f)),    //Position≈0.226
+                //背景：全透明
+                new(0.00f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
+                new(0.15f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
 
-                //软组织：极低透明度
-                new TFControlPoint(-50, new Vector4(0.15f, 0.15f, 0.15f, 0.002f)),  //Position≈0.238
-                new TFControlPoint(0, new Vector4(0.20f, 0.20f, 0.20f, 0.004f)),    //Position≈0.250
-                new TFControlPoint(50, new Vector4(0.25f, 0.25f, 0.25f, 0.008f)),   //Position≈0.262
+                //软组织：极淡
+                new(0.25f, new Vector4(0.18f, 0.18f, 0.20f, 0.003f)),
 
-                //软组织/肌肉：低透明度
-                new TFControlPoint(80, new Vector4(0.30f, 0.30f, 0.32f, 0.015f)),   //Position≈0.270
-                new TFControlPoint(100, new Vector4(0.35f, 0.35f, 0.38f, 0.025f)),  //Position≈0.274
+                //透明凹陷
+                new(0.35f, new Vector4(0.25f, 0.25f, 0.28f, 0.000f)),
 
-                //血管开始：对比增强区
-                new TFControlPoint(150, new Vector4(0.50f, 0.50f, 0.55f, 0.080f)),  //Position≈0.287
-                new TFControlPoint(200, new Vector4(0.70f, 0.70f, 0.75f, 0.250f)),  //Position≈0.299
-                new TFControlPoint(250, new Vector4(0.85f, 0.85f, 0.88f, 0.550f)),  //Position≈0.311
+                //血管开始：对比增强
+                new(0.45f, new Vector4(0.50f, 0.50f, 0.55f, 0.060f)),
+                new(0.55f, new Vector4(0.70f, 0.70f, 0.75f, 0.200f)),
 
-                //血管核心：高不透明度
-                new TFControlPoint(300, new Vector4(0.92f, 0.92f, 0.94f, 0.780f)),  //Position≈0.323
-                new TFControlPoint(350, new Vector4(0.95f, 0.95f, 0.96f, 0.900f)),  //Position≈0.335
-                new TFControlPoint(400, new Vector4(0.97f, 0.97f, 0.98f, 0.950f)),  //Position≈0.348
+                //血管核心
+                new(0.68f, new Vector4(0.85f, 0.85f, 0.88f, 0.500f)),
+                new(0.80f, new Vector4(0.92f, 0.92f, 0.94f, 0.780f)),
 
-                //骨骼/钙化：几乎不透明
-                new TFControlPoint(500, new Vector4(0.98f, 0.98f, 0.99f, 0.970f)),  //Position≈0.372
-                new TFControlPoint(600, new Vector4(0.99f, 0.99f, 0.99f, 0.980f)),  //Position≈0.396
+                //钙化
+                new(0.90f, new Vector4(0.96f, 0.96f, 0.97f, 0.920f)),
 
-                //窗外锚点
-                new TFControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.000f))    //Position≈1.00
+                //骨骼
+                new(0.97f, new Vector4(0.99f, 0.99f, 0.99f, 0.970f)),
+                new(1.00f, new Vector4(1.00f, 1.00f, 1.00f, 1.000f))
             ];
 
             return controlPoints;

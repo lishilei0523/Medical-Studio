@@ -4,38 +4,31 @@ using System.Runtime.InteropServices;
 namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
-    /// 传递函数控制点
+    /// HU控制点
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public record struct TFControlPoint
+    public readonly record struct HUControlPoint
     {
         /// <summary>
-        /// 创建传递函数控制点构造器
+        /// 创建HU控制点构造器
         /// </summary>
-        /// <param name="huValue">HU值</param>
+        /// <param name="hu">HU值</param>
         /// <param name="color">颜色</param>
-        public TFControlPoint(short huValue, Vector4 color)
+        public HUControlPoint(short hu, Vector4 color)
             : this()
         {
+            this.HU = hu;
             this.Color = color;
-            this.HU = huValue;
-            this.Position = float.Epsilon;
         }
 
         /// <summary>
         /// HU值
         /// </summary>
-        public short HU;
+        public readonly short HU;
 
         /// <summary>
         /// 颜色
         /// </summary>
-        public Vector4 Color;
-
-        /// <summary>
-        /// 位置
-        /// </summary>
-        /// <remarks>值域: [0, 1]</remarks>
-        public float Position;
+        public readonly Vector4 Color;
     }
 }

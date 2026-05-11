@@ -64,7 +64,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             Vector3 targetPosition = new Vector3(0.0f);
             Vector3 upDirection = new Vector3(0, 0, 1);
             this.Camera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
-            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ProtocolManager.GrayControlPoints);
+            this.TFControlPoints = new AvaloniaList<DensityControlPoint>(ProtocolManager.GrayControlPoints);
 
             //初始化输入管理器
             this.InputManager = new OrbitInputManager(this.Camera);
@@ -276,12 +276,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public int WindowCenter { get; set; }
         #endregion
 
-        #region 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        #region 传递函数控制点列表 —— AvaloniaList<DensityControlPoint> TFControlPoints
         /// <summary>
         /// 传递函数控制点列表
         /// </summary>
         [DependencyProperty]
-        public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
+        public AvaloniaList<DensityControlPoint> TFControlPoints { get; set; }
         #endregion
 
         #region 横断面 —— PlaneVisual3D AxialPlane

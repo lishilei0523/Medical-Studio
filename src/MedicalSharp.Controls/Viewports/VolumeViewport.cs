@@ -66,7 +66,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 传递函数控制点列表依赖属性
         /// </summary>
-        public static readonly StyledProperty<AvaloniaList<TFControlPoint>> TFControlPointsProperty;
+        public static readonly StyledProperty<AvaloniaList<DensityControlPoint>> TFControlPointsProperty;
 
         /// <summary>
         /// 是否开启深度写入依赖属性
@@ -91,7 +91,7 @@ namespace MedicalSharp.Controls.Viewports
             StepSizeProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(StepSize), 0.0012f);
             MaxStepsCountProperty = AvaloniaProperty.Register<VolumeViewport, int>(nameof(MaxStepsCount), 1000);
             OpacityThresholdProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(OpacityThreshold), 0.99f);
-            TFControlPointsProperty = AvaloniaProperty.Register<VolumeViewport, AvaloniaList<TFControlPoint>>(nameof(TFControlPoints));
+            TFControlPointsProperty = AvaloniaProperty.Register<VolumeViewport, AvaloniaList<DensityControlPoint>>(nameof(TFControlPoints));
             DepthMaskEnabledProperty = AvaloniaProperty.Register<VolumeViewport, bool>(nameof(DepthMaskEnabled), false);
             VolumeDataProperty = AvaloniaProperty.Register<VolumeViewport, VolumeData>(nameof(VolumeData));
 
@@ -104,7 +104,7 @@ namespace MedicalSharp.Controls.Viewports
             StepSizeProperty.Changed.AddClassHandler<VolumeViewport, float>(OnStepSizeChanged);
             MaxStepsCountProperty.Changed.AddClassHandler<VolumeViewport, int>(OnMaxStepsCountChanged);
             OpacityThresholdProperty.Changed.AddClassHandler<VolumeViewport, float>(OnOpacityThresholdChanged);
-            TFControlPointsProperty.Changed.AddClassHandler<VolumeViewport, AvaloniaList<TFControlPoint>>(OnTFControlPointsChanged);
+            TFControlPointsProperty.Changed.AddClassHandler<VolumeViewport, AvaloniaList<DensityControlPoint>>(OnTFControlPointsChanged);
             VolumeDataProperty.Changed.AddClassHandler<VolumeViewport, VolumeData>(OnVolumeDataChanged);
         }
 
@@ -219,11 +219,11 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        #region 依赖属性 - 传递函数控制点列表 —— AvaloniaList<DensityControlPoint> TFControlPoints
         /// <summary>
         /// 依赖属性 - 传递函数控制点列表
         /// </summary>
-        public AvaloniaList<TFControlPoint> TFControlPoints
+        public AvaloniaList<DensityControlPoint> TFControlPoints
         {
             get => this.GetValue(TFControlPointsProperty);
             set => this.SetValue(TFControlPointsProperty, value);
@@ -508,12 +508,12 @@ namespace MedicalSharp.Controls.Viewports
         /// <summary>
         /// 传递函数控制点列表改变事件
         /// </summary>
-        private static void OnTFControlPointsChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<AvaloniaList<TFControlPoint>> eventArgs)
+        private static void OnTFControlPointsChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<AvaloniaList<DensityControlPoint>> eventArgs)
         {
             if (eventArgs.OldValue.Value != null)
             {
                 //清除旧元素
-                foreach (TFControlPoint controlPoint in eventArgs.OldValue.Value)
+                foreach (DensityControlPoint controlPoint in eventArgs.OldValue.Value)
                 {
                     viewport._volumeRenderer?.TransferFunction.RemoveControlPoint(controlPoint);
                 }
@@ -522,7 +522,7 @@ namespace MedicalSharp.Controls.Viewports
             if (eventArgs.NewValue.Value != null)
             {
                 //添加新元素
-                foreach (TFControlPoint controlPoint in eventArgs.NewValue.Value)
+                foreach (DensityControlPoint controlPoint in eventArgs.NewValue.Value)
                 {
                     viewport._volumeRenderer?.TransferFunction.AddControlPoint(controlPoint);
                 }
@@ -549,7 +549,7 @@ namespace MedicalSharp.Controls.Viewports
             if (eventArgs.OldItems != null)
             {
                 //清除旧元素
-                foreach (TFControlPoint controlPoint in eventArgs.OldItems)
+                foreach (DensityControlPoint controlPoint in eventArgs.OldItems)
                 {
                     this._volumeRenderer?.TransferFunction.RemoveControlPoint(controlPoint);
                 }
@@ -557,7 +557,7 @@ namespace MedicalSharp.Controls.Viewports
             if (eventArgs.NewItems != null)
             {
                 //添加新元素
-                foreach (TFControlPoint controlPoint in eventArgs.NewItems)
+                foreach (DensityControlPoint controlPoint in eventArgs.NewItems)
                 {
                     this._volumeRenderer?.TransferFunction.AddControlPoint(controlPoint);
                 }
@@ -611,7 +611,6 @@ namespace MedicalSharp.Controls.Viewports
             //初始化传递函数、标记策略
             viewport._volumeRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
             viewport._volumeRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
-            viewport._volumeRenderer.TransferFunction.SetHURange(volumeData.Metadata.MinHU, volumeData.Metadata.MaxHU);
             viewport._volumeRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
 
             //请求下一帧

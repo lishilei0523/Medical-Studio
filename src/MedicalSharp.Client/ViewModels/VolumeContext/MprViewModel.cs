@@ -64,7 +64,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
-            this.TFControlPoints = new AvaloniaList<TFControlPoint>(ProtocolManager.RainbowControlPoints);
+            this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.RainbowControlPoints);
             this.Shapes = [];
             this.GrayModeChecked = true;
             this.Crosshair = new CrosshairVisual3D();
@@ -210,12 +210,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region 传递函数控制点列表 —— AvaloniaList<TFControlPoint> TFControlPoints
+        #region 传递函数控制点列表 —— AvaloniaList<HUControlPoint> TFControlPoints
         /// <summary>
         /// 传递函数控制点列表
         /// </summary>
         [DependencyProperty]
-        public AvaloniaList<TFControlPoint> TFControlPoints { get; set; }
+        public AvaloniaList<HUControlPoint> TFControlPoints { get; set; }
         #endregion
 
         #region MPR渲染模式 —— MPRRenderMode RenderMode
