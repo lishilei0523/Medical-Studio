@@ -27,6 +27,11 @@ namespace MedicalSharp.Primitives.Managers
         private static readonly DensityControlPoint[] _GrayControlPoints;
 
         /// <summary>
+        /// 解剖色控制点列表
+        /// </summary>
+        private static readonly DensityControlPoint[] _AnatomyControlPoints;
+
+        /// <summary>
         /// 脑控制点列表
         /// </summary>
         private static readonly DensityControlPoint[] _BrainControlPoints;
@@ -74,6 +79,7 @@ namespace MedicalSharp.Primitives.Managers
             _RainbowControlPoints = GetRainbowControlPoints();
             _HotMetalControlPoints = GetHotMetalControlPoints();
             _GrayControlPoints = GetGrayControlPoints();
+            _AnatomyControlPoints = GetAnatomyControlPoints();
             _BrainControlPoints = GetBrainControlPoints();
             _CardiacControlPoints = GetCardiacControlPoints();
             _LiverControlPoints = GetLiverControlPoints();
@@ -84,6 +90,7 @@ namespace MedicalSharp.Primitives.Managers
             _PresetControlPointGroups = new Dictionary<string, DensityControlPoint[]>
             {
                 { "灰度", _GrayControlPoints },
+                { "解剖", _AnatomyControlPoints },
                 { "脑", _BrainControlPoints },
                 { "心脏", _CardiacControlPoints },
                 { "肝脏", _LiverControlPoints },
@@ -126,7 +133,17 @@ namespace MedicalSharp.Primitives.Managers
         {
             get => _GrayControlPoints;
         }
-        #endregion 
+        #endregion
+
+        #region 只读属性 - 解剖色控制点列表 —— static IReadOnlyList<DensityControlPoint> AnatomyControlPoints
+        /// <summary>
+        /// 只读属性 - 解剖色控制点列表
+        /// </summary>
+        public static IReadOnlyList<DensityControlPoint> AnatomyControlPoints
+        {
+            get => _AnatomyControlPoints;
+        }
+        #endregion
 
         #region 只读属性 - 脑控制点列表 —— static IReadOnlyList<DensityControlPoint> BrainControlPoints
         /// <summary>
@@ -269,6 +286,50 @@ namespace MedicalSharp.Primitives.Managers
             [
                 new(0.0f, new Vector4(0.0f, 0.0f, 0.0f, 0.0f)),
                 new(1.0f, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))
+            ];
+
+            return controlPoints;
+        }
+        #endregion
+
+        #region 获取解剖色控制点列表 —— static DensityControlPoint[] GetAnatomyControlPoints()
+        /// <summary>
+        /// 获取解剖色控制点列表
+        /// </summary>
+        /// <returns>控制点列表</returns>
+        /// <remarks>配套窗宽1500/窗位-600</remarks>
+        private static DensityControlPoint[] GetAnatomyControlPoints()
+        {
+            DensityControlPoint[] controlPoints =
+            [
+                //空气：透明黑
+                new DensityControlPoint(0.00f, new Vector4(0.00f, 0.00f, 0.00f, 0.000f)),
+
+                //肺实质：淡粉灰
+                new DensityControlPoint(0.08f, new Vector4(0.18f, 0.12f, 0.15f, 0.010f)),
+                new DensityControlPoint(0.18f, new Vector4(0.35f, 0.22f, 0.28f, 0.025f)),
+
+                //透明凹陷
+                new DensityControlPoint(0.25f, new Vector4(0.30f, 0.20f, 0.25f, 0.000f)),
+
+                //肌肉：红褐色
+                new DensityControlPoint(0.35f, new Vector4(0.55f, 0.25f, 0.18f, 0.040f)),
+                new DensityControlPoint(0.45f, new Vector4(0.68f, 0.32f, 0.22f, 0.080f)),
+
+                //肝脏/实质器官：深红褐
+                new DensityControlPoint(0.55f, new Vector4(0.60f, 0.20f, 0.15f, 0.150f)),
+                new DensityControlPoint(0.65f, new Vector4(0.72f, 0.28f, 0.20f, 0.280f)),
+
+                //透明凹陷
+                new DensityControlPoint(0.70f, new Vector4(0.75f, 0.40f, 0.30f, 0.000f)),
+
+                //骨骼：象牙白带暖色
+                new DensityControlPoint(0.78f, new Vector4(0.88f, 0.72f, 0.50f, 0.450f)),
+                new DensityControlPoint(0.88f, new Vector4(0.95f, 0.88f, 0.72f, 0.750f)),
+
+                //密质骨/钙化：亮白
+                new DensityControlPoint(0.95f, new Vector4(1.00f, 0.96f, 0.88f, 0.920f)),
+                new DensityControlPoint(1.00f, new Vector4(1.00f, 1.00f, 1.00f, 1.000f))
             ];
 
             return controlPoints;

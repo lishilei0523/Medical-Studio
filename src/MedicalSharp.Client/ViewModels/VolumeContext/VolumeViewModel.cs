@@ -83,7 +83,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.StepSize = 0.0012f;
             this.MaxStepsCount = 1000;
             this.OpacityThreshold = 0.99f;
-            this.TFControlPoints = new AvaloniaList<DensityControlPoint>(ProtocolManager.GrayControlPoints);
+            this.TFControlPoints = new AvaloniaList<DensityControlPoint>(ProtocolManager.AnatomyControlPoints);
         }
 
         #endregion
