@@ -5,6 +5,8 @@ using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Client.ViewModels.ProtocolContext
 {
@@ -26,21 +28,6 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         public MprProtocolViewModel(IWindowManager windowManager)
         {
             this._windowManager = windowManager;
-
-            //默认值
-            this.SelectedWindowLevel = WindowLevelManager.Default;
-            this.WindowLevels =
-            [
-                WindowLevelManager.Default,
-                WindowLevelManager.Brain,
-                WindowLevelManager.Cardiac,
-                WindowLevelManager.Liver,
-                WindowLevelManager.Lung,
-                WindowLevelManager.Abdomen,
-                WindowLevelManager.Bone,
-                WindowLevelManager.Vascular,
-                WindowLevelManager.Mediastinum
-            ];
         }
 
         #endregion
@@ -54,11 +41,11 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         public MprViewModel MprViewModel { get; set; }
         #endregion
 
-        #region 已选预设窗 —— WindowLevel? SelectedWindowLevel
+        #region 已选预设窗 —— WindowLevel SelectedWindowLevel
         /// <summary>
         /// 已选预设窗
         /// </summary>
-        public WindowLevel? SelectedWindowLevel
+        public WindowLevel SelectedWindowLevel
         {
             get;
             set
@@ -86,7 +73,33 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
 
         #region # 方法
 
-        //
+        #region 初始化 —— override Task OnActivatedAsync(CancellationToken cancellationToken)
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected override Task OnActivatedAsync(CancellationToken cancellationToken)
+        {
+            //默认值
+            this.WindowLevels =
+            [
+                WindowLevelManager.Default,
+                WindowLevelManager.Brain,
+                WindowLevelManager.Cardiac,
+                WindowLevelManager.Liver,
+                WindowLevelManager.Lung,
+                WindowLevelManager.Abdomen,
+                WindowLevelManager.Bone,
+                WindowLevelManager.Vascular,
+                WindowLevelManager.Mediastinum
+            ];
+            this.SelectedWindowLevel = WindowLevelManager.Default;
+
+            return base.OnActivatedAsync(cancellationToken);
+        }
+
+        #endregion
 
         #endregion
     }

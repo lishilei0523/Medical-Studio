@@ -78,6 +78,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.AxialPlaneVisible = true;
             this.CoronalPlaneVisible = true;
             this.SagittalPlaneVisible = true;
+            this.Brightness = 1.0f;
+            this.DensityScale = 1.0f;
+            this.StepSize = 0.0012f;
+            this.MaxStepsCount = 1000;
+            this.OpacityThreshold = 0.99f;
             this.TFControlPoints = new AvaloniaList<DensityControlPoint>(ProtocolManager.GrayControlPoints);
         }
 
@@ -276,6 +281,46 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public int WindowCenter { get; set; }
         #endregion
 
+        #region 亮度 —— float Brightness
+        /// <summary>
+        /// 亮度
+        /// </summary>
+        [DependencyProperty]
+        public float Brightness { get; set; }
+        #endregion
+
+        #region 密度缩放 —— float DensityScale
+        /// <summary>
+        /// 密度缩放
+        /// </summary>
+        [DependencyProperty]
+        public float DensityScale { get; set; }
+        #endregion
+
+        #region 步长 —— float StepSize
+        /// <summary>
+        /// 步长
+        /// </summary>
+        [DependencyProperty]
+        public float StepSize { get; set; }
+        #endregion
+
+        #region 最大步数 —— int MaxStepsCount
+        /// <summary>
+        /// 最大步数
+        /// </summary>
+        [DependencyProperty]
+        public int MaxStepsCount { get; set; }
+        #endregion
+
+        #region 透明度阈值 —— float OpacityThreshold
+        /// <summary>
+        /// 透明度阈值
+        /// </summary>
+        [DependencyProperty]
+        public float OpacityThreshold { get; set; }
+        #endregion
+
         #region 传递函数控制点列表 —— AvaloniaList<DensityControlPoint> TFControlPoints
         /// <summary>
         /// 传递函数控制点列表
@@ -380,6 +425,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand TuneProtocolCommand => new AsyncRelayCommand(async _ =>
         {
+            if (this.VolumeData == null)
+            {
+                return;
+            }
+
             VolumeProtocolViewModel viewModel = ResolveMediator.Resolve<VolumeProtocolViewModel>();
             viewModel.VolumeViewModel = this;
             await this._windowManager.ShowWindowAsync(viewModel);

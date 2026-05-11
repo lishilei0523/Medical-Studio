@@ -62,6 +62,11 @@ namespace MedicalSharp.Primitives.Managers
         private static readonly DensityControlPoint[] _VascularControlPoints;
 
         /// <summary>
+        /// 预设控制点字典
+        /// </summary>
+        private static readonly IDictionary<string, DensityControlPoint[]> _PresetControlPointGroups;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static ProtocolManager()
@@ -76,6 +81,17 @@ namespace MedicalSharp.Primitives.Managers
             _AbdomenControlPoints = GetAbdomenControlPoints();
             _BoneControlPoints = GetBoneControlPoints();
             _VascularControlPoints = GetVascularControlPoints();
+            _PresetControlPointGroups = new Dictionary<string, DensityControlPoint[]>
+            {
+                { "灰度", _GrayControlPoints },
+                { "脑", _BrainControlPoints },
+                { "心脏", _CardiacControlPoints },
+                { "肝脏", _LiverControlPoints },
+                { "肺", _LungControlPoints },
+                { "腹部", _AbdomenControlPoints },
+                { "骨骼", _BoneControlPoints },
+                { "血管", _VascularControlPoints }
+            };
         }
 
         #endregion
@@ -179,6 +195,16 @@ namespace MedicalSharp.Primitives.Managers
         public static IReadOnlyList<DensityControlPoint> VascularControlPoints
         {
             get => _VascularControlPoints;
+        }
+        #endregion
+
+        #region 只读属性 - 预设控制点字典 —— IDictionary<string, DensityControlPoint[]> PresetControlPointGroups
+        /// <summary>
+        /// 只读属性 - 预设控制点字典
+        /// </summary>
+        public static IDictionary<string, DensityControlPoint[]> PresetControlPointGroups
+        {
+            get => _PresetControlPointGroups;
         }
         #endregion
 
