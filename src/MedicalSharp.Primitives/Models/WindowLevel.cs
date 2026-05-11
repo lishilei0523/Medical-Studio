@@ -1,12 +1,9 @@
-﻿using System.Runtime.InteropServices;
-
-namespace MedicalSharp.Primitives.Models
+﻿namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
     /// 窗宽/窗位
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public readonly struct WindowLevel
+    public record WindowLevel
     {
         /// <summary>
         /// 创建窗宽/窗位构造器
@@ -15,7 +12,6 @@ namespace MedicalSharp.Primitives.Models
         /// <param name="windowWidth">窗宽</param>
         /// <param name="windowCenter">窗位</param>
         public WindowLevel(string name, int windowWidth, int windowCenter)
-            : this()
         {
             this.Name = name;
             this.WindowWidth = windowWidth;
@@ -25,17 +21,17 @@ namespace MedicalSharp.Primitives.Models
         /// <summary>
         /// 名称
         /// </summary>
-        private readonly string Name;
+        private string Name { get; }
 
         /// <summary>
         /// 窗宽
         /// </summary>
-        public readonly int WindowWidth;
+        public int WindowWidth { get; }
 
         /// <summary>
         /// 窗位
         /// </summary>
-        public readonly int WindowCenter;
+        public int WindowCenter { get; }
 
         /// <summary>
         /// 转换字符串

@@ -4,10 +4,53 @@
 			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			  mc:Ignorable="d"
-			  Width="800" Height="600" CanResize="False" ShowAsDialog="True"
+			  Width="600" Height="560" CanResize="False" ShowAsDialog="True"
 			  WindowStartupLocation="CenterScreen"
 			  Title="MPR协议">
-
-	Welcome to Avalonia!
+	
+		<StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
+            <sd:FormItem Label="预设窗：">
+                <ComboBox Width="240" ItemsSource="{Binding WindowLevels}"
+                          DisplayMemberBinding="{Binding}"
+                          SelectedValue="{Binding SelectedWindowLevel}" />
+            </sd:FormItem>
+            <sd:FormItem Label="窗宽：">
+                <TextBox Width="240" HorizontalAlignment="Left" 
+                         Text="{Binding MprViewModel.WindowWidth}" />
+            </sd:FormItem>
+            <sd:FormItem>
+				<Slider Minimum="1" Maximum="4095" SmallChange="1" LargeChange="10"
+                        TickFrequency="100" TickPlacement="TopLeft"
+                        Value="{Binding MprViewModel.WindowWidth}" />
+			</sd:FormItem>
+            <sd:FormItem Label="窗位：">
+                <TextBox Width="240" HorizontalAlignment="Left" 
+                         Text="{Binding MprViewModel.WindowCenter}" />
+            </sd:FormItem>
+			<sd:FormItem>
+                <Slider Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
+                        TickFrequency="100" TickPlacement="TopLeft"
+                        Value="{Binding MprViewModel.WindowCenter}" />
+			</sd:FormItem>
+            <sd:FormItem Label="亮度：">
+                <TextBox Width="240" HorizontalAlignment="Left" 
+                         Text="{Binding MprViewModel.Brightness}" />
+            </sd:FormItem>
+			<sd:FormItem>
+                <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
+                        TickFrequency="0.1" TickPlacement="TopLeft"
+                        Value="{Binding MprViewModel.Brightness}" />
+			</sd:FormItem>
+            <sd:FormItem Label="对比度：">
+                <TextBox Width="240" HorizontalAlignment="Left" 
+                         Text="{Binding MprViewModel.Contrast}" />
+            </sd:FormItem>
+			<sd:FormItem>
+                <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
+                        TickFrequency="0.1" TickPlacement="TopLeft"
+                        Value="{Binding MprViewModel.Contrast}" />
+			</sd:FormItem>
+		</StackPanel>
 </fa:AppWindow>

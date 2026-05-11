@@ -64,11 +64,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
-            this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.RainbowControlPoints);
             this.Shapes = [];
             this.GrayModeChecked = true;
             this.Crosshair = new CrosshairVisual3D();
             this.CrosshairVisible = true;
+            this.Brightness = 1.0f;
+            this.Contrast = 1.0f;
+            this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.RainbowControlPoints);
             this.Translate3D();
         }
 
@@ -206,16 +208,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this.SelectedShape = null;
                     this.Shapes.Clear();
                 }
+                else
+                {
+                    this.WindowWidth = WindowLevelManager.Default.WindowWidth;
+                    this.WindowCenter = WindowLevelManager.Default.WindowCenter;
+                }
             }
         }
-        #endregion
-
-        #region 传递函数控制点列表 —— AvaloniaList<HUControlPoint> TFControlPoints
-        /// <summary>
-        /// 传递函数控制点列表
-        /// </summary>
-        [DependencyProperty]
-        public AvaloniaList<HUControlPoint> TFControlPoints { get; set; }
         #endregion
 
         #region MPR渲染模式 —— MPRRenderMode RenderMode
@@ -224,6 +223,46 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public MPRRenderMode RenderMode { get; set; }
+        #endregion
+
+        #region 窗宽 —— int WindowWidth
+        /// <summary>
+        /// 窗宽
+        /// </summary>
+        [DependencyProperty]
+        public int WindowWidth { get; set; }
+        #endregion
+
+        #region 窗位 —— int WindowCenter
+        /// <summary>
+        /// 窗位
+        /// </summary>
+        [DependencyProperty]
+        public int WindowCenter { get; set; }
+        #endregion
+
+        #region 亮度 —— float Brightness
+        /// <summary>
+        /// 亮度
+        /// </summary>
+        [DependencyProperty]
+        public float Brightness { get; set; }
+        #endregion
+
+        #region 对比度 —— float Contrast
+        /// <summary>
+        /// 对比度
+        /// </summary>
+        [DependencyProperty]
+        public float Contrast { get; set; }
+        #endregion
+
+        #region 传递函数控制点列表 —— AvaloniaList<HUControlPoint> TFControlPoints
+        /// <summary>
+        /// 传递函数控制点列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<HUControlPoint> TFControlPoints { get; set; }
         #endregion
 
         #region 十字线 —— CrosshairVisual3D Crosshair
@@ -296,6 +335,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand TuneProtocolCommand => new AsyncRelayCommand(async _ =>
         {
+            if (this.VolumeData == null)
+            {
+                return;
+            }
+
             MprProtocolViewModel viewModel = ResolveMediator.Resolve<MprProtocolViewModel>();
             viewModel.MprViewModel = this;
             await this._windowManager.ShowWindowAsync(viewModel);

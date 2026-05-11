@@ -104,8 +104,12 @@
                         Camera="{Binding Camera}"
                         InputManager="{Binding InputManager}"
                         VolumeData="{Binding VolumeData}"
-                        TFControlPoints="{Binding TFControlPoints}"
-                        RenderMode="{Binding RenderMode}">
+                        RenderMode="{Binding RenderMode}"
+						WindowWidth="{Binding WindowWidth}"
+						WindowCenter="{Binding WindowCenter}"
+						Brightness="{Binding Brightness}"
+						Contrast="{Binding Contrast}"
+                        TFControlPoints="{Binding TFControlPoints}">
 			<sd:ShapePresenter Content="{Binding Crosshair}" />
 			<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
 		</sd:MPRViewport>
