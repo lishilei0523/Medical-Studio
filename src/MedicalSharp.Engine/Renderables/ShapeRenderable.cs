@@ -1,6 +1,7 @@
 ﻿using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 
@@ -36,12 +37,13 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 方法
 
-        #region 渲染 —— abstract void Render(ShaderProgram program)
+        #region 渲染 —— abstract void Render(ShaderProgram program, RenderContext context)
         /// <summary>
         /// 渲染
         /// </summary>
         /// <param name="program">Shader程序</param>
-        public abstract void Render(ShaderProgram program);
+        /// <param name="context">渲染上下文</param>
+        public abstract void Render(ShaderProgram program, RenderContext context);
         #endregion
 
         #region 检测射线相交 —— virtual bool IntersectsRay(Ray ray, out float distance...

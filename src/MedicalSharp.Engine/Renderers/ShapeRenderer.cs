@@ -118,7 +118,8 @@ namespace MedicalSharp.Engine.Renderers
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
             //渲染上下文
-            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            float zoomFactor = this.Camera is MPRCamera mprCamera ? mprCamera.ZoomFactor : 1.0f;
+            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, zoomFactor);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.ShapeProgram;
@@ -135,10 +136,7 @@ namespace MedicalSharp.Engine.Renderers
                 program.SetUniformMatrix4("u_ModelMatrix", renderable.ModelMatrix);
 
                 //渲染
-                renderable.Render(program);
-
-                //触发渲染事件
-                renderable.OnRender(renderContext);
+                renderable.Render(program, renderContext);
             }
 
             //取消使用

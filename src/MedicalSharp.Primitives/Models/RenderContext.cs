@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using MedicalSharp.Primitives.Enums;
+using OpenTK.Mathematics;
 
 namespace MedicalSharp.Primitives.Models
 {
@@ -12,18 +13,22 @@ namespace MedicalSharp.Primitives.Models
         /// </summary>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
+        /// <param name="cameraMode">相机模式</param>
         /// <param name="cameraPosition">相机位置</param>
         /// <param name="lookDirection">视角方向</param>
         /// <param name="projectionMatrix">投影矩阵</param>
         /// <param name="viewMatrix">视图矩阵</param>
-        public RenderContext(float viewportWidth, float viewportHeight, Vector3 cameraPosition, Vector3 lookDirection, Matrix4 projectionMatrix, Matrix4 viewMatrix)
+        /// <param name="zoomFactor">缩放因子</param>
+        public RenderContext(float viewportWidth, float viewportHeight, CameraMode cameraMode, Vector3 cameraPosition, Vector3 lookDirection, Matrix4 projectionMatrix, Matrix4 viewMatrix, float zoomFactor = 1.0f)
         {
             this.ViewportWidth = viewportWidth;
             this.ViewportHeight = viewportHeight;
+            this.CameraMode = cameraMode;
             this.CameraPosition = cameraPosition;
             this.LookDirection = lookDirection;
             this.ProjectionMatrix = projectionMatrix;
             this.ViewMatrix = viewMatrix;
+            this.ZoomFactor = zoomFactor;
         }
 
         /// <summary>
@@ -35,6 +40,11 @@ namespace MedicalSharp.Primitives.Models
         /// 视口高度
         /// </summary>
         public float ViewportHeight { get; private set; }
+
+        /// <summary>
+        /// 相机模式
+        /// </summary>
+        public CameraMode CameraMode { get; private set; }
 
         /// <summary>
         /// 相机位置
@@ -55,5 +65,11 @@ namespace MedicalSharp.Primitives.Models
         /// 视图矩阵
         /// </summary>
         public Matrix4 ViewMatrix { get; private set; }
+
+        /// <summary>
+        /// 缩放因子
+        /// </summary>
+        /// <remarks>MPR相机适用</remarks>
+        public float ZoomFactor { get; private set; }
     }
 }

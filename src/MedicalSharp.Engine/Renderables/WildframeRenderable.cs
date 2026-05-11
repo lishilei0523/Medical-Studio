@@ -205,12 +205,13 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 渲染 —— override void Render(ShaderProgram program)
+        #region 渲染 —— override void Render(ShaderProgram program, RenderContext context)
         /// <summary>
         /// 渲染
         /// </summary>
         /// <param name="program">Shader程序</param>
-        public override void Render(ShaderProgram program)
+        /// <param name="context">渲染上下文</param>
+        public override void Render(ShaderProgram program, RenderContext context)
         {
             //禁用深度写入、让透明面可以互相混合
             GL.DepthMask(false);
@@ -218,6 +219,7 @@ namespace MedicalSharp.Engine.Renderables
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             //绘制填充模型	
+            program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.Fill);
             this._fillBuffer.Draw(PrimitiveType.Triangles);
 
@@ -227,6 +229,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
+            program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.Stroke);
             this._strokeBuffer.Draw(PrimitiveType.Lines);
 
@@ -247,6 +250,7 @@ namespace MedicalSharp.Engine.Renderables
                 }
 
                 //绘制控制点
+                program.SetUniformInt("u_HasTexture", 0);
                 program.SetUniformVector4("u_Color", invertedStroke);
                 this._strokeBuffer.Draw(PrimitiveType.Points);
             }

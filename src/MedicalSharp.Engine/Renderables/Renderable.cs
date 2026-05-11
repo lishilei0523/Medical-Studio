@@ -1,5 +1,4 @@
 ﻿using MedicalSharp.Primitives.Maths;
-using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 
@@ -11,11 +10,6 @@ namespace MedicalSharp.Engine.Renderables
     public abstract class Renderable
     {
         #region # 字段及构造器
-
-        /// <summary>
-        /// 渲染事件
-        /// </summary>
-        public event EventHandler<RenderContext> RenderEvent;
 
         /// <summary>
         /// 包围盒
@@ -119,17 +113,6 @@ namespace MedicalSharp.Engine.Renderables
             }
 
             this.Transform = transform;
-        }
-        #endregion
-
-        #region 渲染事件 —— void OnRender(RenderContext renderContext)
-        /// <summary>
-        /// 渲染事件
-        /// </summary>
-        /// <param name="renderContext">渲染上下文</param>
-        protected internal void OnRender(RenderContext renderContext)
-        {
-            this.RenderEvent?.Invoke(this, renderContext);
         }
         #endregion
 

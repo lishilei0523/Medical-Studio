@@ -336,9 +336,8 @@ namespace MedicalSharp.Controls.Viewports
             //InputManger默认值
             this.InputManager ??= new MPRInputManager(this.MPRCamera);
 
-            //初始化形状、文本渲染器
+            //初始化形状渲染器
             this._shapeRenderer = new ShapeRenderer(this.MPRCamera);
-            this._textRenderer = new TextRenderer(this.MPRCamera);
 
             //初始化MPR渲染器
             this._mprRenderer = new MPRRenderer(this.MPRCamera);
@@ -371,13 +370,12 @@ namespace MedicalSharp.Controls.Viewports
                 this._mprRenderer.SetRenderable(this._volumeRenderable);
                 this._mprRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
 
-                //形状、文本渲染
+                //形状渲染
                 base.OnOpenTKRender(viewportSize);
             }
             else
             {
                 this._shapeVisual3Ds.Clear();
-                this._textVisual3Ds.Clear();
             }
         }
         #endregion
@@ -423,26 +421,6 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             return shapeVisual3Ds;
-        }
-        #endregion
-
-        #region 获取文本3D元素列表 —— override List<TextVisual3D> GetTextVisual3Ds()
-        /// <summary>
-        /// 获取文本3D元素列表
-        /// </summary>
-        /// <returns>文本3D元素列表</returns>
-        protected override List<TextVisual3D> GetTextVisual3Ds()
-        {
-            List<TextVisual3D> textVisual3Ds = [];
-            foreach (TextVisual3D textVisual3D in base.GetTextVisual3Ds())
-            {
-                if (textVisual3D.IsOnPlane(this.Plane))
-                {
-                    textVisual3Ds.Add(textVisual3D);
-                }
-            }
-
-            return textVisual3Ds;
         }
         #endregion
 

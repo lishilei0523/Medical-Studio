@@ -21,11 +21,6 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _ShapeProgram;
 
         /// <summary>
-        /// 文本着色器程序
-        /// </summary>
-        private static ShaderProgram _TextProgram;
-
-        /// <summary>
         /// 体积渲染着色器程序
         /// </summary>
         private static ShaderProgram _RaycastProgram;
@@ -65,16 +60,6 @@ namespace MedicalSharp.Engine.Managers
         public static ShaderProgram ShapeProgram
         {
             get => _ShapeProgram;
-        }
-        #endregion
-
-        #region 只读属性 - 文本着色器程序 —— static ShaderProgram TextProgram
-        /// <summary>
-        /// 只读属性 - 文本着色器程序
-        /// </summary>
-        public static ShaderProgram TextProgram
-        {
-            get => _TextProgram;
         }
         #endregion
 
@@ -128,7 +113,6 @@ namespace MedicalSharp.Engine.Managers
                 }
 
                 _ShapeProgram = CreateShapeProgram();
-                _TextProgram = CreateTextProgram();
                 _RaycastProgram = CreateRaycastProgram();
                 _RaycastPickProgram = CreateRaycastPickProgram();
                 _MPRProgram = CreateMPRProgram();
@@ -144,7 +128,6 @@ namespace MedicalSharp.Engine.Managers
         public static void Cleanup()
         {
             _ShapeProgram?.Dispose();
-            _TextProgram?.Dispose();
             _RaycastProgram?.Dispose();
             _RaycastPickProgram?.Dispose();
             _MPRProgram?.Dispose();
@@ -163,21 +146,6 @@ namespace MedicalSharp.Engine.Managers
             ShaderProgram program = new ShaderProgram();
             program.ReadVertexShaderFromFile("Resources/GLSLs/shape.vert");
             program.ReadFragmentShaderFromFile("Resources/GLSLs/shape.frag");
-            program.BuildDraw();
-
-            return program;
-        }
-        #endregion 
-
-        #region 创建文本着色器程序 —— static ShaderProgram CreateTextProgram()
-        /// <summary>
-        /// 创建文本着色器程序
-        /// </summary>
-        private static ShaderProgram CreateTextProgram()
-        {
-            ShaderProgram program = new ShaderProgram();
-            program.ReadVertexShaderFromFile("Resources/GLSLs/text.vert");
-            program.ReadFragmentShaderFromFile("Resources/GLSLs/text.frag");
             program.BuildDraw();
 
             return program;

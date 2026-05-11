@@ -140,15 +140,17 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 渲染 —— override void Render(ShaderProgram program)
+        #region 渲染 —— override void Render(ShaderProgram program, RenderContext context)
         /// <summary>
         /// 渲染
         /// </summary>
         /// <param name="program">Shader程序</param>
-        public override void Render(ShaderProgram program)
+        /// <param name="context">渲染上下文</param>
+        public override void Render(ShaderProgram program, RenderContext context)
         {
             //绘制点模型
             GL.PointSize(this.PointSize);
+            program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.Fill);
             this._vertexBuffer.Draw(PrimitiveType.Points);
         }

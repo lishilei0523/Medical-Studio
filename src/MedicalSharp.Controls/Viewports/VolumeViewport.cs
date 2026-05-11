@@ -382,7 +382,6 @@ namespace MedicalSharp.Controls.Viewports
             else
             {
                 this._shapeVisual3Ds.Clear();
-                this._textVisual3Ds.Clear();
             }
         }
         #endregion

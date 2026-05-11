@@ -30,19 +30,9 @@ namespace MedicalSharp.Controls.Viewports
         protected ShapeRenderer _shapeRenderer;
 
         /// <summary>
-        /// 文本渲染器
-        /// </summary>
-        protected TextRenderer _textRenderer;
-
-        /// <summary>
         /// 形状3D元素列表
         /// </summary>
         protected readonly IList<ShapeVisual3D> _shapeVisual3Ds;
-
-        /// <summary>
-        /// 文本3D元素列表
-        /// </summary>
-        protected readonly IList<TextVisual3D> _textVisual3Ds;
 
         /// <summary>
         /// 默认构造器
@@ -50,7 +40,6 @@ namespace MedicalSharp.Controls.Viewports
         public BasicViewport()
         {
             this._shapeVisual3Ds = new List<ShapeVisual3D>();
-            this._textVisual3Ds = new List<TextVisual3D>();
             this.Children = new AvaloniaList<Visual3D>();
             this.Children.CollectionChanged += this.OnChildrenItemsChanged;
         }
@@ -118,14 +107,6 @@ namespace MedicalSharp.Controls.Viewports
                 if (intersects)
                 {
                     hitResults.Add(shapeVisual3D, distance);
-                }
-            }
-            foreach (TextVisual3D textVisual3D in this._textVisual3Ds.Where(x => x.IsVisible))
-            {
-                bool intersects = textVisual3D.Renderable.IntersectsRay(ray, out float distance, out _, out _, out _);
-                if (intersects)
-                {
-                    hitResults.Add(textVisual3D, distance);
                 }
             }
 
@@ -211,7 +192,6 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             this._shapeRenderer = new ShapeRenderer(this.Camera);
-            this._textRenderer = new TextRenderer(this.Camera);
         }
         #endregion
 
@@ -230,26 +210,17 @@ namespace MedicalSharp.Controls.Viewports
 
             //清空渲染对象
             this._shapeVisual3Ds.Clear();
-            this._textVisual3Ds.Clear();
             this._shapeRenderer.ClearItems();
-            this._textRenderer.ClearItems();
 
             //填充渲染对象
             List<ShapeVisual3D> shapeVisual3Ds = this.GetShapeVisual3Ds();
-            List<TextVisual3D> textVisual3Ds = this.GetTextVisual3Ds();
             foreach (ShapeVisual3D shapeVisual3D in shapeVisual3Ds)
             {
                 this._shapeVisual3Ds.Add(shapeVisual3D);
                 this._shapeRenderer.AppendItem(shapeVisual3D.Renderable);
             }
-            foreach (TextVisual3D textVisual3D in textVisual3Ds)
-            {
-                this._textVisual3Ds.Add(textVisual3D);
-                this._textRenderer.AppendItem(textVisual3D.Renderable);
-            }
 
             this._shapeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
-            this._textRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
         }
         #endregion
 
@@ -260,9 +231,7 @@ namespace MedicalSharp.Controls.Viewports
         protected override void OnOpenTKDeinit()
         {
             this._shapeVisual3Ds.Clear();
-            this._textVisual3Ds.Clear();
             this._shapeRenderer.Dispose();
-            this._textRenderer.Dispose();
         }
         #endregion
 
@@ -303,40 +272,6 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 获取文本3D元素列表 —— virtual List<TextVisual3D> GetTextVisual3Ds()
-        /// <summary>
-        /// 获取文本3D元素列表
-        /// </summary>
-        /// <returns>文本3D元素列表</returns>
-        protected virtual List<TextVisual3D> GetTextVisual3Ds()
-        {
-            List<TextVisual3D> textVisual3Ds = [];
-            foreach (Visual3D visual3D in this.Children.Where(x => x.IsVisible))
-            {
-                if (visual3D is TextVisual3D textVisual3D)
-                {
-                    textVisual3D.EnsureRenderable();
-                    textVisual3Ds.Add(textVisual3D);
-                }
-                if (visual3D is TextPresenter textPresenter && textPresenter.Content.IsVisible)
-                {
-                    textPresenter.Content.EnsureRenderable();
-                    textVisual3Ds.Add(textPresenter.Content);
-                }
-                if (visual3D is TextsPresenter textsPresenter)
-                {
-                    foreach (TextVisual3D item in textsPresenter.ItemsSource.Where(x => x.IsVisible))
-                    {
-                        item.EnsureRenderable();
-                        textVisual3Ds.Add(item);
-                    }
-                }
-            }
-
-            return textVisual3Ds;
-        }
-        #endregion
-
 
         //Events
 
@@ -353,10 +288,6 @@ namespace MedicalSharp.Controls.Viewports
                 if (visual3D is ShapesPresenter shapesPresenter)
                 {
                     shapesPresenter.ItemsSource.CollectionChanged += this.OnItemsPresenterItemsChanged;
-                }
-                if (visual3D is TextsPresenter textsPresenter)
-                {
-                    textsPresenter.ItemsSource.CollectionChanged += this.OnItemsPresenterItemsChanged;
                 }
             }
         }

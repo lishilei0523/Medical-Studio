@@ -241,21 +241,24 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 渲染 —— override void Render(ShaderProgram program)
+        #region 渲染 —— override void Render(ShaderProgram program, RenderContext context)
         /// <summary>
         /// 渲染
         /// </summary>
         /// <param name="program">Shader程序</param>
-        public override void Render(ShaderProgram program)
+        /// <param name="context">渲染上下文</param>
+        public override void Render(ShaderProgram program, RenderContext context)
         {
             //设置线宽
             GL.LineWidth(this.StrokeThickness);
 
             //绘制水平线
+            program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.HorizontalStroke);
             this._horizontalBuffer.Draw(PrimitiveType.Lines);
 
             //绘制垂直线
+            program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.VerticalStroke);
             this._verticalBuffer.Draw(PrimitiveType.Lines);
         }

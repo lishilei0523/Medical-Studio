@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using MedicalSharp.Primitives.Enums;
+using OpenTK.Mathematics;
 
 namespace MedicalSharp.Primitives.Cameras
 {
@@ -45,6 +46,13 @@ namespace MedicalSharp.Primitives.Cameras
         #endregion
 
         #region # 属性
+
+        #region 相机模式 —— abstract Vector3 CameraMode
+        /// <summary>
+        /// 相机模式
+        /// </summary>
+        public abstract CameraMode CameraMode { get; }
+        #endregion
 
         #region 相机位置 —— abstract Vector3 CameraPosition
         /// <summary>

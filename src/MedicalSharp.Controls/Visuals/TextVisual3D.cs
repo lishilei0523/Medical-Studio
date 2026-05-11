@@ -1,22 +1,19 @@
 ﻿using Avalonia;
-using Avalonia.Interactivity;
 using Avalonia.Media;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
-using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using System;
-using Transform = MedicalSharp.Primitives.Maths.Transform;
 
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
     /// 文本3D元素
     /// </summary>
-    public class TextVisual3D : Visual3D, IVisual2DIn3D, ITranslatable3D
+    public class TextVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D
     {
         #region # 字段及构造器
 
@@ -173,13 +170,6 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 文本渲染对象 —— TextRenderable Renderable
-        /// <summary>
-        /// 文本渲染对象
-        /// </summary>
-        public TextRenderable Renderable { get; protected set; }
-        #endregion
-
         #region 只读属性 - 平面上一点 —— Vector3D PointOnPlane
         /// <summary>
         /// 只读属性 - 平面上一点
@@ -190,35 +180,15 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 只读属性 - 变换 —— override Transform Transform
-        /// <summary>
-        /// 只读属性 - 变换
-        /// </summary>
-        public override Transform Transform
-        {
-            get => this.Renderable?.Transform;
-        }
-        #endregion
-
-        #region 只读属性 - 包围盒 —— override BoundingBox Bounds
-        /// <summary>
-        /// 只读属性 - 包围盒
-        /// </summary>
-        public override BoundingBox Bounds
-        {
-            get => this.Renderable.BoundingBox;
-        }
-        #endregion
-
         #endregion
 
         #region # 方法
 
-        #region 确保渲染对象 —— void EnsureRenderable()
+        #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象
         /// </summary>
-        internal void EnsureRenderable()
+        internal override void EnsureRenderable()
         {
             if (this.Renderable == null)
             {
@@ -238,13 +208,57 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 元素卸载事件 —— override void OnUnloaded(RoutedEventArgs eventArgs)
+        #region 克隆 —— override ShapeVisual3D Clone()
         /// <summary>
-        /// 元素卸载事件
+        /// 克隆
         /// </summary>
-        protected override void OnUnloaded(RoutedEventArgs eventArgs)
+        /// <returns>形状副本</returns>
+        public override ShapeVisual3D Clone()
         {
-            this.Renderable?.Dispose();
+            TextVisual3D copy = new TextVisual3D
+            {
+                Id = this.Id,
+                Stroke = this.Stroke,
+                StrokeThickness = this.StrokeThickness,
+                Fill = this.Fill,
+                UAxis = this.UAxis,
+                VAxis = this.VAxis,
+                Text = this.Text,
+                Position = this.Position,
+                FontSize = this.FontSize,
+                Color = this.Color,
+                RenderMode = this.RenderMode,
+                Normal = this.Normal,
+                LockYAxis = this.LockYAxis
+            };
+
+            return copy;
+        }
+        #endregion
+
+        #region 复制 —— override void Copy(ShapeVisual3D shapeVisual3D)
+        /// <summary>
+        /// 复制
+        /// </summary>
+        /// <param name="shapeVisual3D">形状</param>
+        public override void Copy(ShapeVisual3D shapeVisual3D)
+        {
+            if (shapeVisual3D is TextVisual3D shape)
+            {
+                this.Stroke = shape.Stroke;
+                this.StrokeThickness = shape.StrokeThickness;
+                this.Fill = shape.Fill;
+                this.UAxis = shape.UAxis;
+                this.VAxis = shape.VAxis;
+                this.Text = shape.Text;
+                this.Position = shape.Position;
+                this.FontSize = shape.FontSize;
+                this.Color = shape.Color;
+                this.RenderMode = shape.RenderMode;
+                this.Normal = shape.Normal;
+                this.LockYAxis = shape.LockYAxis;
+                this.Transform.SetMatrix(shape.Transform.Matrix);
+            }
         }
         #endregion
 

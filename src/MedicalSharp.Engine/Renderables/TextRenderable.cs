@@ -1,6 +1,5 @@
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
-using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
@@ -15,7 +14,7 @@ namespace MedicalSharp.Engine.Renderables
     /// <summary>
     /// 文本渲染对象
     /// </summary>
-    public class TextRenderable : Renderable, IDisposable
+    public class TextRenderable : ShapeRenderable, IDisposable
     {
         #region # 字段及构造器
 
@@ -218,14 +217,13 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 渲染 —— void Render(ShaderProgram program, Camera camera)
+        #region 渲染 —— override void Render(ShaderProgram program, RenderContext context)
         /// <summary>
         /// 渲染
         /// </summary>
         /// <param name="program">Shader程序</param>
-        /// <param name="camera">相机</param>
-        /// <remarks>始终面向相机</remarks>
-        public void Render(ShaderProgram program, Camera camera)
+        /// <param name="context">渲染上下文</param>
+        public override void Render(ShaderProgram program, RenderContext context)
         {
             #region # 验证
 
@@ -233,7 +231,7 @@ namespace MedicalSharp.Engine.Renderables
             {
                 return;
             }
-            if (camera == null)
+            if (context == null)
             {
                 return;
             }
@@ -245,20 +243,21 @@ namespace MedicalSharp.Engine.Renderables
             GL.Enable(EnableCap.DepthTest);
 
             this._texture.Bind(0);
-            program.SetUniformInt("u_TextTexture", 0);
+            program.SetUniformInt("u_HasTexture", 1);
+            program.SetUniformInt("u_Texture", 0);
             program.SetUniformVector4("u_Color", this.Color);
 
             //计算缩放
-            if (camera is MPRCamera mprCamera)
+            if (context.CameraMode == CameraMode.Orthographic)
             {
-                float orthoSize = mprCamera.ZoomFactor;  //正交相机的大小
-                float screenHeight = mprCamera.ViewportHeight;
+                float orthoSize = context.ZoomFactor;  //正交相机的大小
+                float screenHeight = context.ViewportHeight;
                 float targetScreenHeight = 1.2f;  //期望的屏幕像素高度
                 this._referenceScale = (targetScreenHeight / screenHeight) / orthoSize;
             }
             else
             {
-                float cameraDistance = Vector3.Distance(camera.CameraPosition, this.Transform.Position);
+                float cameraDistance = Vector3.Distance(context.CameraPosition, this.Transform.Position);
                 this._referenceScale = BaseScale * (cameraDistance / ReferenceDistance);
             }
             Matrix4 scaleMatrix = Matrix4.CreateScale(this._referenceScale);
@@ -273,7 +272,7 @@ namespace MedicalSharp.Engine.Renderables
             if (this.RenderMode == TextRenderMode.Billboard)
             {
                 //计算广告牌矩阵
-                Matrix4 billboardMatrix = this.CalculateBillboardMatrix(camera);
+                Matrix4 billboardMatrix = this.CalculateBillboardMatrix(context.CameraPosition);
                 program.SetUniformMatrix4("u_ModelMatrix", scaleMatrix * billboardMatrix);
             }
 
@@ -284,7 +283,7 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 检测射线相交 —— bool IntersectsRay(Ray ray, out float distance...
+        #region 检测射线相交 —— override bool IntersectsRay(Ray ray, out float distance...
         /// <summary>
         /// 检测射线相交
         /// </summary>
@@ -294,7 +293,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="hitNormal">命中点法向量</param>
         /// <param name="hitTriangleIndex">命中三角形索引</param>
         /// <returns>是否相交</returns>
-        public bool IntersectsRay(Ray ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex)
+        public override bool IntersectsRay(Ray ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex)
         {
             distance = float.MaxValue;
             hitPoint = Vector3.Zero;
@@ -315,11 +314,11 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 释放资源 —— void Dispose()
+        #region 释放资源 —— override void Dispose()
         /// <summary>
         /// 释放资源
         /// </summary>
-        public void Dispose()
+        public override void Dispose()
         {
             if (this._disposed)
             {
@@ -422,16 +421,16 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 计算广告牌矩阵 —— Matrix4 CalculateBillboardMatrix(Camera camera)
+        #region 计算广告牌矩阵 —— Matrix4 CalculateBillboardMatrix(Vector3 cameraPosition)
         /// <summary>
         /// 计算广告牌矩阵
         /// </summary>
-        /// <param name="camera">相机</param>
+        /// <param name="cameraPosition">相机位置</param>
         /// <returns>广告牌矩阵</returns>
         /// <remarks>Z-up</remarks>
-        private Matrix4 CalculateBillboardMatrix(Camera camera)
+        private Matrix4 CalculateBillboardMatrix(Vector3 cameraPosition)
         {
-            Vector3 forward = camera.CameraPosition - this.Transform.Position;
+            Vector3 forward = cameraPosition - this.Transform.Position;
             forward.Normalize();
 
             //锁定Y轴：只绕Z轴旋转，保持文本直立

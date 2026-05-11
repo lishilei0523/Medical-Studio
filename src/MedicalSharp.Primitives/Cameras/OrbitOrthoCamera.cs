@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using MedicalSharp.Primitives.Enums;
+using OpenTK.Mathematics;
 
 namespace MedicalSharp.Primitives.Cameras
 {
@@ -42,6 +43,16 @@ namespace MedicalSharp.Primitives.Cameras
         #endregion
 
         #region # 属性
+
+        #region 相机模式 —— override Vector3 CameraMode
+        /// <summary>
+        /// 相机模式
+        /// </summary>
+        public override CameraMode CameraMode
+        {
+            get => CameraMode.Orthographic;
+        }
+        #endregion
 
         #region 只读属性 - 投影矩阵 —— override Matrix4 ProjectionMatrix
         /// <summary>
