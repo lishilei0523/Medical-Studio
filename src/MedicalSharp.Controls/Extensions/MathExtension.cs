@@ -3,6 +3,7 @@ using Avalonia.Collections;
 using Avalonia.Media;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MIConvexHull;
 using OpenTK.Mathematics;
@@ -129,6 +130,11 @@ namespace MedicalSharp.Controls.Extensions
         /// <returns>是否在MPR平面上</returns>
         public static bool IsOnPlane(this Visual3D visual3D, MPRPlane plane, float epsilon = 0.001f)
         {
+            if (plane.PlaneType == MPRPlaneType.Oblique)
+            {
+                epsilon *= (plane.VolumeMetadata.Spacing.X + plane.VolumeMetadata.Spacing.Y + plane.VolumeMetadata.Spacing.Z) * 20;
+            }
+
             //线条类：始终显示
             if (visual3D is ILineBasedVisual3D)
             {

@@ -660,9 +660,9 @@ namespace MedicalSharp.Primitives.Maths
             textureCoord = localPoint + new Vector3(0.5f);
 
             //纹理坐标 -> 体素坐标
-            int x = (int)Math.Floor(textureCoord.X * this.VolumeMetadata.VolumeSize.X);
-            int y = (int)Math.Floor(textureCoord.Y * this.VolumeMetadata.VolumeSize.Y);
-            int z = (int)Math.Floor(textureCoord.Z * this.VolumeMetadata.VolumeSize.Z);
+            int x = (int)Math.Round(textureCoord.X * this.VolumeMetadata.VolumeSize.X);
+            int y = (int)Math.Round(textureCoord.Y * this.VolumeMetadata.VolumeSize.Y);
+            int z = (int)Math.Round(textureCoord.Z * this.VolumeMetadata.VolumeSize.Z);
 
             //边界裁剪
             x = Math.Clamp(x, 0, this.VolumeMetadata.VolumeSize.X - 1);
