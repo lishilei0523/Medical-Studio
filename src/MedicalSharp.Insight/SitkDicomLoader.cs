@@ -203,10 +203,18 @@ namespace MedicalSharp.Insight
             }
             if (!string.IsNullOrWhiteSpace(windowWidth))
             {
+                if (windowWidth.Contains('\\'))
+                {
+                    windowWidth = windowWidth.Split('\\')[0];
+                }
                 volumeData.Metadata.WindowWidth = int.Parse(windowWidth);
             }
             if (!string.IsNullOrWhiteSpace(windowCenter))
             {
+                if (windowCenter.Contains('\\'))
+                {
+                    windowCenter = windowCenter.Split('\\')[0];
+                }
                 volumeData.Metadata.WindowCenter = int.Parse(windowCenter);
             }
 
