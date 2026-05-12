@@ -41,9 +41,14 @@
 							<MenuItem Header="保存(_S)" cm:Message.Attach="SaveImage()" />
 							<MenuItem Header="另存为(_A)" cm:Message.Attach="SaveAsImage()" />
 						</MenuItem>
-						<MenuItem Header="布局(_L)">
-							<MenuItem Header="布局13(_A)" Command="{Binding Layout13Command}" />
-							<MenuItem Header="布局22(_B)" Command="{Binding Layout22Command}" />
+						<MenuItem Header="编辑(_E)">
+							<MenuItem Header="组织管理(_T)" Command="{Binding ManageTissueCommand}" />
+						</MenuItem>
+						<MenuItem Header="视图(_V)">
+							<MenuItem Header="布局(_L)">
+								<MenuItem Header="布局13(_A)" Command="{Binding Layout13Command}" />
+								<MenuItem Header="布局22(_B)" Command="{Binding Layout22Command}" />
+							</MenuItem>
 						</MenuItem>
 					</Menu>
 				</Grid>
@@ -136,9 +141,60 @@
 					<ContentControl cm:View.Model="{Binding LayoutViewModel}" />
 				</Grid>
 				<!--Right Pannel-->
-				<sd:GroupBox Grid.Column="2" Header="控制面板" Margin="2,1,4,5">
+				<Grid Grid.Column="2" Margin="2,1,4,5">
+					<Grid.RowDefinitions>
+						<RowDefinition />
+						<RowDefinition />
+					</Grid.RowDefinitions>
+					<sd:GroupBox Grid.Row="0" Header="组织列表" Margin="0,0,0,2">
+						<ListBox ItemsSource="{Binding Tissues}" SelectedItem="{Binding SelectedTissue}">
+							<ListBox.ItemTemplate>
+								<DataTemplate>
+									<Grid>
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="40" />
+											<ColumnDefinition Width="50" />
+											<ColumnDefinition Width="40" />
+											<ColumnDefinition Width="100" />
+										</Grid.ColumnDefinitions>
+										<!--标记值-->
+										<TextBlock Grid.Column="0" Text="{Binding MarkValue}" 
+                                                   Width="30" Padding="2" FontSize="12"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+										<!--组织名称-->
+										<TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12"
+												   VerticalAlignment="Center" Margin="3,0" />
+										<!--颜色色块-->
+										<Border Grid.Column="2" Width="18" Height="18" CornerRadius="2"
+												HorizontalAlignment="Center" VerticalAlignment="Center"
+												BorderBrush="#CCCCCC" BorderThickness="0.5">
+											<Border.Background>
+												<SolidColorBrush Color="{Binding Color}" />
+											</Border.Background>
+										</Border>
+										<!--标记模式-->
+										<ComboBox Grid.Column="3" Width="90" FontSize="11"
+												  ItemsSource="{Binding DataContext.MarkModes,
+												  RelativeSource={RelativeSource AncestorType=fa:AppWindow}}"
+												  DisplayMemberBinding="{Binding Value}"
+												  SelectedValue="{Binding SelectedMarkMode}">
+										</ComboBox>
+									</Grid>
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+                            <ListBox.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="新建组织" Command="{Binding AddTissueCommand}" />
+                                    <MenuItem Header="编辑组织" Command="{Binding UpdateTissueCommand}" />
+                                    <MenuItem Header="删除组织" Command="{Binding RemoveTissueCommand}" />
+                                </MenuFlyout>
+                            </ListBox.ContextFlyout>
+						</ListBox>
+					</sd:GroupBox>
+					<sd:GroupBox Grid.Row="1" Header="统计信息" Margin="0,2,0,0">
 
-				</sd:GroupBox>
+					</sd:GroupBox>
+				</Grid>
 			</Grid>
 			<!--Footer-->
 			<Grid Grid.Row="2" Background="#FF6C6C6C">

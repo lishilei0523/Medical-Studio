@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SD.Common" Version="4.0.1" />
     <PackageReference Include="SD.Toolkits.Mapper" Version="4.0.1" />
     <PackageReference Include="SD.Infrastructure.Avalonia" Version="1.0.4" />
     <PackageReference Include="SD.Infrastructure.Avalonia.Caliburn" Version="1.0.4" />

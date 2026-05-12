@@ -1,11 +1,18 @@
-﻿using Avalonia.Platform.Storage;
+﻿using Avalonia.Collections;
+using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.LayoutContext;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
+using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
+using SD.Common;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.Caliburn.Extensions;
@@ -43,6 +50,21 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this._windowManager = windowManager;
             this._dicomLoader = dicomLoader;
             this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
+
+            //默认值
+            this.MarkModes = typeof(MarkMode).GetEnumMembers();
+
+            Vector4[] colors = ColorFactory.GetStandardMarkColors();
+            this.Tissues =
+            [
+                new TissueInfo("Base", 0, MarkMode.Visible, Colors.Black, true),
+                new TissueInfo("心脏", 1, MarkMode.Collapsed, colors[1].ToColor()),
+                new TissueInfo("肝脏", 2, MarkMode.Tinted, colors[2].ToColor()),
+                new TissueInfo("肺", 3, MarkMode.Visible, colors[3].ToColor()),
+                new TissueInfo("肾", 4, MarkMode.Tinted, colors[4].ToColor()),
+                new TissueInfo("骨骼", 5, MarkMode.Tinted, colors[5].ToColor()),
+                new TissueInfo("皮肤", 6, MarkMode.Collapsed, colors[6].ToColor())
+            ];
         }
 
         #endregion
@@ -108,6 +130,30 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         [DependencyProperty]
         public LayoutViewModel LayoutViewModel { get; set; }
+        #endregion
+
+        #region 已选组织 —— TissueInfo SelectedTissue
+        /// <summary>
+        /// 已选组织
+        /// </summary>
+        [DependencyProperty]
+        public TissueInfo SelectedTissue { get; set; }
+        #endregion
+
+        #region 组织列表 —— AvaloniaList<TissueInfo> Tissues
+        /// <summary>
+        /// 组织列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<TissueInfo> Tissues { get; set; }
+        #endregion
+
+        #region 标记模式字典 —— IDictionary<string, string> MarkModes
+        /// <summary>
+        /// 标记模式字典
+        /// </summary>
+        [DependencyProperty]
+        public IDictionary<string, string> MarkModes { get; set; }
         #endregion
 
 
