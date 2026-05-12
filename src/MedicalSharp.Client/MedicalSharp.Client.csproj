@@ -15,13 +15,6 @@
     </AppConfigWithTargetPath>
     <AvaloniaResource Include="favicon.ico" />
     <AvaloniaResource Include="Content\**" />
-    <None Include="Content\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <AvaloniaXaml Remove="Content\Dictionaries\Resources.Icons.axaml" />
   </ItemGroup>
 
   <ItemGroup>
