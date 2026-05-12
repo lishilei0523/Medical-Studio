@@ -15,9 +15,9 @@ uniform float u_RescaleSlope;
 uniform float u_RescaleIntercept;
 uniform float u_WindowWidth;
 uniform float u_WindowCenter;
-uniform float u_StepSize;               //步长
 uniform float u_Brightness;             //亮度
 uniform float u_DensityScale;           //密度缩放
+uniform float u_StepSize;               //步长
 uniform int u_MaxStepsCount;            //最大步数
 uniform float u_OpacityThreshold;       //透明度阈值
 
@@ -26,6 +26,10 @@ uniform int u_RenderMode;
 
 //标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Tinted）
 uniform int u_MarkModes[256];
+
+//常量
+const float MAX_16BIT_SIGNED = 32767.0;
+const float EPSILON = 0.0001;
 
 
 //线性窗宽窗位转换
@@ -67,6 +71,24 @@ bool rayBoxIntersect(vec3 rayOrigin, vec3 rayDirection, vec3 boxMin, vec3 boxMax
     //如果进入点 > 离开点，射线没有穿过盒子
     //如果离开点 < 0，盒子在射线后面
     return farDistance > max(nearDistance, 0.0);
+}
+
+//获取体素的医学值（HU值）
+float getMedicalValue(vec3 texCoord)
+{
+    // 边界检查
+    if (texCoord.x < 0.0 || texCoord.x > 1.0 ||
+        texCoord.y < 0.0 || texCoord.y > 1.0 ||
+        texCoord.z < 0.0 || texCoord.z > 1.0)
+    {
+        return -1000.0;  // 空气的CT值
+    }
+    
+    float snormValue = texture(u_VolumeTexture, texCoord).r;
+    float rawValue = snormValue * MAX_16BIT_SIGNED;
+    float medicalValue = rawValue * u_RescaleSlope + u_RescaleIntercept;
+    
+    return medicalValue;
 }
 
 void main()
@@ -113,10 +135,11 @@ void main()
         //将位置转换到纹理坐标[0, 1]
         vec3 texCoord = (currentPos - boxMin) / (boxMax - boxMin);;
         
-        //采样体积纹理
-        float originalValue = texture(u_VolumeTexture, texCoord).r;
-        float voxelValue = originalValue * 32767.0 * u_RescaleSlope + u_RescaleIntercept; 
-        float density = applyWindowLevel(voxelValue, u_WindowCenter, u_WindowWidth);
+        //获取原始医学值
+        float medicalValue = getMedicalValue(texCoord);
+
+        //应用窗宽窗位
+        float density = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
 
         //如果密度为负（窗外），跳过这个采样点
         if (density < 0.0)
@@ -229,7 +252,7 @@ void main()
         }
     }
     
-    //应用Gamma校正（仅 Raycast 模式）
+    //应用Gamma校正（仅Raycast模式）
     if (u_RenderMode == 0)
     {
         FragColor.rgb = pow(accumulatedColor.rgb, vec3(1.0/2.2));

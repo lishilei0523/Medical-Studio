@@ -292,9 +292,9 @@ namespace MedicalSharp.Engine.Renderers
             //设置渲染参数
             program.SetUniformFloat("u_WindowCenter", this.WindowCenter);
             program.SetUniformFloat("u_WindowWidth", this.WindowWidth);
-            program.SetUniformFloat("u_StepSize", this.StepSize);
             program.SetUniformFloat("u_Brightness", this.Brightness);
             program.SetUniformFloat("u_DensityScale", this.DensityScale);
+            program.SetUniformFloat("u_StepSize", this.StepSize);
             program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
             program.SetUniformFloat("u_OpacityThreshold", this.OpacityThreshold);
 
@@ -451,44 +451,36 @@ namespace MedicalSharp.Engine.Renderers
             GL.Viewport(0, 0, viewportWidth, viewportHeight);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            //使用拾取Shader
+            //开启Shader程序
             ShaderProgram pickProgram = ShaderManager.RaycastPickProgram;
             pickProgram.Use();
 
-            //设置矩阵
+            //处理缩放
             Matrix4 volumeScaleMatrix = Matrix4.CreateScale(this.Renderable.VolumeMetadata.VolumeScale);
             Matrix4 modelMatrix = this.Renderable.ModelMatrix * volumeScaleMatrix;
 
-            pickProgram.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
-            pickProgram.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
+            //设置MVP矩阵、相机位置、缩放
             pickProgram.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
-
-            //传入射线参数
+            pickProgram.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
+            pickProgram.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
             pickProgram.SetUniformVector3("u_RayOrigin", ray.Position);
             pickProgram.SetUniformVector3("u_RayDirection", ray.Direction);
-
-            //相机参数
             pickProgram.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
             pickProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
-            //DICOM参数
+            //设置DICOM重缩放参数
             pickProgram.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
             pickProgram.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
-            //窗宽窗位（与渲染一致）
+            //设置渲染参数
             pickProgram.SetUniformFloat("u_WindowCenter", this.WindowCenter);
             pickProgram.SetUniformFloat("u_WindowWidth", this.WindowWidth);
-
-            //材质参数（与渲染一致）
             pickProgram.SetUniformFloat("u_Brightness", this.Brightness);
             pickProgram.SetUniformFloat("u_DensityScale", this.DensityScale);
-
-            //采样参数（与渲染一致）
             pickProgram.SetUniformFloat("u_StepSize", this.StepSize);
             pickProgram.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
-            pickProgram.SetUniformFloat("u_OpacityThreshold", this.OpacityThreshold);
 
-            //设置标记策略（与渲染一致）
+            //设置标记策略
             pickProgram.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
 
             //绑定纹理
@@ -499,7 +491,7 @@ namespace MedicalSharp.Engine.Renderers
             pickProgram.SetUniformInt("u_MarkTexture", 1);
             pickProgram.SetUniformInt("u_TransferFunction", 2);
 
-            //绘制
+            //绘制模型
             this._unitCube.Draw(PrimitiveType.Triangles);
 
             //解绑纹理

@@ -61,7 +61,8 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="index">纹理索引</param>
         public override void Bind(int index)
         {
-            GL.ActiveTexture(TextureUnit.Texture0 + index);
+            this.BindingIndex = index;
+            GL.ActiveTexture(TextureUnit.Texture0 + this.BindingIndex);
             GL.BindTexture(TextureTarget.Texture1D, base.Id);
         }
         #endregion
@@ -82,6 +83,7 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public override void Unbind()
         {
+            GL.ActiveTexture(TextureUnit.Texture0 + this.BindingIndex);
             GL.BindTexture(TextureTarget.Texture1D, 0);
         }
         #endregion

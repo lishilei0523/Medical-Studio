@@ -26,6 +26,12 @@ namespace MedicalSharp.Controls.Base
         #region # 字段及构造器
 
         /// <summary>
+        /// GPU厂商缓存
+        /// </summary>
+        /// <remarks>-1: 未知, 0: 非NVIDIA, 1: NVIDIA</remarks>
+        private static int _GpuVendorCache = -1;
+
+        /// <summary>
         /// 帧令牌依赖属性
         /// </summary>
         public static readonly StyledProperty<int> FrameTokenProperty;
@@ -165,6 +171,26 @@ namespace MedicalSharp.Controls.Base
         public PixelSize ViewportSize
         {
             get => this._viewportSize;
+        }
+        #endregion
+
+        #region 只读属性 - 是否NVIDIA卡 —— static bool IsNvidia
+        /// <summary>
+        /// 只读属性 - 是否NVIDIA卡
+        /// </summary>
+        private static bool IsNvidia
+        {
+            get
+            {
+                if (_GpuVendorCache == -1)
+                {
+                    string vendor = GL.GetString(StringName.Vendor);
+                    _GpuVendorCache = (vendor != null && vendor.Contains("NVIDIA", StringComparison.OrdinalIgnoreCase))
+                        ? 1
+                        : 0;
+                }
+                return _GpuVendorCache == 1;
+            }
         }
         #endregion
 
@@ -326,6 +352,12 @@ namespace MedicalSharp.Controls.Base
 
             //OpenTK渲染
             this.OnOpenTKRender(this._viewportSize);
+
+            //N卡兼容性处理
+            if (IsNvidia)
+            {
+                GL.Finish();
+            }
         }
         #endregion
 

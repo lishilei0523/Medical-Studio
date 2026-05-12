@@ -37,6 +37,7 @@ namespace MedicalSharp.Engine.Resources
             #endregion
 
             this.Id = textureId;
+            this.BindingIndex = 0;
             this.PixelInternalFormat = pixelInternalFormat;
             this.PixelFormat = pixelFormat;
             this.PixelType = pixelType;
@@ -51,6 +52,13 @@ namespace MedicalSharp.Engine.Resources
         /// 纹理Id
         /// </summary>
         public int Id { get; private set; }
+        #endregion
+
+        #region 绑定索引 —— int BindingIndex
+        /// <summary>
+        /// 绑定索引
+        /// </summary>
+        public int BindingIndex { get; protected set; }
         #endregion
 
         #region 像素内部格式 —— PixelInternalFormat PixelInternalFormat
