@@ -417,27 +417,12 @@ namespace MedicalSharp.Primitives.Cameras
 
             #endregion
 
-            float sliceOffset = this._targetPlane.GetSliceOffset();
-
-            Vector3 worldNormal = new Vector3(
-                this._targetPlane.Normal.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
-                this._targetPlane.Normal.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
-                this._targetPlane.Normal.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
-            Vector3 worldVAxis = new Vector3(
-                this._targetPlane.VAxis.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
-                this._targetPlane.VAxis.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
-                this._targetPlane.VAxis.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
-
-            float normalScale = Math.Abs(Vector3.Dot(worldNormal, this._targetPlane.VolumeMetadata.VolumeScale));
-            float worldSliceOffset = sliceOffset * normalScale;
-
-            Vector3 planePosition = worldNormal * worldSliceOffset;
-
-            this._cameraPosition = planePosition - worldNormal * this._distance;
-            this._targetPosition = planePosition;
-            this._upDirection = worldVAxis;
+            Vector3 worldCenter = this._targetPlane.WorldCenter;
+            Vector3 worldNormal = this._targetPlane.WorldNormal;
+            Vector3 worldUpDirection = this._targetPlane.WorldVAxis;
+            this._cameraPosition = worldCenter - worldNormal * this._distance;
+            this._targetPosition = worldCenter;
+            this._upDirection = worldUpDirection;
 
             this.UpdateViewMatrix();
         }

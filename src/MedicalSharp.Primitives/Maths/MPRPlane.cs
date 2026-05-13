@@ -57,6 +57,13 @@ namespace MedicalSharp.Primitives.Maths
 
         #region # 属性
 
+        #region 体积元数据 —— VolumeMetadata VolumeMetadata
+        /// <summary>
+        /// 体积元数据
+        /// </summary>
+        public VolumeMetadata VolumeMetadata { get; private set; }
+        #endregion
+
         #region 平面中心 —— Vector3 Center
         /// <summary>
         /// 平面中心
@@ -122,16 +129,9 @@ namespace MedicalSharp.Primitives.Maths
         public float SliceOffsetDelta { get; private set; }
         #endregion
 
-        #region 体积元数据 —— VolumeMetadata VolumeMetadata
+        #region 只读属性 - 世界平面中心 —— Vector3 WorldCenter
         /// <summary>
-        /// 体积元数据
-        /// </summary>
-        public VolumeMetadata VolumeMetadata { get; private set; }
-        #endregion
-
-        #region 只读属性 - 平面世界中心 —— Vector3 WorldCenter
-        /// <summary>
-        /// 只读属性 - 平面世界中心
+        /// 只读属性 - 世界平面中心
         /// </summary>
         public Vector3 WorldCenter
         {
@@ -278,55 +278,6 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 创建斜切面 —— static MPRPlane CreateObliquePlane(MPRPlane originalPlane...
-        /// <summary>
-        /// 创建斜切面
-        /// </summary>
-        /// <param name="originalPlane">原始平面</param>
-        /// <param name="rotationU">绕U轴旋转角度（上下旋转）</param>
-        /// <param name="rotationV">绕V轴旋转角度（左右旋转）</param>
-        /// <returns>斜切面</returns>
-        public static MPRPlane CreateObliquePlane(MPRPlane originalPlane, float rotationU, float rotationV)
-        {
-            //基于原始轴计算旋转
-            Quaternion rotU = Quaternion.FromAxisAngle(originalPlane.UAxis, MathHelper.DegreesToRadians(rotationU));
-            Quaternion rotV = Quaternion.FromAxisAngle(originalPlane.VAxis, MathHelper.DegreesToRadians(rotationV));
-
-            //组合旋转：先左右，再上下
-            Quaternion total = rotU * rotV;
-
-            //旋转原始轴
-            Vector3 uAxis = Vector3.Transform(originalPlane.UAxis, total).Normalized();
-            Vector3 vAxis = Vector3.Transform(originalPlane.VAxis, total).Normalized();
-            Vector3 normal = Vector3.Transform(originalPlane.Normal, total).Normalized();
-
-            //创建斜切平面
-            MPRPlane plane = new MPRPlane(originalPlane.VolumeMetadata)
-            {
-                Center = originalPlane.Center,
-                UAxis = uAxis,
-                VAxis = vAxis,
-                Normal = normal,
-                PlaneType = MPRPlaneType.Oblique,
-                OriginalPlaneType = originalPlane.OriginalPlaneType
-            };
-
-            //重新正交化
-            plane.Orthonormalize();
-
-            //计算投影范围
-            plane.CalculateProjectionRange();
-
-            //计算斜切平面的切片数量（体积在法线方向上的投影）
-            plane.CalculateObliqueSlicesCount();
-
-            //保持切片索引比例
-            plane.SetSliceIndex(originalPlane.SliceIndex);
-
-            return plane;
-        }
-        #endregion
-
 
         //Public
 
@@ -391,9 +342,9 @@ namespace MedicalSharp.Primitives.Maths
         public void Relocate(Vector3 worldUAxis, Vector3 worldVAxis, Vector3 worldCenter, Vector3 worldNormal)
         {
             //更新MPR平面U/V轴
-            this.UAxis = worldUAxis.Normalized();
-            this.VAxis = worldVAxis.Normalized();
-            this.Normal = worldNormal.Normalized();
+            this.UAxis = worldUAxis / this.VolumeMetadata.VolumeScale;
+            this.VAxis = worldVAxis / this.VolumeMetadata.VolumeScale;
+            this.Normal = worldNormal / this.VolumeMetadata.VolumeScale;
 
             //更新平面类型
             if (Math.Abs(this.Normal.Z) > 0.99f)
@@ -417,7 +368,7 @@ namespace MedicalSharp.Primitives.Maths
             if (this.PlaneType == MPRPlaneType.Oblique)
             {
                 this.CalculateProjectionRange();
-                this.CalculateObliqueSlicesCount();
+                this.SlicesCount = this.CalculateObliqueSlicesCount();
             }
 
             //复用中心定位
@@ -454,7 +405,7 @@ namespace MedicalSharp.Primitives.Maths
             this.CalculateProjectionRange();
 
             //重新计算切片数量
-            this.CalculateObliqueSlicesCount();
+            this.SlicesCount = this.CalculateObliqueSlicesCount();
 
             //触发变化事件
             MPRPlaneChangedEventArgs eventArgs = new MPRPlaneChangedEventArgs(MPRPlaneChangeSource.ExternalSync);
@@ -492,90 +443,6 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 获取模型矩阵 —— Matrix4 GetModelMatrix()
-        /// <summary>
-        /// 获取模型矩阵
-        /// </summary>
-        /// <returns>模型矩阵</returns>
-        public Matrix4 GetModelMatrix()
-        {
-            //切片偏移：逻辑空间 -0.5到0.5
-            float sliceOffset = this.GetSliceOffset();
-
-            //平面中心：逻辑空间 (0,0,0) -> 世界空间 (0,0,0)
-            Vector3 worldCenter = Vector3.Zero;
-
-            //法线方向的世界偏移 = 逻辑偏移 * VolumeScale
-            Vector3 worldOffset = new Vector3(
-                this.Normal.X * sliceOffset * this.VolumeMetadata.VolumeScale.X,
-                this.Normal.Y * sliceOffset * this.VolumeMetadata.VolumeScale.Y,
-                this.Normal.Z * sliceOffset * this.VolumeMetadata.VolumeScale.Z
-            );
-
-            //U/V轴：逻辑方向 * VolumeScale，然后归一化
-            Vector3 worldUAxis = new Vector3(
-                this.UAxis.X * this.VolumeMetadata.VolumeScale.X,
-                this.UAxis.Y * this.VolumeMetadata.VolumeScale.Y,
-                this.UAxis.Z * this.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
-            Vector3 worldVAxis = new Vector3(
-                this.VAxis.X * this.VolumeMetadata.VolumeScale.X,
-                this.VAxis.Y * this.VolumeMetadata.VolumeScale.Y,
-                this.VAxis.Z * this.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
-
-            //法线方向（重新正交化确保正确）
-            Vector3 worldNormal = Vector3.Cross(worldUAxis, worldVAxis).Normalized();
-
-            Matrix4 translation = Matrix4.CreateTranslation(worldCenter + worldOffset);
-            Matrix4 basis = new Matrix4(
-                new Vector4(worldUAxis, 0),
-                new Vector4(worldVAxis, 0),
-                new Vector4(worldNormal, 0),
-                new Vector4(0, 0, 0, 1)
-            );
-
-            //处理缩放
-            Matrix4 scale = Matrix4.CreateScale(this.VolumeMetadata.VolumeScale);
-
-            return basis * scale * translation;
-        }
-        #endregion
-
-        #region 获取切片偏移量 —— float GetSliceOffset()
-        /// <summary>
-        /// 获取切片偏移量
-        /// </summary>
-        /// <returns>切片偏移量</returns>
-        public float GetSliceOffset()
-        {
-            #region # 验证
-
-            if (this.SlicesCount <= 1)
-            {
-                return 0;
-            }
-
-            #endregion
-
-            float sliceOffset;
-            if (this.PlaneType == MPRPlaneType.Oblique)
-            {
-                //斜切平面：根据投影范围映射
-                float t = this.SliceIndex * 1.0f / (this.SlicesCount - 1);
-                sliceOffset = this._minProjection + t * (this._maxProjection - this._minProjection);
-            }
-            else
-            {
-                //标准平面：逻辑空间范围 -0.5到0.5
-                float t = this.SliceIndex * 1.0f / (this.SlicesCount - 1);
-                sliceOffset = -0.5f + t;
-            }
-
-            return sliceOffset;
-        }
-        #endregion
-
         #region 屏幕坐标转换平面UV坐标 —— Vector2? ScreenToPlaneUV(Vector2 mousePos2D...
         /// <summary>
         /// 屏幕坐标转换平面UV坐标
@@ -607,20 +474,8 @@ namespace MedicalSharp.Primitives.Maths
             //创建射线
             ray = new Ray(rayStartWorld, rayDirection);
 
-            //计算平面的世界位置，平面实际位置 = Normal * sliceOffset（因为Center = (0,0,0)）
-            float sliceOffset = this.GetSliceOffset();
-            Vector3 worldNormal = new Vector3(
-                this.Normal.X * this.VolumeMetadata.VolumeScale.X,
-                this.Normal.Y * this.VolumeMetadata.VolumeScale.Y,
-                this.Normal.Z * this.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
-
-            float normalScale = Math.Abs(Vector3.Dot(worldNormal, this.VolumeMetadata.VolumeScale));
-            float worldSliceOffset = sliceOffset * normalScale;
-            Vector3 planePoint = worldNormal * worldSliceOffset;
-
             //射线与平面求交
-            if (ray.IntersectsPlane(planePoint, worldNormal, out Vector3 hitPoint, out _))
+            if (ray.IntersectsPlane(this.WorldCenter, this.WorldNormal, out Vector3 hitPoint, out _))
             {
                 //转换到逻辑空间
                 Vector3 localPoint = new Vector3(
@@ -696,21 +551,43 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-
-        //Private
-
-        #region 正交化坐标轴 —— void Orthonormalize()
+        #region 获取模型矩阵 —— Matrix4 GetModelMatrix()
         /// <summary>
-        /// 正交化坐标轴
+        /// 获取模型矩阵
         /// </summary>
-        private void Orthonormalize()
+        /// <returns>模型矩阵</returns>
+        public Matrix4 GetModelMatrix()
         {
-            this.UAxis = this.UAxis.Normalized();
-            this.VAxis = Vector3.Cross(this.Normal, this.UAxis).Normalized();
-            this.Normal = Vector3.Cross(this.UAxis, this.VAxis).Normalized();
-            this.VAxis = Vector3.Cross(this.Normal, this.UAxis).Normalized();
+            //切片偏移：逻辑空间 -0.5到0.5
+            float sliceOffset = this.CalculateSliceOffset();
+
+            //平面中心：逻辑空间 (0,0,0) -> 世界空间 (0,0,0)
+            Vector3 worldCenter = Vector3.Zero;
+
+            //法线方向的世界偏移 = 逻辑偏移 * VolumeScale
+            Vector3 worldOffset = new Vector3(
+                this.Normal.X * this.VolumeMetadata.VolumeScale.X * sliceOffset,
+                this.Normal.Y * this.VolumeMetadata.VolumeScale.Y * sliceOffset,
+                this.Normal.Z * this.VolumeMetadata.VolumeScale.Z * sliceOffset
+            );
+
+            Matrix4 translation = Matrix4.CreateTranslation(worldCenter + worldOffset);
+            Matrix4 basis = new Matrix4(
+                new Vector4(this.WorldUAxis, 0),
+                new Vector4(this.WorldVAxis, 0),
+                new Vector4(this.WorldNormal, 0),
+                new Vector4(0, 0, 0, 1)
+            );
+
+            //处理缩放
+            Matrix4 scale = Matrix4.CreateScale(this.VolumeMetadata.VolumeScale);
+
+            return basis * scale * translation;
         }
         #endregion
+
+
+        //Private
 
         #region 计算投影范围 —— void CalculateProjectionRange()
         /// <summary>
@@ -720,7 +597,6 @@ namespace MedicalSharp.Primitives.Maths
         {
             this._minProjection = float.MaxValue;
             this._maxProjection = float.MinValue;
-
             IEnumerable<Vector3> corners = ResourceManager.UnitCube.Vertices.Select(vertex => vertex.Position);
             foreach (Vector3 corner in corners)
             {
@@ -731,23 +607,59 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 计算斜切面切片数量 —— void CalculateObliqueSlicesCount()
+        #region 计算切片偏移量 —— float CalculateSliceOffset()
+        /// <summary>
+        /// 计算切片偏移量
+        /// </summary>
+        /// <returns>切片偏移量</returns>
+        public float CalculateSliceOffset()
+        {
+            #region # 验证
+
+            if (this.SlicesCount <= 1)
+            {
+                return 0;
+            }
+
+            #endregion
+
+            float sliceOffset;
+            if (this.PlaneType == MPRPlaneType.Oblique)
+            {
+                //斜切平面：根据投影范围映射
+                float t = this.SliceIndex * 1.0f / (this.SlicesCount - 1);
+                sliceOffset = this._minProjection + t * (this._maxProjection - this._minProjection);
+            }
+            else
+            {
+                //标准平面：逻辑空间范围 -0.5到0.5
+                float t = this.SliceIndex * 1.0f / (this.SlicesCount - 1);
+                sliceOffset = -0.5f + t;
+            }
+
+            return sliceOffset;
+        }
+        #endregion
+
+        #region 计算斜切面切片数量 —— int CalculateObliqueSlicesCount()
         /// <summary>
         /// 计算斜切面切片数量
         /// </summary>
-        private void CalculateObliqueSlicesCount()
+        private int CalculateObliqueSlicesCount()
         {
             Vector3 absNormal = new Vector3(
-                Math.Abs(this.Normal.X),
-                Math.Abs(this.Normal.Y),
-                Math.Abs(this.Normal.Z)
+                Math.Abs(this.WorldNormal.X),
+                Math.Abs(this.WorldNormal.Y),
+                Math.Abs(this.WorldNormal.Z)
             );
             float projection =
                 this.VolumeMetadata.VolumeSize.X * absNormal.X +
                 this.VolumeMetadata.VolumeSize.Y * absNormal.Y +
                 this.VolumeMetadata.VolumeSize.Z * absNormal.Z;
 
-            this.SlicesCount = (int)Math.Floor(Math.Max(projection, 2));
+            int slicesCount = (int)Math.Floor(Math.Max(projection, 2));
+
+            return slicesCount;
         }
         #endregion
 
@@ -761,7 +673,7 @@ namespace MedicalSharp.Primitives.Maths
         private Vector3 GetPointOnPlane(float u, float v)
         {
             const float halfSize = 0.5f;
-            float sliceOffset = this.GetSliceOffset();
+            float sliceOffset = this.CalculateSliceOffset();
 
             //平面上的点 = 中心 + 法线方向偏移 + U方向偏移 + V方向偏移
             Vector3 point = this.Center + this.Normal * sliceOffset + this.UAxis * u * halfSize + this.VAxis * v * halfSize;
@@ -779,7 +691,7 @@ namespace MedicalSharp.Primitives.Maths
         private Vector2 ProjectPoint(Vector3 point)
         {
             const float halfSize = 0.5f;
-            float sliceOffset = this.GetSliceOffset();
+            float sliceOffset = this.CalculateSliceOffset();
 
             //计算相对于平面中心的偏移
             Vector3 relative = point - (this.Center + this.Normal * sliceOffset);
@@ -798,7 +710,7 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         private void OnChanged(object sender, MPRPlaneChangedEventArgs eventArgs)
         {
-            float currentOffset = this.GetSliceOffset();
+            float currentOffset = this.CalculateSliceOffset();
             if (this._firstChanged)
             {
                 this._firstChanged = false;

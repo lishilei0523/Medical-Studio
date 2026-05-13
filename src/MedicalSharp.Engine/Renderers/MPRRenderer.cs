@@ -7,7 +7,6 @@ using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
-using MedicalSharp.Primitives.Models.Arguments;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -26,11 +25,6 @@ namespace MedicalSharp.Engine.Renderers
         /// MPR平面
         /// </summary>
         private MPRPlane _plane;
-
-        /// <summary>
-        /// 模型矩阵
-        /// </summary>
-        private Matrix4 _modelMatrix;
 
         /// <summary>
         /// 单位平面
@@ -159,6 +153,10 @@ namespace MedicalSharp.Engine.Renderers
         {
             #region # 验证
 
+            if (plane == null)
+            {
+                throw new ArgumentNullException(nameof(plane), "MPR平面不可为空！");
+            }
             if (this._plane == plane)
             {
                 return;
@@ -166,18 +164,8 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
-            if (this._plane != null)
-            {
-                this._plane.PlaneChangedEvent -= this.OnPlaneChanged;
-            }
-
             this._plane = plane;
-            if (this._plane != null)
-            {
-                this._plane.PlaneChangedEvent += this.OnPlaneChanged;
-                this.MPRCamera?.BindPlane(this._plane);
-                this.UpdateModelMatrix();
-            }
+            this.MPRCamera?.BindPlane(this._plane);
         }
         #endregion
 
@@ -301,7 +289,8 @@ namespace MedicalSharp.Engine.Renderers
             program.Use();
 
             //设置MVP矩阵、相机位置、缩放
-            program.SetUniformMatrix4("u_ModelMatrix", this._modelMatrix);
+            Matrix4 modelMatrix = this._plane.GetModelMatrix();
+            program.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
             program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
             program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
@@ -359,39 +348,8 @@ namespace MedicalSharp.Engine.Renderers
                 return;
             }
 
-            if (this._plane != null)
-            {
-                this._plane.PlaneChangedEvent -= this.OnPlaneChanged;
-            }
-
             this._unitPlane.Dispose();
             this._disposed = true;
-        }
-        #endregion
-
-
-        //Private
-
-        #region 更新模型矩阵 —— void UpdateModelMatrix()
-        /// <summary>
-        /// 更新模型矩阵
-        /// </summary>
-        private void UpdateModelMatrix()
-        {
-            if (this._plane != null)
-            {
-                this._modelMatrix = this._plane.GetModelMatrix();
-            }
-        }
-        #endregion
-
-        #region MPR平面变化事件 —— void OnPlaneChanged(object sender...
-        /// <summary>
-        /// MPR平面变化事件
-        /// </summary>
-        private void OnPlaneChanged(object sender, MPRPlaneChangedEventArgs eventArgs)
-        {
-            this.UpdateModelMatrix();
         }
         #endregion
 
