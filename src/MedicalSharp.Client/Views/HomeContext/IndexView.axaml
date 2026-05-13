@@ -66,20 +66,16 @@
 				<!--Left Pannel-->
 				<Grid Grid.Column="0" Margin="4,1,2,5">
 					<Grid.RowDefinitions>
-						<RowDefinition Height="300" />
-						<RowDefinition Height="240" />
+						<RowDefinition Height="380" />
 						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
-					<sd:GroupBox Grid.Row="0" Header="患者信息" Margin="0,0,0,2">
+					<sd:GroupBox Grid.Row="0" Header="患者检查信息" Margin="0,0,0,2">
 						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,10">
 							<sd:FormItem Label="患者ID：">
 								<TextBlock Text="{Binding PatientInfo.PatientId}" />
 							</sd:FormItem>
-							<sd:FormItem Label="患者姓名：">
+							<sd:FormItem Label="姓名：">
 								<TextBlock Text="{Binding PatientInfo.Name}" />
-							</sd:FormItem>
-							<sd:FormItem Label="出生日期：">
-								<TextBlock Text="{Binding PatientInfo.BirthDate}" />
 							</sd:FormItem>
 							<sd:FormItem Label="性别：">
 								<TextBlock Text="{Binding PatientInfo.Sex}" />
@@ -87,18 +83,14 @@
 							<sd:FormItem Label="年龄：">
 								<TextBlock Text="{Binding PatientInfo.Age}" />
 							</sd:FormItem>
+                            <sd:FormItem Label="生日：">
+                                <TextBlock Text="{Binding PatientInfo.BirthDate}" />
+                            </sd:FormItem>
 							<sd:FormItem Label="身高：">
 								<TextBlock Text="{Binding PatientInfo.Height}" />
 							</sd:FormItem>
 							<sd:FormItem Label="体重：">
 								<TextBlock Text="{Binding PatientInfo.Weight}" />
-							</sd:FormItem>
-						</StackPanel>
-					</sd:GroupBox>
-					<sd:GroupBox Grid.Row="1" Header="检查信息" Margin="0,2,0,2">
-						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,10">
-							<sd:FormItem Label="实例UID：">
-								<TextBlock Text="{Binding StudyInfo.StudyInstanceUId}" />
 							</sd:FormItem>
 							<sd:FormItem Label="检查日期：">
 								<TextBlock Text="{Binding StudyInfo.StudyDate}" />
@@ -106,16 +98,14 @@
 							<sd:FormItem Label="检查时间：">
 								<TextBlock Text="{Binding StudyInfo.StudyTime}" />
 							</sd:FormItem>
-							<sd:FormItem Label="检查描述："/>
-							<TextBlock Text="{Binding StudyInfo.StudyDescription}" TextAlignment="Center" TextWrapping="Wrap" />
 						</StackPanel>
 					</sd:GroupBox>
-					<sd:GroupBox Grid.Row="2" Header="体积信息" Margin="0,2,0,0">
+					<sd:GroupBox Grid.Row="1" Header="体积信息" Margin="0,2,0,0">
 						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,10">
 							<sd:FormItem Label="体积尺寸：">
 								<TextBlock Text="{Binding VolumeInfo.VolumeSize}" />
 							</sd:FormItem>
-							<sd:FormItem Label="间距：">
+							<sd:FormItem Label="体素间距：">
 								<TextBlock Text="{Binding VolumeInfo.Spacing}" />
 							</sd:FormItem>
 							<sd:FormItem Label="物理尺寸：">
@@ -127,11 +117,11 @@
 							<sd:FormItem Label="截距：">
 								<TextBlock Text="{Binding VolumeInfo.RescaleIntercept}" />
 							</sd:FormItem>
-							<sd:FormItem Label="默认窗宽：">
-								<TextBlock Text="{Binding VolumeInfo.WindowWidth}" />
-							</sd:FormItem>
-							<sd:FormItem Label="默认窗位：">
-								<TextBlock Text="{Binding VolumeInfo.WindowCenter}" />
+                            <sd:FormItem Label="HU范围：">
+                                <TextBlock Text="{Binding VolumeInfo.HURange}" />
+                            </sd:FormItem>
+							<sd:FormItem Label="默认窗：">
+								<TextBlock Text="{Binding VolumeInfo.WindowLevel}" />
 							</sd:FormItem>
 						</StackPanel>
 					</sd:GroupBox>
@@ -143,10 +133,10 @@
 				<!--Right Pannel-->
 				<Grid Grid.Column="2" Margin="2,1,4,5">
 					<Grid.RowDefinitions>
-						<RowDefinition />
-						<RowDefinition />
+						<RowDefinition Height="550" />
+						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
-					<sd:GroupBox Grid.Row="0" Header="组织列表" Margin="0,0,0,2">
+					<sd:GroupBox Grid.Row="0" Header="组织管理" Margin="0,0,0,2">
 						<ListBox ItemsSource="{Binding Tissues}" SelectedItem="{Binding SelectedTissue}">
 							<ListBox.ItemTemplate>
 								<DataTemplate>
@@ -199,8 +189,7 @@
 			<!--Footer-->
 			<Grid Grid.Row="2" Background="#FF6C6C6C">
 				<WrapPanel Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<TextBlock Text="Volume Size : " FontSize="12" />
-					<TextBlock Text="{Binding VolumeInfo.VolumeSize}" FontSize="12" />
+					<TextBlock Text="{Binding StudyInfo.StudyDescription}" FontSize="12" />
 				</WrapPanel>
 				<WrapPanel Margin="0,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Center">
 					<TextBlock Text="Series Instance UID : " FontSize="12" />

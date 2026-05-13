@@ -54,18 +54,18 @@ namespace MedicalSharp.Presentation.Models
         public string RescaleIntercept { get; set; }
         #endregion
 
-        #region 窗宽 —— string WindowWidth
+        #region HU范围 —— string HURange
         /// <summary>
-        /// 窗宽
+        /// HU范围
         /// </summary>
-        public string WindowWidth { get; set; }
+        public string HURange { get; set; }
         #endregion
 
-        #region 窗位 —— string WindowCenter
+        #region 默认窗 —— string WindowLevel
         /// <summary>
-        /// 窗位
+        /// 默认窗
         /// </summary>
-        public string WindowCenter { get; set; }
+        public string WindowLevel { get; set; }
         #endregion
     }
 }
