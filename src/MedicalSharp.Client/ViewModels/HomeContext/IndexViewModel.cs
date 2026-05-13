@@ -71,7 +71,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             Vector4[] colors = ColorFactory.StandardMarkColors;
             this.Tissues =
             [
-                new TissueInfo("Base", 0, MarkMode.Visible, Colors.Black, true),
+                new TissueInfo("Base", 0, MarkMode.Visible, Colors.Transparent, true),
                 new TissueInfo("皮肤", 1, MarkMode.Collapsed, colors[1].ToColor()),
                 new TissueInfo("骨骼", 2, MarkMode.Tinted, colors[2].ToColor()),
                 new TissueInfo("血管", 3, MarkMode.Tinted, colors[3].ToColor()),
