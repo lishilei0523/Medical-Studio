@@ -8,6 +8,49 @@ namespace MedicalSharp.Primitives.Builders
     /// </summary>
     public static class ColorFactory
     {
+        #region # 字段及构造器
+
+        /// <summary>
+        /// 默认标记颜色列表
+        /// </summary>
+        private static readonly Vector4[] _DefaultMarkColors;
+
+        /// <summary>
+        /// 标准标记颜色列表
+        /// </summary>
+        private static readonly Vector4[] _StandardMarkColors;
+
+        /// <summary>
+        /// 静态构造器
+        /// </summary>
+        static ColorFactory()
+        {
+            _DefaultMarkColors = GetDefaultMarkColors();
+            _StandardMarkColors = GetStandardMarkColors();
+        }
+
+        #endregion
+
+        #region # 默认标记颜色列表 —— static Vector4[] DefaultMarkColors
+        /// <summary>
+        /// 默认标记颜色列表
+        /// </summary>
+        public static Vector4[] DefaultMarkColors
+        {
+            get => _DefaultMarkColors;
+        }
+        #endregion
+
+        #region # 标准标记颜色列表 —— static Vector4[] StandardMarkColors
+        /// <summary>
+        /// 标准标记颜色列表
+        /// </summary>
+        public static Vector4[] StandardMarkColors
+        {
+            get => _StandardMarkColors;
+        }
+        #endregion
+
         #region # 红色 —— static Vector4 Red(float opacity = 1.0f)
         /// <summary>
         /// 红色

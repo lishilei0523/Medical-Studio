@@ -158,18 +158,18 @@
 											<ColumnDefinition Width="100" />
 										</Grid.ColumnDefinitions>
 										<!--标记值-->
-										<TextBlock Grid.Column="0" Text="{Binding MarkValue}" 
+										<TextBlock Grid.Column="0" Text="{Binding MarkValue, Mode=OneWay}" 
                                                    Width="30" Padding="2" FontSize="12"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
 										<!--组织名称-->
-										<TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12"
+										<TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" FontSize="12"
 												   VerticalAlignment="Center" Margin="3,0" />
 										<!--颜色色块-->
 										<Border Grid.Column="2" Width="18" Height="18" CornerRadius="2"
 												HorizontalAlignment="Center" VerticalAlignment="Center"
 												BorderBrush="#CCCCCC" BorderThickness="0.5">
 											<Border.Background>
-												<SolidColorBrush Color="{Binding Color}" />
+												<SolidColorBrush Color="{Binding Color, Mode=OneWay}" />
 											</Border.Background>
 										</Border>
 										<!--标记模式-->
@@ -184,7 +184,7 @@
 							</ListBox.ItemTemplate>
                             <ListBox.ContextFlyout>
                                 <MenuFlyout>
-                                    <MenuItem Header="新建组织" Command="{Binding AddTissueCommand}" />
+                                    <MenuItem Header="创建组织" Command="{Binding AddTissueCommand}" />
                                     <MenuItem Header="编辑组织" Command="{Binding UpdateTissueCommand}" />
                                     <MenuItem Header="删除组织" Command="{Binding RemoveTissueCommand}" />
                                 </MenuFlyout>

@@ -2,7 +2,9 @@
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Caliburn.Micro;
+using FluentAvalonia.UI.Controls;
 using MedicalSharp.Client.ViewModels.LayoutContext;
+using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Presentation.Maps;
@@ -17,6 +19,8 @@ using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.Caliburn.Extensions;
 using SD.Infrastructure.Avalonia.Commands;
+using SD.Infrastructure.Avalonia.CustomControls;
+using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,16 +58,21 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             //默认值
             this.MarkModes = typeof(MarkMode).GetEnumMembers();
 
-            Vector4[] colors = ColorFactory.GetStandardMarkColors();
+            Vector4[] colors = ColorFactory.StandardMarkColors;
             this.Tissues =
             [
                 new TissueInfo("Base", 0, MarkMode.Visible, Colors.Black, true),
-                new TissueInfo("心脏", 1, MarkMode.Collapsed, colors[1].ToColor()),
-                new TissueInfo("肝脏", 2, MarkMode.Tinted, colors[2].ToColor()),
-                new TissueInfo("肺", 3, MarkMode.Visible, colors[3].ToColor()),
-                new TissueInfo("肾", 4, MarkMode.Tinted, colors[4].ToColor()),
-                new TissueInfo("骨骼", 5, MarkMode.Tinted, colors[5].ToColor()),
-                new TissueInfo("皮肤", 6, MarkMode.Collapsed, colors[6].ToColor())
+                new TissueInfo("皮肤", 1, MarkMode.Collapsed, colors[1].ToColor()),
+                new TissueInfo("骨骼", 2, MarkMode.Tinted, colors[2].ToColor()),
+                new TissueInfo("血管", 3, MarkMode.Tinted, colors[3].ToColor()),
+                new TissueInfo("软组织", 4, MarkMode.Visible, colors[4].ToColor()),
+                new TissueInfo("心脏", 5, MarkMode.Visible, colors[5].ToColor()),
+                new TissueInfo("肺", 6, MarkMode.Visible, colors[6].ToColor()),
+                new TissueInfo("肝脏", 7, MarkMode.Tinted, colors[7].ToColor()),
+                new TissueInfo("肾脏", 8, MarkMode.Tinted, colors[8].ToColor()),
+                new TissueInfo("脾脏", 9, MarkMode.Collapsed, colors[9].ToColor()),
+                new TissueInfo("病变", 10, MarkMode.Tinted, colors[10].ToColor()),
+                new TissueInfo("钙化", 11, MarkMode.Tinted, colors[11].ToColor()),
             ];
         }
 
@@ -209,6 +218,66 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             //this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
         });
+        #endregion
+
+        #region 创建组织命令 —— ICommand AddTissueCommand
+        /// <summary>
+        /// 创建组织命令
+        /// </summary>
+        public ICommand AddTissueCommand => new AsyncRelayCommand(async _ =>
+        {
+            byte markValue = (byte)(this.Tissues.Max(x => x.MarkValue) + 1);
+
+            AddViewModel viewModel = ResolveMediator.Resolve<AddViewModel>();
+            viewModel.TissueName = $"组织{markValue}";
+            viewModel.MarkValue = markValue;
+            bool? result = await this._windowManager.ShowDialogAsync(viewModel);
+            if (result == true)
+            {
+                TissueInfo tissue = new TissueInfo(viewModel.TissueName, viewModel.MarkValue!.Value, viewModel.MarkMode, viewModel.TissueColor);
+                this.Tissues.Add(tissue);
+            }
+        });
+        #endregion
+
+        #region 编辑组织命令 —— ICommand UpdateTissueCommand
+        /// <summary>
+        /// 编辑组织命令
+        /// </summary>
+        public ICommand UpdateTissueCommand => new AsyncRelayCommand(async _ =>
+        {
+            UpdateViewModel viewModel = ResolveMediator.Resolve<UpdateViewModel>();
+            viewModel.TissueName = this.SelectedTissue.Name;
+            viewModel.MarkValue = this.SelectedTissue.MarkValue;
+            viewModel.TissueColor = this.SelectedTissue.Color;
+            viewModel.SelectedMarkMode = new KeyValuePair<string, string>(this.SelectedTissue.MarkMode.ToString(), this.SelectedTissue.MarkMode.GetEnumMember());
+            bool? result = await this._windowManager.ShowDialogAsync(viewModel);
+            if (result == true)
+            {
+                this.SelectedTissue.Name = viewModel.TissueName;
+                this.SelectedTissue.MarkValue = viewModel.MarkValue!.Value;
+                this.SelectedTissue.Color = viewModel.TissueColor;
+                this.SelectedTissue.SelectedMarkMode = new KeyValuePair<string, string>(viewModel.MarkMode.ToString(), viewModel.MarkMode.GetEnumMember());
+            }
+
+        }, _ => this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
+        #endregion
+
+        #region 删除组织命令 —— ICommand RemoveTissueCommand
+        /// <summary>
+        /// 删除组织命令
+        /// </summary>
+        public ICommand RemoveTissueCommand => new AsyncRelayCommand(async _ =>
+        {
+            TaskDialogStandardResult result = await MessageBox.Show("确定要删除吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == TaskDialogStandardResult.OK)
+            {
+                this.Tissues.Remove(this.SelectedTissue);
+            }
+
+            //TODO 组织Mark值置为0
+
+        }, _ => this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
         #endregion
 
         #endregion
