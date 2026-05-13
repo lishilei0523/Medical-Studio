@@ -55,23 +55,12 @@ namespace MedicalSharp.Controls.Commands
         /// <summary>
         /// 获取标记值委托
         /// </summary>
-        public Func<byte> GetMarkValue { get; private set; }
+        public Func<byte> GetMarkValue { get; set; }
         #endregion
 
         #endregion
 
         #region # 方法
-
-        #region 设置获取标记值委托 —— void SetGetMarkValue(Func<byte> getMarkValue)
-        /// <summary>
-        /// 设置获取标记值委托
-        /// </summary>
-        /// <param name="getMarkValue">获取标记值委托</param>
-        public void SetGetMarkValue(Func<byte> getMarkValue)
-        {
-            this.GetMarkValue = getMarkValue;
-        }
-        #endregion
 
         #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
         /// <summary>
@@ -132,12 +121,6 @@ namespace MedicalSharp.Controls.Commands
                 });
                 items.Add(new ContextMenuItem
                 {
-                    Header = "染色",
-                    Command = () => this.ApplyTint(viewport),
-                    IsEnabled = this._selectedVisual is ICutVolume
-                });
-                items.Add(new ContextMenuItem
-                {
                     Header = "内切",
                     Command = () => this.ApplyCutInside(viewport),
                     IsEnabled = this._selectedVisual is ICutVolume
@@ -186,32 +169,6 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion
 
-        #region 适用染色 —— void ApplyTint(OpenTKViewport viewport)
-        /// <summary>
-        /// 适用染色
-        /// </summary>
-        private void ApplyTint(OpenTKViewport viewport)
-        {
-            if (this._selectedVisual is ICutVolume cutVolume)
-            {
-                byte markValue = this.GetMarkValue?.Invoke() ?? 1;
-                if (viewport is VolumeViewport volumeViewport)
-                {
-                    cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Tinted);
-                }
-                if (viewport is MPRViewport mprViewport)
-                {
-                    cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, CutMode.Inside, markValue);
-                    mprViewport.MPRRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Tinted);
-                }
-
-                //请求下一帧
-                viewport.RequestNextFrameRendering();
-            }
-        }
-        #endregion
-
         #region 适用内切 —— void ApplyCutInside(OpenTKViewport viewport)
         /// <summary>
         /// 适用内切
@@ -224,12 +181,10 @@ namespace MedicalSharp.Controls.Commands
                 if (viewport is VolumeViewport volumeViewport)
                 {
                     cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
                 }
                 if (viewport is MPRViewport mprViewport)
                 {
                     cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, CutMode.Inside, markValue);
-                    mprViewport.MPRRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
                 }
 
                 //请求下一帧
@@ -250,12 +205,10 @@ namespace MedicalSharp.Controls.Commands
                 if (viewport is VolumeViewport volumeViewport)
                 {
                     cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.OutSide, markValue);
-                    volumeViewport.VolumeRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
                 }
                 if (viewport is MPRViewport mprViewport)
                 {
                     cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, CutMode.OutSide, markValue);
-                    mprViewport.MPRRenderer.MarkStrategy.SwitchMarkMode(markValue, MarkMode.Collapsed);
                 }
 
                 //请求下一帧

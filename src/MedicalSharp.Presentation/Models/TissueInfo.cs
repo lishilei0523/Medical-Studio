@@ -1,8 +1,10 @@
 ﻿using Avalonia.Media;
 using Caliburn.Micro;
+using MedicalSharp.Presentation.Events;
 using MedicalSharp.Primitives.Enums;
 using SD.Common;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
+using SD.IOC.Core.Mediators;
 using System;
 using System.Collections.Generic;
 
@@ -53,8 +55,24 @@ namespace MedicalSharp.Presentation.Models
         /// <summary>
         /// 标记模式
         /// </summary>
-        [DependencyProperty]
-        public MarkMode MarkMode { get; set; }
+        public MarkMode MarkMode
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+
+                //发布事件
+                MarkModeSwitchedEvent message = new MarkModeSwitchedEvent
+                {
+                    MarkValue = this.MarkValue,
+                    MarkMode = value
+                };
+                IEventAggregator eventAggregator = ResolveMediator.Resolve<IEventAggregator>();
+                eventAggregator.PublishOnUIThreadAsync(message);
+            }
+        }
         #endregion
 
         #region 颜色 —— Color Color

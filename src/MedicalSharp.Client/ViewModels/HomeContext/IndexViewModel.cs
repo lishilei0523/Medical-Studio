@@ -7,6 +7,8 @@ using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Managers;
+using MedicalSharp.Engine.Resources;
+using MedicalSharp.Presentation.Events;
 using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Builders;
@@ -24,6 +26,7 @@ using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -42,6 +45,11 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         private readonly IWindowManager _windowManager;
 
         /// <summary>
+        /// 事件聚合器
+        /// </summary>
+        private readonly IEventAggregator _eventAggregator;
+
+        /// <summary>
         /// DICOM加载器
         /// </summary>
         private readonly IDicomLoader _dicomLoader;
@@ -49,9 +57,11 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public IndexViewModel(IWindowManager windowManager, IDicomLoader dicomLoader)
+        public IndexViewModel(IWindowManager windowManager, IEventAggregator eventAggregator, IDicomLoader dicomLoader)
         {
             this._windowManager = windowManager;
+            this._eventAggregator = eventAggregator;
+            this._eventAggregator.SubscribeOnUIThread(this);
             this._dicomLoader = dicomLoader;
             this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
 
@@ -98,6 +108,13 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                     this.VolumeInfo = value.Metadata.ToVolumeInfo();
                     this.PatientInfo = value.PatientData.ToPatientInfo();
                     this.StudyInfo = value.StudyData.ToStudyInfo();
+
+                    //初始化标记策略
+                    VolumeSession session = SessionManager.VolumeSessions[value.Metadata.Id];
+                    foreach (TissueInfo tissue in this.Tissues)
+                    {
+                        session.MarkStrategy.SwitchMarkMode(tissue.MarkValue, tissue.MarkMode);
+                    }
                 }
                 else
                 {
@@ -145,8 +162,19 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 已选组织
         /// </summary>
-        [DependencyProperty]
-        public TissueInfo SelectedTissue { get; set; }
+        public TissueInfo SelectedTissue
+        {
+            get;
+            set
+            {
+                field = value;
+                TissueSelectedEvent message = new TissueSelectedEvent
+                {
+                    TissueInfo = value
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            }
+        }
         #endregion
 
         #region 组织列表 —— AvaloniaList<TissueInfo> Tissues
@@ -284,6 +312,18 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
         #region # 方法
 
+        #region 初始化 —— override Task OnInitializedAsync(...
+        /// <summary>
+        /// 初始化事件
+        /// </summary>
+        protected override Task OnInitializedAsync(CancellationToken cancellationToken)
+        {
+            this.SelectedTissue = this.Tissues[1];
+
+            return base.OnInitializedAsync(cancellationToken);
+        }
+        #endregion
+
         #region 打开序列 —— async Task OpenSeries()
         /// <summary>
         /// 打开序列
@@ -333,6 +373,21 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
             this.VolumeData = null;
+        }
+        #endregion
+
+        #region 失活事件 —— override Task OnDeactivateAsync(bool close...
+        /// <summary>
+        /// 失活事件
+        /// </summary>
+        protected override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
+        {
+            if (close)
+            {
+                this._eventAggregator.Unsubscribe(this);
+            }
+
+            return base.OnDeactivateAsync(close, cancellationToken);
         }
         #endregion
 

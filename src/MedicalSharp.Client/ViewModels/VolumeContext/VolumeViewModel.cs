@@ -11,7 +11,10 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Engine.Managers;
+using MedicalSharp.Engine.Resources;
 using MedicalSharp.Presentation.Events;
+using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
@@ -36,7 +39,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -91,6 +94,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #region # 属性
 
         //属性
+
+        #region 已选组织 —— TissueInfo SelectedTissue
+        /// <summary>
+        /// 已选组织
+        /// </summary>
+        public TissueInfo SelectedTissue { get; set; }
+        #endregion
 
         #region Raycast渲染模式选中 —— bool RaycastChecked
         /// <summary>
@@ -508,6 +518,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             PickVisual3DCommand command = new PickVisual3DCommand(picked, removed);
+            command.GetMarkValue = () => this.SelectedTissue.MarkValue;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1004,6 +1015,36 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
 
         //Events
+
+        #region 处理组织选中事件 —— Task HandleAsync(TissueSelectedEvent message...
+        /// <summary>
+        /// 处理组织选中事件
+        /// </summary>
+        public Task HandleAsync(TissueSelectedEvent message, CancellationToken cancellationToken)
+        {
+            this.SelectedTissue = message.TissueInfo;
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理标记模式切换事件 —— Task HandleAsync(MarkModeSwitchedEvent message...
+        /// <summary>
+        /// 处理标记模式切换事件
+        /// </summary>
+        public Task HandleAsync(MarkModeSwitchedEvent message, CancellationToken cancellationToken)
+        {
+            if (this.VolumeData != null)
+            {
+                VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                session.MarkStrategy.SwitchMarkMode(message.MarkValue, message.MarkMode);
+            }
+
+            this.VolumeViewport?.RequestNextFrameRendering();
+
+            return Task.CompletedTask;
+        }
+        #endregion
 
         #region 处理同步视口事件 —— Task HandleAsync(SyncViewportEvent message...
         /// <summary>

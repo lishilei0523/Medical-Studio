@@ -158,18 +158,18 @@
 											<ColumnDefinition Width="100" />
 										</Grid.ColumnDefinitions>
 										<!--标记值-->
-										<TextBlock Grid.Column="0" Text="{Binding MarkValue, Mode=OneWay}" 
+										<TextBlock Grid.Column="0" Text="{Binding MarkValue}" 
                                                    Width="30" Padding="2" FontSize="12"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
 										<!--组织名称-->
-										<TextBlock Grid.Column="1" Text="{Binding Name, Mode=OneWay}" FontSize="12"
+										<TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12"
 												   VerticalAlignment="Center" Margin="3,0" />
 										<!--颜色色块-->
 										<Border Grid.Column="2" Width="18" Height="18" CornerRadius="2"
 												HorizontalAlignment="Center" VerticalAlignment="Center"
 												BorderBrush="#CCCCCC" BorderThickness="0.5">
 											<Border.Background>
-												<SolidColorBrush Color="{Binding Color, Mode=OneWay}" />
+												<SolidColorBrush Color="{Binding Color}" />
 											</Border.Background>
 										</Border>
 										<!--标记模式-->

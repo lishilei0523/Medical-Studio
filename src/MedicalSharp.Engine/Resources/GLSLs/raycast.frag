@@ -174,7 +174,7 @@ void main()
         if (markMode == 2 && markValue != 0u) //Tinted - 染色
         {
             //从标记颜色纹理采样（纹理坐标 = 标记值 / 255）
-            float markTexCoord = float(markValue) / 255.0;
+            float markTexCoord = (float(markValue) + 0.5) / 256.0;
             vec4 markColor = texture(u_MarkStrategy, markTexCoord);
             
             //颜色叠加：用标记颜色的Alpha作为混合系数
