@@ -58,6 +58,13 @@ namespace MedicalSharp.Controls.Commands
         public Func<byte> GetMarkValue { get; set; }
         #endregion
 
+        #region 切割结束委托 —— Action CutEnd
+        /// <summary>
+        /// 切割结束委托
+        /// </summary>
+        public Action CutEnd { get; set; }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -189,6 +196,8 @@ namespace MedicalSharp.Controls.Commands
 
                 //请求下一帧
                 viewport.RequestNextFrameRendering();
+
+                this.CutEnd?.Invoke();
             }
         }
         #endregion
@@ -213,6 +222,8 @@ namespace MedicalSharp.Controls.Commands
 
                 //请求下一帧
                 viewport.RequestNextFrameRendering();
+
+                this.CutEnd?.Invoke();
             }
         }
         #endregion

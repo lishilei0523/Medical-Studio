@@ -33,6 +33,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Action = System.Action;
 
 namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
@@ -516,9 +517,18 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
+            Action cutEnd = () =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
 
             PickVisual3DCommand command = new PickVisual3DCommand(picked, removed);
             command.GetMarkValue = () => this.SelectedTissue.MarkValue;
+            command.CutEnd = cutEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
