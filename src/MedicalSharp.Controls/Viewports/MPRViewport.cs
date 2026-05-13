@@ -294,9 +294,9 @@ namespace MedicalSharp.Controls.Viewports
             Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera.LookDirection, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, out ray);
             if (planeUV.HasValue)
             {
-                voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y, out Vector3 texCoord);
+                voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y, out Vector3 texCoord, out Vector3 worldPoint);
                 textureCoord = texCoord;
-                worldPosition = (textureCoord - new Vector3(0.5f)) * this.VolumeData.Metadata.VolumeScale;
+                worldPosition = worldPoint;
                 voxelValue = this.VolumeData[voxelPosition.X, voxelPosition.Y, voxelPosition.Z];
                 markValue = this.VolumeData.GetMarkValue(voxelPosition.X, voxelPosition.Y, voxelPosition.Z);
 
