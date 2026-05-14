@@ -159,6 +159,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public ScanInfo ScanInfo { get; set; }
         #endregion
 
+        #region 统计信息 —— StatisticInfo StatisticInfo
+        /// <summary>
+        /// 统计信息
+        /// </summary>
+        [DependencyProperty]
+        public StatisticInfo StatisticInfo { get; set; }
+        #endregion
+
         #region 布局视图模型 —— LayoutViewModel LayoutViewModel
         /// <summary>
         /// 布局视图模型

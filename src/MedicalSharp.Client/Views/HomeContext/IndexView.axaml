@@ -99,9 +99,9 @@
 							<sd:FormItem Label="检查时间：">
 								<TextBlock Text="{Binding StudyInfo.StudyTime}" />
 							</sd:FormItem>
-                            <sd:FormItem Label="机构名称：">
-                                <TextBlock Text="{Binding StudyInfo.InstitutionName}" />
-                            </sd:FormItem>
+							<sd:FormItem Label="机构名称：">
+								<TextBlock Text="{Binding StudyInfo.InstitutionName}" />
+							</sd:FormItem>
 						</StackPanel>
 					</sd:GroupBox>
 					<sd:GroupBox Grid.Row="1" Header="扫描信息" Margin="0,2,0,2">
@@ -112,21 +112,21 @@
 							<sd:FormItem Label="管电压：">
 								<TextBlock Text="{Binding ScanInfo.KVP}" />
 							</sd:FormItem>
-                            <sd:FormItem Label="管电流：">
-                                <TextBlock Text="{Binding ScanInfo.XRayTubeCurrent}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="曝光时间：">
-                                <TextBlock Text="{Binding ScanInfo.ExposureTime}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="卷积核：">
-                                <TextBlock Text="{Binding ScanInfo.ConvolutionKernel}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="FOV：">
-                                <TextBlock Text="{Binding ScanInfo.ReconstructionDiameter}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="层厚：">
-                                <TextBlock Text="{Binding ScanInfo.SliceThickness}" />
-                            </sd:FormItem>
+							<sd:FormItem Label="管电流：">
+								<TextBlock Text="{Binding ScanInfo.XRayTubeCurrent}" />
+							</sd:FormItem>
+							<sd:FormItem Label="曝光时间：">
+								<TextBlock Text="{Binding ScanInfo.ExposureTime}" />
+							</sd:FormItem>
+							<sd:FormItem Label="卷积核：">
+								<TextBlock Text="{Binding ScanInfo.ConvolutionKernel}" />
+							</sd:FormItem>
+							<sd:FormItem Label="FOV：">
+								<TextBlock Text="{Binding ScanInfo.ReconstructionDiameter}" />
+							</sd:FormItem>
+							<sd:FormItem Label="层厚：">
+								<TextBlock Text="{Binding ScanInfo.SliceThickness}" />
+							</sd:FormItem>
 						</StackPanel>
 					</sd:GroupBox>
 					<sd:GroupBox Grid.Row="2" Header="体积信息" Margin="0,2,0,0">
@@ -211,7 +211,44 @@
 						</ListBox>
 					</sd:GroupBox>
 					<sd:GroupBox Grid.Row="1" Header="统计信息" Margin="0,2,0,0">
-
+						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,10">
+							<sd:FormItem Label="周长：">
+								<TextBlock Text="{Binding StatisticInfo.Length}" />
+							</sd:FormItem>
+							<sd:FormItem Label="表面积：">
+								<TextBlock Text="{Binding StatisticInfo.SurfaceArea }" />
+							</sd:FormItem>
+							<sd:FormItem Label="体积：">
+								<TextBlock Text="{Binding StatisticInfo.Volume}" />
+							</sd:FormItem>
+                            <sd:FormItem Label="长径：">
+                                <TextBlock Text="{Binding StatisticInfo.LongDiameter}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="短径：">
+                                <TextBlock Text="{Binding StatisticInfo.ShortDiameter}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="最大直径：">
+                                <TextBlock Text="{Binding StatisticInfo.MaxDiameter}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="球形度：">
+                                <TextBlock Text="{Binding StatisticInfo.Sphericity}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="最小HU：">
+                                <TextBlock Text="{Binding StatisticInfo.MinHU}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="最大HU：">
+                                <TextBlock Text="{Binding StatisticInfo.MaxHU}" />
+                            </sd:FormItem>
+							<sd:FormItem Label="平均HU：">
+								<TextBlock Text="{Binding StatisticInfo.AverageHU}" />
+							</sd:FormItem>
+                            <sd:FormItem Label="标准差：">
+                                <TextBlock Text="{Binding StatisticInfo.StdDevHU}" />
+                            </sd:FormItem>
+							<sd:FormItem Label="体素数：">
+								<TextBlock Text="{Binding StatisticInfo.VoxelCount}" />
+							</sd:FormItem>
+						</StackPanel>
 					</sd:GroupBox>
 				</Grid>
 			</Grid>
