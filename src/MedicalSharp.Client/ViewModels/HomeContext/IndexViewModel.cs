@@ -108,6 +108,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                     this.VolumeInfo = value.Metadata.ToVolumeInfo();
                     this.PatientInfo = value.PatientData.ToPatientInfo();
                     this.StudyInfo = value.StudyData.ToStudyInfo();
+                    this.ScanInfo = value.ScanData.ToScanInfo();
 
                     //初始化标记策略
                     VolumeSession session = SessionManager.VolumeSessions[value.Metadata.Id];
@@ -148,6 +149,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         [DependencyProperty]
         public StudyInfo StudyInfo { get; set; }
+        #endregion
+
+        #region 扫描信息 —— ScanInfo ScanInfo
+        /// <summary>
+        /// 扫描信息
+        /// </summary>
+        [DependencyProperty]
+        public ScanInfo ScanInfo { get; set; }
         #endregion
 
         #region 布局视图模型 —— LayoutViewModel LayoutViewModel

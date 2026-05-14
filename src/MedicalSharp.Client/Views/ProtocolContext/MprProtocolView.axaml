@@ -17,8 +17,10 @@
                           SelectedValue="{Binding SelectedWindowLevel}" />
             </sd:FormItem>
             <sd:FormItem Label="窗宽：">
-                <TextBox Width="240" HorizontalAlignment="Left" 
-                         Text="{Binding MprViewModel.WindowWidth}" />
+                <NumericUpDown Width="240" HorizontalAlignment="Left"
+                               Minimum="1" Maximum="4095" Increment="1"
+                               ParsingNumberStyle="Integer" FormatString="F0"
+                               Text="{Binding MprViewModel.WindowWidth}" />
             </sd:FormItem>
             <sd:FormItem>
 				<Slider Minimum="1" Maximum="4095" SmallChange="1" LargeChange="10"
@@ -26,8 +28,10 @@
                         Value="{Binding MprViewModel.WindowWidth}" />
 			</sd:FormItem>
             <sd:FormItem Label="窗位：">
-                <TextBox Width="240" HorizontalAlignment="Left" 
-                         Text="{Binding MprViewModel.WindowCenter}" />
+                <NumericUpDown Width="240" HorizontalAlignment="Left"
+                               Minimum="-1024" Maximum="3071" Increment="1"
+                               ParsingNumberStyle="Integer" FormatString="F0"
+                               Text="{Binding MprViewModel.WindowCenter}" />
             </sd:FormItem>
 			<sd:FormItem>
                 <Slider Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
@@ -35,8 +39,10 @@
                         Value="{Binding MprViewModel.WindowCenter}" />
 			</sd:FormItem>
             <sd:FormItem Label="亮度：">
-                <TextBox Width="240" HorizontalAlignment="Left" 
-                         Text="{Binding MprViewModel.Brightness}" />
+                <NumericUpDown Width="240" HorizontalAlignment="Left"
+                               Minimum="0.1" Maximum="5.0" Increment="0.1"
+                               ParsingNumberStyle="Float" FormatString="F2"
+                               Text="{Binding MprViewModel.Brightness}" />
             </sd:FormItem>
 			<sd:FormItem>
                 <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
@@ -44,8 +50,10 @@
                         Value="{Binding MprViewModel.Brightness}" />
 			</sd:FormItem>
             <sd:FormItem Label="对比度：">
-                <TextBox Width="240" HorizontalAlignment="Left" 
-                         Text="{Binding MprViewModel.Contrast}" />
+                <NumericUpDown Width="240" HorizontalAlignment="Left"
+                               Minimum="0.1" Maximum="5.0" Increment="0.1"
+                               ParsingNumberStyle="Float" FormatString="F2"
+                               Text="{Binding MprViewModel.Contrast}" />
             </sd:FormItem>
 			<sd:FormItem>
                 <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"

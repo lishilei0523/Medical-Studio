@@ -7,7 +7,7 @@
 			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			  xmlns:cm="http://caliburnmicro.com"
 			  mc:Ignorable="d"
-			  Width="1440" Height="900"
+			  Width="1920" Height="1080"
 			  WindowState="Maximized"
 			  WindowStartupLocation="CenterScreen">
 
@@ -66,7 +66,8 @@
 				<!--Left Pannel-->
 				<Grid Grid.Column="0" Margin="4,1,2,5">
 					<Grid.RowDefinitions>
-						<RowDefinition Height="380" />
+						<RowDefinition Height="410" />
+						<RowDefinition Height="300" />
 						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
 					<sd:GroupBox Grid.Row="0" Header="患者检查信息" Margin="0,0,0,2">
@@ -83,9 +84,9 @@
 							<sd:FormItem Label="年龄：">
 								<TextBlock Text="{Binding PatientInfo.Age}" />
 							</sd:FormItem>
-                            <sd:FormItem Label="生日：">
-                                <TextBlock Text="{Binding PatientInfo.BirthDate}" />
-                            </sd:FormItem>
+							<sd:FormItem Label="生日：">
+								<TextBlock Text="{Binding PatientInfo.BirthDate}" />
+							</sd:FormItem>
 							<sd:FormItem Label="身高：">
 								<TextBlock Text="{Binding PatientInfo.Height}" />
 							</sd:FormItem>
@@ -98,9 +99,37 @@
 							<sd:FormItem Label="检查时间：">
 								<TextBlock Text="{Binding StudyInfo.StudyTime}" />
 							</sd:FormItem>
+                            <sd:FormItem Label="机构名称：">
+                                <TextBlock Text="{Binding StudyInfo.InstitutionName}" />
+                            </sd:FormItem>
 						</StackPanel>
 					</sd:GroupBox>
-					<sd:GroupBox Grid.Row="1" Header="体积信息" Margin="0,2,0,0">
+					<sd:GroupBox Grid.Row="1" Header="扫描信息" Margin="0,2,0,2">
+						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,10">
+							<sd:FormItem Label="成像设备：">
+								<TextBlock Text="{Binding ScanInfo.Modality}" />
+							</sd:FormItem>
+							<sd:FormItem Label="管电压：">
+								<TextBlock Text="{Binding ScanInfo.KVP}" />
+							</sd:FormItem>
+                            <sd:FormItem Label="管电流：">
+                                <TextBlock Text="{Binding ScanInfo.XRayTubeCurrent}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="曝光时间：">
+                                <TextBlock Text="{Binding ScanInfo.ExposureTime}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="卷积核：">
+                                <TextBlock Text="{Binding ScanInfo.ConvolutionKernel}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="FOV：">
+                                <TextBlock Text="{Binding ScanInfo.ReconstructionDiameter}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="层厚：">
+                                <TextBlock Text="{Binding ScanInfo.SliceThickness}" />
+                            </sd:FormItem>
+						</StackPanel>
+					</sd:GroupBox>
+					<sd:GroupBox Grid.Row="2" Header="体积信息" Margin="0,2,0,0">
 						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,10">
 							<sd:FormItem Label="体积尺寸：">
 								<TextBlock Text="{Binding VolumeInfo.VolumeSize}" />
@@ -117,9 +146,9 @@
 							<sd:FormItem Label="截距：">
 								<TextBlock Text="{Binding VolumeInfo.RescaleIntercept}" />
 							</sd:FormItem>
-                            <sd:FormItem Label="HU范围：">
-                                <TextBlock Text="{Binding VolumeInfo.HURange}" />
-                            </sd:FormItem>
+							<sd:FormItem Label="HU范围：">
+								<TextBlock Text="{Binding VolumeInfo.HURange}" />
+							</sd:FormItem>
 							<sd:FormItem Label="默认窗：">
 								<TextBlock Text="{Binding VolumeInfo.WindowLevel}" />
 							</sd:FormItem>
@@ -148,9 +177,9 @@
 											<ColumnDefinition Width="100" />
 										</Grid.ColumnDefinitions>
 										<!--标记值-->
-										<TextBlock Grid.Column="0" Text="{Binding MarkValue}" 
-                                                   Width="30" Padding="2" FontSize="12"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+										<TextBlock Grid.Column="0" Text="{Binding MarkValue}"
+												   Width="30" Padding="2" FontSize="12"
+												   HorizontalAlignment="Center" VerticalAlignment="Center" />
 										<!--组织名称-->
 										<TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12"
 												   VerticalAlignment="Center" Margin="3,0" />
@@ -172,13 +201,13 @@
 									</Grid>
 								</DataTemplate>
 							</ListBox.ItemTemplate>
-                            <ListBox.ContextFlyout>
-                                <MenuFlyout>
-                                    <MenuItem Header="创建组织" Command="{Binding AddTissueCommand}" />
-                                    <MenuItem Header="编辑组织" Command="{Binding UpdateTissueCommand}" />
-                                    <MenuItem Header="删除组织" Command="{Binding RemoveTissueCommand}" />
-                                </MenuFlyout>
-                            </ListBox.ContextFlyout>
+							<ListBox.ContextFlyout>
+								<MenuFlyout>
+									<MenuItem Header="创建组织" Command="{Binding AddTissueCommand}" />
+									<MenuItem Header="编辑组织" Command="{Binding UpdateTissueCommand}" />
+									<MenuItem Header="删除组织" Command="{Binding RemoveTissueCommand}" />
+								</MenuFlyout>
+							</ListBox.ContextFlyout>
 						</ListBox>
 					</sd:GroupBox>
 					<sd:GroupBox Grid.Row="1" Header="统计信息" Margin="0,2,0,0">

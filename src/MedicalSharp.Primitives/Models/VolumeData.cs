@@ -31,6 +31,7 @@ namespace MedicalSharp.Primitives.Models
             this.Metadata = new VolumeMetadata();
             this.PatientData = new VolumePatientData();
             this.StudyData = new VolumeStudyData();
+            this.ScanData = new VolumeScanData();
         }
 
         #endregion
@@ -56,6 +57,13 @@ namespace MedicalSharp.Primitives.Models
         /// 检查数据
         /// </summary>
         public VolumeStudyData StudyData { get; private set; }
+        #endregion
+
+        #region 扫描数据 —— VolumeScanData ScanData
+        /// <summary>
+        /// 扫描数据
+        /// </summary>
+        public VolumeScanData ScanData { get; set; }
         #endregion
 
         #region 原始数据 —— abstract IntPtr OriginalData

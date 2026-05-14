@@ -235,6 +235,21 @@ namespace MedicalSharp.Insight
             volumeData.StudyData.StudyId = getTagValue(slice, DicomTags.StudyID);
             volumeData.StudyData.AccessionNumber = getTagValue(slice, DicomTags.AccessionNumber);
             volumeData.StudyData.ReferringPhysician = getTagValue(slice, DicomTags.ReferringPhysicianName);
+            volumeData.StudyData.InstitutionName = getTagValue(slice, DicomTags.InstitutionName);
+
+            //提取扫描数据
+            volumeData.ScanData.Modality = getTagValue(slice, DicomTags.Modality);
+            volumeData.ScanData.BodyPartExamined = getTagValue(slice, DicomTags.BodyPartExamined);
+            volumeData.ScanData.KVP = getTagValue(slice, DicomTags.KVP);
+            volumeData.ScanData.ExposureTime = getTagValue(slice, DicomTags.ExposureTime);
+            volumeData.ScanData.XRayTubeCurrent = getTagValue(slice, DicomTags.XRayTubeCurrent);
+            volumeData.ScanData.ConvolutionKernel = getTagValue(slice, DicomTags.ConvolutionKernel);
+            volumeData.ScanData.ReconstructionDiameter = getTagValue(slice, DicomTags.ReconstructionDiameter);
+            volumeData.ScanData.PitchFactor = getTagValue(slice, DicomTags.PitchFactor);
+            volumeData.ScanData.SliceThickness = getTagValue(slice, DicomTags.SliceThickness);
+            volumeData.ScanData.ReconstructionAlgorithm = getTagValue(slice, DicomTags.ReconstructionAlgorithm);
+            volumeData.ScanData.ContrastAgent = getTagValue(slice, DicomTags.ContrastAgent);
+            volumeData.ScanData.ContrastDose = getTagValue(slice, DicomTags.ContrastDose);
         }
         #endregion
 

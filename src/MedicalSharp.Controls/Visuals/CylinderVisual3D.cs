@@ -167,6 +167,7 @@ namespace MedicalSharp.Controls.Visuals
                 StrokeThickness = this.StrokeThickness,
                 Fill = this.Fill,
                 Radius = this.Radius,
+                Height = this.Height,
                 Center = this.Center,
                 Segments = this.Segments,
                 WithCaps = this.WithCaps
@@ -189,6 +190,7 @@ namespace MedicalSharp.Controls.Visuals
                 this.StrokeThickness = shape.StrokeThickness;
                 this.Fill = shape.Fill;
                 this.Radius = shape.Radius;
+                this.Height = shape.Height;
                 this.Center = shape.Center;
                 this.Segments = shape.Segments;
                 this.WithCaps = shape.WithCaps;

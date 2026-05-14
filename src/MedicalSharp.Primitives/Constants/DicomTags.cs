@@ -124,17 +124,31 @@ namespace MedicalSharp.Primitives.Constants
 
         #endregion
 
+        #region # 机构模块 (Institution Module)
+
+        /// <summary>
+        /// 机构名称 (LO)
+        /// </summary>
+        public const string InstitutionName = "0008|0080";
+
+        /// <summary>
+        /// 机构地址 (ST)
+        /// </summary>
+        public const string InstitutionAddress = "0008|0081";
+
+        /// <summary>
+        /// 科室名称 (LO)
+        /// </summary>
+        public const string InstitutionalDepartmentName = "0008|1040";
+
+        #endregion
+
         #region # 设备模块 (Equipment Module)
 
         /// <summary>
         /// 设备制造商 (LO)
         /// </summary>
         public const string Manufacturer = "0008|0070";
-
-        /// <summary>
-        /// 机构名称 (LO)
-        /// </summary>
-        public const string InstitutionName = "0008|0080";
 
         /// <summary>
         /// 设备站名 (SH)
@@ -233,6 +247,16 @@ namespace MedicalSharp.Primitives.Constants
         /// 曝光量 (IS)
         /// </summary>
         public const string Exposure = "0018|1152";
+
+        /// <summary>
+        /// 螺距因子 (DS)
+        /// </summary>
+        public const string PitchFactor = "0018|9311";
+
+        /// <summary>
+        /// 重建算法类型 (CS)
+        /// </summary>
+        public const string ReconstructionAlgorithm = "0018|9315";
 
         #endregion
 
@@ -450,6 +474,20 @@ namespace MedicalSharp.Primitives.Constants
         /// 图形对象序列 (SQ)
         /// </summary>
         public const string GraphicObjectSequence = "0070|0009";
+
+        #endregion
+
+        #region # 造影剂模块
+
+        /// <summary>
+        /// 造影剂名称 (LO)
+        /// </summary>
+        public const string ContrastAgent = "0018|0010";
+
+        /// <summary>
+        /// 造影剂剂量 (DS)
+        /// </summary>
+        public const string ContrastDose = "0018|1041";
 
         #endregion
 

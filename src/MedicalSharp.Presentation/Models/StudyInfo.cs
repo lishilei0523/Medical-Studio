@@ -67,5 +67,14 @@ namespace MedicalSharp.Presentation.Models
         [DependencyProperty]
         public string ReferringPhysician { get; set; }
         #endregion
+
+        #region 机构名称 —— string InstitutionName
+        /// <summary>
+        /// 机构名称
+        /// </summary>
+        /// <remarks>LO</remarks>
+        [DependencyProperty]
+        public string InstitutionName { get; set; }
+        #endregion
     }
 }

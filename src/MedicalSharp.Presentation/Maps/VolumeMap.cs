@@ -92,5 +92,26 @@ namespace MedicalSharp.Presentation.Maps
             return studyInfo;
         }
         #endregion
+
+        #region # 体积扫描数据映射扫描信息 —— static ScanInfo ToScanInfo(this VolumeScanData scanData)
+        /// <summary>
+        /// 体积扫描数据映射扫描信息
+        /// </summary>
+        public static ScanInfo ToScanInfo(this VolumeScanData scanData)
+        {
+            #region # 验证
+
+            if (scanData == null)
+            {
+                return null;
+            }
+
+            #endregion
+
+            ScanInfo scanInfo = scanData.Map<VolumeScanData, ScanInfo>();
+
+            return scanInfo;
+        }
+        #endregion
     }
 }
