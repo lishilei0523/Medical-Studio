@@ -15,6 +15,7 @@
     <Project Path="src/MedicalSharp.Controls/MedicalSharp.Controls.csproj" />
     <Project Path="src/MedicalSharp.Engine/MedicalSharp.Engine.csproj" />
     <Project Path="src/MedicalSharp.Insight/MedicalSharp.Insight.csproj" />
+    <Project Path="src/MedicalSharp.Intelligence/MedicalSharp.Intelligence.csproj" Id="60b572cc-a548-429c-875a-6162b2c579b1" />
     <Project Path="src/MedicalSharp.Primitives/MedicalSharp.Primitives.csproj" />
   </Folder>
   <Folder Name="/03 - Tests/">
