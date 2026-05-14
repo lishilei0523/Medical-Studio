@@ -162,7 +162,7 @@
 				<!--Right Pannel-->
 				<Grid Grid.Column="2" Margin="2,1,4,5">
 					<Grid.RowDefinitions>
-						<RowDefinition Height="550" />
+						<RowDefinition Height="525" />
 						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
 					<sd:GroupBox Grid.Row="0" Header="组织管理" Margin="0,0,0,2">
@@ -186,7 +186,7 @@
 										<!--颜色色块-->
 										<Border Grid.Column="2" Width="18" Height="18" CornerRadius="2"
 												HorizontalAlignment="Center" VerticalAlignment="Center"
-												BorderBrush="#CCCCCC" BorderThickness="0.5">
+												BorderBrush="LightGray" BorderThickness="0.5">
 											<Border.Background>
 												<SolidColorBrush Color="{Binding Color}" />
 											</Border.Background>

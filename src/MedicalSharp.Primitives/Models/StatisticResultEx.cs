@@ -8,12 +8,12 @@ namespace MedicalSharp.Primitives.Models
     /// </summary>
     /// <remarks>GPU交换版本</remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    public struct StatisticResultGPU
+    public struct StatisticResultEx
     {
         /// <summary>
         /// 创建统计结果构造器
         /// </summary>
-        public StatisticResultGPU()
+        public StatisticResultEx()
         {
             this.MinHU = float.MaxValue;
             this.MaxHU = float.MinValue;
