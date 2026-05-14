@@ -10,9 +10,9 @@ namespace MedicalSharp.Presentation.Maps
     /// </summary>
     public static class VolumeMap
     {
-        #region # 体积元数据映射体积信息 —— static VolumeInfo ToVolumeInfo(this VolumeMetadata metadata)
+        #region # 体积信息映射 —— static VolumeInfo ToVolumeInfo(this VolumeMetadata metadata)
         /// <summary>
-        /// 体积元数据映射体积信息
+        /// 体积信息映射
         /// </summary>
         public static VolumeInfo ToVolumeInfo(this VolumeMetadata metadata)
         {
@@ -41,9 +41,9 @@ namespace MedicalSharp.Presentation.Maps
         }
         #endregion
 
-        #region # 体积患者数据映射患者信息 —— static PatientInfo ToPatientInfo(this VolumePatientData patientData)
+        #region # 患者信息映射 —— static PatientInfo ToPatientInfo(this VolumePatientData patientData)
         /// <summary>
-        /// 体积患者数据映射患者信息
+        /// 患者信息映射
         /// </summary>
         public static PatientInfo ToPatientInfo(this VolumePatientData patientData)
         {
@@ -62,9 +62,9 @@ namespace MedicalSharp.Presentation.Maps
         }
         #endregion
 
-        #region # 体积检查数据映射检查信息 —— static StudyInfo ToStudyInfo(this VolumeStudyData studyData)
+        #region # 检查信息映射 —— static StudyInfo ToStudyInfo(this VolumeStudyData studyData)
         /// <summary>
-        /// 体积检查数据映射检查信息
+        /// 检查信息映射
         /// </summary>
         public static StudyInfo ToStudyInfo(this VolumeStudyData studyData)
         {
@@ -93,9 +93,9 @@ namespace MedicalSharp.Presentation.Maps
         }
         #endregion
 
-        #region # 体积扫描数据映射扫描信息 —— static ScanInfo ToScanInfo(this VolumeScanData scanData)
+        #region # 扫描信息映射 —— static ScanInfo ToScanInfo(this VolumeScanData scanData)
         /// <summary>
-        /// 体积扫描数据映射扫描信息
+        /// 扫描信息映射
         /// </summary>
         public static ScanInfo ToScanInfo(this VolumeScanData scanData)
         {
