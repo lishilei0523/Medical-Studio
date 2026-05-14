@@ -41,14 +41,18 @@
 							<MenuItem Header="保存(_S)" cm:Message.Attach="SaveImage()" />
 							<MenuItem Header="另存为(_A)" cm:Message.Attach="SaveAsImage()" />
 						</MenuItem>
-						<MenuItem Header="编辑(_E)">
-							<MenuItem Header="组织管理(_T)" Command="{Binding ManageTissueCommand}" />
+						<MenuItem Header="布局(_L)">
+							<MenuItem Header="布局13(_A)" Command="{Binding Layout13Command}" />
+							<MenuItem Header="布局22(_B)" Command="{Binding Layout22Command}" />
 						</MenuItem>
-						<MenuItem Header="视图(_V)">
-							<MenuItem Header="布局(_L)">
-								<MenuItem Header="布局13(_A)" Command="{Binding Layout13Command}" />
-								<MenuItem Header="布局22(_B)" Command="{Binding Layout22Command}" />
-							</MenuItem>
+						<MenuItem Header="形态学(_M)">
+							<MenuItem Header="占位(_T)" />
+						</MenuItem>
+						<MenuItem Header="滤波(_B)">
+                            <MenuItem Header="占位(_T)" />
+						</MenuItem>
+						<MenuItem Header="分割(_S)">
+                            <MenuItem Header="占位(_T)" />
 						</MenuItem>
 					</Menu>
 				</Grid>
@@ -221,30 +225,30 @@
 							<sd:FormItem Label="体积：">
 								<TextBlock Text="{Binding StatisticInfo.Volume}" />
 							</sd:FormItem>
-                            <sd:FormItem Label="长径：">
-                                <TextBlock Text="{Binding StatisticInfo.LongDiameter}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="短径：">
-                                <TextBlock Text="{Binding StatisticInfo.ShortDiameter}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="最大直径：">
-                                <TextBlock Text="{Binding StatisticInfo.MaxDiameter}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="球形度：">
-                                <TextBlock Text="{Binding StatisticInfo.Sphericity}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="最小HU：">
-                                <TextBlock Text="{Binding StatisticInfo.MinHU}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="最大HU：">
-                                <TextBlock Text="{Binding StatisticInfo.MaxHU}" />
-                            </sd:FormItem>
+							<sd:FormItem Label="长径：">
+								<TextBlock Text="{Binding StatisticInfo.LongDiameter}" />
+							</sd:FormItem>
+							<sd:FormItem Label="短径：">
+								<TextBlock Text="{Binding StatisticInfo.ShortDiameter}" />
+							</sd:FormItem>
+							<sd:FormItem Label="最大直径：">
+								<TextBlock Text="{Binding StatisticInfo.MaxDiameter}" />
+							</sd:FormItem>
+							<sd:FormItem Label="球形度：">
+								<TextBlock Text="{Binding StatisticInfo.Sphericity}" />
+							</sd:FormItem>
+							<sd:FormItem Label="最小HU：">
+								<TextBlock Text="{Binding StatisticInfo.MinHU}" />
+							</sd:FormItem>
+							<sd:FormItem Label="最大HU：">
+								<TextBlock Text="{Binding StatisticInfo.MaxHU}" />
+							</sd:FormItem>
 							<sd:FormItem Label="平均HU：">
 								<TextBlock Text="{Binding StatisticInfo.AverageHU}" />
 							</sd:FormItem>
-                            <sd:FormItem Label="标准差：">
-                                <TextBlock Text="{Binding StatisticInfo.StdDevHU}" />
-                            </sd:FormItem>
+							<sd:FormItem Label="标准差：">
+								<TextBlock Text="{Binding StatisticInfo.StdDevHU}" />
+							</sd:FormItem>
 							<sd:FormItem Label="体素数：">
 								<TextBlock Text="{Binding StatisticInfo.VoxelCount}" />
 							</sd:FormItem>
