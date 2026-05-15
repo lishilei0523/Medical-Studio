@@ -41,7 +41,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// MPR视图模型
     /// </summary>
-    public class MprViewModel : ScreenBase, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
+    public class MprViewModel : ScreenBase, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>, IHandle<MPRPlaneResetEvent>
     {
         #region # 字段及构造器
 
@@ -328,13 +328,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Crosshair.Center = this.Plane.WorldCenter.ToVector3();
             this.Crosshair.Transform.SetMatrix(Matrix4.Identity);
             this.Crosshair.Transform.SetPosition(this.Plane.WorldCenter);
+            this.Plane.ResetToStandard();
             this.FrameToken++;
 
             //发布事件
-            ShapeTranslatingEvent message = new ShapeTranslatingEvent
+            MPRPlaneResetEvent message = new MPRPlaneResetEvent
             {
-                Publisher = this,
-                Shape = this.Crosshair
+                Publisher = this
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
         });
@@ -1026,6 +1026,28 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this.Crosshair.Transform?.SetPosition(message.Crosshair.Transform.Position);
                 this.FrameToken++;
             }
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理MPR平面重置事件 —— Task HandleAsync(MPRPlaneResetEvent message...
+        /// <summary>
+        /// 处理MPR平面重置事件
+        /// </summary>
+        public Task HandleAsync(MPRPlaneResetEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.Plane.ResetToStandard();
+            this.FrameToken++;
 
             return Task.CompletedTask;
         }

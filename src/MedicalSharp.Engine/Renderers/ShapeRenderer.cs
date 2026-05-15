@@ -2,7 +2,9 @@
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 
@@ -118,8 +120,20 @@ namespace MedicalSharp.Engine.Renderers
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
             //渲染上下文
-            float zoomFactor = this.Camera is MPRCamera mprCamera ? mprCamera.ZoomFactor : 1.0f;
-            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, zoomFactor);
+            float zoomFactor = 1.0f;
+            Matrix4 viewMatrix = this.Camera.ViewMatrix;
+            if (this.Camera is MPRCamera mprCamera)
+            {
+                zoomFactor = mprCamera.ZoomFactor;
+
+                //横断位特殊处理
+                if (mprCamera.TargetPlane.OriginalPlaneType == MPRPlaneType.Axial)
+                {
+                    viewMatrix = Matrix4.CreateScale(-1, 1, 1) * viewMatrix;
+                }
+            }
+
+            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, viewMatrix, zoomFactor);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.ShapeProgram;
@@ -127,7 +141,7 @@ namespace MedicalSharp.Engine.Renderers
 
             //设置投影矩阵、视图矩阵、相机位置
             program.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
-            program.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
+            program.SetUniformMatrix4("u_ViewMatrix", viewMatrix);
             program.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
 
             foreach (ShapeRenderable renderable in this._renderables)

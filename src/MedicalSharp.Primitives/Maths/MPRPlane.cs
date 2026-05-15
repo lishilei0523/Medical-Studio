@@ -460,6 +460,12 @@ namespace MedicalSharp.Primitives.Maths
             float ndcX = (2.0f * mousePos2D.X) / viewportSize.X - 1.0f;
             float ndcY = 1.0f - (2.0f * mousePos2D.Y) / viewportSize.Y;
 
+            //横断位特殊处理
+            if (this.OriginalPlaneType == MPRPlaneType.Axial)
+            {
+                ndcX = 1.0f - (2.0f * mousePos2D.X) / viewportSize.X;
+            }
+
             Vector4 rayStartNDC = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
             Matrix4 invProjection = Matrix4.Invert(projectionMatrix);
             Matrix4 invView = Matrix4.Invert(viewMatrix);

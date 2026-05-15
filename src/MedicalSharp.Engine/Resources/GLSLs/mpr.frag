@@ -9,6 +9,7 @@ uniform usampler3D u_MarkTexture;
 uniform sampler1D u_TransferFunction;
 uniform sampler1D u_MarkStrategy;
 
+uniform int u_IsAxial;
 uniform vec3 u_VolumeScale;
 uniform float u_RescaleSlope;
 uniform float u_RescaleIntercept;
@@ -63,7 +64,13 @@ void main()
     
     //构建3D纹理坐标
     vec3 texCoord = (WorldPosition / u_VolumeScale) + 0.5;
-    
+
+    //横断位特殊处理
+    if(u_IsAxial == 1)
+    {
+        texCoord = vec3(1 - texCoord.x, texCoord.y, texCoord.z); 
+    }
+        
     //3D纹理边界检查
     if (texCoord.x < 0.0 || texCoord.x > 1.0 ||
         texCoord.y < 0.0 || texCoord.y > 1.0 ||

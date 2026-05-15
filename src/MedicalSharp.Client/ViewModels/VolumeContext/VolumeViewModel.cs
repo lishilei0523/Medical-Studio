@@ -409,20 +409,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.FrameToken++;
 
             //发布事件
-            ShapeTranslatingEvent messageAxial = new ShapeTranslatingEvent
+            MPRPlaneResetEvent messageAxial = new MPRPlaneResetEvent
             {
-                Publisher = this,
-                Shape = this.AxialPlane
+                Publisher = this
             };
-            ShapeTranslatingEvent messageCoronal = new ShapeTranslatingEvent
+            MPRPlaneResetEvent messageCoronal = new MPRPlaneResetEvent
             {
-                Publisher = this,
-                Shape = this.SagittalPlane
+                Publisher = this
             };
-            ShapeTranslatingEvent messageSagittal = new ShapeTranslatingEvent
+            MPRPlaneResetEvent messageSagittal = new MPRPlaneResetEvent
             {
-                Publisher = this,
-                Shape = this.SagittalPlane
+                Publisher = this
             };
             this._eventAggregator.PublishOnUIThreadAsync(messageAxial);
             this._eventAggregator.PublishOnUIThreadAsync(messageCoronal);

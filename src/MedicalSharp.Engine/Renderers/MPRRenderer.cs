@@ -294,6 +294,7 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
             program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
+            program.SetUniformBoolean("u_IsAxial", this._plane.OriginalPlaneType == MPRPlaneType.Axial);
 
             //设置DICOM重缩放参数
             program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
