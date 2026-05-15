@@ -307,8 +307,8 @@ namespace MedicalSharp.Controls.Viewports
                 textureCoord = texCoord!.Value;
                 worldPosition = (textureCoord - new Vector3(0.5f)) * this.VolumeData.Metadata.VolumeScale;
                 voxelPosition = pickedVoxelPosition.Value;
-                voxelValue = this.VolumeData[voxelPosition.X, voxelPosition.Y, voxelPosition.Z];
-                markValue = this.VolumeData.GetMarkValue(voxelPosition.X, voxelPosition.Y, voxelPosition.Z);
+                voxelValue = this.VolumeData.GetOriginalValue(voxelPosition);
+                markValue = this.VolumeData.GetMarkValue(voxelPosition);
 
                 return true;
             }
@@ -606,7 +606,7 @@ namespace MedicalSharp.Controls.Viewports
                 volumeSession = SessionManager.VolumeSessions[volumeData.Metadata.Id];
             }
 
-            viewport._volumeRenderable = new VolumeRenderable(volumeSession.SourceTexture, volumeSession.MarkTexture, volumeData);
+            viewport._volumeRenderable = new VolumeRenderable(volumeSession.OriginalTexture, volumeSession.MarkTexture, volumeData);
 
             //初始化传递函数、标记策略
             viewport._volumeRenderer.SetTransferFunction(volumeSession.VRTransferFunction);

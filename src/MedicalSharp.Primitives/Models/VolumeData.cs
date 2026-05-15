@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Primitives.Enums;
+using OpenTK.Mathematics;
 using System;
 using System.Threading;
 
@@ -115,48 +116,49 @@ namespace MedicalSharp.Primitives.Models
 
         #region # 方法
 
-        #region 获取体素值 —— short this[int x, int y, int z]
+        #region 获取原始值 —— short GetOriginalValue(Vector3i position)
         /// <summary>
-        /// 获取体素值
+        /// 获取原始值
         /// </summary>
-        /// <param name="x">X坐标</param>
-        /// <param name="y">Y坐标</param>
-        /// <param name="z">Z坐标</param>
+        /// <param name="position">位置</param>
         /// <returns>体素值</returns>
-        public unsafe short this[int x, int y, int z]
+        public unsafe short GetOriginalValue(Vector3i position)
         {
-            get
-            {
-                if (x < 0 || x >= this.Metadata.VolumeSize.X || y < 0 || y >= this.Metadata.VolumeSize.Y || z < 0 || z >= this.Metadata.VolumeSize.Z)
-                {
-                    return 0;
-                }
-
-                int index = z * this.Metadata.VolumeSize.X * this.Metadata.VolumeSize.Y + y * this.Metadata.VolumeSize.X + x;
-                short* pointer = (short*)this.OriginalData.ToPointer();
-                short voxel = pointer[index];
-
-                return voxel;
-            }
-        }
-        #endregion
-
-        #region 获取标记值 —— byte GetMarkValue(int x, int y, int z)
-        /// <summary>
-        /// 获取标记值
-        /// </summary>
-        /// <param name="x">X坐标</param>
-        /// <param name="y">Y坐标</param>
-        /// <param name="z">Z坐标</param>
-        /// <returns>标记值</returns>
-        public unsafe byte GetMarkValue(int x, int y, int z)
-        {
-            if (x < 0 || x >= this.Metadata.VolumeSize.X || y < 0 || y >= this.Metadata.VolumeSize.Y || z < 0 || z >= this.Metadata.VolumeSize.Z)
+            if (position.X < 0 || position.X >= this.Metadata.VolumeSize.X ||
+                position.Y < 0 || position.Y >= this.Metadata.VolumeSize.Y ||
+                position.Z < 0 || position.Z >= this.Metadata.VolumeSize.Z)
             {
                 return 0;
             }
 
-            int index = z * this.Metadata.VolumeSize.X * this.Metadata.VolumeSize.Y + y * this.Metadata.VolumeSize.X + x;
+            int index = position.Z * this.Metadata.VolumeSize.X * this.Metadata.VolumeSize.Y +
+                        position.Y * this.Metadata.VolumeSize.X +
+                        position.X;
+            short* pointer = (short*)this.OriginalData.ToPointer();
+            short voxel = pointer[index];
+
+            return voxel;
+        }
+        #endregion
+
+        #region 获取标记值 —— byte GetMarkValue(Vector3i position)
+        /// <summary>
+        /// 获取标记值
+        /// </summary>
+        /// <param name="position">位置</param>
+        /// <returns>标记值</returns>
+        public unsafe byte GetMarkValue(Vector3i position)
+        {
+            if (position.X < 0 || position.X >= this.Metadata.VolumeSize.X ||
+                position.Y < 0 || position.Y >= this.Metadata.VolumeSize.Y ||
+                position.Z < 0 || position.Z >= this.Metadata.VolumeSize.Z)
+            {
+                return 0;
+            }
+
+            int index = position.Z * this.Metadata.VolumeSize.X * this.Metadata.VolumeSize.Y +
+                        position.Y * this.Metadata.VolumeSize.X +
+                        position.X;
             byte* pointer = (byte*)this.MarkData.ToPointer();
             byte markValue = pointer[index];
 

@@ -314,11 +314,11 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
 
             //绑定纹理
-            this.Renderable.SourceTexture.Bind(0);
+            this.Renderable.OriginalTexture.Bind(0);
             this.Renderable.MarkTexture.Bind(1);
             this.TransferFunction.Texture.Bind(2);
             this.MarkStrategy.Texture.Bind(3);
-            program.SetUniformInt("u_SourceTexture", 0);
+            program.SetUniformInt("u_OriginalTexture", 0);
             program.SetUniformInt("u_MarkTexture", 1);
             program.SetUniformInt("u_TransferFunction", 2);
             program.SetUniformInt("u_MarkStrategy", 3);
@@ -327,7 +327,7 @@ namespace MedicalSharp.Engine.Renderers
             this._unitPlane.Draw(PrimitiveType.Triangles);
 
             //解绑纹理
-            this.Renderable.SourceTexture.Unbind();
+            this.Renderable.OriginalTexture.Unbind();
             this.Renderable.MarkTexture.Unbind();
             this.TransferFunction.Texture.Unbind();
             this.MarkStrategy.Texture.Unbind();

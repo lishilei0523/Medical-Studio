@@ -4,7 +4,7 @@ in vec3 LocalPosition;
 
 out vec4 FragColor;
 
-uniform sampler3D u_SourceTexture;
+uniform sampler3D u_OriginalTexture;
 uniform usampler3D u_MarkTexture;
 uniform sampler1D u_TransferFunction;
 
@@ -82,7 +82,7 @@ float getMedicalValue(vec3 texCoord)
         return -1000.0;  // 空气的CT值
     }
     
-    float snormValue = texture(u_SourceTexture, texCoord).r;
+    float snormValue = texture(u_OriginalTexture, texCoord).r;
     float rawValue = snormValue * MAX_16BIT_SIGNED;
     float medicalValue = rawValue * u_RescaleSlope + u_RescaleIntercept;
     

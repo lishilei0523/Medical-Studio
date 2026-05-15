@@ -42,7 +42,7 @@ namespace MedicalSharp.Engine.Renderables
 
             #endregion
 
-            this.SourceTexture = sourceTexture;
+            this.OriginalTexture = sourceTexture;
             this.MarkTexture = markTexture;
             this.VolumeData = volumeData;
         }
@@ -51,11 +51,11 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 属性
 
-        #region 原始纹理 —— Texture3D SourceTexture
+        #region 原始纹理 —— Texture3D OriginalTexture
         /// <summary>
         /// 原始纹理
         /// </summary>
-        public Texture3D SourceTexture { get; private set; }
+        public Texture3D OriginalTexture { get; private set; }
         #endregion
 
         #region 标记纹理 —— Texture3D MarkTexture

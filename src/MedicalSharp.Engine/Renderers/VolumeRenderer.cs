@@ -302,11 +302,11 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
 
             //绑定纹理
-            this.Renderable.SourceTexture.Bind(0);
+            this.Renderable.OriginalTexture.Bind(0);
             this.Renderable.MarkTexture.Bind(1);
             this.TransferFunction.Texture.Bind(2);
             this.MarkStrategy.Texture.Bind(3);
-            program.SetUniformInt("u_SourceTexture", 0);
+            program.SetUniformInt("u_OriginalTexture", 0);
             program.SetUniformInt("u_MarkTexture", 1);
             program.SetUniformInt("u_TransferFunction", 2);
             program.SetUniformInt("u_MarkStrategy", 3);
@@ -315,7 +315,7 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube.Draw(PrimitiveType.Triangles);
 
             //解绑纹理
-            this.Renderable.SourceTexture.Unbind();
+            this.Renderable.OriginalTexture.Unbind();
             this.Renderable.MarkTexture.Unbind();
             this.TransferFunction.Texture.Unbind();
             this.MarkStrategy.Texture.Unbind();
@@ -381,12 +381,12 @@ namespace MedicalSharp.Engine.Renderers
             textureCoord = new Vector3(pixel[0], pixel[1], pixel[2]);
 
             //转换体素坐标
-            int voxelX = (int)Math.Ceiling(pixel[0] * this.Renderable.SourceTexture.Width);
-            int voxelY = (int)Math.Ceiling(pixel[1] * this.Renderable.SourceTexture.Height);
-            int voxelZ = (int)Math.Ceiling(pixel[2] * this.Renderable.SourceTexture.Depth);
-            voxelX = Math.Clamp(voxelX, 0, this.Renderable.SourceTexture.Width - 1);
-            voxelY = Math.Clamp(voxelY, 0, this.Renderable.SourceTexture.Height - 1);
-            voxelZ = Math.Clamp(voxelZ, 0, this.Renderable.SourceTexture.Depth - 1);
+            int voxelX = (int)Math.Ceiling(pixel[0] * this.Renderable.OriginalTexture.Width);
+            int voxelY = (int)Math.Ceiling(pixel[1] * this.Renderable.OriginalTexture.Height);
+            int voxelZ = (int)Math.Ceiling(pixel[2] * this.Renderable.OriginalTexture.Depth);
+            voxelX = Math.Clamp(voxelX, 0, this.Renderable.OriginalTexture.Width - 1);
+            voxelY = Math.Clamp(voxelY, 0, this.Renderable.OriginalTexture.Height - 1);
+            voxelZ = Math.Clamp(voxelZ, 0, this.Renderable.OriginalTexture.Depth - 1);
 
             return new Vector3i(voxelX, voxelY, voxelZ);
         }
@@ -484,10 +484,10 @@ namespace MedicalSharp.Engine.Renderers
             pickProgram.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
 
             //绑定纹理
-            this.Renderable.SourceTexture.Bind(0);
+            this.Renderable.OriginalTexture.Bind(0);
             this.Renderable.MarkTexture.Bind(1);
             this.TransferFunction.Texture.Bind(2);
-            pickProgram.SetUniformInt("u_SourceTexture", 0);
+            pickProgram.SetUniformInt("u_OriginalTexture", 0);
             pickProgram.SetUniformInt("u_MarkTexture", 1);
             pickProgram.SetUniformInt("u_TransferFunction", 2);
 
@@ -495,7 +495,7 @@ namespace MedicalSharp.Engine.Renderers
             this._unitCube.Draw(PrimitiveType.Triangles);
 
             //解绑纹理
-            this.Renderable.SourceTexture.Unbind();
+            this.Renderable.OriginalTexture.Unbind();
             this.Renderable.MarkTexture.Unbind();
             this.TransferFunction.Texture.Unbind();
 
