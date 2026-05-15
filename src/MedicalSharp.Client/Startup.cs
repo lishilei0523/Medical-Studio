@@ -2,8 +2,10 @@
 using Avalonia.Threading;
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.HomeContext;
+using MedicalSharp.Controls.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Insight;
+using MedicalSharp.Inspiration.Managers;
 using Microsoft.Extensions.DependencyInjection;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.IOC.Core.Mediators;
@@ -74,6 +76,7 @@ namespace MedicalSharp.Client
         {
             ShaderManager.Cleanup();
             ComputerManager.Cleanup();
+            ClContextManager.Cleanup();
             ResolveMediator.Dispose();
         }
         #endregion
@@ -99,6 +102,9 @@ namespace MedicalSharp.Client
 
             //初始化SimpleITK
             SitkInitializer.Initialize();
+
+            //注册事件
+            OpenTKViewport.GlContextInitializedEvent += ClContextManager.InitializeWithGL;
         }
         #endregion
 

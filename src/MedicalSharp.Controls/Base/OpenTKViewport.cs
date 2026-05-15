@@ -8,6 +8,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -30,6 +31,12 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         /// <remarks>-1: 未知, 0: 非NVIDIA, 1: NVIDIA</remarks>
         private static int _GpuVendorCache = -1;
+
+        /// <summary>
+        /// OpenGL上下文已初始化事件
+        /// </summary>
+        /// <remarks>参数：操作系统类型、OpenGL上下文句柄、OpenGL平台显示句柄</remarks>
+        public static event Action<PlatformOS, IntPtr, IntPtr> GlContextInitializedEvent;
 
         /// <summary>
         /// 帧令牌依赖属性
@@ -65,6 +72,10 @@ namespace MedicalSharp.Controls.Base
             FrameTokenProperty.Changed.AddClassHandler<OpenTKViewport, int>(OnFrameTokenChanged);
         }
 
+        /// <summary>
+        /// 平台操作系统
+        /// </summary>
+        private PlatformOS _platformOS;
 
         /// <summary>
         /// FBO
@@ -151,6 +162,16 @@ namespace MedicalSharp.Controls.Base
         {
             get => this.GetValue(InputManagerProperty);
             set => this.SetValue(InputManagerProperty, value);
+        }
+        #endregion
+
+        #region 只读属性 - 平台操作系统 —— PlatformOS PlatformOS
+        /// <summary>
+        /// 只读属性 - 平台操作系统
+        /// </summary>
+        public PlatformOS PlatformOS
+        {
+            get => this._platformOS;
         }
         #endregion
 
@@ -337,6 +358,9 @@ namespace MedicalSharp.Controls.Base
             GL.LoadBindings(bindingsContext);
 
             this._glInitialized = true;
+
+            //触发事件
+            GlContextInitializedEvent?.Invoke(this._platformOS, this._glContextHandle, this._glDisplayHandle);
 
             //初始化着色器
             ShaderManager.Initialize();
@@ -546,6 +570,7 @@ namespace MedicalSharp.Controls.Base
             Type glContextType = glContext!.GetType();
             if (glContextType.Name == "WglContext")
             {
+                this._platformOS = PlatformOS.Windows;
                 FieldInfo handleField = glContextType.GetField("_context", BindingFlags.NonPublic | BindingFlags.Instance);
                 FieldInfo displayField = glContextType.GetField("_dc", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -563,6 +588,7 @@ namespace MedicalSharp.Controls.Base
             }
             else if (glContextType.Name == "GlxContext")
             {
+                this._platformOS = PlatformOS.Linux;
                 PropertyInfo handleProperty = glContextType.GetProperty("Handle", BindingFlags.Public | BindingFlags.Instance);
                 PropertyInfo displayProperty = glContextType.GetProperty("Display", BindingFlags.Public | BindingFlags.Instance);
 

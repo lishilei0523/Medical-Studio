@@ -1,4 +1,4 @@
-﻿namespace MedicalSharp.Inspiration.Platforms
+﻿namespace MedicalSharp.Primitives.Enums
 {
     /// <summary>
     /// 平台操作系统

@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Inspiration.Platforms;
+﻿using MedicalSharp.Primitives.Enums;
 using Silk.NET.OpenCL;
 using System;
 using System.Text;
@@ -12,6 +12,12 @@ namespace MedicalSharp.Inspiration.Resources
     public sealed class ClContext : IDisposable
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// OpenGL上下文句柄
+        /// </summary>
+        /// <remarks>cl_khr_gl_sharing扩展常量</remarks>
+        private const int GLContextKhr = 0x2008;
 
         /// <summary>
         /// 释放标识
@@ -203,8 +209,8 @@ namespace MedicalSharp.Inspiration.Resources
             {
                 contextProperties =
                 [
-                    (IntPtr)GLShare.GLContextKhr, glContext,         //GLContext句柄
-                    (IntPtr)platform, displayHandle,                 //Windows: 设备上下文HDC | Linux: X11 Display
+                    (IntPtr)GLContextKhr, glContext,         //GLContext句柄
+                    (IntPtr)platform, displayHandle,         //Windows: 设备上下文HDC | Linux: X11 Display
                     (IntPtr)ContextProperties.Platform, platformId,
                     IntPtr.Zero
                 ];
@@ -214,7 +220,7 @@ namespace MedicalSharp.Inspiration.Resources
                 //MacOS不需要显示句柄
                 contextProperties =
                 [
-                    (IntPtr)GLShare.GLContextKhr, glContext,
+                    (IntPtr)GLContextKhr, glContext,
                     (IntPtr)ContextProperties.Platform, platformId,
                     IntPtr.Zero
                 ];
