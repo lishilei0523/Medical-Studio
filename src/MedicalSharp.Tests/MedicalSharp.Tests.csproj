@@ -16,5 +16,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MedicalSharp.Insight\MedicalSharp.Insight.csproj" />
+    <ProjectReference Include="..\MedicalSharp.Inspiration\MedicalSharp.Inspiration.csproj" />
+    <ProjectReference Include="..\MedicalSharp.Intelligence\MedicalSharp.Intelligence.csproj" />
+    <ProjectReference Include="..\MedicalSharp.Primitives\MedicalSharp.Primitives.csproj" />
   </ItemGroup>
 </Project>

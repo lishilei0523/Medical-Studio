@@ -34,11 +34,6 @@ namespace MedicalSharp.Engine.Renderables
         private float _referenceScale;
 
         /// <summary>
-        /// 释放标识
-        /// </summary>
-        private bool _disposed;
-
-        /// <summary>
         /// 文本纹理
         /// </summary>
         private Texture2D _texture;
@@ -305,7 +300,7 @@ namespace MedicalSharp.Engine.Renderables
             Ray localRay = ray.Transform(worldToLocal);
 
             //快速剔除：先检测包围盒
-            if (!this.BoundingBox.Intersects(localRay, out float boxDistance))
+            if (!this.BoundingBox.Intersects(localRay, out distance))
             {
                 return false;
             }

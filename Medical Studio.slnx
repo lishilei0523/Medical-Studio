@@ -14,11 +14,14 @@
   <Folder Name="/02 - Engines/">
     <Project Path="src/MedicalSharp.Controls/MedicalSharp.Controls.csproj" />
     <Project Path="src/MedicalSharp.Engine/MedicalSharp.Engine.csproj" />
-    <Project Path="src/MedicalSharp.Insight/MedicalSharp.Insight.csproj" />
-    <Project Path="src/MedicalSharp.Intelligence/MedicalSharp.Intelligence.csproj" Id="60b572cc-a548-429c-875a-6162b2c579b1" />
     <Project Path="src/MedicalSharp.Primitives/MedicalSharp.Primitives.csproj" />
   </Folder>
-  <Folder Name="/03 - Tests/">
+  <Folder Name="/03 - Algorithms/">
+    <Project Path="src/MedicalSharp.Insight/MedicalSharp.Insight.csproj" />
+    <Project Path="src/MedicalSharp.Inspiration/MedicalSharp.Inspiration.csproj" />
+    <Project Path="src/MedicalSharp.Intelligence/MedicalSharp.Intelligence.csproj" Id="60b572cc-a548-429c-875a-6162b2c579b1" />
+  </Folder>
+  <Folder Name="/04 - Tests/">
     <Project Path="src/MedicalSharp.Tests/MedicalSharp.Tests.csproj" />
   </Folder>
 </Solution>
