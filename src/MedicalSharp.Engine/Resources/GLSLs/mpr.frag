@@ -4,7 +4,7 @@ in vec3 WorldPosition;
 
 out vec4 FragColor;
 
-uniform sampler3D u_VolumeTexture;
+uniform sampler3D u_SourceTexture;
 uniform usampler3D u_MarkTexture;
 uniform sampler1D u_TransferFunction;
 uniform sampler1D u_MarkStrategy;
@@ -73,8 +73,8 @@ void main()
         return;
     }
     
-    //采样体积纹理 (R16Snorm格式)
-    float snormValue = texture(u_VolumeTexture, texCoord).r;
+    //采样原始体积纹理 (R16Snorm格式)
+    float snormValue = texture(u_SourceTexture, texCoord).r;
 
     //采样标记纹理
     uint markValue = texture(u_MarkTexture, texCoord).r;
