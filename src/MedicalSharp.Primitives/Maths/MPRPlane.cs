@@ -460,12 +460,6 @@ namespace MedicalSharp.Primitives.Maths
             float ndcX = (2.0f * mousePos2D.X) / viewportSize.X - 1.0f;
             float ndcY = 1.0f - (2.0f * mousePos2D.Y) / viewportSize.Y;
 
-            //横断位特殊处理
-            if (this.OriginalPlaneType == MPRPlaneType.Axial)
-            {
-                ndcX = 1.0f - (2.0f * mousePos2D.X) / viewportSize.X;
-            }
-
             Vector4 rayStartNDC = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
             Matrix4 invProjection = Matrix4.Invert(projectionMatrix);
             Matrix4 invView = Matrix4.Invert(viewMatrix);
@@ -473,6 +467,12 @@ namespace MedicalSharp.Primitives.Maths
             Vector4 rayStartCamera = rayStartNDC * invProjection;
             rayStartCamera /= rayStartCamera.W;
             Vector3 rayStartWorld = Vector3.TransformPosition(rayStartCamera.Xyz, invView);
+
+            //横断位特殊处理
+            if (this.OriginalPlaneType == MPRPlaneType.Axial)
+            {
+                rayStartWorld *= new Vector3(-1, 1, 1);
+            }
 
             //射线方向固定为相机的前向方向（正交投影）
             Vector3 rayDirection = lookDirection;
