@@ -56,22 +56,22 @@ namespace MedicalSharp.Inspiration.Resources
 
         #region # 方法
 
-        #region 创建OpenCL内存缓冲区 —— static unsafe ClBuffer Create(ClContext context...
+        #region 创建OpenCL内存缓冲区 —— static unsafe ClBuffer Create(ClContext clContext...
         /// <summary>
         /// 创建OpenCL内存缓冲区
         /// </summary>
-        /// <param name="context">OpenCL上下文</param>
+        /// <param name="clContext">OpenCL上下文</param>
         /// <param name="flags">内存标识</param>
         /// <param name="elementSize">每个元素的字节数</param>
         /// <param name="data">CPU端数据（byte数组）</param>
         /// <returns>OpenCL内存缓冲区实例</returns>
-        public static unsafe ClBuffer Create(ClContext context, MemFlags flags, int elementSize, byte[] data)
+        public static unsafe ClBuffer Create(ClContext clContext, MemFlags flags, int elementSize, byte[] data)
         {
             CL cl = CL.GetApi();
             UIntPtr size = (UIntPtr)data.Length;
             fixed (byte* pointer = data)
             {
-                IntPtr handle = cl.CreateBuffer(context.Handle, flags | MemFlags.CopyHostPtr, size, pointer, out int err);
+                IntPtr handle = cl.CreateBuffer(clContext.Handle, flags | MemFlags.CopyHostPtr, size, pointer, out int err);
                 ClException.ThrowOnError(err, "CreateBuffer");
                 ClBuffer clBuffer = new ClBuffer(cl, handle, size);
 
@@ -80,23 +80,23 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 创建OpenCL内存缓冲区 —— static unsafe ClBuffer Create<T>(ClContext context...
+        #region 创建OpenCL内存缓冲区 —— static unsafe ClBuffer Create<T>(ClContext clContext...
         /// <summary>
         /// 创建OpenCL内存缓冲区
         /// </summary>
         /// <typeparam name="T">值类型</typeparam>
-        /// <param name="context">OpenCL上下文</param>
+        /// <param name="clContext">OpenCL上下文</param>
         /// <param name="flags">内存标识</param>
         /// <param name="data">CPU端数据</param>
         /// <returns>OpenCL内存缓冲区实例</returns>
-        public static unsafe ClBuffer Create<T>(ClContext context, MemFlags flags, ReadOnlySpan<T> data) where T : unmanaged
+        public static unsafe ClBuffer Create<T>(ClContext clContext, MemFlags flags, ReadOnlySpan<T> data) where T : unmanaged
         {
             CL cl = CL.GetApi();
             UIntPtr bufferSize = (UIntPtr)(data.Length * sizeof(T));
             IntPtr handle;
             fixed (void* pointer = data)
             {
-                handle = cl.CreateBuffer(context.Handle, flags | MemFlags.CopyHostPtr, bufferSize, pointer, out int err);
+                handle = cl.CreateBuffer(clContext.Handle, flags | MemFlags.CopyHostPtr, bufferSize, pointer, out int err);
                 ClException.ThrowOnError(err, "CreateBuffer");
             }
             if (handle == IntPtr.Zero)
@@ -110,19 +110,19 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 创建空OpenCL内存缓冲区 —— static unsafe ClBuffer CreateEmpty(ClContext context...
+        #region 创建空OpenCL内存缓冲区 —— static unsafe ClBuffer CreateEmpty(ClContext clContext...
         /// <summary>
         /// 创建空OpenCL内存缓冲区
         /// </summary>
-        /// <param name="context">OpenCL上下文</param>
+        /// <param name="clContext">OpenCL上下文</param>
         /// <param name="flags">内存标识</param>
         /// <param name="bufferSize">缓冲区尺寸</param>
         /// <returns>OpenCL内存缓冲区实例</returns>
-        public static unsafe ClBuffer CreateEmpty(ClContext context, MemFlags flags, int bufferSize)
+        public static unsafe ClBuffer CreateEmpty(ClContext clContext, MemFlags flags, int bufferSize)
         {
             CL cl = CL.GetApi();
             UIntPtr size = (UIntPtr)bufferSize;
-            IntPtr handle = cl.CreateBuffer(context.Handle, flags, size, null, out int err);
+            IntPtr handle = cl.CreateBuffer(clContext.Handle, flags, size, null, out int err);
             ClException.ThrowOnError(err, "CreateBuffer (empty)");
             ClBuffer clBuffer = new ClBuffer(cl, handle, size);
 
@@ -130,20 +130,20 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 创建空OpenCL内存缓冲区 —— static unsafe ClBuffer CreateEmpty<T>(ClContext context...
+        #region 创建空OpenCL内存缓冲区 —— static unsafe ClBuffer CreateEmpty<T>(ClContext clContext...
         /// <summary>
         /// 创建空OpenCL内存缓冲区
         /// </summary>
         /// <typeparam name="T">值类型</typeparam>
-        /// <param name="context">OpenCL上下文</param>
+        /// <param name="clContext">OpenCL上下文</param>
         /// <param name="flags">内存标识</param>
         /// <param name="elementsCount">元素数量</param>
         /// <returns>OpenCL内存缓冲区实例</returns>
-        public static unsafe ClBuffer CreateEmpty<T>(ClContext context, MemFlags flags, int elementsCount) where T : unmanaged
+        public static unsafe ClBuffer CreateEmpty<T>(ClContext clContext, MemFlags flags, int elementsCount) where T : unmanaged
         {
             CL cl = CL.GetApi();
             UIntPtr size = (UIntPtr)(elementsCount * sizeof(T));
-            IntPtr handle = cl.CreateBuffer(context.Handle, flags, size, null, out int err);
+            IntPtr handle = cl.CreateBuffer(clContext.Handle, flags, size, null, out int err);
             ClException.ThrowOnError(err, "CreateBuffer (empty)");
             if (handle == IntPtr.Zero)
             {
