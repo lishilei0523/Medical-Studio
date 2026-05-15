@@ -9,138 +9,195 @@ namespace MedicalSharp.Inspiration.Resources
     /// <remarks>对应.cl文件中的一个kernel函数，负责设置参数和调度执行</remarks>
     public sealed class ClKernel : IDisposable
     {
-        private readonly CL _cl;
+        #region # 字段及构造器
+
+        /// <summary>
+        /// 释放标识
+        /// </summary>
         private bool _disposed;
 
         /// <summary>
-        /// OpenCL 内核句柄
+        /// OpenCL实例
         /// </summary>
-        public nint Handle { get; private set; }
+        private readonly CL _cl;
 
         /// <summary>
-        /// 内核函数名
+        /// 创建OpenCL内核构造器
         /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// 当前已设置的参数数量（用于调试）
-        /// </summary>
-        public int ArgsSet { get; private set; }
-
-        internal ClKernel(CL cl, nint handle, string name)
+        /// <param name="cl">OpenCL实例</param>
+        /// <param name="handle">内核句柄</param>
+        /// <param name="name">内核函数名</param>
+        internal ClKernel(CL cl, IntPtr handle, string name)
         {
             this._cl = cl;
             this.Handle = handle;
             this.Name = name;
-            this.ArgsSet = 0;
+            this.ArgsCount = 0;
         }
 
+        #endregion
+
+        #region # 属性
+
+        #region 内核句柄 —— IntPtr Handle
         /// <summary>
-        /// 设置内核参数（Buffer）
+        /// 内核句柄
         /// </summary>
-        /// <param name="index">参数索引（从 0 开始）</param>
-        /// <param name="buffer">ClBuffer 实例</param>
-        public void SetArg(int index, ClBuffer buffer)
-        {
-            nint bufferHandle = buffer.Handle;
-            int err = this._cl.SetKernelArg(this.Handle, (uint)index, (nuint)nint.Size, in bufferHandle);
-            ClException.ThrowOnError(err, $"SetKernelArg({index}, Buffer) in {this.Name}");
-            this.ArgsSet++;
-        }
+        public IntPtr Handle { get; private set; }
+        #endregion
 
+        #region 内核函数名 —— string Name
         /// <summary>
-        /// 设置内核参数（值类型：int, float, Vector4 等）
+        /// 内核函数名
+        /// </summary>
+        public string Name { get; private set; }
+        #endregion
+
+        #region 参数数量 —— int ArgsCount
+        /// <summary>
+        /// 参数数量
+        /// </summary>
+        /// <remarks>用于调试</remarks>
+        public int ArgsCount { get; private set; }
+        #endregion
+
+        #endregion
+
+        #region # 方法
+
+        #region 设置内核参数 —— unsafe void SetKernelArg<T>(int index, T value)
+        /// <summary>
+        /// 设置内核参数
         /// </summary>
         /// <typeparam name="T">值类型（必须为 unmanaged）</typeparam>
         /// <param name="index">参数索引（从 0 开始）</param>
         /// <param name="value">参数值</param>
-        public unsafe void SetArg<T>(int index, T value) where T : unmanaged
+        /// <remarks>值类型：int, float, Vector4等</remarks>
+        public unsafe void SetKernelArg<T>(int index, T value) where T : unmanaged
         {
-            int err = this._cl.SetKernelArg(this.Handle, (uint)index, (nuint)sizeof(T), in value);
-            ClException.ThrowOnError(err, $"SetKernelArg({index}, {typeof(T).Name}) in {this.Name}");
-            this.ArgsSet++;
+            int errorCode = this._cl.SetKernelArg(this.Handle, (uint)index, (UIntPtr)sizeof(T), in value);
+            ClException.ThrowOnError(errorCode, $"SetKernelArg({index}, {typeof(T).Name}) in {this.Name}");
+            this.ArgsCount++;
         }
+        #endregion
 
+        #region 设置Buffer内核参数 —— void SetBufferKernelArg(int index, ClBuffer buffer)
         /// <summary>
-        /// 设置内核参数（Image / Image3D，预留）
+        /// 设置Buffer内核参数
+        /// </summary>
+        /// <param name="index">参数索引（从 0 开始）</param>
+        /// <param name="buffer">ClBuffer 实例</param>
+        public void SetBufferKernelArg(int index, ClBuffer buffer)
+        {
+            IntPtr bufferHandle = buffer.Handle;
+            int errorCode = this._cl.SetKernelArg(this.Handle, (uint)index, (UIntPtr)IntPtr.Size, in bufferHandle);
+            ClException.ThrowOnError(errorCode, $"SetKernelArg({index}, Buffer) in {this.Name}");
+            this.ArgsCount++;
+        }
+        #endregion
+
+        #region 设置Image内核参数 —— void SetImageKernelArg(int index, in IntPtr imageHandle)
+        /// <summary>
+        /// 设置Image内核参数
         /// </summary>
         /// <param name="index">参数索引</param>
-        /// <param name="imageHandle">OpenCL Image 句柄</param>
-        internal void SetArgImage(int index, nint imageHandle)
+        /// <param name="imageHandle">Image句柄</param>
+        public void SetImageKernelArg(int index, in IntPtr imageHandle)
         {
-            int err = this._cl.SetKernelArg(this.Handle, (uint)index, (nuint)nint.Size, in imageHandle);
-            ClException.ThrowOnError(err, $"SetKernelArg({index}, Image) in {this.Name}");
-            this.ArgsSet++;
+            int errorCode = this._cl.SetKernelArg(this.Handle, (uint)index, (UIntPtr)IntPtr.Size, in imageHandle);
+            ClException.ThrowOnError(errorCode, $"SetKernelArg({index}, Image) in {this.Name}");
+            this.ArgsCount++;
         }
+        #endregion
 
+        #region 执行1D工作项内核 —— unsafe void Enqueue1D(IntPtr commandQueue, uint globalSize...
         /// <summary>
-        /// 执行内核（1D 工作项）
+        /// 执行1D工作项内核
         /// </summary>
         /// <param name="commandQueue">命令队列句柄</param>
-        /// <param name="globalWorkSize">全局工作项数量</param>
-        /// <param name="localWorkSize">局部工作组大小（可选，默认 1）</param>
-        public unsafe void Enqueue1D(nint commandQueue, nuint globalWorkSize, nuint? localWorkSize = null)
+        /// <param name="globalSize">全局工作项尺寸</param>
+        /// <param name="localSize">局部工作组大小</param>
+        public unsafe void Enqueue1D(IntPtr commandQueue, uint globalSize, uint localSize = 256)
         {
-            nuint local = localWorkSize ?? 1;
-            int err = this._cl.EnqueueNdrangeKernel(commandQueue, this.Handle, 1, null, in globalWorkSize, in local, 0, null, null);
-            ClException.ThrowOnError(err, $"EnqueueNDRangeKernel 1D ({this.Name})");
+            UIntPtr globalWorkSize = ((globalSize + localSize - 1) / localSize) * localSize;
+            UIntPtr localWorkSize = localSize;
+            int errorCode = this._cl.EnqueueNdrangeKernel(commandQueue, this.Handle, 1, null, in globalWorkSize, in localWorkSize, 0, null, null);
+            ClException.ThrowOnError(errorCode, $"EnqueueNDRangeKernel 1D ({this.Name})");
         }
+        #endregion
 
+        #region 执行2D工作项内核 —— unsafe void Enqueue2D(IntPtr commandQueue, uint globalSizeX...
         /// <summary>
-        /// 执行内核（2D 工作项）
+        /// 执行2D工作项内核
         /// </summary>
         /// <param name="commandQueue">命令队列句柄</param>
-        /// <param name="globalX">全局工作项 X 方向数量</param>
-        /// <param name="globalY">全局工作项 Y 方向数量</param>
-        /// <param name="localX">局部工作组 X 大小（可选）</param>
-        /// <param name="localY">局部工作组 Y 大小（可选）</param>
-        public unsafe void Enqueue2D(nint commandQueue,
-            nuint globalX, nuint globalY,
-            nuint? localX = null, nuint? localY = null)
+        /// <param name="globalSizeX">全局工作项X方向尺寸</param>
+        /// <param name="globalSizeY">全局工作项Y方向尺寸</param>
+        /// <param name="localSizeX">局部工作组X方向尺寸</param>
+        /// <param name="localSizeY">局部工作组Y方向尺寸</param>
+        public unsafe void Enqueue2D(IntPtr commandQueue, uint globalSizeX, uint globalSizeY, uint localSizeX = 16, uint localSizeY = 16)
         {
-            nuint[] globalWorkSize = [globalX, globalY];
-            nuint[] localWorkSize = [localX ?? 1, localY ?? 1];
-
-            fixed (nuint* globalPtr = globalWorkSize, localPtr = localWorkSize)
+            UIntPtr[] globalWorkSizes =
+            [
+                ((globalSizeX + localSizeX - 1) / localSizeX) * localSizeX,
+                ((globalSizeY + localSizeY - 1) / localSizeY) * localSizeY
+            ];
+            UIntPtr[] localWorkSizes = [localSizeX, localSizeY];
+            fixed (UIntPtr* globalPtr = globalWorkSizes, localPtr = localWorkSizes)
             {
-                int err = this._cl.EnqueueNdrangeKernel(commandQueue, this.Handle, 2, null, globalPtr, localPtr, 0, null, null);
-                ClException.ThrowOnError(err, $"EnqueueNDRangeKernel 2D ({this.Name})");
+                int errorCode = this._cl.EnqueueNdrangeKernel(commandQueue, this.Handle, 2, null, globalPtr, localPtr, 0, null, null);
+                ClException.ThrowOnError(errorCode, $"EnqueueNDRangeKernel 2D ({this.Name})");
             }
         }
+        #endregion
 
+        #region 执行3D工作项内核 —— unsafe void Enqueue3D(IntPtr commandQueue, uint globalSizeX...
         /// <summary>
-        /// 执行内核（3D 工作项，用于体积处理）
+        /// 执行3D工作项内核
         /// </summary>
         /// <param name="commandQueue">命令队列句柄</param>
-        /// <param name="globalX">全局工作项 X 方向数量</param>
-        /// <param name="globalY">全局工作项 Y 方向数量</param>
-        /// <param name="globalZ">全局工作项 Z 方向数量</param>
-        /// <param name="localX">局部工作组 X 大小（可选）</param>
-        /// <param name="localY">局部工作组 Y 大小（可选）</param>
-        /// <param name="localZ">局部工作组 Z 大小（可选）</param>
-        public unsafe void Enqueue3D(nint commandQueue,
-            nuint globalX, nuint globalY, nuint globalZ,
-            nuint? localX = null, nuint? localY = null, nuint? localZ = null)
+        /// <param name="globalSizeX">全局工作项X方向尺寸</param>
+        /// <param name="globalSizeY">全局工作项Y方向尺寸</param>
+        /// <param name="globalSizeZ">全局工作项Z方向尺寸</param>
+        /// <param name="localSizeX">局部工作组X尺寸</param>
+        /// <param name="localSizeY">局部工作组Y尺寸</param>
+        /// <param name="localSizeZ">局部工作组Z尺寸</param>
+        public unsafe void Enqueue3D(IntPtr commandQueue, uint globalSizeX, uint globalSizeY, uint globalSizeZ, uint localSizeX = 8, uint localSizeY = 8, uint localSizeZ = 8)
         {
-            nuint[] globalWorkSize = [globalX, globalY, globalZ];
-            nuint[] localWorkSize = [localX ?? 1, localY ?? 1, localZ ?? 1];
-
-            fixed (nuint* globalPtr = globalWorkSize, localPtr = localWorkSize)
+            UIntPtr[] globalWorkSizes =
+            [
+                ((globalSizeX + localSizeX - 1) / localSizeX) * localSizeX,
+                ((globalSizeY + localSizeY - 1) / localSizeY) * localSizeY,
+                ((globalSizeZ + localSizeZ - 1) / localSizeZ) * localSizeZ
+            ];
+            UIntPtr[] localWorkSizes = [localSizeX, localSizeY, localSizeZ];
+            fixed (UIntPtr* globalPtr = globalWorkSizes, localPtr = localWorkSizes)
             {
-                int err = this._cl.EnqueueNdrangeKernel(commandQueue, this.Handle, 3, null, globalPtr, localPtr, 0, null, null);
-                ClException.ThrowOnError(err, $"EnqueueNDRangeKernel 3D ({this.Name})");
+                int errorCode = this._cl.EnqueueNdrangeKernel(commandQueue, this.Handle, 3, null, globalPtr, localPtr, 0, null, null);
+                ClException.ThrowOnError(errorCode, $"EnqueueNDRangeKernel 3D ({this.Name})");
             }
         }
+        #endregion
 
+        #region 释放资源 —— void Dispose()
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
-            if (this._disposed) return;
-            if (this.Handle != 0)
+            if (this._disposed)
+            {
+                return;
+            }
+            if (this.Handle != IntPtr.Zero)
             {
                 this._cl.ReleaseKernel(this.Handle);
-                this.Handle = 0;
+                this.Handle = IntPtr.Zero;
             }
             this._disposed = true;
         }
+        #endregion 
+
+        #endregion
     }
 }

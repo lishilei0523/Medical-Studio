@@ -24,6 +24,15 @@ namespace MedicalSharp.Inspiration.Resources
             this._errorCode = errorCode;
         }
 
+
+        /// <summary>
+        /// 只读属性 - OpenCL错误码
+        /// </summary>
+        public int ErrorCode
+        {
+            get => this._errorCode;
+        }
+
         /// <summary>
         /// 检查错误码，非成功则抛出异常
         /// </summary>

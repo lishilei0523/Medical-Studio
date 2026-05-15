@@ -158,20 +158,6 @@ namespace MedicalSharp.Inspiration.Resources
         /// 1. GL Context 在当前线程上是 current 的
         /// 2. 需要共享的 GL 纹理已经创建
         /// 3. 之后创建的 GL 纹理也能被共享
-        /// 
-        /// 使用示例（Windows）：
-        ///   ClContext clContext = ClContext.CreateWithGL(
-        ///       GraphicsContext.CurrentContext.Handle,
-        ///       Wgl.GetCurrentReadDC(),
-        ///       ClGlSharing.WglHdcKhr
-        ///   );
-        /// 
-        /// 使用示例（Linux）：
-        ///   ClContext clContext = ClContext.CreateWithGL(
-        ///       GraphicsContext.CurrentContext.Handle,
-        ///       Glx.GetCurrentDisplay(),
-        ///       ClGlSharing.GLXDisplayKhr
-        ///   );
         /// </remarks>
         public static unsafe ClContext CreateWithGL(PlatformOS platform, IntPtr glContext, IntPtr displayHandle)
         {
