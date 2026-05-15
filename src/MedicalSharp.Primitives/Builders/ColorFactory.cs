@@ -347,7 +347,16 @@ namespace MedicalSharp.Primitives.Builders
         /// <returns>相反颜色</returns>
         public static Vector4 Invert(this Vector4 color)
         {
-            return new Vector4(1.0f - color.X, 1.0f - color.Y, 1.0f - color.Z, color.W);
+            Vector4 invertedColor = new Vector4(1.0f - color.X, 1.0f - color.Y, 1.0f - color.Z, color.W);
+            float contrast = Math.Abs(invertedColor.X - color.X) +
+                             Math.Abs(invertedColor.Y - color.Y) +
+                             Math.Abs(invertedColor.Z - color.Z);
+            if (contrast < 0.5f)
+            {
+                invertedColor = ColorFactory.Yellow(); //固定用亮黄色
+            }
+
+            return invertedColor;
         }
         #endregion
 

@@ -135,7 +135,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 field = value;
                 this.NotifyOfPropertyChange();
                 this.Crosshair.IsVisible = value;
-                this.MPRViewport?.RequestNextFrameRendering();
+                this.FrameToken++;
             }
         }
         #endregion
@@ -328,7 +328,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Crosshair.Center = this.Plane.WorldCenter.ToVector3();
             this.Crosshair.Transform.SetMatrix(Matrix4.Identity);
             this.Crosshair.Transform.SetPosition(this.Plane.WorldCenter);
-            this.MPRViewport.RequestNextFrameRendering();
+            this.FrameToken++;
 
             //发布事件
             ShapeTranslatingEvent message = new ShapeTranslatingEvent
@@ -820,9 +820,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
                 session.MarkStrategy.SwitchMarkMode(message.MarkValue, message.MarkMode);
+                this.FrameToken++;
             }
-
-            this.MPRViewport?.RequestNextFrameRendering();
 
             return Task.CompletedTask;
         }

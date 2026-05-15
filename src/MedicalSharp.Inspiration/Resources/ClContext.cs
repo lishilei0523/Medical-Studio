@@ -1,4 +1,5 @@
-﻿using Silk.NET.OpenCL;
+﻿using MedicalSharp.Inspiration.Platforms;
+using Silk.NET.OpenCL;
 using System;
 using System.Text;
 
@@ -30,15 +31,15 @@ namespace MedicalSharp.Inspiration.Resources
         /// <param name="device">设备句柄</param>
         /// <param name="commandQueue">命令队列句柄</param>
         /// <param name="deviceName">设备名称</param>
-        /// <param name="globalMemoryMB">设备全局显存大小</param>
-        private ClContext(CL cl, IntPtr context, IntPtr device, IntPtr commandQueue, string deviceName, ulong globalMemoryMB)
+        /// <param name="globalMemorySize">设备全局显存大小</param>
+        private ClContext(CL cl, IntPtr context, IntPtr device, IntPtr commandQueue, string deviceName, ulong globalMemorySize)
         {
             this._cl = cl;
             this.Handle = context;
             this.Device = device;
             this.CommandQueue = commandQueue;
             this.DeviceName = deviceName;
-            this.GlobalMemoryMB = globalMemoryMB;
+            this.GlobalMemorySize = globalMemorySize;
         }
 
         #endregion
@@ -74,12 +75,12 @@ namespace MedicalSharp.Inspiration.Resources
         public string DeviceName { get; private set; }
         #endregion
 
-        #region 全局显存大小 —— ulong GlobalMemoryMB
+        #region 全局显存大小 —— ulong GlobalMemorySize
         /// <summary>
         /// 全局显存大小
         /// </summary>
         /// <remarks>单位：MB</remarks>
-        public ulong GlobalMemoryMB { get; private set; }
+        public ulong GlobalMemorySize { get; private set; }
         #endregion
 
         #endregion
@@ -105,14 +106,14 @@ namespace MedicalSharp.Inspiration.Resources
                 throw new ClException("找不到任何OpenCL平台！");
             }
 
-            //创建上下文（GPU 优先，CPU 回退）
-            IntPtr[] contextProps = [(IntPtr)ContextProperties.Platform, platformId, 0];
+            //创建上下文（GPU优先，CPU回退）
+            IntPtr[] contextProps = [(IntPtr)ContextProperties.Platform, platformId, IntPtr.Zero];
             IntPtr context;
             IntPtr device;
             fixed (IntPtr* propsPtr = contextProps)
             {
                 context = cl.CreateContextFromType(propsPtr, DeviceType.Gpu, null, null, out errorCode);
-                if (errorCode == 0)
+                if (errorCode == (int)ErrorCodes.Success)
                 {
                     device = ClContext.GetFirstDevice(cl, context);
                 }
@@ -121,6 +122,133 @@ namespace MedicalSharp.Inspiration.Resources
                     context = cl.CreateContextFromType(propsPtr, DeviceType.Cpu, null, null, out errorCode);
                     ClException.ThrowOnError(errorCode, "CreateContextFromType(CPU)");
                     device = ClContext.GetFirstDevice(cl, context);
+                }
+            }
+
+            //创建命令队列
+            IntPtr queue = cl.CreateCommandQueue(context, device, CommandQueueProperties.None, out errorCode);
+            ClException.ThrowOnError(errorCode, "CreateCommandQueue");
+            if (queue == IntPtr.Zero)
+            {
+                cl.ReleaseContext(context);
+                throw new ClException("创建命令队列失败：返回空句柄！");
+            }
+
+            //查询设备信息
+            string deviceName = GetDeviceInfoString(cl, device, DeviceInfo.Name);
+            ulong globalMemorySize = GetDeviceInfoUlong(cl, device, DeviceInfo.GlobalMemSize);
+
+            ClContext clContext = new ClContext(cl, context, device, queue, deviceName, globalMemorySize / (1024 * 1024));
+
+            return clContext;
+        }
+        #endregion
+
+        #region 创建OpenGL共享OpenCL上下文 —— static unsafe ClContext CreateWithGL(...
+        /// <summary>
+        /// 创建OpenGL共享OpenCL上下文
+        /// </summary>
+        /// <param name="platform">平台操作系统</param>
+        /// <param name="glContext">OpenGL上下文句柄</param>
+        /// <param name="displayHandle">平台显示句柄（Windows: HDC, Linux: Display）</param>
+        /// <returns>OpenCL上下文实例</returns>
+        /// <remarks>
+        /// 用于cl_khr_gl_sharing互操作，使OpenCL可以直接读写GL纹理
+        /// 调用前必须确保：
+        /// 1. GL Context 在当前线程上是 current 的
+        /// 2. 需要共享的 GL 纹理已经创建
+        /// 3. 之后创建的 GL 纹理也能被共享
+        /// 
+        /// 使用示例（Windows）：
+        ///   ClContext clContext = ClContext.CreateWithGL(
+        ///       GraphicsContext.CurrentContext.Handle,
+        ///       Wgl.GetCurrentReadDC(),
+        ///       ClGlSharing.WglHdcKhr
+        ///   );
+        /// 
+        /// 使用示例（Linux）：
+        ///   ClContext clContext = ClContext.CreateWithGL(
+        ///       GraphicsContext.CurrentContext.Handle,
+        ///       Glx.GetCurrentDisplay(),
+        ///       ClGlSharing.GLXDisplayKhr
+        ///   );
+        /// </remarks>
+        public static unsafe ClContext CreateWithGL(PlatformOS platform, IntPtr glContext, IntPtr displayHandle)
+        {
+            #region # 验证
+
+            if (glContext == IntPtr.Zero)
+            {
+                throw new ClException("OpenGL上下文句柄不可为空！");
+            }
+            if (platform != PlatformOS.Mac && displayHandle == IntPtr.Zero)
+            {
+                throw new ClException("平台显示句柄不可为空！");
+            }
+
+            #endregion
+
+            CL cl = CL.GetApi();
+
+            //获取OpenCL平台
+            int errorCode = cl.GetPlatformIDs(1, out IntPtr platformId, out uint platformsCount);
+            if (errorCode != (int)ErrorCodes.Success || platformsCount == 0)
+            {
+                throw new ClException("找不到任何OpenCL平台");
+            }
+
+            //获取GPU设备
+            errorCode = cl.GetDeviceIDs(platformId, DeviceType.Gpu, 1, out IntPtr device, out uint devicesCount);
+            if (errorCode != (int)ErrorCodes.Success || devicesCount == 0)
+            {
+                throw new ClException("找不到GPU设备，GL互操作需要GPU");
+            }
+
+            //验证cl_khr_gl_sharing扩展可用
+            string deviceExtensions = GetDeviceInfoString(cl, device, DeviceInfo.Extensions);
+            if (!deviceExtensions.Contains("cl_khr_gl_sharing"))
+            {
+                throw new ClException("当前GPU不支持cl_khr_gl_sharing扩展，无法与OpenGL共享资源！");
+            }
+
+            //构建互操作属性列表，属性按键值对排列，以0结尾
+            IntPtr[] contextProperties;
+            if (platform != PlatformOS.Mac)
+            {
+                contextProperties =
+                [
+                    (IntPtr)GLShare.GLContextKhr, glContext,         //GLContext句柄
+                    (IntPtr)platform, displayHandle,                 //Windows: 设备上下文HDC | Linux: X11 Display
+                    (IntPtr)ContextProperties.Platform, platformId,
+                    IntPtr.Zero
+                ];
+            }
+            else
+            {
+                //MacOS不需要显示句柄
+                contextProperties =
+                [
+                    (IntPtr)GLShare.GLContextKhr, glContext,
+                    (IntPtr)ContextProperties.Platform, platformId,
+                    IntPtr.Zero
+                ];
+            }
+
+            //创建上下文（带GL互操作属性）
+            IntPtr context;
+            fixed (IntPtr* propsPtr = contextProperties)
+            {
+                context = cl.CreateContext(propsPtr, 1, in device, null, null, out errorCode);
+                if (errorCode != (int)ErrorCodes.Success || context == IntPtr.Zero)
+                {
+                    string errorMsg = errorCode switch
+                    {
+                        -1000 => "无效的GL Context句柄！",
+                        -1001 => "GL Context与设备不兼容！",
+                        -999 => "设备不可用或已被其他上下文独占！",
+                        _ => $"错误码: {errorCode}"
+                    };
+                    throw new ClException($"创建OpenGL互操作上下文失败！错误消息：{errorMsg}", errorCode);
                 }
             }
 

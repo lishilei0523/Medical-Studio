@@ -241,13 +241,6 @@ namespace MedicalSharp.Engine.Renderables
 
                 //点颜色
                 Vector4 invertedStroke = this.Stroke.Invert();
-                float contrast = Math.Abs(invertedStroke.X - invertedStroke.X) +
-                                 Math.Abs(invertedStroke.Y - invertedStroke.Y) +
-                                 Math.Abs(invertedStroke.Z - invertedStroke.Z);
-                if (contrast < 0.5f)
-                {
-                    invertedStroke = ColorFactory.Yellow(); //固定用亮黄色
-                }
 
                 //绘制控制点
                 program.SetUniformInt("u_HasTexture", 0);

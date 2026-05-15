@@ -179,7 +179,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 field = value;
                 this.NotifyOfPropertyChange();
                 this.AxialPlane.IsVisible = value;
-                this.VolumeViewport?.RequestNextFrameRendering();
+                this.FrameToken++;
             }
         }
         #endregion
@@ -196,7 +196,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 field = value;
                 this.NotifyOfPropertyChange();
                 this.CoronalPlane.IsVisible = value;
-                this.VolumeViewport?.RequestNextFrameRendering();
+                this.FrameToken++;
             }
         }
         #endregion
@@ -213,7 +213,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 field = value;
                 this.NotifyOfPropertyChange();
                 this.SagittalPlane.IsVisible = value;
-                this.VolumeViewport?.RequestNextFrameRendering();
+                this.FrameToken++;
             }
         }
         #endregion
@@ -406,7 +406,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.AxialPlane.Transform.SetMatrix(Matrix4.Identity);
             this.CoronalPlane.Transform.SetMatrix(Matrix4.Identity);
             this.SagittalPlane.Transform.SetMatrix(Matrix4.Identity);
-            this.VolumeViewport.RequestNextFrameRendering();
+            this.FrameToken++;
 
             //发布事件
             ShapeTranslatingEvent messageAxial = new ShapeTranslatingEvent
@@ -1048,9 +1048,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
                 session.MarkStrategy.SwitchMarkMode(message.MarkValue, message.MarkMode);
+                this.FrameToken++;
             }
-
-            this.VolumeViewport?.RequestNextFrameRendering();
 
             return Task.CompletedTask;
         }

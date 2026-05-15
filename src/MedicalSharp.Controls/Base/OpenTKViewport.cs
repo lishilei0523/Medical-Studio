@@ -77,6 +77,16 @@ namespace MedicalSharp.Controls.Base
         private IGlContext _glContext;
 
         /// <summary>
+        /// OpenGL上下文句柄
+        /// </summary>
+        private IntPtr _glContextHandle;
+
+        /// <summary>
+        /// OpenGL平台显示句柄
+        /// </summary>
+        private IntPtr _glDisplayHandle;
+
+        /// <summary>
         /// OpenGL是否已初始化
         /// </summary>
         protected bool _glInitialized;
@@ -144,6 +154,16 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
+        #region 只读属性 - FBO —— int FrameBufferId
+        /// <summary>
+        /// 只读属性 - FBO
+        /// </summary>
+        public int FrameBufferId
+        {
+            get => this._frameBufferId;
+        }
+        #endregion
+
         #region 只读属性 - OpenGL上下文 —— IGlContext GlContext
         /// <summary>
         /// 只读属性 - OpenGL上下文
@@ -154,13 +174,23 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region 只读属性 - FBO —— int FrameBufferId
+        #region 只读属性 - OpenGL上下文句柄 —— IntPtr GlContextHandle
         /// <summary>
-        /// 只读属性 - FBO
+        /// 只读属性 - OpenGL上下文句柄
         /// </summary>
-        public int FrameBufferId
+        public IntPtr GlContextHandle
         {
-            get => this._frameBufferId;
+            get => this._glContextHandle;
+        }
+        #endregion
+
+        #region 只读属性 - OpenGL平台显示句柄 —— IntPtr GlDisplayHandle
+        /// <summary>
+        /// 只读属性 - OpenGL平台显示句柄
+        /// </summary>
+        public IntPtr GlDisplayHandle
+        {
+            get => this._glDisplayHandle;
         }
         #endregion
 
@@ -197,6 +227,8 @@ namespace MedicalSharp.Controls.Base
         #endregion
 
         #region # 方法
+
+        //Public
 
         #region 命中测试 —— bool HitTest(Point point)
         /// <summary>
@@ -285,6 +317,9 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
+
+        //Protected
+
         #region OpenGL初始化事件 —— sealed override void OnOpenGlInit(GlInterface glInterface)
         /// <summary>
         /// OpenGL初始化事件
@@ -294,13 +329,8 @@ namespace MedicalSharp.Controls.Base
         {
             base.OnOpenGlInit(glInterface);
 
-            //获取OpenGL上下文
-            Type controlType = typeof(OpenGlControlBase);
-            FieldInfo resField = controlType.GetField("_resources", BindingFlags.NonPublic | BindingFlags.Instance);
-            object fieldValue = resField!.GetValue(this);
-            Type resType = fieldValue!.GetType();
-            PropertyInfo contextProperty = resType.GetProperty("Context");
-            this._glContext = (IGlContext)contextProperty!.GetValue(fieldValue);
+            //解析OpenGL上下文
+            this.ResolveGlContext();
 
             //加载OpenTK绑定
             AvaloniaBindingsContext bindingsContext = new AvaloniaBindingsContext(glInterface);
@@ -454,6 +484,169 @@ namespace MedicalSharp.Controls.Base
             base.OnKeyUp(eventArgs);
 
             this.InputManager.OnKeyUp(this, eventArgs);
+        }
+        #endregion
+
+
+        //Private
+
+        #region 解析OpenGL上下文 —— void ResolveGlContext()
+        /// <summary>
+        /// 解析OpenGL上下文
+        /// </summary>
+        /// <returns>OpenGL上下文实例</returns>
+        private void ResolveGlContext()
+        {
+            Type controlType = typeof(OpenGlControlBase);
+            FieldInfo resourcesField = controlType.GetField("_resources", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            #region # 验证
+
+            if (resourcesField == null)
+            {
+                throw new InvalidOperationException("无法获取Avalonia内部字段'_resources'，请检查Avalonia版本兼容性！");
+            }
+
+            #endregion
+
+            object resourcesValue = resourcesField!.GetValue(this);
+
+            #region # 验证
+
+            if (resourcesValue == null)
+            {
+                throw new InvalidOperationException("Avalonia GL资源尚未初始化！");
+            }
+
+            #endregion
+
+            Type resourcesType = resourcesValue!.GetType();
+            PropertyInfo contextProperty = resourcesType.GetProperty("Context");
+
+            #region # 验证
+
+            if (contextProperty == null)
+            {
+                throw new InvalidOperationException("无法获取GL Context属性，请检查Avalonia版本兼容性！");
+            }
+
+            #endregion
+
+            IGlContext glContext = (IGlContext)contextProperty!.GetValue(resourcesValue);
+
+            #region # 验证
+
+            if (glContext == null)
+            {
+                throw new InvalidOperationException("当前没有可用的GL Context！");
+            }
+
+            #endregion
+
+            Type glContextType = glContext!.GetType();
+            if (glContextType.Name == "WglContext")
+            {
+                FieldInfo handleField = glContextType.GetField("_context", BindingFlags.NonPublic | BindingFlags.Instance);
+                FieldInfo displayField = glContextType.GetField("_dc", BindingFlags.NonPublic | BindingFlags.Instance);
+
+                #region # 验证
+
+                if (handleField == null || displayField == null)
+                {
+                    throw new InvalidOperationException("无法获取WglContext内部字段，请检查Avalonia版本兼容性！");
+                }
+
+                #endregion
+
+                this._glContextHandle = (IntPtr)handleField!.GetValue(glContext)!;
+                this._glDisplayHandle = (IntPtr)displayField!.GetValue(glContext)!;
+            }
+            else if (glContextType.Name == "GlxContext")
+            {
+                PropertyInfo handleProperty = glContextType.GetProperty("Handle", BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo displayProperty = glContextType.GetProperty("Display", BindingFlags.Public | BindingFlags.Instance);
+
+                #region # 验证
+
+                if (handleProperty == null || displayProperty == null)
+                {
+                    throw new InvalidOperationException("无法获取GlxContext属性，请检查Avalonia版本兼容性！");
+                }
+
+                #endregion
+
+                this._glContextHandle = (IntPtr)handleProperty!.GetValue(glContext)!;
+
+                //GlxContext.Display - GlxDisplay对象
+                object glxDisplay = displayProperty!.GetValue(glContext)!;
+
+                #region # 验证
+
+                if (glxDisplay == null)
+                {
+                    throw new InvalidOperationException("GlxContext.Display为空！");
+                }
+
+                #endregion
+
+                //GlxDisplay._x11 - X11Info对象
+                Type glxDisplayType = glxDisplay.GetType();
+                FieldInfo x11Field = glxDisplayType.GetField("_x11", BindingFlags.NonPublic | BindingFlags.Instance);
+
+                #region # 验证
+
+                if (x11Field == null)
+                {
+                    throw new InvalidOperationException("无法获取GlxDisplay._x11字段，请检查Avalonia版本兼容性！");
+                }
+
+                #endregion
+
+                object x11Info = x11Field.GetValue(glxDisplay)!;
+
+                #region # 验证
+
+                if (x11Info == null)
+                {
+                    throw new InvalidOperationException("GlxDisplay._x11为空！");
+                }
+
+                #endregion
+
+                //X11Info.DeferredDisplay - IntPtr
+                Type x11InfoType = x11Info.GetType();
+                PropertyInfo deferredDisplayProperty = x11InfoType.GetProperty("DeferredDisplay", BindingFlags.Public | BindingFlags.Instance);
+
+                #region # 验证
+
+                if (deferredDisplayProperty == null)
+                {
+                    throw new InvalidOperationException("无法获取X11Info.DeferredDisplay属性，请检查Avalonia版本兼容性！");
+                }
+
+                #endregion
+
+                this._glDisplayHandle = (IntPtr)deferredDisplayProperty.GetValue(x11Info)!;
+            }
+            else
+            {
+                throw new NotSupportedException("暂时不支持！");
+            }
+
+            #region # 验证
+
+            if (this._glContextHandle == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("获取到的GL Context句柄为0，可能Context尚未设置为current！");
+            }
+            if (this._glDisplayHandle == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("获取到的GL Display句柄为0，可能Context尚未设置为current！");
+            }
+
+            #endregion
+
+            this._glContext = glContext;
         }
         #endregion
 
