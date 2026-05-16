@@ -38,6 +38,7 @@ namespace MedicalSharp.Engine.Renderers
         public MPRRenderer(MPRCamera camera)
             : base(camera)
         {
+            this.PreviewMode = PreviewMode.Preview;
             this.RenderMode = MPRRenderMode.Gray;
             this.WindowWidth = 400;
             this.WindowCenter = 40;
@@ -50,6 +51,13 @@ namespace MedicalSharp.Engine.Renderers
         #endregion
 
         #region # 属性
+
+        #region 预览模式 —— PreviewMode PreviewMode
+        /// <summary>
+        /// 预览模式
+        /// </summary>
+        public PreviewMode PreviewMode { get; private set; }
+        #endregion
 
         #region 渲染模式 —— MPRRenderMode RenderMode
         /// <summary>
@@ -130,6 +138,17 @@ namespace MedicalSharp.Engine.Renderers
         #endregion
 
         #region # 方法
+
+        #region 切换预览模式 —— void SwitchPreviewMode(PreviewMode previewMode)
+        /// <summary>
+        /// 切换预览模式
+        /// </summary>
+        /// <param name="previewMode">预览模式</param>
+        public void SwitchPreviewMode(PreviewMode previewMode)
+        {
+            this.PreviewMode = previewMode;
+        }
+        #endregion
 
         #region 切换渲染模式 —— void SwitchRenderMode(MPRRenderMode renderMode)
         /// <summary>
@@ -298,7 +317,8 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
             program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
-            //设置渲染模式
+            //设置预览、渲染模式
+            program.SetUniformInt("u_PreviewMode", (int)this.PreviewMode);
             program.SetUniformInt("u_RenderMode", (int)this.RenderMode);
 
             //设置渲染参数

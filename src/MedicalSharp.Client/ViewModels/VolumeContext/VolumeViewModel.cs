@@ -82,6 +82,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             //默认值
             this.Shapes = [];
+            this.PreviewModeChecked = true;
             this.RaycastChecked = true;
             this.AxialPlaneVisible = true;
             this.CoronalPlaneVisible = true;
@@ -105,6 +106,38 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// 已选组织
         /// </summary>
         public TissueInfo SelectedTissue { get; set; }
+        #endregion
+
+        #region 预览模式选中 —— bool PreviewModeChecked
+        /// <summary>
+        /// 预览模式选中
+        /// </summary>
+        public bool PreviewModeChecked
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.PreviewMode = PreviewMode.Preview;
+            }
+        }
+        #endregion
+
+        #region 原始模式选中 —— bool OriginalModeChecked
+        /// <summary>
+        /// 原始模式选中
+        /// </summary>
+        public bool OriginalModeChecked
+        {
+            get => field;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.PreviewMode = PreviewMode.Original;
+            }
+        }
         #endregion
 
         #region Raycast渲染模式选中 —— bool RaycastChecked
@@ -272,9 +305,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region 体积渲染模式 —— VolumeRenderMode RenderMode
+        #region 预览模式 —— PreviewMode PreviewMode
         /// <summary>
-        /// 体积渲染模式
+        /// 预览模式
+        /// </summary>
+        [DependencyProperty]
+        public PreviewMode PreviewMode { get; set; }
+        #endregion
+
+        #region 渲染模式 —— VolumeRenderMode RenderMode
+        /// <summary>
+        /// 渲染模式
         /// </summary>
         [DependencyProperty]
         public VolumeRenderMode RenderMode { get; set; }

@@ -20,6 +20,9 @@ uniform float u_Contrast;               //对比度
 uniform float u_HUMin;
 uniform float u_HUMax;
 
+//预览模式：0=Preview, 1=Original
+uniform int u_PreviewMode;
+
 //渲染模式：0=Gray, 1=PseudoColor
 uniform int u_RenderMode;
 
@@ -53,6 +56,33 @@ float applyWindowLevel(float value, float windowCenter, float windowWidth)
     return clamp(result, 0.0, 1.0);
 }
 
+//获取体素的医学值（HU值）
+float getMedicalValue(vec3 texCoord)
+{
+    //边界检查
+    if (texCoord.x < 0.0 || texCoord.x > 1.0 ||
+        texCoord.y < 0.0 || texCoord.y > 1.0 ||
+        texCoord.z < 0.0 || texCoord.z > 1.0)
+    {
+        return -1000.0;  //空气的CT值
+    }
+    
+    float snormValue;
+    if (u_PreviewMode == 0)
+    {
+        snormValue = texture(u_PreviewTexture, texCoord).r;
+    }
+    else
+    {
+        snormValue = texture(u_OriginalTexture, texCoord).r;
+    }
+
+    float rawValue = snormValue * MAX_16BIT_SIGNED;
+    float medicalValue = rawValue * u_RescaleSlope + u_RescaleIntercept;
+    
+    return medicalValue;
+}
+
 void main()
 {
     //构建3D纹理坐标
@@ -73,9 +103,6 @@ void main()
         return;
     }
     
-    //采样原始体积纹理 (R16Snorm格式)
-    float snormValue = texture(u_OriginalTexture, texCoord).r;
-
     //采样标记纹理
     uint markValue = texture(u_MarkTexture, texCoord).r;
 
@@ -86,11 +113,8 @@ void main()
         discard;
     }
 
-    //转换为原始值
-    float rawValue = convertR16SnormToRaw(snormValue);
-
-    //应用重缩放
-    float medicalValue = rawValue * u_RescaleSlope + u_RescaleIntercept;
+    //获取原始医学值
+    float medicalValue = getMedicalValue(texCoord);
 
     //基础颜色
     vec3 color;

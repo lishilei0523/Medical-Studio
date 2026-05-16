@@ -22,6 +22,9 @@ uniform float u_StepSize;               //步长
 uniform int u_MaxStepsCount;            //最大步数
 uniform float u_OpacityThreshold;       //透明度阈值
 
+//预览模式：0=Preview, 1=Original
+uniform int u_PreviewMode;
+
 //渲染模式：0=Raycast, 1=AIP, 2=MIP, 3=MinIP, 4=SSD
 uniform int u_RenderMode;
 
@@ -77,15 +80,24 @@ bool rayBoxIntersect(vec3 rayOrigin, vec3 rayDirection, vec3 boxMin, vec3 boxMax
 //获取体素的医学值（HU值）
 float getMedicalValue(vec3 texCoord)
 {
-    // 边界检查
+    //边界检查
     if (texCoord.x < 0.0 || texCoord.x > 1.0 ||
         texCoord.y < 0.0 || texCoord.y > 1.0 ||
         texCoord.z < 0.0 || texCoord.z > 1.0)
     {
-        return -1000.0;  // 空气的CT值
+        return -1000.0;  //空气的CT值
     }
     
-    float snormValue = texture(u_OriginalTexture, texCoord).r;
+    float snormValue;
+    if (u_PreviewMode == 0)
+    {
+        snormValue = texture(u_PreviewTexture, texCoord).r;
+    }
+    else
+    {
+        snormValue = texture(u_OriginalTexture, texCoord).r;
+    }
+
     float rawValue = snormValue * MAX_16BIT_SIGNED;
     float medicalValue = rawValue * u_RescaleSlope + u_RescaleIntercept;
     

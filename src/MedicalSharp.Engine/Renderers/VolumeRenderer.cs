@@ -41,12 +41,20 @@ namespace MedicalSharp.Engine.Renderers
             //默认值
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
             this._unitCube.Setup();
+            this.PreviewMode = PreviewMode.Preview;
             this.RenderMode = VolumeRenderMode.Raycast;
         }
 
         #endregion
 
         #region # 属性
+
+        #region 预览模式 —— PreviewMode PreviewMode
+        /// <summary>
+        /// 预览模式
+        /// </summary>
+        public PreviewMode PreviewMode { get; private set; }
+        #endregion
 
         #region 渲染模式 —— VolumeRenderMode RenderMode
         /// <summary>
@@ -130,6 +138,17 @@ namespace MedicalSharp.Engine.Renderers
         #region # 方法
 
         //Public
+
+        #region 切换预览模式 —— void SwitchPreviewMode(PreviewMode previewMode)
+        /// <summary>
+        /// 切换预览模式
+        /// </summary>
+        /// <param name="previewMode">预览模式</param>
+        public void SwitchPreviewMode(PreviewMode previewMode)
+        {
+            this.PreviewMode = previewMode;
+        }
+        #endregion
 
         #region 切换渲染模式 —— void SwitchRenderMode(VolumeRenderMode renderMode)
         /// <summary>
@@ -286,7 +305,8 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
             program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
-            //设置渲染模式
+            //设置预览、渲染模式
+            program.SetUniformInt("u_PreviewMode", (int)this.PreviewMode);
             program.SetUniformInt("u_RenderMode", (int)this.RenderMode);
 
             //设置渲染参数
@@ -470,6 +490,9 @@ namespace MedicalSharp.Engine.Renderers
             pickProgram.SetUniformVector3("u_RayDirection", ray.Direction);
             pickProgram.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
             pickProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
+
+            //设置预览模式
+            pickProgram.SetUniformInt("u_PreviewMode", (int)this.PreviewMode);
 
             //设置DICOM重缩放参数
             pickProgram.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);

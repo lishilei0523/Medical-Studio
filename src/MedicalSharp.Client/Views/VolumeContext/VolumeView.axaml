@@ -91,6 +91,20 @@
 					<DropDownButton Content="VR" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
 							<MenuFlyout>
+                                <MenuItem Header="预览模式(_V)">
+                                    <MenuItem >
+                                        <MenuItem.Header>
+                                            <RadioButton Content="预览模式" GroupName="PreviewMode" 
+                                                         IsChecked="{Binding PreviewModeChecked}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                    <MenuItem >
+                                        <MenuItem.Header>
+                                            <RadioButton Content="原始模式" GroupName="PreviewMode" 
+                                                         IsChecked="{Binding OriginalModeChecked}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                </MenuItem>
 								<MenuItem Header="渲染模式(_M)">
 									<MenuItem >
 										<MenuItem.Header>
@@ -145,6 +159,7 @@
 						   Camera="{Binding Camera}"
 						   InputManager="{Binding InputManager}"
 						   VolumeData="{Binding VolumeData}"
+                           PreviewMode="{Binding PreviewMode}"
                            RenderMode="{Binding RenderMode}"
 						   WindowWidth="{Binding WindowWidth}"
 						   WindowCenter="{Binding WindowCenter}"
