@@ -1,4 +1,5 @@
-﻿using Silk.NET.OpenCL;
+﻿using OpenTK.Mathematics;
+using Silk.NET.OpenCL;
 using Silk.NET.OpenCL.Extensions.KHR;
 using System;
 
@@ -143,7 +144,136 @@ namespace MedicalSharp.Inspiration.Resources
 
         #region # 方法
 
-        #region 接管OpenGL图像所有权 —— unsafe void AcquireForCL(IntPtr commandQueue)
+        #region 填充图像 —— void Fill(IntPtr commandQueue, float value)
+        /// <summary>
+        /// 填充图像
+        /// </summary>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <param name="value">填充值</param>
+        /// <remarks>浮点，自动转换到图像格式</remarks>
+        public unsafe void Fill(IntPtr commandQueue, float value)
+        {
+            UIntPtr[] origin = [0, 0, 0];
+            UIntPtr[] region = [(UIntPtr)this.Width, (UIntPtr)this.Height, (UIntPtr)this.Depth];
+            fixed (UIntPtr* originPtr = origin, regionPtr = region)
+            {
+                int errorCode = this._cl.EnqueueFillImage(commandQueue, this.Handle, in value, originPtr, regionPtr, 0, null, null);
+                ClException.ThrowOnError(errorCode, "EnqueueFillImage");
+            }
+        }
+        #endregion
+
+        #region 填充图像 —— void Fill(IntPtr commandQueue, Vector4 color)
+        /// <summary>
+        /// 填充图像
+        /// </summary>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <param name="color">颜色</param>
+        public unsafe void Fill(IntPtr commandQueue, Vector4 color)
+        {
+            UIntPtr[] origin = [0, 0, 0];
+            UIntPtr[] region = [(UIntPtr)this.Width, (UIntPtr)this.Height, (UIntPtr)this.Depth];
+            fixed (UIntPtr* originPtr = origin, regionPtr = region)
+            {
+                int errorCode = this._cl.EnqueueFillImage(commandQueue, this.Handle, in color, originPtr, regionPtr, 0, null, null);
+                ClException.ThrowOnError(errorCode, "EnqueueFillImage");
+            }
+        }
+        #endregion
+
+        #region 读取图像 —— T[] Read<T>(IntPtr commandQueue)
+        /// <summary>
+        /// 读取图像数据
+        /// </summary>
+        /// <typeparam name="T">值类型（通常为short或float）</typeparam>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <returns>图像数组（一维，行主序）</returns>
+        /// <remarks>到CPU内存</remarks>
+        public T[] Read<T>(IntPtr commandQueue) where T : unmanaged
+        {
+            T[] destination = new T[this.Width * this.Height * this.Depth];
+            this.Read<T>(commandQueue, destination);
+
+            return destination;
+        }
+        #endregion
+
+        #region 读取图像 —— void Read<T>(IntPtr commandQueue, Span<T> destination)
+        /// <summary>
+        /// 读取图像
+        /// </summary>
+        public unsafe void Read<T>(IntPtr commandQueue, Span<T> destination) where T : unmanaged
+        {
+            UIntPtr[] origin = [0, 0, 0];
+            UIntPtr[] region = [(UIntPtr)this.Width, (UIntPtr)this.Height, (UIntPtr)this.Depth];
+
+            fixed (T* destinationPtr = destination)
+            fixed (UIntPtr* originPtr = origin, regionPtr = region)
+            {
+                int errorCode = this._cl.EnqueueReadImage(commandQueue, this.Handle, true, originPtr, regionPtr, 0, 0, destinationPtr, 0, null, null);
+                ClException.ThrowOnError(errorCode, "EnqueueReadImage");
+            }
+        }
+        #endregion
+
+        #region 写入图像 —— void Write<T>(IntPtr commandQueue, ReadOnlySpan<T> data)
+        /// <summary>
+        /// 写入图像
+        /// </summary>
+        /// <typeparam name="T">类型</typeparam>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <param name="data">图像数据</param>
+        public unsafe void Write<T>(IntPtr commandQueue, ReadOnlySpan<T> data) where T : unmanaged
+        {
+            UIntPtr[] origin = [0, 0, 0];
+            UIntPtr[] region = [(UIntPtr)this.Width, (UIntPtr)this.Height, (UIntPtr)this.Depth];
+
+            fixed (void* pointer = data)
+            fixed (UIntPtr* originPtr = origin, regionPtr = region)
+            {
+                int errorCode = this._cl.EnqueueWriteImage(commandQueue, this.Handle, true, originPtr, regionPtr, 0, 0, pointer, 0, null, null);
+                ClException.ThrowOnError(errorCode, "EnqueueWriteImage");
+            }
+        }
+        #endregion
+
+        #region 复制图像 —— void CopyTo(IntPtr commandQueue, ClImage targetImage)
+        /// <summary>
+        /// 复制图像
+        /// </summary>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <param name="targetImage">目标图像</param>
+        /// <remarks>尺寸需相同，底层调用clEnqueueCopyImage</remarks>
+        public unsafe void CopyTo(IntPtr commandQueue, ClImage targetImage)
+        {
+            #region # 验证
+
+            if (this.Width != targetImage.Width)
+            {
+                throw new ArgumentOutOfRangeException(nameof(targetImage), "宽度不一致！");
+            }
+            if (this.Height != targetImage.Height)
+            {
+                throw new ArgumentOutOfRangeException(nameof(targetImage), "高度不一致！");
+            }
+            if (this.Depth != targetImage.Depth)
+            {
+                throw new ArgumentOutOfRangeException(nameof(targetImage), "深度不一致！");
+            }
+
+            #endregion
+
+            UIntPtr[] origin = [0, 0, 0];
+            UIntPtr[] region = [(UIntPtr)this.Width, (UIntPtr)this.Height, (UIntPtr)this.Depth];
+            fixed (UIntPtr* originPtr = origin, regionPtr = region)
+            {
+                int errorCode = this._cl.EnqueueCopyImage(commandQueue, this.Handle, targetImage.Handle, originPtr, originPtr, regionPtr, 0, null, null);
+                ClException.ThrowOnError(errorCode, "EnqueueCopyImage");
+            }
+        }
+        #endregion
+
+        #region 接管OpenGL图像所有权 —— void AcquireForCL(IntPtr commandQueue)
         /// <summary>
         /// 接管OpenGL图像所有权
         /// </summary>
@@ -171,7 +301,7 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 归还OpenGL图像所有权 —— unsafe void ReleaseToGL(IntPtr commandQueue)
+        #region 归还OpenGL图像所有权 —— void ReleaseToGL(IntPtr commandQueue)
         /// <summary>
         /// 归还OpenGL图像所有权
         /// </summary>

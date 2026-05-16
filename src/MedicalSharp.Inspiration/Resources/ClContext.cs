@@ -38,7 +38,8 @@ namespace MedicalSharp.Inspiration.Resources
         /// <param name="commandQueue">命令队列句柄</param>
         /// <param name="deviceName">设备名称</param>
         /// <param name="globalMemorySize">设备全局显存大小</param>
-        private ClContext(CL cl, IntPtr context, IntPtr device, IntPtr commandQueue, string deviceName, ulong globalMemorySize)
+        /// <param name="supportsV20">是否支持OpenCL 2.0</param>
+        private ClContext(CL cl, IntPtr context, IntPtr device, IntPtr commandQueue, string deviceName, ulong globalMemorySize, bool supportsV20)
         {
             this._cl = cl;
             this.Handle = context;
@@ -46,6 +47,7 @@ namespace MedicalSharp.Inspiration.Resources
             this.CommandQueue = commandQueue;
             this.DeviceName = deviceName;
             this.GlobalMemorySize = globalMemorySize;
+            this.SupportsV20 = supportsV20;
         }
 
         #endregion
@@ -89,6 +91,13 @@ namespace MedicalSharp.Inspiration.Resources
         public ulong GlobalMemorySize { get; private set; }
         #endregion
 
+        #region 是否支持2.0 —— bool SupportsV20
+        /// <summary>
+        /// 是否支持2.0
+        /// </summary>
+        public bool SupportsV20 { get; private set; }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -121,13 +130,13 @@ namespace MedicalSharp.Inspiration.Resources
                 context = cl.CreateContextFromType(propsPtr, DeviceType.Gpu, null, null, out errorCode);
                 if (errorCode == (int)ErrorCodes.Success)
                 {
-                    device = ClContext.GetFirstDevice(cl, context);
+                    device = GetFirstDevice(cl, context);
                 }
                 else
                 {
                     context = cl.CreateContextFromType(propsPtr, DeviceType.Cpu, null, null, out errorCode);
                     ClException.ThrowOnError(errorCode, "CreateContextFromType(CPU)");
-                    device = ClContext.GetFirstDevice(cl, context);
+                    device = GetFirstDevice(cl, context);
                 }
             }
 
@@ -142,9 +151,11 @@ namespace MedicalSharp.Inspiration.Resources
 
             //查询设备信息
             string deviceName = GetDeviceInfoString(cl, device, DeviceInfo.Name);
-            ulong globalMemorySize = GetDeviceInfoUlong(cl, device, DeviceInfo.GlobalMemSize);
+            ulong globalMemorySize = GetDeviceInfoUlong(cl, device, DeviceInfo.GlobalMemSize) / (1024 * 1024);
+            string version = GetDeviceInfoString(cl, device, DeviceInfo.Version);
+            bool supportsV20 = version.Contains("2.0");
 
-            ClContext clContext = new ClContext(cl, context, device, queue, deviceName, globalMemorySize / (1024 * 1024));
+            ClContext clContext = new ClContext(cl, context, device, queue, deviceName, globalMemorySize, supportsV20);
 
             return clContext;
         }
@@ -255,9 +266,11 @@ namespace MedicalSharp.Inspiration.Resources
 
             //查询设备信息
             string deviceName = GetDeviceInfoString(cl, device, DeviceInfo.Name);
-            ulong globalMemorySize = GetDeviceInfoUlong(cl, device, DeviceInfo.GlobalMemSize);
+            ulong globalMemorySize = GetDeviceInfoUlong(cl, device, DeviceInfo.GlobalMemSize) / (1024 * 1024);
+            string version = GetDeviceInfoString(cl, device, DeviceInfo.Version);
+            bool supportsV20 = version.Contains("2.0");
 
-            ClContext clContext = new ClContext(cl, context, device, queue, deviceName, globalMemorySize / (1024 * 1024));
+            ClContext clContext = new ClContext(cl, context, device, queue, deviceName, globalMemorySize, supportsV20);
 
             return clContext;
         }
@@ -403,7 +416,7 @@ namespace MedicalSharp.Inspiration.Resources
         private static unsafe ulong GetDeviceInfoUlong(CL cl, IntPtr device, DeviceInfo deviceInfo)
         {
             ulong value = 0;
-            cl.GetDeviceInfo(device, deviceInfo, (UIntPtr)sizeof(ulong), &value, out _);
+            cl.GetDeviceInfo(device, deviceInfo, sizeof(ulong), &value, out _);
 
             return value;
         }

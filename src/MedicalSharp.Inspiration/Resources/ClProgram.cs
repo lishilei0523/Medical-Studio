@@ -14,6 +14,11 @@ namespace MedicalSharp.Inspiration.Resources
         #region # 字段及构造器
 
         /// <summary>
+        /// OpenCL 2.0支持宏
+        /// </summary>
+        private const string V20SupportOptions = "-cl-std=CL2.0 -D__OPENCL_VERSION__=200";
+
+        /// <summary>
         /// 释放标识
         /// </summary>
         private bool _disposed;
@@ -104,7 +109,8 @@ namespace MedicalSharp.Inspiration.Resources
 
             //编译程序
             IntPtr device = clContext.Device;
-            errorCode = cl.BuildProgram(handle, 1, in device, (byte*)null, null, null);
+            string options = clContext.SupportsV20 ? V20SupportOptions : string.Empty;
+            errorCode = cl.BuildProgram(handle, 1, in device, options, null, null);
             if (errorCode != (int)ErrorCodes.Success)
             {
                 //获取编译错误日志
