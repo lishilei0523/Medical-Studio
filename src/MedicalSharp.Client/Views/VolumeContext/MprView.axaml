@@ -100,9 +100,10 @@
 		<!--Content-->
 		<sd:MPRViewport x:Name="MPRViewport"
                         FrameToken="{Binding FrameToken}"
-                        Plane="{Binding Plane}"
                         Camera="{Binding Camera}"
                         InputManager="{Binding InputManager}"
+                        PlaneType="{Binding PlaneType}"
+                        Plane="{Binding Plane}"
                         VolumeData="{Binding VolumeData}"
                         RenderMode="{Binding RenderMode}"
 						WindowWidth="{Binding WindowWidth}"
