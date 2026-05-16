@@ -152,37 +152,37 @@ namespace MedicalSharp.Primitives.Managers
             //单位平面的顶点（包含纹理坐标）
             Vertex[] vertices =
             [
-                //位置(-0.5, -0.5, 0), 纹理坐标(0,0)
+                //位置(-0.5, +0.5, 0), 纹理坐标(0,1) — 左上A
+                new Vertex
+                {
+                    Position = new Vector3(-0.5f, 0.5f, 0),
+                    TextureCoord = new Vector2(0, 1)
+                },
+                //位置(-0.5, -0.5, 0), 纹理坐标(0,0) — 左下B
                 new Vertex
                 {
                     Position = new Vector3(-0.5f, -0.5f, 0),
                     TextureCoord = new Vector2(0, 0)
                 },
-                //位置(0.5, -0.5, 0), 纹理坐标(1,0)
+                //位置(+0.5, -0.5, 0), 纹理坐标(1,0) — 右下C
                 new Vertex
                 {
                     Position = new Vector3(0.5f, -0.5f, 0),
                     TextureCoord = new Vector2(1, 0)
                 },
-                //位置(0.5, 0.5, 0), 纹理坐标(1,1)
+                //位置(+0.5, +0.5, 0), 纹理坐标(1,1) — 右上D
                 new Vertex
                 {
                     Position = new Vector3(0.5f, 0.5f, 0),
                     TextureCoord = new Vector2(1, 1)
                 },
-                //位置(-0.5, 0.5, 0), 纹理坐标(0,1)
-                new Vertex
-                {
-                    Position = new Vector3(-0.5f, 0.5f, 0),
-                    TextureCoord = new Vector2(0, 1)
-                }
             ];
 
             //索引（两个三角形构成一个平面）
             uint[] indices =
             [
-                0, 1, 2,  //第一个三角形
-                2, 3, 0   //第二个三角形
+                1, 2, 3,  //第一个三角形 = △BCD
+                3, 0, 1   //第二个三角形 = △DAB
             ];
 
             MeshGeometry geometry = new MeshGeometry(vertices, indices);
@@ -201,37 +201,37 @@ namespace MedicalSharp.Primitives.Managers
             //单位平面的顶点（包含纹理坐标）
             Vertex[] vertices =
             [
-                //位置(-0.5, -0.5, 0), 纹理坐标(0,0)
+                //位置(-0.5, +0.5, 0), 纹理坐标(0,1) — 左上A
+                new Vertex
+                {
+                    Position = new Vector3(-0.5f, 0.5f, 0),
+                    TextureCoord = new Vector2(0, 1)
+                },
+                //位置(-0.5, -0.5, 0), 纹理坐标(0,0) — 左下B
                 new Vertex
                 {
                     Position = new Vector3(-0.5f, -0.5f, 0),
                     TextureCoord = new Vector2(0, 0)
                 },
-                //位置(0.5, -0.5, 0), 纹理坐标(1,0)
+                //位置(+0.5, -0.5, 0), 纹理坐标(1,0) — 右下C
                 new Vertex
                 {
                     Position = new Vector3(0.5f, -0.5f, 0),
                     TextureCoord = new Vector2(1, 0)
                 },
-                //位置(0.5, 0.5, 0), 纹理坐标(1,1)
+                //位置(+0.5, +0.5, 0), 纹理坐标(1,1) — 右上D
                 new Vertex
                 {
                     Position = new Vector3(0.5f, 0.5f, 0),
                     TextureCoord = new Vector2(1, 1)
                 },
-                //位置(-0.5, 0.5, 0), 纹理坐标(0,1)
-                new Vertex
-                {
-                    Position = new Vector3(-0.5f, 0.5f, 0),
-                    TextureCoord = new Vector2(0, 1)
-                }
             ];
 
             //索引（两个三角形构成一个平面）
             uint[] indices =
             [
-                0, 1, 2,  //第一个三角形
-                2, 3, 0   //第二个三角形
+                1, 2, 3,  //第一个三角形 = △BCD
+                3, 0, 1   //第二个三角形 = △DAB
             ];
 
             MeshGeometry geometry = new MeshGeometry(vertices, indices);
@@ -250,37 +250,37 @@ namespace MedicalSharp.Primitives.Managers
             //单位平面的顶点（包含纹理坐标）
             Vertex[] vertices =
             [
-                //位置(-0.5, -0.5, 0), 纹理坐标(0,0)
+                //位置(-0.5, +0.5, 0), 纹理坐标(0,1) — 左上A
+                new Vertex
+                {
+                    Position = new Vector3(-0.5f, 0.5f, 0),
+                    TextureCoord = new Vector2(0, 1)
+                },
+                //位置(-0.5, -0.5, 0), 纹理坐标(0,0) — 左下B
                 new Vertex
                 {
                     Position = new Vector3(-0.5f, -0.5f, 0),
                     TextureCoord = new Vector2(0, 0)
                 },
-                //位置(0.5, -0.5, 0), 纹理坐标(1,0)
+                //位置(+0.5, -0.5, 0), 纹理坐标(1,0) — 右下C
                 new Vertex
                 {
                     Position = new Vector3(0.5f, -0.5f, 0),
                     TextureCoord = new Vector2(1, 0)
                 },
-                //位置(0.5, 0.5, 0), 纹理坐标(1,1)
+                //位置(+0.5, +0.5, 0), 纹理坐标(1,1) — 右上D
                 new Vertex
                 {
                     Position = new Vector3(0.5f, 0.5f, 0),
                     TextureCoord = new Vector2(1, 1)
                 },
-                //位置(-0.5, 0.5, 0), 纹理坐标(0,1)
-                new Vertex
-                {
-                    Position = new Vector3(-0.5f, 0.5f, 0),
-                    TextureCoord = new Vector2(0, 1)
-                }
             ];
 
             //索引（两个三角形构成一个平面）
             uint[] indices =
             [
-                0, 1, 2,  //第一个三角形
-                2, 3, 0   //第二个三角形
+                1, 2, 3,  //第一个三角形 = △BCD
+                3, 0, 1   //第二个三角形 = △DAB
             ];
 
             MeshGeometry geometry = new MeshGeometry(vertices, indices);
@@ -299,37 +299,37 @@ namespace MedicalSharp.Primitives.Managers
             //单位平面的顶点（包含纹理坐标）
             Vertex[] vertices =
             [
-                //位置(-0.5, -0.5, 0), 纹理坐标(0,0)
+                //位置(-0.5, +0.5, 0), 纹理坐标(0,1) — 左上A
+                new Vertex
+                {
+                    Position = new Vector3(-0.5f, 0.5f, 0),
+                    TextureCoord = new Vector2(0, 1)
+                },
+                //位置(-0.5, -0.5, 0), 纹理坐标(0,0) — 左下B
                 new Vertex
                 {
                     Position = new Vector3(-0.5f, -0.5f, 0),
                     TextureCoord = new Vector2(0, 0)
                 },
-                //位置(0.5, -0.5, 0), 纹理坐标(1,0)
+                //位置(+0.5, -0.5, 0), 纹理坐标(1,0) — 右下C
                 new Vertex
                 {
                     Position = new Vector3(0.5f, -0.5f, 0),
                     TextureCoord = new Vector2(1, 0)
                 },
-                //位置(0.5, 0.5, 0), 纹理坐标(1,1)
+                //位置(+0.5, +0.5, 0), 纹理坐标(1,1) — 右上D
                 new Vertex
                 {
                     Position = new Vector3(0.5f, 0.5f, 0),
                     TextureCoord = new Vector2(1, 1)
                 },
-                //位置(-0.5, 0.5, 0), 纹理坐标(0,1)
-                new Vertex
-                {
-                    Position = new Vector3(-0.5f, 0.5f, 0),
-                    TextureCoord = new Vector2(0, 1)
-                }
             ];
 
             //索引（两个三角形构成一个平面）
             uint[] indices =
             [
-                0, 1, 2,  //第一个三角形
-                2, 3, 0   //第二个三角形
+                1, 2, 3,  //第一个三角形 = △BCD
+                3, 0, 1   //第二个三角形 = △DAB
             ];
 
             MeshGeometry geometry = new MeshGeometry(vertices, indices);
