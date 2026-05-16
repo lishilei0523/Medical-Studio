@@ -34,12 +34,6 @@ const float EPSILON = 0.0001;
 const float MAX_16BIT_SIGNED = 32767.0;
 
 
-//将R16Snorm值转换为原始像素值
-float convertR16SnormToRaw(float snormValue)
-{
-    return snormValue * MAX_16BIT_SIGNED;
-}
-
 //线性窗宽窗位转换
 float applyWindowLevel(float value, float windowCenter, float windowWidth)
 {
