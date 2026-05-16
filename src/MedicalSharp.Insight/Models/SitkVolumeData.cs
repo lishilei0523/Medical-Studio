@@ -35,14 +35,14 @@ namespace MedicalSharp.Insight.Models
         /// <summary>
         /// SimpleITK预览图像
         /// </summary>
-        public Image SitkPreviewImage { get; internal set; }
+        public Image SitkPreviewImage { get; private set; }
         #endregion
 
         #region SimpleITK标记图像 —— Image SitkMarkImage
         /// <summary>
         /// SimpleITK标记图像
         /// </summary>
-        public Image SitkMarkImage { get; internal set; }
+        public Image SitkMarkImage { get; private set; }
         #endregion
 
         #region 只读属性 - 原始数据 —— override IntPtr OriginalData
