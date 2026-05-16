@@ -1,5 +1,4 @@
 #version 330 core
-in vec2 TexCoord;
 in vec3 WorldPosition;
 
 out vec4 FragColor;
@@ -56,22 +55,15 @@ float applyWindowLevel(float value, float windowCenter, float windowWidth)
 
 void main()
 {
-    //2D纹理边界检查
-    if (TexCoord.x < 0.0 || TexCoord.x > 1.0 || TexCoord.y < 0.0 || TexCoord.y > 1.0)
-    {
-        FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-        return;
-    }
-    
     //构建3D纹理坐标
     vec3 texCoord = (WorldPosition / u_VolumeScale) + 0.5;
-
+        
     //横断位特殊处理
     if(u_IsAxial == 1)
     {
         texCoord = vec3(1 - texCoord.x, texCoord.y, texCoord.z); 
     }
-        
+       
     //3D纹理边界检查
     if (texCoord.x < 0.0 || texCoord.x > 1.0 ||
         texCoord.y < 0.0 || texCoord.y > 1.0 ||
