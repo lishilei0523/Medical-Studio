@@ -54,6 +54,39 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 方法
 
+        //Static
+
+        #region 创建8位标记缓冲区 —— static ReadPixelBuffer3D CreateMark8(int width, int height...
+        /// <summary>
+        /// 创建8位标记缓冲区
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
+        /// <returns>像素缓冲区(读)3D</returns>
+        public static ReadPixelBuffer3D CreateMark8(int width, int height, int depth)
+        {
+            return new ReadPixelBuffer3D(width, height, depth, PixelFormat.RedInteger, PixelType.UnsignedByte);
+        }
+        #endregion
+
+        #region 创建16位预览缓冲区 —— static ReadPixelBuffer3D CreatePreview16(int width, int height...
+        /// <summary>
+        /// 创建16位预览缓冲区
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
+        /// <returns>像素缓冲区(读)3D</returns>
+        public static ReadPixelBuffer3D CreatePreview16(int width, int height, int depth)
+        {
+            return new ReadPixelBuffer3D(width, height, depth, PixelFormat.Red, PixelType.Short);
+        }
+        #endregion
+
+
+        //Public
+
         #region 读取3D纹理 —— void ReadTexture3D(Texture3D texture, bool useFence)
         /// <summary>
         /// 读取3D纹理

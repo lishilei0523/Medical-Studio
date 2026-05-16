@@ -1,6 +1,7 @@
 ﻿using MedicalSharp.Primitives.Enums;
 using OpenTK.Mathematics;
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace MedicalSharp.Primitives.Models
@@ -232,6 +233,94 @@ namespace MedicalSharp.Primitives.Models
             byte markValue = pointer[index];
 
             return markValue;
+        }
+        #endregion
+
+        #region 重置预览数据 —— void ResetPreviewData()
+        /// <summary>
+        /// 重置预览数据
+        /// </summary>
+        public unsafe void ResetPreviewData()
+        {
+            #region # 验证
+
+            if (this.OriginalData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("原始数据未分配！");
+            }
+            if (this.PreviewData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("预览数据未分配！");
+            }
+
+            #endregion
+
+            int size = this.Metadata.VolumeSize.X *
+                           this.Metadata.VolumeSize.Y *
+                           this.Metadata.VolumeSize.Z *
+                           sizeof(short);
+
+            //直接内存复制
+            Buffer.MemoryCopy(this.OriginalData.ToPointer(), this.PreviewData.ToPointer(), size, size);
+        }
+        #endregion
+
+        #region 重置标记数据 —— void ResetMarkData()
+        /// <summary>
+        /// 重置标记数据
+        /// </summary>
+        public unsafe void ResetMarkData()
+        {
+            #region # 验证
+
+            if (this.MarkData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("标记数据未分配！");
+            }
+
+            #endregion
+
+            int size = this.Metadata.VolumeSize.X *
+                       this.Metadata.VolumeSize.Y *
+                       this.Metadata.VolumeSize.Z *
+                       sizeof(byte);
+
+            //清空内存
+            NativeMemory.Clear(this.MarkData.ToPointer(), (UIntPtr)size);
+        }
+        #endregion
+
+        #region 重置标记值 —— void ResetMarkValue(byte targetMarkValue)
+        /// <summary>
+        /// 重置标记值
+        /// </summary>
+        /// <param name="targetMarkValue">目标标记值（1~255）</param>
+        /// <remarks>将给定标记值重置为0</remarks>
+        public unsafe void ResetMarkValue(byte targetMarkValue)
+        {
+            #region # 验证
+
+            if (targetMarkValue == 0)
+            {
+                return;
+            }
+
+            #endregion
+
+            int size = this.Metadata.VolumeSize.X *
+                       this.Metadata.VolumeSize.Y *
+                       this.Metadata.VolumeSize.Z *
+                       sizeof(byte);
+
+            //遍历重置
+            byte* pointer = (byte*)this.MarkData.ToPointer();
+            for (int index = 0; index < size; index++)
+            {
+                if (pointer[index] == targetMarkValue)
+                {
+                    pointer[index] = 0;
+                }
+            }
         }
         #endregion
 

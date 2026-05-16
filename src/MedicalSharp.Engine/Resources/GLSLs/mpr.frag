@@ -5,6 +5,7 @@ in vec3 WorldPosition;
 out vec4 FragColor;
 
 uniform sampler3D u_OriginalTexture;
+uniform sampler3D u_PreviewTexture;
 uniform usampler3D u_MarkTexture;
 uniform sampler1D u_TransferFunction;
 uniform sampler1D u_MarkStrategy;

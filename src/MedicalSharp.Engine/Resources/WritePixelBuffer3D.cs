@@ -67,20 +67,6 @@ namespace MedicalSharp.Engine.Resources
 
         //Static
 
-        #region 创建8位灰度缓冲区 —— static WritePixelBuffer3D CreateGray8(int width, int height...
-        /// <summary>
-        /// 创建8位灰度缓冲区
-        /// </summary>
-        /// <param name="width">宽度</param>
-        /// <param name="height">高度</param>
-        /// <param name="depth">深度</param>
-        /// <returns>像素缓冲区(写)3D</returns>
-        public static WritePixelBuffer3D CreateGray8(int width, int height, int depth)
-        {
-            return new WritePixelBuffer3D(width, height, depth, PixelFormat.Red, PixelType.UnsignedByte);
-        }
-        #endregion
-
         #region 创建8位标记缓冲区 —— static WritePixelBuffer3D CreateMark8(int width, int height...
         /// <summary>
         /// 创建8位标记缓冲区
@@ -95,32 +81,17 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 创建16位灰度缓冲区 —— static WritePixelBuffer3D CreateGray16(int width, int height...
+        #region 创建16位预览缓冲区 —— static WritePixelBuffer3D CreatePreview16(int width, int height...
         /// <summary>
-        /// 创建16位灰度缓冲区
+        /// 创建16位预览缓冲区
         /// </summary>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
         /// <param name="depth">深度</param>
         /// <returns>像素缓冲区(写)3D</returns>
-        /// <remarks>CT/MRI 常用</remarks>
-        public static WritePixelBuffer3D CreateGray16(int width, int height, int depth)
+        public static WritePixelBuffer3D CreatePreview16(int width, int height, int depth)
         {
-            return new WritePixelBuffer3D(width, height, depth, PixelFormat.Red, PixelType.UnsignedShort);
-        }
-        #endregion
-
-        #region 创建32位浮点灰度缓冲区 —— static WritePixelBuffer3D CreateGray32F(int width, int height...
-        /// <summary>
-        /// 创建32位浮点灰度缓冲区
-        /// </summary>
-        /// <param name="width">宽度</param>
-        /// <param name="height">高度</param>
-        /// <param name="depth">深度</param>
-        /// <returns>像素缓冲区(写)3D</returns>
-        public static WritePixelBuffer3D CreateGray32F(int width, int height, int depth)
-        {
-            return new WritePixelBuffer3D(width, height, depth, PixelFormat.Red, PixelType.Float);
+            return new WritePixelBuffer3D(width, height, depth, PixelFormat.Red, PixelType.Short);
         }
         #endregion
 

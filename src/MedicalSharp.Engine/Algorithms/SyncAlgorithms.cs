@@ -1,6 +1,5 @@
 ﻿using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
-using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -12,6 +11,189 @@ namespace MedicalSharp.Engine.Algorithms
     /// </summary>
     public static class SyncAlgorithms
     {
+        #region # 同步预览数据GPU->CPU —— static void SyncPreviewDataFromGpu(this VolumeRenderable renderable)
+        /// <summary>
+        /// 同步预览数据GPU->CPU
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <repreviews>将GPU预览纹理数据回读到CPU端的VolumeData.PreviewData</repreviews>
+        public static void SyncPreviewDataFromGpu(this VolumeRenderable renderable)
+        {
+            #region # 验证
+
+            if (renderable.VolumeData.PreviewData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("CPU预览数据未分配！");
+            }
+            if (!renderable.VolumeData.TryBeginPreviewGpuToCpu())
+            {
+                throw new InvalidOperationException($"预览数据正在同步中，当前状态: \"{renderable.VolumeData.PreviewSyncStatus}\"");
+            }
+
+            #endregion
+
+            try
+            {
+                int width = renderable.PreviewTexture.Width;
+                int height = renderable.PreviewTexture.Height;
+                int depth = renderable.PreviewTexture.Depth;
+                int bufferSize = width * height * depth;
+
+                //读取3D纹理到PBO
+                using ReadPixelBuffer3D readBuffer = ReadPixelBuffer3D.CreatePreview16(width, height, depth);
+                readBuffer.ReadTexture3D(renderable.PreviewTexture, true);
+
+                //获取数据（阻塞等待）
+                byte[] data = readBuffer.GetCpuBuffer();
+
+                //复制到非托管内存
+                if (data != null && data.Length == bufferSize)
+                {
+                    Marshal.Copy(data, 0, renderable.VolumeData.PreviewData, bufferSize);
+                }
+            }
+            finally
+            {
+                renderable.VolumeData.EndPreviewSync();
+            }
+        }
+        #endregion
+
+        #region # 异步同步预览数据GPU->CPU —— static async Task SyncPreviewDataFromGpuAsync(this VolumeRenderable...
+        /// <summary>
+        /// 异步同步预览数据GPU->CPU
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <repreviews>将GPU预览纹理数据回读到CPU端的VolumeData.PreviewData</repreviews>
+        public static async Task SyncPreviewDataFromGpuAsync(this VolumeRenderable renderable)
+        {
+            #region # 验证
+
+            if (renderable.VolumeData.PreviewData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("CPU预览数据未分配！");
+            }
+            if (!renderable.VolumeData.TryBeginPreviewGpuToCpu())
+            {
+                throw new InvalidOperationException($"预览数据正在同步中，当前状态: \"{renderable.VolumeData.PreviewSyncStatus}\"");
+            }
+
+            #endregion
+
+            try
+            {
+                int width = renderable.PreviewTexture.Width;
+                int height = renderable.PreviewTexture.Height;
+                int depth = renderable.PreviewTexture.Depth;
+                int bufferSize = width * height * depth;
+
+                //异步读取3D纹理
+                byte[] data = await Task.Run(() =>
+                {
+                    using ReadPixelBuffer3D readBuffer = ReadPixelBuffer3D.CreatePreview16(width, height, depth);
+                    readBuffer.ReadTexture3D(renderable.PreviewTexture, true);
+                    return readBuffer.GetCpuBuffer();
+                });
+
+                //复制到非托管内存
+                if (data != null && data.Length == bufferSize)
+                {
+                    Marshal.Copy(data, 0, renderable.VolumeData.PreviewData, bufferSize);
+                }
+            }
+            finally
+            {
+                renderable.VolumeData.EndPreviewSync();
+            }
+        }
+        #endregion
+
+        #region # 同步预览数据CPU->GPU —— static void SyncPreviewDataToGpu(this VolumeRenderable renderable)
+        /// <summary>
+        /// 同步预览数据CPU->GPU
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <repreviews>将CPU端VolumeData.PreviewData上传到GPU预览纹理</repreviews>
+        public static void SyncPreviewDataToGpu(this VolumeRenderable renderable)
+        {
+            #region # 验证
+
+            if (renderable.VolumeData.PreviewData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("CPU预览数据未分配！");
+            }
+            if (!renderable.VolumeData.TryBeginPreviewCpuToGpu())
+            {
+                throw new InvalidOperationException($"预览数据正在同步中，当前状态: \"{renderable.VolumeData.PreviewSyncStatus}\"");
+            }
+
+            #endregion
+
+            try
+            {
+                int width = renderable.PreviewTexture.Width;
+                int height = renderable.PreviewTexture.Height;
+                int depth = renderable.PreviewTexture.Depth;
+                using WritePixelBuffer3D writeBuffer = WritePixelBuffer3D.CreatePreview16(width, height, depth);
+
+                //上传到PBO
+                writeBuffer.UploadData(renderable.VolumeData.PreviewData);
+
+                //上传到纹理
+                writeBuffer.UploadToTexture(renderable.PreviewTexture, true);
+            }
+            finally
+            {
+                renderable.VolumeData.EndPreviewSync();
+            }
+        }
+        #endregion
+
+        #region # 异步同步预览数据CPU->GPU —— static async Task SyncPreviewDataToGpuAsync(this VolumeRenderable...
+        /// <summary>
+        /// 异步同步预览数据CPU->GPU
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <repreviews>将CPU端VolumeData.PreviewData上传到GPU预览纹理</repreviews>
+        public static async Task SyncPreviewDataToGpuAsync(this VolumeRenderable renderable)
+        {
+            #region # 验证
+
+            if (renderable.VolumeData.PreviewData == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("CPU预览数据未分配！");
+            }
+            if (!renderable.VolumeData.TryBeginPreviewCpuToGpu())
+            {
+                throw new InvalidOperationException($"预览数据正在同步中，当前状态: \"{renderable.VolumeData.PreviewSyncStatus}\"");
+            }
+
+            #endregion
+
+            try
+            {
+                int width = renderable.PreviewTexture.Width;
+                int height = renderable.PreviewTexture.Height;
+                int depth = renderable.PreviewTexture.Depth;
+
+                await Task.Run(() =>
+                {
+                    using WritePixelBuffer3D writeBuffer = WritePixelBuffer3D.CreatePreview16(width, height, depth);
+
+                    //上传到PBO
+                    writeBuffer.UploadData(renderable.VolumeData.PreviewData);
+
+                    //上传到纹理
+                    writeBuffer.UploadToTexture(renderable.PreviewTexture, true);
+                });
+            }
+            finally
+            {
+                renderable.VolumeData.EndPreviewSync();
+            }
+        }
+        #endregion
+
         #region # 同步标记数据GPU->CPU —— static void SyncMarkDataFromGpu(this VolumeRenderable renderable)
         /// <summary>
         /// 同步标记数据GPU->CPU
@@ -41,7 +223,7 @@ namespace MedicalSharp.Engine.Algorithms
                 int bufferSize = width * height * depth;
 
                 //读取3D纹理到PBO
-                using ReadPixelBuffer3D readBuffer = new ReadPixelBuffer3D(width, height, depth, PixelFormat.RedInteger, PixelType.UnsignedByte);
+                using ReadPixelBuffer3D readBuffer = ReadPixelBuffer3D.CreateMark8(width, height, depth);
                 readBuffer.ReadTexture3D(renderable.MarkTexture, true);
 
                 //获取数据（阻塞等待）
@@ -91,7 +273,7 @@ namespace MedicalSharp.Engine.Algorithms
                 //异步读取3D纹理
                 byte[] data = await Task.Run(() =>
                 {
-                    using ReadPixelBuffer3D readBuffer = new ReadPixelBuffer3D(width, height, depth, PixelFormat.RedInteger, PixelType.UnsignedByte);
+                    using ReadPixelBuffer3D readBuffer = ReadPixelBuffer3D.CreateMark8(width, height, depth);
                     readBuffer.ReadTexture3D(renderable.MarkTexture, true);
                     return readBuffer.GetCpuBuffer();
                 });

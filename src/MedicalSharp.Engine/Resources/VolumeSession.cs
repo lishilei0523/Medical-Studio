@@ -39,6 +39,7 @@ namespace MedicalSharp.Engine.Resources
             int height = this.VolumeData.Metadata.VolumeSize.Y;
             int depth = this.VolumeData.Metadata.VolumeSize.Z;
             this.OriginalTexture = Texture3D.CreateFromVolume(width, height, depth, this.VolumeData.OriginalData);
+            this.PreviewTexture = Texture3D.CreateFromVolume(width, height, depth, this.VolumeData.PreviewData);
             this.MarkTexture = Texture3D.CreateFromMark(width, height, depth, this.VolumeData.MarkData);
             this.VRTransferFunction = new DensityTransferFunction();
             this.MPRTransferFunction = new HUTransferFunction();
@@ -68,6 +69,13 @@ namespace MedicalSharp.Engine.Resources
         /// 原始纹理
         /// </summary>
         public Texture3D OriginalTexture { get; private set; }
+        #endregion
+
+        #region 预览纹理 —— Texture3D PreviewTexture
+        /// <summary>
+        /// 预览纹理
+        /// </summary>
+        public Texture3D PreviewTexture { get; private set; }
         #endregion
 
         #region 标记纹理 —— Texture3D MarkTexture
@@ -115,6 +123,7 @@ namespace MedicalSharp.Engine.Resources
 
             this.VolumeData?.Dispose();
             this.OriginalTexture?.Dispose();
+            this.PreviewTexture?.Dispose();
             this.MarkTexture?.Dispose();
             this.VRTransferFunction?.Dispose();
             this.MPRTransferFunction?.Dispose();

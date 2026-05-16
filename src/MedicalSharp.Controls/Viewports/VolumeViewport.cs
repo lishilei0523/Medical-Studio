@@ -606,7 +606,7 @@ namespace MedicalSharp.Controls.Viewports
                 volumeSession = SessionManager.VolumeSessions[volumeData.Metadata.Id];
             }
 
-            viewport._volumeRenderable = new VolumeRenderable(volumeSession.OriginalTexture, volumeSession.MarkTexture, volumeData);
+            viewport._volumeRenderable = new VolumeRenderable(volumeSession.OriginalTexture, volumeSession.PreviewTexture, volumeSession.MarkTexture, volumeData);
 
             //初始化传递函数、标记策略
             viewport._volumeRenderer.SetTransferFunction(volumeSession.VRTransferFunction);

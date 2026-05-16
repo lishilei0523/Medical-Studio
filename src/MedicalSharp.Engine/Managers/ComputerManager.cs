@@ -59,6 +59,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _ConvexPolyhedronCutComputer;
 
         /// <summary>
+        /// 重置标记值计算着色器
+        /// </summary>
+        private static ShaderProgram _ResetMarkValueComputer;
+
+        /// <summary>
         /// 同步锁
         /// </summary>
         private static readonly Lock _Sync;
@@ -156,6 +161,16 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - 重置标记值计算着色器 —— static ShaderProgram ResetMarkValueComputer
+        /// <summary>
+        /// 只读属性 - 重置标记值计算着色器
+        /// </summary>
+        public static ShaderProgram ResetMarkValueComputer
+        {
+            get => _ResetMarkValueComputer;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -183,6 +198,7 @@ namespace MedicalSharp.Engine.Managers
                 _SphereCutComputer = CreateSphereCutComputer();
                 _CylinderCutComputer = CreateCylinderCutComputer();
                 _ConvexPolyhedronCutComputer = CreateConvexPolyhedronCutComputer();
+                _ResetMarkValueComputer = CreateResetMarkValueComputer();
                 _Initialized = true;
             }
         }
@@ -241,6 +257,7 @@ namespace MedicalSharp.Engine.Managers
             _SphereCutComputer?.Dispose();
             _CylinderCutComputer?.Dispose();
             _ConvexPolyhedronCutComputer?.Dispose();
+            _ResetMarkValueComputer?.Dispose();
         }
         #endregion
 
@@ -353,6 +370,20 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/cut_convex_polyhedron.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion
+
+        #region 创建重置标记值计算着色器 —— static ShaderProgram CreateResetMarkValueComputer()
+        /// <summary>
+        /// 创建重置标记值计算着色器
+        /// </summary>
+        private static ShaderProgram CreateResetMarkValueComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/reset_mark.comp");
             program.BuildCompute();
 
             return program;

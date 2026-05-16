@@ -2,11 +2,11 @@
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Engine.Renderables
 {
@@ -20,16 +20,21 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 创建体积渲染对象构造器
         /// </summary>
-        /// <param name="sourceTexture">体积纹理</param>
+        /// <param name="originalTexture">原始纹理</param>
+        /// <param name="previewTexture">预览纹理</param>
         /// <param name="markTexture">标记纹理</param>
         /// <param name="volumeData">体积数据</param>
-        public VolumeRenderable(Texture3D sourceTexture, Texture3D markTexture, VolumeData volumeData)
+        public VolumeRenderable(Texture3D originalTexture, Texture3D previewTexture, Texture3D markTexture, VolumeData volumeData)
         {
             #region # 验证
 
-            if (sourceTexture == null)
+            if (originalTexture == null)
             {
-                throw new ArgumentNullException(nameof(sourceTexture), "体积纹理不可为空！");
+                throw new ArgumentNullException(nameof(originalTexture), "原始纹理不可为空！");
+            }
+            if (previewTexture == null)
+            {
+                throw new ArgumentNullException(nameof(previewTexture), "预览纹理不可为空！");
             }
             if (markTexture == null)
             {
@@ -42,7 +47,8 @@ namespace MedicalSharp.Engine.Renderables
 
             #endregion
 
-            this.OriginalTexture = sourceTexture;
+            this.OriginalTexture = originalTexture;
+            this.PreviewTexture = previewTexture;
             this.MarkTexture = markTexture;
             this.VolumeData = volumeData;
         }
@@ -56,6 +62,13 @@ namespace MedicalSharp.Engine.Renderables
         /// 原始纹理
         /// </summary>
         public Texture3D OriginalTexture { get; private set; }
+        #endregion
+
+        #region 预览纹理 —— Texture3D PreviewTexture
+        /// <summary>
+        /// 预览纹理
+        /// </summary>
+        public Texture3D PreviewTexture { get; private set; }
         #endregion
 
         #region 标记纹理 —— Texture3D MarkTexture
@@ -86,6 +99,49 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 方法
 
+        #region 重置预览纹理 —— void ResetPreviewTexture()
+        /// <summary>
+        /// 重置预览纹理
+        /// </summary>
+        /// <remarks>将预览纹理重置为原始纹理</remarks>
+        public void ResetPreviewTexture()
+        {
+            #region # 验证
+
+            if (this.OriginalTexture == null)
+            {
+                throw new InvalidOperationException("原始纹理未初始化！");
+            }
+            if (this.PreviewTexture == null)
+            {
+                throw new InvalidOperationException("预览纹理未初始化！");
+            }
+            if (this.PreviewTexture.Width != this.OriginalTexture.Width ||
+                this.PreviewTexture.Height != this.OriginalTexture.Height ||
+                this.PreviewTexture.Depth != this.OriginalTexture.Depth)
+            {
+                throw new InvalidOperationException("预览纹理与原始纹理尺寸不匹配！");
+            }
+
+            #endregion
+
+            //确保之前的GPU操作完成
+            GL.MemoryBarrier(MemoryBarrierFlags.TextureUpdateBarrierBit);
+
+            //从原始纹理复制到预览纹理
+            GL.CopyImageSubData(
+                this.OriginalTexture.Id, ImageTarget.Texture3D, 0, 0, 0, 0,
+                this.PreviewTexture.Id, ImageTarget.Texture3D, 0, 0, 0, 0,
+                this.PreviewTexture.Width, this.PreviewTexture.Height, this.PreviewTexture.Depth);
+
+            //确保复制完成后后续操作能读到数据
+            GL.MemoryBarrier(MemoryBarrierFlags.TextureUpdateBarrierBit);
+
+            //重置CPU端
+            this.VolumeData.ResetPreviewData();
+        }
+        #endregion
+
         #region 重置标记纹理 —— void ResetMarkTexture()
         /// <summary>
         /// 重置标记纹理
@@ -96,12 +152,8 @@ namespace MedicalSharp.Engine.Renderables
             //清空标记纹理
             this.MarkTexture.Clear();
 
-            //清空CPU端内存
-            if (this.VolumeData.MarkData != IntPtr.Zero)
-            {
-                int size = this.VolumeMetadata.VolumeSize.X * this.VolumeMetadata.VolumeSize.Y * this.VolumeMetadata.VolumeSize.Z;
-                NativeMemory.Clear(this.VolumeData.MarkData.ToPointer(), (nuint)size);
-            }
+            //清空CPU端
+            this.VolumeData.ResetMarkData();
         }
         #endregion
 

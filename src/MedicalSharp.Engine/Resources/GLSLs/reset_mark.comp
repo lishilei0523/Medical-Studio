@@ -1,0 +1,33 @@
+#version 430 core
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+//标记纹理（可读写，R8UI格式）
+layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
+
+//体积参数
+uniform ivec3 u_VolumeSize;
+
+//目标标记值（要重置的标记值）
+uniform uint u_TargetMarkValue;
+
+
+void main()
+{
+    //获取当前线程对应的体素坐标
+    ivec3 voxelCoord = ivec3(gl_GlobalInvocationID);
+    
+    //边界检查
+    if (voxelCoord.x >= u_VolumeSize.x || voxelCoord.y >= u_VolumeSize.y || voxelCoord.z >= u_VolumeSize.z)
+    {
+        return;
+    }
+    
+    //读取当前标记值
+    uint currentMarkValue = imageLoad(u_MarkTexture, voxelCoord).r;
+    
+    //如果匹配目标标记值，则重置为0
+    if (currentMarkValue == u_TargetMarkValue)
+    {
+        imageStore(u_MarkTexture, voxelCoord, uvec4(0, 0, 0, 0));
+    }
+}

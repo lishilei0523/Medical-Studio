@@ -316,19 +316,22 @@ namespace MedicalSharp.Engine.Renderers
 
             //绑定纹理
             this.Renderable.OriginalTexture.Bind(0);
-            this.Renderable.MarkTexture.Bind(1);
-            this.TransferFunction.Texture.Bind(2);
-            this.MarkStrategy.Texture.Bind(3);
+            this.Renderable.PreviewTexture.Bind(1);
+            this.Renderable.MarkTexture.Bind(2);
+            this.TransferFunction.Texture.Bind(3);
+            this.MarkStrategy.Texture.Bind(4);
             program.SetUniformInt("u_OriginalTexture", 0);
-            program.SetUniformInt("u_MarkTexture", 1);
-            program.SetUniformInt("u_TransferFunction", 2);
-            program.SetUniformInt("u_MarkStrategy", 3);
+            program.SetUniformInt("u_PreviewTexture", 1);
+            program.SetUniformInt("u_MarkTexture", 2);
+            program.SetUniformInt("u_TransferFunction", 3);
+            program.SetUniformInt("u_MarkStrategy", 4);
 
             //绘制平面
             this._unitPlane.Draw(PrimitiveType.Triangles);
 
             //解绑纹理
             this.Renderable.OriginalTexture.Unbind();
+            this.Renderable.PreviewTexture.Unbind();
             this.Renderable.MarkTexture.Unbind();
             this.TransferFunction.Texture.Unbind();
             this.MarkStrategy.Texture.Unbind();
