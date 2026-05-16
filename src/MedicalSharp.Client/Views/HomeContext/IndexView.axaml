@@ -49,10 +49,10 @@
 							<MenuItem Header="占位(_T)" />
 						</MenuItem>
 						<MenuItem Header="滤波(_B)">
-                            <MenuItem Header="占位(_T)" />
+							<MenuItem Header="占位(_T)" />
 						</MenuItem>
 						<MenuItem Header="分割(_S)">
-                            <MenuItem Header="占位(_T)" />
+							<MenuItem Header="占位(_T)" />
 						</MenuItem>
 					</Menu>
 				</Grid>
@@ -207,9 +207,10 @@
 							</ListBox.ItemTemplate>
 							<ListBox.ContextFlyout>
 								<MenuFlyout>
-									<MenuItem Header="创建组织" Command="{Binding AddTissueCommand}" />
-									<MenuItem Header="编辑组织" Command="{Binding UpdateTissueCommand}" />
-									<MenuItem Header="删除组织" Command="{Binding RemoveTissueCommand}" />
+									<MenuItem Header="创建组织(_C)" Command="{Binding AddTissueCommand}" />
+									<MenuItem Header="编辑组织(_E)" Command="{Binding UpdateTissueCommand}" />
+									<MenuItem Header="重置组织(_R)" Command="{Binding ResetTissueCommand}" />
+									<MenuItem Header="删除组织(_D)" Command="{Binding RemoveTissueCommand}" />
 								</MenuFlyout>
 							</ListBox.ContextFlyout>
 						</ListBox>

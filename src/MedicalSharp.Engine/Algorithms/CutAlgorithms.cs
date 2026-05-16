@@ -440,46 +440,5 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Unuse();
         }
         #endregion
-
-        #region # 重置标记值 —— static void ResetMarkValue(this VolumeRenderable renderable...
-        /// <summary>
-        /// 重置标记值
-        /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
-        /// <param name="targetMarkValue">目标标记值（1~255）</param>
-        /// <remarks>将给定标记值重置为0</remarks>
-        public static void ResetMarkValue(this VolumeRenderable renderable, byte targetMarkValue)
-        {
-            #region # 验证
-
-            if (targetMarkValue == 0)
-            {
-                return;
-            }
-
-            #endregion
-
-            //重置标记值计算着色器
-            ShaderProgram resetMarkValueComputer = ComputerManager.ResetMarkValueComputer;
-
-            //开启Shader程序
-            resetMarkValueComputer.Use();
-
-            //绑定标记纹理为可读写
-            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
-
-            //设置体积参数
-            resetMarkValueComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
-
-            //设置标记值
-            resetMarkValueComputer.SetUniformUInt("u_TargetMarkValue", targetMarkValue);
-
-            //调度执行
-            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
-
-            //取消使用
-            resetMarkValueComputer.Unuse();
-        }
-        #endregion
     }
 }

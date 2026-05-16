@@ -165,13 +165,13 @@ namespace MedicalSharp.Controls.Commands
             [
                 new ContextMenuItem
                 {
-                    Header = "完成",
+                    Header = "完成(_F)",
                     Command = () => this.CompleteDrawing(viewport),
                     IsEnabled = this._curve != null
                 },
                 new ContextMenuItem
                 {
-                    Header = "取消",
+                    Header = "取消(_C)",
                     Command = () => this.CancelDrawing(viewport),
                     IsEnabled = this._curve != null
                 }
@@ -181,7 +181,7 @@ namespace MedicalSharp.Controls.Commands
             {
                 items.Add(new ContextMenuItem
                 {
-                    Header = "撤销上一点",
+                    Header = "撤销上一点(_U)",
                     Command = () => this.UndoLastPoint(viewport)
                 });
             }

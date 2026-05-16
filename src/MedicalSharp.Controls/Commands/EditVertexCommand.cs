@@ -174,7 +174,7 @@ namespace MedicalSharp.Controls.Commands
             [
                 new ContextMenuItem
                 {
-                    Header = "删除顶点",
+                    Header = "删除顶点(_D)",
                     Command = () => this.RemoveVertex(viewport, eventArgs),
                     IsEnabled = true
                 }

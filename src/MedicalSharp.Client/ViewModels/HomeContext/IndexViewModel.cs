@@ -308,6 +308,27 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }, _ => this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
         #endregion
 
+        #region 重置组织命令 —— ICommand ResetTissueCommand
+        /// <summary>
+        /// 重置组织命令
+        /// </summary>
+        public ICommand ResetTissueCommand => new AsyncRelayCommand(async _ =>
+        {
+            TaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == TaskDialogStandardResult.OK)
+            {
+                //组织Mark值置为0
+                VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                session.ResetMarkValue(this.SelectedTissue.MarkValue);
+
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent();
+                await this._eventAggregator.PublishOnUIThreadAsync(message);
+            }
+
+        }, _ => this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
+        #endregion
+
         #region 删除组织命令 —— ICommand RemoveTissueCommand
         /// <summary>
         /// 删除组织命令
@@ -317,10 +338,21 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             TaskDialogStandardResult result = await MessageBox.Show("确定要删除吗？", "警告", MessageBoxButton.OKCancel);
             if (result == TaskDialogStandardResult.OK)
             {
-                this.Tissues.Remove(this.SelectedTissue);
-            }
+                //组织Mark值置为0
+                VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                session.ResetMarkValue(this.SelectedTissue.MarkValue);
 
-            //TODO 组织Mark值置为0
+                //删除组织，重设选中
+                this.Tissues.Remove(this.SelectedTissue);
+                if (this.Tissues.Any())
+                {
+                    this.SelectedTissue = this.Tissues[0];
+                }
+
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent();
+                await this._eventAggregator.PublishOnUIThreadAsync(message);
+            }
 
         }, _ => this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
         #endregion

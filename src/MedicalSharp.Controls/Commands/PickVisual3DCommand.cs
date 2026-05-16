@@ -123,20 +123,20 @@ namespace MedicalSharp.Controls.Commands
             {
                 items.Add(new ContextMenuItem
                 {
-                    Header = "删除",
+                    Header = "删除(_D)",
                     Command = () => this.RemoveVisual(viewport)
                 });
                 items.Add(new ContextMenuItem
                 {
-                    Header = "内切",
+                    Header = "内切(_I)",
                     Command = () => this.ApplyCutInside(viewport),
-                    IsEnabled = this._selectedVisual is ICutVolume
+                    IsEnabled = this._selectedVisual is ICutVolume && this.GetMarkValue != null
                 });
                 items.Add(new ContextMenuItem
                 {
-                    Header = "外切",
+                    Header = "外切(_O)",
                     Command = () => this.ApplyCutOutSide(viewport),
-                    IsEnabled = this._selectedVisual is ICutVolume
+                    IsEnabled = this._selectedVisual is ICutVolume && this.GetMarkValue != null
                 });
             }
 
@@ -184,7 +184,26 @@ namespace MedicalSharp.Controls.Commands
         {
             if (this._selectedVisual is ICutVolume cutVolume)
             {
-                byte markValue = this.GetMarkValue?.Invoke() ?? 1;
+                #region # 验证
+
+                if (this.GetMarkValue == null)
+                {
+                    return;
+                }
+
+                #endregion
+
+                byte markValue = this.GetMarkValue.Invoke();
+
+                #region # 验证
+
+                if (markValue == 0)
+                {
+                    return;
+                }
+
+                #endregion
+
                 if (viewport is VolumeViewport volumeViewport)
                 {
                     cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
