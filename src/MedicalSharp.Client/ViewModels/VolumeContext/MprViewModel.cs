@@ -58,14 +58,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public MprViewModel(IWindowManager windowManager, IEventAggregator eventAggregator, string title, MPRCamera camera, MPRPlaneType planeType, MPRInputManager inputManager)
+        public MprViewModel(IWindowManager windowManager, IEventAggregator eventAggregator, string title, MPRCamera camera, MPRInputManager inputManager)
         {
             this._windowManager = windowManager;
             this._eventAggregator = eventAggregator;
             this._eventAggregator.SubscribeOnUIThread(this);
             this.Title = title;
             this.Camera = camera;
-            this.PlaneType = planeType;
             this.InputManager = inputManager;
 
             //默认值
@@ -155,14 +154,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public string Title { get; set; }
-        #endregion
-
-        #region MPR平面类型 —— MPRPlaneType PlaneType
-        /// <summary>
-        /// MPR平面类型
-        /// </summary>
-        [DependencyProperty]
-        public MPRPlaneType PlaneType { get; set; }
         #endregion
 
         #region MPR平面 —— MPRPlane Plane

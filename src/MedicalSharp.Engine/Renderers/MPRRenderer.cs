@@ -35,17 +35,15 @@ namespace MedicalSharp.Engine.Renderers
         /// 创建MPR渲染器构造器
         /// </summary>
         /// <param name="camera">MPR相机</param>
-        /// <param name="planeType">MPR平面类型</param>
-        public MPRRenderer(MPRCamera camera, MPRPlaneType planeType)
+        public MPRRenderer(MPRCamera camera)
             : base(camera)
         {
-            this.PlaneType = planeType;
             this.RenderMode = MPRRenderMode.Gray;
             this.WindowWidth = 400;
             this.WindowCenter = 40;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
-            this._unitPlane = this.CreateUnitPlane();
+            this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
             this._unitPlane.Setup();
         }
 
@@ -58,13 +56,6 @@ namespace MedicalSharp.Engine.Renderers
         /// 渲染模式
         /// </summary>
         public MPRRenderMode RenderMode { get; private set; }
-        #endregion
-
-        #region 平面类型 —— MPRPlaneType PlaneType
-        /// <summary>
-        /// 平面类型
-        /// </summary>
-        public MPRPlaneType PlaneType { get; private set; }
         #endregion
 
         #region 窗宽 —— float WindowWidth
@@ -139,8 +130,6 @@ namespace MedicalSharp.Engine.Renderers
         #endregion
 
         #region # 方法
-
-        //Public
 
         #region 切换渲染模式 —— void SwitchRenderMode(MPRRenderMode renderMode)
         /// <summary>
@@ -363,31 +352,6 @@ namespace MedicalSharp.Engine.Renderers
 
             this._unitPlane.Dispose();
             this._disposed = true;
-        }
-        #endregion
-
-
-        //Private
-
-        #region 创建单位平面 —— VertexBuffer CreateUnitPlane()
-        /// <summary>
-        /// 创建单位平面
-        /// </summary>
-        /// <returns>顶点缓冲区</returns>
-        private VertexBuffer CreateUnitPlane()
-        {
-            //初始化平面顶点缓冲区
-            MeshGeometry planeMesh = this.PlaneType switch
-            {
-                MPRPlaneType.Axial => ResourceManager.AxialPlane,
-                MPRPlaneType.Coronal => ResourceManager.CoronalPlane,
-                MPRPlaneType.Sagittal => ResourceManager.SagittalPlane,
-                MPRPlaneType.Oblique => ResourceManager.UnitPlane,
-                _ => throw new NotSupportedException()
-            };
-            VertexBuffer planeBuffer = new VertexBuffer(planeMesh);
-
-            return planeBuffer;
         }
         #endregion
 

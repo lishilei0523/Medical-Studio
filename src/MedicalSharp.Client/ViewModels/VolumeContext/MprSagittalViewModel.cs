@@ -2,7 +2,6 @@
 using Caliburn.Micro;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Primitives.Cameras;
-using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
@@ -41,7 +40,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             const string title = "Sagittal";
             MPRCamera camera = new MPRCamera();
             MPRInputManager inputManager = new MPRInputManager(camera);
-            this.MprViewModel = new MprViewModel(windowManager, eventAggregator, title, camera, MPRPlaneType.Sagittal, inputManager);
+            this.MprViewModel = new MprViewModel(windowManager, eventAggregator, title, camera, inputManager);
             this.MprViewModel.Crosshair.HorizontalStroke = Colors.LimeGreen;
             this.MprViewModel.Crosshair.VerticalStroke = Colors.Red;
         }

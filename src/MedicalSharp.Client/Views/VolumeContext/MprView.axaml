@@ -102,7 +102,6 @@
                         FrameToken="{Binding FrameToken}"
                         Camera="{Binding Camera}"
                         InputManager="{Binding InputManager}"
-                        PlaneType="{Binding PlaneType}"
                         Plane="{Binding Plane}"
                         VolumeData="{Binding VolumeData}"
                         RenderMode="{Binding RenderMode}"

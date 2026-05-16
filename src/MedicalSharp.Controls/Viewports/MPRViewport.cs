@@ -33,11 +33,6 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<MPRRenderMode> RenderModeProperty;
 
         /// <summary>
-        /// MPR平面类型依赖属性
-        /// </summary>
-        public static readonly StyledProperty<MPRPlaneType> PlaneTypeProperty;
-
-        /// <summary>
         /// MPR平面依赖属性
         /// </summary>
         public static readonly StyledProperty<MPRPlane> PlaneProperty;
@@ -78,7 +73,6 @@ namespace MedicalSharp.Controls.Viewports
         static MPRViewport()
         {
             RenderModeProperty = AvaloniaProperty.Register<MPRViewport, MPRRenderMode>(nameof(RenderMode));
-            PlaneTypeProperty = AvaloniaProperty.Register<MPRViewport, MPRPlaneType>(nameof(PlaneType));
             PlaneProperty = AvaloniaProperty.Register<MPRViewport, MPRPlane>(nameof(Plane));
             WindowWidthProperty = AvaloniaProperty.Register<MPRViewport, int>(nameof(WindowWidth), 400);
             WindowCenterProperty = AvaloniaProperty.Register<MPRViewport, int>(nameof(WindowCenter), 40);
@@ -128,17 +122,6 @@ namespace MedicalSharp.Controls.Viewports
         {
             get => this.GetValue(RenderModeProperty);
             set => this.SetValue(RenderModeProperty, value);
-        }
-        #endregion
-
-        #region 依赖属性 - MPR平面类型 —— MPRPlaneType PlaneType
-        /// <summary>
-        /// 依赖属性 - MPR平面类型
-        /// </summary>
-        public MPRPlaneType PlaneType
-        {
-            get => this.GetValue(PlaneTypeProperty);
-            set => this.SetValue(PlaneTypeProperty, value);
         }
         #endregion
 
@@ -357,7 +340,7 @@ namespace MedicalSharp.Controls.Viewports
             this._shapeRenderer = new ShapeRenderer(this.MPRCamera);
 
             //初始化MPR渲染器
-            this._mprRenderer = new MPRRenderer(this.MPRCamera, this.PlaneType);
+            this._mprRenderer = new MPRRenderer(this.MPRCamera);
             this._mprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._mprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
         }
