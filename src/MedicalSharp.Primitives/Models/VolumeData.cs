@@ -18,9 +18,14 @@ namespace MedicalSharp.Primitives.Models
         protected bool _disposed;
 
         /// <summary>
+        /// 预览同步状态
+        /// </summary>
+        private int _previewSyncStatus;
+
+        /// <summary>
         /// 标记同步状态
         /// </summary>
-        private int _syncStatus;
+        private int _markSyncStatus;
 
         /// <summary>
         /// 默认构造器
@@ -28,7 +33,8 @@ namespace MedicalSharp.Primitives.Models
         protected VolumeData()
         {
             //默认值
-            this._syncStatus = (int)MarkSyncStatus.Idle;
+            this._previewSyncStatus = (int)DataSyncStatus.Idle;
+            this._markSyncStatus = (int)DataSyncStatus.Idle;
             this.Metadata = new VolumeMetadata();
             this.PatientData = new VolumePatientData();
             this.StudyData = new VolumeStudyData();
@@ -74,6 +80,13 @@ namespace MedicalSharp.Primitives.Models
         public abstract IntPtr OriginalData { get; }
         #endregion
 
+        #region 预览数据 —— abstract IntPtr PreviewData
+        /// <summary>
+        /// 预览数据
+        /// </summary>
+        public abstract IntPtr PreviewData { get; }
+        #endregion
+
         #region 标记数据 —— abstract IntPtr MarkData
         /// <summary>
         /// 标记数据
@@ -81,13 +94,44 @@ namespace MedicalSharp.Primitives.Models
         public abstract IntPtr MarkData { get; }
         #endregion
 
-        #region 只读属性 - 标记同步状态 —— MarkSyncStatus MarkSyncStatus
+        #region 只读属性 - 预览同步状态 —— DataSyncStatus PreviewSyncStatus
+        /// <summary>
+        /// 只读属性 - 预览同步状态
+        /// </summary>
+        public DataSyncStatus PreviewSyncStatus
+        {
+            get => (DataSyncStatus)Interlocked.CompareExchange(ref this._previewSyncStatus, 0, 0);
+        }
+        #endregion
+
+        #region 只读属性 - 是否可读取预览 —— bool CanReadPreviewData
+        /// <summary>
+        /// 只读属性 - 是否可读取预览
+        /// </summary>
+        public bool CanReadPreviewData
+        {
+            get => this.PreviewSyncStatus == DataSyncStatus.Idle;
+        }
+
+        #endregion
+
+        #region 只读属性 - 是否可写入预览 —— bool CanWritePreviewData
+        /// <summary>
+        /// 只读属性 - 是否可写入预览
+        /// </summary>
+        public bool CanWritePreviewData
+        {
+            get => this.PreviewSyncStatus == DataSyncStatus.Idle;
+        }
+        #endregion
+
+        #region 只读属性 - 标记同步状态 —— DataSyncStatus MarkSyncStatus
         /// <summary>
         /// 只读属性 - 标记同步状态
         /// </summary>
-        public MarkSyncStatus MarkSyncStatus
+        public DataSyncStatus MarkSyncStatus
         {
-            get => (MarkSyncStatus)Interlocked.CompareExchange(ref this._syncStatus, 0, 0);
+            get => (DataSyncStatus)Interlocked.CompareExchange(ref this._markSyncStatus, 0, 0);
         }
         #endregion
 
@@ -97,7 +141,7 @@ namespace MedicalSharp.Primitives.Models
         /// </summary>
         public bool CanReadMarkData
         {
-            get => this.MarkSyncStatus == MarkSyncStatus.Idle;
+            get => this.MarkSyncStatus == DataSyncStatus.Idle;
         }
 
         #endregion
@@ -108,7 +152,7 @@ namespace MedicalSharp.Primitives.Models
         /// </summary>
         public bool CanWriteMarkData
         {
-            get => this.MarkSyncStatus == MarkSyncStatus.Idle;
+            get => this.MarkSyncStatus == DataSyncStatus.Idle;
         }
         #endregion
 
@@ -141,6 +185,31 @@ namespace MedicalSharp.Primitives.Models
         }
         #endregion
 
+        #region 获取预览值 —— short GetPreviewValue(Vector3i position)
+        /// <summary>
+        /// 获取预览值
+        /// </summary>
+        /// <param name="position">位置</param>
+        /// <returns>体素值</returns>
+        public unsafe short GetPreviewValue(Vector3i position)
+        {
+            if (position.X < 0 || position.X >= this.Metadata.VolumeSize.X ||
+                position.Y < 0 || position.Y >= this.Metadata.VolumeSize.Y ||
+                position.Z < 0 || position.Z >= this.Metadata.VolumeSize.Z)
+            {
+                return 0;
+            }
+
+            int index = position.Z * this.Metadata.VolumeSize.X * this.Metadata.VolumeSize.Y +
+                        position.Y * this.Metadata.VolumeSize.X +
+                        position.X;
+            short* pointer = (short*)this.PreviewData.ToPointer();
+            short voxel = pointer[index];
+
+            return voxel;
+        }
+        #endregion
+
         #region 获取标记值 —— byte GetMarkValue(Vector3i position)
         /// <summary>
         /// 获取标记值
@@ -166,77 +235,77 @@ namespace MedicalSharp.Primitives.Models
         }
         #endregion
 
-        #region 开始GPU->CPU同步 —— void BeginGpuToCpu()
+        #region 尝试开始GPU->CPU同步预览 —— bool TryBeginPreviewGpuToCpu()
         /// <summary>
-        /// 开始GPU->CPU同步
-        /// </summary>
-        /// <remarks>调用前应确保UI层已防止重复操作</remarks>
-        public void BeginGpuToCpu()
-        {
-            int previous = Interlocked.Exchange(ref this._syncStatus, (int)MarkSyncStatus.GpuToCpu);
-#if DEBUG
-            //调试模式下检查状态（Release时可移除）
-            if (previous != (int)MarkSyncStatus.Idle)
-            {
-                string message = $"同步状态异常：当前状态为 {this.MarkSyncStatus}，无法开始GPU->CPU同步。这通常是由于UI层未正确防止重复操作所致。";
-                throw new InvalidOperationException(message);
-            }
-#endif
-        }
-        #endregion
-
-        #region 开始CPU->GPU同步 —— void BeginCpuToGpu()
-        /// <summary>
-        /// 开始CPU->GPU同步
-        /// </summary>
-        /// <remarks>调用前应确保UI层已防止重复操作</remarks>
-        public void BeginCpuToGpu()
-        {
-            int previous = Interlocked.Exchange(ref this._syncStatus, (int)MarkSyncStatus.CpuToGpu);
-#if DEBUG
-            //调试模式下检查状态（Release 时可移除）
-            if (previous != (int)MarkSyncStatus.Idle)
-            {
-                string message = $"同步状态异常：当前状态为 {this.MarkSyncStatus}，无法开始CPU->GPU同步。这通常是由于UI层未正确防止重复操作所致。";
-                throw new InvalidOperationException(message);
-            }
-#endif
-        }
-        #endregion
-
-        #region 尝试开始GPU->CPU同步 —— bool TryBeginGpuToCpu()
-        /// <summary>
-        /// 尝试开始GPU->CPU同步
+        /// 尝试开始GPU->CPU同步预览
         /// </summary>
         /// <returns>是否成功开始</returns>
-        public bool TryBeginGpuToCpu()
+        public bool TryBeginPreviewGpuToCpu()
         {
-            int status = Interlocked.CompareExchange(ref this._syncStatus, (int)MarkSyncStatus.GpuToCpu, (int)MarkSyncStatus.Idle);
+            int status = Interlocked.CompareExchange(ref this._previewSyncStatus, (int)DataSyncStatus.GpuToCpu, (int)DataSyncStatus.Idle);
 
-            return status == (int)MarkSyncStatus.Idle;
+            return status == (int)DataSyncStatus.Idle;
         }
         #endregion
 
-        #region 尝试开始CPU->GPU同步 —— bool TryBeginCpuToGpu()
+        #region 尝试开始CPU->GPU同步预览 —— bool TryBeginPreviewCpuToGpu()
         /// <summary>
-        /// 尝试开始CPU->GPU同步
+        /// 尝试开始CPU->GPU同步预览
         /// </summary>
         /// <returns>是否成功开始</returns>
-        public bool TryBeginCpuToGpu()
+        public bool TryBeginPreviewCpuToGpu()
         {
-            int status = Interlocked.CompareExchange(ref this._syncStatus, (int)MarkSyncStatus.CpuToGpu, (int)MarkSyncStatus.Idle);
+            int status = Interlocked.CompareExchange(ref this._previewSyncStatus, (int)DataSyncStatus.CpuToGpu, (int)DataSyncStatus.Idle);
 
-            return status == (int)MarkSyncStatus.Idle;
+            return status == (int)DataSyncStatus.Idle;
         }
         #endregion
 
-        #region 结束同步 —— void EndSync()
+        #region 结束同步预览 —— void EndPreviewSync()
         /// <summary>
-        /// 结束同步（无论哪种方向）
+        /// 结束同步预览
         /// </summary>
-        public void EndSync()
+        /// <repreviews>无论哪种方向</repreviews>
+        public void EndPreviewSync()
         {
-            Interlocked.Exchange(ref this._syncStatus, (int)MarkSyncStatus.Idle);
+            Interlocked.Exchange(ref this._previewSyncStatus, (int)DataSyncStatus.Idle);
+        }
+        #endregion
+
+        #region 尝试开始GPU->CPU同步标记 —— bool TryBeginMarkGpuToCpu()
+        /// <summary>
+        /// 尝试开始GPU->CPU同步标记
+        /// </summary>
+        /// <returns>是否成功开始</returns>
+        public bool TryBeginMarkGpuToCpu()
+        {
+            int status = Interlocked.CompareExchange(ref this._markSyncStatus, (int)DataSyncStatus.GpuToCpu, (int)DataSyncStatus.Idle);
+
+            return status == (int)DataSyncStatus.Idle;
+        }
+        #endregion
+
+        #region 尝试开始CPU->GPU同步标记 —— bool TryBeginMarkCpuToGpu()
+        /// <summary>
+        /// 尝试开始CPU->GPU同步标记
+        /// </summary>
+        /// <returns>是否成功开始</returns>
+        public bool TryBeginMarkCpuToGpu()
+        {
+            int status = Interlocked.CompareExchange(ref this._markSyncStatus, (int)DataSyncStatus.CpuToGpu, (int)DataSyncStatus.Idle);
+
+            return status == (int)DataSyncStatus.Idle;
+        }
+        #endregion
+
+        #region 结束同步标记 —— void EndMarkSync()
+        /// <summary>
+        /// 结束同步标记
+        /// </summary>
+        /// <remarks>无论哪种方向</remarks>
+        public void EndMarkSync()
+        {
+            Interlocked.Exchange(ref this._markSyncStatus, (int)DataSyncStatus.Idle);
         }
         #endregion
 

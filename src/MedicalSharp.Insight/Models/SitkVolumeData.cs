@@ -24,11 +24,18 @@ namespace MedicalSharp.Insight.Models
 
         #region # 属性
 
-        #region SimpleITK图像 —— Image SitkImage
+        #region SimpleITK原始图像 —— Image SitkOriginalImage
         /// <summary>
-        /// SimpleITK图像
+        /// SimpleITK原始图像
         /// </summary>
-        public Image SitkImage { get; internal set; }
+        public Image SitkOriginalImage { get; internal set; }
+        #endregion
+
+        #region SimpleITK预览图像 —— Image SitkPreviewImage
+        /// <summary>
+        /// SimpleITK预览图像
+        /// </summary>
+        public Image SitkPreviewImage { get; internal set; }
         #endregion
 
         #region SimpleITK标记图像 —— Image SitkMarkImage
@@ -46,12 +53,30 @@ namespace MedicalSharp.Insight.Models
         {
             get
             {
-                if (this.SitkImage == null)
+                if (this.SitkOriginalImage == null)
                 {
                     return IntPtr.Zero;
                 }
 
-                return this.SitkImage.GetBufferAsInt16();
+                return this.SitkOriginalImage.GetBufferAsInt16();
+            }
+        }
+        #endregion
+
+        #region 只读属性 - 预览数据 —— override IntPtr PreviewData
+        /// <summary>
+        /// 只读属性 - 预览数据
+        /// </summary>
+        public override IntPtr PreviewData
+        {
+            get
+            {
+                if (this.SitkPreviewImage == null)
+                {
+                    return IntPtr.Zero;
+                }
+
+                return this.SitkPreviewImage.GetBufferAsInt16();
             }
         }
         #endregion
@@ -78,11 +103,21 @@ namespace MedicalSharp.Insight.Models
 
         #region # 方法
 
+        #region 创建预览图像 —— void CreatePreview()
+        /// <summary>
+        /// 创建预览图像
+        /// </summary>
+        internal void CreatePreview()
+        {
+            this.SitkPreviewImage = new Image(this.SitkOriginalImage);
+        }
+        #endregion
+
         #region 分配标记数据 —— void AllocMarkData()
         /// <summary>
         /// 分配标记数据
         /// </summary>
-        public void AllocMarkData()
+        internal void AllocMarkData()
         {
             #region # 验证
 
@@ -107,11 +142,11 @@ namespace MedicalSharp.Insight.Models
             this.SitkMarkImage = new Image(size, PixelIDValueEnum.sitkUInt8, 1);
 
             //从原始图像复制空间元数据
-            if (this.SitkImage != null)
+            if (this.SitkOriginalImage != null)
             {
-                this.SitkMarkImage.SetSpacing(this.SitkImage.GetSpacing());
-                this.SitkMarkImage.SetOrigin(this.SitkImage.GetOrigin());
-                this.SitkMarkImage.SetDirection(this.SitkImage.GetDirection());
+                this.SitkMarkImage.SetSpacing(this.SitkOriginalImage.GetSpacing());
+                this.SitkMarkImage.SetOrigin(this.SitkOriginalImage.GetOrigin());
+                this.SitkMarkImage.SetDirection(this.SitkOriginalImage.GetDirection());
             }
         }
         #endregion
@@ -127,7 +162,7 @@ namespace MedicalSharp.Insight.Models
                 return;
             }
 
-            this.SitkImage?.Dispose();
+            this.SitkOriginalImage?.Dispose();
             this.SitkMarkImage?.Dispose();
 
             base.Dispose();

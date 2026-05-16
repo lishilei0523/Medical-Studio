@@ -26,7 +26,7 @@ namespace MedicalSharp.Engine.Algorithms
             {
                 throw new InvalidOperationException("CPU标记数据未分配！");
             }
-            if (!renderable.VolumeData.TryBeginGpuToCpu())
+            if (!renderable.VolumeData.TryBeginMarkGpuToCpu())
             {
                 throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.MarkSyncStatus}\"");
             }
@@ -55,7 +55,7 @@ namespace MedicalSharp.Engine.Algorithms
             }
             finally
             {
-                renderable.VolumeData.EndSync();
+                renderable.VolumeData.EndMarkSync();
             }
         }
         #endregion
@@ -74,7 +74,7 @@ namespace MedicalSharp.Engine.Algorithms
             {
                 throw new InvalidOperationException("CPU标记数据未分配！");
             }
-            if (!renderable.VolumeData.TryBeginGpuToCpu())
+            if (!renderable.VolumeData.TryBeginMarkGpuToCpu())
             {
                 throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.MarkSyncStatus}\"");
             }
@@ -104,7 +104,7 @@ namespace MedicalSharp.Engine.Algorithms
             }
             finally
             {
-                renderable.VolumeData.EndSync();
+                renderable.VolumeData.EndMarkSync();
             }
         }
         #endregion
@@ -123,7 +123,7 @@ namespace MedicalSharp.Engine.Algorithms
             {
                 throw new InvalidOperationException("CPU标记数据未分配！");
             }
-            if (!renderable.VolumeData.TryBeginCpuToGpu())
+            if (!renderable.VolumeData.TryBeginMarkCpuToGpu())
             {
                 throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.MarkSyncStatus}\"");
             }
@@ -145,7 +145,7 @@ namespace MedicalSharp.Engine.Algorithms
             }
             finally
             {
-                renderable.VolumeData.EndSync();
+                renderable.VolumeData.EndMarkSync();
             }
         }
         #endregion
@@ -164,7 +164,7 @@ namespace MedicalSharp.Engine.Algorithms
             {
                 throw new InvalidOperationException("CPU标记数据未分配！");
             }
-            if (!renderable.VolumeData.TryBeginCpuToGpu())
+            if (!renderable.VolumeData.TryBeginMarkCpuToGpu())
             {
                 throw new InvalidOperationException($"标记数据正在同步中，当前状态: \"{renderable.VolumeData.MarkSyncStatus}\"");
             }
@@ -190,7 +190,7 @@ namespace MedicalSharp.Engine.Algorithms
             }
             finally
             {
-                renderable.VolumeData.EndSync();
+                renderable.VolumeData.EndMarkSync();
             }
         }
         #endregion

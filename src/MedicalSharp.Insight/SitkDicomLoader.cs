@@ -151,7 +151,7 @@ namespace MedicalSharp.Insight
 
             //获取体素原始数据
             volumeData.Metadata.VoxelsCount = (long)volumeData.Metadata.VolumeSize.X * volumeData.Metadata.VolumeSize.Y * volumeData.Metadata.VolumeSize.Z;
-            volumeData.SitkImage = normalizedImage;
+            volumeData.SitkOriginalImage = normalizedImage;
             if (volumeData.OriginalData == IntPtr.Zero)
             {
                 throw new InvalidCastException("Failed to get pixel buffer");
@@ -161,6 +161,9 @@ namespace MedicalSharp.Insight
             CalculateMinMaxHU(volumeData.OriginalData, volumeData.Metadata.VoxelsCount, out short minHU, out short maxHU);
             volumeData.Metadata.MinHU = minHU;
             volumeData.Metadata.MaxHU = maxHU;
+
+            //创建预览图像
+            volumeData.CreatePreview();
 
             //分配标记数据内存
             volumeData.AllocMarkData();

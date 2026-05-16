@@ -1,9 +1,9 @@
 ﻿namespace MedicalSharp.Primitives.Enums
 {
     /// <summary>
-    /// 标记同步状态
+    /// 数据同步状态
     /// </summary>
-    public enum MarkSyncStatus : byte
+    public enum DataSyncStatus : byte
     {
         /// <summary>
         /// 空闲，可安全访问
