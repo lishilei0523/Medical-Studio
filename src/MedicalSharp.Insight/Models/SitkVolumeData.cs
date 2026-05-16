@@ -163,6 +163,7 @@ namespace MedicalSharp.Insight.Models
             }
 
             this.SitkOriginalImage?.Dispose();
+            this.SitkPreviewImage?.Dispose();
             this.SitkMarkImage?.Dispose();
 
             base.Dispose();
