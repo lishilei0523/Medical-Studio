@@ -91,7 +91,7 @@
 					<DropDownButton Content="VR" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
 							<MenuFlyout>
-								<MenuItem Header="渲染模式">
+								<MenuItem Header="渲染模式(_M)">
 									<MenuItem >
 										<MenuItem.Header>
 											<RadioButton Content="Raycast" GroupName="RenderMode" IsChecked="{Binding RaycastChecked}" />
@@ -113,7 +113,7 @@
 										</MenuItem.Header>
 									</MenuItem>
 								</MenuItem>
-								<MenuItem Header="MPR平面">
+								<MenuItem Header="MPR平面(_P)">
 									<MenuItem >
 										<MenuItem.Header>
 											<CheckBox Content="横断面" IsChecked="{Binding AxialPlaneVisible}" />
@@ -129,9 +129,10 @@
 											<CheckBox Content="矢状面" IsChecked="{Binding SagittalPlaneVisible}" />
 										</MenuItem.Header>
 									</MenuItem>
-									<MenuItem Header="复位" Command="{Binding ResetMprPlanesCommand}" />
+									<MenuItem Header="复位(_R)" Command="{Binding ResetMprPlanesCommand}" />
 								</MenuItem>
-								<MenuItem Header="调节协议" Command="{Binding TuneProtocolCommand}" />
+								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />
+								<MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
 							</MenuFlyout>
 						</DropDownButton.Flyout>
 					</DropDownButton>

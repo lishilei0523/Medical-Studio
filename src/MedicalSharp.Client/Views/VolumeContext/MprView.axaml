@@ -70,7 +70,7 @@
 					<DropDownButton Content="{Binding Title}" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
 							<MenuFlyout>
-								<MenuItem Header="渲染模式">
+								<MenuItem Header="渲染模式(_M)">
                                     <MenuItem >
                                         <MenuItem.Header>
                                             <RadioButton Content="灰度" GroupName="RenderMode" IsChecked="{Binding GrayModeChecked}" />
@@ -82,15 +82,16 @@
                                         </MenuItem.Header>
                                     </MenuItem>
 								</MenuItem>
-								<MenuItem Header="十字线" >
+								<MenuItem Header="十字线(_C)" >
                                     <MenuItem >
                                         <MenuItem.Header>
                                             <CheckBox Content="显示" IsChecked="{Binding CrosshairVisible}" />
                                         </MenuItem.Header>
                                     </MenuItem>
-									<MenuItem Header="复位" Command="{Binding ResetCrosshairCommand}" />
+									<MenuItem Header="复位(_R)" Command="{Binding ResetCrosshairCommand}" />
 								</MenuItem>
-								<MenuItem Header="调节协议" Command="{Binding TuneProtocolCommand}" />
+								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />
+                                <MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
 							</MenuFlyout>
 						</DropDownButton.Flyout>
 					</DropDownButton>

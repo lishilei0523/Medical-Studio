@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Client.ViewModels.ProtocolContext;
@@ -23,11 +24,14 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
+using SD.Infrastructure.Avalonia.Caliburn.Extensions;
 using SD.Infrastructure.Avalonia.Commands;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
+using SkiaSharp;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -403,6 +407,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand ResetMprPlanesCommand => new RelayCommand(_ =>
         {
+            #region # 验证
+
+            if (this.VolumeData == null)
+            {
+                return;
+            }
+
+            #endregion
+
             this.AxialPlane.Transform.SetMatrix(Matrix4.Identity);
             this.CoronalPlane.Transform.SetMatrix(Matrix4.Identity);
             this.SagittalPlane.Transform.SetMatrix(Matrix4.Identity);
@@ -433,14 +446,61 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand TuneProtocolCommand => new AsyncRelayCommand(async _ =>
         {
+            #region # 验证
+
             if (this.VolumeData == null)
             {
                 return;
             }
 
+            #endregion
+
             VolumeProtocolViewModel viewModel = ResolveMediator.Resolve<VolumeProtocolViewModel>();
             viewModel.VolumeViewModel = this;
             await this._windowManager.ShowWindowAsync(viewModel);
+        });
+        #endregion
+
+        #region 截屏命令 —— ICommand CaptureCommand
+        /// <summary>
+        /// 截屏命令
+        /// </summary>
+        public ICommand CaptureCommand => new AsyncRelayCommand(async _ =>
+        {
+            #region # 验证
+
+            if (this.VolumeData == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            using SKBitmap bitmap = this.VolumeViewport.Capture();
+
+            //保存文件对话框
+            FilePickerSaveOptions saveOptions = new FilePickerSaveOptions
+            {
+                Title = "保存截图",
+                DefaultExtension = "png",
+                SuggestedFileName = $"截图_{DateTime.Now:yyyy_MM_dd_HH_mm_ss}",
+                FileTypeChoices =
+                [
+                    new FilePickerFileType("PNG图片")
+                    {
+                        Patterns = ["*.png"]
+                    }
+                ]
+            };
+
+            //保存截图
+            IStorageFile storageFile = await this.SaveFilePickerAsync(saveOptions);
+            if (storageFile != null)
+            {
+                await using Stream stream = await storageFile.OpenWriteAsync();
+                bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
+                await MessageBox.Show($"已保存至\"{storageFile.TryGetLocalPath()}\"");
+            }
         });
         #endregion
 
