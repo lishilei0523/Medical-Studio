@@ -198,10 +198,33 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
+        #region 读取图像 —— void Read(IntPtr commandQueue, IntPtr data)
+        /// <summary>
+        /// 读取图像
+        /// </summary>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <param name="data">数据指针</param>
+        public unsafe void Read(IntPtr commandQueue, IntPtr data)
+        {
+            UIntPtr[] origin = [0, 0, 0];
+            UIntPtr[] region = [(UIntPtr)this.Width, (UIntPtr)this.Height, (UIntPtr)this.Depth];
+
+            void* pointer = data.ToPointer();
+            fixed (UIntPtr* originPtr = origin, regionPtr = region)
+            {
+                int errorCode = this._cl.EnqueueReadImage(commandQueue, this.Handle, true, originPtr, regionPtr, 0, 0, pointer, 0, null, null);
+                ClException.ThrowOnError(errorCode, "EnqueueReadImage");
+            }
+        }
+        #endregion
+
         #region 读取图像 —— void Read<T>(IntPtr commandQueue, Span<T> destination)
         /// <summary>
         /// 读取图像
         /// </summary>
+        /// <typeparam name="T">类型</typeparam>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <param name="destination">目标Span</param>
         public unsafe void Read<T>(IntPtr commandQueue, Span<T> destination) where T : unmanaged
         {
             UIntPtr[] origin = [0, 0, 0];
@@ -212,6 +235,26 @@ namespace MedicalSharp.Inspiration.Resources
             {
                 int errorCode = this._cl.EnqueueReadImage(commandQueue, this.Handle, true, originPtr, regionPtr, 0, 0, destinationPtr, 0, null, null);
                 ClException.ThrowOnError(errorCode, "EnqueueReadImage");
+            }
+        }
+        #endregion
+
+        #region 写入图像 —— void Write(IntPtr commandQueue, IntPtr data)
+        /// <summary>
+        /// 写入图像
+        /// </summary>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <param name="data">数据指针</param>
+        public unsafe void Write(IntPtr commandQueue, IntPtr data)
+        {
+            UIntPtr[] origin = [0, 0, 0];
+            UIntPtr[] region = [(UIntPtr)this.Width, (UIntPtr)this.Height, (UIntPtr)this.Depth];
+
+            void* pointer = data.ToPointer();
+            fixed (UIntPtr* originPtr = origin, regionPtr = region)
+            {
+                int errorCode = this._cl.EnqueueWriteImage(commandQueue, this.Handle, true, originPtr, regionPtr, 0, 0, pointer, 0, null, null);
+                ClException.ThrowOnError(errorCode, "EnqueueWriteImage");
             }
         }
         #endregion

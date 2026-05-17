@@ -100,7 +100,7 @@ namespace MedicalSharp.Inspiration.Algorithms
         public void ExecuteInPlace(ClImage3D image, int kernelSize = 3, float sigma = 1.0f)
         {
             //创建临时输出图像
-            using ClImage3D outputImage = ClImage3D.Create(this._clContext, image.Width, image.Height, image.Depth, MemFlags.WriteOnly, image.ChannelOrder, image.ChannelType);
+            using ClImage3D outputImage = ClImage3D.Create(this._clContext, image.Width, image.Height, image.Depth, MemFlags.ReadWrite, image.ChannelOrder, image.ChannelType);
 
             //执行算法
             this.Execute(image, outputImage, kernelSize, sigma);
@@ -123,7 +123,7 @@ namespace MedicalSharp.Inspiration.Algorithms
         public void ExecuteGLTexture(ClImage3D glTexture, int kernelSize = 3, float sigma = 1.0f)
         {
             //创建临时输出图像
-            using ClImage3D outputImage = ClImage3D.Create(this._clContext, glTexture.Width, glTexture.Height, glTexture.Depth, MemFlags.WriteOnly, glTexture.ChannelOrder, glTexture.ChannelType);
+            using ClImage3D outputImage = ClImage3D.Create(this._clContext, glTexture.Width, glTexture.Height, glTexture.Depth, MemFlags.ReadWrite, glTexture.ChannelOrder, glTexture.ChannelType);
 
             //从GL接管纹理
             glTexture.AcquireForCL(this._clContext.CommandQueue);
