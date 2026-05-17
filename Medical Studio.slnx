@@ -6,6 +6,7 @@
   <Folder Name="/00 - Global/">
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
+    <File Path="README.MD" />
   </Folder>
   <Folder Name="/01 - Clients/">
     <Project Path="src/MedicalSharp.Client/MedicalSharp.Client.csproj" />
