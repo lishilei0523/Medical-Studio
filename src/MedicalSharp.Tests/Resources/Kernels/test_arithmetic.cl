@@ -7,11 +7,11 @@
 /// <param name="count">向量数量</param>
 __kernel void vector_add(__global const float4* vectorA, __global const float4* vectorB, __global float4* result, const int count)
 {
-	int gid = get_global_id(0);
-	if (gid >= count)
+	int index = get_global_id(0);
+	if (index >= count)
 	{
 		return;
 	}
 
-	result[gid] = vectorA[gid] + vectorB[gid];
+	result[index] = vectorA[index] + vectorB[index];
 }

@@ -1,4 +1,4 @@
-﻿__kernel void test_read_write(read_write image3d_t image)
+﻿__kernel void test_read_write(__read_write image3d_t image)
 {
     int x = get_global_id(0);
     int y = get_global_id(1);

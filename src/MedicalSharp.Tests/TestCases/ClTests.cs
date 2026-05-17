@@ -17,22 +17,22 @@ namespace MedicalSharp.Tests.TestCases
     [TestClass]
     public class ClTests
     {
-        #region # 测试向量加法 —— void TestVectorAdd()
+        #region # 测试算术 —— void TestArithmetic()
         /// <summary>
-        /// 测试向量加法
+        /// 测试算术
         /// </summary>
         [TestMethod]
-        public void TestVectorAdd()
+        public void TestArithmetic()
         {
             //内核文件
-            const string sourcePath = "Kernels/text_vector_add.cl";
+            const string sourcePath = "Resources/Kernels/test_arithmetic.cl";
 
-            //准备数据：1000个四位向量
-            const int vectorsCount = 1000;
-            Vector4[] vectorA = new Vector4[vectorsCount];
-            Vector4[] vectorB = new Vector4[vectorsCount];
-            Vector4[] cpuResult = new Vector4[vectorsCount];
-            for (int index = 0; index < vectorsCount; index++)
+            //准备数据：1000个四维向量
+            const int count = 1000;
+            Vector4[] vectorA = new Vector4[count];
+            Vector4[] vectorB = new Vector4[count];
+            Vector4[] cpuResult = new Vector4[count];
+            for (int index = 0; index < count; index++)
             {
                 vectorA[index] = new Vector4(index, index + 2, index + 3, index + 4);
                 vectorB[index] = new Vector4(index, index * 2, index * 3, index * 4);
@@ -44,34 +44,25 @@ namespace MedicalSharp.Tests.TestCases
             Trace.WriteLine($"设备: {context.DeviceName}");
             Trace.WriteLine($"显存: {context.GlobalMemorySize} MB");
 
-            //编译内核
+            //创建GPU缓冲区
+            using ClBuffer bufferA = ClBuffer.Create(context, MemFlags.ReadOnly, vectorA);
+            using ClBuffer bufferB = ClBuffer.Create(context, MemFlags.ReadOnly, vectorB);
+            using ClBuffer bufferResult = ClBuffer.CreateEmpty<Vector4>(context, MemFlags.WriteOnly, count);
+
+            //编译内核、执行
             using ClProgram program = ClProgram.FromFile(context, sourcePath);
             using ClKernel kernel = program.CreateKernel("vector_add");
-
-            //创建GPU缓冲区
-            using ClBuffer bufferA = ClBuffer.Create(context, MemFlags.ReadOnly, vectorA.AsSpan());
-            using ClBuffer bufferB = ClBuffer.Create(context, MemFlags.ReadOnly, vectorB.AsSpan());
-            using ClBuffer bufferResult = ClBuffer.CreateEmpty<Vector4>(context, MemFlags.WriteOnly, vectorsCount);
-
-            //设置参数
             kernel.SetBufferKernelArg(0, bufferA);
             kernel.SetBufferKernelArg(1, bufferB);
             kernel.SetBufferKernelArg(2, bufferResult);
-            kernel.SetKernelArg(3, vectorsCount);
-
-            //执行
-            kernel.Enqueue1D(context.CommandQueue, vectorsCount);
-
-            //等待完成
+            kernel.SetKernelArg(3, count);
+            kernel.Enqueue1D(context.CommandQueue, count);
             context.Finish();
 
-            //读回结果
-            Vector4[] gpuResult = bufferResult.Read<Vector4>(context.CommandQueue, vectorsCount);
-
-            //验证
-            Assert.AreEqual(vectorsCount, gpuResult.Length, "结果数组长度不匹配！");
-
-            for (int index = 0; index < vectorsCount; index++)
+            //读回结果验证
+            Vector4[] gpuResult = bufferResult.Read<Vector4>(context.CommandQueue, count);
+            Assert.AreEqual(count, gpuResult.Length, "结果数组长度不匹配！");
+            for (int index = 0; index < count; index++)
             {
                 Assert.AreEqual(cpuResult[index], gpuResult[index], $"索引 {index} 处不匹配");
             }
@@ -92,7 +83,7 @@ namespace MedicalSharp.Tests.TestCases
         [TestMethod]
         public void TestReadWriteImage1D()
         {
-            const string sourcePath = "Kernels/test_rw_img_1D.cl";
+            const string sourcePath = "Resources/Kernels/test_rw_img_1D.cl";
             const int size = 256;
             const ChannelOrder channelOrder = ChannelOrder.Intensity;
             const ChannelType channelType = ChannelType.SNormInt16;
@@ -172,7 +163,7 @@ namespace MedicalSharp.Tests.TestCases
         [TestMethod]
         public void TestReadWriteImage2D()
         {
-            const string sourcePath = "Kernels/test_rw_img_2D.cl";
+            const string sourcePath = "Resources/Kernels/test_rw_img_2D.cl";
             const int size = 64;
             const ChannelOrder channelOrder = ChannelOrder.Rgba;
             const ChannelType channelType = ChannelType.UnormInt8;
@@ -224,7 +215,7 @@ namespace MedicalSharp.Tests.TestCases
         [TestMethod]
         public void TestReadWriteImage3D1()
         {
-            const string sourcePath = "Kernels/test_rw_img_3D_1.cl";
+            const string sourcePath = "Resources/Kernels/test_rw_img_3D_1.cl";
             const int size = 16;
             const ChannelOrder channelOrder = ChannelOrder.Intensity;
             const ChannelType channelType = ChannelType.SNormInt16;
@@ -278,7 +269,7 @@ namespace MedicalSharp.Tests.TestCases
         [TestMethod]
         public void TestReadWriteImage3D2()
         {
-            const string sourcePath = "Kernels/test_rw_img_3D_2.cl";
+            const string sourcePath = "Resources/Kernels/test_rw_img_3D_2.cl";
             const int size = 16;
             const ChannelOrder channelOrder = ChannelOrder.Intensity;
             const ChannelType channelType = ChannelType.SNormInt16;
@@ -390,7 +381,7 @@ namespace MedicalSharp.Tests.TestCases
         [TestMethod]
         public void TestStructBuffer()
         {
-            const string sourcePath = "Kernels/test_struct_buffer.cl";
+            const string sourcePath = "Resources/Kernels/test_struct_buffer.cl";
             const int count = 1024;
 
             //创建上下文
@@ -448,6 +439,129 @@ namespace MedicalSharp.Tests.TestCases
                 builder.AppendLine($"[{index}] Visited: {input[index].Visited} → {output[index].Visited}");
                 Trace.WriteLine(builder);
             }
+        }
+        #endregion
+
+        #region # 测试内存缓冲区与图像交换 —— void TestBufferImageExchange()
+        /// <summary>
+        /// 测试内存缓冲区与图像交换
+        /// </summary>
+        [TestMethod]
+        public void TestBufferImageExchange()
+        {
+            const int size = 64;
+            const ChannelOrder channelOrder = ChannelOrder.Intensity;
+            const ChannelType channelType = ChannelType.SNormInt16;
+
+            //创建上下文
+            using ClContext context = ClContext.Create();
+            Trace.WriteLine($"设备: {context.DeviceName}");
+
+            //准备数据：0~4095的斜坡值
+            int count = size * size * size;
+            short[] cpuArray = new short[count];
+            for (int index = 0; index < count; index++)
+            {
+                cpuArray[index] = (short)(index % 4096); //0~4095
+            }
+
+            //创建内存缓冲区
+            using ClBuffer clBuffer = ClBuffer.Create(context, MemFlags.ReadWrite, cpuArray);
+
+            //验证读取内存缓冲区
+            short[] fillBufferArray = clBuffer.Read<short>(context.CommandQueue, count);
+            for (int index = 0; index < count; index++)
+            {
+                Assert.AreEqual(cpuArray[index], fillBufferArray[index]);
+            }
+
+            //创建图像，从内存缓冲区复制
+            using ClImage3D image = ClImage3D.Create(context, size, size, size, MemFlags.ReadWrite, channelOrder, channelType);
+            image.CopyFromBuffer(context.CommandQueue, clBuffer);
+            context.Finish();
+
+            //验证读取图像
+            short[] imageArray = image.Read<short>(context.CommandQueue);
+            for (int index = 0; index < count; index++)
+            {
+                Assert.AreEqual(cpuArray[index], imageArray[index]);
+            }
+
+            //创建内存缓冲区，复制图像到内存缓冲区
+            using ClBuffer resultBuffer = ClBuffer.CreateEmpty<short>(context, MemFlags.ReadWrite, count);
+            image.CopyToBuffer(context.CommandQueue, resultBuffer);
+            context.Finish();
+
+            //验证读取内存缓冲区
+            short[] resultBufferArray = resultBuffer.Read<short>(context.CommandQueue, count);
+            for (int index = 0; index < count; index++)
+            {
+                Assert.AreEqual(cpuArray[index], resultBufferArray[index]);
+            }
+        }
+        #endregion
+
+        #region # 测试统计 —— void TestStatistic()
+        /// <summary>
+        /// 测试统计
+        /// </summary>
+        [TestMethod]
+        public void TestStatistic()
+        {
+            const string sourcePath = "Resources/Kernels/test_statistic.cl";
+
+            //创建上下文
+            using ClContext context = ClContext.Create();
+            Trace.WriteLine($"设备: {context.DeviceName}");
+
+            //准备数据
+            const int count = 1000;
+            float[] array = new float[count];
+            Random random = new Random(42);
+            for (int index = 0; index < count; index++)
+            {
+                array[index] = (float)(random.NextDouble() * 1000.0 - 500.0);
+            }
+            float cpuMin = array.Min();
+            float cpuMax = array.Max();
+            float cpuSum = array.Sum();
+
+            //创建缓冲区
+            using ClBuffer inputBuffer = ClBuffer.Create(context, MemFlags.ReadOnly, array);
+            using ClBuffer resultBuffer = ClBuffer.CreateEmpty<Statistic>(context, MemFlags.ReadWrite, 1);
+
+            //初始化统计结果：min=最大浮点，max=最小浮点，sum=0
+            Statistic result = new Statistic
+            {
+                Min = float.MaxValue,
+                Max = float.MinValue,
+                Sum = 0
+            };
+            resultBuffer.Write(context.CommandQueue, [result]);
+
+            //验证初始值
+            Statistic[] initValue = resultBuffer.Read<Statistic>(context.CommandQueue, 1);
+            Assert.AreEqual(initValue[0].Min, float.MaxValue, float.Epsilon);
+            Assert.AreEqual(initValue[0].Max, float.MinValue, float.Epsilon);
+            Assert.AreEqual(initValue[0].Sum, 0, float.Epsilon);
+
+            //编译执行
+            using ClProgram program = ClProgram.FromFile(context, sourcePath);
+            using ClKernel kernel = program.CreateKernel("analyse");
+            kernel.SetBufferKernelArg(0, inputBuffer);
+            kernel.SetBufferKernelArg(1, resultBuffer);
+            kernel.SetKernelArg(2, count);
+            kernel.Enqueue1D(context.CommandQueue, (uint)count, 256);
+            context.Finish();
+
+            //验证计算结果
+            result = resultBuffer.Read<Statistic>(context.CommandQueue, 1)[0];
+            Assert.AreEqual(cpuMin, result.Min, 0.01f, "最小值不匹配");
+            Assert.AreEqual(cpuMax, result.Max, 0.01f, "最大值不匹配");
+            Assert.AreEqual(cpuSum, result.Sum, 0.1f, "求和不匹配");
+
+            Trace.WriteLine("统计全部正确");
+            Trace.WriteLine($"Min: {result.Min}, Max: {result.Max}, Sum: {result.Sum}");
         }
         #endregion
     }

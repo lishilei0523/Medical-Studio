@@ -1,4 +1,4 @@
-﻿__kernel void test_rgba8(read_write image2d_t image)
+﻿__kernel void test_rgba8(__read_write image2d_t image)
 {
     int x = get_global_id(0);
     int y = get_global_id(1);

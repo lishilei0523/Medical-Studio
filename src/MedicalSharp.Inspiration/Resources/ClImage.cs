@@ -273,6 +273,44 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
+        #region 复制图像到内存缓冲区 —— void CopyToBuffer(IntPtr commandQueue, ClBuffer clBuffer)
+        /// <summary>
+        /// 复制图像到内存缓冲区
+        /// </summary>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <param name="clBuffer">内存缓冲区</param>
+        /// <remarks>底层调用clEnqueueCopyImageToBuffer</remarks>
+        public unsafe void CopyToBuffer(IntPtr commandQueue, ClBuffer clBuffer)
+        {
+            UIntPtr[] origin = [0, 0, 0];
+            UIntPtr[] region = [(UIntPtr)this.Width, (UIntPtr)this.Height, (UIntPtr)this.Depth];
+            fixed (UIntPtr* originPtr = origin, regionPtr = region)
+            {
+                int errorCode = this._cl.EnqueueCopyImageToBuffer(commandQueue, this.Handle, clBuffer.Handle, originPtr, regionPtr, 0, 0, null, null);
+                ClException.ThrowOnError(errorCode, "EnqueueCopyImageToBuffer");
+            }
+        }
+        #endregion
+
+        #region 从内存缓冲区复制图像 —— void CopyFromBuffer(IntPtr commandQueue, ClBuffer clBuffer)
+        /// <summary>
+        /// 从内存缓冲区复制图像
+        /// </summary>
+        /// <param name="commandQueue">命令队列句柄</param>
+        /// <param name="clBuffer">内存缓冲区</param>
+        /// <remarks>底层调用clEnqueueCopyBufferToImage</remarks>
+        public unsafe void CopyFromBuffer(IntPtr commandQueue, ClBuffer clBuffer)
+        {
+            UIntPtr[] origin = [0, 0, 0];
+            UIntPtr[] region = [(UIntPtr)this.Width, (UIntPtr)this.Height, (UIntPtr)this.Depth];
+            fixed (UIntPtr* originPtr = origin, regionPtr = region)
+            {
+                int errorCode = this._cl.EnqueueCopyBufferToImage(commandQueue, clBuffer.Handle, this.Handle, 0, originPtr, regionPtr, 0, null, null);
+                ClException.ThrowOnError(errorCode, "EnqueueCopyBufferToImage");
+            }
+        }
+        #endregion
+
         #region 接管OpenGL图像所有权 —— void AcquireForCL(IntPtr commandQueue)
         /// <summary>
         /// 接管OpenGL图像所有权

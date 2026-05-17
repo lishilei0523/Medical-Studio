@@ -1,4 +1,4 @@
-﻿__kernel void halve_1d(read_write image1d_t image)
+﻿__kernel void halve_1d(__read_write image1d_t image)
 {
     int x = get_global_id(0);
     int width = get_image_width(image);
