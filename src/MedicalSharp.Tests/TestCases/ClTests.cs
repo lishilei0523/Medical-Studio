@@ -1,3 +1,4 @@
+using MedicalSharp.Inspiration.Algorithms;
 using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Tests.Models;
@@ -562,6 +563,48 @@ namespace MedicalSharp.Tests.TestCases
 
             Trace.WriteLine("统计全部正确");
             Trace.WriteLine($"Min: {result.Min}, Max: {result.Max}, Sum: {result.Sum}");
+        }
+        #endregion
+
+        #region # 测试3D高斯滤波算法 —— void TestGaussianBlur3D()
+        /// <summary>
+        /// 测试3D高斯滤波算法
+        /// </summary>
+        [TestMethod]
+        public void TestGaussianBlur3D()
+        {
+            const int size = 32;
+
+            //实例化算法
+            using ClContext context = ClContext.Create();
+            using GaussianBlur3D blur = new GaussianBlur3D(context);
+
+            //定义输入、输出图像
+            using ClImage3D inputImage = ClImage3D.Create(context, size, size, size, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
+            using ClImage3D outputImage = ClImage3D.Create(context, size, size, size, MemFlags.WriteOnly, ChannelOrder.Intensity, ChannelType.SNormInt16);
+
+            //填充数据，中心一个亮点
+            inputImage.Fill(context.CommandQueue, 0.0f);
+            const int center = size / 2;
+            short[] spot = new short[size * size * size];
+            spot[center * size * size + center * size + center] = 32767;
+            inputImage.Write(context.CommandQueue, spot);
+            context.Finish();
+
+            //执行算法
+            blur.Execute(inputImage, outputImage);
+            context.Finish();
+
+            //读取结果
+            short[] result = outputImage.Read<short>(context.CommandQueue);
+
+            //验证：中心点值应该变小，被模糊
+            short centerValue = result[center * size * size + center * size + center];
+            Assert.IsTrue(centerValue < 32000);
+
+            //验证：相邻点应该有扩散值
+            short nearValue = result[center * size * size + center * size + center - 1];
+            Assert.IsTrue(nearValue > 0);
         }
         #endregion
     }

@@ -162,7 +162,7 @@ namespace MedicalSharp.Inspiration.Resources
         /// <param name="localSizeX">局部工作组X尺寸</param>
         /// <param name="localSizeY">局部工作组Y尺寸</param>
         /// <param name="localSizeZ">局部工作组Z尺寸</param>
-        public unsafe void Enqueue3D(IntPtr commandQueue, uint globalSizeX, uint globalSizeY, uint globalSizeZ, uint localSizeX = 8, uint localSizeY = 8, uint localSizeZ = 8)
+        public unsafe void Enqueue3D(IntPtr commandQueue, uint globalSizeX, uint globalSizeY, uint globalSizeZ, uint localSizeX = 4, uint localSizeY = 4, uint localSizeZ = 4)
         {
             UIntPtr[] globalWorkSizes =
             [

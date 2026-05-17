@@ -1,93 +1,67 @@
-﻿// ============================================================
-// 3x3x3 高斯模糊核
-// 用于医学影像体积数据的平滑降噪
-// ============================================================
-
-// 3x3x3 高斯权重，σ ≈ 0.7，总和归一化到 1.0
-// 权重布局：z=-1 平面 → z=0 平面 → z=+1 平面
-// 每个平面内按 y=-1 → y=0 → y=+1 排列，每行内 x=-1 → x=0 → x=+1
-__constant float gaussian_weights[27] = {
-    // z = -1
-    1.0f / 64.0f, 2.0f / 64.0f, 1.0f / 64.0f,  // y = -1
-    2.0f / 64.0f, 4.0f / 64.0f, 2.0f / 64.0f,  // y =  0
-    1.0f / 64.0f, 2.0f / 64.0f, 1.0f / 64.0f,  // y = +1
-    // z = 0
-    2.0f / 64.0f, 4.0f / 64.0f, 2.0f / 64.0f,  // y = -1
-    4.0f / 64.0f, 8.0f / 64.0f, 4.0f / 64.0f,  // y =  0
-    2.0f / 64.0f, 4.0f / 64.0f, 2.0f / 64.0f,  // y = +1
-    // z = +1
-    1.0f / 64.0f, 2.0f / 64.0f, 1.0f / 64.0f,  // y = -1
-    2.0f / 64.0f, 4.0f / 64.0f, 2.0f / 64.0f,  // y =  0
-    1.0f / 64.0f, 2.0f / 64.0f, 1.0f / 64.0f   // y = +1
-};
-
-// -----------------------------------------------------------
-// 3D 高斯模糊内核
-// 对体积数据的每个体素执行 3×3×3 邻域加权平均
-// -----------------------------------------------------------
-// 参数：
-//   input  - 输入体积数据（一维数组，行主序：z * H * W + y * W + x）
-//   output - 输出体积数据
-//   width  - 体积宽度（X 方向体素数）
-//   height - 体积高度（Y 方向体素数）
-//   depth  - 体积深度（Z 方向体素数）
-// -----------------------------------------------------------
-// 边界处理：
-//   体素位于体积边缘（< 1 或 >= size-1）时直接复制原值，
-//   因为邻域不完整，无法应用完整的 3×3×3 核
-// -----------------------------------------------------------
-
-
-__kernel void gaussian_blur_3d(
-    __global const float* input,   // 只读输入
-    __global float* output,        // 输出（可写）
-    const int width,               // X 方向尺寸
-    const int height,              // Y 方向尺寸
-    const int depth)               // Z 方向尺寸
+﻿/// <summary>
+/// 高斯滤波
+/// </summary>
+/// <param name="input">输入图像</param>
+/// <param name="output">输出图像</param>
+/// <param name="kernelSize">核矩阵尺寸</param>
+/// <param name="sigma">标准差</param>
+__kernel void gaussian_blur_3d(__read_only image3d_t input, __write_only image3d_t output, const int kernelSize, const float sigma)
 {
-    // 获取当前工作项对应的体素坐标
-    int x = get_global_id(0);
-    int y = get_global_id(1);
-    int z = get_global_id(2);
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+	int z = get_global_id(2);
 
-    // 超出体积范围的工作项直接返回
-    if (x >= width || y >= height || z >= depth)
-        return;
+	int width = get_image_width(input);
+	int height = get_image_height(input);
+	int depth = get_image_depth(input);
+	if (x >= width || y >= height || z >= depth)
+	{
+		return;
+	}
 
-    // ---- 边界处理 ----
-    // 位于体积表面（0 或 size-1）的体素没有完整的 3×3×3 邻域，
-    // 直接复制原值避免越界访问
-    if (x < 1 || x >= width - 1 ||
-        y < 1 || y >= height - 1 ||
-        z < 1 || z >= depth - 1)
-    {
-        int idx = z * width * height + y * width + x;
-        output[idx] = input[idx];
-        return;
-    }
+	int4 position = (int4)(x, y, z, 0);
+	int radius = kernelSize / 2;
 
-    // ---- 3×3×3 邻域加权求和 ----
-    float sum = 0.0f;   // 加权累加器
-    int wIdx = 0;       // 权重数组索引
+	//边界：保留原值
+	if (x < radius || x >= width - radius ||
+		y < radius || y >= height - radius ||
+		z < radius || z >= depth - radius)
+	{
+		float4 value = read_imagef(input, position);
+		write_imagef(output, position, value);
 
-    // 遍历 3×3×3 = 27 个邻域体素
-    for (int dz = -1; dz <= 1; dz++)      // Z 方向偏移
-    {
-        for (int dy = -1; dy <= 1; dy++)  // Y 方向偏移
-        {
-            for (int dx = -1; dx <= 1; dx++)  // X 方向偏移
-            {
-                // 计算邻域体素在输入数组中的线性索引
-                int idx = (z + dz) * width * height + (y + dy) * width + (x + dx);
+		return;
+	}
 
-                // 累加：邻域值 × 对应权重
-                sum += input[idx] * gaussian_weights[wIdx];
-                wIdx++;
-            }
-        }
-    }
+	//动态计算权重
+	float sigma2 = 2.0f * sigma * sigma;
+	float weightSum = 0.0f;
+	for (int dz = -radius; dz <= radius; dz++)
+	{
+		for (int dy = -radius; dy <= radius; dy++)
+		{
+			for (int dx = -radius; dx <= radius; dx++)
+			{
+				float dist2 = (float)(dx * dx + dy * dy + dz * dz);
+				weightSum += exp(-dist2 / sigma2);
+			}
+		}
+	}
 
-    // 写入输出
-    int outIdx = z * width * height + y * width + x;
-    output[outIdx] = sum;
+	//卷积
+	float4 sum = (float4)(0.0f);
+	for (int dz = -radius; dz <= radius; dz++)
+	{
+		for (int dy = -radius; dy <= radius; dy++)
+		{
+			for (int dx = -radius; dx <= radius; dx++)
+			{
+				float dist2 = (float)(dx * dx + dy * dy + dz * dz);
+				float weight = exp(-dist2 / sigma2) / weightSum;
+				sum += read_imagef(input, (int4)(x + dx, y + dy, z + dz, 0)) * weight;
+			}
+		}
+	}
+
+	write_imagef(output, position, sum);
 }
