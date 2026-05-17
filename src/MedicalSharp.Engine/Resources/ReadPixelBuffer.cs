@@ -47,11 +47,31 @@ namespace MedicalSharp.Engine.Resources
         {
             get => BufferUsageHint.StreamRead;
         }
-        #endregion 
+        #endregion
 
         #endregion
 
         #region # 方法
+
+        #region 绑定像素缓冲区 —— override void Bind()
+        /// <summary>
+        /// 绑定像素缓冲区
+        /// </summary>
+        public override void Bind()
+        {
+            GL.BindBuffer(BufferTarget.PixelPackBuffer, this.Id);
+        }
+        #endregion
+
+        #region 解绑像素缓冲区 —— override void Unbind()
+        /// <summary>
+        /// 解绑像素缓冲区
+        /// </summary>
+        public override void Unbind()
+        {
+            GL.BindBuffer(BufferTarget.PixelPackBuffer, 0);
+        }
+        #endregion
 
         #region 获取CPU数据 —— byte[] GetCpuBufferInternal(long timeoutNanoseconds)
         /// <summary>

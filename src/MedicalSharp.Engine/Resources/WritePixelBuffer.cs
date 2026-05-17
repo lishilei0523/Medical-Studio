@@ -53,6 +53,26 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 方法
 
+        #region 绑定像素缓冲区 —— override void Bind()
+        /// <summary>
+        /// 绑定像素缓冲区
+        /// </summary>
+        public override void Bind()
+        {
+            GL.BindBuffer(BufferTarget.PixelUnpackBuffer, this.Id);
+        }
+        #endregion
+
+        #region 解绑像素缓冲区 —— override void Unbind()
+        /// <summary>
+        /// 解绑像素缓冲区
+        /// </summary>
+        public override void Unbind()
+        {
+            GL.BindBuffer(BufferTarget.PixelUnpackBuffer, 0);
+        }
+        #endregion
+
         #region 上传byte数组 —— virtual void UploadData(byte[] data)
         /// <summary>
         /// 上传byte数组

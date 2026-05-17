@@ -136,24 +136,18 @@ namespace MedicalSharp.Engine.Resources
 
         //Public
 
-        #region 绑定像素缓冲区 —— void Bind()
+        #region 绑定像素缓冲区 —— abstract void Bind()
         /// <summary>
         /// 绑定像素缓冲区
         /// </summary>
-        public void Bind()
-        {
-            GL.BindBuffer(BufferTarget.PixelPackBuffer, this.Id);
-        }
+        public abstract void Bind();
         #endregion
 
-        #region 解绑像素缓冲区 —— void Unbind()
+        #region 解绑像素缓冲区 —— abstract void Unbind()
         /// <summary>
         /// 解绑像素缓冲区
         /// </summary>
-        public void Unbind()
-        {
-            GL.BindBuffer(BufferTarget.PixelPackBuffer, 0);
-        }
+        public abstract void Unbind();
         #endregion
 
         #region 释放资源 —— virtual void Dispose()
