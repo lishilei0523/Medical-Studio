@@ -6,6 +6,7 @@ using FluentAvalonia.UI.Controls;
 using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Inspiration.Algorithms;
@@ -27,6 +28,7 @@ using SD.Infrastructure.Avalonia.Commands;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
+using Silk.NET.OpenCL;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -364,7 +366,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 高斯滤波命令
         /// </summary>
-        public ICommand GaussianBlurCommand => new RelayCommand(_ =>
+        public ICommand GaussianBlurCommand => new AsyncRelayCommand(async _ =>
         {
             #region # 验证
 
@@ -375,16 +377,38 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             #endregion
 
-            VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+            VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
             ClContext clContext = ClContextManager.Current;
 
-            ClImage3D image = ClImage3D.FromTexture3D(clContext, session.PreviewTexture.Id, session.PreviewTexture.Width, session.PreviewTexture.Height, session.PreviewTexture.Depth);
-            using GaussianBlur3D gaussianBlur = new GaussianBlur3D(clContext);
-            gaussianBlur.ExecuteGLTexture(image);
+            //TODO 参数化
+
+            this.Busy();
+            await Task.Run(() =>
+            {
+                //创建并写入图像
+                int width = this.VolumeData.Metadata.VolumeSize.X;
+                int height = this.VolumeData.Metadata.VolumeSize.Y;
+                int depth = this.VolumeData.Metadata.VolumeSize.Z;
+                using ClImage3D image = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
+                image.Write(clContext.CommandQueue, this.VolumeData.OriginalData);
+                clContext.Finish();
+
+                //执行算法
+                using GaussianBlur3D gaussianBlur = new GaussianBlur3D(clContext);
+                gaussianBlur.ExecuteInPlace(image);
+
+                //读回CPU
+                image.Read(clContext.CommandQueue, this.VolumeData.PreviewData);
+            });
+
+            //同步到预览纹理
+            SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, volumeSession.PreviewTexture);
 
             //发布消息
             SyncViewportEvent message = new SyncViewportEvent();
-            this._eventAggregator.PublishOnUIThreadAsync(message);
+            await this._eventAggregator.PublishOnUIThreadAsync(message);
+
+            this.Idle();
         });
         #endregion
 
