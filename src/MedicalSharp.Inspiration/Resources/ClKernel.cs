@@ -65,7 +65,7 @@ namespace MedicalSharp.Inspiration.Resources
 
         #region # 方法
 
-        #region 设置内核参数 —— unsafe void SetKernelArg<T>(int index, T value)
+        #region 设置内核参数 —— void SetKernelArg<T>(int index, T value)
         /// <summary>
         /// 设置内核参数
         /// </summary>
@@ -110,7 +110,7 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 执行1D工作项内核 —— unsafe void Enqueue1D(IntPtr commandQueue, uint globalSize...
+        #region 执行1D工作项内核 —— void Enqueue1D(IntPtr commandQueue, uint globalSize...
         /// <summary>
         /// 执行1D工作项内核
         /// </summary>
@@ -126,7 +126,7 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 执行2D工作项内核 —— unsafe void Enqueue2D(IntPtr commandQueue, uint globalSizeX...
+        #region 执行2D工作项内核 —— void Enqueue2D(IntPtr commandQueue, uint globalSizeX...
         /// <summary>
         /// 执行2D工作项内核
         /// </summary>
@@ -151,7 +151,7 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 执行3D工作项内核 —— unsafe void Enqueue3D(IntPtr commandQueue, uint globalSizeX...
+        #region 执行3D工作项内核 —— void Enqueue3D(IntPtr commandQueue, uint globalSizeX...
         /// <summary>
         /// 执行3D工作项内核
         /// </summary>

@@ -104,7 +104,7 @@ namespace MedicalSharp.Inspiration.Resources
 
         //Public
 
-        #region 创建默认OpenCL上下文 —— static unsafe ClContext Create()
+        #region 创建默认OpenCL上下文 —— static ClContext Create()
         /// <summary>
         /// 创建默认OpenCL上下文
         /// </summary>
@@ -161,7 +161,7 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 创建OpenGL共享OpenCL上下文 —— static unsafe ClContext CreateWithGL(...
+        #region 创建OpenGL共享OpenCL上下文 —— static ClContext CreateWithGL(...
         /// <summary>
         /// 创建OpenGL共享OpenCL上下文
         /// </summary>
@@ -359,7 +359,7 @@ namespace MedicalSharp.Inspiration.Resources
 
         //Private
 
-        #region 从上下文获取第一个设备 —— static unsafe IntPtr GetFirstDevice(CL cl, IntPtr context)
+        #region 从上下文获取第一个设备 —— static IntPtr GetFirstDevice(CL cl, IntPtr context)
         /// <summary>
         /// 从上下文获取第一个设备
         /// </summary>
@@ -387,7 +387,7 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 获取设备字符串信息 —— static unsafe string GetDeviceInfoString(CL cl, IntPtr device...
+        #region 获取设备字符串信息 —— static string GetDeviceInfoString(CL cl, IntPtr device...
         /// <summary>
         /// 获取设备字符串信息
         /// </summary>
@@ -409,7 +409,7 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 获取设备64位无符号整型信息 —— static unsafe ulong GetDeviceInfoUlong(CL cl, IntPtr device...
+        #region 获取设备64位无符号整型信息 —— static ulong GetDeviceInfoUlong(CL cl, IntPtr device...
         /// <summary>
         /// 获取设备64位无符号整型信息
         /// </summary>

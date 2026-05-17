@@ -88,7 +88,7 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 从文本创建OpenCL程序 —— static unsafe ClProgram FromSource(ClContext clContext...
+        #region 从文本创建OpenCL程序 —— static ClProgram FromSource(ClContext clContext...
         /// <summary>
         /// 从文本创建OpenCL程序
         /// </summary>
@@ -165,7 +165,7 @@ namespace MedicalSharp.Inspiration.Resources
         }
         #endregion
 
-        #region 获取编译错误日志 —— static unsafe string GetBuildLog(CL cl...
+        #region 获取编译错误日志 —— static string GetBuildLog(CL cl...
         /// <summary>
         /// 获取编译错误日志
         /// </summary>

@@ -48,7 +48,7 @@ namespace MedicalSharp.Inspiration.Resources
 
         #region # 方法
 
-        #region 创建OpenCL-2D图像 —— static unsafe ClImage2D Create(ClContext clContext, int width...
+        #region 创建OpenCL-2D图像 —— static ClImage2D Create(ClContext clContext, int width...
         /// <summary>
         /// 创建OpenCL-2D图像
         /// </summary>
