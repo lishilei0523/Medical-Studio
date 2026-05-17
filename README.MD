@@ -24,22 +24,22 @@
 
 #### 核心优势：
 
-    ✅ 全栈GPU加速：渲染、切割、统计、预处理全流程GPU并行
+    ✅ 全栈GPU加速：渲染、切割、统计、预处理全流程GPU并行；
 
-    ✅ 标记场系统：256级标签管理，支持 Visible/Collapsed/Tinted 三种模式
+    ✅ 标记场系统：256级标签管理，支持 Visible/Collapsed/Tinted 三种模式；
 
-    ✅ 双缓冲架构：SourceTexture + PreviewTexture 实现非破坏性编辑
+    ✅ 双缓冲架构：SourceTexture + PreviewTexture 实现非破坏性编辑；
 
-    ✅ 三通道计算引擎：CPU (SimpleITK) + GPU (Compute Shader/OpenCL) + AI (ONNX)
+    ✅ 三通道计算引擎：CPU (SimpleITK) + GPU (Compute Shader/OpenCL) + AI (ONNX)；
 
-    ✅ 跨平台支持：Windows/Linux 双平台发布
+    ✅ 跨平台支持：Windows/Linux 双平台发布；
 
-    ✅ 模块化设计：9个项目分层清晰，职责单一
+    ✅ 模块化设计：9个项目分层清晰，职责单一；
 
 #### 主要涉及技术：
     UI部分：OpenGL、Avalonia、Caliburn.Micro、FluentAvaloniaUI等；
 
-    算法部分：Compute Shader、OpenCL、OpenTK.Mathematics、MIConvexHull、SimpleITK、OnnxRuntime；
+    算法部分：Compute Shader、OpenCL、OpenTK.Mathematics、MIConvexHull、SimpleITK、OnnxRuntime等；
 
 #### 目标功能模块：
     基础图像浏览：
