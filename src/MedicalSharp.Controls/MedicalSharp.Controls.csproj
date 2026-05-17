@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MedicalSharp.Engine\MedicalSharp.Engine.csproj" />
+    <ProjectReference Include="..\MedicalSharp.Inspiration\MedicalSharp.Inspiration.csproj" />
     <ProjectReference Include="..\MedicalSharp.Primitives\MedicalSharp.Primitives.csproj" />
   </ItemGroup>
 </Project>

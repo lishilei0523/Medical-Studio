@@ -13,6 +13,11 @@ namespace MedicalSharp.Inspiration.Resources
         #region # 字段及构造器
 
         /// <summary>
+        /// OpenGL 3D纹理常量
+        /// </summary>
+        private const uint GL_TEXTURE_3D = 0x806F;
+
+        /// <summary>
         /// 创建OpenCL-3D图像构造器
         /// </summary>
         /// <param name="cl">OpenCL实例</param>
@@ -103,7 +108,7 @@ namespace MedicalSharp.Inspiration.Resources
             CL cl = CL.GetApi();
             KhrGlSharing glSharing = new KhrGlSharing(cl.Context);
 
-            IntPtr handle = glSharing.CreateFromGltexture(clContext.Handle, memoryFlags, (uint)GlObjectType.Texture3D, 0, (uint)glTextureId, out int errorCode);
+            IntPtr handle = glSharing.CreateFromGltexture3D(clContext.Handle, memoryFlags, GL_TEXTURE_3D, 0, (uint)glTextureId, out int errorCode);
             ClException.ThrowOnError(errorCode, "CreateFromGLTexture3D");
 
             ClImage3D image = new ClImage3D(cl, glSharing, handle, width, height, depth, memoryFlags, 0, 0, true);

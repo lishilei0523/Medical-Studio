@@ -8,6 +8,9 @@ using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Inspiration.Algorithms;
+using MedicalSharp.Inspiration.Managers;
+using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
@@ -355,6 +358,34 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             }
 
         }, _ => this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
+        #endregion
+
+        #region 高斯滤波命令 —— ICommand GaussianBlurCommand
+        /// <summary>
+        /// 高斯滤波命令
+        /// </summary>
+        public ICommand GaussianBlurCommand => new RelayCommand(_ =>
+        {
+            #region # 验证
+
+            if (this.VolumeData == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+            ClContext clContext = ClContextManager.Current;
+
+            ClImage3D image = ClImage3D.FromTexture3D(clContext, session.PreviewTexture.Id, session.PreviewTexture.Width, session.PreviewTexture.Height, session.PreviewTexture.Depth);
+            using GaussianBlur3D gaussianBlur = new GaussianBlur3D(clContext);
+            gaussianBlur.ExecuteGLTexture(image);
+
+            //发布消息
+            SyncViewportEvent message = new SyncViewportEvent();
+            this._eventAggregator.PublishOnUIThreadAsync(message);
+        });
         #endregion
 
         #endregion

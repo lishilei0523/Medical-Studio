@@ -49,7 +49,7 @@
 							<MenuItem Header="占位(_T)" />
 						</MenuItem>
 						<MenuItem Header="滤波(_B)">
-							<MenuItem Header="占位(_T)" />
+							<MenuItem Header="高斯滤波(_G)" Command="{Binding GaussianBlurCommand}" />
 						</MenuItem>
 						<MenuItem Header="分割(_S)">
 							<MenuItem Header="占位(_T)" />
