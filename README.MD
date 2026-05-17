@@ -5,7 +5,7 @@
 
 > 医学影像算法的可视化操作，包含常用预处理、分割、提取、配准等常用算法；
 
-> HelixToolkit式引擎控件；
+> Helix-Toolkit式Avalonia医学影像渲染引擎控件；
 
 > CPU/GPU双通道算法处理与数据同步；
 
