@@ -310,11 +310,7 @@ namespace MedicalSharp.Primitives.Maths
         public void Relocate(Vector3 worldCenter, MPRPlaneChangeSource triggerSource = MPRPlaneChangeSource.CrosshairDrag)
         {
             //将世界坐标转换到逻辑空间
-            Vector3 localCenter = new Vector3(
-                worldCenter.X / this.VolumeMetadata.VolumeScale.X,
-                worldCenter.Y / this.VolumeMetadata.VolumeScale.Y,
-                worldCenter.Z / this.VolumeMetadata.VolumeScale.Z
-            );
+            Vector3 localCenter = worldCenter / this.VolumeMetadata.VolumeScale;
 
             //计算切片索引
             float sliceOffset = Vector3.Dot(localCenter, this.Normal);
@@ -397,6 +393,9 @@ namespace MedicalSharp.Primitives.Maths
             this.UAxis = Vector3.Transform(this.UAxis, rotation).Normalized();
             this.VAxis = Vector3.Transform(this.VAxis, rotation).Normalized();
             this.Normal = Vector3.Transform(this.Normal, rotation).Normalized();
+
+            //重新正交化
+            this.Orthonormalize();
 
             //更新类型
             this.PlaneType = MPRPlaneType.Oblique;
@@ -484,11 +483,7 @@ namespace MedicalSharp.Primitives.Maths
             if (ray.IntersectsPlane(this.WorldCenter, this.WorldNormal, out Vector3 hitPoint, out _))
             {
                 //转换到逻辑空间
-                Vector3 localPoint = new Vector3(
-                    hitPoint.X / this.VolumeMetadata.VolumeScale.X,
-                    hitPoint.Y / this.VolumeMetadata.VolumeScale.Y,
-                    hitPoint.Z / this.VolumeMetadata.VolumeScale.Z
-                );
+                Vector3 localPoint = hitPoint / this.VolumeMetadata.VolumeScale;
 
                 //投影到平面得到UV
                 Vector2 uv = this.ProjectPoint(localPoint);
@@ -671,6 +666,41 @@ namespace MedicalSharp.Primitives.Maths
             int slicesCount = (int)Math.Floor(Math.Max(projection, 2));
 
             return slicesCount;
+        }
+        #endregion
+
+        #region 正交化坐标轴 —— void Orthonormalize()
+        /// <summary>
+        /// 正交化坐标轴
+        /// </summary>
+        private void Orthonormalize()
+        {
+            //保存原始方向用于符号修正
+            Vector3 originalV = this.VAxis;
+            Vector3 originalN = this.Normal;
+            Vector3 originalU = this.UAxis;
+
+            //第一步：固定U轴，正交化N，移除N中与U平行的分量，保证N⟂U
+            this.UAxis = this.UAxis.Normalized();
+            this.Normal = this.Normal.Normalized();
+            this.Normal = (this.Normal - Vector3.Dot(this.Normal, this.UAxis) * this.UAxis).Normalized();
+
+            //第二步：V由N×U得到，保证右手系
+            this.VAxis = Vector3.Cross(this.Normal, this.UAxis).Normalized();
+
+            //第三步：符号修正——确保新基向量的方向和原始基向量一致
+            if (Vector3.Dot(this.UAxis, originalU) < 0)
+            {
+                this.UAxis = -this.UAxis;
+            }
+            if (Vector3.Dot(this.VAxis, originalV) < 0)
+            {
+                this.VAxis = -this.VAxis;
+            }
+            if (Vector3.Dot(this.Normal, originalN) < 0)
+            {
+                this.Normal = -this.Normal;
+            }
         }
         #endregion
 
