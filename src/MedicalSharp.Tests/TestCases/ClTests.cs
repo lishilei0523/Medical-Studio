@@ -104,7 +104,7 @@ namespace MedicalSharp.Tests.TestCases
                 //线性映射：i=0 → -1000, i=size-1 → +1000
                 inputData[index] = (short)(-1000 + (2000.0 * index / (size - 1)));
             }
-            image.Write(context.CommandQueue, inputData.AsSpan());
+            image.Write(context.CommandQueue, inputData);
             context.Finish();
 
             //验证写入：读回检查
@@ -403,7 +403,7 @@ namespace MedicalSharp.Tests.TestCases
             }
 
             //创建GPU缓冲区
-            using ClBuffer inputBuffer = ClBuffer.Create(context, MemFlags.ReadOnly, input.AsSpan());
+            using ClBuffer inputBuffer = ClBuffer.Create(context, MemFlags.ReadOnly, input);
             using ClBuffer outputBuffer = ClBuffer.CreateEmpty<Voxel>(context, MemFlags.WriteOnly, count);
 
             //编译内核
