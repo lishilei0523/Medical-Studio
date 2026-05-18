@@ -28,7 +28,7 @@
 
     ✅ 标记场系统：256级标签管理，支持 Visible/Collapsed/Tinted 三种模式；
 
-    ✅ 双缓冲架构：SourceTexture + PreviewTexture 实现非破坏性编辑；
+    ✅ 双缓冲架构：OriginalTexture + PreviewTexture 实现非破坏性编辑；
 
     ✅ 三通道计算引擎：CPU (SimpleITK) + GPU (Compute Shader/OpenCL) + AI (ONNX)；
 
