@@ -106,9 +106,9 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 方法
 
-        #region 初始化缓冲区 —— unsafe void Setup()
+        #region 初始化顶点缓冲区 —— unsafe void Setup()
         /// <summary>
-        /// 初始化缓冲区
+        /// 初始化顶点缓冲区
         /// </summary>
         public unsafe void Setup()
         {
@@ -155,41 +155,33 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 更新缓冲区 —— unsafe void Update(MeshGeometry meshGeometry)
+        #region 绑定顶点缓冲区 —— void Bind()
         /// <summary>
-        /// 更新缓冲区
+        /// 绑定顶点缓冲区
         /// </summary>
-        public unsafe void Update(MeshGeometry meshGeometry)
+        public void Bind()
         {
-            #region # 验证
-
-            if (!this._initialized)
-            {
-                throw new InvalidOperationException("未初始化，不可更新！");
-            }
-
-            #endregion
-
-            this.MeshGeometry = meshGeometry;
-            this.Bind();
-
-            //更新顶点数据
-            GL.BufferData(BufferTarget.ArrayBuffer, this.MeshGeometry.Vertices.Length * sizeof(Vertex), this.MeshGeometry.Vertices, BufferUsageHint.DynamicDraw);
-
-            //更新索引数据
-            if (this.MeshGeometry.Indices.Length > 0)
-            {
-                GL.BufferData(BufferTarget.ElementArrayBuffer, this.MeshGeometry.Indices.Length * sizeof(uint), this.MeshGeometry.Indices, BufferUsageHint.DynamicDraw);
-            }
-
-            //解绑
-            this.Unbind();
+            GL.BindVertexArray(this._vao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, this._vbo);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this._ebo);
         }
         #endregion
 
-        #region 绘制 —— void Draw(PrimitiveType primitiveType)
+        #region 解绑顶点缓冲区 —— void Unbind()
         /// <summary>
-        /// 绘制
+        /// 解绑顶点缓冲区
+        /// </summary>
+        public void Unbind()
+        {
+            GL.BindVertexArray(0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+        }
+        #endregion
+
+        #region 绘制顶点缓冲区 —— void Draw(PrimitiveType primitiveType)
+        /// <summary>
+        /// 绘制顶点缓冲区
         /// </summary>
         /// <param name="primitiveType">图元类型</param>
         public void Draw(PrimitiveType primitiveType)
@@ -218,27 +210,36 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 绑定 —— void Bind()
+        #region 更新顶点缓冲区 —— void Update(MeshGeometry meshGeometry)
         /// <summary>
-        /// 绑定
+        /// 更新顶点缓冲区
         /// </summary>
-        public void Bind()
+        /// <param name="meshGeometry">网格几何</param>
+        public unsafe void Update(MeshGeometry meshGeometry)
         {
-            GL.BindVertexArray(this._vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, this._vbo);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, this._ebo);
-        }
-        #endregion
+            #region # 验证
 
-        #region 解绑 —— void Unbind()
-        /// <summary>
-        /// 解绑
-        /// </summary>
-        public void Unbind()
-        {
-            GL.BindVertexArray(0);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+            if (!this._initialized)
+            {
+                throw new InvalidOperationException("未初始化，不可更新！");
+            }
+
+            #endregion
+
+            this.MeshGeometry = meshGeometry;
+            this.Bind();
+
+            //更新顶点数据
+            GL.BufferData(BufferTarget.ArrayBuffer, this.MeshGeometry.Vertices.Length * sizeof(Vertex), this.MeshGeometry.Vertices, BufferUsageHint.DynamicDraw);
+
+            //更新索引数据
+            if (this.MeshGeometry.Indices.Length > 0)
+            {
+                GL.BufferData(BufferTarget.ElementArrayBuffer, this.MeshGeometry.Indices.Length * sizeof(uint), this.MeshGeometry.Indices, BufferUsageHint.DynamicDraw);
+            }
+
+            //解绑
+            this.Unbind();
         }
         #endregion
 

@@ -20,54 +20,16 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
         public Texture3D(int width, int height, int depth, PixelInternalFormat pixelInternalFormat = PixelInternalFormat.Rgba32f, PixelFormat pixelFormat = PixelFormat.Rgba, PixelType pixelType = PixelType.Float)
-            : base(pixelInternalFormat, pixelFormat, pixelType)
+            : base(width, height, depth, pixelInternalFormat, pixelFormat, pixelType)
         {
-            #region # 验证
 
-            if (width <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(width), "宽度必须大于0！");
-            }
-            if (height <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(height), "高度必须大于0！");
-            }
-            if (depth <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(depth), "深度必须大于0！");
-            }
-
-            #endregion
-
-            this.Width = width;
-            this.Height = height;
-            this.Depth = depth;
         }
 
         #endregion
 
         #region # 属性
 
-        #region 宽度 —— int Width
-        /// <summary>
-        /// 宽度
-        /// </summary>
-        public int Width { get; private set; }
-        #endregion 
-
-        #region 高度 —— int Height
-        /// <summary>
-        /// 高度
-        /// </summary>
-        public int Height { get; private set; }
-        #endregion 
-
-        #region 深度 —— int Depth
-        /// <summary>
-        /// 深度
-        /// </summary>
-        public int Depth { get; private set; }
-        #endregion
+        //
 
         #endregion
 
@@ -227,6 +189,44 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 设置过滤器 —— override void SetFilter(TextureMinFilter minFilter...
+        /// <summary>
+        /// 设置过滤器
+        /// </summary>
+        /// <param name="minFilter">最小值过滤器</param>
+        /// <param name="magFilter">最大值过滤器</param>
+        public override void SetFilter(TextureMinFilter minFilter, TextureMagFilter magFilter)
+        {
+            base.SetFilter(minFilter, magFilter);
+
+            this.Bind();
+
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMinFilter, (int)minFilter);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMagFilter, (int)magFilter);
+
+            this.Unbind();
+        }
+        #endregion
+
+        #region 设置包裹模式 —— override void SetWrapMode(TextureWrapMode wrapMode)
+        /// <summary>
+        /// 设置包裹模式
+        /// </summary>
+        /// <param name="wrapMode">包裹模式</param>
+        public override void SetWrapMode(TextureWrapMode wrapMode)
+        {
+            base.SetWrapMode(wrapMode);
+
+            this.Bind();
+
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapS, (int)wrapMode);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapT, (int)wrapMode);
+            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapR, (int)wrapMode);
+
+            this.Unbind();
+        }
+        #endregion
+
         #region 更新纹理 —— override void Update(IntPtr pixels)
         /// <summary>
         /// 更新纹理
@@ -305,40 +305,6 @@ namespace MedicalSharp.Engine.Resources
             this.Bind();
 
             GL.TexSubImage3D(TextureTarget.Texture3D, 0, 0, 0, sliceIndex, this.Width, this.Height, slicesCount, this.PixelFormat, this.PixelType, pixels);
-
-            this.Unbind();
-        }
-        #endregion
-
-        #region 设置过滤器 —— override void SetFilter(TextureMinFilter minFilter...
-        /// <summary>
-        /// 设置过滤器
-        /// </summary>
-        /// <param name="minFilter">最小值过滤器</param>
-        /// <param name="magFilter">最大值过滤器</param>
-        public override void SetFilter(TextureMinFilter minFilter, TextureMagFilter magFilter)
-        {
-            this.Bind();
-
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMinFilter, (int)minFilter);
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureMagFilter, (int)magFilter);
-
-            this.Unbind();
-        }
-        #endregion
-
-        #region 设置包裹模式 —— override void SetWrapMode(TextureWrapMode wrapMode)
-        /// <summary>
-        /// 设置包裹模式
-        /// </summary>
-        /// <param name="wrapMode">包裹模式</param>
-        public override void SetWrapMode(TextureWrapMode wrapMode)
-        {
-            this.Bind();
-
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapS, (int)wrapMode);
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapT, (int)wrapMode);
-            GL.TexParameter(TextureTarget.Texture3D, TextureParameterName.TextureWrapR, (int)wrapMode);
 
             this.Unbind();
         }

@@ -20,10 +20,13 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 创建纹理构造器
         /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
         /// <param name="pixelInternalFormat">像素内部格式</param>
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
-        protected Texture(PixelInternalFormat pixelInternalFormat, PixelFormat pixelFormat, PixelType pixelType)
+        protected Texture(int width, int height, int depth, PixelInternalFormat pixelInternalFormat, PixelFormat pixelFormat, PixelType pixelType)
         {
             int textureId = GL.GenTexture();
 
@@ -33,11 +36,26 @@ namespace MedicalSharp.Engine.Resources
             {
                 throw new RuntimeBinderException("创建纹理失败！");
             }
+            if (width <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(width), "宽度必须大于0！");
+            }
+            if (height <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(height), "高度必须大于0！");
+            }
+            if (depth <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(depth), "深度必须大于0！");
+            }
 
             #endregion
 
             this.Id = textureId;
             this.BindingIndex = 0;
+            this.Width = width;
+            this.Height = height;
+            this.Depth = depth;
             this.PixelInternalFormat = pixelInternalFormat;
             this.PixelFormat = pixelFormat;
             this.PixelType = pixelType;
@@ -59,6 +77,27 @@ namespace MedicalSharp.Engine.Resources
         /// 绑定索引
         /// </summary>
         public int BindingIndex { get; protected set; }
+        #endregion
+
+        #region 宽度 —— int Width
+        /// <summary>
+        /// 宽度
+        /// </summary>
+        public int Width { get; private set; }
+        #endregion 
+
+        #region 高度 —— int Height
+        /// <summary>
+        /// 高度
+        /// </summary>
+        public int Height { get; private set; }
+        #endregion 
+
+        #region 深度 —— int Depth
+        /// <summary>
+        /// 深度
+        /// </summary>
+        public int Depth { get; private set; }
         #endregion
 
         #region 像素内部格式 —— PixelInternalFormat PixelInternalFormat
@@ -157,26 +196,6 @@ namespace MedicalSharp.Engine.Resources
         public abstract void AllocateMemory(IntPtr pixels);
         #endregion
 
-        #region 更新纹理 —— void Update(IntPtr pixels)
-        /// <summary>
-        /// 更新纹理
-        /// </summary>
-        /// <param name="pixels">像素数据</param>
-        public abstract void Update(IntPtr pixels);
-        #endregion
-
-        #region 清空纹理 —— void Clear()
-        /// <summary>
-        /// 清空纹理
-        /// </summary>
-        /// <remarks>将纹理全部设为0</remarks>
-        public void Clear()
-        {
-            //使用glClearTexImage清除整个纹理（OpenGL 4.4+）
-            GL.ClearTexImage(this.Id, 0, this.PixelFormat, this.PixelType, IntPtr.Zero);
-        }
-        #endregion
-
         #region 设置过滤器 —— virtual void SetFilter(TextureMinFilter minFilter...
         /// <summary>
         /// 设置过滤器
@@ -201,11 +220,31 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 释放资源 —— void Dispose()
+        #region 更新纹理 —— abstract void Update(IntPtr pixels)
+        /// <summary>
+        /// 更新纹理
+        /// </summary>
+        /// <param name="pixels">像素数据</param>
+        public abstract void Update(IntPtr pixels);
+        #endregion
+
+        #region 清空纹理 —— virtual void Clear()
+        /// <summary>
+        /// 清空纹理
+        /// </summary>
+        /// <remarks>将纹理全部设为0</remarks>
+        public virtual void Clear()
+        {
+            //使用glClearTexImage清除整个纹理（OpenGL 4.4+）
+            GL.ClearTexImage(this.Id, 0, this.PixelFormat, this.PixelType, IntPtr.Zero);
+        }
+        #endregion
+
+        #region 释放资源 —— virtual void Dispose()
         /// <summary>
         /// 释放资源
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (this._disposed)
             {

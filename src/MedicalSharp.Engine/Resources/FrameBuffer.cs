@@ -81,8 +81,6 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 方法
 
-        //Static
-
         #region 创建帧缓冲区 —— static FrameBuffer Create(int width, int height...
         /// <summary>
         /// 创建帧缓冲区
@@ -139,9 +137,6 @@ namespace MedicalSharp.Engine.Resources
             return frameBuffer;
         }
         #endregion
-
-
-        //Public
 
         #region 绑定帧缓冲区 —— void Bind()
         /// <summary>

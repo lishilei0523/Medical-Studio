@@ -19,24 +19,8 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
         public Texture2D(int width, int height, PixelInternalFormat pixelInternalFormat = PixelInternalFormat.Rgba8, PixelFormat pixelFormat = PixelFormat.Rgba, PixelType pixelType = PixelType.UnsignedByte)
-            : base(pixelInternalFormat, pixelFormat, pixelType)
+            : base(width, height, 1, pixelInternalFormat, pixelFormat, pixelType)
         {
-            #region # 验证
-
-            if (width <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(width), "宽度必须大于0！");
-            }
-            if (height <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(height), "高度必须大于0！");
-            }
-
-            #endregion
-
-            this.Width = width;
-            this.Height = height;
-
             //分配显存
             this.AllocateMemory();
 
@@ -49,19 +33,7 @@ namespace MedicalSharp.Engine.Resources
 
         #region # 属性
 
-        #region 宽度 —— int Width
-        /// <summary>
-        /// 宽度
-        /// </summary>
-        public int Width { get; private set; }
-        #endregion 
-
-        #region 高度 —— int Height
-        /// <summary>
-        /// 高度
-        /// </summary>
-        public int Height { get; private set; }
-        #endregion
+        //
 
         #endregion
 
@@ -130,6 +102,43 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 设置过滤器 —— override void SetFilter(TextureMinFilter minFilter...
+        /// <summary>
+        /// 设置过滤器
+        /// </summary>
+        /// <param name="minFilter">最小值过滤器</param>
+        /// <param name="magFilter">最大值过滤器</param>
+        public override void SetFilter(TextureMinFilter minFilter, TextureMagFilter magFilter)
+        {
+            base.SetFilter(minFilter, magFilter);
+
+            this.Bind();
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)minFilter);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)magFilter);
+
+            this.Unbind();
+        }
+        #endregion
+
+        #region 设置包裹模式 —— override void SetWrapMode(TextureWrapMode wrapMode)
+        /// <summary>
+        /// 设置包裹模式
+        /// </summary>
+        /// <param name="wrapMode">包裹模式</param>
+        public override void SetWrapMode(TextureWrapMode wrapMode)
+        {
+            base.SetWrapMode(wrapMode);
+
+            this.Bind();
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrapMode);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrapMode);
+
+            this.Unbind();
+        }
+        #endregion
+
         #region 更新纹理 —— override void Update(IntPtr pixels)
         /// <summary>
         /// 更新纹理
@@ -149,39 +158,6 @@ namespace MedicalSharp.Engine.Resources
             this.Bind();
 
             GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, this.Width, this.Height, this.PixelFormat, this.PixelType, pixels);
-
-            this.Unbind();
-        }
-        #endregion
-
-        #region 设置过滤器 —— override void SetFilter(TextureMinFilter minFilter...
-        /// <summary>
-        /// 设置过滤器
-        /// </summary>
-        /// <param name="minFilter">最小值过滤器</param>
-        /// <param name="magFilter">最大值过滤器</param>
-        public override void SetFilter(TextureMinFilter minFilter, TextureMagFilter magFilter)
-        {
-            this.Bind();
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)minFilter);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)magFilter);
-
-            this.Unbind();
-        }
-        #endregion
-
-        #region 设置包裹模式 —— override void SetWrapMode(TextureWrapMode wrapMode)
-        /// <summary>
-        /// 设置包裹模式
-        /// </summary>
-        /// <param name="wrapMode">包裹模式</param>
-        public override void SetWrapMode(TextureWrapMode wrapMode)
-        {
-            this.Bind();
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)wrapMode);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)wrapMode);
 
             this.Unbind();
         }
