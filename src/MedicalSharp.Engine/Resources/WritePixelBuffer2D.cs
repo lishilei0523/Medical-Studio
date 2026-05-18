@@ -18,9 +18,9 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
         public WritePixelBuffer2D(int width, int height, PixelFormat pixelFormat = PixelFormat.Rgba, PixelType pixelType = PixelType.UnsignedByte)
-            : base(width, height, pixelFormat, pixelType)
+            : base(width, height, 1, pixelFormat, pixelType)
         {
-            this.CreateBuffer();
+
         }
 
         #endregion
@@ -32,8 +32,6 @@ namespace MedicalSharp.Engine.Resources
         #endregion
 
         #region # 方法
-
-        //Static
 
         #region 创建8位灰度缓冲区 —— static WritePixelBuffer2D CreateGray8(int width, int height)
         /// <summary>
@@ -101,9 +99,6 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-
-        //Public
-
         #region 上传到2D纹理 —— void UploadToTexture(Texture2D texture...
         /// <summary>
         /// 上传到2D纹理
@@ -116,7 +111,6 @@ namespace MedicalSharp.Engine.Resources
             this.Bind();
 
             GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, this.Width, this.Height, this.PixelFormat, this.PixelType, IntPtr.Zero);
-
             if (useFence)
             {
                 this.CreateFence();
@@ -140,7 +134,6 @@ namespace MedicalSharp.Engine.Resources
             this.Bind();
 
             GL.TexSubImage3D(TextureTarget.Texture3D, 0, 0, 0, sliceIndex, this.Width, this.Height, 1, this.PixelFormat, this.PixelType, IntPtr.Zero);
-
             if (useFence)
             {
                 this.CreateFence();

@@ -26,16 +26,18 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
-        protected PixelBuffer(int width, int height, PixelFormat pixelFormat, PixelType pixelType)
+        protected PixelBuffer(int width, int height, int depth, PixelFormat pixelFormat, PixelType pixelType)
         {
             this.Width = width;
             this.Height = height;
+            this.Depth = depth;
             this.PixelFormat = pixelFormat;
             this.PixelType = pixelType;
             this.BytesPerPixel = this.CalculateBytesPerPixel(pixelFormat, pixelType);
-            this.BufferSize = width * height * this.BytesPerPixel;
+            this.BufferSize = width * height * depth * this.BytesPerPixel;
 
             //设置对齐方式（重要！）
             GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
@@ -65,6 +67,13 @@ namespace MedicalSharp.Engine.Resources
         /// 高度
         /// </summary>
         public int Height { get; private set; }
+        #endregion
+
+        #region 深度 —— int Depth
+        /// <summary>
+        /// 深度
+        /// </summary>
+        public int Depth { get; private set; }
         #endregion
 
         #region 像素格式 —— PixelFormat PixelFormat
@@ -110,8 +119,9 @@ namespace MedicalSharp.Engine.Resources
                 }
 
                 WaitSyncStatus status = GL.ClientWaitSync(this._fenceSync, ClientWaitSyncFlags.None, 0);
+                bool ready = status == WaitSyncStatus.AlreadySignaled || status == WaitSyncStatus.ConditionSatisfied;
 
-                return status == WaitSyncStatus.AlreadySignaled || status == WaitSyncStatus.ConditionSatisfied;
+                return ready;
             }
         }
         #endregion

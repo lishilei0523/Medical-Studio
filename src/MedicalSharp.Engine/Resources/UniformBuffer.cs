@@ -150,6 +150,28 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 更新数据 —— void Update(IntPtr data)
+        /// <summary>
+        /// 更新数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        public void Update(IntPtr data)
+        {
+            #region # 验证
+
+            if (data == IntPtr.Zero)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            #endregion
+
+            this.Bind();
+            GL.BufferSubData(BufferTarget.UniformBuffer, IntPtr.Zero, this.BufferSize, data);
+            this.Unbind();
+        }
+        #endregion
+
         #region 更新数据 —— void Update(byte[] data)
         /// <summary>
         /// 更新数据

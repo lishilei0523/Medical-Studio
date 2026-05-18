@@ -1,7 +1,5 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using System;
-using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Engine.Resources
 {
@@ -22,40 +20,20 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
         public ReadPixelBuffer3D(int width, int height, int depth, PixelFormat pixelFormat = PixelFormat.RedInteger, PixelType pixelType = PixelType.UnsignedByte)
-            : base(width, height, pixelFormat, pixelType)
+            : base(width, height, depth, pixelFormat, pixelType)
         {
-            this.Depth = depth;
-            this.TotalBufferSize = this.BufferSize * depth;
 
-            //分配3D大小的缓冲区
-            this.Bind();
-            GL.BufferData(base.BufferTarget, this.TotalBufferSize, IntPtr.Zero, base.BufferUsage);
-            this.Unbind();
         }
 
         #endregion
 
         #region # 属性
 
-        #region 深度 —— int Depth
-        /// <summary>
-        /// 深度
-        /// </summary>
-        public int Depth { get; private set; }
-        #endregion
-
-        #region 总缓冲区尺寸 —— int TotalBufferSize
-        /// <summary>
-        /// 总缓冲区尺寸
-        /// </summary>
-        public int TotalBufferSize { get; private set; }
-        #endregion
+        //
 
         #endregion
 
         #region # 方法
-
-        //Static
 
         #region 创建8位标记缓冲区 —— static ReadPixelBuffer3D CreateMark8(int width, int height...
         /// <summary>
@@ -84,9 +62,6 @@ namespace MedicalSharp.Engine.Resources
             return new ReadPixelBuffer3D(width, height, depth, PixelFormat.Red, PixelType.Short);
         }
         #endregion
-
-
-        //Public
 
         #region 读取3D纹理 —— void ReadTexture3D(Texture3D texture, bool useFence)
         /// <summary>
@@ -140,110 +115,6 @@ namespace MedicalSharp.Engine.Resources
 
             this.Unbind();
             texture.Unbind();
-        }
-        #endregion
-
-        #region 获取CPU数据 —— byte[] GetCpuBuffer(long timeoutNanoseconds)
-        /// <summary>
-        /// 获取CPU数据（全量）
-        /// </summary>
-        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
-        /// <returns>缓冲区数据</returns>
-        public byte[] GetCpuBuffer(long timeoutNanoseconds = -1)
-        {
-            base.WaitForFence(timeoutNanoseconds);
-            byte[] data = this.ReadImmediately();
-
-            return data;
-        }
-        #endregion
-
-        #region 获取CPU数据 —— void GetCpuBuffer(IntPtr data, long timeoutNanoseconds)
-        /// <summary>
-        /// 获取CPU数据
-        /// </summary>
-        /// <param name="data">数据指针</param>
-        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
-        /// <returns>缓冲区数据</returns>
-        public void GetCpuBuffer(IntPtr data, long timeoutNanoseconds = -1)
-        {
-            base.WaitForFence(timeoutNanoseconds);
-            this.ReadImmediately(data);
-        }
-        #endregion
-
-        #region 非阻塞获取CPU数据 —— bool TryGetCpuData(out byte[] data)
-        /// <summary>
-        /// 非阻塞获取CPU数据
-        /// </summary>
-        /// <param name="data">输出数据</param>
-        /// <returns>是否成功获取数据</returns>
-        public bool TryGetCpuData(out byte[] data)
-        {
-            data = null;
-            if (!base.IsDataReady)
-            {
-                return false;
-            }
-
-            data = this.ReadImmediately();
-
-            return data != null;
-        }
-        #endregion
-
-        #region 立即读取数据 —— byte[] ReadImmediately()
-        /// <summary>
-        /// 立即读取数据
-        /// </summary>
-        private byte[] ReadImmediately()
-        {
-            this.Bind();
-            try
-            {
-                IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
-                if (gpuPtr == IntPtr.Zero)
-                {
-                    throw new RuntimeBinderException("GL.MapBuffer失败！");
-                }
-
-                //使用TotalBufferSize而不是BufferSize
-                byte[] data = new byte[this.TotalBufferSize];
-                Marshal.Copy(gpuPtr, data, 0, this.TotalBufferSize);
-                return data;
-            }
-            finally
-            {
-                GL.UnmapBuffer(this.BufferTarget);
-                this.Unbind();
-            }
-        }
-        #endregion
-
-        #region 立即读取数据 —— void ReadImmediately(IntPtr data)
-        /// <summary>
-        /// 立即读取数据
-        /// </summary>
-        /// <param name="data">数据指针</param>
-        private unsafe void ReadImmediately(IntPtr data)
-        {
-            this.Bind();
-            try
-            {
-                IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
-                if (gpuPtr == IntPtr.Zero)
-                {
-                    throw new RuntimeBinderException("GL.MapBuffer失败！");
-                }
-
-                //使用TotalBufferSize而不是BufferSize
-                NativeMemory.Copy(gpuPtr.ToPointer(), data.ToPointer(), (UIntPtr)this.TotalBufferSize);
-            }
-            finally
-            {
-                GL.UnmapBuffer(this.BufferTarget);
-                this.Unbind();
-            }
         }
         #endregion
 

@@ -182,6 +182,28 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 更新数据 —— void Update(IntPtr data)
+        /// <summary>
+        /// 更新数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        public void Update(IntPtr data)
+        {
+            #region # 验证
+
+            if (data == IntPtr.Zero)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            #endregion
+
+            this.Bind();
+            GL.BufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, this.BufferSize, data);
+            this.Unbind();
+        }
+        #endregion
+
         #region 更新数据 —— void Update(byte[] data)
         /// <summary>
         /// 更新数据
@@ -328,12 +350,12 @@ namespace MedicalSharp.Engine.Resources
             this.Bind();
 
             byte[] data = new byte[this.BufferSize];
-            IntPtr ptr = GL.MapBuffer(BufferTarget.ShaderStorageBuffer, BufferAccess.ReadOnly);
-            if (ptr != IntPtr.Zero)
+            IntPtr gpuPtr = GL.MapBuffer(BufferTarget.ShaderStorageBuffer, BufferAccess.ReadOnly);
+            if (gpuPtr != IntPtr.Zero)
             {
                 try
                 {
-                    Marshal.Copy(ptr, data, 0, this.BufferSize);
+                    Marshal.Copy(gpuPtr, data, 0, this.BufferSize);
                 }
                 finally
                 {
@@ -344,6 +366,42 @@ namespace MedicalSharp.Engine.Resources
             this.Unbind();
 
             return data;
+        }
+        #endregion
+
+        #region 读取数据 —— void Read(IntPtr data)
+        /// <summary>
+        /// 读取数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        /// <returns>缓冲区数据</returns>
+        public unsafe void Read(IntPtr data)
+        {
+            #region # 验证
+
+            if (data == IntPtr.Zero)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            #endregion
+
+            this.Bind();
+
+            IntPtr gpuPtr = GL.MapBuffer(BufferTarget.ShaderStorageBuffer, BufferAccess.ReadOnly);
+            if (gpuPtr != IntPtr.Zero)
+            {
+                try
+                {
+                    NativeMemory.Copy(gpuPtr.ToPointer(), data.ToPointer(), (UIntPtr)this.BufferSize);
+                }
+                finally
+                {
+                    GL.UnmapBuffer(BufferTarget.ShaderStorageBuffer);
+                }
+            }
+
+            this.Unbind();
         }
         #endregion
 

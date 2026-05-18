@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using Microsoft.CSharp.RuntimeBinder;
+using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Runtime.InteropServices;
 
@@ -17,10 +18,11 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
-        protected ReadPixelBuffer(int width, int height, PixelFormat pixelFormat, PixelType pixelType)
-            : base(width, height, pixelFormat, pixelType)
+        protected ReadPixelBuffer(int width, int height, int depth, PixelFormat pixelFormat, PixelType pixelType)
+            : base(width, height, depth, pixelFormat, pixelType)
         {
             base.CreateBuffer();
         }
@@ -73,26 +75,41 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 获取CPU数据 —— byte[] GetCpuBufferInternal(long timeoutNanoseconds)
+        #region 获取CPU数据 —— byte[] GetCpuBuffer(long timeoutNanoseconds)
         /// <summary>
         /// 获取CPU数据
         /// </summary>
         /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
+        /// <returns>缓冲区数据</returns>
         /// <remarks>会在数据传输完成时返回</remarks>
-        protected byte[] GetCpuBufferInternal(long timeoutNanoseconds = -1)
+        public byte[] GetCpuBuffer(long timeoutNanoseconds = -1)
         {
             base.WaitForFence(timeoutNanoseconds);
-            byte[] buffer = this.ReadImmediatelyInternal();
+            byte[] buffer = this.ReadImmediately();
 
             return buffer;
         }
         #endregion
 
-        #region 非阻塞获取CPU数据 —— bool TryGetCpuDataInternal(out byte[] data)
+        #region 获取CPU数据 —— void GetCpuBuffer(IntPtr data, long timeoutNanoseconds)
+        /// <summary>
+        /// 获取CPU数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
+        /// <remarks>会在数据传输完成时返回</remarks>
+        public void GetCpuBuffer(IntPtr data, long timeoutNanoseconds = -1)
+        {
+            base.WaitForFence(timeoutNanoseconds);
+            this.ReadImmediately(data);
+        }
+        #endregion
+
+        #region 非阻塞获取CPU数据 —— bool TryGetCpuData(out byte[] data)
         /// <summary>
         /// 非阻塞获取CPU数据
         /// </summary>
-        protected bool TryGetCpuDataInternal(out byte[] data)
+        public bool TryGetCpuData(out byte[] data)
         {
             data = null;
 
@@ -101,32 +118,78 @@ namespace MedicalSharp.Engine.Resources
                 return false;
             }
 
-            data = this.ReadImmediatelyInternal();
+            data = this.ReadImmediately();
 
             return data != null;
         }
         #endregion
 
-        #region 立即读取数据 —— byte[] ReadImmediatelyInternal()
+        #region 非阻塞获取CPU数据 —— bool TryGetCpuData(IntPtr data)
+        /// <summary>
+        /// 非阻塞获取CPU数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        /// <returns>是否成功获取数据</returns>
+        public bool TryGetCpuData(IntPtr data)
+        {
+            if (!base.IsDataReady)
+            {
+                return false;
+            }
+
+            this.ReadImmediately(data);
+
+            return true;
+        }
+        #endregion
+
+        #region 立即读取数据 —— byte[] ReadImmediately()
         /// <summary>
         /// 立即读取数据
         /// </summary>
-        private byte[] ReadImmediatelyInternal()
+        private byte[] ReadImmediately()
         {
             this.Bind();
 
             try
             {
-                IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
-                if (ptr == IntPtr.Zero)
+                IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
+                if (gpuPtr == IntPtr.Zero)
                 {
-                    return null;
+                    throw new RuntimeBinderException("GL.MapBuffer失败！");
                 }
 
                 byte[] data = new byte[this.BufferSize];
-                Marshal.Copy(ptr, data, 0, this.BufferSize);
+                Marshal.Copy(gpuPtr, data, 0, this.BufferSize);
 
                 return data;
+            }
+            finally
+            {
+                GL.UnmapBuffer(this.BufferTarget);
+                this.Unbind();
+            }
+        }
+        #endregion
+
+        #region 立即读取数据 —— void ReadImmediately(IntPtr data)
+        /// <summary>
+        /// 立即读取数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        private unsafe void ReadImmediately(IntPtr data)
+        {
+            this.Bind();
+
+            try
+            {
+                IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
+                if (gpuPtr == IntPtr.Zero)
+                {
+                    throw new RuntimeBinderException("GL.MapBuffer失败！");
+                }
+
+                NativeMemory.Copy(gpuPtr.ToPointer(), data.ToPointer(), (UIntPtr)this.BufferSize);
             }
             finally
             {

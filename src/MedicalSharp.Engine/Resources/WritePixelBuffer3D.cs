@@ -1,8 +1,5 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using System;
-using System.Runtime.InteropServices;
-using Buffer = System.Buffer;
 
 namespace MedicalSharp.Engine.Resources
 {
@@ -22,50 +19,20 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
         public WritePixelBuffer3D(int width, int height, int depth, PixelFormat pixelFormat = PixelFormat.Red, PixelType pixelType = PixelType.UnsignedByte)
-            : base(width, height, pixelFormat, pixelType)
+            : base(width, height, depth, pixelFormat, pixelType)
         {
-            this.Depth = depth;
-            this.TotalBufferSize = this.BufferSize * this.Depth;
-            this.Id = GL.GenBuffer();
 
-            #region # 验证
-
-            if (this.Id == 0)
-            {
-                throw new RuntimeBinderException("创建像素缓冲区失败！");
-            }
-
-            #endregion
-
-            //分配3D大小的缓冲区
-            this.Bind();
-            GL.BufferData(base.BufferTarget, this.TotalBufferSize, IntPtr.Zero, base.BufferUsage);
-            this.Unbind();
         }
 
         #endregion
 
         #region # 属性
 
-        #region 深度 —— int Depth
-        /// <summary>
-        /// 深度
-        /// </summary>
-        public int Depth { get; private set; }
-        #endregion
-
-        #region 总缓冲区尺寸 —— int TotalBufferSize
-        /// <summary>
-        /// 总缓冲区尺寸
-        /// </summary>
-        public int TotalBufferSize { get; private set; }
-        #endregion
+        //
 
         #endregion
 
         #region # 方法
-
-        //Static
 
         #region 创建8位标记缓冲区 —— static WritePixelBuffer3D CreateMark8(int width, int height...
         /// <summary>
@@ -92,163 +59,6 @@ namespace MedicalSharp.Engine.Resources
         public static WritePixelBuffer3D CreatePreview16(int width, int height, int depth)
         {
             return new WritePixelBuffer3D(width, height, depth, PixelFormat.Red, PixelType.Short);
-        }
-        #endregion
-
-
-        //Public
-
-        #region 上传指针数据 —— void UploadData(IntPtr data)
-        /// <summary>
-        /// 上传指针数据
-        /// </summary>
-        /// <param name="data">数据指针</param>
-        public unsafe void UploadData(IntPtr data)
-        {
-            this.Bind();
-
-            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
-            {
-                Buffer.MemoryCopy((void*)data, (void*)ptr, this.TotalBufferSize, this.TotalBufferSize);
-                GL.UnmapBuffer(this.BufferTarget);
-            }
-
-            this.Unbind();
-        }
-        #endregion
-
-        #region 上传byte数组 —— override void UploadData(byte[] data)
-        /// <summary>
-        /// 上传byte数组
-        /// </summary>
-        public override void UploadData(byte[] data)
-        {
-            #region # 验证
-
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data), "数据不可为空！");
-            }
-            if (data.Length != this.TotalBufferSize)
-            {
-                throw new ArgumentOutOfRangeException($"数据尺寸\"{data.Length}\"与缓冲区尺寸\"{this.TotalBufferSize}\"不匹配");
-            }
-
-            #endregion
-
-            this.Bind();
-
-            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
-            {
-                Marshal.Copy(data, 0, ptr, data.Length);
-                GL.UnmapBuffer(this.BufferTarget);
-            }
-
-            this.Unbind();
-        }
-        #endregion
-
-        #region 上传short数组 —— override void UploadData(short[] data)
-        /// <summary>
-        /// 上传short数组
-        /// </summary>
-        public override void UploadData(short[] data)
-        {
-            #region # 验证
-
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data), "数据不可为空！");
-            }
-
-            int byteSize = data.Length * sizeof(short);
-            if (byteSize != this.TotalBufferSize)
-            {
-                throw new ArgumentOutOfRangeException($"数据尺寸\"{byteSize}\"与缓冲区尺寸\"{this.TotalBufferSize}\"不匹配");
-            }
-
-            #endregion
-
-            this.Bind();
-
-            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
-            {
-                Marshal.Copy(data, 0, ptr, data.Length);
-                GL.UnmapBuffer(this.BufferTarget);
-            }
-
-            this.Unbind();
-        }
-        #endregion
-
-        #region 上传int数组 —— override void UploadData(int[] data)
-        /// <summary>
-        /// 上传int数组
-        /// </summary>
-        public override void UploadData(int[] data)
-        {
-            #region # 验证
-
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data), "数据不可为空！");
-            }
-
-            int byteSize = data.Length * sizeof(int);
-            if (byteSize != this.TotalBufferSize)
-            {
-                throw new ArgumentOutOfRangeException($"数据尺寸\"{byteSize}\"与缓冲区尺寸\"{this.TotalBufferSize}\"不匹配");
-            }
-
-            #endregion
-
-            this.Bind();
-
-            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
-            {
-                Marshal.Copy(data, 0, ptr, data.Length);
-                GL.UnmapBuffer(this.BufferTarget);
-            }
-
-            this.Unbind();
-        }
-        #endregion
-
-        #region 上传float数组 —— override void UploadData(float[] data)
-        /// <summary>
-        /// 上传float数组
-        /// </summary>
-        public override void UploadData(float[] data)
-        {
-            #region # 验证
-
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data), "数据不可为空！");
-            }
-
-            int byteSize = data.Length * sizeof(float);
-            if (byteSize != this.TotalBufferSize)
-            {
-                throw new ArgumentOutOfRangeException($"数据尺寸\"{byteSize}\"与缓冲区尺寸\"{this.TotalBufferSize}\"不匹配");
-            }
-
-            #endregion
-
-            this.Bind();
-
-            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
-            {
-                Marshal.Copy(data, 0, ptr, data.Length);
-                GL.UnmapBuffer(this.BufferTarget);
-            }
-
-            this.Unbind();
         }
         #endregion
 

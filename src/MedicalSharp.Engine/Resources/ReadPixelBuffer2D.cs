@@ -19,7 +19,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
         public ReadPixelBuffer2D(int width, int height, PixelFormat pixelFormat = PixelFormat.Rgba, PixelType pixelType = PixelType.UnsignedByte)
-            : base(width, height, pixelFormat, pixelType)
+            : base(width, height, 1, pixelFormat, pixelType)
         {
 
         }
@@ -96,28 +96,6 @@ namespace MedicalSharp.Engine.Resources
 
             this.Unbind();
             texture.Unbind();
-        }
-        #endregion
-
-        #region 获取CPU数据 —— byte[] GetCpuBuffer(long timeoutNanoseconds)
-        /// <summary>
-        /// 获取CPU数据
-        /// </summary>
-        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
-        /// <remarks>会在数据传输完成时返回</remarks>
-        public byte[] GetCpuBuffer(long timeoutNanoseconds = -1)
-        {
-            return base.GetCpuBufferInternal(timeoutNanoseconds);
-        }
-        #endregion
-
-        #region 非阻塞获取CPU数据 —— bool TryGetCpuData(out byte[] data)
-        /// <summary>
-        /// 非阻塞获取CPU数据
-        /// </summary>
-        public bool TryGetCpuData(out byte[] data)
-        {
-            return base.TryGetCpuDataInternal(out data);
         }
         #endregion
 

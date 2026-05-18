@@ -1,6 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Runtime.InteropServices;
+using Buffer = System.Buffer;
 
 namespace MedicalSharp.Engine.Resources
 {
@@ -17,12 +18,13 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
         /// <param name="pixelFormat">像素格式</param>
         /// <param name="pixelType">像素类型</param>
-        protected WritePixelBuffer(int width, int height, PixelFormat pixelFormat, PixelType pixelType)
-            : base(width, height, pixelFormat, pixelType)
+        protected WritePixelBuffer(int width, int height, int depth, PixelFormat pixelFormat, PixelType pixelType)
+            : base(width, height, depth, pixelFormat, pixelType)
         {
-
+            base.CreateBuffer();
         }
 
         #endregion
@@ -73,6 +75,26 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 上传指针数据 —— virtual void UploadData(IntPtr data)
+        /// <summary>
+        /// 上传指针数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        public virtual unsafe void UploadData(IntPtr data)
+        {
+            this.Bind();
+
+            IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
+            if (gpuPtr != IntPtr.Zero)
+            {
+                Buffer.MemoryCopy((void*)data, (void*)gpuPtr, this.BufferSize, this.BufferSize);
+                GL.UnmapBuffer(this.BufferTarget);
+            }
+
+            this.Unbind();
+        }
+        #endregion
+
         #region 上传byte数组 —— virtual void UploadData(byte[] data)
         /// <summary>
         /// 上传byte数组
@@ -94,10 +116,10 @@ namespace MedicalSharp.Engine.Resources
 
             this.Bind();
 
-            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
+            IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
+            if (gpuPtr != IntPtr.Zero)
             {
-                Marshal.Copy(data, 0, ptr, data.Length);
+                Marshal.Copy(data, 0, gpuPtr, data.Length);
                 GL.UnmapBuffer(this.BufferTarget);
             }
 
@@ -128,10 +150,10 @@ namespace MedicalSharp.Engine.Resources
 
             this.Bind();
 
-            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
+            IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
+            if (gpuPtr != IntPtr.Zero)
             {
-                Marshal.Copy(data, 0, ptr, data.Length);
+                Marshal.Copy(data, 0, gpuPtr, data.Length);
                 GL.UnmapBuffer(this.BufferTarget);
             }
 
@@ -162,10 +184,10 @@ namespace MedicalSharp.Engine.Resources
 
             this.Bind();
 
-            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
+            IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
+            if (gpuPtr != IntPtr.Zero)
             {
-                Marshal.Copy(data, 0, ptr, data.Length);
+                Marshal.Copy(data, 0, gpuPtr, data.Length);
                 GL.UnmapBuffer(this.BufferTarget);
             }
 
@@ -196,10 +218,10 @@ namespace MedicalSharp.Engine.Resources
 
             this.Bind();
 
-            IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
-            if (ptr != IntPtr.Zero)
+            IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.WriteOnly);
+            if (gpuPtr != IntPtr.Zero)
             {
-                Marshal.Copy(data, 0, ptr, data.Length);
+                Marshal.Copy(data, 0, gpuPtr, data.Length);
                 GL.UnmapBuffer(this.BufferTarget);
             }
 
