@@ -233,6 +233,54 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public ICommand CloseSeriesCommand => new RelayCommand(_ => this.CloseSeries());
         #endregion
 
+        #region 重置预览命令 —— ICommand ResetPreviewCommand
+        /// <summary>
+        /// 重置预览命令
+        /// </summary>
+        public ICommand ResetPreviewCommand => new RelayCommand(_ =>
+        {
+            #region # 验证
+
+            if (this.VolumeData == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+            volumeSession.ResetPreviewTexture();
+
+            //发布消息
+            SyncViewportEvent message = new SyncViewportEvent();
+            this._eventAggregator.PublishOnUIThreadAsync(message);
+        });
+        #endregion
+
+        #region 重置标记命令 —— ICommand ResetMarkCommand
+        /// <summary>
+        /// 重置标记命令
+        /// </summary>
+        public ICommand ResetMarkCommand => new RelayCommand(_ =>
+        {
+            #region # 验证
+
+            if (this.VolumeData == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+            volumeSession.ResetMarkTexture();
+
+            //发布消息
+            SyncViewportEvent message = new SyncViewportEvent();
+            this._eventAggregator.PublishOnUIThreadAsync(message);
+        });
+        #endregion
+
         #region 布局13命令 —— ICommand Layout13Command
         /// <summary>
         /// 布局13命令

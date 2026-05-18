@@ -41,6 +41,10 @@
 							<MenuItem Header="保存(_S)" cm:Message.Attach="SaveImage()" />
 							<MenuItem Header="另存为(_A)" cm:Message.Attach="SaveAsImage()" />
 						</MenuItem>
+                        <MenuItem Header="编辑(_E)">
+                            <MenuItem Header="重置预览(_P)" Command="{Binding ResetPreviewCommand}" />
+                            <MenuItem Header="重置标记(_M)" Command="{Binding ResetMarkCommand}" />
+                        </MenuItem>
 						<MenuItem Header="布局(_L)">
 							<MenuItem Header="布局13(_A)" Command="{Binding Layout13Command}" />
 							<MenuItem Header="布局22(_B)" Command="{Binding Layout22Command}" />
