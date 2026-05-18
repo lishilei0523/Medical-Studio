@@ -34,8 +34,9 @@ namespace MedicalSharp.Inspiration.Resources
         /// <param name="glSharing">OpenGL扩展实例</param>
         /// <param name="handle">内存缓冲区句柄</param>
         /// <param name="bufferSize">内存缓冲区尺寸</param>
+        /// <param name="memoryFlags">内存标识</param>
         /// <param name="isFromGl">是否从OpenGL缓冲区创建</param>
-        private ClBuffer(CL cl, KhrGlSharing glSharing, IntPtr handle, UIntPtr bufferSize, bool isFromGl = false)
+        private ClBuffer(CL cl, KhrGlSharing glSharing, IntPtr handle, UIntPtr bufferSize, MemFlags memoryFlags, bool isFromGl = false)
         {
             #region # 验证
 
@@ -50,6 +51,8 @@ namespace MedicalSharp.Inspiration.Resources
             this._glSharing = glSharing;
             this.Handle = handle;
             this.BufferSize = bufferSize;
+            this.MemoryFlags = memoryFlags;
+            this.IsFromGl = isFromGl;
         }
 
         #endregion
@@ -69,6 +72,20 @@ namespace MedicalSharp.Inspiration.Resources
         /// </summary>
         /// <remarks>单位：字节</remarks>
         public UIntPtr BufferSize { get; private set; }
+        #endregion
+
+        #region 内存标识 —— MemFlags MemoryFlags
+        /// <summary>
+        /// 内存标识
+        /// </summary>
+        public MemFlags MemoryFlags { get; private set; }
+        #endregion
+
+        #region OpenGL缓冲区ID —— int? GlBufferId
+        /// <summary>
+        /// OpenGL缓冲区ID
+        /// </summary>
+        public int? GlBufferId { get; private set; }
         #endregion
 
         #region 是否从OpenGL缓冲区创建 —— bool IsFromGl
@@ -100,7 +117,7 @@ namespace MedicalSharp.Inspiration.Resources
             {
                 IntPtr handle = cl.CreateBuffer(clContext.Handle, flags | MemFlags.CopyHostPtr, size, pointer, out int err);
                 ClException.ThrowOnError(err, "CreateBuffer");
-                ClBuffer clBuffer = new ClBuffer(cl, null, handle, size);
+                ClBuffer clBuffer = new ClBuffer(cl, null, handle, size, flags);
 
                 return clBuffer;
             }
@@ -128,10 +145,10 @@ namespace MedicalSharp.Inspiration.Resources
             }
             if (handle == IntPtr.Zero)
             {
-                throw new ClException("CreateBuffer 返回空句柄！");
+                throw new ClException("CreateBuffer 返回空句柄");
             }
 
-            ClBuffer clBuffer = new ClBuffer(cl, null, handle, bufferSize);
+            ClBuffer clBuffer = new ClBuffer(cl, null, handle, bufferSize, flags);
 
             return clBuffer;
         }
@@ -151,7 +168,7 @@ namespace MedicalSharp.Inspiration.Resources
             UIntPtr size = (UIntPtr)bufferSize;
             IntPtr handle = cl.CreateBuffer(clContext.Handle, flags, size, null, out int err);
             ClException.ThrowOnError(err, "CreateBuffer (empty)");
-            ClBuffer clBuffer = new ClBuffer(cl, null, handle, size);
+            ClBuffer clBuffer = new ClBuffer(cl, null, handle, size, flags);
 
             return clBuffer;
         }
@@ -177,7 +194,7 @@ namespace MedicalSharp.Inspiration.Resources
                 throw new ClException("CreateBuffer 返回空句柄");
             }
 
-            ClBuffer clBuffer = new ClBuffer(cl, null, handle, size);
+            ClBuffer clBuffer = new ClBuffer(cl, null, handle, size, flags);
 
             return clBuffer;
         }
@@ -192,7 +209,7 @@ namespace MedicalSharp.Inspiration.Resources
         /// <param name="bufferSize">OpenGL缓冲区尺寸</param>
         /// <param name="flags">内存标识</param>
         /// <returns>OpenCL内存缓冲区实例</returns>
-        public static ClBuffer FromGLBuffer(ClContext clContext, int glBufferId, int bufferSize, MemFlags flags = MemFlags.ReadWrite)
+        public static ClBuffer FromGLBuffer(ClContext clContext, int glBufferId, int bufferSize, MemFlags flags)
         {
             CL cl = CL.GetApi();
             KhrGlSharing glSharing = new KhrGlSharing(cl.Context);
@@ -204,7 +221,8 @@ namespace MedicalSharp.Inspiration.Resources
                 throw new ClException("CreateFromGlbuffer 返回空句柄");
             }
 
-            ClBuffer clBuffer = new ClBuffer(cl, glSharing, handle, (UIntPtr)bufferSize, true);
+            ClBuffer clBuffer = new ClBuffer(cl, glSharing, handle, (UIntPtr)bufferSize, flags, true);
+            clBuffer.GlBufferId = glBufferId;
 
             return clBuffer;
         }

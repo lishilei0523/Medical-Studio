@@ -170,11 +170,11 @@ namespace MedicalSharp.Inspiration.Resources
         /// <param name="displayHandle">平台显示句柄（Windows: HDC, Linux: Display）</param>
         /// <returns>OpenCL上下文实例</returns>
         /// <remarks>
-        /// 用于cl_khr_gl_sharing互操作，使OpenCL可以直接读写GL纹理
+        /// 用于cl_khr_gl_sharing互操作，使OpenCL可以直接读写GL纹理、内存缓冲区
         /// 调用前必须确保：
-        /// 1. GL Context 在当前线程上是 current 的
-        /// 2. 需要共享的 GL 纹理已经创建
-        /// 3. 之后创建的 GL 纹理也能被共享
+        /// 1. GL Context在当前线程上是current的
+        /// 2. 需要共享的GL纹理已经创建
+        /// 3. 之后创建的GL纹理也能被共享
         /// </remarks>
         public static unsafe ClContext CreateWithGL(PlatformOS platform, IntPtr glContext, IntPtr displayHandle)
         {
@@ -239,9 +239,9 @@ namespace MedicalSharp.Inspiration.Resources
 
             //创建上下文（带GL互操作属性）
             IntPtr context;
-            fixed (IntPtr* propsPtr = contextProperties)
+            fixed (IntPtr* contextPropertiesPtr = contextProperties)
             {
-                context = cl.CreateContext(propsPtr, 1, in device, null, null, out errorCode);
+                context = cl.CreateContext(contextPropertiesPtr, 1, in device, null, null, out errorCode);
                 if (errorCode != (int)ErrorCodes.Success || context == IntPtr.Zero)
                 {
                     string errorMsg = errorCode switch

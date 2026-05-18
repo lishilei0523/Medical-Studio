@@ -380,15 +380,15 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
             ClContext clContext = ClContextManager.Current;
 
-            //TODO 参数化
+            //TODO PBO化、参数化
+            int width = this.VolumeData.Metadata.VolumeSize.X;
+            int height = this.VolumeData.Metadata.VolumeSize.Y;
+            int depth = this.VolumeData.Metadata.VolumeSize.Z;
 
             this.Busy();
             await Task.Run(() =>
             {
                 //创建并写入图像
-                int width = this.VolumeData.Metadata.VolumeSize.X;
-                int height = this.VolumeData.Metadata.VolumeSize.Y;
-                int depth = this.VolumeData.Metadata.VolumeSize.Z;
                 using ClImage3D image = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
                 image.Write(clContext.CommandQueue, this.VolumeData.OriginalData);
                 clContext.Finish();
@@ -400,6 +400,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 //读回CPU
                 image.Read(clContext.CommandQueue, this.VolumeData.PreviewData);
             });
+            this.Idle();
 
             //同步到预览纹理
             SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, volumeSession.PreviewTexture);
@@ -407,8 +408,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             //发布消息
             SyncViewportEvent message = new SyncViewportEvent();
             await this._eventAggregator.PublishOnUIThreadAsync(message);
-
-            this.Idle();
         });
         #endregion
 

@@ -132,6 +132,13 @@ namespace MedicalSharp.Inspiration.Resources
         public bool IsFromGl { get; private set; }
         #endregion
 
+        #region OpenGL纹理ID —— int? GlTextureId
+        /// <summary>
+        /// OpenGL纹理ID
+        /// </summary>
+        public int? GlTextureId { get; protected set; }
+        #endregion
+
         #region 只读属性 - 图像维度 —— abstract uint Dimension
         /// <summary>
         /// 只读属性 - 图像维度

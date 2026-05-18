@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using Microsoft.CSharp.RuntimeBinder;
+using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Runtime.InteropServices;
 
@@ -157,6 +158,20 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 获取CPU数据 —— void GetCpuBuffer(IntPtr data, long timeoutNanoseconds)
+        /// <summary>
+        /// 获取CPU数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
+        /// <returns>缓冲区数据</returns>
+        public void GetCpuBuffer(IntPtr data, long timeoutNanoseconds = -1)
+        {
+            base.WaitForFence(timeoutNanoseconds);
+            this.ReadImmediately(data);
+        }
+        #endregion
+
         #region 非阻塞获取CPU数据 —— bool TryGetCpuData(out byte[] data)
         /// <summary>
         /// 非阻塞获取CPU数据
@@ -186,16 +201,43 @@ namespace MedicalSharp.Engine.Resources
             this.Bind();
             try
             {
-                IntPtr ptr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
-                if (ptr == IntPtr.Zero)
+                IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
+                if (gpuPtr == IntPtr.Zero)
                 {
-                    return null;
+                    throw new RuntimeBinderException("GL.MapBuffer失败！");
                 }
 
                 //使用TotalBufferSize而不是BufferSize
                 byte[] data = new byte[this.TotalBufferSize];
-                Marshal.Copy(ptr, data, 0, this.TotalBufferSize);
+                Marshal.Copy(gpuPtr, data, 0, this.TotalBufferSize);
                 return data;
+            }
+            finally
+            {
+                GL.UnmapBuffer(this.BufferTarget);
+                this.Unbind();
+            }
+        }
+        #endregion
+
+        #region 立即读取数据 —— void ReadImmediately(IntPtr data)
+        /// <summary>
+        /// 立即读取数据
+        /// </summary>
+        /// <param name="data">数据指针</param>
+        private unsafe void ReadImmediately(IntPtr data)
+        {
+            this.Bind();
+            try
+            {
+                IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
+                if (gpuPtr == IntPtr.Zero)
+                {
+                    throw new RuntimeBinderException("GL.MapBuffer失败！");
+                }
+
+                //使用TotalBufferSize而不是BufferSize
+                NativeMemory.Copy(gpuPtr.ToPointer(), data.ToPointer(), (UIntPtr)this.TotalBufferSize);
             }
             finally
             {

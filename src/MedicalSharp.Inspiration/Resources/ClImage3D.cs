@@ -102,8 +102,10 @@ namespace MedicalSharp.Inspiration.Resources
         /// <param name="height">高度</param>
         /// <param name="depth">深度</param>
         /// <param name="memoryFlags">内存标识</param>
+        /// <param name="channelOrder">通道排序</param>
+        /// <param name="channelType">通道类型</param>
         /// <returns>OpenCL-3D图像</returns>
-        public static ClImage3D FromTexture3D(ClContext clContext, int glTextureId, int width, int height, int depth, MemFlags memoryFlags = MemFlags.ReadWrite)
+        public static ClImage3D FromTexture3D(ClContext clContext, int glTextureId, int width, int height, int depth, MemFlags memoryFlags = MemFlags.ReadWrite, ChannelOrder channelOrder = ChannelOrder.Intensity, ChannelType channelType = ChannelType.SNormInt16)
         {
             CL cl = CL.GetApi();
             KhrGlSharing glSharing = new KhrGlSharing(cl.Context);
@@ -111,7 +113,8 @@ namespace MedicalSharp.Inspiration.Resources
             IntPtr handle = glSharing.CreateFromGltexture3D(clContext.Handle, memoryFlags, GL_TEXTURE_3D, 0, (uint)glTextureId, out int errorCode);
             ClException.ThrowOnError(errorCode, "CreateFromGLTexture3D");
 
-            ClImage3D image = new ClImage3D(cl, glSharing, handle, width, height, depth, memoryFlags, 0, 0, true);
+            ClImage3D image = new ClImage3D(cl, glSharing, handle, width, height, depth, memoryFlags, channelOrder, channelType, true);
+            image.GlTextureId = glTextureId;
 
             return image;
         }
