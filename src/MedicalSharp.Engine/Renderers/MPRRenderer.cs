@@ -38,14 +38,13 @@ namespace MedicalSharp.Engine.Renderers
         public MPRRenderer(MPRCamera camera)
             : base(camera)
         {
+            this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
             this.PreviewMode = PreviewMode.Preview;
             this.RenderMode = MPRRenderMode.Gray;
             this.WindowWidth = 400;
             this.WindowCenter = 40;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
-            this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
-            this._unitPlane.Setup();
         }
 
         #endregion

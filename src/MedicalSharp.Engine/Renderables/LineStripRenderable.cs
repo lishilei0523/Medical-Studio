@@ -59,7 +59,6 @@ namespace MedicalSharp.Engine.Renderables
             #endregion
 
             this._vertexBuffer = new VertexBuffer(strokeMesh);
-            this._vertexBuffer.Setup();
 
             //提取三角形面
             this._triangles = this._vertexBuffer.MeshGeometry.ExtractTriangles();
@@ -137,7 +136,6 @@ namespace MedicalSharp.Engine.Renderables
             this._vertexBuffer.Dispose();
 
             this._vertexBuffer = new VertexBuffer(strokeMesh);
-            this._vertexBuffer.Setup();
 
             //提取三角形面
             this._triangles = this._vertexBuffer.MeshGeometry.ExtractTriangles();

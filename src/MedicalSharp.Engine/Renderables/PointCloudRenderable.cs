@@ -44,7 +44,6 @@ namespace MedicalSharp.Engine.Renderables
             //初始化缓冲区
             MeshGeometry pointCloudGeometry = MeshFactory.CreatePointCloud(positions);
             this._vertexBuffer = new VertexBuffer(pointCloudGeometry);
-            this._vertexBuffer.Setup();
         }
 
         #endregion
@@ -120,7 +119,6 @@ namespace MedicalSharp.Engine.Renderables
 
             MeshGeometry pointCloudGeometry = MeshFactory.CreatePointCloud(positions);
             this._vertexBuffer = new VertexBuffer(pointCloudGeometry);
-            this._vertexBuffer.Setup();
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();

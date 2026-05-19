@@ -40,7 +40,6 @@ namespace MedicalSharp.Engine.Renderers
         {
             //默认值
             this._unitCube = new VertexBuffer(ResourceManager.UnitCube);
-            this._unitCube.Setup();
             this.PreviewMode = PreviewMode.Preview;
             this.RenderMode = VolumeRenderMode.Raycast;
         }

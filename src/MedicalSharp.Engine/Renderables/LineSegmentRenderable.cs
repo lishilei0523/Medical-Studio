@@ -43,7 +43,6 @@ namespace MedicalSharp.Engine.Renderables
 
             MeshGeometry lineGeometry = MeshFactory.CreateLineSegment(startPoint, endPoint);
             this._vertexBuffer = new VertexBuffer(lineGeometry);
-            this._vertexBuffer.Setup();
         }
 
         #endregion
@@ -123,7 +122,6 @@ namespace MedicalSharp.Engine.Renderables
 
             MeshGeometry lineGeometry = MeshFactory.CreateLineSegment(this.StartPoint, this.EndPoint);
             this._vertexBuffer = new VertexBuffer(lineGeometry);
-            this._vertexBuffer.Setup();
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();

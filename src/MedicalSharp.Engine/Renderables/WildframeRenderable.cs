@@ -69,8 +69,6 @@ namespace MedicalSharp.Engine.Renderables
             this.DrawVertex = drawVertex;
             this._strokeBuffer = new VertexBuffer(strokeMesh);
             this._fillBuffer = new VertexBuffer(fillMesh);
-            this._strokeBuffer.Setup();
-            this._fillBuffer.Setup();
 
             //提取三角形面
             this._triangles = this._fillBuffer.MeshGeometry.ExtractTriangles();
@@ -179,8 +177,6 @@ namespace MedicalSharp.Engine.Renderables
 
             this._strokeBuffer = new VertexBuffer(strokeMesh);
             this._fillBuffer = new VertexBuffer(fillMesh);
-            this._strokeBuffer.Setup();
-            this._fillBuffer.Setup();
 
             //提取三角形面
             this._triangles = this._fillBuffer.MeshGeometry.ExtractTriangles();

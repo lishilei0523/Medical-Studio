@@ -16,6 +16,11 @@ namespace MedicalSharp.Engine.Resources
         #region # 字段及构造器
 
         /// <summary>
+        /// 释放标识
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
         /// VAO
         /// </summary>
         private int _vao;
@@ -31,52 +36,38 @@ namespace MedicalSharp.Engine.Resources
         private int _ebo;
 
         /// <summary>
-        /// 初始化标识
-        /// </summary>
-        private bool _initialized;
-
-        /// <summary>
-        /// 释放标识
-        /// </summary>
-        private bool _disposed;
-
-        /// <summary>
         /// 默认构造器
         /// </summary>
         private VertexBuffer()
         {
-            int vao = GL.GenVertexArray();
-            int vbo = GL.GenBuffer();
-            int ebo = GL.GenBuffer();
+            this._vao = GL.GenVertexArray();
+            this._vbo = GL.GenBuffer();
+            this._ebo = GL.GenBuffer();
 
             #region # 验证
 
-            if (vao == 0)
+            if (this._vao == 0)
             {
                 throw new RuntimeBinderException("创建VAO失败！");
             }
-            if (vbo == 0)
+            if (this._vbo == 0)
             {
                 throw new RuntimeBinderException("创建VBO失败！");
             }
-            if (ebo == 0)
+            if (this._ebo == 0)
             {
                 throw new RuntimeBinderException("创建EBO失败！");
             }
 
             #endregion
-
-            this._vao = vao;
-            this._vbo = vbo;
-            this._ebo = ebo;
-            this._initialized = false;
         }
 
         /// <summary>
         /// 创建顶点缓冲区构造器
         /// </summary>
         /// <param name="meshGeometry">网格几何</param>
-        public VertexBuffer(MeshGeometry meshGeometry)
+        /// <param name="bufferUsage">缓冲区用途</param>
+        public VertexBuffer(MeshGeometry meshGeometry, BufferUsageHint bufferUsage = BufferUsageHint.DynamicDraw)
             : this()
         {
             #region # 验证
@@ -89,6 +80,11 @@ namespace MedicalSharp.Engine.Resources
             #endregion
 
             this.MeshGeometry = meshGeometry;
+            this.BufferUsage = bufferUsage;
+
+            //初始化
+            this.AllocateMemory();
+            this.Setup();
         }
 
         #endregion
@@ -102,58 +98,18 @@ namespace MedicalSharp.Engine.Resources
         public MeshGeometry MeshGeometry { get; private set; }
         #endregion
 
+        #region 缓冲区用途 —— BufferUsageHint BufferUsage
+        /// <summary>
+        /// 缓冲区用途
+        /// </summary>
+        public BufferUsageHint BufferUsage { get; private set; }
+        #endregion
+
         #endregion
 
         #region # 方法
 
-        #region 初始化顶点缓冲区 —— unsafe void Setup()
-        /// <summary>
-        /// 初始化顶点缓冲区
-        /// </summary>
-        public unsafe void Setup()
-        {
-            #region # 验证
-
-            if (this._initialized)
-            {
-                throw new InvalidOperationException("已初始化，不可重复操作！");
-            }
-
-            #endregion
-
-            this.Bind();
-
-            //上传顶点到VBO
-            GL.BufferData(BufferTarget.ArrayBuffer, this.MeshGeometry.Vertices.Length * sizeof(Vertex), this.MeshGeometry.Vertices, BufferUsageHint.DynamicDraw);
-
-            //如果使用索引，上传索引到EBO
-            if (this.MeshGeometry.Indices.Length > 0)
-            {
-                GL.BufferData(BufferTarget.ElementArrayBuffer, this.MeshGeometry.Indices.Length * sizeof(uint), this.MeshGeometry.Indices, BufferUsageHint.DynamicDraw);
-            }
-
-            //位置(location = 0)
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Position)).ToInt32());
-            GL.EnableVertexAttribArray(0);
-
-            //颜色(location = 1)
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Color)).ToInt32());
-            GL.EnableVertexAttribArray(1);
-
-            //纹理坐标(location = 2)
-            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.TextureCoord)).ToInt32());
-            GL.EnableVertexAttribArray(2);
-
-            //法向量(location = 3)
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Normal)).ToInt32());
-            GL.EnableVertexAttribArray(3);
-
-            //解绑
-            this.Unbind();
-
-            this._initialized = true;
-        }
-        #endregion
+        //Public
 
         #region 绑定顶点缓冲区 —— void Bind()
         /// <summary>
@@ -186,15 +142,6 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="primitiveType">图元类型</param>
         public void Draw(PrimitiveType primitiveType)
         {
-            #region # 验证
-
-            if (!this._initialized)
-            {
-                throw new InvalidOperationException("未初始化，不可绘制！");
-            }
-
-            #endregion
-
             this.Bind();
 
             if (this.MeshGeometry.Indices.Any())
@@ -217,15 +164,6 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="meshGeometry">网格几何</param>
         public unsafe void Update(MeshGeometry meshGeometry)
         {
-            #region # 验证
-
-            if (!this._initialized)
-            {
-                throw new InvalidOperationException("未初始化，不可更新！");
-            }
-
-            #endregion
-
             this.MeshGeometry = meshGeometry;
             this.Bind();
 
@@ -254,15 +192,80 @@ namespace MedicalSharp.Engine.Resources
                 return;
             }
 
-            GL.DeleteVertexArray(this._vao);
-            GL.DeleteBuffer(this._vbo);
-            GL.DeleteBuffer(this._ebo);
-            this._vao = 0;
-            this._vbo = 0;
-            this._ebo = 0;
+            if (this._vao != 0)
+            {
+                GL.DeleteVertexArray(this._vao);
+                this._vao = 0;
+            }
+            if (this._vbo != 0)
+            {
+                GL.DeleteBuffer(this._vbo);
+                this._vbo = 0;
+            }
+            if (this._ebo != 0)
+            {
+                GL.DeleteBuffer(this._ebo);
+                this._ebo = 0;
+            }
+
             this._disposed = true;
         }
-        #endregion  
+        #endregion
+
+
+        //Private
+
+        #region 分配内存 —— void AllocateMemory()
+        /// <summary>
+        /// 分配内存
+        /// </summary>
+        private unsafe void AllocateMemory()
+        {
+            this.Bind();
+
+            Vertex[] vertices = this.MeshGeometry.Vertices;
+            uint[] indices = this.MeshGeometry.Indices;
+
+            //上传顶点VBO
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(Vertex), vertices, this.BufferUsage);
+
+            //上传索引EBO
+            if (indices.Length > 0)
+            {
+                GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, this.BufferUsage);
+            }
+
+            this.Unbind();
+        }
+        #endregion
+
+        #region 初始化顶点数组 —— void Setup()
+        /// <summary>
+        /// 初始化顶点数组
+        /// </summary>
+        private unsafe void Setup()
+        {
+            this.Bind();
+
+            //位置(location = 0)
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Position)).ToInt32());
+            GL.EnableVertexAttribArray(0);
+
+            //颜色(location = 1)
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Color)).ToInt32());
+            GL.EnableVertexAttribArray(1);
+
+            //纹理坐标(location = 2)
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.TextureCoord)).ToInt32());
+            GL.EnableVertexAttribArray(2);
+
+            //法向量(location = 3)
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Normal)).ToInt32());
+            GL.EnableVertexAttribArray(3);
+
+            this.Unbind();
+        }
+        #endregion
 
         #endregion
     }

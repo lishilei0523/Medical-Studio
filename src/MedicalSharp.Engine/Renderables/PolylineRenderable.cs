@@ -54,12 +54,10 @@ namespace MedicalSharp.Engine.Renderables
             //初始化缓冲区
             MeshGeometry polylineGeometry = MeshFactory.CreatePolyline(this.Positions, this.Closed);
             this._strokeBuffer = new VertexBuffer(polylineGeometry);
-            this._strokeBuffer.Setup();
             if (this.Closed && positions.Count >= 3)
             {
                 MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.Positions);
                 this._fillBuffer = new VertexBuffer(polygonGeometry);
-                this._fillBuffer.Setup();
             }
         }
 
@@ -167,12 +165,10 @@ namespace MedicalSharp.Engine.Renderables
 
             MeshGeometry polylineGeometry = MeshFactory.CreatePolyline(positions, this.Closed);
             this._strokeBuffer = new VertexBuffer(polylineGeometry);
-            this._strokeBuffer.Setup();
             if (this.Closed && this.Positions.Count >= 3)
             {
                 MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.Positions);
                 this._fillBuffer = new VertexBuffer(polygonGeometry);
-                this._fillBuffer.Setup();
             }
 
             //标记包围盒/包围球为脏

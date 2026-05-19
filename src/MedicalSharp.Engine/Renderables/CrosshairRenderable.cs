@@ -79,8 +79,6 @@ namespace MedicalSharp.Engine.Renderables
                 center + vAxis * halfVerticalLength);
             this._horizontalBuffer = new VertexBuffer(horizontalLine);
             this._verticalBuffer = new VertexBuffer(verticalLine);
-            this._horizontalBuffer.Setup();
-            this._verticalBuffer.Setup();
         }
 
         #endregion
@@ -218,8 +216,6 @@ namespace MedicalSharp.Engine.Renderables
                 center + vAxis * halfVerticalLength);
             this._horizontalBuffer = new VertexBuffer(horizontalLine);
             this._verticalBuffer = new VertexBuffer(verticalLine);
-            this._horizontalBuffer.Setup();
-            this._verticalBuffer.Setup();
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();

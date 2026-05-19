@@ -412,7 +412,6 @@ namespace MedicalSharp.Engine.Renderables
 
             MeshGeometry meshGeometry = MeshFactory.CreateContainer2D(this.TextSize.X, this.TextSize.Y, this.Normal);
             this._vertexBuffer = new VertexBuffer(meshGeometry);
-            this._vertexBuffer.Setup();
         }
         #endregion
 
