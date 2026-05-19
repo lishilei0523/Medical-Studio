@@ -27,11 +27,25 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 属性
 
-        #region 相机位置 —— abstract Vector3 CameraPosition
+        #region 相机位置 —— Vector3 CameraPosition
         /// <summary>
         /// 相机位置
         /// </summary>
-        public abstract Vector3 CameraPosition { get; }
+        public Vector3 CameraPosition { get; protected set; }
+        #endregion
+
+        #region 目标位置 —— Vector3 TargetPosition
+        /// <summary>
+        /// 目标位置
+        /// </summary>
+        public Vector3 TargetPosition { get; protected set; }
+        #endregion
+
+        #region 相机到目标距离 —— float Distance
+        /// <summary>
+        /// 相机到目标距离
+        /// </summary>
+        public float Distance { get; protected set; }
         #endregion
 
         #region 视角方向 —— abstract Vector3 LookDirection 
@@ -41,11 +55,11 @@ namespace MedicalSharp.Primitives.Cameras
         public abstract Vector3 LookDirection { get; }
         #endregion
 
-        #region 相机上方向 —— abstract Vector3 UpDirection
+        #region 相机上方向 —— Vector3 UpDirection
         /// <summary>
         /// 相机上方向
         /// </summary>
-        public abstract Vector3 UpDirection { get; }
+        public Vector3 UpDirection { get; protected set; }
         #endregion
 
         #region 相机右方向 —— abstract Vector3 RightDirection

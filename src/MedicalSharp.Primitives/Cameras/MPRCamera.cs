@@ -13,30 +13,9 @@ namespace MedicalSharp.Primitives.Cameras
     {
         #region # 字段及构造器
 
-        /// <summary>
-        /// 目标距离
-        /// </summary>
-        private float _distance;
 
-        /// <summary>
-        /// 相机位置
-        /// </summary>
-        private Vector3 _cameraPosition;
 
-        /// <summary>
-        /// 相机上方向
-        /// </summary>
-        private Vector3 _upDirection;
 
-        /// <summary>
-        /// 投影矩阵
-        /// </summary>
-        private Matrix4 _projectionMatrix;
-
-        /// <summary>
-        /// 视图矩阵
-        /// </summary>
-        private Matrix4 _viewMatrix;
 
         /// <summary>
         /// 创建MPR相机构造器
@@ -46,9 +25,9 @@ namespace MedicalSharp.Primitives.Cameras
         public MPRCamera(float nearPlaneDistance = -1000, float farPlaneDistance = 1000)
             : base(nearPlaneDistance, farPlaneDistance)
         {
-            this._distance = 4.0f;
+            this.Distance = 4.0f;
             this._panOffset = Vector2.Zero;
-            this._targetPosition = Vector3.Zero;
+            this.TargetPosition = Vector3.Zero;
             this._zoomFactor = 1.0f;
             this.UpdateViewMatrix();
             this.UpdateProjectionMatrix();
@@ -58,25 +37,11 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 属性
 
-        #region 相机位置 —— override Vector3 CameraPosition
-        /// <summary>
-        /// 相机位置
-        /// </summary>
-        public override Vector3 CameraPosition => this._cameraPosition;
-        #endregion
-
         #region 视角方向 —— override Vector3 LookDirection
         /// <summary>
         /// 视角方向
         /// </summary>
-        public override Vector3 LookDirection => (this._targetPosition - this._cameraPosition).Normalized();
-        #endregion
-
-        #region 相机上方向 —— override Vector3 UpDirection
-        /// <summary>
-        /// 相机上方向
-        /// </summary>
-        public override Vector3 UpDirection => this._upDirection;
+        public override Vector3 LookDirection => (this.TargetPosition - this.CameraPosition).Normalized();
         #endregion
 
         #region 相机右方向 —— override Vector3 RightDirection
@@ -90,6 +55,11 @@ namespace MedicalSharp.Primitives.Cameras
         /// <summary>
         /// 投影矩阵
         /// </summary>
+        private Matrix4 _projectionMatrix;
+
+        /// <summary>
+        /// 投影矩阵
+        /// </summary>
         public override Matrix4 ProjectionMatrix => this._projectionMatrix;
         #endregion
 
@@ -97,22 +67,12 @@ namespace MedicalSharp.Primitives.Cameras
         /// <summary>
         /// 视图矩阵
         /// </summary>
+        private Matrix4 _viewMatrix;
+
+        /// <summary>
+        /// 视图矩阵
+        /// </summary>
         public override Matrix4 ViewMatrix => this._viewMatrix;
-        #endregion
-
-        #region 目标位置 —— Vector3 TargetPosition
-        /// <summary>
-        /// 目标位置
-        /// </summary>
-        private Vector3 _targetPosition;
-
-        /// <summary>
-        /// 目标位置
-        /// </summary>
-        public Vector3 TargetPosition
-        {
-            get => this._targetPosition;
-        }
         #endregion
 
         #region 缩放因子 —— float ZoomFactor
@@ -205,12 +165,12 @@ namespace MedicalSharp.Primitives.Cameras
         public override void LookAt(Vector3 targetPosition)
         {
             //更新目标位置
-            this._targetPosition = targetPosition;
+            this.TargetPosition = targetPosition;
 
             //重新计算相机位置（保持原距离）
             if (this.TargetPlane != null)
             {
-                this._cameraPosition = this._targetPosition - this.TargetPlane.WorldNormal * this._distance;
+                this.CameraPosition = this.TargetPosition - this.TargetPlane.WorldNormal * this.Distance;
             }
 
             this.UpdateViewMatrix();
@@ -324,9 +284,9 @@ namespace MedicalSharp.Primitives.Cameras
             Vector3 worldCenter = this.TargetPlane.WorldCenter;
             Vector3 worldNormal = this.TargetPlane.WorldNormal;
             Vector3 worldUpDirection = this.TargetPlane.WorldVAxis;
-            this._cameraPosition = worldCenter - worldNormal * this._distance;
-            this._targetPosition = worldCenter;
-            this._upDirection = worldUpDirection;
+            this.CameraPosition = worldCenter - worldNormal * this.Distance;
+            this.TargetPosition = worldCenter;
+            this.UpDirection = worldUpDirection;
 
             this.UpdateViewMatrix();
         }

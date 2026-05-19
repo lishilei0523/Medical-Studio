@@ -12,11 +12,6 @@ namespace MedicalSharp.Primitives.Cameras
         #region # 字段及构造器
 
         /// <summary>
-        /// 相机上方向
-        /// </summary>
-        private Vector3 _upDirection;
-
-        /// <summary>
         /// 相机右方向
         /// </summary>
         private Vector3 _rightDirection;
@@ -90,14 +85,14 @@ namespace MedicalSharp.Primitives.Cameras
             this.SetWorldUpDirectionInternal(worldUpDirection);
 
             //设置相机参数
-            this._targetPosition = targetPosition == default ? Vector3.Zero : targetPosition;
-            this._distance = MathHelper.Clamp(distance, this._minDistance, this._maxDistance);
+            this.TargetPosition = targetPosition == default ? Vector3.Zero : targetPosition;
+            this.Distance = MathHelper.Clamp(distance, this._minDistance, this._maxDistance);
             this._yaw = yaw;
             this._pitch = MathHelper.Clamp(pitch, this._minPitch, this._maxPitch);
 
             //从角度计算方向
             this._lookDirection = this.CalculateLookDirection(this._yaw, this._pitch);
-            this._cameraPosition = this._targetPosition - this._lookDirection * this._distance;
+            this.CameraPosition = this.TargetPosition - this._lookDirection * this.Distance;
 
             //更新相机坐标系
             this.UpdateCameraVectors();
@@ -138,11 +133,11 @@ namespace MedicalSharp.Primitives.Cameras
             this.SetWorldUpDirectionInternal(worldUpDirection);
 
             //设置相机位置和目标位置
-            this._cameraPosition = cameraPosition;
-            this._targetPosition = targetPosition;
+            this.CameraPosition = cameraPosition;
+            this.TargetPosition = targetPosition;
 
             //计算视角方向
-            Vector3 lookDirectionRaw = this._targetPosition - this._cameraPosition;
+            Vector3 lookDirectionRaw = this.TargetPosition - this.CameraPosition;
             float distance = lookDirectionRaw.Length;
 
             #region # 验证
@@ -155,7 +150,7 @@ namespace MedicalSharp.Primitives.Cameras
             #endregion
 
             this._lookDirection = Vector3.Normalize(lookDirectionRaw);
-            this._distance = MathHelper.Clamp(distance, this._minDistance, this._maxDistance);
+            this.Distance = MathHelper.Clamp(distance, this._minDistance, this._maxDistance);
 
             //从方向计算角度
             this.CalculateAngles(this._lookDirection);
@@ -169,18 +164,6 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 属性
 
-        #region 相机位置 —— override Vector3 CameraPosition
-        /// <summary>
-        /// 相机位置
-        /// </summary>
-        private Vector3 _cameraPosition;
-
-        /// <summary>
-        /// 相机位置
-        /// </summary>
-        public override Vector3 CameraPosition => this._cameraPosition;
-        #endregion
-
         #region 视角方向 —— override Vector3 LookDirection
         /// <summary>
         /// 视角方向
@@ -191,13 +174,6 @@ namespace MedicalSharp.Primitives.Cameras
         /// 视角方向
         /// </summary>
         public override Vector3 LookDirection => this._lookDirection;
-        #endregion
-
-        #region 相机上方向 —— override Vector3 UpDirection
-        /// <summary>
-        /// 相机上方向
-        /// </summary>
-        public override Vector3 UpDirection => this._upDirection;
         #endregion
 
         #region 相机右方向 —— override Vector3 RightDirection
@@ -212,48 +188,6 @@ namespace MedicalSharp.Primitives.Cameras
         /// 视图矩阵
         /// </summary>
         public override Matrix4 ViewMatrix => this._viewMatrix;
-        #endregion
-
-        #region 目标位置 —— Vector3 TargetPosition
-        /// <summary>
-        /// 目标位置
-        /// </summary>
-        private Vector3 _targetPosition;
-
-        /// <summary>
-        /// 目标位置
-        /// </summary>
-        public Vector3 TargetPosition
-        {
-            get => this._targetPosition;
-            set
-            {
-                this._targetPosition = value;
-                this.UpdateCameraVectors();
-                this.UpdateViewMatrix();
-            }
-        }
-        #endregion
-
-        #region 相机到目标距离 —— float Distance
-        /// <summary>
-        /// 相机到目标距离
-        /// </summary>
-        private float _distance;
-
-        /// <summary>
-        /// 相机到目标距离
-        /// </summary>
-        public float Distance
-        {
-            get => this._distance;
-            set
-            {
-                this._distance = MathHelper.Clamp(value, this._minDistance, this._maxDistance);
-                this.UpdateCameraVectors();
-                this.UpdateViewMatrix();
-            }
-        }
         #endregion
 
         #region 偏航角 —— float Yaw
@@ -317,7 +251,7 @@ namespace MedicalSharp.Primitives.Cameras
         /// <param name="targetPosition">目标位置（世界坐标）</param>
         public override void LookAt(Vector3 targetPosition)
         {
-            this._targetPosition = targetPosition;
+            this.TargetPosition = targetPosition;
 
             this.UpdateCameraVectors();
             this.UpdateViewMatrix();
@@ -382,7 +316,7 @@ namespace MedicalSharp.Primitives.Cameras
         {
             this._minDistance = minDistance;
             this._maxDistance = maxDistance;
-            this._distance = Math.Clamp(this._distance, this._minDistance, this._maxDistance);
+            this.Distance = Math.Clamp(this.Distance, this._minDistance, this._maxDistance);
             this.UpdateCameraVectors();
             this.UpdateViewMatrix();
         }
@@ -493,8 +427,8 @@ namespace MedicalSharp.Primitives.Cameras
         /// <param name="delta">缩放变化量</param>
         public void Zoom(float delta)
         {
-            this._distance -= delta * this._zoomSpeed;
-            this._distance = MathHelper.Clamp(this._distance, this._minDistance, this._maxDistance);
+            this.Distance -= delta * this._zoomSpeed;
+            this.Distance = MathHelper.Clamp(this.Distance, this._minDistance, this._maxDistance);
             this.UpdateCameraVectors();
             this.UpdateViewMatrix();
         }
@@ -509,11 +443,11 @@ namespace MedicalSharp.Primitives.Cameras
         public void Pan(float deltaX, float deltaY)
         {
             //计算平移向量
-            float actualMoveSpeed = this._moveSpeed * this._distance * 0.01f;
-            Vector3 panOffset = this._rightDirection * (-deltaX * actualMoveSpeed) + this._upDirection * (deltaY * actualMoveSpeed);
+            float actualMoveSpeed = this._moveSpeed * this.Distance * 0.01f;
+            Vector3 panOffset = this._rightDirection * (-deltaX * actualMoveSpeed) + this.UpDirection * (deltaY * actualMoveSpeed);
 
             //平移目标点和相机位置
-            this._targetPosition += panOffset;
+            this.TargetPosition += panOffset;
 
             this.UpdateCameraVectors();
             this.UpdateViewMatrix();
@@ -526,8 +460,8 @@ namespace MedicalSharp.Primitives.Cameras
         /// </summary>
         public void Reset()
         {
-            this._targetPosition = Vector3.Zero;
-            this._distance = 5.0f;
+            this.TargetPosition = Vector3.Zero;
+            this.Distance = 5.0f;
             this._yaw = 0.0f;
             this._pitch = 0.0f;
 
@@ -549,7 +483,7 @@ namespace MedicalSharp.Primitives.Cameras
             this._lookDirection = this.CalculateLookDirection(this._yaw, this._pitch);
 
             //计算相机位置
-            this._cameraPosition = this._targetPosition - this._lookDirection * this._distance;
+            this.CameraPosition = this.TargetPosition - this._lookDirection * this.Distance;
 
             //计算右方向和上方向
             float dot = Math.Abs(Vector3.Dot(this._worldUpDirection, this._lookDirection));
@@ -561,7 +495,7 @@ namespace MedicalSharp.Primitives.Cameras
             this._rightDirection = Vector3.Normalize(Vector3.Cross(this._lookDirection, upDirection));
 
             //计算真正的上方向：right × look
-            this._upDirection = Vector3.Normalize(Vector3.Cross(this._rightDirection, this._lookDirection));
+            this.UpDirection = Vector3.Normalize(Vector3.Cross(this._rightDirection, this._lookDirection));
         }
         #endregion
 
@@ -571,7 +505,7 @@ namespace MedicalSharp.Primitives.Cameras
         /// </summary>
         private void UpdateViewMatrix()
         {
-            this._viewMatrix = Matrix4.LookAt(this._cameraPosition, this._targetPosition, this._upDirection);
+            this._viewMatrix = Matrix4.LookAt(this.CameraPosition, this.TargetPosition, this.UpDirection);
         }
         #endregion
 
