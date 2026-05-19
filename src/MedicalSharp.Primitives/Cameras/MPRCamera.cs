@@ -63,16 +63,6 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 属性
 
-        #region 相机模式 —— override Vector3 CameraMode
-        /// <summary>
-        /// 相机模式
-        /// </summary>
-        public override CameraMode CameraMode
-        {
-            get => CameraMode.Orthographic;
-        }
-        #endregion
-
         #region 相机位置 —— override Vector3 CameraPosition
         /// <summary>
         /// 相机位置
@@ -173,6 +163,16 @@ namespace MedicalSharp.Primitives.Cameras
                     this.UpdateProjectionMatrix();
                 }
             }
+        }
+        #endregion
+
+        #region 只读属性 - 相机模式 —— override Vector3 CameraMode
+        /// <summary>
+        /// 只读属性 - 相机模式
+        /// </summary>
+        public override CameraMode CameraMode
+        {
+            get => CameraMode.Orthographic;
         }
         #endregion
 

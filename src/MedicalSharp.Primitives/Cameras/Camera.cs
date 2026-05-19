@@ -27,13 +27,6 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 属性
 
-        #region 相机模式 —— abstract Vector3 CameraMode
-        /// <summary>
-        /// 相机模式
-        /// </summary>
-        public abstract CameraMode CameraMode { get; }
-        #endregion
-
         #region 相机位置 —— abstract Vector3 CameraPosition
         /// <summary>
         /// 相机位置
@@ -102,6 +95,13 @@ namespace MedicalSharp.Primitives.Cameras
         /// 视口高度
         /// </summary>
         public float ViewportHeight { get; protected set; }
+        #endregion
+
+        #region 只读属性 - 相机模式 —— abstract Vector3 CameraMode
+        /// <summary>
+        /// 只读属性 - 相机模式
+        /// </summary>
+        public abstract CameraMode CameraMode { get; }
         #endregion
 
         #endregion

@@ -46,16 +46,6 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 属性
 
-        #region 相机模式 —— override Vector3 CameraMode
-        /// <summary>
-        /// 相机模式
-        /// </summary>
-        public override CameraMode CameraMode
-        {
-            get => CameraMode.Perspective;
-        }
-        #endregion
-
         #region 视野角度 —— float FieldOfView
         /// <summary>
         /// 视野角度（度）
@@ -81,6 +71,16 @@ namespace MedicalSharp.Primitives.Cameras
 
                 return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(this.FieldOfView), aspectRatio, this.NearPlaneDistance, this.FarPlaneDistance);
             }
+        }
+        #endregion
+
+        #region 只读属性 - 相机模式 —— override Vector3 CameraMode
+        /// <summary>
+        /// 只读属性 - 相机模式
+        /// </summary>
+        public override CameraMode CameraMode
+        {
+            get => CameraMode.Perspective;
         }
         #endregion
 

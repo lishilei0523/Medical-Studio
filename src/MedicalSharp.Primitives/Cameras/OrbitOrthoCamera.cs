@@ -44,16 +44,6 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 属性
 
-        #region 相机模式 —— override Vector3 CameraMode
-        /// <summary>
-        /// 相机模式
-        /// </summary>
-        public override CameraMode CameraMode
-        {
-            get => CameraMode.Orthographic;
-        }
-        #endregion
-
         #region 只读属性 - 投影矩阵 —— override Matrix4 ProjectionMatrix
         /// <summary>
         /// 只读属性 - 投影矩阵
@@ -79,6 +69,16 @@ namespace MedicalSharp.Primitives.Cameras
                 // 创建正交投影矩阵
                 return Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this.NearPlaneDistance, this.FarPlaneDistance);
             }
+        }
+        #endregion
+
+        #region 只读属性 - 相机模式 —— override Vector3 CameraMode
+        /// <summary>
+        /// 只读属性 - 相机模式
+        /// </summary>
+        public override CameraMode CameraMode
+        {
+            get => CameraMode.Orthographic;
         }
         #endregion
 
