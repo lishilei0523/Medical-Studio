@@ -63,7 +63,7 @@ namespace MedicalSharp.Primitives.Cameras
             get
             {
                 //防止视口尺寸无效
-                if (this._viewportWidth <= 0 || this._viewportHeight <= 0)
+                if (this.ViewportWidth <= 0 || this.ViewportHeight <= 0)
                 {
                     return Matrix4.Identity;
                 }
@@ -71,13 +71,13 @@ namespace MedicalSharp.Primitives.Cameras
                 //TODO 完善
                 //计算正交投影的边界
                 //除以100.0f是为了调整缩放比例，使相机距离与实际显示比例匹配
-                float left = -this._viewportWidth / 2.0f / 100.0f;
-                float right = this._viewportWidth / 2.0f / 100.0f;
-                float bottom = -this._viewportHeight / 2.0f / 100.0f;
-                float top = this._viewportHeight / 2.0f / 100.0f;
+                float left = -this.ViewportWidth / 2.0f / 100.0f;
+                float right = this.ViewportWidth / 2.0f / 100.0f;
+                float bottom = -this.ViewportHeight / 2.0f / 100.0f;
+                float top = this.ViewportHeight / 2.0f / 100.0f;
 
                 // 创建正交投影矩阵
-                return Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this._nearPlaneDistance, this._farPlaneDistance);
+                return Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this.NearPlaneDistance, this.FarPlaneDistance);
             }
         }
         #endregion

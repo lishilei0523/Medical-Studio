@@ -11,36 +11,16 @@ namespace MedicalSharp.Primitives.Cameras
         #region # 字段及构造器
 
         /// <summary>
-        /// 视口宽度
-        /// </summary>
-        protected float _viewportWidth;
-
-        /// <summary>
-        /// 视口高度
-        /// </summary>
-        protected float _viewportHeight;
-
-        /// <summary>
-        /// 近平面距离
-        /// </summary>
-        protected float _nearPlaneDistance;
-
-        /// <summary>
-        /// 远平面距离
-        /// </summary>
-        protected float _farPlaneDistance;
-
-        /// <summary>
         /// 创建相机构造器
         /// </summary>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
         protected Camera(float nearPlaneDistance = -1.0f, float farPlaneDistance = 1.0f)
         {
-            this._viewportWidth = 0;
-            this._viewportHeight = 0;
-            this._nearPlaneDistance = nearPlaneDistance;
-            this._farPlaneDistance = farPlaneDistance;
+            this.ViewportWidth = 0;
+            this.ViewportHeight = 0;
+            this.NearPlaneDistance = nearPlaneDistance;
+            this.FarPlaneDistance = farPlaneDistance;
         }
 
         #endregion
@@ -96,24 +76,32 @@ namespace MedicalSharp.Primitives.Cameras
         public abstract Matrix4 ViewMatrix { get; }
         #endregion
 
-        #region 只读属性 - 视口宽度 —— float ViewportWidth
+        #region 近平面距离 —— float NearPlaneDistance
         /// <summary>
-        /// 只读属性 - 视口宽度
+        /// 近平面距离
         /// </summary>
-        public float ViewportWidth
-        {
-            get => this._viewportWidth;
-        }
+        public float NearPlaneDistance { get; protected set; }
         #endregion
 
-        #region 只读属性 - 视口高度 —— float ViewportHeight
+        #region 远平面距离 —— float FarPlaneDistance
         /// <summary>
-        /// 只读属性 - 视口高度
+        /// 远平面距离
         /// </summary>
-        public float ViewportHeight
-        {
-            get => this._viewportHeight;
-        }
+        public float FarPlaneDistance { get; protected set; }
+        #endregion
+
+        #region 视口宽度 —— float ViewportWidth
+        /// <summary>
+        /// 视口宽度
+        /// </summary>
+        public float ViewportWidth { get; protected set; }
+        #endregion
+
+        #region 视口高度 —— float ViewportHeight
+        /// <summary>
+        /// 视口高度
+        /// </summary>
+        public float ViewportHeight { get; protected set; }
         #endregion
 
         #endregion
@@ -128,8 +116,8 @@ namespace MedicalSharp.Primitives.Cameras
         /// <param name="height">视口高度</param>
         public virtual void SetViewportSize(float width, float height)
         {
-            this._viewportWidth = width;
-            this._viewportHeight = height;
+            this.ViewportWidth = width;
+            this.ViewportHeight = height;
         }
         #endregion
 

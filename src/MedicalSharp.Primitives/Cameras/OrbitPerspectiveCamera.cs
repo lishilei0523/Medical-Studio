@@ -72,14 +72,14 @@ namespace MedicalSharp.Primitives.Cameras
             get
             {
                 //防止除以零
-                if (this._viewportWidth <= 0 || this._viewportHeight <= 0)
+                if (this.ViewportWidth <= 0 || this.ViewportHeight <= 0)
                 {
                     return Matrix4.Identity;
                 }
 
-                float aspectRatio = this._viewportWidth / this._viewportHeight;
+                float aspectRatio = this.ViewportWidth / this.ViewportHeight;
 
-                return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(this.FieldOfView), aspectRatio, this._nearPlaneDistance, this._farPlaneDistance);
+                return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(this.FieldOfView), aspectRatio, this.NearPlaneDistance, this.FarPlaneDistance);
             }
         }
         #endregion

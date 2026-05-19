@@ -276,7 +276,7 @@ namespace MedicalSharp.Primitives.Cameras
         {
             #region # 验证
 
-            if (this._viewportWidth <= 0 || this._viewportHeight <= 0)
+            if (this.ViewportWidth <= 0 || this.ViewportHeight <= 0)
             {
                 return;
             }
@@ -284,8 +284,8 @@ namespace MedicalSharp.Primitives.Cameras
             #endregion
 
             //将鼠标移动归一化到[-1, 1]范围
-            float normalizedDeltaX = deltaX / this._viewportWidth * 2.0f;
-            float normalizedDeltaY = deltaY / this._viewportHeight * 2.0f;
+            float normalizedDeltaX = deltaX / this.ViewportWidth * 2.0f;
+            float normalizedDeltaY = deltaY / this.ViewportHeight * 2.0f;
 
             //考虑缩放因子
             float panSpeed = 1.0f / this._zoomFactor;
@@ -436,7 +436,7 @@ namespace MedicalSharp.Primitives.Cameras
         {
             #region # 验证
 
-            if (this._viewportWidth <= 0 || this._viewportHeight <= 0)
+            if (this.ViewportWidth <= 0 || this.ViewportHeight <= 0)
             {
                 this._projectionMatrix = Matrix4.Identity;
                 return;
@@ -444,7 +444,7 @@ namespace MedicalSharp.Primitives.Cameras
 
             #endregion
 
-            float aspect = this._viewportWidth / this._viewportHeight;
+            float aspect = this.ViewportWidth / this.ViewportHeight;
             float halfSideSize = 0.5f / this._zoomFactor;
             float left, right, bottom, top;
 
@@ -463,7 +463,7 @@ namespace MedicalSharp.Primitives.Cameras
                 top = halfSideSize / aspect + this._panOffset.Y;
             }
 
-            this._projectionMatrix = Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this._nearPlaneDistance, this._farPlaneDistance);
+            this._projectionMatrix = Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this.NearPlaneDistance, this.FarPlaneDistance);
         }
         #endregion
 
