@@ -14,11 +14,6 @@ namespace MedicalSharp.Primitives.Cameras
         #region # 字段及构造器
 
         /// <summary>
-        /// 目标平面
-        /// </summary>
-        private MPRPlane _targetPlane;
-
-        /// <summary>
         /// 目标距离
         /// </summary>
         private float _distance;
@@ -166,6 +161,13 @@ namespace MedicalSharp.Primitives.Cameras
         }
         #endregion
 
+        #region 目标平面 —— MPRPlane TargetPlane
+        /// <summary>
+        /// 目标平面
+        /// </summary>
+        public MPRPlane TargetPlane { get; private set; }
+        #endregion
+
         #region 只读属性 - 相机模式 —— override Vector3 CameraMode
         /// <summary>
         /// 只读属性 - 相机模式
@@ -173,16 +175,6 @@ namespace MedicalSharp.Primitives.Cameras
         public override CameraMode CameraMode
         {
             get => CameraMode.Orthographic;
-        }
-        #endregion
-
-        #region 只读属性 - 目标平面 —— MPRPlane TargetPlane
-        /// <summary>
-        /// 只读属性 - 目标平面
-        /// </summary>
-        public MPRPlane TargetPlane
-        {
-            get => this._targetPlane;
         }
         #endregion
 
@@ -216,15 +208,9 @@ namespace MedicalSharp.Primitives.Cameras
             this._targetPosition = targetPosition;
 
             //重新计算相机位置（保持原距离）
-            if (this._targetPlane != null)
+            if (this.TargetPlane != null)
             {
-                Vector3 worldNormal = new Vector3(
-                    this._targetPlane.Normal.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
-                    this._targetPlane.Normal.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
-                    this._targetPlane.Normal.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
-                ).Normalized();
-
-                this._cameraPosition = this._targetPosition - worldNormal * this._distance;
+                this._cameraPosition = this._targetPosition - this.TargetPlane.WorldNormal * this._distance;
             }
 
             this.UpdateViewMatrix();
@@ -238,17 +224,24 @@ namespace MedicalSharp.Primitives.Cameras
         /// <param name="plane">MPR平面</param>
         public void BindPlane(MPRPlane plane)
         {
-            if (this._targetPlane != null)
+            #region # 验证
+
+            if (plane == null)
             {
-                this._targetPlane.PlaneChangedEvent -= this.OnPlaneChanged;
+                throw new ArgumentNullException(nameof(plane), "MPR平面不可为空！");
             }
 
-            this._targetPlane = plane;
-            if (this._targetPlane != null)
+            #endregion
+
+            //卸载旧实例事件
+            if (this.TargetPlane != null)
             {
-                this._targetPlane.PlaneChangedEvent += this.OnPlaneChanged;
-                this.UpdateCameraVectors();
+                this.TargetPlane.PlaneChangedEvent -= this.OnPlaneChanged;
             }
+
+            this.TargetPlane = plane;
+            this.TargetPlane.PlaneChangedEvent += this.OnPlaneChanged;
+            this.UpdateCameraVectors();
         }
         #endregion
 
@@ -310,95 +303,6 @@ namespace MedicalSharp.Primitives.Cameras
         }
         #endregion
 
-        #region 看向体素 —— void LookAtVoxel(Vector3i voxelPosition)
-        /// <summary>
-        /// 看向体素
-        /// </summary>
-        /// <param name="voxelPosition">体素位置</param>
-        public void LookAtVoxel(Vector3i voxelPosition)
-        {
-            #region # 验证
-
-            if (this._targetPlane == null)
-            {
-                return;
-            }
-
-            #endregion
-
-            Vector3 texCoord = new Vector3(
-                voxelPosition.X * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.X - 1),
-                voxelPosition.Y * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.Y - 1),
-                voxelPosition.Z * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.Z - 1)
-            );
-            Vector3 localPoint = texCoord - new Vector3(0.5f);
-
-            Vector3 worldPoint = new Vector3(
-                localPoint.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
-                localPoint.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
-                localPoint.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
-            );
-
-            this._targetPosition = worldPoint;
-
-            Vector3 worldNormal = new Vector3(
-                this._targetPlane.Normal.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
-                this._targetPlane.Normal.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
-                this._targetPlane.Normal.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
-
-            this._cameraPosition = this._targetPosition - worldNormal * this._distance;
-            this.UpdateViewMatrix();
-        }
-        #endregion
-
-        #region 看向体素 —— void LookAtVoxel(Vector3i voxelPosition, Vector2 offsetUV)
-        /// <summary>
-        /// 看向体素
-        /// </summary>
-        /// <param name="voxelPosition">体素坐标</param>
-        /// <param name="offsetUV">UV偏移量</param>
-        public void LookAtVoxel(Vector3i voxelPosition, Vector2 offsetUV)
-        {
-            #region # 验证
-
-            if (this._targetPlane == null)
-            {
-                return;
-            }
-
-            #endregion
-
-            Vector3 texCoord = new Vector3(
-                voxelPosition.X * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.X - 1),
-                voxelPosition.Y * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.Y - 1),
-                voxelPosition.Z * 1.0f / (this._targetPlane.VolumeMetadata.VolumeSize.Z - 1)
-            );
-            Vector3 localPoint = texCoord - new Vector3(0.5f);
-
-            const float halfSize = 0.5f;
-            Vector3 offsetLocal = this._targetPlane.UAxis * offsetUV.X * halfSize + this._targetPlane.VAxis * offsetUV.Y * halfSize;
-            localPoint += offsetLocal;
-
-            Vector3 worldPoint = new Vector3(
-                localPoint.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
-                localPoint.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
-                localPoint.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
-            );
-
-            this._targetPosition = worldPoint;
-
-            Vector3 worldNormal = new Vector3(
-                this._targetPlane.Normal.X * this._targetPlane.VolumeMetadata.VolumeScale.X,
-                this._targetPlane.Normal.Y * this._targetPlane.VolumeMetadata.VolumeScale.Y,
-                this._targetPlane.Normal.Z * this._targetPlane.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
-
-            this._cameraPosition = this._targetPosition - worldNormal * this._distance;
-            this.UpdateViewMatrix();
-        }
-        #endregion
-
 
         //Private
 
@@ -410,16 +314,16 @@ namespace MedicalSharp.Primitives.Cameras
         {
             #region # 验证
 
-            if (this._targetPlane == null)
+            if (this.TargetPlane == null)
             {
                 return;
             }
 
             #endregion
 
-            Vector3 worldCenter = this._targetPlane.WorldCenter;
-            Vector3 worldNormal = this._targetPlane.WorldNormal;
-            Vector3 worldUpDirection = this._targetPlane.WorldVAxis;
+            Vector3 worldCenter = this.TargetPlane.WorldCenter;
+            Vector3 worldNormal = this.TargetPlane.WorldNormal;
+            Vector3 worldUpDirection = this.TargetPlane.WorldVAxis;
             this._cameraPosition = worldCenter - worldNormal * this._distance;
             this._targetPosition = worldCenter;
             this._upDirection = worldUpDirection;
