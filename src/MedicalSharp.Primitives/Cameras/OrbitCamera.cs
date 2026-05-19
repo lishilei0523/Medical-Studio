@@ -34,13 +34,13 @@ namespace MedicalSharp.Primitives.Cameras
             //默认值
             this.SetDefaultValues();
 
-            //设置世界坐标系上方向
-            worldUpDirection = Vector3.Normalize(worldUpDirection);
-            this.SetWorldUpDirectionInternal(worldUpDirection);
-
             //设置相机位置和目标位置
             this.CameraPosition = cameraPosition;
             this.TargetPosition = targetPosition;
+
+            //设置世界坐标系上方向
+            worldUpDirection = Vector3.Normalize(worldUpDirection);
+            this.SetWorldUpDirectionInternal(worldUpDirection);
 
             //计算视角方向
             Vector3 lookDirectionRaw = this.TargetPosition - this.CameraPosition;
@@ -128,16 +128,11 @@ namespace MedicalSharp.Primitives.Cameras
         public Vector3 WorldUpDirection { get; protected set; }
         #endregion
 
-        #region 当前坐标系类型 —— CoordinateType CoordinateType
+        #region 世界坐标系类型 —— CoordinateType WorldCoordinateType
         /// <summary>
-        /// 当前坐标系类型
+        /// 世界坐标系类型
         /// </summary>
-        private CoordinateType _coordinateType;
-
-        /// <summary>
-        /// 当前坐标系类型
-        /// </summary>
-        public CoordinateType CoordinateType => this._coordinateType;
+        public CoordinateType WorldCoordinateType { get; protected set; }
         #endregion
 
         #region 偏航角 —— float Yaw
@@ -209,14 +204,14 @@ namespace MedicalSharp.Primitives.Cameras
         }
         #endregion
 
-        #region 设置世界坐标系 —— void SetWorldCoordinate(CoordinateType coordinateSystem)
+        #region 设置世界坐标系类型 —— void SetWorldCoordinate(CoordinateType worldCoordinateType)
         /// <summary>
-        /// 设置世界坐标系
+        /// 设置世界坐标系类型
         /// </summary>
-        /// <param name="coordinateSystem">坐标系类型</param>
-        public void SetWorldCoordinate(CoordinateType coordinateSystem)
+        /// <param name="worldCoordinateType">世界坐标系类型</param>
+        public void SetWorldCoordinate(CoordinateType worldCoordinateType)
         {
-            Vector3 worldUpDirection = coordinateSystem switch
+            Vector3 worldUpDirection = worldCoordinateType switch
             {
                 CoordinateType.XUp => new Vector3(1, 0, 0),
                 CoordinateType.YUp => new Vector3(0, 1, 0),
@@ -245,13 +240,10 @@ namespace MedicalSharp.Primitives.Cameras
             #endregion
 
             worldUpDirection = Vector3.Normalize(worldUpDirection);
-
-            //检查是否方向改变
-            bool isSameDirection = Math.Abs(Vector3.Dot(this.WorldUpDirection, worldUpDirection)) > 0.9999f;
-
             this.SetWorldUpDirectionInternal(worldUpDirection);
 
-            //坐标系改变时重新计算角度
+            //检查是否方向改变，坐标系改变时重新计算角度
+            bool isSameDirection = Math.Abs(Vector3.Dot(this.WorldUpDirection, worldUpDirection)) > 0.9999f;
             if (!isSameDirection)
             {
                 this.CalculateAngles(this.LookDirection);
@@ -432,15 +424,15 @@ namespace MedicalSharp.Primitives.Cameras
             //使用点积判断方向，避免浮点精度问题
             if (Math.Abs(Vector3.Dot(worldUpDirection, new Vector3(1, 0, 0))) > 0.9999f)
             {
-                this._coordinateType = CoordinateType.XUp;
+                this.WorldCoordinateType = CoordinateType.XUp;
             }
             else if (Math.Abs(Vector3.Dot(worldUpDirection, new Vector3(0, 0, 1))) > 0.9999f)
             {
-                this._coordinateType = CoordinateType.ZUp;
+                this.WorldCoordinateType = CoordinateType.ZUp;
             }
             else
             {
-                this._coordinateType = CoordinateType.YUp;
+                this.WorldCoordinateType = CoordinateType.YUp;
             }
         }
         #endregion
@@ -462,7 +454,7 @@ namespace MedicalSharp.Primitives.Cameras
             float cosYaw = MathF.Cos(yawRad);
             float sinYaw = MathF.Sin(yawRad);
 
-            switch (this._coordinateType)
+            switch (this.WorldCoordinateType)
             {
                 case CoordinateType.XUp:  //X-up: 方向向量 = (-sin(pitch), cos(yaw)*cos(pitch), sin(yaw)*cos(pitch))
                     return new Vector3(-sinPitch, cosPitch * cosYaw, cosPitch * sinYaw).Normalized();
@@ -487,7 +479,7 @@ namespace MedicalSharp.Primitives.Cameras
         /// <remarks>根据世界坐标系上方向</remarks>
         private void CalculateAngles(Vector3 lookDirection)
         {
-            switch (this._coordinateType)
+            switch (this.WorldCoordinateType)
             {
                 case CoordinateType.XUp:  //X-up: 偏航角绕X轴，俯仰角绕Y轴
                     this.Yaw = MathHelper.RadiansToDegrees(MathF.Atan2(lookDirection.Z, lookDirection.Y));
@@ -525,7 +517,7 @@ namespace MedicalSharp.Primitives.Cameras
         /// <remarks>当视线与世界上方向平行时使用</remarks>
         private Vector3 GetAlternativeUpDirection()
         {
-            return this._coordinateType switch
+            return this.WorldCoordinateType switch
             {
                 CoordinateType.XUp => Vector3.UnitY,
                 CoordinateType.YUp => Vector3.UnitZ,
