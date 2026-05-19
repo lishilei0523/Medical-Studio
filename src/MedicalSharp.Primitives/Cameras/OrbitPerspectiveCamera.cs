@@ -90,6 +90,7 @@ namespace MedicalSharp.Primitives.Cameras
             if (this.ViewportWidth <= 0 || this.ViewportHeight <= 0)
             {
                 this.ProjectionMatrix = Matrix4.Identity;
+                return;
             }
 
             float aspectRatio = this.ViewportWidth / this.ViewportHeight;
