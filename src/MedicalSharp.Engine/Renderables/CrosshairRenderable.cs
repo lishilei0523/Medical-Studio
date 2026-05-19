@@ -20,12 +20,12 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 水平缓冲区
         /// </summary>
-        private VertexBuffer _horizontalBuffer;
+        private readonly VertexBuffer _horizontalBuffer;
 
         /// <summary>
         /// 垂直缓冲区
         /// </summary>
-        private VertexBuffer _verticalBuffer;
+        private readonly VertexBuffer _verticalBuffer;
 
         /// <summary>
         /// 默认构造器
@@ -202,10 +202,7 @@ namespace MedicalSharp.Engine.Renderables
             this.HorizontalLength = horizontalLength;
             this.VerticalLength = verticalLength;
 
-            //先释放旧的
-            this._horizontalBuffer.Dispose();
-            this._verticalBuffer.Dispose();
-
+            //更新VBO
             float halfHorizontalLength = horizontalLength / 2.0f;
             float halfVerticalLength = verticalLength / 2.0f;
             MeshGeometry horizontalLine = MeshFactory.CreateLineSegment(
@@ -214,8 +211,8 @@ namespace MedicalSharp.Engine.Renderables
             MeshGeometry verticalLine = MeshFactory.CreateLineSegment(
                 center - vAxis * halfVerticalLength,
                 center + vAxis * halfVerticalLength);
-            this._horizontalBuffer = new VertexBuffer(horizontalLine);
-            this._verticalBuffer = new VertexBuffer(verticalLine);
+            this._horizontalBuffer.Update(horizontalLine);
+            this._verticalBuffer.Update(verticalLine);
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();
@@ -304,8 +301,8 @@ namespace MedicalSharp.Engine.Renderables
                 return;
             }
 
-            this._horizontalBuffer?.Dispose();
-            this._verticalBuffer?.Dispose();
+            this._horizontalBuffer.Dispose();
+            this._verticalBuffer.Dispose();
 
             this._disposed = true;
         }

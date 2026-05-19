@@ -20,12 +20,12 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 线框缓冲区
         /// </summary>
-        private VertexBuffer _strokeBuffer;
+        private readonly VertexBuffer _strokeBuffer;
 
         /// <summary>
         /// 填充缓冲区
         /// </summary>
-        private VertexBuffer _fillBuffer;
+        private readonly VertexBuffer _fillBuffer;
 
         /// <summary>
         /// 默认构造器
@@ -54,7 +54,7 @@ namespace MedicalSharp.Engine.Renderables
             //初始化缓冲区
             MeshGeometry polylineGeometry = MeshFactory.CreatePolyline(this.Positions, this.Closed);
             this._strokeBuffer = new VertexBuffer(polylineGeometry);
-            if (this.Closed && positions.Count >= 3)
+            if (this.Closed)
             {
                 MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.Positions);
                 this._fillBuffer = new VertexBuffer(polygonGeometry);
@@ -159,16 +159,13 @@ namespace MedicalSharp.Engine.Renderables
 
             this.Positions = positions;
 
-            //先释放旧的
-            this._strokeBuffer.Dispose();
-            this._fillBuffer?.Dispose();
-
+            //更新VBO
             MeshGeometry polylineGeometry = MeshFactory.CreatePolyline(positions, this.Closed);
-            this._strokeBuffer = new VertexBuffer(polylineGeometry);
-            if (this.Closed && this.Positions.Count >= 3)
+            this._strokeBuffer.Update(polylineGeometry);
+            if (this.Closed)
             {
                 MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.Positions);
-                this._fillBuffer = new VertexBuffer(polygonGeometry);
+                this._fillBuffer.Update(polygonGeometry);
             }
 
             //标记包围盒/包围球为脏
@@ -199,7 +196,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="context">渲染上下文</param>
         public override void Render(ShaderProgram program, RenderContext context)
         {
-            if (this.Closed && this.Positions.Count >= 3)
+            if (this.Closed)
             {
                 //禁用深度写入、让透明面可以互相混合
                 GL.DepthMask(false);
@@ -285,7 +282,6 @@ namespace MedicalSharp.Engine.Renderables
 
             this._strokeBuffer.Dispose();
             this._fillBuffer?.Dispose();
-
             this._disposed = true;
         }
         #endregion

@@ -17,7 +17,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 顶点缓冲区
         /// </summary>
-        private VertexBuffer _vertexBuffer;
+        private readonly VertexBuffer _vertexBuffer;
 
         /// <summary>
         /// 默认构造器
@@ -103,11 +103,9 @@ namespace MedicalSharp.Engine.Renderables
 
             this.Position = position;
 
-            //先释放旧的
-            this._vertexBuffer.Dispose();
-
+            //更新VBO
             MeshGeometry pointGeometry = MeshFactory.CreatePoint(position);
-            this._vertexBuffer = new VertexBuffer(pointGeometry);
+            this._vertexBuffer.Update(pointGeometry);
 
             //标记包围盒/包围球为脏
             base.InvalidateBoundings();

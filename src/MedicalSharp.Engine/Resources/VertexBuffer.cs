@@ -4,7 +4,6 @@ using Microsoft.CSharp.RuntimeBinder;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Engine.Resources
 {
@@ -21,11 +20,6 @@ namespace MedicalSharp.Engine.Resources
         private bool _disposed;
 
         /// <summary>
-        /// VAO
-        /// </summary>
-        private int _vao;
-
-        /// <summary>
         /// VBO
         /// </summary>
         private int _vbo;
@@ -40,16 +34,11 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         private VertexBuffer()
         {
-            this._vao = GL.GenVertexArray();
             this._vbo = GL.GenBuffer();
             this._ebo = GL.GenBuffer();
 
             #region # 验证
 
-            if (this._vao == 0)
-            {
-                throw new RuntimeBinderException("创建VAO失败！");
-            }
             if (this._vbo == 0)
             {
                 throw new RuntimeBinderException("创建VBO失败！");
@@ -60,6 +49,8 @@ namespace MedicalSharp.Engine.Resources
             }
 
             #endregion
+
+            this.VertexArray = new VertexArray(this);
         }
 
         /// <summary>
@@ -82,14 +73,23 @@ namespace MedicalSharp.Engine.Resources
             this.MeshGeometry = meshGeometry;
             this.BufferUsage = bufferUsage;
 
-            //初始化
+            //分配内存
             this.AllocateMemory();
-            this.Setup();
+
+            //初始化VAO
+            this.VertexArray.Setup();
         }
 
         #endregion
 
         #region # 属性
+
+        #region 顶点数组对象 —— VertexArray VertexArray
+        /// <summary>
+        /// 顶点数组对象
+        /// </summary>
+        internal VertexArray VertexArray { get; private set; }
+        #endregion
 
         #region 网格几何 —— MeshGeometry MeshGeometry
         /// <summary>
@@ -117,7 +117,6 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Bind()
         {
-            GL.BindVertexArray(this._vao);
             GL.BindBuffer(BufferTarget.ArrayBuffer, this._vbo);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, this._ebo);
         }
@@ -129,7 +128,6 @@ namespace MedicalSharp.Engine.Resources
         /// </summary>
         public void Unbind()
         {
-            GL.BindVertexArray(0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
         }
@@ -142,6 +140,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="primitiveType">图元类型</param>
         public void Draw(PrimitiveType primitiveType)
         {
+            this.VertexArray.Bind();
             this.Bind();
 
             if (this.MeshGeometry.Indices.Any())
@@ -154,6 +153,7 @@ namespace MedicalSharp.Engine.Resources
             }
 
             this.Unbind();
+            this.VertexArray.Unbind();
         }
         #endregion
 
@@ -192,11 +192,6 @@ namespace MedicalSharp.Engine.Resources
                 return;
             }
 
-            if (this._vao != 0)
-            {
-                GL.DeleteVertexArray(this._vao);
-                this._vao = 0;
-            }
             if (this._vbo != 0)
             {
                 GL.DeleteBuffer(this._vbo);
@@ -208,6 +203,7 @@ namespace MedicalSharp.Engine.Resources
                 this._ebo = 0;
             }
 
+            this.VertexArray.Dispose();
             this._disposed = true;
         }
         #endregion
@@ -234,34 +230,6 @@ namespace MedicalSharp.Engine.Resources
             {
                 GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, this.BufferUsage);
             }
-
-            this.Unbind();
-        }
-        #endregion
-
-        #region 初始化顶点数组 —— void Setup()
-        /// <summary>
-        /// 初始化顶点数组
-        /// </summary>
-        private unsafe void Setup()
-        {
-            this.Bind();
-
-            //位置(location = 0)
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Position)).ToInt32());
-            GL.EnableVertexAttribArray(0);
-
-            //颜色(location = 1)
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Color)).ToInt32());
-            GL.EnableVertexAttribArray(1);
-
-            //纹理坐标(location = 2)
-            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.TextureCoord)).ToInt32());
-            GL.EnableVertexAttribArray(2);
-
-            //法向量(location = 3)
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, sizeof(Vertex), Marshal.OffsetOf<Vertex>(nameof(Vertex.Normal)).ToInt32());
-            GL.EnableVertexAttribArray(3);
 
             this.Unbind();
         }

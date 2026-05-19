@@ -19,19 +19,19 @@ namespace MedicalSharp.Engine.Renderables
         #region # 字段及构造器
 
         /// <summary>
+        /// 三角形列表
+        /// </summary>
+        private Triangle[] _triangles;
+
+        /// <summary>
         /// 线框顶点缓冲区
         /// </summary>
-        private VertexBuffer _strokeBuffer;
+        private readonly VertexBuffer _strokeBuffer;
 
         /// <summary>
         /// 填充顶点缓冲区
         /// </summary>
-        private VertexBuffer _fillBuffer;
-
-        /// <summary>
-        /// 三角形列表
-        /// </summary>
-        private Triangle[] _triangles;
+        private readonly VertexBuffer _fillBuffer;
 
         /// <summary>
         /// 默认构造器
@@ -171,12 +171,9 @@ namespace MedicalSharp.Engine.Renderables
 
             #endregion
 
-            //先释放旧的
-            this._strokeBuffer.Dispose();
-            this._fillBuffer.Dispose();
-
-            this._strokeBuffer = new VertexBuffer(strokeMesh);
-            this._fillBuffer = new VertexBuffer(fillMesh);
+            //更新VBO
+            this._strokeBuffer.Update(strokeMesh);
+            this._fillBuffer.Update(fillMesh);
 
             //提取三角形面
             this._triangles = this._fillBuffer.MeshGeometry.ExtractTriangles();
@@ -257,9 +254,8 @@ namespace MedicalSharp.Engine.Renderables
                 return;
             }
 
-            this._strokeBuffer?.Dispose();
-            this._fillBuffer?.Dispose();
-
+            this._strokeBuffer.Dispose();
+            this._fillBuffer.Dispose();
             this._disposed = true;
         }
         #endregion

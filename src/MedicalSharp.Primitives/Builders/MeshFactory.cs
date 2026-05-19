@@ -110,7 +110,7 @@ namespace MedicalSharp.Primitives.Builders
             }
             if (positions.Count == 1)
             {
-                // 单个点：创建一个零长度的线段（点）
+                //单个点：创建一个零长度的线段（点）
                 Vertex vertex = new Vertex
                 {
                     Position = positions[0],
@@ -180,9 +180,17 @@ namespace MedicalSharp.Primitives.Builders
         {
             #region # 验证
 
-            if (positions == null || positions.Count < 3)
+            if (positions == null || positions.Count == 0)
             {
-                return new MeshGeometry([]);  //空网格（少于3个点无法形成面）
+                throw new ArgumentNullException(nameof(positions), "位置列表不可为空！");
+            }
+            if (positions.Count == 1)
+            {
+                return CreatePoint(positions[0]);
+            }
+            if (positions.Count == 2)
+            {
+                return CreateLineSegment(positions[0], positions[1]);
             }
 
             #endregion

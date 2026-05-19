@@ -322,7 +322,6 @@ namespace MedicalSharp.Engine.Renderables
 
             this._texture?.Dispose();
             this._vertexBuffer?.Dispose();
-
             this._disposed = true;
         }
         #endregion
@@ -401,17 +400,20 @@ namespace MedicalSharp.Engine.Renderables
 
             if (this._texture == null)
             {
-                this._vertexBuffer?.Dispose();
-                this._vertexBuffer = null;
                 return;
             }
 
             #endregion
 
-            this._vertexBuffer?.Dispose();
-
             MeshGeometry meshGeometry = MeshFactory.CreateContainer2D(this.TextSize.X, this.TextSize.Y, this.Normal);
-            this._vertexBuffer = new VertexBuffer(meshGeometry);
+            if (this._vertexBuffer == null)
+            {
+                this._vertexBuffer = new VertexBuffer(meshGeometry);
+            }
+            else
+            {
+                this._vertexBuffer.Update(meshGeometry);
+            }
         }
         #endregion
 

@@ -20,17 +20,17 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 控制点缓冲区
         /// </summary>
-        private VertexBuffer _pointBuffer;
+        private readonly VertexBuffer _pointBuffer;
 
         /// <summary>
         /// 曲线缓冲区
         /// </summary>
-        private VertexBuffer _curveBuffer;
+        private readonly VertexBuffer _curveBuffer;
 
         /// <summary>
         /// 填充缓冲区
         /// </summary>
-        private VertexBuffer _fillBuffer;
+        private readonly VertexBuffer _fillBuffer;
 
         /// <summary>
         /// 默认构造器
@@ -61,7 +61,7 @@ namespace MedicalSharp.Engine.Renderables
             MeshGeometry curveGeometry = MeshFactory.CreatePolyline(this.SampledPositions, this.Closed);
             this._pointBuffer = new VertexBuffer(pointGeometry);
             this._curveBuffer = new VertexBuffer(curveGeometry);
-            if (this.Closed && this.SampledPositions.Count >= 3)
+            if (this.Closed)
             {
                 MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.SampledPositions);
                 this._fillBuffer = new VertexBuffer(polygonGeometry);
@@ -162,19 +162,15 @@ namespace MedicalSharp.Engine.Renderables
             this.ControlPositions = controlPositions;
             this.SampledPositions = sampledPositions;
 
-            //先释放旧的
-            this._pointBuffer.Dispose();
-            this._curveBuffer.Dispose();
-            this._fillBuffer?.Dispose();
-
+            //更新VBO
             MeshGeometry pointGeometry = MeshFactory.CreatePointCloud(this.ControlPositions);
             MeshGeometry curveGeometry = MeshFactory.CreatePolyline(this.SampledPositions, this.Closed);
-            this._pointBuffer = new VertexBuffer(pointGeometry);
-            this._curveBuffer = new VertexBuffer(curveGeometry);
-            if (this.Closed && this.SampledPositions.Count >= 3)
+            this._pointBuffer.Update(pointGeometry);
+            this._curveBuffer.Update(curveGeometry);
+            if (this.Closed)
             {
                 MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.SampledPositions);
-                this._fillBuffer = new VertexBuffer(polygonGeometry);
+                this._fillBuffer.Update(polygonGeometry);
             }
 
             //标记包围盒/包围球为脏
@@ -205,7 +201,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="context">渲染上下文</param>
         public override void Render(ShaderProgram program, RenderContext context)
         {
-            if (this.Closed && this.SampledPositions.Count >= 3)
+            if (this.Closed)
             {
                 //禁用深度写入、让透明面可以互相混合
                 GL.DepthMask(false);
