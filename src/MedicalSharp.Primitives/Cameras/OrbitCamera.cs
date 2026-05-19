@@ -25,13 +25,7 @@ namespace MedicalSharp.Primitives.Cameras
             : base(nearPlaneDistance, farPlaneDistance)
         {
             //默认值
-            this.MinDistance = 0.1f;
-            this.MaxDistance = 100.0f;
-            this.MinPitch = -89.0f;
-            this.MaxPitch = 89.0f;
-            this.MoveSpeed = 3.0f;
-            this.RotateSpeed = 0.15f;
-            this.ZoomSpeed = 0.5f;
+            this.SetDefaultValues();
 
             //设置世界坐标系上方向（默认Y-up）
             worldUpDirection = worldUpDirection == default
@@ -75,13 +69,7 @@ namespace MedicalSharp.Primitives.Cameras
             #endregion
 
             //默认值
-            this.MinDistance = 0.1f;
-            this.MaxDistance = 100.0f;
-            this.MinPitch = -89.0f;
-            this.MaxPitch = 89.0f;
-            this.MoveSpeed = 3.0f;
-            this.RotateSpeed = 0.15f;
-            this.ZoomSpeed = 0.5f;
+            this.SetDefaultValues();
 
             //设置世界坐标系上方向
             worldUpDirection = Vector3.Normalize(worldUpDirection);
@@ -226,9 +214,9 @@ namespace MedicalSharp.Primitives.Cameras
         }
         #endregion
 
-        #region 设置相机到目标距离限制 —— void SetDistanceLimits(float minDistance, float maxDistance)
+        #region 设置距离限制 —— void SetDistanceLimits(float minDistance, float maxDistance)
         /// <summary>
-        /// 设置相机到目标距离限制
+        /// 设置距离限制
         /// </summary>
         /// <param name="minDistance">最小距离</param>
         /// <param name="maxDistance">最大距离</param>
@@ -258,12 +246,12 @@ namespace MedicalSharp.Primitives.Cameras
         }
         #endregion
 
-        #region 设置坐标系类型 —— void SetCoordinateType(CoordinateType coordinateSystem)
+        #region 设置世界坐标系 —— void SetWorldCoordinate(CoordinateType coordinateSystem)
         /// <summary>
-        /// 设置坐标系类型
+        /// 设置世界坐标系
         /// </summary>
         /// <param name="coordinateSystem">坐标系类型</param>
-        public void SetCoordinateType(CoordinateType coordinateSystem)
+        public void SetWorldCoordinate(CoordinateType coordinateSystem)
         {
             Vector3 worldUpDirection = coordinateSystem switch
             {
@@ -426,6 +414,22 @@ namespace MedicalSharp.Primitives.Cameras
 
 
         //Private
+
+        #region 设置默认值 —— void SetDefaultValues()
+        /// <summary>
+        /// 设置默认值
+        /// </summary>
+        private void SetDefaultValues()
+        {
+            this.MinDistance = 0.1f;
+            this.MaxDistance = 100.0f;
+            this.MinPitch = -89.0f;
+            this.MaxPitch = 89.0f;
+            this.MoveSpeed = 3.0f;
+            this.RotateSpeed = 0.15f;
+            this.ZoomSpeed = 0.5f;
+        }
+        #endregion
 
         #region 更新相机向量 —— override void UpdateCameraVectors()
         /// <summary>
