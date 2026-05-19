@@ -48,11 +48,11 @@ namespace MedicalSharp.Primitives.Cameras
         public float Distance { get; protected set; }
         #endregion
 
-        #region 视角方向 —— abstract Vector3 LookDirection 
+        #region 视角方向 —— Vector3 LookDirection 
         /// <summary>
         /// 视角方向
         /// </summary>
-        public abstract Vector3 LookDirection { get; }
+        public Vector3 LookDirection { get; protected set; }
         #endregion
 
         #region 相机上方向 —— Vector3 UpDirection
@@ -62,25 +62,25 @@ namespace MedicalSharp.Primitives.Cameras
         public Vector3 UpDirection { get; protected set; }
         #endregion
 
-        #region 相机右方向 —— abstract Vector3 RightDirection
+        #region 相机右方向 —— Vector3 RightDirection
         /// <summary>
         /// 相机右方向
         /// </summary>
-        public abstract Vector3 RightDirection { get; }
+        public Vector3 RightDirection { get; protected set; }
         #endregion
 
-        #region 投影矩阵 —— abstract Matrix4 ProjectionMatrix
+        #region 投影矩阵 —— Matrix4 ProjectionMatrix
         /// <summary>
         /// 投影矩阵
         /// </summary>
-        public abstract Matrix4 ProjectionMatrix { get; }
+        public Matrix4 ProjectionMatrix { get; protected set; }
         #endregion
 
-        #region 视图矩阵 —— abstract Matrix4 ViewMatrix
+        #region 视图矩阵 —— Matrix4 ViewMatrix
         /// <summary>
         /// 视图矩阵
         /// </summary>
-        public abstract Matrix4 ViewMatrix { get; }
+        public Matrix4 ViewMatrix { get; protected set; }
         #endregion
 
         #region 近平面距离 —— float NearPlaneDistance
@@ -122,6 +122,8 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 方法
 
+        //Public
+
         #region 设置视口尺寸 —— virtual void SetViewportSize(float width, float height)
         /// <summary>
         /// 设置视口尺寸
@@ -132,6 +134,7 @@ namespace MedicalSharp.Primitives.Cameras
         {
             this.ViewportWidth = width;
             this.ViewportHeight = height;
+            this.UpdateProjectionMatrix();
         }
         #endregion
 
@@ -141,6 +144,58 @@ namespace MedicalSharp.Primitives.Cameras
         /// </summary>
         /// <param name="targetPosition">目标位置（世界坐标）</param>
         public abstract void LookAt(Vector3 targetPosition);
+        #endregion
+
+        #region 缩放相机 —— abstract void Zoom(float delta)
+        /// <summary>
+        /// 缩放相机
+        /// </summary>
+        /// <param name="delta">缩放增量</param>
+        /// <remarks>正数放大，负数缩小</remarks>
+        public abstract void Zoom(float delta);
+        #endregion
+
+        #region 平移相机 —— abstract void Pan(float deltaX, float deltaY)
+        /// <summary>
+        /// 平移相机
+        /// </summary>
+        /// <param name="deltaX">水平平移量</param>
+        /// <param name="deltaY">垂直平移量</param>
+        public abstract void Pan(float deltaX, float deltaY);
+        #endregion
+
+        #region 重置相机 —— abstract void Reset()
+        /// <summary>
+        /// 重置相机
+        /// </summary>
+        public abstract void Reset();
+        #endregion
+
+
+        //Protected
+
+        #region 更新相机向量 —— abstract void UpdateCameraVectors()
+        /// <summary>
+        /// 更新相机向量
+        /// </summary>
+        protected abstract void UpdateCameraVectors();
+        #endregion
+
+        #region 更新投影矩阵 —— abstract void UpdateProjectionMatrix()
+        /// <summary>
+        /// 更新投影矩阵
+        /// </summary>
+        protected abstract void UpdateProjectionMatrix();
+        #endregion
+
+        #region 更新视图矩阵 —— virtual void UpdateViewMatrix()
+        /// <summary>
+        /// 更新视图矩阵
+        /// </summary>
+        protected virtual void UpdateViewMatrix()
+        {
+            this.ViewMatrix = Matrix4.LookAt(this.CameraPosition, this.TargetPosition, this.UpDirection);
+        }
         #endregion
 
         #endregion

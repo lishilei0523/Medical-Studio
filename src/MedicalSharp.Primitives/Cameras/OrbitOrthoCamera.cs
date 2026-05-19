@@ -23,7 +23,7 @@ namespace MedicalSharp.Primitives.Cameras
         public OrbitOrthoCamera(Vector3 targetPosition = default, float distance = 5.0f, float yaw = 0.0f, float pitch = 0.0f, Vector3 worldUpDirection = default, float nearPlaneDistance = -100.0f, float farPlaneDistance = 100.0f)
             : base(targetPosition, distance, yaw, pitch, worldUpDirection, nearPlaneDistance, farPlaneDistance)
         {
-
+            this.UpdateProjectionMatrix();
         }
 
         /// <summary>
@@ -37,40 +37,12 @@ namespace MedicalSharp.Primitives.Cameras
         public OrbitOrthoCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 worldUpDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535)
             : base(cameraPosition, targetPosition, worldUpDirection, nearPlaneDistance, farPlaneDistance)
         {
-
+            this.UpdateProjectionMatrix();
         }
 
         #endregion
 
         #region # 属性
-
-        #region 只读属性 - 投影矩阵 —— override Matrix4 ProjectionMatrix
-        /// <summary>
-        /// 只读属性 - 投影矩阵
-        /// </summary>
-        public override Matrix4 ProjectionMatrix
-        {
-            get
-            {
-                //防止视口尺寸无效
-                if (this.ViewportWidth <= 0 || this.ViewportHeight <= 0)
-                {
-                    return Matrix4.Identity;
-                }
-
-                //TODO 完善
-                //计算正交投影的边界
-                //除以100.0f是为了调整缩放比例，使相机距离与实际显示比例匹配
-                float left = -this.ViewportWidth / 2.0f / 100.0f;
-                float right = this.ViewportWidth / 2.0f / 100.0f;
-                float bottom = -this.ViewportHeight / 2.0f / 100.0f;
-                float top = this.ViewportHeight / 2.0f / 100.0f;
-
-                // 创建正交投影矩阵
-                return Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this.NearPlaneDistance, this.FarPlaneDistance);
-            }
-        }
-        #endregion
 
         #region 只读属性 - 相机模式 —— override Vector3 CameraMode
         /// <summary>
@@ -79,6 +51,37 @@ namespace MedicalSharp.Primitives.Cameras
         public override CameraMode CameraMode
         {
             get => CameraMode.Orthographic;
+        }
+        #endregion
+
+        #endregion
+
+        #region # 方法
+
+        #region 更新投影矩阵 —— override void UpdateProjectionMatrix()
+        /// <summary>
+        /// 更新投影矩阵
+        /// </summary>
+        protected override void UpdateProjectionMatrix()
+        {
+            //防止视口尺寸无效
+            if (this.ViewportWidth <= 0 || this.ViewportHeight <= 0)
+            {
+                this.ProjectionMatrix = Matrix4.Identity;
+                return;
+            }
+
+            //TODO 完善
+
+            //计算正交投影的边界
+            //除以100.0f是为了调整缩放比例，使相机距离与实际显示比例匹配
+            float left = -this.ViewportWidth / 2.0f / 100.0f;
+            float right = this.ViewportWidth / 2.0f / 100.0f;
+            float bottom = -this.ViewportHeight / 2.0f / 100.0f;
+            float top = this.ViewportHeight / 2.0f / 100.0f;
+
+            //创建正交投影矩阵
+            this.ProjectionMatrix = Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this.NearPlaneDistance, this.FarPlaneDistance);
         }
         #endregion
 

@@ -25,6 +25,7 @@ namespace MedicalSharp.Primitives.Cameras
             : base(targetPosition, distance, yaw, pitch, worldUpDirection, nearPlaneDistance, farPlaneDistance)
         {
             this.FieldOfView = fieldOfView;
+            this.UpdateProjectionMatrix();
         }
 
         /// <summary>
@@ -40,6 +41,7 @@ namespace MedicalSharp.Primitives.Cameras
             : base(cameraPosition, targetPosition, worldUpDirection, nearPlaneDistance, farPlaneDistance)
         {
             this.FieldOfView = fieldOfView;
+            this.UpdateProjectionMatrix();
         }
 
         #endregion
@@ -51,27 +53,6 @@ namespace MedicalSharp.Primitives.Cameras
         /// 视野角度（度）
         /// </summary>
         public float FieldOfView { get; private set; }
-        #endregion
-
-        #region 只读属性 - 投影矩阵 —— override Matrix4 ProjectionMatrix
-        /// <summary>
-        /// 只读属性 - 投影矩阵
-        /// </summary>
-        public override Matrix4 ProjectionMatrix
-        {
-            get
-            {
-                //防止除以零
-                if (this.ViewportWidth <= 0 || this.ViewportHeight <= 0)
-                {
-                    return Matrix4.Identity;
-                }
-
-                float aspectRatio = this.ViewportWidth / this.ViewportHeight;
-
-                return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(this.FieldOfView), aspectRatio, this.NearPlaneDistance, this.FarPlaneDistance);
-            }
-        }
         #endregion
 
         #region 只读属性 - 相机模式 —— override Vector3 CameraMode
@@ -96,6 +77,24 @@ namespace MedicalSharp.Primitives.Cameras
         public void SetFieldOfView(float fieldOfView)
         {
             this.FieldOfView = fieldOfView;
+        }
+        #endregion
+
+        #region 更新投影矩阵 —— override void UpdateProjectionMatrix()
+        /// <summary>
+        /// 更新投影矩阵
+        /// </summary>
+        protected override void UpdateProjectionMatrix()
+        {
+            //防止除以零
+            if (this.ViewportWidth <= 0 || this.ViewportHeight <= 0)
+            {
+                this.ProjectionMatrix = Matrix4.Identity;
+            }
+
+            float aspectRatio = this.ViewportWidth / this.ViewportHeight;
+            float fov = MathHelper.DegreesToRadians(this.FieldOfView);
+            this.ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(fov, aspectRatio, this.NearPlaneDistance, this.FarPlaneDistance);
         }
         #endregion
 
