@@ -77,13 +77,14 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 渲染帧 —— abstract void RenderFrame(float viewportWidth, float viewportHeight)
+        #region 渲染帧 —— abstract void RenderFrame(float viewportWidth, float viewportHeight...
         /// <summary>
         /// 渲染帧
         /// </summary>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        public abstract void RenderFrame(float viewportWidth, float viewportHeight);
+        /// <param name="glContext">OpenGL上下文句柄</param>
+        public abstract void RenderFrame(float viewportWidth, float viewportHeight, IntPtr glContext);
         #endregion
 
         #region 释放资源 —— virtual void Dispose()

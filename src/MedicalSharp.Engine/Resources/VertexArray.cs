@@ -26,8 +26,9 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 创建顶点数组对象构造器
         /// </summary>
+        /// <param name="glContext">OpenGL上下文句柄</param>
         /// <param name="vertexBuffer">顶点缓冲区</param>
-        internal VertexArray(VertexBuffer vertexBuffer)
+        internal VertexArray(IntPtr glContext, VertexBuffer vertexBuffer)
         {
             this._vao = GL.GenVertexArray();
 
@@ -40,12 +41,20 @@ namespace MedicalSharp.Engine.Resources
 
             #endregion
 
+            this.GlContext = glContext;
             this.VertexBuffer = vertexBuffer;
         }
 
         #endregion
 
         #region # 属性
+
+        #region OpenGL上下文句柄 —— IntPtr GlContext
+        /// <summary>
+        /// OpenGL上下文句柄
+        /// </summary>
+        public IntPtr GlContext { get; private set; }
+        #endregion
 
         #region 顶点缓冲区 —— VertexBuffer VertexBuffer
         /// <summary>

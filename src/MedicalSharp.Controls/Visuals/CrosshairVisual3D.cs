@@ -182,56 +182,6 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 克隆 —— override ShapeVisual3D Clone()
-        /// <summary>
-        /// 克隆
-        /// </summary>
-        /// <returns>形状副本</returns>
-        public override ShapeVisual3D Clone()
-        {
-            CrosshairVisual3D copy = new CrosshairVisual3D
-            {
-                Id = this.Id,
-                Stroke = this.Stroke,
-                StrokeThickness = this.StrokeThickness,
-                Fill = this.Fill,
-                Center = this.Center,
-                UAxis = this.UAxis,
-                VAxis = this.VAxis,
-                HorizontalLength = this.HorizontalLength,
-                VerticalLength = this.VerticalLength,
-                HorizontalStroke = this.HorizontalStroke,
-                VerticalStroke = this.VerticalStroke
-            };
-
-            return copy;
-        }
-        #endregion
-
-        #region 复制 —— override void Copy(ShapeVisual3D shapeVisual3D)
-        /// <summary>
-        /// 复制
-        /// </summary>
-        /// <param name="shapeVisual3D">形状</param>
-        public override void Copy(ShapeVisual3D shapeVisual3D)
-        {
-            if (shapeVisual3D is CrosshairVisual3D shape)
-            {
-                this.Stroke = shape.Stroke;
-                this.StrokeThickness = shape.StrokeThickness;
-                this.Fill = shape.Fill;
-                this.Center = shape.Center;
-                this.UAxis = shape.UAxis;
-                this.VAxis = shape.VAxis;
-                this.HorizontalLength = shape.HorizontalLength;
-                this.VerticalLength = shape.VerticalLength;
-                this.HorizontalStroke = shape.HorizontalStroke;
-                this.VerticalStroke = shape.VerticalStroke;
-                this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
         #endregion
     }
 }

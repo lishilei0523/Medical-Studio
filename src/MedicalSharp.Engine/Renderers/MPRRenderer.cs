@@ -257,13 +257,14 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight)
+        #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight...
         /// <summary>
         /// 渲染帧
         /// </summary>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        public override void RenderFrame(float viewportWidth, float viewportHeight)
+        /// <param name="glContext">OpenGL上下文句柄</param>
+        public override void RenderFrame(float viewportWidth, float viewportHeight, IntPtr glContext)
         {
             #region # 验证
 
@@ -298,7 +299,7 @@ namespace MedicalSharp.Engine.Renderers
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
             //渲染上下文
-            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, this.MPRCamera.ZoomFactor);
+            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, this.MPRCamera.ZoomFactor);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.MPRProgram;
@@ -344,7 +345,7 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformInt("u_MarkStrategy", 4);
 
             //绘制平面
-            this._unitPlane.Draw(PrimitiveType.Triangles);
+            this._unitPlane.Draw(glContext, PrimitiveType.Triangles);
 
             //解绑纹理
             this.Renderable.OriginalTexture.Unbind();

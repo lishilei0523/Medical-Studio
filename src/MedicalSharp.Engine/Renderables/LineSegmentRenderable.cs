@@ -151,7 +151,7 @@ namespace MedicalSharp.Engine.Renderables
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.Stroke);
-            this._vertexBuffer.Draw(PrimitiveType.Lines);
+            this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Lines);
 
             //点尺寸
             float pointSize = Math.Clamp(this.StrokeThickness * 3.0f, 5f, 20f);
@@ -163,7 +163,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制控制点
             program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", invertedStroke);
-            this._vertexBuffer.Draw(PrimitiveType.Points);
+            this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Points);
         }
         #endregion
 

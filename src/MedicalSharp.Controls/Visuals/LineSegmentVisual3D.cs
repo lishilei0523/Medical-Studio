@@ -97,46 +97,6 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 克隆 —— override ShapeVisual3D Clone()
-        /// <summary>
-        /// 克隆
-        /// </summary>
-        /// <returns>形状副本</returns>
-        public override ShapeVisual3D Clone()
-        {
-            LineSegmentVisual3D copy = new LineSegmentVisual3D
-            {
-                Id = this.Id,
-                Stroke = this.Stroke,
-                StrokeThickness = this.StrokeThickness,
-                Fill = this.Fill,
-                StartPoint = this.StartPoint,
-                EndPoint = this.EndPoint
-            };
-
-            return copy;
-        }
-        #endregion
-
-        #region 复制 —— override void Copy(ShapeVisual3D shapeVisual3D)
-        /// <summary>
-        /// 复制
-        /// </summary>
-        /// <param name="shapeVisual3D">形状</param>
-        public override void Copy(ShapeVisual3D shapeVisual3D)
-        {
-            if (shapeVisual3D is LineSegmentVisual3D shape)
-            {
-                this.Stroke = shape.Stroke;
-                this.StrokeThickness = shape.StrokeThickness;
-                this.Fill = shape.Fill;
-                this.StartPoint = shape.StartPoint;
-                this.EndPoint = shape.EndPoint;
-                this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
         #region 尝试获取顶点拖拽约束 —— bool TryGetVertexDrag(Ray localRay, Vector3 localLookDirection...
         /// <summary>
         /// 尝试获取顶点拖拽约束

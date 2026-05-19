@@ -40,7 +40,7 @@ namespace MedicalSharp.Controls.Viewports
         public BasicViewport()
         {
             this._shapeVisual3Ds = new List<ShapeVisual3D>();
-            this.Children = new AvaloniaList<Visual3D>();
+            this.Children = [];
             this.Children.CollectionChanged += this.OnChildrenItemsChanged;
         }
 
@@ -220,7 +220,7 @@ namespace MedicalSharp.Controls.Viewports
                 this._shapeRenderer.AppendItem(shapeVisual3D.Renderable);
             }
 
-            this._shapeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+            this._shapeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height, this.GlContextHandle);
         }
         #endregion
 
@@ -290,6 +290,9 @@ namespace MedicalSharp.Controls.Viewports
                     shapesPresenter.ItemsSource.CollectionChanged += this.OnItemsPresenterItemsChanged;
                 }
             }
+
+            //请求下一帧
+            this.RequestNextFrameRendering();
         }
         #endregion
 
@@ -299,6 +302,7 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         private void OnItemsPresenterItemsChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
+            //请求下一帧
             this.RequestNextFrameRendering();
         }
         #endregion

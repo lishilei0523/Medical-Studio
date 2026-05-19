@@ -152,7 +152,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制填充模型	
             program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.Fill);
-            this._vertexBuffer.Draw(PrimitiveType.Triangles);
+            this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
         }
         #endregion
 

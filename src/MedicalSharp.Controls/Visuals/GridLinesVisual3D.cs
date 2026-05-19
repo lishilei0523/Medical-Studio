@@ -116,8 +116,6 @@ namespace MedicalSharp.Controls.Visuals
 
         #region # 方法
 
-        //Public
-
         #region 确保渲染对象 —— override void EnsureRenderable()
         /// <summary>
         /// 确保渲染对象
@@ -142,55 +140,6 @@ namespace MedicalSharp.Controls.Visuals
             this.BuildBasis();
         }
         #endregion
-
-        #region 克隆 —— override ShapeVisual3D Clone()
-        /// <summary>
-        /// 克隆
-        /// </summary>
-        /// <returns>形状副本</returns>
-        public override ShapeVisual3D Clone()
-        {
-            GridLinesVisual3D copy = new GridLinesVisual3D
-            {
-                Id = this.Id,
-                Stroke = this.Stroke,
-                StrokeThickness = this.StrokeThickness,
-                Fill = this.Fill,
-                UAxis = this.UAxis,
-                VAxis = this.VAxis,
-                Size = this.Size,
-                Divisions = this.Divisions,
-                Normal = this.Normal
-            };
-
-            return copy;
-        }
-        #endregion
-
-        #region 复制 —— override void Copy(ShapeVisual3D shapeVisual3D)
-        /// <summary>
-        /// 复制
-        /// </summary>
-        /// <param name="shapeVisual3D">形状</param>
-        public override void Copy(ShapeVisual3D shapeVisual3D)
-        {
-            if (shapeVisual3D is GridLinesVisual3D shape)
-            {
-                this.Stroke = shape.Stroke;
-                this.StrokeThickness = shape.StrokeThickness;
-                this.Fill = shape.Fill;
-                this.UAxis = shape.UAxis;
-                this.VAxis = shape.VAxis;
-                this.Size = shape.Size;
-                this.Divisions = shape.Divisions;
-                this.Normal = shape.Normal;
-                this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
-
-        //Private
 
         #region 构建UV正交基 —— void BuildBasis()
         /// <summary>

@@ -3,6 +3,8 @@ using MedicalSharp.Primitives.Models;
 using Microsoft.CSharp.RuntimeBinder;
 using OpenTK.Graphics.OpenGL4;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MedicalSharp.Engine.Resources
@@ -30,6 +32,12 @@ namespace MedicalSharp.Engine.Resources
         private int _ebo;
 
         /// <summary>
+        /// 顶点数组对象字典
+        /// </summary>
+        /// <remarks>键：OpenGL上下文句柄，值：顶点数组对象</remarks>
+        private readonly IDictionary<IntPtr, VertexArray> _vertexArrays;
+
+        /// <summary>
         /// 默认构造器
         /// </summary>
         private VertexBuffer()
@@ -50,7 +58,7 @@ namespace MedicalSharp.Engine.Resources
 
             #endregion
 
-            this.VertexArray = new VertexArray(this);
+            this._vertexArrays = new ConcurrentDictionary<IntPtr, VertexArray>();
         }
 
         /// <summary>
@@ -73,23 +81,13 @@ namespace MedicalSharp.Engine.Resources
             this.MeshGeometry = meshGeometry;
             this.BufferUsage = bufferUsage;
 
-            //分配内存
-            this.AllocateMemory();
-
-            //初始化VAO
-            this.VertexArray.Setup();
+            //更新数据
+            this.Update(this.MeshGeometry);
         }
 
         #endregion
 
         #region # 属性
-
-        #region 顶点数组对象 —— VertexArray VertexArray
-        /// <summary>
-        /// 顶点数组对象
-        /// </summary>
-        internal VertexArray VertexArray { get; private set; }
-        #endregion
 
         #region 网格几何 —— MeshGeometry MeshGeometry
         /// <summary>
@@ -133,14 +131,18 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
-        #region 绘制顶点缓冲区 —— void Draw(PrimitiveType primitiveType)
+        #region 绘制顶点缓冲区 —— void Draw(IntPtr glContext, PrimitiveType...
         /// <summary>
         /// 绘制顶点缓冲区
         /// </summary>
+        /// <param name="glContext">OpenGL上下文句柄</param>
         /// <param name="primitiveType">图元类型</param>
-        public void Draw(PrimitiveType primitiveType)
+        public void Draw(IntPtr glContext, PrimitiveType primitiveType)
         {
-            this.VertexArray.Bind();
+            //确保VAO
+            VertexArray vertexArray = this.Ensure(glContext);
+
+            vertexArray.Bind();
             this.Bind();
 
             if (this.MeshGeometry.Indices.Any())
@@ -153,7 +155,7 @@ namespace MedicalSharp.Engine.Resources
             }
 
             this.Unbind();
-            this.VertexArray.Unbind();
+            vertexArray.Unbind();
         }
         #endregion
 
@@ -167,13 +169,16 @@ namespace MedicalSharp.Engine.Resources
             this.MeshGeometry = meshGeometry;
             this.Bind();
 
-            //更新顶点数据
-            GL.BufferData(BufferTarget.ArrayBuffer, this.MeshGeometry.Vertices.Length * sizeof(Vertex), this.MeshGeometry.Vertices, BufferUsageHint.DynamicDraw);
+            Vertex[] vertices = this.MeshGeometry.Vertices;
+            uint[] indices = this.MeshGeometry.Indices;
 
-            //更新索引数据
+            //更新顶点
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(Vertex), vertices, this.BufferUsage);
+
+            //更新索引
             if (this.MeshGeometry.Indices.Length > 0)
             {
-                GL.BufferData(BufferTarget.ElementArrayBuffer, this.MeshGeometry.Indices.Length * sizeof(uint), this.MeshGeometry.Indices, BufferUsageHint.DynamicDraw);
+                GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, this.BufferUsage);
             }
 
             //解绑
@@ -202,8 +207,11 @@ namespace MedicalSharp.Engine.Resources
                 GL.DeleteBuffer(this._ebo);
                 this._ebo = 0;
             }
+            foreach (VertexArray vertexArray in this._vertexArrays.Values)
+            {
+                vertexArray.Dispose();
+            }
 
-            this.VertexArray.Dispose();
             this._disposed = true;
         }
         #endregion
@@ -211,27 +219,22 @@ namespace MedicalSharp.Engine.Resources
 
         //Private
 
-        #region 分配内存 —— void AllocateMemory()
+        #region 确保顶点缓冲区 —— VertexArray Ensure(IntPtr glContext)
         /// <summary>
-        /// 分配内存
+        /// 确保顶点缓冲区
         /// </summary>
-        private unsafe void AllocateMemory()
+        /// <param name="glContext">OpenGL上下文句柄</param>
+        /// <remarks>初始化VAO</remarks>
+        private VertexArray Ensure(IntPtr glContext)
         {
-            this.Bind();
-
-            Vertex[] vertices = this.MeshGeometry.Vertices;
-            uint[] indices = this.MeshGeometry.Indices;
-
-            //上传顶点VBO
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(Vertex), vertices, this.BufferUsage);
-
-            //上传索引EBO
-            if (indices.Length > 0)
+            if (!this._vertexArrays.TryGetValue(glContext, out VertexArray vertexArray))
             {
-                GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, this.BufferUsage);
+                vertexArray = new VertexArray(glContext, this);
+                vertexArray.Setup();
+                this._vertexArrays.Add(glContext, vertexArray);
             }
 
-            this.Unbind();
+            return vertexArray;
         }
         #endregion
 

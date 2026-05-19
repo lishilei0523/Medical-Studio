@@ -32,7 +32,6 @@ using SD.IOC.Core.Mediators;
 using SkiaSharp;
 using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +43,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeSyncEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -639,15 +638,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Action<ITranslatable3D> translateEnd = translatable =>
             {
-                if (translatable is ShapeVisual3D shape)
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    ShapeSyncEvent message = new ShapeSyncEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             TranslateVisual3DCommand command = new TranslateVisual3DCommand(translateEnd);
@@ -675,15 +670,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<ITranslatableNormal> translateEnd = translatable =>
             {
-                if (translatable is ShapeVisual3D shape)
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    ShapeSyncEvent message = new ShapeSyncEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             TranslateVisualNormalCommand command = new TranslateVisualNormalCommand(translateEnd);
@@ -712,15 +703,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<IRotatable> rotateEnd = rotatable =>
             {
-                if (rotatable is ShapeVisual3D shape)
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    ShapeSyncEvent message = new ShapeSyncEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             RotateVisualUCommand command = new RotateVisualUCommand(rotateEnd);
@@ -749,15 +736,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<IRotatable> rotateEnd = rotatable =>
             {
-                if (rotatable is ShapeVisual3D shape)
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    ShapeSyncEvent message = new ShapeSyncEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             RotateVisualVCommand command = new RotateVisualVCommand(rotateEnd);
@@ -786,15 +769,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<IRotatable> rotateEnd = rotatable =>
             {
-                if (rotatable is ShapeVisual3D shape)
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    ShapeSyncEvent message = new ShapeSyncEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             RotateVisual3DCommand command = new RotateVisual3DCommand(rotateEnd);
@@ -811,15 +790,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Action<IResizable3D> resizeEnd = resizable =>
             {
-                if (resizable is ShapeVisual3D shape)
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    ShapeSyncEvent message = new ShapeSyncEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             ResizeVisual3DCommand command = new ResizeVisual3DCommand(resizeEnd);
@@ -835,15 +810,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Action<IVertexEditable> vertexEditEnd = vertexEditable =>
             {
-                if (vertexEditable is ShapeVisual3D shape)
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    ShapeSyncEvent message = new ShapeSyncEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             EditVertexCommand command = new EditVertexCommand(vertexEditEnd);
@@ -1193,38 +1164,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             #endregion
 
-            this.Shapes.Add(message.Shape.Clone());
+            this.Shapes.Add(message.Shape);
             this.FrameToken++;
-
-            return Task.CompletedTask;
-        }
-        #endregion
-
-        #region 处理形状同步事件 —— Task HandleAsync(ShapeSyncEvent message...
-        /// <summary>
-        /// 处理形状同步事件
-        /// </summary>
-        public Task HandleAsync(ShapeSyncEvent message, CancellationToken cancellationToken)
-        {
-            #region # 验证
-
-            if (message.Publisher == this)
-            {
-                return Task.CompletedTask;
-            }
-            if (message.Shape == null)
-            {
-                return Task.CompletedTask;
-            }
-
-            #endregion
-
-            ShapeVisual3D shape = this.Shapes.SingleOrDefault(shape => shape.Id == message.Shape.Id);
-            if (shape != null)
-            {
-                shape.Copy(message.Shape);
-                this.FrameToken++;
-            }
 
             return Task.CompletedTask;
         }
@@ -1249,12 +1190,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             #endregion
 
-            ShapeVisual3D shape = this.Shapes.SingleOrDefault(shape => shape.Id == message.Shape.Id);
-            if (shape != null)
-            {
-                this.Shapes.Remove(shape);
-                this.FrameToken++;
-            }
+            this.Shapes.Remove(message.Shape);
+            this.FrameToken++;
 
             return Task.CompletedTask;
         }

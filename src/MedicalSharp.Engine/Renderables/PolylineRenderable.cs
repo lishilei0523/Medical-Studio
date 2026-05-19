@@ -206,7 +206,7 @@ namespace MedicalSharp.Engine.Renderables
                 //绘制填充模型	
                 program.SetUniformInt("u_HasTexture", 0);
                 program.SetUniformVector4("u_Color", this.Fill);
-                this._fillBuffer.Draw(PrimitiveType.Triangles);
+                this._fillBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
                 //恢复状态
                 GL.DepthMask(true);
@@ -217,7 +217,7 @@ namespace MedicalSharp.Engine.Renderables
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.Stroke);
-            this._strokeBuffer.Draw(PrimitiveType.Lines);
+            this._strokeBuffer.Draw(context.GlContext, PrimitiveType.Lines);
 
             if (this.DrawVertex)
             {
@@ -231,7 +231,7 @@ namespace MedicalSharp.Engine.Renderables
                 //绘制控制点
                 program.SetUniformInt("u_HasTexture", 0);
                 program.SetUniformVector4("u_Color", invertedStroke);
-                this._strokeBuffer.Draw(PrimitiveType.Points);
+                this._strokeBuffer.Draw(context.GlContext, PrimitiveType.Points);
             }
         }
         #endregion

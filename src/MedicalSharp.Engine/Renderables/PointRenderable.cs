@@ -137,7 +137,7 @@ namespace MedicalSharp.Engine.Renderables
             GL.PointSize(this.PointSize);
             program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.Fill);
-            this._vertexBuffer.Draw(PrimitiveType.Points);
+            this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Points);
         }
         #endregion
 

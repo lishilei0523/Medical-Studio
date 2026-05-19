@@ -247,13 +247,14 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight)
+        #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight...
         /// <summary>
         /// 渲染帧
         /// </summary>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        public override void RenderFrame(float viewportWidth, float viewportHeight)
+        /// <param name="glContext">OpenGL上下文句柄</param>
+        public override void RenderFrame(float viewportWidth, float viewportHeight, IntPtr glContext)
         {
             #region # 验证
 
@@ -284,7 +285,7 @@ namespace MedicalSharp.Engine.Renderers
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
             //渲染上下文
-            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.RaycastProgram;
@@ -333,7 +334,7 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformInt("u_MarkStrategy", 4);
 
             //绘制模型
-            this._unitCube.Draw(PrimitiveType.Triangles);
+            this._unitCube.Draw(glContext, PrimitiveType.Triangles);
 
             //解绑纹理
             this.Renderable.OriginalTexture.Unbind();
@@ -347,16 +348,17 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 拾取体素 —— Vector3i? PickVoxel(Ray ray, float viewportWidth, float viewportHeight...
+        #region 拾取体素 —— Vector3i? PickVoxel(IntPtr glContext, Ray ray...
         /// <summary>
         /// 拾取体素
         /// </summary>
+        /// <param name="glContext">OpenGL上下文句柄</param>
         /// <param name="ray">射线（世界空间）</param>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
         /// <param name="textureCoord">纹理坐标</param>
         /// <returns>体素坐标，未命中返回null</returns>
-        public Vector3i? PickVoxel(Ray ray, float viewportWidth, float viewportHeight, out Vector3? textureCoord)
+        public Vector3i? PickVoxel(IntPtr glContext, Ray ray, float viewportWidth, float viewportHeight, out Vector3? textureCoord)
         {
             #region # 验证
 
@@ -381,7 +383,7 @@ namespace MedicalSharp.Engine.Renderers
             this.InitPickFrameBuffer(pickWidth, pickHeight);
 
             //渲染到拾取FBO
-            this.RenderPickFrameBuffer(ray, pickWidth, pickHeight);
+            this.RenderPickFrameBuffer(glContext, ray, pickWidth, pickHeight);
 
             //读取中心像素
             int textureCoordX = pickWidth / 2;
@@ -434,14 +436,15 @@ namespace MedicalSharp.Engine.Renderers
 
         //Private
 
-        #region 渲染拾取帧缓冲区 —— void RenderPickFrameBuffer(Ray ray, int viewportWidth...
+        #region 渲染拾取帧缓冲区 —— void RenderPickFrameBuffer(IntPtr glContext, Ray ray...
         /// <summary>
         /// 渲染拾取帧缓冲区
         /// </summary>
+        /// <param name="glContext">OpenGL上下文句柄</param>
         /// <param name="ray">射线（世界空间）</param>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        private void RenderPickFrameBuffer(Ray ray, int viewportWidth, int viewportHeight)
+        private void RenderPickFrameBuffer(IntPtr glContext, Ray ray, int viewportWidth, int viewportHeight)
         {
             #region # 验证
 
@@ -519,7 +522,7 @@ namespace MedicalSharp.Engine.Renderers
             pickProgram.SetUniformInt("u_TransferFunction", 3);
 
             //绘制模型
-            this._unitCube.Draw(PrimitiveType.Triangles);
+            this._unitCube.Draw(glContext, PrimitiveType.Triangles);
 
             //解绑纹理
             this.Renderable.OriginalTexture.Unbind();

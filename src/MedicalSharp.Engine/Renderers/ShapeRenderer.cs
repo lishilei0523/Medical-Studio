@@ -95,13 +95,14 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight)
+        #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight...
         /// <summary>
         /// 渲染帧
         /// </summary>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        public override void RenderFrame(float viewportWidth, float viewportHeight)
+        /// <param name="glContext">OpenGL上下文句柄</param>
+        public override void RenderFrame(float viewportWidth, float viewportHeight, IntPtr glContext)
         {
             #region # 验证
 
@@ -133,7 +134,7 @@ namespace MedicalSharp.Engine.Renderers
                 }
             }
 
-            RenderContext renderContext = new RenderContext(viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, viewMatrix, zoomFactor);
+            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, viewMatrix, zoomFactor);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.ShapeProgram;

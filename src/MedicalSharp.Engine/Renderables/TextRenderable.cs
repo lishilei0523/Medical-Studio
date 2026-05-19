@@ -271,7 +271,7 @@ namespace MedicalSharp.Engine.Renderables
                 program.SetUniformMatrix4("u_ModelMatrix", scaleMatrix * billboardMatrix);
             }
 
-            this._vertexBuffer.Draw(PrimitiveType.Triangles);
+            this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
             GL.Disable(EnableCap.DepthTest);
             GL.Disable(EnableCap.Blend);

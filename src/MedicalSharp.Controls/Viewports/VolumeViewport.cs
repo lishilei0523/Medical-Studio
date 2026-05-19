@@ -319,7 +319,7 @@ namespace MedicalSharp.Controls.Viewports
             markValue = 0;
 
             ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
-            Vector3i? pickedVoxelPosition = this._volumeRenderer.PickVoxel(ray, this._viewportSize.Width, this._viewportSize.Height, out Vector3? texCoord);
+            Vector3i? pickedVoxelPosition = this._volumeRenderer.PickVoxel(this.GlContextHandle, ray, this._viewportSize.Width, this._viewportSize.Height, out Vector3? texCoord);
             if (pickedVoxelPosition.HasValue)
             {
                 textureCoord = texCoord!.Value;
@@ -392,7 +392,7 @@ namespace MedicalSharp.Controls.Viewports
 
                 //体积渲染
                 this._volumeRenderer.SetRenderable(this._volumeRenderable);
-                this._volumeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+                this._volumeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height, this.GlContextHandle);
 
                 //形状渲染
                 base.OnOpenTKRender(viewportSize);

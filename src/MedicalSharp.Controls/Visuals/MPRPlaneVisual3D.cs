@@ -235,54 +235,6 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 克隆 —— override ShapeVisual3D Clone()
-        /// <summary>
-        /// 克隆
-        /// </summary>
-        /// <returns>形状副本</returns>
-        public override ShapeVisual3D Clone()
-        {
-            MPRPlaneVisual3D copy = new MPRPlaneVisual3D
-            {
-                Id = this.Id,
-                Stroke = this.Stroke,
-                StrokeThickness = this.StrokeThickness,
-                Fill = this.Fill,
-                UAxis = this.UAxis,
-                VAxis = this.VAxis,
-                Width = this.Width,
-                Height = this.Height,
-                Center = this.Center,
-                Normal = this.Normal
-            };
-
-            return copy;
-        }
-        #endregion
-
-        #region 复制 —— override void Copy(ShapeVisual3D shapeVisual3D)
-        /// <summary>
-        /// 复制
-        /// </summary>
-        /// <param name="shapeVisual3D">形状</param>
-        public override void Copy(ShapeVisual3D shapeVisual3D)
-        {
-            if (shapeVisual3D is MPRPlaneVisual3D shape)
-            {
-                this.Stroke = shape.Stroke;
-                this.StrokeThickness = shape.StrokeThickness;
-                this.Fill = shape.Fill;
-                this.UAxis = shape.UAxis;
-                this.VAxis = shape.VAxis;
-                this.Width = shape.Width;
-                this.Height = shape.Height;
-                this.Center = shape.Center;
-                this.Normal = shape.Normal;
-                this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
         #endregion
     }
 }

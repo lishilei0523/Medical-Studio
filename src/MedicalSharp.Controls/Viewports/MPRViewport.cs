@@ -386,7 +386,7 @@ namespace MedicalSharp.Controls.Viewports
                 //MPR渲染
                 this._mprRenderer.BindPlane(this.Plane);
                 this._mprRenderer.SetRenderable(this._volumeRenderable);
-                this._mprRenderer.RenderFrame(viewportSize.Width, viewportSize.Height);
+                this._mprRenderer.RenderFrame(viewportSize.Width, viewportSize.Height, this.GlContextHandle);
 
                 //形状渲染
                 base.OnOpenTKRender(viewportSize);

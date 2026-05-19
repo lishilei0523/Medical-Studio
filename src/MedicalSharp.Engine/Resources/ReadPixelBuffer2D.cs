@@ -57,10 +57,10 @@ namespace MedicalSharp.Engine.Resources
 
             GL.ReadPixels(0, 0, this.Width, this.Height, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
 
-            //确保PBO写入完成（可选）
+            //确保PBO写入完成
             GL.MemoryBarrier(MemoryBarrierFlags.PixelBufferBarrierBit);
 
-            //创建栅栏标记读取完成（推荐，用于非阻塞检查）
+            //创建栅栏标记读取完成
             if (useFence)
             {
                 base.CreateFence();
@@ -83,7 +83,7 @@ namespace MedicalSharp.Engine.Resources
             texture.Bind();
             this.Bind();
 
-            GL.GetTexImage(TextureTarget.Texture2D, 0, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.GetTexImage(TextureTarget.Texture2D, 0, this.PixelFormat, this.PixelType, IntPtr.Zero);
 
             //确保PBO写入完成
             GL.MemoryBarrier(MemoryBarrierFlags.PixelBufferBarrierBit);

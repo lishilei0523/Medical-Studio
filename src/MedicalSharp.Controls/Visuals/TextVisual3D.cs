@@ -208,63 +208,6 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 克隆 —— override ShapeVisual3D Clone()
-        /// <summary>
-        /// 克隆
-        /// </summary>
-        /// <returns>形状副本</returns>
-        public override ShapeVisual3D Clone()
-        {
-            TextVisual3D copy = new TextVisual3D
-            {
-                Id = this.Id,
-                Stroke = this.Stroke,
-                StrokeThickness = this.StrokeThickness,
-                Fill = this.Fill,
-                UAxis = this.UAxis,
-                VAxis = this.VAxis,
-                Text = this.Text,
-                Position = this.Position,
-                FontSize = this.FontSize,
-                Color = this.Color,
-                RenderMode = this.RenderMode,
-                Normal = this.Normal,
-                LockYAxis = this.LockYAxis
-            };
-
-            return copy;
-        }
-        #endregion
-
-        #region 复制 —— override void Copy(ShapeVisual3D shapeVisual3D)
-        /// <summary>
-        /// 复制
-        /// </summary>
-        /// <param name="shapeVisual3D">形状</param>
-        public override void Copy(ShapeVisual3D shapeVisual3D)
-        {
-            if (shapeVisual3D is TextVisual3D shape)
-            {
-                this.Stroke = shape.Stroke;
-                this.StrokeThickness = shape.StrokeThickness;
-                this.Fill = shape.Fill;
-                this.UAxis = shape.UAxis;
-                this.VAxis = shape.VAxis;
-                this.Text = shape.Text;
-                this.Position = shape.Position;
-                this.FontSize = shape.FontSize;
-                this.Color = shape.Color;
-                this.RenderMode = shape.RenderMode;
-                this.Normal = shape.Normal;
-                this.LockYAxis = shape.LockYAxis;
-                this.Transform.SetMatrix(shape.Transform.Matrix);
-            }
-        }
-        #endregion
-
-
-        //Private
-
         #region 构建UV正交基 —— void BuildBasis()
         /// <summary>
         /// 构建UV正交基

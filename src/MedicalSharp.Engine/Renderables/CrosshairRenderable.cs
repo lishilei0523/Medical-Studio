@@ -248,12 +248,12 @@ namespace MedicalSharp.Engine.Renderables
             //绘制水平线
             program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.HorizontalStroke);
-            this._horizontalBuffer.Draw(PrimitiveType.Lines);
+            this._horizontalBuffer.Draw(context.GlContext, PrimitiveType.Lines);
 
             //绘制垂直线
             program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this.VerticalStroke);
-            this._verticalBuffer.Draw(PrimitiveType.Lines);
+            this._verticalBuffer.Draw(context.GlContext, PrimitiveType.Lines);
         }
         #endregion
 
