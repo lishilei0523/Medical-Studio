@@ -13,24 +13,6 @@ namespace MedicalSharp.Primitives.Cameras
         /// <summary>
         /// 创建轨道透视相机构造器
         /// </summary>
-        /// <param name="targetPosition">目标位置</param>
-        /// <param name="distance">相机到目标的距离</param>
-        /// <param name="yaw">偏航角-RY（角度）</param>
-        /// <param name="pitch">俯仰角-RX（角度）</param>
-        /// <param name="worldUpDirection">世界坐标系上方向</param>
-        /// <param name="nearPlaneDistance">近平面距离</param>
-        /// <param name="farPlaneDistance">远平面距离</param>
-        /// <param name="fieldOfView">视野角度（度）</param>
-        public OrbitPerspectiveCamera(Vector3 targetPosition = default, float distance = 5.0f, float yaw = 0.0f, float pitch = 0.0f, Vector3 worldUpDirection = default, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f, float fieldOfView = 30.0f)
-            : base(targetPosition, distance, yaw, pitch, worldUpDirection, nearPlaneDistance, farPlaneDistance)
-        {
-            this.FieldOfView = fieldOfView;
-            this.UpdateProjectionMatrix();
-        }
-
-        /// <summary>
-        /// 创建轨道透视相机构造器
-        /// </summary>
         /// <param name="cameraPosition">相机位置</param>
         /// <param name="targetPosition">目标位置</param>
         /// <param name="worldUpDirection">世界坐标系上方向</param>

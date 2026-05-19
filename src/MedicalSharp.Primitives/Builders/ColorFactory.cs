@@ -285,9 +285,9 @@ namespace MedicalSharp.Primitives.Builders
         public static Vector4 FromHSV(float h, float s, float v, float opacity = 1.0f)
         {
             //确保参数在有效范围内
-            h = MathHelper.Clamp(h, 0f, 360f);
-            s = MathHelper.Clamp(s, 0f, 1f);
-            v = MathHelper.Clamp(v, 0f, 1f);
+            h = Math.Clamp(h, 0f, 360f);
+            s = Math.Clamp(s, 0f, 1f);
+            v = Math.Clamp(v, 0f, 1f);
 
             float c = v * s;
             float x = c * (1 - Math.Abs((h / 60.0f) % 2 - 1));

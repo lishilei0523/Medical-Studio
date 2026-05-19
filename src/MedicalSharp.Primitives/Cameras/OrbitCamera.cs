@@ -14,43 +14,6 @@ namespace MedicalSharp.Primitives.Cameras
         /// <summary>
         /// 创建轨道相机构造器
         /// </summary>
-        /// <param name="targetPosition">目标位置</param>
-        /// <param name="distance">相机到目标距离</param>
-        /// <param name="yaw">偏航角-RY（角度）</param>
-        /// <param name="pitch">俯仰角-RX（角度）</param>
-        /// <param name="worldUpDirection">世界坐标系上方向</param>
-        /// <param name="nearPlaneDistance">近平面距离</param>
-        /// <param name="farPlaneDistance">远平面距离</param>
-        protected OrbitCamera(Vector3 targetPosition = default, float distance = 5.0f, float yaw = 0.0f, float pitch = 0.0f, Vector3 worldUpDirection = default, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f)
-            : base(nearPlaneDistance, farPlaneDistance)
-        {
-            //默认值
-            this.SetDefaultValues();
-
-            //设置世界坐标系上方向（默认Y-up）
-            worldUpDirection = worldUpDirection == default
-                ? new Vector3(0, 1, 0)
-                : Vector3.Normalize(worldUpDirection);
-            this.SetWorldUpDirectionInternal(worldUpDirection);
-
-            //设置相机参数
-            this.TargetPosition = targetPosition == default ? Vector3.Zero : targetPosition;
-            this.Distance = MathHelper.Clamp(distance, this.MinDistance, this.MaxDistance);
-            this.Yaw = yaw;
-            this.Pitch = MathHelper.Clamp(pitch, this.MinPitch, this.MaxPitch);
-
-            //从角度计算方向
-            this.LookDirection = this.CalculateLookDirection(this.Yaw, this.Pitch);
-            this.CameraPosition = this.TargetPosition - this.LookDirection * this.Distance;
-
-            //更新相机坐标系
-            this.UpdateCameraVectors();
-            this.UpdateViewMatrix();
-        }
-
-        /// <summary>
-        /// 创建轨道相机构造器
-        /// </summary>
         /// <param name="cameraPosition">相机位置</param>
         /// <param name="targetPosition">目标位置</param>
         /// <param name="worldUpDirection">世界坐标系上方向</param>
@@ -93,7 +56,7 @@ namespace MedicalSharp.Primitives.Cameras
             #endregion
 
             this.LookDirection = Vector3.Normalize(lookDirectionRaw);
-            this.Distance = MathHelper.Clamp(distance, this.MinDistance, this.MaxDistance);
+            this.Distance = Math.Clamp(distance, this.MinDistance, this.MaxDistance);
 
             //从方向计算角度
             this.CalculateAngles(this.LookDirection);
@@ -367,7 +330,7 @@ namespace MedicalSharp.Primitives.Cameras
         public override void Zoom(float delta)
         {
             this.Distance -= delta * this.ZoomSpeed;
-            this.Distance = MathHelper.Clamp(this.Distance, this.MinDistance, this.MaxDistance);
+            this.Distance = Math.Clamp(this.Distance, this.MinDistance, this.MaxDistance);
             this.UpdateCameraVectors();
             this.UpdateProjectionMatrix();
             this.UpdateViewMatrix();
@@ -534,7 +497,7 @@ namespace MedicalSharp.Primitives.Cameras
 
                 case CoordinateType.YUp:  //Y-up: 偏航角绕Y轴，俯仰角绕X轴
                     this.Yaw = MathHelper.RadiansToDegrees(MathF.Atan2(lookDirection.Z, lookDirection.X));
-                    this.Pitch = MathHelper.RadiansToDegrees(MathF.Asin(MathHelper.Clamp(lookDirection.Y, -1.0f, 1.0f)));
+                    this.Pitch = MathHelper.RadiansToDegrees(MathF.Asin(Math.Clamp(lookDirection.Y, -1.0f, 1.0f)));
                     break;
 
                 case CoordinateType.ZUp:  //Z-up: 偏航角绕Z轴，俯仰角绕X轴
