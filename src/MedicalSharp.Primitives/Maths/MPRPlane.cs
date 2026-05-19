@@ -145,11 +145,7 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         public Vector3 WorldUAxis
         {
-            get => new Vector3(
-                this.UAxis.X * this.VolumeMetadata.VolumeScale.X,
-                this.UAxis.Y * this.VolumeMetadata.VolumeScale.Y,
-                this.UAxis.Z * this.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
+            get => (this.UAxis * this.VolumeMetadata.VolumeScale).Normalized();
         }
         #endregion
 
@@ -159,11 +155,7 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         public Vector3 WorldVAxis
         {
-            get => new Vector3(
-                this.VAxis.X * this.VolumeMetadata.VolumeScale.X,
-                this.VAxis.Y * this.VolumeMetadata.VolumeScale.Y,
-                this.VAxis.Z * this.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
+            get => (this.VAxis * this.VolumeMetadata.VolumeScale).Normalized();
         }
         #endregion
 
@@ -173,11 +165,7 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         public Vector3 WorldNormal
         {
-            get => new Vector3(
-                this.Normal.X * this.VolumeMetadata.VolumeScale.X,
-                this.Normal.Y * this.VolumeMetadata.VolumeScale.Y,
-                this.Normal.Z * this.VolumeMetadata.VolumeScale.Z
-            ).Normalized();
+            get => (this.Normal * this.VolumeMetadata.VolumeScale).Normalized();
         }
         #endregion
 
@@ -447,13 +435,12 @@ namespace MedicalSharp.Primitives.Maths
         /// 屏幕坐标转换平面U/V坐标
         /// </summary>
         /// <param name="mousePos2D">鼠标2D位置</param>
-        /// <param name="lookDirection">视角方向</param>
         /// <param name="viewportSize">视口尺寸</param>
         /// <param name="projectionMatrix">投影矩阵</param>
         /// <param name="viewMatrix">视图矩阵</param>
         /// <param name="ray">射线</param>
         /// <returns>U/V坐标，[-1, 1]，如果不在平面上则返回null</returns>
-        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector3 lookDirection, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix, out Ray ray)
+        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix, out Ray ray)
         {
             //将屏幕坐标转换到世界空间的射线起点（近平面上的点）
             float ndcX = (2.0f * mousePos2D.X) / viewportSize.X - 1.0f;
@@ -473,8 +460,8 @@ namespace MedicalSharp.Primitives.Maths
                 rayStartWorld *= new Vector3(-1, 1, 1);
             }
 
-            //射线方向固定为相机的前向方向（正交投影）
-            Vector3 rayDirection = lookDirection;
+            //射线方向固定为平面世界法向量 = 相机视角方向
+            Vector3 rayDirection = this.WorldNormal;
 
             //创建射线
             ray = new Ray(rayStartWorld, rayDirection);
@@ -654,9 +641,9 @@ namespace MedicalSharp.Primitives.Maths
         private int CalculateObliqueSlicesCount()
         {
             Vector3 absNormal = new Vector3(
-                Math.Abs(this.WorldNormal.X),
-                Math.Abs(this.WorldNormal.Y),
-                Math.Abs(this.WorldNormal.Z)
+                Math.Abs(this.Normal.X),
+                Math.Abs(this.Normal.Y),
+                Math.Abs(this.Normal.Z)
             );
             float projection =
                 this.VolumeMetadata.VolumeSize.X * absNormal.X +

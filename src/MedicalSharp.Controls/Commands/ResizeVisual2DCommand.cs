@@ -68,7 +68,7 @@ namespace MedicalSharp.Controls.Commands
 
                 //获取鼠标在平面上的UV坐标
                 Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
-                Vector2? planeUV = this._mprPlane.ScreenToPlaneUV(mousePos2D, mprViewport.Camera.LookDirection, mprViewport.ViewportSize.ToVector2(), mprViewport.Camera.ProjectionMatrix, mprViewport.Camera.ViewMatrix, out _);
+                Vector2? planeUV = this._mprPlane.ScreenToPlaneUV(mousePos2D, mprViewport.ViewportSize.ToVector2(), mprViewport.Camera.ProjectionMatrix, mprViewport.Camera.ViewMatrix, out _);
                 if (planeUV.HasValue && mprViewport.FindNearest(mousePos2D, out _, out _, out Visual3D visual3D, out _))
                 {
                     #region # 验证
@@ -104,7 +104,7 @@ namespace MedicalSharp.Controls.Commands
 
                 //获取鼠标在平面上的UV坐标
                 Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
-                Vector2? planeUV = this._mprPlane.ScreenToPlaneUV(mousePos2D, mprViewport.Camera.LookDirection, mprViewport.ViewportSize.ToVector2(), mprViewport.Camera.ProjectionMatrix, mprViewport.Camera.ViewMatrix, out _);
+                Vector2? planeUV = this._mprPlane.ScreenToPlaneUV(mousePos2D, mprViewport.ViewportSize.ToVector2(), mprViewport.Camera.ProjectionMatrix, mprViewport.Camera.ViewMatrix, out _);
                 if (planeUV.HasValue)
                 {
                     this._selectedVisual.ApplyResize(planeUV.Value);
