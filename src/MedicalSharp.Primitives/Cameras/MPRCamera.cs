@@ -21,10 +21,10 @@ namespace MedicalSharp.Primitives.Cameras
         public MPRCamera(float nearPlaneDistance = -1000, float farPlaneDistance = 1000)
             : base(nearPlaneDistance, farPlaneDistance)
         {
-            this.Distance = 4.0f;
-            this.PanOffset = Vector2.Zero;
             this.TargetPosition = Vector3.Zero;
+            this.Distance = 4.0f;
             this.ZoomFactor = 1.0f;
+            this.PanOffset = Vector2.Zero;
             this.UpdateViewMatrix();
             this.UpdateProjectionMatrix();
         }
@@ -196,15 +196,11 @@ namespace MedicalSharp.Primitives.Cameras
 
             #endregion
 
-            Vector3 worldCenter = this.TargetPlane.WorldCenter;
-            Vector3 worldNormal = this.TargetPlane.WorldNormal;
-            Vector3 worldUpDirection = this.TargetPlane.WorldVAxis;
-            this.CameraPosition = worldCenter - worldNormal * this.Distance;
-            this.TargetPosition = worldCenter;
-            this.LookDirection = (this.TargetPosition - this.CameraPosition).Normalized();
-            this.UpDirection = worldUpDirection;
-            this.RightDirection = Vector3.Cross(this.LookDirection, this.UpDirection).Normalized();
-
+            this.CameraPosition = this.TargetPlane.WorldCenter - this.TargetPlane.WorldNormal * this.Distance;
+            this.TargetPosition = this.TargetPlane.WorldCenter;
+            this.LookDirection = this.TargetPlane.WorldNormal;
+            this.UpDirection = this.TargetPlane.WorldVAxis;
+            this.RightDirection = this.TargetPlane.WorldUAxis;
             this.UpdateViewMatrix();
         }
         #endregion
@@ -228,7 +224,6 @@ namespace MedicalSharp.Primitives.Cameras
             float aspect = this.ViewportWidth / this.ViewportHeight;
             float halfSideSize = 0.5f / this.ZoomFactor;
             float left, right, bottom, top;
-
             if (aspect >= 1.0f)
             {
                 left = -halfSideSize * aspect + this.PanOffset.X;
