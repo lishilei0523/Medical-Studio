@@ -12,6 +12,46 @@ namespace MedicalSharp.Primitives.Cameras
         #region # 字段及构造器
 
         /// <summary>
+        /// 默认最小距离
+        /// </summary>
+        private const float DefaultDistance = 5.0f;
+
+        /// <summary>
+        /// 默认最小距离
+        /// </summary>
+        private const float DefaultMinDistance = 0.1f;
+
+        /// <summary>
+        /// 默认最大距离
+        /// </summary>
+        private const float DefaultMaxDistance = 100.0f;
+
+        /// <summary>
+        /// 默认最小俯仰角
+        /// </summary>
+        private const float DefaultMinPitch = -89.0f;
+
+        /// <summary>
+        /// 默认最大俯仰角
+        /// </summary>
+        private const float DefaultMaxPitch = 89.0f;
+
+        /// <summary>
+        /// 默认平移速度
+        /// </summary>
+        private const float DefaultMoveSpeed = 3.0f;
+
+        /// <summary>
+        /// 默认旋转速度
+        /// </summary>
+        private const float DefaultRotateSpeed = 0.15f;
+
+        /// <summary>
+        /// 默认缩放速度
+        /// </summary>
+        private const float DefaultZoomSpeed = 0.5f;
+
+        /// <summary>
         /// 创建轨道相机构造器
         /// </summary>
         /// <param name="cameraPosition">相机位置</param>
@@ -19,7 +59,7 @@ namespace MedicalSharp.Primitives.Cameras
         /// <param name="worldUpDirection">世界坐标系上方向</param>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
-        protected OrbitCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 worldUpDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f)
+        protected OrbitCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 worldUpDirection = default, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f)
             : base(nearPlaneDistance, farPlaneDistance)
         {
             #region # 验证
@@ -39,7 +79,9 @@ namespace MedicalSharp.Primitives.Cameras
             this.TargetPosition = targetPosition;
 
             //设置世界坐标系上方向
-            worldUpDirection = Vector3.Normalize(worldUpDirection);
+            worldUpDirection = worldUpDirection == default
+                ? Vector3.UnitZ
+                : Vector3.Normalize(worldUpDirection);
             this.SetWorldUpDirectionInternal(worldUpDirection);
 
             //计算视角方向
@@ -121,20 +163,6 @@ namespace MedicalSharp.Primitives.Cameras
         public float MaxPitch { get; private set; }
         #endregion
 
-        #region 世界坐标系上方向 —— Vector3 WorldUpDirection
-        /// <summary>
-        /// 世界坐标系上方向
-        /// </summary>
-        public Vector3 WorldUpDirection { get; protected set; }
-        #endregion
-
-        #region 世界坐标系类型 —— CoordinateType WorldCoordinateType
-        /// <summary>
-        /// 世界坐标系类型
-        /// </summary>
-        public CoordinateType WorldCoordinateType { get; protected set; }
-        #endregion
-
         #region 偏航角 —— float Yaw
         /// <summary>
         /// 偏航角
@@ -149,6 +177,20 @@ namespace MedicalSharp.Primitives.Cameras
         /// </summary>
         /// <remarks>RX（角度）</remarks>
         public float Pitch { get; protected set; }
+        #endregion
+
+        #region 世界坐标系上方向 —— Vector3 WorldUpDirection
+        /// <summary>
+        /// 世界坐标系上方向
+        /// </summary>
+        public Vector3 WorldUpDirection { get; protected set; }
+        #endregion
+
+        #region 世界坐标系类型 —— CoordinateType WorldCoordinateType
+        /// <summary>
+        /// 世界坐标系类型
+        /// </summary>
+        public CoordinateType WorldCoordinateType { get; protected set; }
         #endregion
 
         #endregion
@@ -357,7 +399,7 @@ namespace MedicalSharp.Primitives.Cameras
         public override void Reset()
         {
             this.TargetPosition = Vector3.Zero;
-            this.Distance = 5.0f;
+            this.Distance = DefaultDistance;
             this.Yaw = 0.0f;
             this.Pitch = 0.0f;
 
@@ -376,13 +418,13 @@ namespace MedicalSharp.Primitives.Cameras
         /// </summary>
         private void SetDefaultValues()
         {
-            this.MinDistance = 0.1f;
-            this.MaxDistance = 100.0f;
-            this.MinPitch = -89.0f;
-            this.MaxPitch = 89.0f;
-            this.MoveSpeed = 3.0f;
-            this.RotateSpeed = 0.15f;
-            this.ZoomSpeed = 0.5f;
+            this.MinDistance = DefaultMinDistance;
+            this.MaxDistance = DefaultMaxDistance;
+            this.MinPitch = DefaultMinPitch;
+            this.MaxPitch = DefaultMaxPitch;
+            this.MoveSpeed = DefaultMoveSpeed;
+            this.RotateSpeed = DefaultRotateSpeed;
+            this.ZoomSpeed = DefaultZoomSpeed;
         }
         #endregion
 

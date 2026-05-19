@@ -68,9 +68,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             //初始化相机
             Vector3 cameraPosition = new Vector3(0, 2, 0);
-            Vector3 targetPosition = new Vector3(0.0f);
-            Vector3 upDirection = new Vector3(0, 0, 1);
-            this.Camera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, upDirection);
+            Vector3 targetPosition = Vector3.Zero;
+            Vector3 worldUpDirection = Vector3.UnitZ;
+            this.Camera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, worldUpDirection);
 
             //初始化输入管理器
             this.InputManager = new OrbitInputManager(this.Camera);

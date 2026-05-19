@@ -18,7 +18,7 @@ namespace MedicalSharp.Primitives.Cameras
         /// <param name="worldUpDirection">世界坐标系上方向</param>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
-        public OrbitOrthoCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 worldUpDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535)
+        public OrbitOrthoCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 worldUpDirection = default, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535)
             : base(cameraPosition, targetPosition, worldUpDirection, nearPlaneDistance, farPlaneDistance)
         {
             this.UpdateProjectionMatrix();

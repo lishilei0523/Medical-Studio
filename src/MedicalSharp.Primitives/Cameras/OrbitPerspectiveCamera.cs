@@ -19,7 +19,7 @@ namespace MedicalSharp.Primitives.Cameras
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
         /// <param name="fieldOfView">视野角度（度）</param>
-        public OrbitPerspectiveCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 worldUpDirection, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f, float fieldOfView = 30.0f)
+        public OrbitPerspectiveCamera(Vector3 cameraPosition, Vector3 targetPosition, Vector3 worldUpDirection = default, float nearPlaneDistance = 0.125f, float farPlaneDistance = 65535.0f, float fieldOfView = 30.0f)
             : base(cameraPosition, targetPosition, worldUpDirection, nearPlaneDistance, farPlaneDistance)
         {
             this.FieldOfView = fieldOfView;
