@@ -44,8 +44,8 @@ namespace MedicalSharp.Primitives.Builders
         /// <returns>网格模型</returns>
         public static MeshGeometry CreatePointCloud(IReadOnlyList<Vector3> positions)
         {
-            IList<Vertex> vertices = [];
-            IList<uint> indices = [];
+            List<Vertex> vertices = [];
+            List<uint> indices = [];
             for (int index = 0; index < positions.Count; index++)
             {
                 Vector3 position = positions[index];
