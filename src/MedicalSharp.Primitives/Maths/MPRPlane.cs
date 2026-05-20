@@ -297,14 +297,17 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="triggerSource">触发源</param>
         public void Relocate(Vector3 worldCenter, MPRPlaneChangeSource triggerSource = MPRPlaneChangeSource.CrosshairDrag)
         {
+            //将世界坐标转换到逻辑空间
+            Vector3 localCenter = worldCenter / this.VolumeMetadata.VolumeScale;
+
             //计算切片索引
-            float sliceOffset = Vector3.Dot(worldCenter, this.Normal);
+            float sliceOffset = Vector3.Dot(localCenter, this.Normal);
             float t = this.PlaneType switch
             {
                 MPRPlaneType.Oblique => (sliceOffset - this._minProjection) / (this._maxProjection - this._minProjection),
-                MPRPlaneType.Axial => worldCenter.Z + 0.5f,
-                MPRPlaneType.Coronal => worldCenter.Y + 0.5f,
-                MPRPlaneType.Sagittal => -worldCenter.X + 0.5f,
+                MPRPlaneType.Axial => localCenter.Z + 0.5f,
+                MPRPlaneType.Coronal => localCenter.Y + 0.5f,
+                MPRPlaneType.Sagittal => -localCenter.X + 0.5f,
                 _ => throw new NotSupportedException()
             };
             int sliceIndex = (int)Math.Round(t * (this.SlicesCount - 1));
