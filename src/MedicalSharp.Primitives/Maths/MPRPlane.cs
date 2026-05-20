@@ -457,8 +457,8 @@ namespace MedicalSharp.Primitives.Maths
                 rayStartWorld *= new Vector3(-1, 1, 1);
             }
 
-            //创建射线，射线方向固定为平面世界法向量 = 相机视角方向
-            ray = new Ray(rayStartWorld, this.WorldNormal);
+            //创建射线，射线方向固定为相机视角方向
+            ray = new Ray(rayStartWorld, camera.LookDirection);
 
             //射线与平面求交
             if (ray.IntersectsPlane(this.WorldCenter, this.WorldNormal, out Vector3 worldPoint, out _))
