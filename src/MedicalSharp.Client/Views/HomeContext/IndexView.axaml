@@ -44,6 +44,7 @@
                         <MenuItem Header="编辑(_E)">
                             <MenuItem Header="重置预览(_P)" Command="{Binding ResetPreviewCommand}" />
                             <MenuItem Header="重置标记(_M)" Command="{Binding ResetMarkCommand}" />
+                            <MenuItem Header="清空形状(_S)" Command="{Binding ClearShapesCommand}" />
                         </MenuItem>
 						<MenuItem Header="布局(_L)">
 							<MenuItem Header="布局13(_A)" Command="{Binding Layout13Command}" />

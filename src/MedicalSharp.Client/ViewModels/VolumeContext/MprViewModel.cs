@@ -44,7 +44,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// MPR视图模型
     /// </summary>
-    public class MprViewModel : ScreenBase, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>, IHandle<MPRPlaneResetEvent>
+    public class MprViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>, IHandle<MPRPlaneResetEvent>
     {
         #region # 字段及构造器
 
@@ -879,6 +879,19 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 SkipVolumeSync = eventArgs.TriggerSource == MPRPlaneChangeSource.ExternalSync
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
+        }
+        #endregion
+
+        #region 处理清空形状事件 —— Task HandleAsync(ClearShapesEvent message...
+        /// <summary>
+        /// 处理清空形状事件
+        /// </summary>
+        public Task HandleAsync(ClearShapesEvent message, CancellationToken cancellationToken)
+        {
+            this.Shapes.Clear();
+            this.FrameToken++;
+
+            return Task.CompletedTask;
         }
         #endregion
 

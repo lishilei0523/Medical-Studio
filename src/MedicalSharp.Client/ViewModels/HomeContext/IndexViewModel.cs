@@ -237,7 +237,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 重置预览命令
         /// </summary>
-        public ICommand ResetPreviewCommand => new RelayCommand(_ =>
+        public ICommand ResetPreviewCommand => new AsyncRelayCommand(async _ =>
         {
             #region # 验证
 
@@ -248,12 +248,16 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             #endregion
 
-            VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-            volumeSession.ResetPreviewTexture();
+            TaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == TaskDialogStandardResult.OK)
+            {
+                VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                volumeSession.ResetPreviewTexture();
 
-            //发布消息
-            SyncViewportEvent message = new SyncViewportEvent();
-            this._eventAggregator.PublishOnUIThreadAsync(message);
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent();
+                await this._eventAggregator.PublishOnUIThreadAsync(message);
+            }
         });
         #endregion
 
@@ -261,7 +265,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 重置标记命令
         /// </summary>
-        public ICommand ResetMarkCommand => new RelayCommand(_ =>
+        public ICommand ResetMarkCommand => new AsyncRelayCommand(async _ =>
         {
             #region # 验证
 
@@ -272,12 +276,40 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             #endregion
 
-            VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-            volumeSession.ResetMarkTexture();
+            TaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == TaskDialogStandardResult.OK)
+            {
+                VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                volumeSession.ResetMarkTexture();
 
-            //发布消息
-            SyncViewportEvent message = new SyncViewportEvent();
-            this._eventAggregator.PublishOnUIThreadAsync(message);
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent();
+                await this._eventAggregator.PublishOnUIThreadAsync(message);
+            }
+        });
+        #endregion
+
+        #region 清空形状命令 —— ICommand ClearShapesCommand
+        /// <summary>
+        /// 清空形状命令
+        /// </summary>
+        public ICommand ClearShapesCommand => new AsyncRelayCommand(async _ =>
+        {
+            #region # 验证
+
+            if (this.VolumeData == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            TaskDialogStandardResult result = await MessageBox.Show("确定要清空吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == TaskDialogStandardResult.OK)
+            {
+                ClearShapesEvent message = new ClearShapesEvent();
+                await this._eventAggregator.PublishOnUIThreadAsync(message);
+            }
         });
         #endregion
 

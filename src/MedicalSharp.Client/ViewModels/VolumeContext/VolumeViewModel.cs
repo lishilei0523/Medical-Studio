@@ -43,7 +43,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -83,9 +83,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Shapes = [];
             this.PreviewModeChecked = true;
             this.RaycastChecked = true;
-            this.AxialPlaneVisible = true;
-            this.CoronalPlaneVisible = true;
-            this.SagittalPlaneVisible = true;
+            this.AxialPlaneVisible = false;
+            this.CoronalPlaneVisible = false;
+            this.SagittalPlaneVisible = false;
             this.Brightness = 1.0f;
             this.DensityScale = 1.0f;
             this.StepSize = 0.0012f;
@@ -1094,6 +1094,19 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
 
         //Events
+
+        #region 处理清空形状事件 —— Task HandleAsync(ClearShapesEvent message...
+        /// <summary>
+        /// 处理清空形状事件
+        /// </summary>
+        public Task HandleAsync(ClearShapesEvent message, CancellationToken cancellationToken)
+        {
+            this.Shapes.Clear();
+            this.FrameToken++;
+
+            return Task.CompletedTask;
+        }
+        #endregion
 
         #region 处理组织选中事件 —— Task HandleAsync(TissueSelectedEvent message...
         /// <summary>
