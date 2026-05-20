@@ -211,8 +211,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     value.PlaneChangedEvent += this.OnMPRPlaneChanged;
 
                     //初始化十字线方向和位置
-                    this.Crosshair.UAxis = value.WorldUAxis.ToVector3();
-                    this.Crosshair.VAxis = value.WorldVAxis.ToVector3();
+                    this.Crosshair.UAxis = value.WorldUAxis.Normalized().ToVector3();
+                    this.Crosshair.VAxis = value.WorldVAxis.Normalized().ToVector3();
                     this.Crosshair.Center = value.WorldCenter.ToVector3();
                     this.Crosshair.Transform?.SetPosition(value.WorldCenter);
                 }
@@ -859,7 +859,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
                 //逻辑空间偏移 -> 世界空间偏移
                 float worldDelta = plane.SliceOffsetDelta * plane.WorldSliceSpacing;
-                Vector3 worldStep = plane.WorldNormal * worldDelta;
+                Vector3 worldStep = plane.WorldNormal.Normalized() * worldDelta;
                 this.Crosshair.Transform?.Translate(worldStep);
             }
             if (eventArgs.TriggerSource == MPRPlaneChangeSource.ExternalSync)
