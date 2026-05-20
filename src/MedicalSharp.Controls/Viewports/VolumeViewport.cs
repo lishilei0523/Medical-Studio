@@ -310,14 +310,23 @@ namespace MedicalSharp.Controls.Viewports
         /// <returns>是否成功</returns>
         public bool FindNearestVoxel(Vector2 position, out Vector3 textureCoord, out Vector3 worldPosition, out Vector3i voxelPosition, out short voxelValue, out byte markValue, out Ray ray)
         {
-            this.GlContext.MakeCurrent();
-
             textureCoord = Vector3.Zero;
             worldPosition = Vector3.Zero;
             voxelPosition = Vector3i.Zero;
             voxelValue = -1;
             markValue = 0;
+            ray = default;
 
+            #region # 验证
+
+            if (this.VolumeData == null)
+            {
+                return false;
+            }
+
+            #endregion
+
+            this.GlContext.MakeCurrent();
             ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
             Vector3i? pickedVoxelPosition = this._volumeRenderer.PickVoxel(this.GlContextHandle, ray, this._viewportSize.Width, this._viewportSize.Height, out Vector3? texCoord);
             if (pickedVoxelPosition.HasValue)

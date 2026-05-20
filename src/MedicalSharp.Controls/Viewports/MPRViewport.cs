@@ -303,10 +303,19 @@ namespace MedicalSharp.Controls.Viewports
             voxelValue = -1;
             markValue = 0;
             ray = default;
+
+            #region # 验证
+
+            if (this.VolumeData == null)
+            {
+                return false;
+            }
             if (this.Plane == null)
             {
                 return false;
             }
+
+            #endregion
 
             this.GlContext.MakeCurrent();
             Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera, out ray);
