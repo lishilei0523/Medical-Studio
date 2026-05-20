@@ -3,15 +3,12 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Caliburn.Micro;
 using FluentAvalonia.UI.Controls;
+using MedicalSharp.Client.ViewModels.AlgorithmContext;
 using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Controls.Extensions;
-using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Resources;
-using MedicalSharp.Inspiration.Algorithms;
-using MedicalSharp.Inspiration.Managers;
-using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
@@ -28,9 +25,7 @@ using SD.Infrastructure.Avalonia.Commands;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
-using Silk.NET.OpenCL;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -457,60 +452,9 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             #endregion
 
-            VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-            ClContext clContext = ClContextManager.Current;
-
-            //TODO 参数化
-            int width = this.VolumeData.Metadata.VolumeSize.X;
-            int height = this.VolumeData.Metadata.VolumeSize.Y;
-            int depth = this.VolumeData.Metadata.VolumeSize.Z;
-
-            Stopwatch stopwatch = new Stopwatch();
-            Stopwatch stopwatch1 = new Stopwatch();
-            Stopwatch stopwatch2 = new Stopwatch();
-            Stopwatch stopwatch3 = new Stopwatch();
-            Stopwatch stopwatch4 = new Stopwatch();
-            stopwatch.Start();
-
-            this.Busy();
-            await Task.Run(() =>
-            {
-                //创建并写入图像
-                stopwatch1.Start();
-                using ClImage3D image = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
-                image.Write(clContext.CommandQueue, this.VolumeData.OriginalData);
-                clContext.Finish();
-                stopwatch1.Stop();
-                Trace.WriteLine($"创建并写入图像耗时：{stopwatch1.Elapsed}");
-
-                //执行算法
-                stopwatch2.Start();
-                using GaussianBlur3D gaussianBlur = new GaussianBlur3D(clContext);
-                gaussianBlur.ExecuteInPlace(image);
-                stopwatch2.Stop();
-                Trace.WriteLine($"高斯滤波算法耗时：{stopwatch2.Elapsed}");
-
-                //读回CPU
-                stopwatch3.Start();
-                image.Read(clContext.CommandQueue, this.VolumeData.PreviewData);
-                stopwatch3.Stop();
-                Trace.WriteLine($"回读CPU耗时：{stopwatch3.Elapsed}");
-
-            });
-            this.Idle();
-
-            //同步到预览纹理
-            stopwatch4.Start();
-            SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, volumeSession.PreviewTexture);
-            stopwatch4.Stop();
-            Trace.WriteLine($"同步纹理耗时：{stopwatch4.Elapsed}");
-
-            stopwatch.Stop();
-            Trace.WriteLine($"总耗时：{stopwatch.Elapsed}");
-
-            //发布消息
-            SyncViewportEvent message = new SyncViewportEvent();
-            await this._eventAggregator.PublishOnUIThreadAsync(message);
+            GaussianBlurViewModel viewModel = ResolveMediator.Resolve<GaussianBlurViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            await this._windowManager.ShowWindowAsync(viewModel);
         });
         #endregion
 

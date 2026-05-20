@@ -98,7 +98,6 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
 
             return base.OnActivatedAsync(cancellationToken);
         }
-
         #endregion
 
         #endregion
