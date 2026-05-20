@@ -121,9 +121,10 @@ namespace MedicalSharp.Controls.Commands
                     Vector3 deltaWorld = hitPoint - this._dragStartPoint.Value;
 
                     //投影到法向量方向
-                    Vector3 normal = visual2DIn3D.Normal.ToVector3().Normalized();
-                    float dot = Vector3.Dot(deltaWorld, normal);
-                    Vector3 translation = normal * dot;
+                    Vector3 localNormal = visual2DIn3D.Normal.ToVector3().Normalized();
+                    Vector3 worldNormal = Vector3.TransformNormal(localNormal, ((Visual3D)visual2DIn3D).Transform.Matrix);
+                    float dot = Vector3.Dot(deltaWorld, worldNormal);
+                    Vector3 translation = worldNormal * dot;
 
                     //应用平移（从起始位置计算，避免累积误差）
                     Vector3 newPosition = this._dragStartPosition.Value + translation;
