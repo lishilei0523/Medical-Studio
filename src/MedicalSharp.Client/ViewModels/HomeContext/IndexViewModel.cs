@@ -78,17 +78,16 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.Tissues =
             [
                 new TissueInfo("Base", 0, MarkMode.Visible, Colors.Transparent, true),
-                new TissueInfo("皮肤", 1, MarkMode.Collapsed, colors[1].ToColor()),
-                new TissueInfo("骨骼", 2, MarkMode.Tinted, colors[2].ToColor()),
-                new TissueInfo("血管", 3, MarkMode.Tinted, colors[3].ToColor()),
-                new TissueInfo("软组织", 4, MarkMode.Visible, colors[4].ToColor()),
-                new TissueInfo("心脏", 5, MarkMode.Visible, colors[5].ToColor()),
-                new TissueInfo("肺", 6, MarkMode.Visible, colors[6].ToColor()),
-                new TissueInfo("肝脏", 7, MarkMode.Tinted, colors[7].ToColor()),
-                new TissueInfo("肾脏", 8, MarkMode.Tinted, colors[8].ToColor()),
-                new TissueInfo("脾脏", 9, MarkMode.Collapsed, colors[9].ToColor()),
-                new TissueInfo("病变", 10, MarkMode.Tinted, colors[10].ToColor()),
-                new TissueInfo("钙化", 11, MarkMode.Tinted, colors[11].ToColor()),
+                new TissueInfo("骨骼", 1, MarkMode.Tinted, colors[1].ToColor()),
+                new TissueInfo("血管", 2, MarkMode.Tinted, colors[2].ToColor()),
+                new TissueInfo("软组织", 3, MarkMode.Visible, colors[3].ToColor()),
+                new TissueInfo("心脏", 4, MarkMode.Visible, colors[4].ToColor()),
+                new TissueInfo("肺", 5, MarkMode.Visible, colors[5].ToColor()),
+                new TissueInfo("肝脏", 6, MarkMode.Tinted, colors[6].ToColor()),
+                new TissueInfo("肾脏", 7, MarkMode.Tinted, colors[7].ToColor()),
+                new TissueInfo("脾脏", 8, MarkMode.Collapsed, colors[8].ToColor()),
+                new TissueInfo("病变", 9, MarkMode.Tinted, colors[9].ToColor()),
+                new TissueInfo("钙化", 10, MarkMode.Tinted, colors[10].ToColor()),
             ];
         }
 

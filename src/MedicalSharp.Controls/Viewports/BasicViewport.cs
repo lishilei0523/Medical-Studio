@@ -12,7 +12,6 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 
 namespace MedicalSharp.Controls.Viewports
@@ -41,7 +40,6 @@ namespace MedicalSharp.Controls.Viewports
         {
             this._shapeVisual3Ds = new List<ShapeVisual3D>();
             this.Children = [];
-            this.Children.CollectionChanged += this.OnChildrenItemsChanged;
         }
 
         #endregion
@@ -269,41 +267,6 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             return shapeVisual3Ds;
-        }
-        #endregion
-
-
-        //Events
-
-        #region 子元素列表元素改变事件 —— void OnChildrenItemsChanged(object sender...
-        /// <summary>
-        /// 子元素列表元素改变事件
-        /// </summary>
-        private void OnChildrenItemsChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
-        {
-            if (eventArgs.Action == NotifyCollectionChangedAction.Add)
-            {
-                Visual3D visual3D = this.Children[eventArgs.NewStartingIndex];
-                visual3D.DataContext = this.DataContext;
-                if (visual3D is ShapesPresenter shapesPresenter)
-                {
-                    shapesPresenter.ItemsSource.CollectionChanged += this.OnItemsPresenterItemsChanged;
-                }
-            }
-
-            //请求下一帧
-            this.RequestNextFrameRendering();
-        }
-        #endregion
-
-        #region 3D元素列表容器元素改变事件 —— void OnItemsPresenterItemsChanged(object sender...
-        /// <summary>
-        /// 3D元素列表容器元素改变事件
-        /// </summary>
-        private void OnItemsPresenterItemsChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
-        {
-            //请求下一帧
-            this.RequestNextFrameRendering();
         }
         #endregion
 

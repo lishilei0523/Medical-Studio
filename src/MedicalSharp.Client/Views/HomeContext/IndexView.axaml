@@ -75,8 +75,8 @@
 				<!--Left Pannel-->
 				<Grid Grid.Column="0" Margin="4,1,2,5">
 					<Grid.RowDefinitions>
-						<RowDefinition Height="410" />
-						<RowDefinition Height="300" />
+						<RowDefinition Height="345" />
+						<RowDefinition Height="310" />
 						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
 					<sd:GroupBox Grid.Row="0" Header="患者检查信息" Margin="0,0,0,2">
@@ -95,12 +95,6 @@
 							</sd:FormItem>
 							<sd:FormItem Label="生日：">
 								<TextBlock Text="{Binding PatientInfo.BirthDate}" />
-							</sd:FormItem>
-							<sd:FormItem Label="身高：">
-								<TextBlock Text="{Binding PatientInfo.Height}" />
-							</sd:FormItem>
-							<sd:FormItem Label="体重：">
-								<TextBlock Text="{Binding PatientInfo.Weight}" />
 							</sd:FormItem>
 							<sd:FormItem Label="检查日期：">
 								<TextBlock Text="{Binding StudyInfo.StudyDate}" />
@@ -171,8 +165,8 @@
 				<!--Right Pannel-->
 				<Grid Grid.Column="2" Margin="2,1,4,5">
 					<Grid.RowDefinitions>
-						<RowDefinition Height="525" />
-						<RowDefinition Height="*" />
+						<RowDefinition />
+						<RowDefinition />
 					</Grid.RowDefinitions>
 					<sd:GroupBox Grid.Row="0" Header="组织管理" Margin="0,0,0,2">
 						<ListBox ItemsSource="{Binding Tissues}" SelectedItem="{Binding SelectedTissue}">
