@@ -371,13 +371,8 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="deltaV">绕V轴旋转角度（左右旋转）</param>
         public void Rotate(float deltaU, float deltaV)
         {
-            //绕U轴旋转（上下）
             Quaternion rotationU = Quaternion.FromAxisAngle(this.UAxis, MathHelper.DegreesToRadians(deltaU));
-
-            //绕V轴旋转（左右）
             Quaternion rotationV = Quaternion.FromAxisAngle(this.VAxis, MathHelper.DegreesToRadians(deltaV));
-
-            //组合旋转：先左右，再上下
             Quaternion rotation = rotationU * rotationV;
 
             //应用旋转
@@ -394,7 +389,7 @@ namespace MedicalSharp.Primitives.Maths
             //计算投影范围
             this.CalculateProjectionRange();
 
-            //重新计算切片数量
+            //计算切片数量
             this.SlicesCount = this.CalculateObliqueSlicesCount();
 
             //触发变化事件
@@ -445,17 +440,17 @@ namespace MedicalSharp.Primitives.Maths
         /// <returns>U/V坐标，[-1, 1]，如果不在平面上则返回null</returns>
         public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix, out Ray ray)
         {
+            //计算投影、视图逆矩阵
+            Matrix4 projectionMatrixInv = Matrix4.Invert(projectionMatrix);
+            Matrix4 viewMatrixInv = Matrix4.Invert(viewMatrix);
+
             //将屏幕坐标转换到世界空间的射线起点（近平面上的点）
             float ndcX = (2.0f * mousePos2D.X) / viewportSize.X - 1.0f;
             float ndcY = 1.0f - (2.0f * mousePos2D.Y) / viewportSize.Y;
-
-            Vector4 rayStartNDC = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
-            Matrix4 invProjection = Matrix4.Invert(projectionMatrix);
-            Matrix4 invView = Matrix4.Invert(viewMatrix);
-
-            Vector4 rayStartCamera = rayStartNDC * invProjection;
+            Vector4 ndcStart = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
+            Vector4 rayStartCamera = ndcStart * projectionMatrixInv;
             rayStartCamera /= rayStartCamera.W;
-            Vector3 rayStartWorld = Vector3.TransformPosition(rayStartCamera.Xyz, invView);
+            Vector3 rayStartWorld = (rayStartCamera * viewMatrixInv).Xyz;
 
             //横断位特殊处理
             if (this.OriginalPlaneType == MPRPlaneType.Axial)
@@ -467,10 +462,10 @@ namespace MedicalSharp.Primitives.Maths
             ray = new Ray(rayStartWorld, this.WorldNormal);
 
             //射线与平面求交
-            if (ray.IntersectsPlane(this.WorldCenter, this.WorldNormal, out Vector3 hitPoint, out _))
+            if (ray.IntersectsPlane(this.WorldCenter, this.WorldNormal, out Vector3 worldPoint, out _))
             {
                 //转换到逻辑空间
-                Vector3 localPoint = hitPoint / this.VolumeMetadata.VolumeScale;
+                Vector3 localPoint = worldPoint / this.VolumeMetadata.VolumeScale;
 
                 //投影到平面得到UV
                 Vector2 uv = this.ProjectPoint(localPoint);
@@ -539,7 +534,9 @@ namespace MedicalSharp.Primitives.Maths
             Vector3 localPoint = texCoord - new Vector3(0.5f);
 
             //投影到平面得到UV
-            return this.ProjectPoint(localPoint);
+            Vector2 uv = this.ProjectPoint(localPoint);
+
+            return uv;
         }
         #endregion
 
@@ -550,12 +547,9 @@ namespace MedicalSharp.Primitives.Maths
         /// <returns>模型矩阵</returns>
         public Matrix4 GetModelMatrix()
         {
-            //切片沿世界法向量方向偏移
+            //世界中心：切片沿世界法向量方向偏移
             float sliceOffset = this.CalculateSliceOffset();
-            Vector3 worldOffset = this.WorldNormal * sliceOffset;
-
-            //世界中心
-            Vector3 worldCenter = this.Center + worldOffset;
+            Vector3 worldCenter = this.WorldNormal * sliceOffset;
 
             //构建平移矩阵
             Matrix4 translation = Matrix4.CreateTranslation(worldCenter);
@@ -694,7 +688,6 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="u">U坐标，范围[-1, 1]</param>
         /// <param name="v">V坐标，范围[-1, 1]</param>
         /// <returns>逻辑空间中的点，范围[-0.5, 0.5]</returns>
-        /// <remarks>逻辑空间</remarks>
         private Vector3 GetPointOnPlane(float u, float v)
         {
             //TODO 考虑斜切，特殊处理
@@ -703,20 +696,20 @@ namespace MedicalSharp.Primitives.Maths
             float sliceOffset = this.CalculateSliceOffset();
 
             //平面上的点 = 中心 + 法向量方向偏移 + U方向偏移 + V方向偏移
-            Vector3 point = this.Center + this.Normal * sliceOffset + this.UAxis * u * halfSize + this.VAxis * v * halfSize;
+            Vector3 localPoint = this.Center + this.Normal * sliceOffset + this.UAxis * u * halfSize + this.VAxis * v * halfSize;
 
-            return point;
+            return localPoint;
         }
         #endregion
 
-        #region 投影点到平面 —— Vector2 ProjectPoint(Vector3 point)
+        #region 投影点到平面 —— Vector2 ProjectPoint(Vector3 localPoint)
         /// <summary>
         /// 投影点到平面
         /// </summary>
-        /// <param name="point">逻辑空间中的点，范围[-0.5, 0.5]</param>
+        /// <param name="localPoint">逻辑空间中的点，范围[-0.5, 0.5]</param>
         /// <returns>平面U/V坐标，范围[-1, 1]</returns>
         /// <remarks>逻辑空间</remarks>
-        private Vector2 ProjectPoint(Vector3 point)
+        private Vector2 ProjectPoint(Vector3 localPoint)
         {
             //TODO 考虑斜切，特殊处理
 
@@ -724,7 +717,7 @@ namespace MedicalSharp.Primitives.Maths
             float sliceOffset = this.CalculateSliceOffset();
 
             //计算相对于平面中心的偏移
-            Vector3 relative = point - (this.Center + this.Normal * sliceOffset);
+            Vector3 relative = localPoint - (this.Center + this.Normal * sliceOffset);
 
             //投影到U轴和V轴
             float u = Vector3.Dot(relative, this.UAxis) / halfSize;
