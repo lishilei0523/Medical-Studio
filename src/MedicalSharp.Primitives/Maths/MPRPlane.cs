@@ -327,6 +327,9 @@ namespace MedicalSharp.Primitives.Maths
             this.VAxis = worldVAxis / this.VolumeMetadata.VolumeScale;
             this.Normal = worldNormal / this.VolumeMetadata.VolumeScale;
 
+            //重新正交化
+            this.Orthonormalize();
+
             //更新平面类型
             if (Math.Abs(this.Normal.Z) > 0.99f)
             {
