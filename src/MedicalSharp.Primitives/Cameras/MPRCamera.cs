@@ -18,11 +18,11 @@ namespace MedicalSharp.Primitives.Cameras
         /// </summary>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
-        public MPRCamera(float nearPlaneDistance = -5, float farPlaneDistance = 5)
+        public MPRCamera(float nearPlaneDistance = -2, float farPlaneDistance = 2)
             : base(nearPlaneDistance, farPlaneDistance)
         {
             this.TargetPosition = Vector3.Zero;
-            this.Distance = 4.0f;
+            this.Distance = 1.0f;
             this.ZoomFactor = 1.0f;
             this.PanOffset = Vector2.Zero;
             this.UpdateViewMatrix();

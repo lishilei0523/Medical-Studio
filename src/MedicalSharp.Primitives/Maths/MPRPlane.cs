@@ -1,4 +1,5 @@
-﻿using MedicalSharp.Primitives.Enums;
+﻿using MedicalSharp.Primitives.Cameras;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using MedicalSharp.Primitives.Models.Arguments;
@@ -433,20 +434,18 @@ namespace MedicalSharp.Primitives.Maths
         /// 屏幕坐标转换平面U/V坐标
         /// </summary>
         /// <param name="mousePos2D">鼠标2D位置</param>
-        /// <param name="viewportSize">视口尺寸</param>
-        /// <param name="projectionMatrix">投影矩阵</param>
-        /// <param name="viewMatrix">视图矩阵</param>
+        /// <param name="camera">MPR相机</param>
         /// <param name="ray">射线</param>
         /// <returns>U/V坐标，[-1, 1]，如果不在平面上则返回null</returns>
-        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Vector2 viewportSize, Matrix4 projectionMatrix, Matrix4 viewMatrix, out Ray ray)
+        public Vector2? ScreenToPlaneUV(Vector2 mousePos2D, Camera camera, out Ray ray)
         {
             //计算投影、视图逆矩阵
-            Matrix4 projectionMatrixInv = Matrix4.Invert(projectionMatrix);
-            Matrix4 viewMatrixInv = Matrix4.Invert(viewMatrix);
+            Matrix4 projectionMatrixInv = Matrix4.Invert(camera.ProjectionMatrix);
+            Matrix4 viewMatrixInv = Matrix4.Invert(camera.ViewMatrix);
 
             //将屏幕坐标转换到世界空间的射线起点（近平面上的点）
-            float ndcX = (2.0f * mousePos2D.X) / viewportSize.X - 1.0f;
-            float ndcY = 1.0f - (2.0f * mousePos2D.Y) / viewportSize.Y;
+            float ndcX = (2.0f * mousePos2D.X) / camera.ViewportWidth - 1.0f;
+            float ndcY = 1.0f - (2.0f * mousePos2D.Y) / camera.ViewportHeight;
             Vector4 ndcStart = new Vector4(ndcX, ndcY, -1.0f, 1.0f);
             Vector4 rayStartCamera = ndcStart * projectionMatrixInv;
             rayStartCamera /= rayStartCamera.W;

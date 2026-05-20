@@ -273,7 +273,7 @@ namespace MedicalSharp.Controls.Viewports
 
             #endregion
 
-            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(screenPos2D, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, out Ray ray);
+            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(screenPos2D, this.Camera, out Ray ray);
             if (planeUV.HasValue)
             {
                 return ray;
@@ -309,7 +309,7 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             this.GlContext.MakeCurrent();
-            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, out ray);
+            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera, out ray);
             if (planeUV.HasValue)
             {
                 voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y, out Vector3 texCoord, out Vector3 worldPoint);
