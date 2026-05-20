@@ -722,8 +722,9 @@ namespace MedicalSharp.Primitives.Maths
             //投影到U轴和V轴
             float u = Vector3.Dot(relative, this.UAxis) / halfSize;
             float v = Vector3.Dot(relative, this.VAxis) / halfSize;
+            Vector2 uv = new Vector2(u, v);
 
-            return new Vector2(u, v);
+            return uv;
         }
         #endregion
 
