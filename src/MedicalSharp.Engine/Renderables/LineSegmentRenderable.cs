@@ -105,7 +105,7 @@ namespace MedicalSharp.Engine.Renderables
 
             if (startPoint == endPoint)
             {
-                throw new ArgumentNullException(nameof(endPoint), "起始点与终止点不可相等！");
+                return;
             }
             if (this.StartPoint == startPoint && this.EndPoint == endPoint)
             {
