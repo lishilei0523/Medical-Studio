@@ -196,11 +196,16 @@ namespace MedicalSharp.Primitives.Cameras
 
             #endregion
 
-            this.CameraPosition = this.TargetPlane.WorldCenter - this.TargetPlane.WorldNormal * this.Distance;
-            this.TargetPosition = this.TargetPlane.WorldCenter;
-            this.LookDirection = this.TargetPlane.WorldNormal;
-            this.UpDirection = this.TargetPlane.WorldVAxis;
-            this.RightDirection = this.TargetPlane.WorldUAxis;
+            Vector3 worldCenter = this.TargetPlane.WorldCenter;
+            Vector3 worldUAxis = this.TargetPlane.WorldUAxis.Normalized();
+            Vector3 worldVAxis = this.TargetPlane.WorldVAxis.Normalized();
+            Vector3 worldNormal = this.TargetPlane.WorldNormal.Normalized();
+
+            this.CameraPosition = worldCenter - worldNormal * this.Distance;
+            this.TargetPosition = worldCenter;
+            this.LookDirection = worldNormal;
+            this.UpDirection = worldVAxis;
+            this.RightDirection = worldUAxis;
             this.UpdateViewMatrix();
         }
         #endregion

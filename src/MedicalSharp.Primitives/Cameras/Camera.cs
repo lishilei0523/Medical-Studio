@@ -27,6 +27,20 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 属性
 
+        #region 视口宽度 —— float ViewportWidth
+        /// <summary>
+        /// 视口宽度
+        /// </summary>
+        public float ViewportWidth { get; protected set; }
+        #endregion
+
+        #region 视口高度 —— float ViewportHeight
+        /// <summary>
+        /// 视口高度
+        /// </summary>
+        public float ViewportHeight { get; protected set; }
+        #endregion
+
         #region 相机位置 —— Vector3 CameraPosition
         /// <summary>
         /// 相机位置
@@ -95,20 +109,6 @@ namespace MedicalSharp.Primitives.Cameras
         /// 远平面距离
         /// </summary>
         public float FarPlaneDistance { get; protected set; }
-        #endregion
-
-        #region 视口宽度 —— float ViewportWidth
-        /// <summary>
-        /// 视口宽度
-        /// </summary>
-        public float ViewportWidth { get; protected set; }
-        #endregion
-
-        #region 视口高度 —— float ViewportHeight
-        /// <summary>
-        /// 视口高度
-        /// </summary>
-        public float ViewportHeight { get; protected set; }
         #endregion
 
         #region 只读属性 - 相机模式 —— abstract Vector3 CameraMode
