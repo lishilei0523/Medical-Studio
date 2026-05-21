@@ -118,6 +118,28 @@ namespace MedicalSharp.Engine.Protocols
         }
         #endregion
 
+        #region 设置标记颜色 —— void SetMarkColor(byte markValue, Vector4 color)
+        /// <summary>
+        /// 设置标记颜色
+        /// </summary>
+        /// <param name="markValue">标记值</param>
+        /// <param name="color">颜色</param>
+        public void SetMarkColor(byte markValue, Vector4 color)
+        {
+            #region # 验证
+
+            if (this._markColors[markValue] == color)
+            {
+                return;
+            }
+
+            #endregion
+
+            this._markColors[markValue] = color;
+            this.UpdateTexture();
+        }
+        #endregion
+
         #region 适用默认标记颜色 —— void ApplyDefaultMarkColors(float opacity = 0.6f)
         /// <summary>
         /// 适用默认标记颜色

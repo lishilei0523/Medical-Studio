@@ -372,7 +372,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 TissueInfo tissue = new TissueInfo(viewModel.TissueName, viewModel.MarkValue!.Value, viewModel.MarkMode, viewModel.TissueColor);
                 this.Tissues.Add(tissue);
             }
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 编辑组织命令 —— ICommand UpdateTissueCommand
@@ -389,13 +389,24 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             bool? result = await this._windowManager.ShowDialogAsync(viewModel);
             if (result == true)
             {
+                #region # 验证
+
+                if (viewModel.MarkValue != this.SelectedTissue.MarkValue &&
+                    this.Tissues.Any(x => x.MarkValue == viewModel.MarkValue!.Value))
+                {
+                    await MessageBox.Show("组织标记值已存在，请重试！");
+                    return;
+                }
+
+                #endregion
+
                 this.SelectedTissue.Name = viewModel.TissueName;
                 this.SelectedTissue.MarkValue = viewModel.MarkValue!.Value;
                 this.SelectedTissue.Color = viewModel.TissueColor;
                 this.SelectedTissue.SelectedMarkMode = new KeyValuePair<string, string>(viewModel.MarkMode.ToString(), viewModel.MarkMode.GetEnumMember());
             }
 
-        }, _ => this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
+        }, _ => this.VolumeData != null && this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
         #endregion
 
         #region 重置组织命令 —— ICommand ResetTissueCommand
@@ -416,7 +427,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
 
-        }, _ => this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
+        }, _ => this.VolumeData != null && this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
         #endregion
 
         #region 删除组织命令 —— ICommand RemoveTissueCommand
@@ -444,7 +455,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
 
-        }, _ => this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
+        }, _ => this.VolumeData != null && this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
         #endregion
 
         #region 高斯滤波命令 —— ICommand GaussianBlurCommand

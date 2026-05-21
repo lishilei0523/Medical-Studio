@@ -40,7 +40,7 @@
             </sd:FormItem>
             <sd:FormItem Label="组织颜色：">
 				<ColorPicker Width="300" HorizontalAlignment="Left" 
-                             Color="{Binding TissueColor}" IsEnabled="False" />
+                             Color="{Binding TissueColor}" />
             </sd:FormItem>
 		</StackPanel>
 		<!--占位区-->

@@ -1,12 +1,12 @@
-﻿using MedicalSharp.Primitives.Enums;
+﻿using Avalonia.Media;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 
 namespace MedicalSharp.Presentation.Events
 {
     /// <summary>
-    /// 标记模式切换事件
+    /// 标记颜色改变事件
     /// </summary>
-    public class MarkModeSwitchedEvent : CaliburnEvent
+    public class MarkColorChangedEvent : CaliburnEvent
     {
         /// <summary>
         /// 标记值
@@ -14,8 +14,8 @@ namespace MedicalSharp.Presentation.Events
         public byte MarkValue { get; set; }
 
         /// <summary>
-        /// 标记模式
+        /// 颜色
         /// </summary>
-        public MarkMode MarkMode { get; set; }
+        public Color Color { get; set; }
     }
 }

@@ -1,6 +1,8 @@
-﻿using MedicalSharp.Engine.Renderables;
+﻿using MedicalSharp.Engine.Managers;
+using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Graphics.OpenGL4;
 using System;
 
 namespace MedicalSharp.Engine.Algorithms
@@ -94,30 +96,6 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 同步预览数据GPU->CPU —— static void SyncPreviewDataFromGpu(this VolumeRenderable renderable)
-        /// <summary>
-        /// 同步预览数据GPU->CPU
-        /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
-        /// <repreviews>将GPU预览纹理数据回读到CPU端的VolumeData.PreviewData</repreviews>
-        public static void SyncPreviewDataFromGpu(this VolumeRenderable renderable)
-        {
-            SyncPreviewDataFromGpu(renderable.VolumeData, renderable.PreviewTexture);
-        }
-        #endregion
-
-        #region # 同步预览数据CPU->GPU —— static void SyncPreviewDataToGpu(this VolumeRenderable renderable)
-        /// <summary>
-        /// 同步预览数据CPU->GPU
-        /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
-        /// <repreviews>将CPU端VolumeData.PreviewData上传到GPU预览纹理</repreviews>
-        public static void SyncPreviewDataToGpu(this VolumeRenderable renderable)
-        {
-            SyncPreviewDataToGpu(renderable.VolumeData, renderable.PreviewTexture);
-        }
-        #endregion
-
         #region # 同步标记数据GPU->CPU —— static void SyncMarkDataFromGpu(VolumeData volumeData...
         /// <summary>
         /// 同步标记数据GPU->CPU
@@ -157,6 +135,18 @@ namespace MedicalSharp.Engine.Algorithms
             {
                 volumeData.EndMarkSync();
             }
+        }
+        #endregion
+
+        #region # 同步标记数据GPU->CPU —— static void SyncMarkDataFromGpu(this VolumeRenderable renderable)
+        /// <summary>
+        /// 同步标记数据GPU->CPU
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <remarks>将GPU标记纹理数据回读到CPU端的VolumeData.MarkData</remarks>
+        public static void SyncMarkDataFromGpu(this VolumeRenderable renderable)
+        {
+            SyncMarkDataFromGpu(renderable.VolumeData, renderable.MarkTexture);
         }
         #endregion
 
@@ -202,27 +192,111 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 同步标记数据GPU->CPU —— static void SyncMarkDataFromGpu(this VolumeRenderable renderable)
+        #region # 重置预览纹理 —— static void ResetPreviewTexture(VolumeData volumeData...
         /// <summary>
-        /// 同步标记数据GPU->CPU
+        /// 重置预览纹理
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
-        /// <remarks>将GPU标记纹理数据回读到CPU端的VolumeData.MarkData</remarks>
-        public static void SyncMarkDataFromGpu(this VolumeRenderable renderable)
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="originalTexture">原始纹理</param>
+        /// <param name="previewTexture">预览纹理</param>
+        /// <remarks>将预览纹理重置为原始纹理</remarks>
+        public static void ResetPreviewTexture(VolumeData volumeData, Texture3D originalTexture, Texture3D previewTexture)
         {
-            SyncMarkDataFromGpu(renderable.VolumeData, renderable.MarkTexture);
+            #region # 验证
+
+            if (originalTexture == null)
+            {
+                throw new InvalidOperationException("原始纹理未初始化！");
+            }
+            if (previewTexture == null)
+            {
+                throw new InvalidOperationException("预览纹理未初始化！");
+            }
+            if (previewTexture.Width != originalTexture.Width ||
+                previewTexture.Height != originalTexture.Height ||
+                previewTexture.Depth != originalTexture.Depth)
+            {
+                throw new InvalidOperationException("预览纹理与原始纹理尺寸不匹配！");
+            }
+
+            #endregion
+
+            //确保之前的GPU操作完成
+            GL.MemoryBarrier(MemoryBarrierFlags.TextureUpdateBarrierBit);
+
+            //从原始纹理复制到预览纹理
+            GL.CopyImageSubData(
+                originalTexture.Id, ImageTarget.Texture3D, 0, 0, 0, 0,
+                previewTexture.Id, ImageTarget.Texture3D, 0, 0, 0, 0,
+                previewTexture.Width, previewTexture.Height, previewTexture.Depth);
+
+            //确保复制完成后后续操作能读到数据
+            GL.MemoryBarrier(MemoryBarrierFlags.TextureUpdateBarrierBit);
+
+            //重置CPU端
+            volumeData.ResetPreviewData();
         }
         #endregion
 
-        #region # 同步标记数据CPU->GPU —— static void SyncMarkDataToGpu(this VolumeRenderable renderable)
+        #region # 重置标记纹理 —— static void ResetMarkTexture(VolumeData volumeData...
         /// <summary>
-        /// 同步标记数据CPU->GPU
+        /// 重置标记纹理
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
-        /// <remarks>将CPU端VolumeData.MarkData上传到GPU标记纹理</remarks>
-        public static void SyncMarkDataToGpu(this VolumeRenderable renderable)
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
+        /// <remarks>将标记纹理全部设为0</remarks>
+        public static void ResetMarkTexture(VolumeData volumeData, Texture3D markTexture)
         {
-            SyncMarkDataToGpu(renderable.VolumeData, renderable.MarkTexture);
+            //清空标记纹理
+            markTexture.Clear();
+
+            //清空CPU端
+            volumeData.ResetMarkData();
+        }
+        #endregion
+
+        #region # 重置标记值 —— static void ResetMarkValue(VolumeData volumeData, Texture3D markTexture...
+        /// <summary>
+        /// 重置标记值
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
+        /// <param name="targetMarkValue">目标标记值（1~255）</param>
+        /// <remarks>将给定标记值重置为0</remarks>
+        public static void ResetMarkValue(VolumeData volumeData, Texture3D markTexture, byte targetMarkValue)
+        {
+            #region # 验证
+
+            if (targetMarkValue == 0)
+            {
+                return;
+            }
+
+            #endregion
+
+            //重置标记值计算着色器
+            ShaderProgram resetMarkValueComputer = ComputerManager.ResetMarkValueComputer;
+
+            //开启Shader程序
+            resetMarkValueComputer.Use();
+
+            //绑定标记纹理为可读写
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+
+            //设置体积参数
+            resetMarkValueComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+
+            //设置标记值
+            resetMarkValueComputer.SetUniformUInt("u_TargetMarkValue", targetMarkValue);
+
+            //调度执行
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
+
+            //取消使用
+            resetMarkValueComputer.Unuse();
+
+            //CPU端重置
+            volumeData.ResetMarkValue(targetMarkValue);
         }
         #endregion
     }

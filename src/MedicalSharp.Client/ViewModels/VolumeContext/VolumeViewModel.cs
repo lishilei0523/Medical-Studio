@@ -43,7 +43,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -1139,6 +1139,23 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
                 session.MarkStrategy.SwitchMarkMode(message.MarkValue, message.MarkMode);
+                this.FrameToken++;
+            }
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理标记颜色改变事件 —— Task HandleAsync(MarkColorChangedEvent message...
+        /// <summary>
+        /// 处理标记颜色改变事件
+        /// </summary>
+        public Task HandleAsync(MarkColorChangedEvent message, CancellationToken cancellationToken)
+        {
+            if (this.VolumeData != null)
+            {
+                VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                session.MarkStrategy.SetMarkColor(message.MarkValue, message.Color.ToVector4());
                 this.FrameToken++;
             }
 

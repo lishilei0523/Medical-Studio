@@ -79,8 +79,24 @@ namespace MedicalSharp.Presentation.Models
         /// <summary>
         /// 颜色
         /// </summary>
-        [DependencyProperty]
-        public Color Color { get; set; }
+        public Color Color
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+
+                //发布事件
+                MarkColorChangedEvent message = new MarkColorChangedEvent
+                {
+                    MarkValue = this.MarkValue,
+                    Color = value
+                };
+                IEventAggregator eventAggregator = ResolveMediator.Resolve<IEventAggregator>();
+                eventAggregator.PublishOnUIThreadAsync(message);
+            }
+        }
         #endregion
 
         #region 是否锁定 —— bool Locked

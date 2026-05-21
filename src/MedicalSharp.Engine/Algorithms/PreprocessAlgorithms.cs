@@ -1,9 +1,9 @@
 ﻿namespace MedicalSharp.Engine.Algorithms
 {
     /// <summary>
-    /// 分割算法
+    /// 预处理算法
     /// </summary>
-    public static class SegmentAlgorithms
+    public static class PreprocessAlgorithms
     {
 
     }
