@@ -41,6 +41,11 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<Vector3D> NormalProperty;
 
         /// <summary>
+        /// 可否旋转依赖属性
+        /// </summary>
+        public static readonly StyledProperty<bool> CanRotateProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static RectangleVisual3D()
@@ -49,6 +54,7 @@ namespace MedicalSharp.Controls.Visuals
             HeightProperty = AvaloniaProperty.Register<RectangleVisual3D, float>(nameof(Height), 1.0f);
             CenterProperty = AvaloniaProperty.Register<RectangleVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
             NormalProperty = AvaloniaProperty.Register<RectangleVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 0, 1));
+            CanRotateProperty = AvaloniaProperty.Register<RectangleVisual3D, bool>(nameof(CanRotate), true);
         }
 
 
@@ -134,6 +140,17 @@ namespace MedicalSharp.Controls.Visuals
         {
             get => this.GetValue(NormalProperty);
             set => this.SetValue(NormalProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 可否旋转 —— bool CanRotate
+        /// <summary>
+        /// 依赖属性 - 可否旋转
+        /// </summary>
+        public bool CanRotate
+        {
+            get => this.GetValue(CanRotateProperty);
+            set => this.SetValue(CanRotateProperty, value);
         }
         #endregion
 

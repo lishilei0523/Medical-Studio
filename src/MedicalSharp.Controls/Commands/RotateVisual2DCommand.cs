@@ -60,7 +60,7 @@ namespace MedicalSharp.Controls.Commands
             {
                 Point mousePos2D = eventArgs.GetPosition(viewport);
                 bool success = pickVisual3D.FindNearest(mousePos2D.ToVector2(), out _, out _, out Visual3D visual3D, out _);
-                if (success && visual3D is IRotatable rotatable)
+                if (success && visual3D is IRotatable rotatable && rotatable.CanRotate)
                 {
                     #region # 验证
 

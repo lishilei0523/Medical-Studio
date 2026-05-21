@@ -8,6 +8,11 @@ namespace MedicalSharp.Primitives.Interfaces
     public interface IRotatable
     {
         /// <summary>
+        /// 可否旋转
+        /// </summary>
+        bool CanRotate { get; }
+
+        /// <summary>
         /// 变换
         /// </summary>
         Transform Transform { get; }

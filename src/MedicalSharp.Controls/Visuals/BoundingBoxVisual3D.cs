@@ -43,6 +43,11 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<Vector3D> CenterProperty;
 
         /// <summary>
+        /// 可否旋转依赖属性
+        /// </summary>
+        public static readonly StyledProperty<bool> CanRotateProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static BoundingBoxVisual3D()
@@ -51,6 +56,7 @@ namespace MedicalSharp.Controls.Visuals
             HeightProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Height), 1.0f);
             DepthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Depth), 1.0f);
             CenterProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
+            CanRotateProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, bool>(nameof(CanRotate), true);
         }
 
 
@@ -67,7 +73,6 @@ namespace MedicalSharp.Controls.Visuals
         #region # 属性
 
         #region 依赖属性 - 宽度 —— float Width
-
         /// <summary>
         /// 依赖属性 - 宽度
         /// </summary>
@@ -76,11 +81,9 @@ namespace MedicalSharp.Controls.Visuals
             get => this.GetValue(WidthProperty);
             set => this.SetValue(WidthProperty, value);
         }
-
         #endregion
 
         #region 依赖属性 - 高度 —— float Height
-
         /// <summary>
         /// 依赖属性 - 高度
         /// </summary>
@@ -89,11 +92,9 @@ namespace MedicalSharp.Controls.Visuals
             get => this.GetValue(HeightProperty);
             set => this.SetValue(HeightProperty, value);
         }
-
         #endregion
 
         #region 依赖属性 - 深度 —— float Depth
-
         /// <summary>
         /// 依赖属性 - 深度
         /// </summary>
@@ -102,11 +103,9 @@ namespace MedicalSharp.Controls.Visuals
             get => this.GetValue(DepthProperty);
             set => this.SetValue(DepthProperty, value);
         }
-
         #endregion
 
         #region 依赖属性 - 中心位置 —— Vector3D Center
-
         /// <summary>
         /// 依赖属性 - 中心位置
         /// </summary>
@@ -115,7 +114,17 @@ namespace MedicalSharp.Controls.Visuals
             get => this.GetValue(CenterProperty);
             set => this.SetValue(CenterProperty, value);
         }
+        #endregion
 
+        #region 依赖属性 - 可否旋转 —— bool CanRotate
+        /// <summary>
+        /// 依赖属性 - 可否旋转
+        /// </summary>
+        public bool CanRotate
+        {
+            get => this.GetValue(CanRotateProperty);
+            set => this.SetValue(CanRotateProperty, value);
+        }
         #endregion
 
         #region 只读属性 - 最小点 —— Vector3 Minimum

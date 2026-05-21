@@ -28,11 +28,17 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<AvaloniaList<Vector3D>> PositionsProperty;
 
         /// <summary>
+        /// 可否旋转依赖属性
+        /// </summary>
+        public static readonly StyledProperty<bool> CanRotateProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static ConvexPolyhedronVisual3D()
         {
             PositionsProperty = AvaloniaProperty.Register<ConvexPolyhedronVisual3D, AvaloniaList<Vector3D>>(nameof(Positions), []);
+            CanRotateProperty = AvaloniaProperty.Register<ConvexPolyhedronVisual3D, bool>(nameof(CanRotate), true);
         }
 
         /// <summary>
@@ -62,6 +68,17 @@ namespace MedicalSharp.Controls.Visuals
         {
             get => this.GetValue(PositionsProperty);
             set => this.SetValue(PositionsProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 可否旋转 —— bool CanRotate
+        /// <summary>
+        /// 依赖属性 - 可否旋转
+        /// </summary>
+        public bool CanRotate
+        {
+            get => this.GetValue(CanRotateProperty);
+            set => this.SetValue(CanRotateProperty, value);
         }
         #endregion
 

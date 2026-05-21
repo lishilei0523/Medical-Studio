@@ -41,6 +41,11 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<int> SegmentsProperty;
 
         /// <summary>
+        /// 可否旋转依赖属性
+        /// </summary>
+        public static readonly StyledProperty<bool> CanRotateProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static CircleVisual3D()
@@ -49,6 +54,7 @@ namespace MedicalSharp.Controls.Visuals
             CenterProperty = AvaloniaProperty.Register<CircleVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
             NormalProperty = AvaloniaProperty.Register<CircleVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 0, 1));
             SegmentsProperty = AvaloniaProperty.Register<CircleVisual3D, int>(nameof(Segments), 64);
+            CanRotateProperty = AvaloniaProperty.Register<CircleVisual3D, bool>(nameof(CanRotate), true);
         }
 
 
@@ -130,6 +136,17 @@ namespace MedicalSharp.Controls.Visuals
         {
             get => this.GetValue(SegmentsProperty);
             set => this.SetValue(SegmentsProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 可否旋转 —— bool CanRotate
+        /// <summary>
+        /// 依赖属性 - 可否旋转
+        /// </summary>
+        public bool CanRotate
+        {
+            get => this.GetValue(CanRotateProperty);
+            set => this.SetValue(CanRotateProperty, value);
         }
         #endregion
 
