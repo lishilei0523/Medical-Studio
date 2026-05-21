@@ -22,26 +22,25 @@
 		</Grid.RowDefinitions>
 		<!--表单区-->
 		<StackPanel Grid.Row="0" Grid.IsSharedSizeScope="True" Margin="20,20">
-            <sd:FormItem Label="组织名称：">
-                <TextBox Width="300" HorizontalAlignment="Left" 
-                         Text="{Binding TissueName}" />
-            </sd:FormItem>
-            <sd:FormItem Label="标记值：">
-                <NumericUpDown Width="300" HorizontalAlignment="Left"
-							   Minimum="1" Maximum="255" Increment="1" 
-                               ParsingNumberStyle="Integer" FormatString="F0"
-                               Text="{Binding MarkValue}" />
-            </sd:FormItem>
-            <sd:FormItem Label="标记模式：">
-                <ComboBox Width="300" 
-                          ItemsSource="{Binding MarkModes}"
-                          DisplayMemberBinding="{Binding Value}"
-                          SelectedValue="{Binding SelectedMarkMode}" />
-            </sd:FormItem>
-            <sd:FormItem Label="组织颜色：">
-				<ColorPicker Width="300" HorizontalAlignment="Left" 
-                             Color="{Binding TissueColor}" />
-            </sd:FormItem>
+			<sd:FormItem Label="组织名称：">
+				<TextBox Width="300" HorizontalAlignment="Left"
+						 Text="{Binding TissueName}" />
+			</sd:FormItem>
+			<sd:FormItem Label="标记值：">
+				<NumericUpDown Width="300" HorizontalAlignment="Left"
+							   Minimum="1" Maximum="255" Increment="1"
+							   ParsingNumberStyle="Integer" FormatString="F0"
+							   Text="{Binding MarkValue}" />
+			</sd:FormItem>
+			<sd:FormItem Label="标记模式：">
+				<ComboBox Width="300"
+						  ItemsSource="{Binding MarkModes}"
+						  DisplayMemberBinding="{Binding Value}"
+						  SelectedValue="{Binding SelectedMarkMode}" />
+			</sd:FormItem>
+			<sd:FormItem Label="组织颜色：">
+				<ColorPicker Width="300" HorizontalAlignment="Left" Color="{Binding TissueColor}" />
+			</sd:FormItem>
 		</StackPanel>
 		<!--占位区-->
 		<Grid Grid.Row="1" />
