@@ -347,6 +347,9 @@ namespace MedicalSharp.Primitives.Maths
             this.VAxis = worldVAxis;
             this.Normal = worldNormal;
 
+            //重新正交化
+            this.Orthonormalize();
+
             //更新平面类型
             if (Math.Abs(this.Normal.Z) > 0.99f)
             {
@@ -477,7 +480,14 @@ namespace MedicalSharp.Primitives.Maths
             //横断位特殊处理
             if (this.OriginalPlaneType == MPRPlaneType.Axial)
             {
-                rayStartWorld *= new Vector3(-1, 1, 1);
+                //分解到U/V/N
+                Vector3 offset = rayStartWorld - this.WorldCenter;
+                float u = Vector3.Dot(offset, this.UAxis);
+                float v = Vector3.Dot(offset, this.VAxis);
+                float n = Vector3.Dot(offset, this.Normal);
+
+                //关于V轴对称 = U取反，V和N不变
+                rayStartWorld = this.WorldCenter - u * this.UAxis + v * this.VAxis + n * this.Normal;
             }
 
             //创建射线，射线方向固定为相机视角方向
@@ -610,11 +620,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <returns>切片数量</returns>
         private int CalculateObliqueSlicesCount()
         {
-            Vector3 absNormal = new Vector3(
-                Math.Abs(this.Normal.X),
-                Math.Abs(this.Normal.Y),
-                Math.Abs(this.Normal.Z)
-            );
+            Vector3 absNormal = this.Normal.Abs();
             float projection =
                 this.VolumeMetadata.VolumeSize.X * absNormal.X +
                 this.VolumeMetadata.VolumeSize.Y * absNormal.Y +

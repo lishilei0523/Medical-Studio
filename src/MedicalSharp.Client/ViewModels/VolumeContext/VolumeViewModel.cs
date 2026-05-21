@@ -456,9 +456,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             #endregion
 
-            this.AxialPlane.Transform.SetMatrix(Matrix4.Identity);
-            this.CoronalPlane.Transform.SetMatrix(Matrix4.Identity);
-            this.SagittalPlane.Transform.SetMatrix(Matrix4.Identity);
+            this.AxialPlane.Transform?.SetMatrix(Matrix4.Identity);
+            this.CoronalPlane.Transform?.SetMatrix(Matrix4.Identity);
+            this.SagittalPlane.Transform?.SetMatrix(Matrix4.Identity);
             this.FrameToken++;
 
             //发布事件

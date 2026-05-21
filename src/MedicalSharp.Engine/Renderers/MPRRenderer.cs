@@ -298,8 +298,15 @@ namespace MedicalSharp.Engine.Renderers
             //设置相机视口尺寸
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
+            //横断位特殊处理
+            Matrix4 viewMatrix = this.Camera.ViewMatrix;
+            if (this.MPRCamera.TargetPlane.OriginalPlaneType == MPRPlaneType.Axial)
+            {
+                viewMatrix = Matrix4.CreateScale(-1, 1, 1) * viewMatrix;
+            }
+
             //渲染上下文
-            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, this.MPRCamera.ZoomFactor);
+            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, viewMatrix, this.MPRCamera.ZoomFactor);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.MPRProgram;
@@ -311,7 +318,6 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
             program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
-            program.SetUniformBoolean("u_IsAxial", this._plane.OriginalPlaneType == MPRPlaneType.Axial);
 
             //设置DICOM重缩放参数
             program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
