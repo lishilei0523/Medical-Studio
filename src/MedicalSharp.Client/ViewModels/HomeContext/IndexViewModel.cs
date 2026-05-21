@@ -359,6 +359,16 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             bool? result = await this._windowManager.ShowDialogAsync(viewModel);
             if (result == true)
             {
+                #region # 验证
+
+                if (this.Tissues.Any(x => x.MarkValue == viewModel.MarkValue!.Value))
+                {
+                    await MessageBox.Show("组织标记值已存在，请重试！");
+                    return;
+                }
+
+                #endregion
+
                 TissueInfo tissue = new TissueInfo(viewModel.TissueName, viewModel.MarkValue!.Value, viewModel.MarkMode, viewModel.TissueColor);
                 this.Tissues.Add(tissue);
             }
