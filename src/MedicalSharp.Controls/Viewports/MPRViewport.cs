@@ -273,8 +273,8 @@ namespace MedicalSharp.Controls.Viewports
 
             #endregion
 
-            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(screenPos2D, this.Camera, out Ray ray);
-            if (planeUV.HasValue)
+            bool success = this._mprRenderer.Plane.FindNearest(screenPos2D, this.Camera, out _, out _, out _, out _, out Ray ray);
+            if (success)
             {
                 return ray;
             }
@@ -318,12 +318,9 @@ namespace MedicalSharp.Controls.Viewports
             #endregion
 
             this.GlContext.MakeCurrent();
-            Vector2? planeUV = this._mprRenderer.Plane.ScreenToPlaneUV(position, this.Camera, out ray);
-            if (planeUV.HasValue)
+            bool success = this._mprRenderer.Plane.FindNearest(position, this.Camera, out _, out textureCoord, out worldPosition, out voxelPosition, out ray);
+            if (success)
             {
-                voxelPosition = this._mprRenderer.Plane.GetVoxelPosition(planeUV.Value.X, planeUV.Value.Y, out Vector3 texCoord, out Vector3 worldPoint);
-                textureCoord = texCoord;
-                worldPosition = worldPoint;
                 voxelValue = this.VolumeData.GetOriginalValue(voxelPosition);
                 markValue = this.VolumeData.GetMarkValue(voxelPosition);
 
