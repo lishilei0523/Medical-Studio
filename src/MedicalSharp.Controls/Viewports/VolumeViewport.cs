@@ -334,7 +334,9 @@ namespace MedicalSharp.Controls.Viewports
                 textureCoord = texCoord!.Value;
                 worldPosition = (textureCoord - new Vector3(0.5f)) * this.VolumeData.Metadata.VolumeScale;
                 voxelPosition = pickedVoxelPosition.Value;
-                voxelValue = this.VolumeData.GetOriginalValue(voxelPosition);
+                voxelValue = this.PreviewMode == PreviewMode.Original
+                    ? this.VolumeData.GetOriginalValue(voxelPosition)
+                    : this.VolumeData.GetPreviewValue(voxelPosition);
                 markValue = this.VolumeData.GetMarkValue(voxelPosition);
 
                 return true;

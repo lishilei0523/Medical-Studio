@@ -321,7 +321,9 @@ namespace MedicalSharp.Controls.Viewports
             bool success = this._mprRenderer.Plane.FindNearest(position, this.Camera, out _, out textureCoord, out worldPosition, out voxelPosition, out ray);
             if (success)
             {
-                voxelValue = this.VolumeData.GetOriginalValue(voxelPosition);
+                voxelValue = this.PreviewMode == PreviewMode.Original
+                    ? this.VolumeData.GetOriginalValue(voxelPosition)
+                    : this.VolumeData.GetPreviewValue(voxelPosition);
                 markValue = this.VolumeData.GetMarkValue(voxelPosition);
 
                 return true;
