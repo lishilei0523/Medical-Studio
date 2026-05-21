@@ -857,16 +857,16 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this.Crosshair.VAxis = plane.WorldVAxis.ToVector3();
                 this.Crosshair.Center = plane.WorldCenter.ToVector3();
 
-                //逻辑空间偏移 -> 世界空间偏移
-                float worldDelta = plane.SliceOffsetDelta * plane.WorldSliceSpacing;
-                Vector3 worldStep = plane.WorldNormal.Normalized() * worldDelta;
-                this.Crosshair.Transform?.Translate(worldStep);
+                //平移世界步长
+                this.Crosshair.Transform?.Translate(plane.WorldSliceStep);
             }
             if (eventArgs.TriggerSource == MPRPlaneChangeSource.ExternalSync)
             {
                 this.Crosshair.UAxis = plane.WorldUAxis.ToVector3();
                 this.Crosshair.VAxis = plane.WorldVAxis.ToVector3();
                 this.Crosshair.Center = plane.WorldCenter.ToVector3();
+
+                //设置世界位置
                 this.Crosshair.Transform?.SetPosition(plane.WorldCenter);
             }
 

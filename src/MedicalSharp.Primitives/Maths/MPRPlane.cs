@@ -183,6 +183,22 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
+        #region 只读属性 - 世界切片步长 —— Vector3 WorldSliceStep
+        /// <summary>
+        /// 只读属性 - 世界切片步长
+        /// </summary>
+        public Vector3 WorldSliceStep
+        {
+            get
+            {
+                float worldDelta = this.SliceOffsetDelta * this.WorldSliceSpacing;
+                Vector3 worldStep = this.Normal * worldDelta;
+
+                return worldStep;
+            }
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -327,12 +343,9 @@ namespace MedicalSharp.Primitives.Maths
         public void Relocate(Vector3 worldUAxis, Vector3 worldVAxis, Vector3 worldCenter, Vector3 worldNormal)
         {
             //更新MPR平面U/V/N轴
-            this.UAxis = worldUAxis / this.VolumeMetadata.VolumeScale;
-            this.VAxis = worldVAxis / this.VolumeMetadata.VolumeScale;
-            this.Normal = worldNormal / this.VolumeMetadata.VolumeScale;
-
-            //重新正交化
-            this.Orthonormalize();
+            this.UAxis = worldUAxis;
+            this.VAxis = worldVAxis;
+            this.Normal = worldNormal;
 
             //更新平面类型
             if (Math.Abs(this.Normal.Z) > 0.99f)
