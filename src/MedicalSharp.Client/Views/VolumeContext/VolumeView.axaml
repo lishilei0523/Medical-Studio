@@ -19,70 +19,92 @@
 				</Grid.ColumnDefinitions>
 				<!--Toolbar-->
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<sd:ToggleRadioButton cm:Message.Attach="PickVoxel()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="PickVoxel()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.PickVoxelEnabled}">
 						<PathIcon Data="{StaticResource Icon-PickVoxel}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.PickShapeEnabled}">
 						<PathIcon Data="{StaticResource Icon-PickShape}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="TranslateNormal()" Classes="Transparent-Panel" IsChecked="True">
+					<sd:ToggleRadioButton cm:Message.Attach="TranslateNormal()" Classes="Transparent-Panel" IsChecked="True"
+                                          IsVisible="{Binding ToolbarConfig.TranslateNormalEnabled}">
 						<PathIcon Data="{StaticResource Icon-TranslateNormal}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.Translate3DEnabled}">
 						<PathIcon Data="{StaticResource Icon-Translate3D}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="RotateU()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="RotateU()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.RotateUEnabled}">
 						<PathIcon Data="{StaticResource Icon-RotateU}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="RotateV()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="RotateV()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.RotateVEnabled}">
 						<PathIcon Data="{StaticResource Icon-RotateV}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="Rotate3D()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="Rotate3D()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.Rotate3DEnabled}">
 						<PathIcon Data="{StaticResource Icon-Rotate3D}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="Resize()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="Resize()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.ResizeEnabled}">
 						<PathIcon Data="{StaticResource Icon-Resize}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="EditVertex()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="EditVertex()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.EditVertexEnabled}">
 						<PathIcon Data="{StaticResource Icon-EditVertex}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawPoint()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawPoint()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawPointEnabled}">
 						<PathIcon Data="{StaticResource Icon-Point}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawLineSegment()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawLineSegment()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawLineSegmentEnabled}">
 						<PathIcon Data="{StaticResource Icon-LineSegment}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawPolyline()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawPolyline()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawPolylineEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polyline}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawCurve()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawCurve()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawCurveEnabled}">
 						<PathIcon Data="{StaticResource Icon-Curve}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawRectangle()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawRectangle()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawRectangleEnabled}">
 						<PathIcon Data="{StaticResource Icon-Rectangle}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawCircle()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawCircle()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawCircleEnabled}">
 						<PathIcon Data="{StaticResource Icon-Circle}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawEllipse()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawEllipse()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawEllipseEnabled}">
 						<PathIcon Data="{StaticResource Icon-Ellipse}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawPolygon()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawPolygon()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawPolygonEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polygon}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawClosedCurve()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawClosedCurve()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawClosedCurveEnabled}">
 						<PathIcon Data="{StaticResource Icon-ClosedCurve}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawBox()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawBox()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawBoxEnabled}">
 						<PathIcon Data="{StaticResource Icon-Cube}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawSphere()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawSphere()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawSphereEnabled}">
 						<PathIcon Data="{StaticResource Icon-Sphere}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawCylinder()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawCylinder()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawCylinderEnabled}">
 						<PathIcon Data="{StaticResource Icon-Cylinder}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="DrawConvexPolyhedron()" Classes="Transparent-Panel">
+					<sd:ToggleRadioButton cm:Message.Attach="DrawConvexPolyhedron()" Classes="Transparent-Panel"
+                                          IsVisible="{Binding ToolbarConfig.DrawConvexPolyhedronEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polyhedron}" />
 					</sd:ToggleRadioButton>
 				</WrapPanel>

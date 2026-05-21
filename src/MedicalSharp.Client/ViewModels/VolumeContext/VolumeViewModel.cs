@@ -80,6 +80,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InitMprPlanes();
 
             //默认值
+            this.ToolbarConfig = new VolumeToolbar();
             this.Shapes = [];
             this.PreviewModeChecked = true;
             this.RaycastChecked = true;
@@ -99,6 +100,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #region # 属性
 
         //属性
+
+        #region 工具栏配置 —— VolumeToolbar ToolbarConfig
+        /// <summary>
+        /// 工具栏配置
+        /// </summary>
+        [DependencyProperty]
+        public VolumeToolbar ToolbarConfig { get; set; }
+        #endregion
 
         #region 已选组织 —— TissueInfo SelectedTissue
         /// <summary>
@@ -957,7 +966,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region 绘制多边形 —— void DrawPolyline()
+        #region 绘制多边形 —— void DrawPolygon()
         /// <summary>
         /// 绘制多边形
         /// </summary>

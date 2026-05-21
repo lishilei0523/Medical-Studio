@@ -71,6 +71,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
+            this.ToolbarConfig = new MprToolbar();
             this.Shapes = [];
             this.PreviewModeChecked = true;
             this.GrayModeChecked = true;
@@ -87,6 +88,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #region # 属性
 
         //属性
+
+        #region 工具栏配置 —— MprToolbar ToolbarConfig
+        /// <summary>
+        /// 工具栏配置
+        /// </summary>
+        [DependencyProperty]
+        public MprToolbar ToolbarConfig { get; set; }
+        #endregion
 
         #region 已选组织 —— TissueInfo SelectedTissue
         /// <summary>
@@ -795,7 +804,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region 绘制多边形 —— void DrawPolyline()
+        #region 绘制多边形 —— void DrawPolygon()
         /// <summary>
         /// 绘制多边形
         /// </summary>
