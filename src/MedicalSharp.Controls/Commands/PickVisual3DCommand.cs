@@ -76,7 +76,7 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
             base.OnMouseDown(viewport, eventArgs);
-            if (eventArgs.Properties.IsLeftButtonPressed && viewport is IPickVisual3D pickVisual3D)
+            if (viewport is IPickVisual3D pickVisual3D)
             {
                 Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
                 Visual3DPickedEventArgs commandEventArgs = new Visual3DPickedEventArgs
@@ -129,13 +129,13 @@ namespace MedicalSharp.Controls.Commands
                 items.Add(new ContextMenuItem
                 {
                     Header = "内切(_I)",
-                    Command = () => this.ApplyCutInside(viewport),
+                    Command = () => this.ApplyCut(viewport, CutMode.Inside),
                     IsEnabled = this._selectedVisual is ICutVolume && this.GetMarkValue != null
                 });
                 items.Add(new ContextMenuItem
                 {
                     Header = "外切(_O)",
-                    Command = () => this.ApplyCutOutSide(viewport),
+                    Command = () => this.ApplyCut(viewport, CutMode.OutSide),
                     IsEnabled = this._selectedVisual is ICutVolume && this.GetMarkValue != null
                 });
             }
@@ -176,11 +176,13 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion
 
-        #region 适用内切 —— void ApplyCutInside(OpenTKViewport viewport)
+        #region 适用切割 —— void ApplyCut(OpenTKViewport viewport, CutMode cutMode)
         /// <summary>
-        /// 适用内切
+        /// 适用切割
         /// </summary>
-        private void ApplyCutInside(OpenTKViewport viewport)
+        /// <param name="viewport">OpenTK视口</param>
+        /// <param name="cutMode">切割模式</param>
+        private void ApplyCut(OpenTKViewport viewport, CutMode cutMode)
         {
             if (this._selectedVisual is ICutVolume cutVolume)
             {
@@ -206,37 +208,11 @@ namespace MedicalSharp.Controls.Commands
 
                 if (viewport is VolumeViewport volumeViewport)
                 {
-                    cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.Inside, markValue);
+                    cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, cutMode, markValue);
                 }
                 if (viewport is MPRViewport mprViewport)
                 {
-                    cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, CutMode.Inside, markValue);
-                }
-
-                //请求下一帧
-                viewport.RequestNextFrameRendering();
-
-                this.CutEnd?.Invoke();
-            }
-        }
-        #endregion
-
-        #region 适用外切 —— void ApplyCutOutSide(OpenTKViewport viewport)
-        /// <summary>
-        /// 适用外切
-        /// </summary>
-        private void ApplyCutOutSide(OpenTKViewport viewport)
-        {
-            if (this._selectedVisual is ICutVolume cutVolume)
-            {
-                byte markValue = this.GetMarkValue?.Invoke() ?? 1;
-                if (viewport is VolumeViewport volumeViewport)
-                {
-                    cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, CutMode.OutSide, markValue);
-                }
-                if (viewport is MPRViewport mprViewport)
-                {
-                    cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, CutMode.OutSide, markValue);
+                    cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, cutMode, markValue);
                 }
 
                 //请求下一帧
