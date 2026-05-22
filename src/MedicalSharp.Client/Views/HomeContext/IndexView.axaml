@@ -41,20 +41,34 @@
 							<MenuItem Header="保存(_S)" cm:Message.Attach="SaveImage()" />
 							<MenuItem Header="另存为(_A)" cm:Message.Attach="SaveAsImage()" />
 						</MenuItem>
-                        <MenuItem Header="编辑(_E)">
-                            <MenuItem Header="重置预览(_P)" Command="{Binding ResetPreviewCommand}" />
-                            <MenuItem Header="重置标记(_M)" Command="{Binding ResetMarkCommand}" />
-                            <MenuItem Header="清空形状(_S)" Command="{Binding ClearShapesCommand}" />
-                        </MenuItem>
+						<MenuItem Header="编辑(_E)">
+							<MenuItem Header="重置预览(_P)" Command="{Binding ResetPreviewCommand}" />
+							<MenuItem Header="重置标记(_M)" Command="{Binding ResetMarkCommand}" />
+							<MenuItem Header="清空形状(_S)" Command="{Binding ClearShapesCommand}" />
+						</MenuItem>
 						<MenuItem Header="布局(_L)">
 							<MenuItem Header="布局13(_A)" Command="{Binding Layout13Command}" />
 							<MenuItem Header="布局22(_B)" Command="{Binding Layout22Command}" />
 						</MenuItem>
 						<MenuItem Header="形态学(_M)">
-							<MenuItem Header="占位(_T)" />
+							<MenuItem Header="腐蚀(_E)" Command="{Binding MorphErodeCommand}" />
+							<MenuItem Header="膨胀(_D)" Command="{Binding MorphDilateCommand}" />
+							<MenuItem Header="开运算(_O)" Command="{Binding MorphOpenCommand}" />
+							<MenuItem Header="闭运算(_C)" Command="{Binding MorphCloseCommand}" />
+							<MenuItem Header="礼帽运算(_T)" Command="{Binding MorphTopHatCommand}" />
+							<MenuItem Header="黑帽运算(_B)" Command="{Binding MorphBlackHatCommand}" />
+							<MenuItem Header="梯度运算(_G)" Command="{Binding MorphGradientCommand}" />
 						</MenuItem>
 						<MenuItem Header="滤波(_B)">
 							<MenuItem Header="高斯滤波(_G)" Command="{Binding GaussianBlurCommand}" />
+							<MenuItem Header="均值滤波(_M)" Command="{Binding MeanBlurCommand}" />
+							<MenuItem Header="中值滤波(_C)" Command="{Binding MedianBlurCommand}" />
+						</MenuItem>
+						<MenuItem Header="边缘检测(_B)">
+							<MenuItem Header="Sobel边缘检测(_S)" Command="{Binding SobelCommand}" />
+                            <MenuItem Header="Scharr边缘检测(_A)" Command="{Binding ScharrCommand}" />
+							<MenuItem Header="Canny边缘检测(_C)" Command="{Binding CannyCommand}" />
+							<MenuItem Header="Laplacian边缘检测(_L)" Command="{Binding LaplacianCommand}" />
 						</MenuItem>
 						<MenuItem Header="分割(_S)">
 							<MenuItem Header="阈值分割(_T)" Command="{Binding ThresholdSegmentCommand}" />
