@@ -27,6 +27,9 @@ namespace MedicalSharp.Engine.Resources
             //设置参数
             this.SetFilter(TextureMinFilter.Nearest, TextureMagFilter.Linear);
             this.SetWrapMode(TextureWrapMode.Repeat);
+
+            //检查错误
+            GlException.ThrowOnError(nameof(Texture2D));
         }
 
         #endregion

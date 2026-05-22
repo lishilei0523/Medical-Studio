@@ -156,7 +156,7 @@ namespace MedicalSharp.Engine.Resources
                 IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
                 if (gpuPtr == IntPtr.Zero)
                 {
-                    throw new RuntimeBinderException("GL.MapBuffer失败！");
+                    throw new GlException("GL.MapBuffer失败！");
                 }
 
                 byte[] data = new byte[this.BufferSize];
@@ -186,7 +186,7 @@ namespace MedicalSharp.Engine.Resources
                 IntPtr gpuPtr = GL.MapBuffer(this.BufferTarget, BufferAccess.ReadOnly);
                 if (gpuPtr == IntPtr.Zero)
                 {
-                    throw new RuntimeBinderException("GL.MapBuffer失败！");
+                    throw new GlException("GL.MapBuffer失败！");
                 }
 
                 NativeMemory.Copy(gpuPtr.ToPointer(), data.ToPointer(), (UIntPtr)this.BufferSize);

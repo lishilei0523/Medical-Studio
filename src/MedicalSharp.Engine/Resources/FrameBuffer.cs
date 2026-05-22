@@ -1,5 +1,4 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using System;
 
 namespace MedicalSharp.Engine.Resources
@@ -29,7 +28,7 @@ namespace MedicalSharp.Engine.Resources
 
             if (this.Id == 0)
             {
-                throw new RuntimeBinderException("创建帧缓冲区失败！");
+                throw new GlException("创建帧缓冲区失败！");
             }
 
             #endregion
@@ -101,6 +100,9 @@ namespace MedicalSharp.Engine.Resources
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, frameBuffer.OutputTexture.Id, 0);
 
             frameBuffer.Unbind();
+
+            //检查错误
+            GlException.ThrowOnError("CreateFrameBuffer");
             frameBuffer.CheckFrameBufferStatus();
 
             return frameBuffer;
@@ -132,6 +134,9 @@ namespace MedicalSharp.Engine.Resources
             GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, frameBuffer.DepthBuffer.Id);
 
             frameBuffer.Unbind();
+
+            //检查错误
+            GlException.ThrowOnError("CreateFrameBufferWithDepthBuffer");
             frameBuffer.CheckFrameBufferStatus();
 
             return frameBuffer;
@@ -167,7 +172,7 @@ namespace MedicalSharp.Engine.Resources
             FramebufferErrorCode status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
             if (status != FramebufferErrorCode.FramebufferComplete)
             {
-                throw new RuntimeBinderException($"FBO创建失败: {status}");
+                throw new GlException($"FBO创建失败: {status}");
             }
         }
         #endregion

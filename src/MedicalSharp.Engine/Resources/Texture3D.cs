@@ -74,7 +74,7 @@ namespace MedicalSharp.Engine.Resources
             texture.SetWrapMode(TextureWrapMode.ClampToEdge);
 
             //检查错误
-            CheckError("GL.TexImage3D");
+            GlException.ThrowOnError(nameof(CreateFromVolume));
 
             return texture;
         }
@@ -117,7 +117,7 @@ namespace MedicalSharp.Engine.Resources
             texture.SetWrapMode(TextureWrapMode.ClampToEdge);
 
             //检查错误
-            CheckError("GL.TexImage3D");
+            GlException.ThrowOnError(nameof(CreateFromMark));
 
             return texture;
         }

@@ -1,5 +1,4 @@
 ﻿using MedicalSharp.Primitives.Maths;
-using Microsoft.CSharp.RuntimeBinder;
 using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Runtime.InteropServices;
@@ -36,7 +35,7 @@ namespace MedicalSharp.Engine.Resources
 
             if (this._vao == 0)
             {
-                throw new RuntimeBinderException("创建VAO失败！");
+                throw new GlException("创建VAO失败！");
             }
 
             #endregion

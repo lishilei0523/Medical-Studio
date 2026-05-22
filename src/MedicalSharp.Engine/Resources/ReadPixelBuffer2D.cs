@@ -85,6 +85,9 @@ namespace MedicalSharp.Engine.Resources
 
             GL.GetTexImage(TextureTarget.Texture2D, 0, this.PixelFormat, this.PixelType, IntPtr.Zero);
 
+            //检查错误
+            GlException.ThrowOnError(nameof(this.ReadTexture2D));
+
             //确保PBO写入完成
             GL.MemoryBarrier(MemoryBarrierFlags.PixelBufferBarrierBit);
 

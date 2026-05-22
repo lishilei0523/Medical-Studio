@@ -1,7 +1,5 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using System;
-using System.ComponentModel.Design;
 
 namespace MedicalSharp.Engine.Resources
 {
@@ -34,7 +32,7 @@ namespace MedicalSharp.Engine.Resources
 
             if (textureId == 0)
             {
-                throw new RuntimeBinderException("创建纹理失败！");
+                throw new GlException("创建纹理失败！");
             }
             if (width <= 0)
             {
@@ -258,21 +256,6 @@ namespace MedicalSharp.Engine.Resources
             }
 
             this._disposed = true;
-        }
-        #endregion
-
-        #region 检查错误 —— static void CheckError(string operation)
-        /// <summary>
-        /// 检查错误
-        /// </summary>
-        /// <param name="operation">操作</param>
-        protected static void CheckError(string operation)
-        {
-            ErrorCode errorCode = GL.GetError();
-            if (errorCode != ErrorCode.NoError)
-            {
-                throw new CheckoutException($"OpenGL Error in {operation}: {errorCode}");
-            }
         }
         #endregion
 

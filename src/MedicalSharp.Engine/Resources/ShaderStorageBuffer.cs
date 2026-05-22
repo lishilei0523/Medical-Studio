@@ -1,5 +1,4 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Runtime.InteropServices;
 
@@ -23,7 +22,7 @@ namespace MedicalSharp.Engine.Resources
         /// <param name="bufferSize">缓冲区尺寸（字节）</param>
         /// <param name="usage">缓冲区用途提示（影响驱动优化策略）</param>
         /// <exception cref="ArgumentOutOfRangeException">缓冲区尺寸必须大于0</exception>
-        /// <exception cref="RuntimeBinderException">创建SSBO失败</exception>
+        /// <exception cref="GlException">创建SSBO失败</exception>
         public ShaderStorageBuffer(int bufferSize, BufferUsageHint usage = BufferUsageHint.StaticRead)
         {
             #region # 验证
@@ -42,7 +41,7 @@ namespace MedicalSharp.Engine.Resources
 
             if (this.Id == 0)
             {
-                throw new RuntimeBinderException("创建着色器存储缓冲区失败！");
+                throw new GlException("创建着色器存储缓冲区失败！");
             }
 
             #endregion

@@ -1,5 +1,4 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using System;
 
 namespace MedicalSharp.Engine.Resources
@@ -201,7 +200,7 @@ namespace MedicalSharp.Engine.Resources
 
             if (this.Id == 0)
             {
-                throw new RuntimeBinderException($"创建像素缓冲区失败！");
+                throw new GlException($"创建像素缓冲区失败！");
             }
 
             #endregion

@@ -1,5 +1,4 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.IO;
@@ -30,7 +29,7 @@ namespace MedicalSharp.Engine.Resources
 
             if (this.Id == 0)
             {
-                throw new RuntimeBinderException("创建Shader程序失败！");
+                throw new GlException("创建Shader程序失败！");
             }
 
             #endregion
@@ -157,11 +156,13 @@ namespace MedicalSharp.Engine.Resources
             GL.AttachShader(this.Id, fragmentShaderId);
             GL.LinkProgram(this.Id);
 
+            //检查异常
+            GlException.ThrowOnError(nameof(this.BuildDraw));
             GL.GetProgram(this.Id, GetProgramParameterName.LinkStatus, out int success);
             if (success <= 0)
             {
                 GL.GetShaderInfoLog(this.Id, out string logInfo);
-                throw new RuntimeBinderInternalCompilerException(logInfo);
+                throw new GlException(logInfo);
             }
 
             //编译完成后清理Shader
@@ -182,11 +183,13 @@ namespace MedicalSharp.Engine.Resources
             GL.AttachShader(this.Id, computeShaderId);
             GL.LinkProgram(this.Id);
 
+            //检查异常
+            GlException.ThrowOnError(nameof(this.BuildCompute));
             GL.GetProgram(this.Id, GetProgramParameterName.LinkStatus, out int success);
             if (success <= 0)
             {
                 GL.GetProgramInfoLog(this.Id, out string logInfo);
-                throw new RuntimeBinderInternalCompilerException($"计算着色器链接失败: {logInfo}");
+                throw new GlException($"计算着色器链接失败: {logInfo}");
             }
 
             //编译完成后清理Shader
@@ -432,7 +435,7 @@ namespace MedicalSharp.Engine.Resources
             if (success <= 0)
             {
                 GL.GetShaderInfoLog(shaderId, out string logInfo);
-                throw new RuntimeBinderInternalCompilerException(logInfo);
+                throw new GlException(logInfo);
             }
 
             return shaderId;

@@ -220,6 +220,9 @@ namespace MedicalSharp.Engine.Managers
 
             //内存屏障：确保计算完成后渲染能读到新数据
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit | MemoryBarrierFlags.ShaderStorageBarrierBit);
+
+            //检查错误
+            GlException.ThrowOnError(nameof(DispatchCompute2D));
         }
         #endregion
 
@@ -240,6 +243,9 @@ namespace MedicalSharp.Engine.Managers
 
             //内存屏障：确保计算完成后渲染能读到新数据
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit | MemoryBarrierFlags.ShaderStorageBarrierBit);
+
+            //检查错误
+            GlException.ThrowOnError(nameof(DispatchCompute3D));
         }
         #endregion
 
