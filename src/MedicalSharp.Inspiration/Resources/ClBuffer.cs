@@ -115,8 +115,8 @@ namespace MedicalSharp.Inspiration.Resources
             UIntPtr size = (UIntPtr)data.Length;
             fixed (byte* pointer = data)
             {
-                IntPtr handle = cl.CreateBuffer(clContext.Handle, flags | MemFlags.CopyHostPtr, size, pointer, out int err);
-                ClException.ThrowOnError(err, "CreateBuffer");
+                IntPtr handle = cl.CreateBuffer(clContext.Handle, flags | MemFlags.CopyHostPtr, size, pointer, out int errorCode);
+                ClException.ThrowOnError(errorCode, "CreateBuffer");
                 ClBuffer clBuffer = new ClBuffer(cl, null, handle, size, flags);
 
                 return clBuffer;
@@ -140,8 +140,8 @@ namespace MedicalSharp.Inspiration.Resources
             IntPtr handle;
             fixed (void* pointer = data)
             {
-                handle = cl.CreateBuffer(clContext.Handle, flags | MemFlags.CopyHostPtr, bufferSize, pointer, out int err);
-                ClException.ThrowOnError(err, "CreateBuffer");
+                handle = cl.CreateBuffer(clContext.Handle, flags | MemFlags.CopyHostPtr, bufferSize, pointer, out int errorCode);
+                ClException.ThrowOnError(errorCode, "CreateBuffer");
             }
             if (handle == IntPtr.Zero)
             {
@@ -166,8 +166,8 @@ namespace MedicalSharp.Inspiration.Resources
         {
             CL cl = CL.GetApi();
             UIntPtr size = (UIntPtr)bufferSize;
-            IntPtr handle = cl.CreateBuffer(clContext.Handle, flags, size, null, out int err);
-            ClException.ThrowOnError(err, "CreateBuffer (empty)");
+            IntPtr handle = cl.CreateBuffer(clContext.Handle, flags, size, null, out int errorCode);
+            ClException.ThrowOnError(errorCode, "CreateBuffer (empty)");
             ClBuffer clBuffer = new ClBuffer(cl, null, handle, size, flags);
 
             return clBuffer;
@@ -187,8 +187,8 @@ namespace MedicalSharp.Inspiration.Resources
         {
             CL cl = CL.GetApi();
             UIntPtr size = (UIntPtr)(elementsCount * sizeof(T));
-            IntPtr handle = cl.CreateBuffer(clContext.Handle, flags, size, null, out int err);
-            ClException.ThrowOnError(err, "CreateBuffer (empty)");
+            IntPtr handle = cl.CreateBuffer(clContext.Handle, flags, size, null, out int errorCode);
+            ClException.ThrowOnError(errorCode, "CreateBuffer (empty)");
             if (handle == IntPtr.Zero)
             {
                 throw new ClException("CreateBuffer 返回空句柄");
@@ -215,7 +215,7 @@ namespace MedicalSharp.Inspiration.Resources
             KhrGlSharing glSharing = new KhrGlSharing(cl.Context);
 
             IntPtr handle = glSharing.CreateFromGlbuffer(clContext.Handle, flags, (uint)glBufferId, out int errorCode);
-            ClException.ThrowOnError(errorCode, "CreateFromGlbuffer");
+            ClException.ThrowOnError(errorCode, nameof(ClBuffer.FromGLBuffer));
             if (handle == IntPtr.Zero)
             {
                 throw new ClException("CreateFromGlbuffer 返回空句柄");
@@ -246,7 +246,7 @@ namespace MedicalSharp.Inspiration.Resources
 
             IntPtr handle = this.Handle;
             int errorCode = this._glSharing.EnqueueAcquireGlobjects(commandQueue, 1, &handle, 0, null, null);
-            ClException.ThrowOnError(errorCode, "EnqueueAcquireGLObjects");
+            ClException.ThrowOnError(errorCode, nameof(this.AcquireForCL));
         }
         #endregion
 
@@ -268,7 +268,7 @@ namespace MedicalSharp.Inspiration.Resources
 
             IntPtr handle = this.Handle;
             int errorCode = this._glSharing.EnqueueReleaseGlobjects(commandQueue, 1, &handle, 0, null, null);
-            ClException.ThrowOnError(errorCode, "EnqueueReleaseGLObjects");
+            ClException.ThrowOnError(errorCode, nameof(this.ReleaseToGL));
         }
         #endregion
 
