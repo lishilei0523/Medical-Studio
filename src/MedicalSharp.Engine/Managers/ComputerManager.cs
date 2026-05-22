@@ -64,6 +64,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _ResetMarkValueComputer;
 
         /// <summary>
+        /// 阈值分割计算着色器
+        /// </summary>
+        private static ShaderProgram _ThresholdSegmentComputer;
+
+        /// <summary>
         /// 同步锁
         /// </summary>
         private static readonly Lock _Sync;
@@ -171,6 +176,16 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - 阈值分割计算着色器 —— static ShaderProgram ThresholdSegmentComputer
+        /// <summary>
+        /// 只读属性 - 阈值分割计算着色器
+        /// </summary>
+        public static ShaderProgram ThresholdSegmentComputer
+        {
+            get => _ThresholdSegmentComputer;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -199,6 +214,7 @@ namespace MedicalSharp.Engine.Managers
                 _CylinderCutComputer = CreateCylinderCutComputer();
                 _ConvexPolyhedronCutComputer = CreateConvexPolyhedronCutComputer();
                 _ResetMarkValueComputer = CreateResetMarkValueComputer();
+                _ThresholdSegmentComputer = CreateThresholdSegmentComputer();
                 _Initialized = true;
             }
         }
@@ -220,6 +236,9 @@ namespace MedicalSharp.Engine.Managers
 
             //内存屏障：确保计算完成后渲染能读到新数据
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit | MemoryBarrierFlags.ShaderStorageBarrierBit);
+
+            //保证完成
+            GL.Finish();
 
             //检查错误
             GlException.ThrowOnError(nameof(DispatchCompute2D));
@@ -244,6 +263,9 @@ namespace MedicalSharp.Engine.Managers
             //内存屏障：确保计算完成后渲染能读到新数据
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit | MemoryBarrierFlags.ShaderStorageBarrierBit);
 
+            //保证完成
+            GL.Finish();
+
             //检查错误
             GlException.ThrowOnError(nameof(DispatchCompute3D));
         }
@@ -264,6 +286,7 @@ namespace MedicalSharp.Engine.Managers
             _CylinderCutComputer?.Dispose();
             _ConvexPolyhedronCutComputer?.Dispose();
             _ResetMarkValueComputer?.Dispose();
+            _ThresholdSegmentComputer?.Dispose();
         }
         #endregion
 
@@ -390,6 +413,20 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/reset_mark.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion
+
+        #region 创建阈值分割计算着色器 —— static ShaderProgram CreateThresholdSegmentComputer()
+        /// <summary>
+        /// 创建阈值分割计算着色器
+        /// </summary>
+        private static ShaderProgram CreateThresholdSegmentComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/threshold_segment.comp");
             program.BuildCompute();
 
             return program;

@@ -67,6 +67,9 @@ namespace MedicalSharp.Engine.Algorithms
 
             //取消使用
             cutComputer.Unuse();
+
+            //同步CPU端
+            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 
@@ -119,6 +122,9 @@ namespace MedicalSharp.Engine.Algorithms
 
             //取消使用
             cutComputer.Unuse();
+
+            //同步CPU端
+            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 
@@ -173,6 +179,9 @@ namespace MedicalSharp.Engine.Algorithms
 
             //取消使用
             cutComputer.Unuse();
+
+            //同步CPU端
+            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 
@@ -239,6 +248,9 @@ namespace MedicalSharp.Engine.Algorithms
 
             //取消使用
             cutComputer.Unuse();
+
+            //同步CPU端
+            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 
@@ -285,6 +297,9 @@ namespace MedicalSharp.Engine.Algorithms
 
             //取消使用
             cutComputer.Unuse();
+
+            //同步CPU端
+            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 
@@ -331,6 +346,9 @@ namespace MedicalSharp.Engine.Algorithms
 
             //取消使用
             cutComputer.Unuse();
+
+            //同步CPU端
+            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 
@@ -379,6 +397,9 @@ namespace MedicalSharp.Engine.Algorithms
 
             //取消使用
             cutComputer.Unuse();
+
+            //同步CPU端
+            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 
@@ -438,6 +459,9 @@ namespace MedicalSharp.Engine.Algorithms
 
             //取消使用
             cutComputer.Unuse();
+
+            //同步CPU端
+            renderable.SyncMarkDataFromGpu();
         }
         #endregion
     }

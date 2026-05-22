@@ -310,7 +310,6 @@ namespace MedicalSharp.Controls.Visuals
             Vector3 center = this.Center.ToVector3();
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyCylinderCut(this.Radius, this.Height, center, localToWorld, cutMode, markValue);
-            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 

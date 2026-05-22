@@ -262,7 +262,6 @@ namespace MedicalSharp.Controls.Visuals
             Vector3 center = this.Center.ToVector3();
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplySphereCut(this.Radius, center, localToWorld, cutMode, markValue);
-            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 

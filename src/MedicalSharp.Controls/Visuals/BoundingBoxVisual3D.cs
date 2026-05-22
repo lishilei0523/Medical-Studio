@@ -327,7 +327,6 @@ namespace MedicalSharp.Controls.Visuals
         {
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyBoxCut(this.Minimum, this.Maximum, localToWorld, cutMode, markValue);
-            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 

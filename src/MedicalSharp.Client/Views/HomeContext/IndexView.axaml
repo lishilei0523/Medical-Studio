@@ -57,7 +57,7 @@
 							<MenuItem Header="高斯滤波(_G)" Command="{Binding GaussianBlurCommand}" />
 						</MenuItem>
 						<MenuItem Header="分割(_S)">
-							<MenuItem Header="占位(_T)" />
+							<MenuItem Header="阈值分割(_T)" Command="{Binding ThresholdSegmentCommand}" />
 						</MenuItem>
 					</Menu>
 				</Grid>

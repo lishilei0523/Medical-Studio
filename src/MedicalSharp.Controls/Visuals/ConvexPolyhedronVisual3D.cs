@@ -311,7 +311,6 @@ namespace MedicalSharp.Controls.Visuals
             Matrix4 localToWorld = this.Transform.Matrix;
             Vector4[] planes = this.MeshGeometry.ExtractPlanes();
             renderable.ApplyConvexPolyhedronCut(planes, localToWorld, cutMode, markValue);
-            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 

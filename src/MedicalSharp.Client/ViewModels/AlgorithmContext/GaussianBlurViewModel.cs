@@ -7,6 +7,7 @@ using MedicalSharp.Inspiration.Managers;
 using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Primitives.Models;
+using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using Silk.NET.OpenCL;
 using System.Threading;
@@ -49,6 +50,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         /// <summary>
         /// 核矩阵尺寸
         /// </summary>
+        [DependencyProperty]
         public int KernelSize { get; set; }
         #endregion
 
@@ -56,6 +58,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         /// <summary>
         /// 核矩阵尺寸
         /// </summary>
+        [DependencyProperty]
         public float Sigma { get; set; }
         #endregion
 

@@ -287,7 +287,6 @@ namespace MedicalSharp.Controls.Visuals
             Vector3 vAxis = this.VAxis.ToVector3();
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyCircleCut(this.Radius, center, normal, uAxis, vAxis, localToWorld, cutMode, markValue);
-            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 

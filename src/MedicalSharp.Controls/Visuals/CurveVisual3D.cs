@@ -336,7 +336,6 @@ namespace MedicalSharp.Controls.Visuals
 
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyPolygonCut(this.SampledPositions, localToWorld, cutMode, markValue);
-            renderable.SyncMarkDataFromGpu();
         }
         #endregion
 
