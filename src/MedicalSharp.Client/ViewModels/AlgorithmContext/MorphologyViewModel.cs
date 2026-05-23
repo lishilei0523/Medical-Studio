@@ -6,19 +6,21 @@ using MedicalSharp.Inspiration.Algorithms;
 using MedicalSharp.Inspiration.Managers;
 using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Presentation.Events;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using Silk.NET.OpenCL;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace MedicalSharp.Client.ViewModels.AlgorithmContext
 {
     /// <summary>
-    /// 高斯滤波视图模型
+    /// 形态学视图模型
     /// </summary>
-    public class GaussianBlurViewModel : ScreenBase
+    public class MorphologyViewModel : ScreenBase
     {
         #region # 字段及构造器
 
@@ -30,7 +32,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public GaussianBlurViewModel(IEventAggregator eventAggregator)
+        public MorphologyViewModel(IEventAggregator eventAggregator)
         {
             this._eventAggregator = eventAggregator;
         }
@@ -46,20 +48,20 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         public VolumeData VolumeData { get; set; }
         #endregion
 
+        #region 形态学模式 —— MorphMode MorphMode
+        /// <summary>
+        /// 形态学模式
+        /// </summary>
+        [DependencyProperty]
+        public MorphMode MorphMode { get; set; }
+        #endregion
+
         #region 核矩阵尺寸 —— int KernelSize
         /// <summary>
         /// 核矩阵尺寸
         /// </summary>
         [DependencyProperty]
         public int KernelSize { get; set; }
-        #endregion
-
-        #region 标准差 —— float Sigma
-        /// <summary>
-        /// 标准差
-        /// </summary>
-        [DependencyProperty]
-        public float Sigma { get; set; }
         #endregion
 
         #endregion
@@ -76,7 +78,6 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         {
             //默认值
             this.KernelSize = 3;
-            this.Sigma = 1.0f;
 
             return base.OnActivatedAsync(cancellationToken);
         }
@@ -98,17 +99,45 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
             this.Busy();
             await Task.Run(() =>
             {
-                //创建并写入图像
-                using ClImage3D image = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
-                image.Write(clContext.CommandQueue, this.VolumeData.PreviewData);
+                //创建图像
+                using ClImage3D inputImage = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
+                using ClImage3D outputImage = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
+                inputImage.Write(clContext.CommandQueue, this.VolumeData.PreviewData);
                 clContext.Finish();
 
                 //执行算法
-                using GaussianBlur3D gaussianBlur = new GaussianBlur3D(clContext);
-                gaussianBlur.ExecuteInPlace(image, this.KernelSize, this.Sigma);
+                using Morphology3D morphology = new Morphology3D(clContext);
+                switch (this.MorphMode)
+                {
+                    case MorphMode.Erode:
+                        morphology.Erode(inputImage, outputImage, this.KernelSize);
+                        clContext.Finish();
+                        break;
+                    case MorphMode.Dilate:
+                        morphology.Dilate(inputImage, outputImage, this.KernelSize);
+                        clContext.Finish();
+                        break;
+                    case MorphMode.Open:
+                        morphology.Open(inputImage, outputImage, this.KernelSize);
+                        break;
+                    case MorphMode.Close:
+                        morphology.Close(inputImage, outputImage, this.KernelSize);
+                        break;
+                    case MorphMode.TopHat:
+                        morphology.TopHat(inputImage, outputImage, this.KernelSize);
+                        break;
+                    case MorphMode.BlackHat:
+                        morphology.BlackHat(inputImage, outputImage, this.KernelSize);
+                        break;
+                    case MorphMode.Gradient:
+                        morphology.Gradient(inputImage, outputImage, this.KernelSize);
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
 
                 //读回CPU
-                image.Read(clContext.CommandQueue, this.VolumeData.PreviewData);
+                outputImage.Read(clContext.CommandQueue, this.VolumeData.PreviewData);
             });
             this.Idle();
 

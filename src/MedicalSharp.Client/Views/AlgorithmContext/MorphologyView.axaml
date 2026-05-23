@@ -1,0 +1,51 @@
+<fa:AppWindow x:Class="MedicalSharp.Client.Views.AlgorithmContext.MorphologyView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  xmlns:cm="http://caliburnmicro.com"
+			  mc:Ignorable="d"
+			  Width="460" Height="300" CanResize="False" ShowAsDialog="True"
+			  WindowStartupLocation="CenterScreen"
+			  Title="形态学运算">
+
+	<fa:AppWindow.Resources>
+		<sd:EnumMemberConverter x:Key="EnumMemberConverter" />
+	</fa:AppWindow.Resources>
+
+	<sd:BusyMask IsBusy="{Binding IsBusy}">
+		<Grid>
+			<Grid.RowDefinitions>
+				<!--表单区-->
+				<RowDefinition Height="240" />
+				<!--占位区-->
+				<RowDefinition Height="*" />
+				<!--控制区-->
+				<RowDefinition Height="50" />
+			</Grid.RowDefinitions>
+			<!--表单区-->
+			<StackPanel Grid.Row="0" Grid.IsSharedSizeScope="True" Margin="20,20">
+				<sd:FormItem Label="形态学模式：">
+					<TextBlock HorizontalAlignment="Left" Text="{Binding MorphMode, Converter={StaticResource EnumMemberConverter}}" />
+				</sd:FormItem>
+				<sd:FormItem Label="核矩阵尺寸：">
+					<NumericUpDown Width="300" HorizontalAlignment="Left"
+								   Minimum="3" Maximum="9" Increment="2"
+								   ParsingNumberStyle="Integer" FormatString="F0"
+								   Text="{Binding KernelSize}" />
+				</sd:FormItem>
+			</StackPanel>
+			<!--占位区-->
+			<Grid Grid.Row="1" />
+			<!--控制区-->
+			<Grid Grid.Row="2" Classes="Submit-Grid">
+				<WrapPanel Classes="Submit-WrapPanel">
+					<Button Content="应用" cm:Message.Attach="Apply()" Classes="Focus" />
+					<Button Content="取消" cm:Message.Attach="TryCloseAsync('false')" />
+				</WrapPanel>
+			</Grid>
+		</Grid>
+	</sd:BusyMask>
+</fa:AppWindow>

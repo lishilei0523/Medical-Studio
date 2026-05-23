@@ -963,6 +963,97 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }, _ => this.VolumeData != null);
         #endregion
 
+        #region 形态学腐蚀命令 —— ICommand MorphErodeCommand
+        /// <summary>
+        /// 形态学腐蚀命令
+        /// </summary>
+        public ICommand MorphErodeCommand => new AsyncRelayCommand(async _ =>
+        {
+            MorphologyViewModel viewModel = ResolveMediator.Resolve<MorphologyViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            viewModel.MorphMode = MorphMode.Erode;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 形态学膨胀命令 —— ICommand MorphDilateCommand
+        /// <summary>
+        /// 形态学膨胀命令
+        /// </summary>
+        public ICommand MorphDilateCommand => new AsyncRelayCommand(async _ =>
+        {
+            MorphologyViewModel viewModel = ResolveMediator.Resolve<MorphologyViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            viewModel.MorphMode = MorphMode.Dilate;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 形态学开运算命令 —— ICommand MorphOpenCommand
+        /// <summary>
+        /// 形态学开运算命令
+        /// </summary>
+        public ICommand MorphOpenCommand => new AsyncRelayCommand(async _ =>
+        {
+            MorphologyViewModel viewModel = ResolveMediator.Resolve<MorphologyViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            viewModel.MorphMode = MorphMode.Open;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 形态学闭运算命令 —— ICommand MorphCloseCommand
+        /// <summary>
+        /// 形态学闭运算命令
+        /// </summary>
+        public ICommand MorphCloseCommand => new AsyncRelayCommand(async _ =>
+        {
+            MorphologyViewModel viewModel = ResolveMediator.Resolve<MorphologyViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            viewModel.MorphMode = MorphMode.Close;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 形态学礼帽运算命令 —— ICommand MorphTopHatCommand
+        /// <summary>
+        /// 形态学礼帽运算命令
+        /// </summary>
+        public ICommand MorphTopHatCommand => new AsyncRelayCommand(async _ =>
+        {
+            MorphologyViewModel viewModel = ResolveMediator.Resolve<MorphologyViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            viewModel.MorphMode = MorphMode.TopHat;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 形态学黑帽运算命令 —— ICommand MorphBlackHatCommand
+        /// <summary>
+        /// 形态学黑帽运算命令
+        /// </summary>
+        public ICommand MorphBlackHatCommand => new AsyncRelayCommand(async _ =>
+        {
+            MorphologyViewModel viewModel = ResolveMediator.Resolve<MorphologyViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            viewModel.MorphMode = MorphMode.BlackHat;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 形态学梯度运算命令 —— ICommand MorphGradientCommand
+        /// <summary>
+        /// 形态学梯度运算命令
+        /// </summary>
+        public ICommand MorphGradientCommand => new AsyncRelayCommand(async _ =>
+        {
+            MorphologyViewModel viewModel = ResolveMediator.Resolve<MorphologyViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            viewModel.MorphMode = MorphMode.Gradient;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
         #endregion
 
         #region # 方法
