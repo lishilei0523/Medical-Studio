@@ -69,11 +69,6 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _ThresholdSegmentComputer;
 
         /// <summary>
-        /// 立方体统计计算着色器
-        /// </summary>
-        private static ShaderProgram _BoxStatisticsComputer;
-
-        /// <summary>
         /// 同步锁
         /// </summary>
         private static readonly Lock _Sync;
@@ -191,16 +186,6 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
-        #region 只读属性 - 立方体统计计算着色器 —— static ShaderProgram BoxStatisticsComputer
-        /// <summary>
-        /// 只读属性 - 立方体统计计算着色器
-        /// </summary>
-        public static ShaderProgram BoxStatisticsComputer
-        {
-            get => _BoxStatisticsComputer;
-        }
-        #endregion
-
         #endregion
 
         #region # 方法
@@ -230,7 +215,6 @@ namespace MedicalSharp.Engine.Managers
                 _ConvexPolyhedronCutComputer = CreateConvexPolyhedronCutComputer();
                 _ResetMarkValueComputer = CreateResetMarkValueComputer();
                 _ThresholdSegmentComputer = CreateThresholdSegmentComputer();
-                _BoxStatisticsComputer = CreateBoxStatisticsComputer();
                 _Initialized = true;
             }
         }
@@ -303,7 +287,6 @@ namespace MedicalSharp.Engine.Managers
             _ConvexPolyhedronCutComputer?.Dispose();
             _ResetMarkValueComputer?.Dispose();
             _ThresholdSegmentComputer?.Dispose();
-            _BoxStatisticsComputer?.Dispose();
         }
         #endregion
 
@@ -444,20 +427,6 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/threshold_segment.comp");
-            program.BuildCompute();
-
-            return program;
-        }
-        #endregion
-
-        #region 创建立方体统计计算着色器 —— static ShaderProgram CreateBoxStatisticsComputer()
-        /// <summary>
-        /// 创建立方体统计计算着色器
-        /// </summary>
-        private static ShaderProgram CreateBoxStatisticsComputer()
-        {
-            ShaderProgram program = new ShaderProgram();
-            program.ReadComputeShaderFromFile("Resources/GLSLs/statistics_box.comp");
             program.BuildCompute();
 
             return program;

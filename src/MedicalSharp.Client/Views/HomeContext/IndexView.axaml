@@ -263,7 +263,7 @@
                                 <TextBlock Text="{Binding StatisticInfo.Sphericity}" />
                             </sd:FormItem>
 							<sd:FormItem Label="体素数：">
-								<TextBlock Text="{Binding StatisticInfo.VoxelCount}" />
+								<TextBlock Text="{Binding StatisticInfo.VoxelsCount}" />
 							</sd:FormItem>
 						</StackPanel>
 					</sd:GroupBox>
