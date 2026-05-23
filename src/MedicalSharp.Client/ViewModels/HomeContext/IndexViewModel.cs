@@ -103,9 +103,9 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             set
             {
                 field = value;
-                this.LayoutViewModel.SetVolumeData(value);
                 if (value != null)
                 {
+                    this.LayoutViewModel.SetVolumeData(value);
                     this.VolumeInfo = value.Metadata.ToVolumeInfo();
                     this.PatientInfo = value.PatientData.ToPatientInfo();
                     this.StudyInfo = value.StudyData.ToStudyInfo();
@@ -120,6 +120,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 }
                 else
                 {
+                    this.LayoutViewModel.ClearVolumeData();
                     this.VolumeInfo = null;
                     this.PatientInfo = null;
                     this.StudyInfo = null;
@@ -784,44 +785,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
         }, _ => this.VolumeData != null);
-        #endregion
-
-        #region 布局13命令 —— ICommand Layout13Command
-        /// <summary>
-        /// 布局13命令
-        /// </summary>
-        public ICommand Layout13Command => new RelayCommand(_ =>
-        {
-            //#region # 验证
-
-            //if (this.LayoutViewModel is Layout13ViewModel)
-            //{
-            //    return;
-            //}
-
-            //#endregion
-
-            //this.LayoutViewModel = ResolveMediator.Resolve<Layout13ViewModel>();
-        });
-        #endregion
-
-        #region 布局22命令 —— ICommand Layout22Command
-        /// <summary>
-        /// 布局22命令
-        /// </summary>
-        public ICommand Layout22Command => new RelayCommand(_ =>
-        {
-            //#region # 验证
-
-            //if (this.LayoutViewModel is LayoutViewModel)
-            //{
-            //    return;
-            //}
-
-            //#endregion
-
-            //this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
-        });
         #endregion
 
         #region 创建组织命令 —— ICommand AddTissueCommand

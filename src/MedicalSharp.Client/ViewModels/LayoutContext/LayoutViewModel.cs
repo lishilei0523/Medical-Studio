@@ -63,12 +63,12 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
 
         #region # 方法
 
-        #region 设置体积数据 —— virtual void SetVolumeData(VolumeData volumeData)
+        #region 设置体积数据 —— void SetVolumeData(VolumeData volumeData)
         /// <summary>
         /// 设置体积数据
         /// </summary>
         /// <param name="volumeData">体积数据</param>
-        public virtual void SetVolumeData(VolumeData volumeData)
+        public void SetVolumeData(VolumeData volumeData)
         {
             this.VolumeViewModel.VolumeData = volumeData;
             this.MprAxialViewModel.VolumeData = volumeData;
@@ -77,11 +77,11 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
         }
         #endregion
 
-        #region 清空体积数据 —— virtual void ClearVolumeData()
+        #region 清空体积数据 —— void ClearVolumeData()
         /// <summary>
         /// 清空体积数据
         /// </summary>
-        public virtual void ClearVolumeData()
+        public void ClearVolumeData()
         {
             this.VolumeViewModel.VolumeData = null;
             this.MprAxialViewModel.VolumeData = null;
