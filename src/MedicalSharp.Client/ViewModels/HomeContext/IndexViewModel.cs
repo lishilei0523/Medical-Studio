@@ -213,18 +213,491 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
         //命令
 
-        #region 打开序列命令 —— ICommand OpenSeriesCommand
+        #region 打开序列文件命令 —— ICommand OpenSeriesFilesCommand
         /// <summary>
-        /// 打开序列命令
+        /// 打开序列文件命令
         /// </summary>
-        public ICommand OpenSeriesCommand => new AsyncRelayCommand(_ => this.OpenSeries());
+        public ICommand OpenSeriesFilesCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //打开文件对话框
+            FilePickerOpenOptions openOptions = new FilePickerOpenOptions
+            {
+                Title = "打开序列文件",
+                AllowMultiple = true,
+                FileTypeFilter = [
+                    new FilePickerFileType("DICOM文件")
+                    {
+                        Patterns = ["*.dcm"]
+                    }
+                ]
+            };
+
+            //获取文件
+            IReadOnlyList<IStorageFile> files = await this.OpenFilePickerAsync(openOptions);
+            if (files.Any())
+            {
+                string[] filePaths = files.Select(x => x.TryGetLocalPath()).ToArray();
+                VolumeData volumeData = await Task.Run(() => this._dicomLoader.LoadSeries(filePaths));
+                if (this.VolumeData != null)
+                {
+                    SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
+                }
+                this.VolumeData = volumeData;
+            }
+
+            this.Idle();
+        });
         #endregion
 
-        #region 关闭序列命令 —— ICommand CloseSeriesCommand
+        #region 打开序列文件夹命令 —— ICommand OpenSeriesFolderCommand
         /// <summary>
-        /// 关闭序列命令
+        /// 打开序列文件夹命令
         /// </summary>
-        public ICommand CloseSeriesCommand => new RelayCommand(_ => this.CloseSeries());
+        public ICommand OpenSeriesFolderCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //打开文件夹对话框
+            FolderPickerOpenOptions openOptions = new FolderPickerOpenOptions
+            {
+                Title = "打开序列文件夹",
+                AllowMultiple = false
+            };
+
+            //获取文件夹
+            IReadOnlyList<IStorageFolder> folders = await this.OpenFolderPickerAsync(openOptions);
+            if (folders.Any())
+            {
+                string dicomFolder = folders[0].Path.AbsolutePath;
+                VolumeData volumeData = await Task.Run(() => this._dicomLoader.LoadSeries(dicomFolder));
+                if (this.VolumeData != null)
+                {
+                    SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
+                }
+                this.VolumeData = volumeData;
+            }
+
+            this.Idle();
+        });
+        #endregion
+
+        #region 打开(NIFTI)命令 —— ICommand OpenNiiCommand
+        /// <summary>
+        /// 打开(NIFTI)命令
+        /// </summary>
+        public ICommand OpenNiiCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //打开文件对话框
+            FilePickerOpenOptions openOptions = new FilePickerOpenOptions
+            {
+                Title = "打开NIFTI文件",
+                AllowMultiple = false,
+                FileTypeFilter = [
+                    new FilePickerFileType("NIFTI文件")
+                    {
+                        Patterns = ["*.nii"]
+                    }
+                ]
+            };
+
+            //获取文件
+            IReadOnlyList<IStorageFile> files = await this.OpenFilePickerAsync(openOptions);
+            if (files.Any())
+            {
+                string filePath = files[0].TryGetLocalPath();
+                VolumeData volumeData = await Task.Run(() => this._dicomLoader.LoadNiiImage(filePath));
+                if (this.VolumeData != null)
+                {
+                    SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
+                }
+                this.VolumeData = volumeData;
+            }
+
+            this.Idle();
+        });
+        #endregion
+
+        #region 打开(MHD+RAW)命令 —— ICommand OpenRawCommand
+        /// <summary>
+        /// 打开(MHD+RAW)命令
+        /// </summary>
+        public ICommand OpenRawCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //打开文件对话框
+            FilePickerOpenOptions openOptions = new FilePickerOpenOptions
+            {
+                Title = "打开(MHD+RAW)文件",
+                AllowMultiple = false,
+                FileTypeFilter = [
+                    new FilePickerFileType("(MHD+RAW)文件")
+                    {
+                        Patterns = ["*.mhd"]
+                    }
+                ]
+            };
+
+            //获取文件
+            IReadOnlyList<IStorageFile> files = await this.OpenFilePickerAsync(openOptions);
+            if (files.Any())
+            {
+                string filePath = files[0].TryGetLocalPath();
+                VolumeData volumeData = await Task.Run(() => this._dicomLoader.LoadRawImage(filePath));
+                if (this.VolumeData != null)
+                {
+                    SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
+                }
+                this.VolumeData = volumeData;
+            }
+
+            this.Idle();
+        });
+        #endregion
+
+        #region 保存原始数据(NIFTI)命令 —— ICommand SaveOriginalNiiCommand
+        /// <summary>
+        /// 保存原始数据(NIFTI)命令
+        /// </summary>
+        public ICommand SaveOriginalNiiCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //保存文件对话框
+            FilePickerSaveOptions openOptions = new FilePickerSaveOptions
+            {
+                Title = "保存原始数据为NIFTI文件",
+                SuggestedFileName = "Original.nii",
+                FileTypeChoices = [
+                    new FilePickerFileType("NIFTI文件")
+                    {
+                        Patterns = ["*.nii"]
+                    }
+                ]
+            };
+
+            //保存文件
+            IStorageFile storageFile = await this.SaveFilePickerAsync(openOptions);
+            if (storageFile != null)
+            {
+                string filePath = storageFile.TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.SaveOriginalNiiImage(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 保存原始数据(MHD+RAW)命令 —— ICommand SaveOriginalRawCommand
+        /// <summary>
+        /// 保存原始数据(MHD+RAW)命令
+        /// </summary>
+        public ICommand SaveOriginalRawCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //保存文件对话框
+            FilePickerSaveOptions openOptions = new FilePickerSaveOptions
+            {
+                Title = "保存原始数据为(MHD+RAW)文件",
+                SuggestedFileName = "Original.mhd",
+                FileTypeChoices = [
+                    new FilePickerFileType("(MHD+RAW)文件")
+                    {
+                        Patterns = ["*.mhd"]
+                    }
+                ]
+            };
+
+            //保存文件
+            IStorageFile storageFile = await this.SaveFilePickerAsync(openOptions);
+            if (storageFile != null)
+            {
+                string filePath = storageFile.TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.SaveOriginalRawImage(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 保存预览数据(NIFTI)命令 —— ICommand SavePreviewNiiCommand
+        /// <summary>
+        /// 保存预览数据(NIFTI)命令
+        /// </summary>
+        public ICommand SavePreviewNiiCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //保存文件对话框
+            FilePickerSaveOptions openOptions = new FilePickerSaveOptions
+            {
+                Title = "保存预览数据为NIFTI文件",
+                SuggestedFileName = "Preview.nii",
+                FileTypeChoices = [
+                    new FilePickerFileType("NIFTI文件")
+                    {
+                        Patterns = ["*.nii"]
+                    }
+                ]
+            };
+
+            //保存文件
+            IStorageFile storageFile = await this.SaveFilePickerAsync(openOptions);
+            if (storageFile != null)
+            {
+                string filePath = storageFile.TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.SavePreviewNiiImage(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 保存预览数据(MHD+RAW)命令 —— ICommand SavePreviewRawCommand
+        /// <summary>
+        /// 保存预览数据(MHD+RAW)命令
+        /// </summary>
+        public ICommand SavePreviewRawCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //保存文件对话框
+            FilePickerSaveOptions openOptions = new FilePickerSaveOptions
+            {
+                Title = "保存预览数据为(MHD+RAW)文件",
+                SuggestedFileName = "Preview.mhd",
+                FileTypeChoices = [
+                    new FilePickerFileType("(MHD+RAW)文件")
+                    {
+                        Patterns = ["*.mhd"]
+                    }
+                ]
+            };
+
+            //保存文件
+            IStorageFile storageFile = await this.SaveFilePickerAsync(openOptions);
+            if (storageFile != null)
+            {
+                string filePath = storageFile.TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.SavePreviewRawImage(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 保存标记数据(NIFTI)命令 —— ICommand SaveMarkNiiCommand
+        /// <summary>
+        /// 保存标记数据(NIFTI)命令
+        /// </summary>
+        public ICommand SaveMarkNiiCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //保存文件对话框
+            FilePickerSaveOptions openOptions = new FilePickerSaveOptions
+            {
+                Title = "保存标记数据为NIFTI文件",
+                SuggestedFileName = "Mark.nii",
+                FileTypeChoices = [
+                    new FilePickerFileType("NIFTI文件")
+                    {
+                        Patterns = ["*.nii"]
+                    }
+                ]
+            };
+
+            //保存文件
+            IStorageFile storageFile = await this.SaveFilePickerAsync(openOptions);
+            if (storageFile != null)
+            {
+                string filePath = storageFile.TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.SaveMarkNiiImage(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 保存标记数据(MHD+RAW)命令 —— ICommand SaveMarkRawCommand
+        /// <summary>
+        /// 保存标记数据(MHD+RAW)命令
+        /// </summary>
+        public ICommand SaveMarkRawCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //保存文件对话框
+            FilePickerSaveOptions openOptions = new FilePickerSaveOptions
+            {
+                Title = "保存标记数据为(MHD+RAW)文件",
+                SuggestedFileName = "Mark.mhd",
+                FileTypeChoices = [
+                    new FilePickerFileType("(MHD+RAW)文件")
+                    {
+                        Patterns = ["*.mhd"]
+                    }
+                ]
+            };
+
+            //保存文件
+            IStorageFile storageFile = await this.SaveFilePickerAsync(openOptions);
+            if (storageFile != null)
+            {
+                string filePath = storageFile.TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.SaveMarkNiiImage(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 加载预览数据(NIFTI)命令 —— ICommand LoadPreviewNiiCommand
+        /// <summary>
+        /// 加载预览数据(NIFTI)命令
+        /// </summary>
+        public ICommand LoadPreviewNiiCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //打开文件对话框
+            FilePickerOpenOptions openOptions = new FilePickerOpenOptions
+            {
+                Title = "打开预览NIFTI文件",
+                AllowMultiple = false,
+                FileTypeFilter = [
+                    new FilePickerFileType("NIFTI文件")
+                    {
+                        Patterns = ["*.nii"]
+                    }
+                ]
+            };
+
+            //获取文件
+            IReadOnlyList<IStorageFile> files = await this.OpenFilePickerAsync(openOptions);
+            if (files.Any())
+            {
+                string filePath = files[0].TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.LoadNiiPreview(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 加载预览数据(MHD+RAW)命令 —— ICommand LoadPreviewRawCommand
+        /// <summary>
+        /// 加载预览数据(MHD+RAW)命令
+        /// </summary>
+        public ICommand LoadPreviewRawCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //打开文件对话框
+            FilePickerOpenOptions openOptions = new FilePickerOpenOptions
+            {
+                Title = "打开预览(MHD+RAW)文件",
+                AllowMultiple = false,
+                FileTypeFilter = [
+                    new FilePickerFileType("(MHD+RAW)文件")
+                    {
+                        Patterns = ["*.mhd"]
+                    }
+                ]
+            };
+
+            //获取文件
+            IReadOnlyList<IStorageFile> files = await this.OpenFilePickerAsync(openOptions);
+            if (files.Any())
+            {
+                string filePath = files[0].TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.LoadRawPreview(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 加载标记数据(NIFTI)命令 —— ICommand LoadMarkNiiCommand
+        /// <summary>
+        /// 加载标记数据(NIFTI)命令
+        /// </summary>
+        public ICommand LoadMarkNiiCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //打开文件对话框
+            FilePickerOpenOptions openOptions = new FilePickerOpenOptions
+            {
+                Title = "打开标记NIFTI文件",
+                AllowMultiple = false,
+                FileTypeFilter = [
+                    new FilePickerFileType("NIFTI文件")
+                    {
+                        Patterns = ["*.nii"]
+                    }
+                ]
+            };
+
+            //获取文件
+            IReadOnlyList<IStorageFile> files = await this.OpenFilePickerAsync(openOptions);
+            if (files.Any())
+            {
+                string filePath = files[0].TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.LoadNiiMark(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 加载标记数据(MHD+RAW)命令 —— ICommand LoadMarkRawCommand
+        /// <summary>
+        /// 加载标记数据(MHD+RAW)命令
+        /// </summary>
+        public ICommand LoadMarkRawCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //打开文件对话框
+            FilePickerOpenOptions openOptions = new FilePickerOpenOptions
+            {
+                Title = "打开标记(MHD+RAW)文件",
+                AllowMultiple = false,
+                FileTypeFilter = [
+                    new FilePickerFileType("(MHD+RAW)文件")
+                    {
+                        Patterns = ["*.mhd"]
+                    }
+                ]
+            };
+
+            //获取文件
+            IReadOnlyList<IStorageFile> files = await this.OpenFilePickerAsync(openOptions);
+            if (files.Any())
+            {
+                string filePath = files[0].TryGetLocalPath();
+                await Task.Run(() => this._dicomLoader.LoadRawMark(this.VolumeData, filePath));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 关闭会话命令 —— ICommand CloseSessionCommand
+        /// <summary>
+        /// 关闭会话命令
+        /// </summary>
+        public ICommand CloseSessionCommand => new RelayCommand(_ =>
+        {
+            SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
+            this.VolumeData = null;
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 重置预览命令 —— ICommand ResetPreviewCommand
@@ -233,15 +706,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand ResetPreviewCommand => new AsyncRelayCommand(async _ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             TaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
             if (result == TaskDialogStandardResult.OK)
             {
@@ -252,7 +716,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 SyncViewportEvent message = new SyncViewportEvent();
                 await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 重置标记命令 —— ICommand ResetMarkCommand
@@ -261,15 +725,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand ResetMarkCommand => new AsyncRelayCommand(async _ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             TaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
             if (result == TaskDialogStandardResult.OK)
             {
@@ -280,7 +735,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 SyncViewportEvent message = new SyncViewportEvent();
                 await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 清空形状命令 —— ICommand ClearShapesCommand
@@ -289,22 +744,13 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand ClearShapesCommand => new AsyncRelayCommand(async _ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             TaskDialogStandardResult result = await MessageBox.Show("确定要清空吗？", "警告", MessageBoxButton.OKCancel);
             if (result == TaskDialogStandardResult.OK)
             {
                 ClearShapesEvent message = new ClearShapesEvent();
                 await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 布局13命令 —— ICommand Layout13Command
@@ -464,19 +910,10 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand GaussianBlurCommand => new AsyncRelayCommand(async _ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             GaussianBlurViewModel viewModel = ResolveMediator.Resolve<GaussianBlurViewModel>();
             viewModel.VolumeData = this.VolumeData;
             await this._windowManager.ShowWindowAsync(viewModel);
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 阈值分割命令 —— ICommand ThresholdSegmentCommand
@@ -485,21 +922,12 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand ThresholdSegmentCommand => new AsyncRelayCommand(async _ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             ThresholdSegmentViewModel viewModel = ResolveMediator.Resolve<ThresholdSegmentViewModel>();
             viewModel.VolumeData = this.VolumeData;
             viewModel.SelectedTissue = this.SelectedTissue;
             viewModel.Tissues = this.Tissues;
             await this._windowManager.ShowWindowAsync(viewModel);
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #endregion
@@ -515,58 +943,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.SelectedTissue = this.Tissues[1];
 
             return base.OnInitializedAsync(cancellationToken);
-        }
-        #endregion
-
-        #region 打开序列 —— async Task OpenSeries()
-        /// <summary>
-        /// 打开序列
-        /// </summary>
-        public async Task OpenSeries()
-        {
-            this.Busy();
-
-            //打开文件夹对话框
-            FolderPickerOpenOptions openOptions = new FolderPickerOpenOptions
-            {
-                Title = "打开文件夹",
-                AllowMultiple = false
-            };
-
-            //获取文件夹
-            IReadOnlyList<IStorageFolder> folders = await this.OpenFolderPickerAsync(openOptions);
-            if (folders.Any())
-            {
-                string dicomFolder = folders[0].Path.AbsolutePath;
-                VolumeData volumeData = await Task.Run(() => this._dicomLoader.LoadSeries(dicomFolder));
-                if (this.VolumeData != null)
-                {
-                    SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
-                }
-                this.VolumeData = volumeData;
-            }
-
-            this.Idle();
-        }
-        #endregion
-
-        #region 关闭序列 —— void CloseSeries()
-        /// <summary>
-        /// 关闭序列
-        /// </summary>
-        public void CloseSeries()
-        {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
-            SessionManager.RemoveVolumeSession(this.VolumeData.Metadata.Id);
-            this.VolumeData = null;
         }
         #endregion
 

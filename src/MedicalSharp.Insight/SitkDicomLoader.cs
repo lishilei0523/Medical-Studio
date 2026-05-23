@@ -86,6 +86,355 @@ namespace MedicalSharp.Insight
         }
         #endregion
 
+        #region # 加载NIFTI图像文件 —— VolumeData LoadNiiImage(string filePath)
+        /// <summary>
+        /// 加载NIFTI图像文件
+        /// </summary>
+        /// <param name="filePath">Nii文件路径</param>
+        /// <returns>体积数据</returns>
+        public VolumeData LoadNiiImage(string filePath)
+        {
+            #region # 验证
+
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件路径不可为空！");
+            }
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件不存在！");
+            }
+
+            #endregion
+
+            //读取NIFTI图像
+            using Image image = SimpleITK.ReadImage(filePath);
+
+            //创建体积数据
+            SitkVolumeData volumeData = new SitkVolumeData();
+            this.ExtractData(volumeData, image);
+
+            return volumeData;
+        }
+        #endregion
+
+        #region # 加载MHD+RAW图像文件 —— VolumeData LoadRawImage(string filePath)
+        /// <summary>
+        /// 加载MHD+RAW图像文件
+        /// </summary>
+        /// <param name="filePath">MHD文件路径</param>
+        /// <returns>体积数据</returns>
+        public VolumeData LoadRawImage(string filePath)
+        {
+            #region # 验证
+
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件路径不可为空！");
+            }
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "MHD文件不存在！");
+            }
+
+            #endregion
+
+            //读取MHD+RAW图像
+            using Image image = SimpleITK.ReadImage(filePath);
+
+            //创建体积数据
+            SitkVolumeData volumeData = new SitkVolumeData();
+            this.ExtractData(volumeData, image);
+
+            return volumeData;
+        }
+        #endregion
+
+        #region # 加载NIFTI预览文件 —— void LoadNiiPreview(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 加载NIFTI预览文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">Nii文件路径</param>
+        public unsafe void LoadNiiPreview(VolumeData volumeData, string filePath)
+        {
+            #region # 验证
+
+            if (volumeData == null)
+            {
+                throw new ArgumentNullException(nameof(volumeData), "体积数据不可为空！");
+            }
+            if (volumeData.PreviewData == IntPtr.Zero)
+            {
+                throw new ArgumentNullException(nameof(volumeData), "预览数据指针不可为空！");
+            }
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件路径不可为空！");
+            }
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件不存在！");
+            }
+
+            #endregion
+
+            using Image previewImage = SimpleITK.ReadImage(filePath);
+            PixelIDValueEnum pixelFormat = previewImage.GetPixelID();
+            VectorUInt32 imageSize = previewImage.GetSize();
+
+            #region # 验证
+
+            if (pixelFormat != PixelIDValueEnum.sitkInt16)
+            {
+                throw new InvalidOperationException("预览图必须是short类型！");
+            }
+            if ((imageSize[0] != volumeData.Metadata.VolumeSize.X))
+            {
+                throw new InvalidOperationException("宽度不匹配！");
+            }
+            if ((imageSize[1] != volumeData.Metadata.VolumeSize.Y))
+            {
+                throw new InvalidOperationException("高度不匹配！");
+            }
+            if ((imageSize[2] != volumeData.Metadata.VolumeSize.Z))
+            {
+                throw new InvalidOperationException("深度不匹配！");
+            }
+
+            #endregion
+
+            IntPtr previewPtr = previewImage.GetBufferAsInt16();
+            uint bufferSize = imageSize[0] * imageSize[1] * imageSize[2] * sizeof(short);
+            Buffer.MemoryCopy(previewPtr.ToPointer(), volumeData.PreviewData.ToPointer(), bufferSize, bufferSize);
+        }
+        #endregion
+
+        #region # 加载MHD+RAW预览文件 —— void LoadRawPreview(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 加载MHD+RAW预览文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">MHD文件路径</param>
+        public void LoadRawPreview(VolumeData volumeData, string filePath)
+        {
+            this.LoadNiiPreview(volumeData, filePath);
+        }
+        #endregion
+
+        #region # 加载NIFTI标记文件 —— void LoadNiiMark(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 加载NIFTI标记文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">Nii文件路径</param>
+        public unsafe void LoadNiiMark(VolumeData volumeData, string filePath)
+        {
+            #region # 验证
+
+            if (volumeData == null)
+            {
+                throw new ArgumentNullException(nameof(volumeData), "体积数据不可为空！");
+            }
+            if (volumeData.MarkData == IntPtr.Zero)
+            {
+                throw new ArgumentNullException(nameof(volumeData), "标记数据指针不可为空！");
+            }
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件路径不可为空！");
+            }
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件不存在！");
+            }
+
+            #endregion
+
+            using Image markImage = SimpleITK.ReadImage(filePath);
+            PixelIDValueEnum pixelFormat = markImage.GetPixelID();
+            VectorUInt32 imageSize = markImage.GetSize();
+
+            #region # 验证
+
+            if (pixelFormat != PixelIDValueEnum.sitkUInt8)
+            {
+                throw new InvalidOperationException("标记图必须是label类型！");
+            }
+            if ((imageSize[0] != volumeData.Metadata.VolumeSize.X))
+            {
+                throw new InvalidOperationException("宽度不匹配！");
+            }
+            if ((imageSize[1] != volumeData.Metadata.VolumeSize.Y))
+            {
+                throw new InvalidOperationException("高度不匹配！");
+            }
+            if ((imageSize[2] != volumeData.Metadata.VolumeSize.Z))
+            {
+                throw new InvalidOperationException("深度不匹配！");
+            }
+
+            #endregion
+
+            IntPtr markPtr = markImage.GetBufferAsUInt8();
+            uint bufferSize = imageSize[0] * imageSize[1] * imageSize[2] * sizeof(byte);
+            Buffer.MemoryCopy(markPtr.ToPointer(), volumeData.MarkData.ToPointer(), bufferSize, bufferSize);
+        }
+        #endregion
+
+        #region # 加载MHD+RAW标记文件 —— void LoadRawMark(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 加载MHD+RAW标记文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">MHD文件路径</param>
+        public void LoadRawMark(VolumeData volumeData, string filePath)
+        {
+            this.LoadNiiMark(volumeData, filePath);
+        }
+        #endregion
+
+        #region # 保存原始NIFTI图像文件 —— void SaveOriginalNiiImage(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 保存原始NIFTI图像文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">Nii文件路径</param>
+        public void SaveOriginalNiiImage(VolumeData volumeData, string filePath)
+        {
+            #region # 验证
+
+            if (volumeData is not SitkVolumeData sitkVolume)
+            {
+                throw new ArgumentOutOfRangeException(nameof(volumeData), "volumeData必须是SitkVolumeData");
+            }
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件路径不可为空！");
+            }
+
+            #endregion
+
+            SimpleITK.WriteImage(sitkVolume.SitkOriginalImage, filePath);
+        }
+        #endregion
+
+        #region # 保存原始MHD+RAW图像文件 —— void SaveOriginalRawImage(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 保存原始MHD+RAW图像文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">MHD文件路径</param>
+        public void SaveOriginalRawImage(VolumeData volumeData, string filePath)
+        {
+            #region # 验证
+
+            if (volumeData is not SitkVolumeData sitkVolume)
+            {
+                throw new ArgumentOutOfRangeException(nameof(volumeData), "volumeData必须是SitkVolumeData");
+            }
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件路径不可为空！");
+            }
+
+            #endregion
+
+            SimpleITK.WriteImage(sitkVolume.SitkOriginalImage, filePath);
+        }
+        #endregion
+
+        #region # 保存预览NIFTI图像文件 —— void SavePreviewNiiImage(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 保存预览NIFTI图像文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">Nii文件路径</param>
+        public void SavePreviewNiiImage(VolumeData volumeData, string filePath)
+        {
+            #region # 验证
+
+            if (volumeData is not SitkVolumeData sitkVolume)
+            {
+                throw new ArgumentOutOfRangeException(nameof(volumeData), "volumeData必须是SitkVolumeData");
+            }
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件路径不可为空！");
+            }
+
+            #endregion
+
+            SimpleITK.WriteImage(sitkVolume.SitkPreviewImage, filePath);
+        }
+        #endregion
+
+        #region # 保存预览MHD+RAW图像文件 —— void SavePreviewRawImage(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 保存预览MHD+RAW图像文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">MHD文件路径</param>
+        public void SavePreviewRawImage(VolumeData volumeData, string filePath)
+        {
+            #region # 验证
+
+            if (volumeData is not SitkVolumeData sitkVolume)
+            {
+                throw new ArgumentOutOfRangeException(nameof(volumeData), "volumeData必须是SitkVolumeData");
+            }
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件路径不可为空！");
+            }
+
+            #endregion
+
+            SimpleITK.WriteImage(sitkVolume.SitkPreviewImage, filePath);
+        }
+        #endregion
+
+        #region # 保存标记NIFTI图像文件 —— void SaveMarkNiiImage(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 保存标记NIFTI图像文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">Nii文件路径</param>
+        public void SaveMarkNiiImage(VolumeData volumeData, string filePath)
+        {
+            #region # 验证
+
+            if (volumeData is not SitkVolumeData sitkVolume)
+            {
+                throw new ArgumentOutOfRangeException(nameof(volumeData), "volumeData必须是SitkVolumeData");
+            }
+            if (sitkVolume.SitkMarkImage == null)
+            {
+                throw new InvalidOperationException("标记数据未分配");
+            }
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                throw new ArgumentOutOfRangeException(nameof(filePath), "文件路径不可为空！");
+            }
+
+            #endregion
+
+            SimpleITK.WriteImage(sitkVolume.SitkMarkImage, filePath);
+        }
+        #endregion
+
+        #region # 保存标记MHD+RAW图像文件 —— void SaveMarkRawImage(VolumeData volumeData, string filePath)
+        /// <summary>
+        /// 保存标记MHD+RAW图像文件
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="filePath">MHD文件路径</param>
+        public void SaveMarkRawImage(VolumeData volumeData, string filePath)
+        {
+            this.SaveMarkNiiImage(volumeData, filePath);
+        }
+        #endregion
+
 
         //Private
 
@@ -158,7 +507,7 @@ namespace MedicalSharp.Insight
             }
 
             //计算HU最小值、最大值
-            CalculateMinMaxHU(volumeData.OriginalData, volumeData.Metadata.VoxelsCount, out short minHU, out short maxHU);
+            CalculateMinMax(volumeData.OriginalData, volumeData.Metadata.VoxelsCount, out short minHU, out short maxHU);
             volumeData.Metadata.MinHU = minHU;
             volumeData.Metadata.MaxHU = maxHU;
 
@@ -256,12 +605,12 @@ namespace MedicalSharp.Insight
         }
         #endregion
 
-        #region # 计算体素HU最小最大值 —— static unsafe void CalculateMinMaxHU(IntPtr originalData...
+        #region # 计算体素HU最小最大值 —— static void CalculateMinMax(IntPtr originalData...
         /// <summary>
         /// 计算体素HU最小最大值
         /// </summary>
         /// <remarks>SIMD加速</remarks>
-        private static unsafe void CalculateMinMaxHU(IntPtr originalData, long voxelsCount, out short minHU, out short maxHU)
+        private static unsafe void CalculateMinMax(IntPtr originalData, long voxelsCount, out short minHU, out short maxHU)
         {
             short* pointer = (short*)originalData.ToPointer();
 
@@ -285,7 +634,6 @@ namespace MedicalSharp.Insight
                 minHU = Math.Min(minHU, vecMin[j]);
                 maxHU = Math.Max(maxHU, vecMax[j]);
             }
-
             for (; index < voxelsCount; index++)
             {
                 short val = pointer[index];
@@ -293,7 +641,6 @@ namespace MedicalSharp.Insight
                 {
                     minHU = val;
                 }
-
                 if (val > maxHU)
                 {
                     maxHU = val;

@@ -36,10 +36,21 @@
 					</Image>
 					<Menu Grid.Column="1">
 						<MenuItem Header="文件(_F)">
-							<MenuItem Header="打开(_O)" Command="{Binding OpenSeriesCommand}" />
-							<MenuItem Header="关闭(_C)" Command="{Binding CloseSeriesCommand}" />
-							<MenuItem Header="保存(_S)" cm:Message.Attach="SaveImage()" />
-							<MenuItem Header="另存为(_A)" cm:Message.Attach="SaveAsImage()" />
+							<MenuItem Header="打开序列文件(_P)" Command="{Binding OpenSeriesFilesCommand}" />
+							<MenuItem Header="打开序列文件夹(_D)" Command="{Binding OpenSeriesFolderCommand}" />
+							<MenuItem Header="打开 (NIFTI)(_N)" Command="{Binding OpenNiiCommand}" />
+							<MenuItem Header="打开 (MHD+RAW)(_M)" Command="{Binding OpenRawCommand}" />
+                            <MenuItem Header="保存原始数据 (NIFTI)(_O)" Command="{Binding SaveOriginalNiiCommand}" />
+                            <MenuItem Header="保存原始数据 (MHD+RAW)(_H)" Command="{Binding SaveOriginalRawCommand}" />
+							<MenuItem Header="保存预览数据 (NIFTI)(_I)" Command="{Binding SavePreviewNiiCommand}" />
+							<MenuItem Header="保存预览数据 (MHD+RAW)(_R)" Command="{Binding SavePreviewRawCommand}" />
+                            <MenuItem Header="保存标记数据 (NIFTI)(_T)" Command="{Binding SaveMarkNiiCommand}" />
+                            <MenuItem Header="保存标记数据 (MHD+RAW)(_W)" Command="{Binding SaveMarkRawCommand}" />
+                            <MenuItem Header="加载预览数据 (NIFTI)(_V)" Command="{Binding LoadPreviewNiiCommand}" />
+                            <MenuItem Header="加载预览数据 (MHD+RAW)(_E)" Command="{Binding LoadPreviewRawCommand}" />
+							<MenuItem Header="加载标记数据 (NIFTI)(_L)" Command="{Binding LoadMarkNiiCommand}" />
+							<MenuItem Header="加载标记数据 (MHD+RAW)(_A)" Command="{Binding LoadMarkRawCommand}" />
+							<MenuItem Header="关闭会话(_C)" Command="{Binding CloseSessionCommand}" />
 						</MenuItem>
 						<MenuItem Header="编辑(_E)">
 							<MenuItem Header="重置预览(_P)" Command="{Binding ResetPreviewCommand}" />
@@ -66,7 +77,7 @@
 						</MenuItem>
 						<MenuItem Header="边缘检测(_B)">
 							<MenuItem Header="Sobel边缘检测(_S)" Command="{Binding SobelCommand}" />
-                            <MenuItem Header="Scharr边缘检测(_A)" Command="{Binding ScharrCommand}" />
+							<MenuItem Header="Scharr边缘检测(_A)" Command="{Binding ScharrCommand}" />
 							<MenuItem Header="Canny边缘检测(_C)" Command="{Binding CannyCommand}" />
 							<MenuItem Header="Laplacian边缘检测(_L)" Command="{Binding LaplacianCommand}" />
 						</MenuItem>
