@@ -18,7 +18,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 包围盒3D元素
     /// </summary>
-    public class BoundingBoxVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IResizable3D, ICutVolume
+    public class BoundingBoxVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IResizable3D, ICutVolume, IAnalyseVolume
     {
         #region # 字段及构造器
 
@@ -327,6 +327,22 @@ namespace MedicalSharp.Controls.Visuals
         {
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyBoxCut(this.Minimum, this.Maximum, localToWorld, cutMode, markValue);
+        }
+        #endregion
+
+        #region 适用统计体积 —— StatisticResult ApplyAnalyseVolume(VolumeRenderable renderable...
+        /// <summary>
+        /// 适用统计体积
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="markValue">标记值</param>
+        /// <returns>统计结果</returns>
+        public StatisticResult ApplyAnalyseVolume(VolumeRenderable renderable, int markValue)
+        {
+            Matrix4 localToWorld = this.Transform.Matrix;
+            StatisticResult result = renderable.ApplyBoxAnalyse(this.Minimum, this.Maximum, localToWorld, markValue);
+
+            return result;
         }
         #endregion
 

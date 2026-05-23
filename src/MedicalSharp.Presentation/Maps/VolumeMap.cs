@@ -113,5 +113,27 @@ namespace MedicalSharp.Presentation.Maps
             return scanInfo;
         }
         #endregion
+
+        #region # 统计信息映射 —— static StatisticInfo ToStatisticInfo(this StatisticResult result)
+        /// <summary>
+        /// 统计信息映射
+        /// </summary>
+        public static StatisticInfo ToStatisticInfo(this StatisticResult result)
+        {
+            StatisticInfo statisticInfo = new StatisticInfo
+            {
+                MinHU = result.MinHU.ToString("F0"),
+                MaxHU = result.MaxHU.ToString("F0"),
+                AverageHU = result.AverageHU.ToString("F0"),
+                StdDevHU = result.StdDevHU.ToString("F0"),
+                SurfaceArea = $"{result.SurfaceArea:F2}mm²",
+                Volume = $"{result.Volume:F2}mm³",
+                Sphericity = result.Sphericity.ToString("F2"),
+                VoxelsCount = result.VoxelsCount.ToString()
+            };
+
+            return statisticInfo;
+        }
+        #endregion
     }
 }

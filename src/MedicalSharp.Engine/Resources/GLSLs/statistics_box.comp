@@ -1,0 +1,231 @@
+#version 430 core
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+//输入纹理
+layout(binding = 0, r16_snorm) readonly uniform image3D u_PreviewTexture;
+layout(binding = 1, r8ui) readonly uniform uimage3D u_MarkTexture;
+
+//立方体参数
+uniform vec3 u_BoxLocalMin;
+uniform vec3 u_BoxLocalMax;
+uniform mat4 u_WorldToLocal;
+
+//体积参数
+uniform ivec3 u_VolumeSize;
+uniform vec3 u_VolumeScale;
+
+//标记值（-1=全部，0~255=指定标记值）
+uniform int u_MarkValue;
+
+//输出SSBO
+layout(std430, binding = 2) buffer StatisticsBuffer
+{
+    uint minHU;
+    uint maxHU;
+    uint huSum;
+    uint huSumSq;
+    uint voxelsCount;
+    uint boundaryCount;
+    uint padding1;
+    uint padding2;
+};
+
+//共享内存（512个线程）
+shared uint sharedMinHU[512];
+shared uint sharedMaxHU[512];
+shared uint sharedHuSum[512];
+shared uint sharedHuSumSq[512];
+shared uint sharedVoxelsCount[512];
+shared uint sharedBoundaryCount[512];
+
+//常量
+const float MAX_16BIT_SIGNED = 32767.0;
+const float FLOAT_MAX = 1e20;
+const float FLOAT_MIN = -1e20;
+
+
+//判断点是否在立方体内
+bool isInBox(vec3 position)
+{
+    bool inBox= (position.x >= u_BoxLocalMin.x && position.x <= u_BoxLocalMax.x &&
+                 position.y >= u_BoxLocalMin.y && position.y <= u_BoxLocalMax.y &&
+                 position.z >= u_BoxLocalMin.z && position.z <= u_BoxLocalMax.z);
+
+    return inBox;
+}
+
+//判断是否为边界体素
+bool isBoundaryVoxel(ivec3 voxelCoord)
+{
+    ivec3 offsets[6] = ivec3[](
+        ivec3(1,0,0), ivec3(-1,0,0),
+        ivec3(0,1,0), ivec3(0,-1,0),
+        ivec3(0,0,1), ivec3(0,0,-1)
+    );
+    
+    for (int i = 0; i < 6; i++)
+    {
+        ivec3 neighborCoord = voxelCoord + offsets[i];        
+        if (neighborCoord.x < 0 || neighborCoord.x >= u_VolumeSize.x ||
+            neighborCoord.y < 0 || neighborCoord.y >= u_VolumeSize.y ||
+            neighborCoord.z < 0 || neighborCoord.z >= u_VolumeSize.z)
+        {
+            return true;
+        }
+        
+        vec3 neighborTexCoord = (vec3(neighborCoord) + 0.5) / vec3(u_VolumeSize);
+        vec3 neighborWorldPos = (neighborTexCoord - 0.5) * u_VolumeScale;
+        vec4 neighborLocalPos = u_WorldToLocal * vec4(neighborWorldPos, 1.0);
+        vec3 neighborPos = neighborLocalPos.xyz / neighborLocalPos.w;        
+        if (!isInBox(neighborPos))
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+void main()
+{
+    //获取当前线程对应的体素坐标
+    ivec3 voxelCoord = ivec3(gl_GlobalInvocationID);
+    uint index = gl_LocalInvocationIndex;
+
+    //局部统计
+    float localMinHU = FLOAT_MAX;
+    float localMaxHU = FLOAT_MIN;
+    float localHuSum = 0.0;
+    float localHuSumSq = 0.0;
+    uint localVoxelsCount = 0;
+    uint localBoundaryCount = 0;
+
+    //边界检查
+    if (voxelCoord.x < u_VolumeSize.x && voxelCoord.y < u_VolumeSize.y && voxelCoord.z < u_VolumeSize.z)
+    {
+        //坐标转换
+        vec3 texCoord = (vec3(voxelCoord) + 0.5) / vec3(u_VolumeSize);
+        vec3 worldPos = (texCoord - 0.5) * u_VolumeScale;
+        vec4 localPos = u_WorldToLocal * vec4(worldPos, 1.0);
+        vec3 position = localPos.xyz / localPos.w;        
+        if (isInBox(position))
+        {
+            //标记值检查
+            uint markValue = imageLoad(u_MarkTexture, voxelCoord).r;
+            bool shouldCount = (u_MarkValue == -1) || (u_MarkValue == int(markValue));
+            if (shouldCount)
+            {
+                float huValue = imageLoad(u_PreviewTexture, voxelCoord).r * MAX_16BIT_SIGNED; 
+                localMinHU = huValue;
+                localMaxHU = huValue;
+                localHuSum = huValue;
+                localHuSumSq = huValue * huValue;
+                localVoxelsCount = 1;
+                if (isBoundaryVoxel(voxelCoord))
+                {
+                    localBoundaryCount = 1;
+                }
+            }
+        }
+    }
+    
+    //存储到共享内存
+    sharedVoxelsCount[index] = localVoxelsCount;
+    sharedBoundaryCount[index] = localBoundaryCount;
+    sharedHuSum[index] = floatBitsToUint(localHuSum);
+    sharedHuSumSq[index] = floatBitsToUint(localHuSumSq);
+    sharedMinHU[index] = floatBitsToUint(localMinHU);
+    sharedMaxHU[index] = floatBitsToUint(localMaxHU);
+    barrier();
+    
+    //树形归约
+    for (int stride = 256; stride > 0; stride >>= 1)
+    {
+        if (index < stride)
+        {
+            int j = int(index) + stride;
+            
+            //整数加法
+            sharedVoxelsCount[index] += sharedVoxelsCount[j];
+            sharedBoundaryCount[index] += sharedBoundaryCount[j];
+            
+            //浮点加法
+            float sum0 = uintBitsToFloat(sharedHuSum[index]);
+            float sum1 = uintBitsToFloat(sharedHuSum[j]);
+            sharedHuSum[index] = floatBitsToUint(sum0 + sum1);
+            
+            float sq0 = uintBitsToFloat(sharedHuSumSq[index]);
+            float sq1 = uintBitsToFloat(sharedHuSumSq[j]);
+            sharedHuSumSq[index] = floatBitsToUint(sq0 + sq1);
+            
+            //最小值
+            float min0 = uintBitsToFloat(sharedMinHU[index]);
+            float min1 = uintBitsToFloat(sharedMinHU[j]);
+            sharedMinHU[index] = floatBitsToUint(min(min0, min1));
+            
+            //最大值
+            float max0 = uintBitsToFloat(sharedMaxHU[index]);
+            float max1 = uintBitsToFloat(sharedMaxHU[j]);
+            sharedMaxHU[index] = floatBitsToUint(max(max0, max1));
+        }
+        barrier();
+    }
+    
+    //线程0负责写入SSBO
+    if (index == 0)
+    {
+        //浮点原子加法
+        uint oldVal;
+        uint newVal;
+        
+        //MinHU
+        oldVal = minHU;
+        float oldMin = uintBitsToFloat(oldVal);
+        float newMin = uintBitsToFloat(sharedMinHU[0]);
+        while (newMin < oldMin)
+        {
+            newVal = floatBitsToUint(newMin);
+            uint prev = atomicCompSwap(minHU, oldVal, newVal);
+            if (prev == oldVal)
+            {
+                break;
+            }
+
+            oldVal = prev;
+            oldMin = uintBitsToFloat(oldVal);
+        }
+        
+        //MaxHU
+        oldVal = maxHU;
+        float oldMax = uintBitsToFloat(oldVal);
+        float newMax = uintBitsToFloat(sharedMaxHU[0]);
+        while (newMax > oldMax)
+        {
+            newVal = floatBitsToUint(newMax);
+            uint prev = atomicCompSwap(maxHU, oldVal, newVal);
+            if (prev == oldVal)
+            {
+                break;
+            }
+
+            oldVal = prev;
+            oldMax = uintBitsToFloat(oldVal);
+        }
+
+        //HuSum
+        oldVal = huSum;
+        do {
+            newVal = floatBitsToUint(uintBitsToFloat(oldVal) + uintBitsToFloat(sharedHuSum[0]));
+        } while (atomicCompSwap(huSum, oldVal, newVal) != oldVal);
+        
+        //HuSumSq
+        oldVal = huSumSq;
+        do {
+            newVal = floatBitsToUint(uintBitsToFloat(oldVal) + uintBitsToFloat(sharedHuSumSq[0]));
+        } while (atomicCompSwap(huSumSq, oldVal, newVal) != oldVal);
+        
+        //使用原子操作合并多个工作组的统计结果
+        atomicAdd(voxelsCount, sharedVoxelsCount[0]);
+        atomicAdd(boundaryCount, sharedBoundaryCount[0]);
+    }
+}

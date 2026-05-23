@@ -544,10 +544,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
+            Action<StatisticResult> analyseEnd = result =>
+            {
+                StatisticFinishedEvent message = new StatisticFinishedEvent
+                {
+                    Publisher = this,
+                    StatisticResult = result
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
 
             PickVisual3DCommand command = new PickVisual3DCommand(picked, removed);
             command.GetMarkValue = () => this.SelectedTissue.MarkValue;
             command.CutEnd = cutEnd;
+            command.AnalyseEnd = analyseEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion

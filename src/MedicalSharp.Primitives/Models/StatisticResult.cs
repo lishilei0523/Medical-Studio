@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Primitives.Models
 {
@@ -6,106 +7,81 @@ namespace MedicalSharp.Primitives.Models
     /// 统计结果
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public readonly record struct StatisticResult
+    public record struct StatisticResult
     {
         /// <summary>
-        /// 创建统计结果构造器
+        /// 最小HU
         /// </summary>
-        /// <param name="length">周长</param>
-        /// <param name="surfaceArea">表面积</param>
-        /// <param name="volume">体积</param>
-        /// <param name="longDiameter">长径</param>
-        /// <param name="shortDiameter">短径</param>
-        /// <param name="maxDiameter">最大直径</param>
-        /// <param name="sphericity">球形度</param>
-        /// <param name="minHU">最小HU</param>
-        /// <param name="maxHU">最大HU</param>
-        /// <param name="averageHU">平均HU</param>
-        /// <param name="stdDevHU">标准差</param>
-        /// <param name="voxelsCount">体素数</param>
-        public StatisticResult(float length, float surfaceArea, float volume, float longDiameter, float shortDiameter, float maxDiameter,
-            float sphericity, float minHU, float maxHU, float averageHU, float stdDevHU, int voxelsCount)
-            : this()
-        {
-            this.Length = length;
-            this.SurfaceArea = surfaceArea;
-            this.Volume = volume;
-            this.LongDiameter = longDiameter;
-            this.ShortDiameter = shortDiameter;
-            this.MaxDiameter = maxDiameter;
-            this.Sphericity = sphericity;
-            this.MinHU = minHU;
-            this.MaxHU = maxHU;
-            this.AverageHU = averageHU;
-            this.StdDevHU = stdDevHU;
-            this.VoxelsCount = voxelsCount;
-        }
+        public float MinHU;
 
         /// <summary>
-        /// 周长
+        /// 最大HU
         /// </summary>
-        /// <remarks>mm</remarks>
-        public readonly float Length;
+        public float MaxHU;
+
+        /// <summary>
+        /// 平均HU
+        /// </summary>
+        public float AverageHU;
+
+        /// <summary>
+        /// 标准差
+        /// </summary>
+        public float StdDevHU;
+
+        /// <summary>
+        /// 体素数
+        /// </summary>
+        public int VoxelsCount;
+
+        /// <summary>
+        /// 边界体素数
+        /// </summary>
+        public int BoundaryCount;
 
         /// <summary>
         /// 表面积
         /// </summary>
         /// <remarks>mm²</remarks>
-        public readonly float SurfaceArea;
+        public float SurfaceArea;
 
         /// <summary>
         /// 体积
         /// </summary>
         /// <remarks>mm³</remarks>
-        public readonly float Volume;
-
-        /// <summary>
-        /// 长径
-        /// </summary>
-        /// <remarks>mm</remarks>
-        public readonly float LongDiameter;
-
-        /// <summary>
-        /// 短径
-        /// </summary>
-        /// <remarks>mm</remarks>
-        public readonly float ShortDiameter;
-
-        /// <summary>
-        /// 最大直径
-        /// </summary>
-        /// <remarks>mm</remarks>
-        public readonly float MaxDiameter;
+        public float Volume;
 
         /// <summary>
         /// 球形度
         /// </summary>
         /// <remarks>值域：0~1，越接近1越接近球体</remarks>
-        public readonly float Sphericity;
+        public float Sphericity;
 
         /// <summary>
-        /// 最小HU
+        /// 计算几何指标
         /// </summary>
-        public readonly float MinHU;
+        /// <param name="voxelVolume">体素体积（mm³）</param>
+        /// <param name="voxelArea">体素表面积（mm²）</param>
+        public void CalculateGeometry(float voxelVolume, float voxelArea)
+        {
+            //计算体积 = 体素数 × 单个体素体积
+            this.Volume = this.VoxelsCount * voxelVolume;
 
-        /// <summary>
-        /// 最大HU
-        /// </summary>
-        public readonly float MaxHU;
+            //计算表面积 = 边界体素数 × 单个体素表面积
+            this.SurfaceArea = this.BoundaryCount * voxelArea;
 
-        /// <summary>
-        /// 平均HU
-        /// </summary>
-        public readonly float AverageHU;
-
-        /// <summary>
-        /// 标准差
-        /// </summary>
-        public readonly float StdDevHU;
-
-        /// <summary>
-        /// 体素数
-        /// </summary>
-        public readonly int VoxelsCount;
+            //计算球形度，V: 体积, S: 表面积
+            if (this.Volume > 0 && this.SurfaceArea > 0)
+            {
+                //球形度 = (π^(1/3) × (6V)^(2/3)) / S
+                float numerator = MathF.Pow(MathF.PI, 1.0f / 3.0f) * MathF.Pow(6 * this.Volume, 2.0f / 3.0f);
+                this.Sphericity = numerator / this.SurfaceArea;
+                this.Sphericity = Math.Clamp(this.Sphericity, 0, 1);
+            }
+            else
+            {
+                this.Sphericity = 0;
+            }
+        }
     }
 }

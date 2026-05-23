@@ -37,7 +37,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
     /// <summary>
     /// 首页视图模型
     /// </summary>
-    public class IndexViewModel : ScreenBase
+    public class IndexViewModel : ScreenBase, IHandle<StatisticFinishedEvent>
     {
         #region # 字段及构造器
 
@@ -1074,6 +1074,27 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.SelectedTissue = this.Tissues[1];
 
             return base.OnInitializedAsync(cancellationToken);
+        }
+        #endregion
+
+        #region 处理统计完成事件 —— Task HandleAsync(StatisticFinishedEvent message...
+        /// <summary>
+        /// 处理统计完成事件
+        /// </summary>
+        public Task HandleAsync(StatisticFinishedEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.StatisticInfo = message.StatisticResult.ToStatisticInfo();
+
+            return Task.CompletedTask;
         }
         #endregion
 

@@ -65,6 +65,13 @@ namespace MedicalSharp.Controls.Commands
         public Action CutEnd { get; set; }
         #endregion
 
+        #region 统计结束委托 —— Action<StatisticResult> AnalyseEnd
+        /// <summary>
+        /// 统计结束委托
+        /// </summary>
+        public Action<StatisticResult> AnalyseEnd { get; set; }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -137,6 +144,12 @@ namespace MedicalSharp.Controls.Commands
                     Header = "外切(_O)",
                     Command = () => this.ApplyCut(viewport, CutMode.OutSide),
                     IsEnabled = this._selectedVisual is ICutVolume && this.GetMarkValue != null
+                });
+                items.Add(new ContextMenuItem
+                {
+                    Header = "统计(_S)",
+                    Command = () => this.ApplyAnalyse(viewport),
+                    IsEnabled = this._selectedVisual is IAnalyseVolume && this.GetMarkValue != null
                 });
             }
 
@@ -219,6 +232,33 @@ namespace MedicalSharp.Controls.Commands
                 viewport.RequestNextFrameRendering();
 
                 this.CutEnd?.Invoke();
+            }
+        }
+        #endregion
+
+        #region 适用统计 —— void ApplyAnalyse(OpenTKViewport viewport)
+        /// <summary>
+        /// 适用统计
+        /// </summary>
+        /// <param name="viewport">OpenTK视口</param>
+        private void ApplyAnalyse(OpenTKViewport viewport)
+        {
+            if (this._selectedVisual is IAnalyseVolume analyseVolume)
+            {
+                StatisticResult result = default;
+                if (viewport is VolumeViewport volumeViewport)
+                {
+                    result = analyseVolume.ApplyAnalyseVolume(volumeViewport.VolumeRenderable, -1);
+                }
+                if (viewport is MPRViewport mprViewport)
+                {
+                    result = analyseVolume.ApplyAnalyseVolume(mprViewport.VolumeRenderable, -1);
+                }
+
+                this.AnalyseEnd?.Invoke(result);
+
+                //请求下一帧
+                viewport.RequestNextFrameRendering();
             }
         }
         #endregion

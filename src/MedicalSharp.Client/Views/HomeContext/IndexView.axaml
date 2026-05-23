@@ -241,27 +241,6 @@
 					</sd:GroupBox>
 					<sd:GroupBox Grid.Row="1" Header="统计信息" Margin="0,2,0,0">
 						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,10">
-							<sd:FormItem Label="周长：">
-								<TextBlock Text="{Binding StatisticInfo.Length}" />
-							</sd:FormItem>
-							<sd:FormItem Label="表面积：">
-								<TextBlock Text="{Binding StatisticInfo.SurfaceArea }" />
-							</sd:FormItem>
-							<sd:FormItem Label="体积：">
-								<TextBlock Text="{Binding StatisticInfo.Volume}" />
-							</sd:FormItem>
-							<sd:FormItem Label="长径：">
-								<TextBlock Text="{Binding StatisticInfo.LongDiameter}" />
-							</sd:FormItem>
-							<sd:FormItem Label="短径：">
-								<TextBlock Text="{Binding StatisticInfo.ShortDiameter}" />
-							</sd:FormItem>
-							<sd:FormItem Label="最大直径：">
-								<TextBlock Text="{Binding StatisticInfo.MaxDiameter}" />
-							</sd:FormItem>
-							<sd:FormItem Label="球形度：">
-								<TextBlock Text="{Binding StatisticInfo.Sphericity}" />
-							</sd:FormItem>
 							<sd:FormItem Label="最小HU：">
 								<TextBlock Text="{Binding StatisticInfo.MinHU}" />
 							</sd:FormItem>
@@ -274,6 +253,15 @@
 							<sd:FormItem Label="标准差：">
 								<TextBlock Text="{Binding StatisticInfo.StdDevHU}" />
 							</sd:FormItem>
+                            <sd:FormItem Label="表面积：">
+                                <TextBlock Text="{Binding StatisticInfo.SurfaceArea }" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="体积：">
+                                <TextBlock Text="{Binding StatisticInfo.Volume}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="球形度：">
+                                <TextBlock Text="{Binding StatisticInfo.Sphericity}" />
+                            </sd:FormItem>
 							<sd:FormItem Label="体素数：">
 								<TextBlock Text="{Binding StatisticInfo.VoxelCount}" />
 							</sd:FormItem>

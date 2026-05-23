@@ -9,10 +9,11 @@ namespace MedicalSharp.Controls.Interfaces
     public interface IAnalyseVolume
     {
         /// <summary>
-        /// 统计体积
+        /// 适用统计体积
         /// </summary>
         /// <param name="renderable">体积渲染对象</param>
+        /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        StatisticResult AnalyseVolume(VolumeRenderable renderable);
+        StatisticResult ApplyAnalyseVolume(VolumeRenderable renderable, int markValue);
     }
 }
