@@ -949,6 +949,30 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }, _ => this.VolumeData != null);
         #endregion
 
+        #region 均值滤波命令 —— ICommand MeanBlurCommand
+        /// <summary>
+        /// 均值滤波命令
+        /// </summary>
+        public ICommand MeanBlurCommand => new AsyncRelayCommand(async _ =>
+        {
+            MeanBlurViewModel viewModel = ResolveMediator.Resolve<MeanBlurViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 中值滤波命令 —— ICommand MedianBlurCommand
+        /// <summary>
+        /// 中值滤波命令
+        /// </summary>
+        public ICommand MedianBlurCommand => new AsyncRelayCommand(async _ =>
+        {
+            MedianBlurViewModel viewModel = ResolveMediator.Resolve<MedianBlurViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
         #region 阈值分割命令 —— ICommand ThresholdSegmentCommand
         /// <summary>
         /// 阈值分割命令

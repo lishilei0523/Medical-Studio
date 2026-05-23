@@ -4,7 +4,7 @@
 /// <param name="input">输入图像</param>
 /// <param name="output">输出图像</param>
 /// <param name="kernelSize">核矩阵尺寸</param>
-__kernel void median_filter_3d(__read_only image3d_t input, __write_only image3d_t output, const int kernelSize)
+__kernel void median_blur_3d(__read_only image3d_t input, __write_only image3d_t output, const int kernelSize)
 {
 	int x = get_global_id(0);
 	int y = get_global_id(1);
@@ -32,37 +32,32 @@ __kernel void median_filter_3d(__read_only image3d_t input, __write_only image3d
 		return;
 	}
 
-	//读取邻域值到数组
-	int totalCount = kernelSize * kernelSize * kernelSize;
-	float values[125]; //最大支持5×5×5=125，更大核需要更大的数组
-
+	float values[27];
 	int index = 0;
-	for (int dz = -radius; dz <= radius; dz++)
+	for (int dz = -1; dz <= 1; dz++)
 	{
-		for (int dy = -radius; dy <= radius; dy++)
+		for (int dy = -1; dy <= 1; dy++)
 		{
-			for (int dx = -radius; dx <= radius; dx++)
+			for (int dx = -1; dx <= 1; dx++)
 			{
-				float4 value = read_imagef(input, (int4)(x + dx, y + dy, z + dz, 0));
-				values[index++] = value.x;
+				values[index++] = read_imagef(input, (int4)(x + dx, y + dy, z + dz, 0)).x;
 			}
 		}
 	}
 
-	//排序取中位数（冒泡排序，小数据量足够）
-	for (int i = 0; i < totalCount - 1; i++)
+	//冒泡排序27个数
+	for (int i = 0; i < 26; i++)
 	{
-		for (int j = i + 1; j < totalCount; j++)
+		for (int j = i + 1; j < 27; j++)
 		{
 			if (values[i] > values[j])
 			{
-				float tmp = values[i];
+				float temp = values[i];
 				values[i] = values[j];
-				values[j] = tmp;
+				values[j] = temp;
 			}
 		}
 	}
 
-	float median = values[totalCount / 2];
-	write_imagef(output, position, (float4)(median, 0, 0, 0));
+	write_imagef(output, position, (float4)(values[13], 0, 0, 0));
 }
