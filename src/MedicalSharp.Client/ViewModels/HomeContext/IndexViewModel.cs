@@ -7,6 +7,7 @@ using MedicalSharp.Client.ViewModels.AlgorithmContext;
 using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Presentation.Events;
@@ -584,6 +585,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 string filePath = files[0].TryGetLocalPath();
                 await Task.Run(() => this._dicomLoader.LoadNiiPreview(this.VolumeData, filePath));
+
+                //同步GPU端
+                VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, session.PreviewTexture);
+
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent();
+                await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
 
             this.Idle();
@@ -617,6 +626,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 string filePath = files[0].TryGetLocalPath();
                 await Task.Run(() => this._dicomLoader.LoadRawPreview(this.VolumeData, filePath));
+
+                //同步GPU端
+                VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, session.PreviewTexture);
+
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent();
+                await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
 
             this.Idle();
@@ -650,6 +667,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 string filePath = files[0].TryGetLocalPath();
                 await Task.Run(() => this._dicomLoader.LoadNiiMark(this.VolumeData, filePath));
+
+                //同步GPU端
+                VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                SyncAlgorithms.SyncMarkDataToGpu(this.VolumeData, session.MarkTexture);
+
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent();
+                await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
 
             this.Idle();
@@ -683,6 +708,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 string filePath = files[0].TryGetLocalPath();
                 await Task.Run(() => this._dicomLoader.LoadRawMark(this.VolumeData, filePath));
+
+                //同步GPU端
+                VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                SyncAlgorithms.SyncMarkDataToGpu(this.VolumeData, session.MarkTexture);
+
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent();
+                await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
 
             this.Idle();
