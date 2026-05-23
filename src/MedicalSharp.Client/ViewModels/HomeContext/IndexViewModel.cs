@@ -787,6 +787,26 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }, _ => this.VolumeData != null);
         #endregion
 
+        #region 布局22命令 —— ICommand Layout22Command
+        /// <summary>
+        /// 布局22命令
+        /// </summary>
+        public ICommand Layout22Command => new RelayCommand(_ =>
+        {
+            this.LayoutViewModel.SwitchToLayout22();
+        });
+        #endregion
+
+        #region 布局13命令 —— ICommand Layout13Command
+        /// <summary>
+        /// 布局13命令
+        /// </summary>
+        public ICommand Layout13Command => new RelayCommand(_ =>
+        {
+            this.LayoutViewModel.SwitchToLayout13();
+        });
+        #endregion
+
         #region 创建组织命令 —— ICommand AddTissueCommand
         /// <summary>
         /// 创建组织命令

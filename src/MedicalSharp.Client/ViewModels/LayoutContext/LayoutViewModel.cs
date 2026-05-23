@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Client.ViewModels.VolumeContext;
+using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
@@ -21,11 +22,20 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             this.MprAxialViewModel = mprAxialViewModel;
             this.MprCoronalViewModel = mprCoronalViewModel;
             this.MprSagittalViewModel = mprSagittalViewModel;
+            this.Layout = Layout4.Create2x2();
         }
 
         #endregion
 
         #region # 属性
+
+        #region 布局信息 —— Layout4 Layout
+        /// <summary>
+        /// 布局信息
+        /// </summary>
+        [DependencyProperty]
+        public Layout4 Layout { get; set; }
+        #endregion
 
         #region 体积渲染视图模型 —— VolumeViewModel VolumeViewModel
         /// <summary>
@@ -62,6 +72,26 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
         #endregion
 
         #region # 方法
+
+        #region 切换2×2布局 —— void SwitchToLayout22()
+        /// <summary>
+        /// 切换2×2布局
+        /// </summary>
+        public void SwitchToLayout22()
+        {
+            this.Layout = Layout4.Create2x2();
+        }
+        #endregion
+
+        #region 切换1×3布局 —— void SwitchToLayout13()
+        /// <summary>
+        /// 切换1×3布局
+        /// </summary>
+        public void SwitchToLayout13()
+        {
+            this.Layout = Layout4.Create1x3();
+        }
+        #endregion
 
         #region 设置体积数据 —— void SetVolumeData(VolumeData volumeData)
         /// <summary>
