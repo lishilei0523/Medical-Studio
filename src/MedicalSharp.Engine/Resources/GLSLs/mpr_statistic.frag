@@ -43,8 +43,7 @@ void main()
         snormValue = texture(u_OriginalTexture, texCoord).r;
     }
     
-    //归一化snorm到[0, 1]范围（用于存储）
-    //snorm范围 -1~1 -> 0~1
+    //归一化snorm范围[-1, 1] -> [0, 1]
     float normalized = (snormValue + 1.0) / 2.0;
     normalized = clamp(normalized, 0.0, 1.0);
     
