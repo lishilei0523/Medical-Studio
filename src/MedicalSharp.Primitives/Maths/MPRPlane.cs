@@ -530,35 +530,6 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 获取像素间距 —— Vector2 GetPixelSpacing(int viewportWidth, int viewportHeight)
-        /// <summary>
-        /// 获取像素间距
-        /// </summary>
-        /// <param name="viewportWidth">视口宽度</param>
-        /// <param name="viewportHeight">视口高度</param>
-        /// <returns>像素间距</returns>
-        /// <remarks>mm</remarks>
-        public Vector2 GetPixelSpacing(int viewportWidth, int viewportHeight)
-        {
-            //计算U轴方向的物理长度（mm）
-            float physicalLengthU = Math.Abs(this.UAxis.X) * this.VolumeMetadata.PhysicalSize.X +
-                                    Math.Abs(this.UAxis.Y) * this.VolumeMetadata.PhysicalSize.Y +
-                                    Math.Abs(this.UAxis.Z) * this.VolumeMetadata.PhysicalSize.Z;
-
-            //计算V轴方向的物理长度（mm）
-            float physicalLengthV = Math.Abs(this.VAxis.X) * this.VolumeMetadata.PhysicalSize.X +
-                                    Math.Abs(this.VAxis.Y) * this.VolumeMetadata.PhysicalSize.Y +
-                                    Math.Abs(this.VAxis.Z) * this.VolumeMetadata.PhysicalSize.Z;
-
-            //像素间距 = 物理长度 / 像素数
-            float pixelSpacingU = physicalLengthU / viewportWidth;
-            float pixelSpacingV = physicalLengthV / viewportHeight;
-            Vector2 pixelSpacing = new Vector2(pixelSpacingU, pixelSpacingV);
-
-            return pixelSpacing;
-        }
-        #endregion
-
         #region 获取模型矩阵 —— Matrix4 GetModelMatrix()
         /// <summary>
         /// 获取模型矩阵
