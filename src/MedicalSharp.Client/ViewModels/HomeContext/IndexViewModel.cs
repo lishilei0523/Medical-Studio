@@ -124,6 +124,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                     this.VolumeInfo = null;
                     this.PatientInfo = null;
                     this.StudyInfo = null;
+                    this.ScanInfo = null;
                 }
             }
         }

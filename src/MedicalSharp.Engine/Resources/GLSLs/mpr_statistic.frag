@@ -48,6 +48,6 @@ void main()
     float normalized = (snormValue + 1.0) / 2.0;
     normalized = clamp(normalized, 0.0, 1.0);
     
-    //输出：R=归一化HU，G=0，B=0，A=标记值/255
-    FragColor = vec4(normalized, 0.0, 0.0, float(markValue) / 255.0);
+    //输出：R=归一化HU，G=1，B=1，A=标记值/255
+    FragColor = vec4(normalized, 1, 1, float(markValue) / 255.0);
 }

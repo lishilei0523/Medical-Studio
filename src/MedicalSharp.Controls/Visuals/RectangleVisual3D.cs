@@ -373,6 +373,10 @@ namespace MedicalSharp.Controls.Visuals
             {
                 return default;
             }
+            if (viewport.MPRCamera == null)
+            {
+                return default;
+            }
             if (viewport.Plane == null)
             {
                 return default;
@@ -380,112 +384,29 @@ namespace MedicalSharp.Controls.Visuals
 
             #endregion
 
-            VolumeData volumeData = viewport.VolumeData;
-            int viewportWidth = viewport.ViewportSize.Width;
-            int viewportHeight = viewport.ViewportSize.Height;
-            float rescaleSlope = volumeData.Metadata.RescaleSlope;
-            float rescaleIntercept = volumeData.Metadata.RescaleIntercept;
-            byte[] pixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
-
-            //计算矩形在像素空间的范围
-            Vector3 rectLocalCenter = this.Center.ToVector3();
-            Vector3 rectWorldCenter = Vector3.TransformPosition(rectLocalCenter, this.Transform.Matrix);
             Vector3 uAxis = this.UAxis.ToVector3();
             Vector3 vAxis = this.VAxis.ToVector3();
+            Vector3 localCenter = this.Center.ToVector3();
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, this.Transform.Matrix);
+            Vector3 worldUAxis = Vector3.TransformNormal(uAxis, this.Transform.Matrix);
+            Vector3 worldVAxis = Vector3.TransformNormal(vAxis, this.Transform.Matrix);
 
-            Vector3 p1 = rectWorldCenter - uAxis * this.Width / 2 - vAxis * this.Height / 2;
-            Vector3 p2 = rectWorldCenter + uAxis * this.Width / 2 - vAxis * this.Height / 2;
-            Vector3 p3 = rectWorldCenter + uAxis * this.Width / 2 + vAxis * this.Height / 2;
-            Vector3 p4 = rectWorldCenter - uAxis * this.Width / 2 + vAxis * this.Height / 2;
+            //计算4个世界顶点
+            Vector3 worldPointA = worldCenter - worldUAxis * this.Width / 2 - worldVAxis * this.Height / 2;
+            Vector3 worldPointB = worldCenter + worldUAxis * this.Width / 2 - worldVAxis * this.Height / 2;
+            Vector3 worldPointC = worldCenter + worldUAxis * this.Width / 2 + worldVAxis * this.Height / 2;
+            Vector3 worldPointD = worldCenter - worldUAxis * this.Width / 2 + worldVAxis * this.Height / 2;
 
             //投影到屏幕坐标
-            Vector2 screenP1 = viewport.Project(p1);
-            Vector2 screenP2 = viewport.Project(p2);
-            Vector2 screenP3 = viewport.Project(p3);
-            Vector2 screenP4 = viewport.Project(p4);
+            Vector2 screenPointA = viewport.Project(worldPointA);
+            Vector2 screenPointB = viewport.Project(worldPointB);
+            Vector2 screenPointC = viewport.Project(worldPointC);
+            Vector2 screenPointD = viewport.Project(worldPointD);
 
-            Vector2[] screenCorners = [screenP1, screenP2, screenP3, screenP4];
-
-            // 统计变量
-            float minHu = float.MaxValue;
-            float maxHu = float.MinValue;
-            double huSum = 0;
-            double huSumSq = 0;
-            int voxelsCount = 0;
-            int boundaryCount = 0;
-
-            //遍历全部像素
-            for (int y = 0; y < viewportHeight; y++)
-            {
-                for (int x = 0; x < viewportWidth; x++)
-                {
-                    Vector2 pixelCenter = new Vector2(x + 0.5f, y + 0.5f);
-
-                    //精确判断像素是否在多边形内
-                    if (!IsPointInPolygon(pixelCenter, screenCorners))
-                    {
-                        continue;
-                    }
-
-                    //OpenGL像素数据Y轴翻转
-                    int flippedY = viewportHeight - 1 - y;
-                    int idx = (flippedY * viewportWidth + x) * 4;
-
-                    byte pixelValue = pixels[idx];
-                    byte currentMark = pixels[idx + 3];
-
-                    //跳过背景
-                    if (pixelValue == 0 && currentMark == 0)
-                    {
-                        continue;
-                    }
-
-                    //标记值过滤
-                    if (markValue.HasValue && currentMark != markValue.Value)
-                    {
-                        continue;
-                    }
-
-                    //还原HU值
-                    float normalized = pixelValue / 255.0f;
-                    float snormValue = normalized * 2.0f - 1.0f;
-                    float rawValue = snormValue * 32767.0f;
-                    float huValue = rawValue * rescaleSlope + rescaleIntercept;
-
-                    //累加统计
-                    voxelsCount++;
-                    huSum += huValue;
-                    huSumSq += huValue * huValue;
-
-                    if (huValue < minHu) minHu = huValue;
-                    if (huValue > maxHu) maxHu = huValue;
-
-                    //边界判断：像素在多边形的边上
-                    if (IsPointOnPolygonEdge(pixelCenter, screenCorners, 0.5f))
-                    {
-                        boundaryCount++;
-                    }
-                }
-            }
-
-            //计算统计指标
-            float averageHu = voxelsCount > 0 ? (float)(huSum / voxelsCount) : 0;
-            float variance = voxelsCount > 0 ? (float)((huSumSq / voxelsCount) - (averageHu * averageHu)) : 0;
-            float stdDevHu = variance > 0 ? MathF.Sqrt(variance) : 0;
-
-
-            // 构造结果
-            StatisticResult result = new StatisticResult
-            {
-                MinHU = minHu == float.MaxValue ? 0 : minHu,
-                MaxHU = maxHu == float.MinValue ? 0 : maxHu,
-                AverageHU = averageHu,
-                StdDevHU = stdDevHu,
-                BoundaryCount = boundaryCount,
-                VoxelsCount = voxelsCount,
-                Volume = 0,
-                Sphericity = 0
-            };
+            int viewportWidth = viewport.ViewportSize.Width;
+            int viewportHeight = viewport.ViewportSize.Height;
+            byte[] layerPixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
+            StatisticResult result = viewport.VolumeData.ApplyRectangleAnalyse(screenPointA, screenPointB, screenPointC, screenPointD, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, layerPixels, markValue);
 
             return result;
         }
@@ -528,61 +449,6 @@ namespace MedicalSharp.Controls.Visuals
             }
         }
         #endregion
-
-        /// <summary>
-        /// 判断点是否在多边形内（射线投射法）
-        /// </summary>
-        private static bool IsPointInPolygon(Vector2 point, Vector2[] polygon)
-        {
-            bool inside = false;
-            for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
-            {
-                Vector2 vi = polygon[i];
-                Vector2 vj = polygon[j];
-
-                bool intersect = ((vi.Y > point.Y) != (vj.Y > point.Y)) &&
-                                 (point.X < (vj.X - vi.X) * (point.Y - vi.Y) / (vj.Y - vi.Y) + vi.X);
-                if (intersect)
-                {
-                    inside = !inside;
-                }
-            }
-            return inside;
-        }
-
-        /// <summary>
-        /// 判断点是否在多边形边上（有容差）
-        /// </summary>
-        private static bool IsPointOnPolygonEdge(Vector2 point, Vector2[] polygon, float tolerance)
-        {
-            for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
-            {
-                if (IsPointOnSegment(point, polygon[i], polygon[j], tolerance))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 判断点是否在线段上
-        /// </summary>
-        private static bool IsPointOnSegment(Vector2 point, Vector2 a, Vector2 b, float tolerance)
-        {
-            // 叉积判断是否共线
-            float cross = (b.X - a.X) * (point.Y - a.Y) - (b.Y - a.Y) * (point.X - a.X);
-            if (Math.Abs(cross) > tolerance) return false;
-
-            // 点积判断是否在线段范围内
-            float dot = (point.X - a.X) * (b.X - a.X) + (point.Y - a.Y) * (b.Y - a.Y);
-            if (dot < 0) return false;
-
-            float squaredLength = (b.X - a.X) * (b.X - a.X) + (b.Y - a.Y) * (b.Y - a.Y);
-            if (dot > squaredLength) return false;
-
-            return true;
-        }
 
         #endregion
     }
