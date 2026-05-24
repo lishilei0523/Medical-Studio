@@ -3,7 +3,6 @@ using OpenTK.Mathematics;
 using SkiaSharp;
 using System;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace MedicalSharp.Engine.Algorithms
 {
@@ -125,7 +124,7 @@ namespace MedicalSharp.Engine.Algorithms
             result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
 
             //保存图像测试
-            Task.Run(() => SaveImage(viewportWidth, viewportHeight, layerPixels, screenCorners));
+            //Task.Run(() => SaveImage(viewportWidth, viewportHeight, layerPixels, screenCorners));
 
             return result;
         }
