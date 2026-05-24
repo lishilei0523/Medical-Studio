@@ -78,7 +78,7 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 获取CPU数据
         /// </summary>
-        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
+        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1表示无限等待</param>
         /// <returns>缓冲区数据</returns>
         /// <remarks>会在数据传输完成时返回</remarks>
         public byte[] GetCpuBuffer(long timeoutNanoseconds = -1)
@@ -95,7 +95,7 @@ namespace MedicalSharp.Engine.Resources
         /// 获取CPU数据
         /// </summary>
         /// <param name="data">数据指针</param>
-        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1 表示无限等待</param>
+        /// <param name="timeoutNanoseconds">超时时间（纳秒），-1表示无限等待</param>
         /// <remarks>会在数据传输完成时返回</remarks>
         public void GetCpuBuffer(IntPtr data, long timeoutNanoseconds = -1)
         {

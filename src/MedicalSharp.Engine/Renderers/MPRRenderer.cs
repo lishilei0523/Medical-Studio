@@ -457,10 +457,8 @@ namespace MedicalSharp.Engine.Renderers
             pixelBuffer.ReadFrameBuffer(this._statisticFrameBuffer);
             byte[] pixels = pixelBuffer.GetCpuBuffer();
 
-            //清理统计帧缓冲区
+            //解绑统计帧缓冲区
             this._statisticFrameBuffer.Unbind();
-            this._statisticFrameBuffer.Dispose();
-            this._statisticFrameBuffer = null;
 
             return pixels;
         }
@@ -477,6 +475,7 @@ namespace MedicalSharp.Engine.Renderers
                 return;
             }
 
+            this._statisticFrameBuffer?.Dispose();
             this._unitPlane.Dispose();
             this._disposed = true;
         }
@@ -495,7 +494,7 @@ namespace MedicalSharp.Engine.Renderers
         {
             if (this._statisticFrameBuffer == null)
             {
-                this._statisticFrameBuffer = FrameBuffer.CreateWithDepthBuffer(viewportWidth, viewportHeight);
+                this._statisticFrameBuffer = FrameBuffer.Create(viewportWidth, viewportHeight);
             }
             else
             {
@@ -505,7 +504,7 @@ namespace MedicalSharp.Engine.Renderers
                 }
 
                 this._statisticFrameBuffer.Dispose();
-                this._statisticFrameBuffer = FrameBuffer.CreateWithDepthBuffer(viewportWidth, viewportHeight);
+                this._statisticFrameBuffer = FrameBuffer.Create(viewportWidth, viewportHeight);
             }
         }
         #endregion

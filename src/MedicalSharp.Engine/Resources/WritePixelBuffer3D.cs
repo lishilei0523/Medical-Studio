@@ -269,7 +269,8 @@ namespace MedicalSharp.Engine.Resources
             texture.Bind();
             this.Bind();
 
-            GL.TexSubImage3D(TextureTarget.Texture3D, 0, 0, 0, sliceIndex, this.Width, this.Height, slicesCount, this.PixelFormat, this.PixelType, (IntPtr)(sliceIndex * this.BufferSize));
+            int offset = sliceIndex * this.Width * this.Height * this.BytesPerPixel;
+            GL.TexSubImage3D(TextureTarget.Texture3D, 0, 0, 0, sliceIndex, this.Width, this.Height, slicesCount, this.PixelFormat, this.PixelType, offset);
 
             if (useFence)
             {

@@ -411,8 +411,9 @@ namespace MedicalSharp.Engine.Renderers
             voxelX = Math.Clamp(voxelX, 0, this.Renderable.OriginalTexture.Width - 1);
             voxelY = Math.Clamp(voxelY, 0, this.Renderable.OriginalTexture.Height - 1);
             voxelZ = Math.Clamp(voxelZ, 0, this.Renderable.OriginalTexture.Depth - 1);
+            Vector3i voxelPosition = new Vector3i(voxelX, voxelY, voxelZ);
 
-            return new Vector3i(voxelX, voxelY, voxelZ);
+            return voxelPosition;
         }
         #endregion
 
@@ -532,6 +533,9 @@ namespace MedicalSharp.Engine.Renderers
 
             //取消使用
             pickProgram.Unuse();
+
+            //解绑拾取FBO
+            this._pickFrameBuffer.Unbind();
         }
         #endregion
 
