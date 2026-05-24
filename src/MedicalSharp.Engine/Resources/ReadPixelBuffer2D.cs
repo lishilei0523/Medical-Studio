@@ -55,7 +55,7 @@ namespace MedicalSharp.Engine.Resources
 
             this.Bind();
 
-            GL.ReadPixels(0, 0, this.Width, this.Height, this.PixelFormat, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.ReadPixels(0, 0, this.Width, this.Height, this.PixelFormat, this.PixelType, IntPtr.Zero);
 
             //确保PBO写入完成
             GL.MemoryBarrier(MemoryBarrierFlags.PixelBufferBarrierBit);

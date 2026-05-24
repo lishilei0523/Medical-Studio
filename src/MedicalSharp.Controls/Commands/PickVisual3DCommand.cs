@@ -245,7 +245,7 @@ namespace MedicalSharp.Controls.Commands
         {
             if (this._selectedVisual is IAnalyseVolume2D analyseVolume2D && viewport is MPRViewport mprViewport)
             {
-                StatisticResult result = analyseVolume2D.ApplyAnalyseVolume(mprViewport.VolumeRenderable, null);
+                StatisticResult result = analyseVolume2D.ApplyAnalyseVolume(mprViewport, null);
                 this.AnalyseEnd?.Invoke(result);
             }
             if (this._selectedVisual is IAnalyseVolume3D analyseVolume3D && viewport is VolumeViewport volumeViewport)

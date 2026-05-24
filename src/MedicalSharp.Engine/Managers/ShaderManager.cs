@@ -36,6 +36,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _MPRProgram;
 
         /// <summary>
+        /// MPR渲染统计着色器程序
+        /// </summary>
+        private static ShaderProgram _MPRStatisticProgram;
+
+        /// <summary>
         /// 同步锁
         /// </summary>
         private static readonly Lock _Sync;
@@ -93,6 +98,16 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - MPR渲染统计着色器程序 —— static ShaderProgram MPRStatisticProgram
+        /// <summary>
+        /// 只读属性 - MPR渲染统计着色器程序
+        /// </summary>
+        public static ShaderProgram MPRStatisticProgram
+        {
+            get => _MPRStatisticProgram;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -116,6 +131,7 @@ namespace MedicalSharp.Engine.Managers
                 _RaycastProgram = CreateRaycastProgram();
                 _RaycastPickProgram = CreateRaycastPickProgram();
                 _MPRProgram = CreateMPRProgram();
+                _MPRStatisticProgram = CreateMPRStatisticProgram();
                 _Initialized = true;
             }
         }
@@ -131,6 +147,7 @@ namespace MedicalSharp.Engine.Managers
             _RaycastProgram?.Dispose();
             _RaycastPickProgram?.Dispose();
             _MPRProgram?.Dispose();
+            _MPRStatisticProgram?.Dispose();
         }
         #endregion
 
@@ -191,6 +208,21 @@ namespace MedicalSharp.Engine.Managers
             ShaderProgram program = new ShaderProgram();
             program.ReadVertexShaderFromFile("Resources/GLSLs/mpr.vert");
             program.ReadFragmentShaderFromFile("Resources/GLSLs/mpr.frag");
+            program.BuildDraw();
+
+            return program;
+        }
+        #endregion 
+
+        #region 创建MPR渲染统计着色器程序 —— static ShaderProgram CreateMPRStatisticProgram()
+        /// <summary>
+        /// 创建MPR渲染统计着色器程序
+        /// </summary>
+        private static ShaderProgram CreateMPRStatisticProgram()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadVertexShaderFromFile("Resources/GLSLs/mpr.vert");
+            program.ReadFragmentShaderFromFile("Resources/GLSLs/mpr_statistic.frag");
             program.BuildDraw();
 
             return program;

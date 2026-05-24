@@ -27,6 +27,11 @@ namespace MedicalSharp.Engine.Renderers
         private MPRPlane _plane;
 
         /// <summary>
+        /// 统计帧缓冲区
+        /// </summary>
+        private FrameBuffer _statisticFrameBuffer;
+
+        /// <summary>
         /// 单位平面
         /// </summary>
         private readonly VertexBuffer _unitPlane;
@@ -137,6 +142,8 @@ namespace MedicalSharp.Engine.Renderers
         #endregion
 
         #region # 方法
+
+        //Public
 
         #region 切换预览模式 —— void SwitchPreviewMode(PreviewMode previewMode)
         /// <summary>
@@ -365,6 +372,100 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
+        #region 渲染统计帧 —— byte[] RenderStatistic(float viewportWidth, float viewportHeight...
+        /// <summary>
+        /// 渲染统计帧
+        /// </summary>
+        /// <param name="viewportWidth">视口宽度</param>
+        /// <param name="viewportHeight">视口高度</param>
+        /// <param name="glContext">OpenGL上下文句柄</param>
+        /// <returns>离屏帧数据</returns>
+        public byte[] RenderStatistic(float viewportWidth, float viewportHeight, IntPtr glContext)
+        {
+            #region # 验证
+
+            if (viewportWidth <= 0 || viewportHeight <= 0)
+            {
+                return [];
+            }
+            if (this.Plane == null)
+            {
+                throw new InvalidOperationException("MPR平面不可为空！");
+            }
+            if (this.Camera == null)
+            {
+                throw new InvalidOperationException("MPR相机不可为空！");
+            }
+            if (this.Renderable == null)
+            {
+                throw new InvalidOperationException("渲染对象不可为空！");
+            }
+
+            #endregion
+
+            //初始化绑定统计FBO
+            this.InitStatisticFrameBuffer((int)viewportWidth, (int)viewportHeight);
+            this._statisticFrameBuffer.Bind();
+            GL.Viewport(0, 0, (int)viewportWidth, (int)viewportHeight);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            //设置相机视口尺寸
+            this.Camera.SetViewportSize(viewportWidth, viewportHeight);
+
+            //横断位特殊处理
+            Matrix4 viewMatrix = this.Camera.ViewMatrix;
+            if (this.MPRCamera.TargetPlane.OriginalPlaneType == MPRPlaneType.Axial)
+            {
+                viewMatrix = Matrix4.CreateScale(-1, 1, 1) * viewMatrix;
+            }
+
+            //开启Shader程序
+            ShaderProgram statProgram = ShaderManager.MPRStatisticProgram;
+            statProgram.Use();
+
+            //设置MVP矩阵、相机位置、缩放
+            Matrix4 modelMatrix = this._plane.GetModelMatrix();
+            statProgram.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
+            statProgram.SetUniformMatrix4("u_ViewMatrix", viewMatrix);
+            statProgram.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
+            statProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
+
+            //设置预览模式
+            statProgram.SetUniformInt("u_PreviewMode", (int)this.PreviewMode);
+
+            //绑定纹理
+            this.Renderable.OriginalTexture.Bind(0);
+            this.Renderable.PreviewTexture.Bind(1);
+            this.Renderable.MarkTexture.Bind(2);
+            statProgram.SetUniformInt("u_OriginalTexture", 0);
+            statProgram.SetUniformInt("u_PreviewTexture", 1);
+            statProgram.SetUniformInt("u_MarkTexture", 2);
+
+            //绘制平面
+            this._unitPlane.Draw(glContext, PrimitiveType.Triangles);
+
+            //解绑纹理
+            this.Renderable.OriginalTexture.Unbind();
+            this.Renderable.PreviewTexture.Unbind();
+            this.Renderable.MarkTexture.Unbind();
+
+            //取消使用
+            statProgram.Unuse();
+
+            //读取统计帧缓冲区
+            using ReadPixelBuffer2D pixelBuffer = new ReadPixelBuffer2D((int)viewportWidth, (int)viewportHeight, PixelFormat.Rgba, PixelType.UnsignedByte);
+            pixelBuffer.ReadFrameBuffer(this._statisticFrameBuffer);
+            byte[] pixels = pixelBuffer.GetCpuBuffer();
+
+            //清理统计帧缓冲区
+            this._statisticFrameBuffer.Unbind();
+            this._statisticFrameBuffer.Dispose();
+            this._statisticFrameBuffer = null;
+
+            return pixels;
+        }
+        #endregion
+
         #region 释放资源 —— override void Dispose()
         /// <summary>
         /// 释放资源
@@ -378,6 +479,34 @@ namespace MedicalSharp.Engine.Renderers
 
             this._unitPlane.Dispose();
             this._disposed = true;
+        }
+        #endregion
+
+
+        //Private
+
+        #region 初始化统计帧缓冲区 —— void InitStatisticFrameBuffer(int viewportWidth...
+        /// <summary>
+        /// 初始化统计帧缓冲区
+        /// </summary>
+        /// <param name="viewportWidth">视口宽度</param>
+        /// <param name="viewportHeight">视口高度</param>
+        private void InitStatisticFrameBuffer(int viewportWidth, int viewportHeight)
+        {
+            if (this._statisticFrameBuffer == null)
+            {
+                this._statisticFrameBuffer = FrameBuffer.CreateWithDepthBuffer(viewportWidth, viewportHeight);
+            }
+            else
+            {
+                if (this._statisticFrameBuffer.Width == viewportWidth && this._statisticFrameBuffer.Height == viewportHeight)
+                {
+                    return;
+                }
+
+                this._statisticFrameBuffer.Dispose();
+                this._statisticFrameBuffer = FrameBuffer.CreateWithDepthBuffer(viewportWidth, viewportHeight);
+            }
         }
         #endregion
 

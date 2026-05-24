@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Engine.Renderables;
+﻿using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Primitives.Models;
 
 namespace MedicalSharp.Controls.Interfaces
@@ -11,9 +11,9 @@ namespace MedicalSharp.Controls.Interfaces
         /// <summary>
         /// 适用统计体积
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="viewport">MPR渲染视口</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        StatisticResult ApplyAnalyseVolume(VolumeRenderable renderable, byte? markValue);
+        StatisticResult ApplyAnalyseVolume(MPRViewport viewport, byte? markValue);
     }
 }
