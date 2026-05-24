@@ -149,7 +149,8 @@ namespace MedicalSharp.Controls.Commands
                 {
                     Header = "统计(_S)",
                     Command = () => this.ApplyAnalyse(viewport),
-                    IsEnabled = this._selectedVisual is IAnalyseVolume2D or IAnalyseVolume3D
+                    IsEnabled = (this._selectedVisual is IAnalyseVolume2D && viewport is MPRViewport) ||
+                                (this._selectedVisual is IAnalyseVolume3D && viewport is VolumeViewport)
                 });
             }
 
