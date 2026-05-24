@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Primitives.Models
@@ -10,6 +11,15 @@ namespace MedicalSharp.Primitives.Models
     public record struct StatisticResult
     {
         /// <summary>
+        /// 默认构造器
+        /// </summary>
+        public StatisticResult()
+        {
+            this.MinHU = float.MaxValue;
+            this.MaxHU = float.MinValue;
+        }
+
+        /// <summary>
         /// 最小HU
         /// </summary>
         public float MinHU;
@@ -18,6 +28,18 @@ namespace MedicalSharp.Primitives.Models
         /// 最大HU
         /// </summary>
         public float MaxHU;
+
+        /// <summary>
+        /// HU累加和
+        /// </summary>
+        /// <remarks>用于计算平均HU</remarks>
+        public float HuSum;
+
+        /// <summary>
+        /// HU平方和
+        /// </summary>
+        /// <remarks>用于计算标准差</remarks>
+        public float HuSumSq;
 
         /// <summary>
         /// 平均HU
@@ -30,14 +52,14 @@ namespace MedicalSharp.Primitives.Models
         public float StdDevHU;
 
         /// <summary>
-        /// 体素数
-        /// </summary>
-        public int VoxelsCount;
-
-        /// <summary>
         /// 边界体素数
         /// </summary>
         public int BoundaryCount;
+
+        /// <summary>
+        /// 体素数
+        /// </summary>
+        public int VoxelsCount;
 
         /// <summary>
         /// 表面积
@@ -56,6 +78,26 @@ namespace MedicalSharp.Primitives.Models
         /// </summary>
         /// <remarks>值域：0~1，越接近1越接近球体</remarks>
         public float Sphericity;
+
+        /// <summary>
+        /// 计算统计指标
+        /// </summary>
+        public void CalculateExpectations()
+        {
+            #region # 验证
+
+            if (this.VoxelsCount <= 0)
+            {
+                this.AverageHU = 0;
+                this.StdDevHU = 0;
+                return;
+            }
+
+            #endregion
+
+            this.AverageHU = this.HuSum / this.VoxelsCount;
+            this.StdDevHU = MathF.Sqrt((this.HuSumSq / this.VoxelsCount) - (this.AverageHU * this.AverageHU));
+        }
 
         /// <summary>
         /// 计算几何指标
@@ -82,6 +124,25 @@ namespace MedicalSharp.Primitives.Models
             {
                 this.Sphericity = 0;
             }
+        }
+
+        /// <summary>
+        /// 合并单位统计结果
+        /// </summary>
+        public static StatisticResult MergeResults(IReadOnlyCollection<StatisticResult> results)
+        {
+            StatisticResult mergedResult = new StatisticResult();
+            foreach (StatisticResult result in results)
+            {
+                mergedResult.MinHU = Math.Min(mergedResult.MinHU, result.MinHU);
+                mergedResult.MaxHU = Math.Max(mergedResult.MaxHU, result.MaxHU);
+                mergedResult.HuSum += result.HuSum;
+                mergedResult.HuSumSq += result.HuSumSq;
+                mergedResult.BoundaryCount += result.BoundaryCount;
+                mergedResult.VoxelsCount += result.VoxelsCount;
+            }
+
+            return mergedResult;
         }
     }
 }

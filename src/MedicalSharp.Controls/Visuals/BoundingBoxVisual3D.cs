@@ -12,13 +12,14 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
     /// 包围盒3D元素
     /// </summary>
-    public class BoundingBoxVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IResizable3D, ICutVolume, IAnalyseVolume
+    public class BoundingBoxVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IResizable3D, ICutVolume, IAnalyseVolume3D
     {
         #region # 字段及构造器
 
@@ -330,17 +331,19 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 适用统计体积 —— StatisticResult ApplyAnalyseVolume(VolumeRenderable renderable...
+        #region 适用统计体积 —— async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable...
         /// <summary>
         /// 适用统计体积
         /// </summary>
         /// <param name="renderable">体积渲染对象</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        public StatisticResult ApplyAnalyseVolume(VolumeRenderable renderable, int markValue)
+        public async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable, byte? markValue)
         {
+            Vector3 minimum = this.Minimum;
+            Vector3 maximum = this.Maximum;
             Matrix4 localToWorld = this.Transform.Matrix;
-            StatisticResult result = renderable.ApplyBoxAnalyse(this.Minimum, this.Maximum, localToWorld, markValue);
+            StatisticResult result = await Task.Run(() => renderable.VolumeData.ApplyBoxAnalyse(minimum, maximum, localToWorld, markValue));
 
             return result;
         }

@@ -1,5 +1,4 @@
-﻿using MedicalSharp.Engine.Renderables;
-using MedicalSharp.Primitives.Models;
+﻿using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Concurrent;
@@ -14,36 +13,30 @@ namespace MedicalSharp.Engine.Algorithms
     {
         //Public
 
-        #region # 适用立方体统计 —— static StatisticResultEx ApplyBoxAnalyse(this VolumeRenderable renderable...
+        #region # 适用立方体统计 —— static StatisticResultEx ApplyBoxAnalyse(this VolumeData volumeData...
         /// <summary>
         /// 适用立方体统计
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
         /// <param name="boxLocalMin">立方体局部最小点</param>
         /// <param name="boxLocalMax">立方体局部最大点</param>
         /// <param name="localToWorld">局部到世界变换矩阵</param>
-        /// <param name="markValue">标记值（-1=全部，0~255=指定标记值）</param>
+        /// <param name="markValue">标记值（null=全部，0~255=指定标记值）</param>
         /// <returns>统计结果</returns>
-        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeRenderable renderable, Vector3 boxLocalMin, Vector3 boxLocalMax, Matrix4 localToWorld, int markValue = -1)
+        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeData volumeData, Vector3 boxLocalMin, Vector3 boxLocalMax, Matrix4 localToWorld, byte? markValue)
         {
-            VolumeData volumeData = renderable.VolumeData;
             Vector3i volumeSize = volumeData.Metadata.VolumeSize;
             Vector3 volumeScale = volumeData.Metadata.VolumeScale;
             Matrix4 worldToLocal = localToWorld.Inverted();
             byte* markPtr = (byte*)volumeData.MarkData.ToPointer();
             short* volumePtr = (short*)volumeData.PreviewData.ToPointer();
 
-            //使用Partitioner自动分块
+            //使用Partitioner分块
             OrderablePartitioner<Tuple<long, long>> partitioner = Partitioner.Create(0, volumeData.Metadata.VoxelsCount);
-            ConcurrentBag<StatisticResultEx> localResults = [];
+            ConcurrentBag<StatisticResult> localResults = [];
             Parallel.ForEach(partitioner, range =>
             {
-                float localMinHU = float.MaxValue;
-                float localMaxHU = float.MinValue;
-                float localHuSum = 0;
-                float localHuSumSq = 0;
-                int localVoxelsCount = 0;
-                int localBoundaryCount = 0;
+                StatisticResult localResult = new StatisticResult();
                 for (long index = range.Item1; index < range.Item2; index++)
                 {
                     //将线性索引转换为3D坐标
@@ -59,51 +52,39 @@ namespace MedicalSharp.Engine.Algorithms
                     }
 
                     //标记值检查
-                    byte currentMark = markPtr[index];
-                    if (markValue != -1 && currentMark != markValue)
+                    if (markValue.HasValue && markPtr[index] != markValue.Value)
                     {
                         continue;
                     }
 
                     //统计
                     float huValue = volumePtr[index];
-                    localHuSum += huValue;
-                    localHuSumSq += huValue * huValue;
-                    localVoxelsCount++;
-                    if (huValue < localMinHU)
+                    if (huValue < localResult.MinHU)
                     {
-                        localMinHU = huValue;
+                        localResult.MinHU = huValue;
                     }
-                    if (huValue > localMaxHU)
+                    if (huValue > localResult.MaxHU)
                     {
-                        localMaxHU = huValue;
+                        localResult.MaxHU = huValue;
                     }
+                    localResult.HuSum += huValue;
+                    localResult.HuSumSq += huValue * huValue;
 
                     //边界判断
-                    if (IsBoundaryVoxel(voxelPosition, volumeSize, boxLocalMin, boxLocalMax, volumeScale, worldToLocal))
+                    if (BoxStatistics.IsBoundary(voxelPosition, volumeSize, boxLocalMin, boxLocalMax, volumeScale, worldToLocal))
                     {
-                        localBoundaryCount++;
+                        localResult.BoundaryCount++;
                     }
-                }
 
-                StatisticResultEx localResult = new StatisticResultEx
-                {
-                    MinHU = localMinHU,
-                    MaxHU = localMaxHU,
-                    HuSum = localHuSum,
-                    HuSumSq = localHuSumSq,
-                    BoundaryCount = localBoundaryCount,
-                    VoxelsCount = localVoxelsCount
-                };
+                    localResult.VoxelsCount++;
+                }
 
                 localResults.Add(localResult);
             });
 
             //合并结果
-            StatisticResultEx mergedResult = StatisticResultEx.MergeResults(localResults);
-
-            //计算最终结果
-            StatisticResult result = mergedResult.ToResult();
+            StatisticResult result = StatisticResult.MergeResults(localResults);
+            result.CalculateExpectations();
             result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
 
             return result;
@@ -131,31 +112,33 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断是否为边界体素 —— static bool IsBoundaryVoxel(in Vector3i voxelPosition, in Vector3i volumeSize...
+        #region # 判断体素是否为边界体素 —— static bool IsBoundary(in Vector3i voxelPosition, in Vector3i volumeSize...
         /// <summary>
-        /// 判断是否为边界体素
+        /// 判断体素是否为边界体素
         /// </summary>
-        private static bool IsBoundaryVoxel(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 boxMin, in Vector3 boxMax, in Vector3 volumeScale, in Matrix4 worldToLocal)
+        private static bool IsBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 boxMin, in Vector3 boxMax, in Vector3 volumeScale, in Matrix4 worldToLocal)
         {
-            //检查6个邻域
-            int[] dx = [1, -1, 0, 0, 0, 0];
-            int[] dy = [0, 0, 1, -1, 0, 0];
-            int[] dz = [0, 0, 0, 0, 1, -1];
-            for (int i = 0; i < 6; i++)
+            //定义6个方向的偏移量
+            int[] offsetX = [1, -1, 0, 0, 0, 0];  //右、左、无、无、无、无
+            int[] offsetY = [0, 0, 1, -1, 0, 0];  //无、无、前、后、无、无
+            int[] offsetZ = [0, 0, 0, 0, 1, -1];  //无、无、无、无、上、下
+            for (int index = 0; index < 6; index++)
             {
-                int nx = voxelPosition.X + dx[i];
-                int ny = voxelPosition.Y + dy[i];
-                int nz = voxelPosition.Z + dz[i];
+                int neighborX = voxelPosition.X + offsetX[index];
+                int neighborY = voxelPosition.Y + offsetY[index];
+                int neighborZ = voxelPosition.Z + offsetZ[index];
 
-                //超出体积边界
-                if (nx < 0 || nx >= volumeSize.X || ny < 0 || ny >= volumeSize.Y || nz < 0 || nz >= volumeSize.Z)
+                //邻居超出体积边界
+                if (neighborX < 0 || neighborX >= volumeSize.X ||
+                    neighborY < 0 || neighborY >= volumeSize.Y ||
+                    neighborZ < 0 || neighborZ >= volumeSize.Z)
                 {
                     return true;
                 }
 
                 //邻居不在立方体内
-                Vector3i nVoxelPosition = new Vector3i(nx, ny, nz);
-                if (!IsInBox(nVoxelPosition, boxMin, boxMax, volumeSize, volumeScale, worldToLocal))
+                Vector3i neighborPosition = new Vector3i(neighborX, neighborY, neighborZ);
+                if (!IsInBox(neighborPosition, boxMin, boxMax, volumeSize, volumeScale, worldToLocal))
                 {
                     return true;
                 }

@@ -149,7 +149,7 @@ namespace MedicalSharp.Controls.Commands
                 {
                     Header = "统计(_S)",
                     Command = () => this.ApplyAnalyse(viewport),
-                    IsEnabled = this._selectedVisual is IAnalyseVolume && this.GetMarkValue != null
+                    IsEnabled = this._selectedVisual is IAnalyseVolume2D or IAnalyseVolume3D
                 });
             }
 
@@ -241,24 +241,17 @@ namespace MedicalSharp.Controls.Commands
         /// 适用统计
         /// </summary>
         /// <param name="viewport">OpenTK视口</param>
-        private void ApplyAnalyse(OpenTKViewport viewport)
+        private async void ApplyAnalyse(OpenTKViewport viewport)
         {
-            if (this._selectedVisual is IAnalyseVolume analyseVolume)
+            if (this._selectedVisual is IAnalyseVolume2D analyseVolume2D && viewport is MPRViewport mprViewport)
             {
-                StatisticResult result = default;
-                if (viewport is VolumeViewport volumeViewport)
-                {
-                    result = analyseVolume.ApplyAnalyseVolume(volumeViewport.VolumeRenderable, -1);
-                }
-                if (viewport is MPRViewport mprViewport)
-                {
-                    result = analyseVolume.ApplyAnalyseVolume(mprViewport.VolumeRenderable, -1);
-                }
-
+                StatisticResult result = analyseVolume2D.ApplyAnalyseVolume(mprViewport.VolumeRenderable, null);
                 this.AnalyseEnd?.Invoke(result);
-
-                //请求下一帧
-                viewport.RequestNextFrameRendering();
+            }
+            if (this._selectedVisual is IAnalyseVolume3D analyseVolume3D && viewport is VolumeViewport volumeViewport)
+            {
+                StatisticResult result = await analyseVolume3D.ApplyAnalyseVolume(volumeViewport.VolumeRenderable, null);
+                this.AnalyseEnd?.Invoke(result);
             }
         }
         #endregion
