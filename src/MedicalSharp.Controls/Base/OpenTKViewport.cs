@@ -301,13 +301,13 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region 投影 —— Vector2 Project(Vector3 worldPos3D)
+        #region 投影 —— virtual Vector2 Project(Vector3 worldPos3D)
         /// <summary>
         /// 投影
         /// </summary>
         /// <param name="worldPos3D">世界3D位置</param>
         /// <returns>屏幕2D位置</returns>
-        public Vector2 Project(Vector3 worldPos3D)
+        public virtual Vector2 Project(Vector3 worldPos3D)
         {
             #region # 验证
 
