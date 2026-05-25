@@ -1,8 +1,20 @@
 ﻿/// <summary>
+/// 边缘 = 3071（骨骼及以上）
+/// </summary>
+/// <remarks>归一化到SNORM范围[-1, 1]：除以32767</remarks>
+__constant float canny_edge_value = 3071.0f / 32767.0f;
+
+/// <summary>
+/// 背景 = -1024（空气）
+/// </summary>
+/// <remarks>归一化到SNORM范围[-1, 1]：除以32767</remarks>
+__constant float canny_background_value = -1024.0f / 32767.0f;
+
+/// <summary>
 /// Canny边缘检测3D
 /// </summary>
 /// <param name="input">梯度强度图像</param>
-/// <param name="output">输出二值图像（边缘=1，背景=0）</param>
+/// <param name="output">输出二值图像（边缘=3071，背景=-1024）</param>
 /// <param name="lower">低阈值（弱边缘）</param>
 /// <param name="upper">高阈值（强边缘）</param>
 /// <param name="radius">膨胀半径（用于滞后跟踪，默认1）</param>
@@ -27,17 +39,17 @@ __kernel void canny_3D(__read_only image3d_t input, __write_only image3d_t outpu
 	int4 position = (int4)(x, y, z, 0);
 	float magnitude = read_imagef(input, position).x;
 
-	//强边缘：直接标记为 1
+	//强边缘：标记为边缘
 	if (magnitude >= upper)
 	{
-		write_imagef(output, position, (float4)(1.0f, 0, 0, 0));
+		write_imagef(output, position, (float4)(canny_edge_value, 0, 0, 0));
 		return;
 	}
 
-	//非边缘：直接标记为 0
+	//非边缘：标记为背景
 	if (magnitude < lower)
 	{
-		write_imagef(output, position, (float4)(0.0f, 0, 0, 0));
+		write_imagef(output, position, (float4)(canny_background_value, 0, 0, 0));
 
 		return;
 	}
@@ -60,7 +72,7 @@ __kernel void canny_3D(__read_only image3d_t input, __write_only image3d_t outpu
 				float neighborMagnitude = read_imagef(input, (int4)(nx, ny, nz, 0)).x;
 				if (neighborMagnitude >= upper)
 				{
-					write_imagef(output, position, (float4)(1.0f, 0, 0, 0));
+					write_imagef(output, position, (float4)(canny_edge_value, 0, 0, 0));
 
 					return;
 				}
@@ -69,5 +81,5 @@ __kernel void canny_3D(__read_only image3d_t input, __write_only image3d_t outpu
 	}
 
 	//没有连接到强边缘的弱边缘：丢弃
-	write_imagef(output, position, (float4)(0.0f, 0, 0, 0));
+	write_imagef(output, position, (float4)(canny_background_value, 0, 0, 0));
 }

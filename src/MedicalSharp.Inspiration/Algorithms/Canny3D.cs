@@ -8,8 +8,7 @@ namespace MedicalSharp.Inspiration.Algorithms
     /// 3D Canny边缘检测算法
     /// </summary>
     /// <remarks>
-    /// 使用形态学膨胀近似滞后跟踪，GPU友好
-    /// 对应 OpenCV 的 Cv2.Canny
+    /// 使用形态学膨胀近似滞后跟踪，GPU友好，对应OpenCV的Cv2.Canny
     /// 流程：高斯滤波 -> Sobel梯度 -> 双阈值 + 形态学滞后跟踪
     /// </remarks>
     public sealed class Canny3D : IDisposable
