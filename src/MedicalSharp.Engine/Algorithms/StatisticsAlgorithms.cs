@@ -44,7 +44,7 @@ namespace MedicalSharp.Engine.Algorithms
                     Vector3i voxelPosition = new Vector3i(x, y, z);
 
                     //判断体素是否在立方体内
-                    if (!GeometryAlgorithms.IsInBox(voxelPosition, boxLocalMin, boxLocalMax, volumeSize, volumeScale, worldToLocal))
+                    if (!GeometryAlgorithms.IsVoxelInBox(voxelPosition, volumeSize, volumeScale, boxLocalMin, boxLocalMax, worldToLocal))
                     {
                         continue;
                     }
@@ -69,7 +69,7 @@ namespace MedicalSharp.Engine.Algorithms
                     localResult.HuSumSq += huValue * huValue;
 
                     //边界判断
-                    if (GeometryAlgorithms.IsBoxBoundary(voxelPosition, volumeSize, boxLocalMin, boxLocalMax, volumeScale, worldToLocal))
+                    if (GeometryAlgorithms.IsVoxelOnBoxBoundary(voxelPosition, volumeSize, volumeScale, boxLocalMin, boxLocalMax, worldToLocal))
                     {
                         localResult.BoundaryCount++;
                     }

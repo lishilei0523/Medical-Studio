@@ -20,72 +20,84 @@ namespace MedicalSharp.Engine.Algorithms
         /// <remarks>用于调试</remarks>
         public static unsafe void SaveImage(int viewportWidth, int viewportHeight, byte[] layerPixels, Vector2[] screenCorners)
         {
-            using SKBitmap bitmap = new SKBitmap(viewportWidth, viewportHeight, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+            //翻转生成SK图像
+            using SKBitmap bitmap = new SKBitmap(viewportWidth, viewportHeight, SKColorType.Rgba8888, SKAlphaType.Unpremul);
             byte* targetPtr = (byte*)bitmap.GetPixels().ToPointer();
             fixed (byte* sourcePtr = layerPixels)
             {
                 int stride = viewportWidth * 4;
                 for (int y = 0; y < viewportHeight; y++)
                 {
-                    int srcY = viewportHeight - 1 - y;  //翻转Y轴
-                    byte* srcRow = sourcePtr + srcY * stride;
-                    byte* dstRow = targetPtr + y * stride;
+                    int sourceY = viewportHeight - 1 - y;  //翻转Y轴
+                    byte* sourceRow = sourcePtr + sourceY * stride;
+                    byte* targetRow = targetPtr + y * stride;
 
-                    //复制整行（RGB -> RGBA，顺序相同）
-                    Buffer.MemoryCopy(srcRow, dstRow, stride, stride);
+                    //复制整行（RGBA -> RGBA，顺序相同）
+                    Buffer.MemoryCopy(sourceRow, targetRow, stride, stride);
                 }
             }
 
-            using SKCanvas canvas = new SKCanvas(bitmap);
-            SKPaint fill = new SKPaint
-            {
-                Color = SKColors.White,
-                IsAntialias = true,
-                Style = SKPaintStyle.Fill
-            };
-            SKPaint stroke = new SKPaint
-            {
-                Color = SKColors.Black,
-                StrokeWidth = 1,
-                IsAntialias = true,
-                Style = SKPaintStyle.Stroke
-            };
-
-            // 绘制矩形
+            //定义矩形
             int minX = (int)Math.Min(Math.Min(screenCorners[0].X, screenCorners[1].X), Math.Min(screenCorners[2].X, screenCorners[3].X));
             int maxX = (int)Math.Max(Math.Max(screenCorners[0].X, screenCorners[1].X), Math.Max(screenCorners[2].X, screenCorners[3].X));
             int minY = (int)Math.Min(Math.Min(screenCorners[0].Y, screenCorners[1].Y), Math.Min(screenCorners[2].Y, screenCorners[3].Y));
             int maxY = (int)Math.Max(Math.Max(screenCorners[0].Y, screenCorners[1].Y), Math.Max(screenCorners[2].Y, screenCorners[3].Y));
-            SKRect rect = SKRect.Create(minX, minY, maxX - minX, maxY - minY);
-            canvas.DrawRect(rect, fill);      //填充
-            canvas.DrawRect(rect, stroke);    //边框
+            SKRect reactangle = SKRect.Create(minX, minY, maxX - minX, maxY - minY);
 
+            //绘制矩形
+            using SKCanvas canvas = new SKCanvas(bitmap);
+            using SKPaint fill = new SKPaint();
+            using SKPaint stroke = new SKPaint();
+            fill.Style = SKPaintStyle.Fill;
+            fill.Color = SKColors.White;
+            fill.IsAntialias = true;
+            stroke.Style = SKPaintStyle.Stroke;
+            stroke.Color = SKColors.Black;
+            stroke.StrokeWidth = 1;
+            stroke.IsAntialias = true;
+            canvas.DrawRect(reactangle, fill);
+            canvas.DrawRect(reactangle, stroke);
+
+            //保存文件
             using FileStream stream = File.OpenWrite("MPR.png");
             bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
         }
         #endregion
 
-        #region # 线性插值 —— static Vector3 Lerp(Vector3 a, Vector3 b, float t)
+        #region # 线性插值 —— static Vector3 Lerp(Vector3 start, Vector3 end, float t)
         /// <summary>
         /// 线性插值
         /// </summary>
-        public static Vector3 Lerp(Vector3 a, Vector3 b, float t)
+        /// <param name="start">起始点</param>
+        /// <param name="end">结束点</param>
+        /// <param name="t">插值系数（0~1）</param>
+        /// <returns>插值点</returns>
+        public static Vector3 Lerp(Vector3 start, Vector3 end, float t)
         {
-            return new Vector3(a.X + (b.X - a.X) * t, a.Y + (b.Y - a.Y) * t, a.Z + (b.Z - a.Z) * t);
+            Vector3 point = new Vector3(
+                start.X + (end.X - start.X) * t,
+                start.Y + (end.Y - start.Y) * t,
+                start.Z + (end.Z - start.Z) * t);
+
+            return point;
         }
         #endregion
 
-        #region # 判断包含 —— static bool ContainsPoint(IReadOnlyList<Vector3> points...
+        #region # 判断点是否在顶点列表中 —— static bool ContainsPoint(IReadOnlyList<Vector3> vertices...
         /// <summary>
-        /// 判断包含
+        /// 判断点是否在顶点列表中
         /// </summary>
-        public static bool ContainsPoint(IReadOnlyList<Vector3> points, Vector3 point, float epsilon)
+        /// <param name="vertices">顶点列表</param>
+        /// <param name="point">待判断的点</param>
+        /// <param name="epsilon">容差</param>
+        /// <returns>是否在列表中</returns>
+        public static bool ContainsPoint(IReadOnlyList<Vector3> vertices, Vector3 point, float epsilon)
         {
-            foreach (Vector3 position in points)
+            foreach (Vector3 vertex in vertices)
             {
-                float dx = position.X - point.X;
-                float dy = position.Y - point.Y;
-                float dz = position.Z - point.Z;
+                float dx = vertex.X - point.X;
+                float dy = vertex.Y - point.Y;
+                float dz = vertex.Z - point.Z;
                 if (dx * dx + dy * dy + dz * dz < epsilon * epsilon)
                 {
                     return true;
@@ -100,6 +112,10 @@ namespace MedicalSharp.Engine.Algorithms
         /// <summary>
         /// 逆时针排序
         /// </summary>
+        /// <param name="points">待排序的点集（应在同一平面上）</param>
+        /// <param name="planeNormal">平面法向量</param>
+        /// <returns>逆时针排序后的点集</returns>
+        /// <remarks>将平面上的点按逆时针方向排序</remarks>
         public static IReadOnlyList<Vector3> SortPointsCounterClockwise(IReadOnlyList<Vector3> points, Vector3 planeNormal)
         {
             #region # 验证
@@ -157,7 +173,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// 计算凸包真实棱边
         /// </summary>
         /// <param name="hullPositions">凸包位置列表</param>
-        /// <returns>去重后的边列表（顶点索引对）</returns>
+        /// <returns>去重后的棱边列表（顶点索引对）</returns>
         public static HashSet<(int, int)> ComputeConvexHullEdges(IReadOnlyList<Vector3> hullPositions)
         {
             try
@@ -197,7 +213,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// 全连接枚举边
         /// </summary>
         /// <param name="count">顶点数</param>
-        /// <returns>所有点对</returns>
+        /// <returns>所有可能的边列表（点对）</returns>
         public static HashSet<(int, int)> EnumerateAllEdges(int count)
         {
             HashSet<(int, int)> edges = [];
@@ -216,13 +232,20 @@ namespace MedicalSharp.Engine.Algorithms
         /// <summary>
         /// 剔除内部点
         /// </summary>
-        /// <remarks>如果某点落在其他两点的连线上（共线），则它是内部点，丢弃</remarks>
+        /// <param name="points">点集（应按顺序排列）</param>
+        /// <param name="epsilon">容差</param>
+        /// <returns>剔除共线点后的点集</returns>
+        /// <remarks>保留端点，如果某点落在其他两点的连线上（共线），则它是内部点，丢弃</remarks>
         public static List<Vector3> RemoveInteriorPoints(List<Vector3> points, float epsilon)
         {
+            #region # 验证
+
             if (points.Count <= 3)
             {
                 return points;
             }
+
+            #endregion
 
             bool[] isInterior = new bool[points.Count];
             for (int i = 0; i < points.Count; i++)
@@ -263,27 +286,35 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断点是否在线段上 —— static bool IsPointOnSegment(Vector2 point, Vector2 start...
+        #region # 判断点是否在线段上(2D) —— static bool IsPointOnSegment(Vector2 point, Vector2 start...
         /// <summary>
-        /// 判断点是否在线段上
+        /// 判断点是否在线段上(2D)
         /// </summary>
+        /// <param name="point">待判断的点</param>
+        /// <param name="start">线段起点</param>
+        /// <param name="end">线段终点</param>
+        /// <param name="epsilon">容差</param>
+        /// <returns>是否在线段上</returns>
         public static bool IsPointOnSegment(Vector2 point, Vector2 start, Vector2 end, float epsilon)
         {
             //叉积判断是否共线
-            float cross = (end.X - start.X) * (point.Y - start.Y) - (end.Y - start.Y) * (point.X - start.X);
+            float cross = (end.X - start.X) * (point.Y - start.Y) -
+                          (end.Y - start.Y) * (point.X - start.X);
             if (Math.Abs(cross) > epsilon)
             {
                 return false;
             }
 
             //点积判断是否在线段范围内
-            float dot = (point.X - start.X) * (end.X - start.X) + (point.Y - start.Y) * (end.Y - start.Y);
+            float dot = (point.X - start.X) * (end.X - start.X) +
+                        (point.Y - start.Y) * (end.Y - start.Y);
             if (dot < 0)
             {
                 return false;
             }
 
-            float squaredLength = (end.X - start.X) * (end.X - start.X) + (end.Y - start.Y) * (end.Y - start.Y);
+            float squaredLength = (end.X - start.X) * (end.X - start.X) +
+                                  (end.Y - start.Y) * (end.Y - start.Y);
             if (dot > squaredLength)
             {
                 return false;
@@ -293,10 +324,15 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断点是否在线段上 —— static bool IsPointOnSegment(Vector3 point, Vector3 start...
+        #region # 判断点是否在线段上(3D) —— static bool IsPointOnSegment(Vector3 point, Vector3 start...
         /// <summary>
-        /// 判断是否在线段上
+        /// 判断是否在线段上(3D)
         /// </summary>
+        /// <param name="point">待判断的点</param>
+        /// <param name="start">线段起点</param>
+        /// <param name="end">线段终点</param>
+        /// <param name="epsilon">容差</param>
+        /// <returns>是否在线段上</returns>
         public static bool IsPointOnSegment(Vector3 point, Vector3 start, Vector3 end, float epsilon)
         {
             Vector3 ab = end - start;
@@ -305,7 +341,7 @@ namespace MedicalSharp.Engine.Algorithms
             float abLengthSq = ab.LengthSquared;
             if (abLengthSq < epsilon * epsilon)
             {
-                return false;  //a和b重合
+                return false;  //起点和终点重合
             }
 
             //投影参数 t = (ap·ab) / |ab|²
@@ -332,6 +368,9 @@ namespace MedicalSharp.Engine.Algorithms
         /// <summary>
         /// 判断点是否在多边形内
         /// </summary>
+        /// <param name="point">待判断的点</param>
+        /// <param name="polygon">多边形顶点（按顺序排列）</param>
+        /// <returns>是否在多边形内</returns>
         /// <remarks>射线投射法</remarks>
         public static bool IsPointInPolygon(Vector2 point, Vector2[] polygon)
         {
@@ -352,11 +391,14 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断点是否在多边形边上 —— static bool IsPointOnPolygonEdge(Vector2 point...
+        #region # 判断点是否在多边形边界 —— static bool IsPointOnPolygonEdge(Vector2 point...
         /// <summary>
-        /// 判断点是否在多边形边上
+        /// 判断点是否在多边形边界
         /// </summary>
-        /// <remarks>有容差</remarks>
+        /// <param name="point">待判断的点</param>
+        /// <param name="polygon">多边形顶点（按顺序排列）</param>
+        /// <param name="tolerance">容差</param>
+        /// <returns>是否在多边形边界</returns>
         public static bool IsPointOnPolygonEdge(Vector2 point, Vector2[] polygon, float tolerance)
         {
             for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
@@ -371,13 +413,20 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断体素是否在立方体内 —— static bool IsInBox(in Vector3i voxelPosition, in Vector3 boxMin...
+        #region # 判断体素是否在立方体内 —— static bool IsVoxelInBox(in Vector3i voxelPosition, in Vector3 boxMin...
         /// <summary>
         /// 判断体素是否在立方体内
         /// </summary>
-        public static bool IsInBox(in Vector3i voxelPosition, in Vector3 boxMin, in Vector3 boxMax, in Vector3i volumeSize, in Vector3 volumeScale, in Matrix4 worldToLocal)
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="volumeSize">体积尺寸</param>
+        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="boxMin">立方体最小点（局部空间）</param>
+        /// <param name="boxMax">立方体最大点（局部空间）</param>
+        /// <param name="worldToLocal">世界到局部变换矩阵</param>
+        /// <returns>是否在立方体内</returns>
+        public static bool IsVoxelInBox(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxMin, in Vector3 boxMax, in Matrix4 worldToLocal)
         {
-            //体素坐标 -> 世界坐标 -> 局部坐标
+            //体素坐标 -> 纹理坐标 -> 世界坐标 -> 局部坐标
             Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
             Vector3 worldPos = (texCoord - new Vector3(0.5f)) * volumeScale;
             Vector3 localPos = Vector3.TransformPosition(worldPos, worldToLocal);
@@ -389,11 +438,19 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断体素是否是立方体边界体素 —— static bool IsBoxBoundary(in Vector3i voxelPosition, in Vector3i volumeSize...
+        #region # 判断体素是否在立方体边界 —— static bool IsVoxelOnBoxBoundary(in Vector3i voxelPosition...
         /// <summary>
-        /// 判断体素是否是立方体边界体素
+        /// 判断体素是否在立方体边界
         /// </summary>
-        public static bool IsBoxBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 boxMin, in Vector3 boxMax, in Vector3 volumeScale, in Matrix4 worldToLocal)
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="volumeSize">体积尺寸</param>
+        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="boxMin">立方体最小点（局部空间）</param>
+        /// <param name="boxMax">立方体最大点（局部空间）</param>
+        /// <param name="worldToLocal">世界到局部变换矩阵</param>
+        /// <returns>是否在立方体边界</returns>
+        /// <remarks>6个面</remarks>
+        public static bool IsVoxelOnBoxBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxMin, in Vector3 boxMax, in Matrix4 worldToLocal)
         {
             //定义6个方向的偏移量
             int[] offsetX = [1, -1, 0, 0, 0, 0];  //右、左、无、无、无、无
@@ -405,7 +462,7 @@ namespace MedicalSharp.Engine.Algorithms
                 int neighborY = voxelPosition.Y + offsetY[index];
                 int neighborZ = voxelPosition.Z + offsetZ[index];
 
-                //邻居超出体积边界
+                //邻居超出体积边界 -> 当前体素是边界
                 if (neighborX < 0 || neighborX >= volumeSize.X ||
                     neighborY < 0 || neighborY >= volumeSize.Y ||
                     neighborZ < 0 || neighborZ >= volumeSize.Z)
@@ -413,9 +470,9 @@ namespace MedicalSharp.Engine.Algorithms
                     return true;
                 }
 
-                //邻居不在立方体内
+                //邻居不在立方体内 -> 当前体素是边界
                 Vector3i neighborPosition = new Vector3i(neighborX, neighborY, neighborZ);
-                if (!IsInBox(neighborPosition, boxMin, boxMax, volumeSize, volumeScale, worldToLocal))
+                if (!IsVoxelInBox(neighborPosition, volumeSize, volumeScale, boxMin, boxMax, worldToLocal))
                 {
                     return true;
                 }
