@@ -565,7 +565,7 @@ namespace MedicalSharp.Primitives.Maths
         /// 计算切片偏移量
         /// </summary>
         /// <returns>切片偏移量</returns>
-        public float CalculateSliceOffset()
+        private float CalculateSliceOffset()
         {
             #region # 验证
 
