@@ -8,14 +8,14 @@ namespace MedicalSharp.Insight.Algorithms
     /// <summary>
     /// Canny边缘检测算法
     /// </summary>
-    public class Canny3D
+    public sealed class Canny3D
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 体积数据
         /// </summary>
-        private readonly VolumeData _volumeData;
+        private readonly SitkVolumeData _volumeData;
 
         /// <summary>
         /// 创建Canny边缘检测算法构造器
@@ -29,14 +29,14 @@ namespace MedicalSharp.Insight.Algorithms
             {
                 throw new ArgumentNullException(nameof(volumeData), "体积数据不可为空！");
             }
-            if (volumeData is not SitkVolumeData)
+            if (volumeData is not SitkVolumeData sitkVolumeData)
             {
                 throw new ArgumentNullException(nameof(volumeData), "volumeData必须是SitkVolumeData！");
             }
 
             #endregion
 
-            this._volumeData = volumeData;
+            this._volumeData = sitkVolumeData;
         }
 
         #endregion
@@ -49,13 +49,7 @@ namespace MedicalSharp.Insight.Algorithms
         /// </summary>
         public Image SitkImage
         {
-            get
-            {
-                SitkVolumeData volumeData = (SitkVolumeData)this._volumeData;
-                Image sitkImage = volumeData.SitkPreviewImage;
-
-                return sitkImage;
-            }
+            get => this._volumeData.SitkPreviewImage;
         }
         #endregion
 
