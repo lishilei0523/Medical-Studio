@@ -3,8 +3,8 @@ using Avalonia.Collections;
 using Avalonia.Media;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Primitives.Maths;
-using MIConvexHull;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -17,8 +17,6 @@ namespace MedicalSharp.Controls.Extensions
     /// </summary>
     public static class MathExtension
     {
-        //Public
-
         #region # Vector3D转Vector3 —— static Vector3 ToVector3(this Vector3D vector3D)
         /// <summary>
         /// Vector3D转Vector3
@@ -96,26 +94,6 @@ namespace MedicalSharp.Controls.Extensions
         public static Vector2 ToVector2(this PixelSize pixelSize)
         {
             return new Vector2(pixelSize.Width, pixelSize.Height);
-        }
-        #endregion
-
-        #region # System.Numerics三维向量转GLM三维向量 —— static Vector3 ToGlmVector3(this in Vector3 vector3)
-        /// <summary>
-        /// System.Numerics三维向量转GLM三维向量
-        /// </summary>
-        public static Vector3 ToGlmVector3(this in System.Numerics.Vector3 vector3)
-        {
-            return new Vector3(vector3.X, vector3.Y, vector3.Z);
-        }
-        #endregion
-
-        #region # GLM三维向量转System.Numerics三维向量 —— Vector3 ToSystemVector3(this in Vector3 vector3)
-        /// <summary>
-        /// GLM三维向量转System.Numerics三维向量
-        /// </summary>
-        public static System.Numerics.Vector3 ToSystemVector3(this in Vector3 vector3)
-        {
-            return new System.Numerics.Vector3(vector3.X, vector3.Y, vector3.Z);
         }
         #endregion
 
@@ -212,8 +190,8 @@ namespace MedicalSharp.Controls.Extensions
 
             //提取凸包的真实棱边
             HashSet<(int, int)> edges = hullPositions.Count <= 8
-                ? EnumerateAllEdges(hullPositions.Count)
-                : ComputeConvexHullEdges(hullPositions);
+                ? GeometryAlgorithms.EnumerateAllEdges(hullPositions.Count)
+                : GeometryAlgorithms.ComputeConvexHullEdges(hullPositions);
 
             List<Vector3> intersections = [];
             Vector3 planeNormal = plane.WorldNormal.Normalized();
@@ -247,17 +225,17 @@ namespace MedicalSharp.Controls.Extensions
 
                 //插值求交点
                 float t = distance1 / (distance1 - distance2);
-                Vector3 intersection = Lerp(hullPositions[i], hullPositions[j], t);
+                Vector3 intersection = GeometryAlgorithms.Lerp(hullPositions[i], hullPositions[j], t);
 
                 //去重
-                if (!ContainsPoint(intersections, intersection, epsilon))
+                if (!GeometryAlgorithms.ContainsPoint(intersections, intersection, epsilon))
                 {
                     intersections.Add(intersection);
                 }
             }
 
             //剔除共线内部点
-            intersections = RemoveInteriorPoints(intersections, 1e-4f);
+            intersections = GeometryAlgorithms.RemoveInteriorPoints(intersections, 1e-4f);
 
             #region # 验证
 
@@ -269,7 +247,7 @@ namespace MedicalSharp.Controls.Extensions
             #endregion
 
             //按逆时针排序
-            IReadOnlyList<Vector3> positions = SortPointsCounterClockwise(intersections, planeNormal);
+            IReadOnlyList<Vector3> positions = GeometryAlgorithms.SortPointsCounterClockwise(intersections, planeNormal);
 
             return positions.Select(x => x.ToVector3()).ToList();
         }
@@ -313,241 +291,6 @@ namespace MedicalSharp.Controls.Extensions
             };
 
             return polyline;
-        }
-        #endregion
-
-
-        //Private
-
-        #region # 线性插值 —— static Vector3 Lerp(Vector3 a, Vector3 b, float t)
-        /// <summary>
-        /// 线性插值
-        /// </summary>
-        private static Vector3 Lerp(Vector3 a, Vector3 b, float t)
-        {
-            return new Vector3(a.X + (b.X - a.X) * t, a.Y + (b.Y - a.Y) * t, a.Z + (b.Z - a.Z) * t);
-        }
-        #endregion
-
-        #region # 判断包含 —— static bool ContainsPoint(IReadOnlyList<Vector3> points...
-        /// <summary>
-        /// 判断包含
-        /// </summary>
-        private static bool ContainsPoint(IReadOnlyList<Vector3> points, Vector3 point, float epsilon)
-        {
-            foreach (Vector3 position in points)
-            {
-                float dx = position.X - point.X;
-                float dy = position.Y - point.Y;
-                float dz = position.Z - point.Z;
-                if (dx * dx + dy * dy + dz * dz < epsilon * epsilon)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        #endregion
-
-        #region # 逆时针排序 —— static IReadOnlyList<Vector3> SortPointsCounterClockwise(...
-        /// <summary>
-        /// 逆时针排序
-        /// </summary>
-        private static IReadOnlyList<Vector3> SortPointsCounterClockwise(IReadOnlyList<Vector3> points, Vector3 planeNormal)
-        {
-            #region # 验证
-
-            if (points.Count <= 1)
-            {
-                return points;
-            }
-
-            #endregion
-
-            //计算中心点
-            Vector3 center = Vector3.Zero;
-            foreach (Vector3 point in points)
-            {
-                center = new Vector3(center.X + point.X, center.Y + point.Y, center.Z + point.Z);
-            }
-            center = new Vector3(center.X, center.Y, center.Z) / points.Count;
-
-            //选择与法线不平行的向量作为参考
-            Vector3 reference = Math.Abs(planeNormal.X) < 0.9 ? new Vector3(1, 0, 0) : new Vector3(0, 1, 0);
-
-            //构建平面局部坐标系（两个正交轴）
-            //u = normalize(reference × planeNormal)
-            Vector3 u = Vector3.Cross(reference, planeNormal);
-            float uLength = MathF.Sqrt(u.X * u.X + u.Y * u.Y + u.Z * u.Z);
-            Vector3 uAxis = new Vector3(u.X / uLength, u.Y / uLength, u.Z / uLength);
-
-            //v = normalize(planeNormal × u)
-            Vector3 v = Vector3.Cross(planeNormal, u);
-            float vLength = MathF.Sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);
-            Vector3 vAxis = new Vector3(v.X / vLength, v.Y / vLength, v.Z / vLength);
-
-            //投影到局部2D坐标系并计算角度
-            List<(Vector3 point, double angle)> angledPoints = [];
-            foreach (Vector3 p in points)
-            {
-                Vector3 relative = new Vector3(p.X - center.X, p.Y - center.Y, p.Z - center.Z);
-                float uCoord = Vector3.Dot(relative, uAxis);
-                float vCoord = Vector3.Dot(relative, vAxis);
-                float angle = MathF.Atan2(vCoord, uCoord); //返回[-π, π]
-                angledPoints.Add((p, angle));
-            }
-
-            //按角度排序（逆时针）
-            angledPoints.Sort((a, b) => a.angle.CompareTo(b.angle));
-            List<Vector3> sortedPoints = angledPoints.Select(p => p.point).ToList();
-
-            return sortedPoints;
-        }
-        #endregion
-
-        #region # 计算凸包真实棱边 —— static HashSet<(int, int)> ComputeConvexHullEdges(...
-        /// <summary>
-        /// 计算凸包真实棱边
-        /// </summary>
-        /// <param name="hullPositions">凸包位置列表</param>
-        /// <returns>去重后的边列表（顶点索引对）</returns>
-        private static HashSet<(int, int)> ComputeConvexHullEdges(IReadOnlyList<Vector3> hullPositions)
-        {
-            try
-            {
-                //转成MIConvexHull的输入格式
-                DefaultVertex[] vertices = hullPositions.Select(position => new DefaultVertex
-                {
-                    Position = [position.X, position.Y, position.Z]
-                }).ToArray();
-                ConvexHullCreationResult<DefaultVertex, DefaultConvexFace<DefaultVertex>> result = ConvexHull.Create(vertices);
-
-                //从凸包面中提取边并去重
-                HashSet<(int, int)> edges = [];
-                foreach (DefaultConvexFace<DefaultVertex> face in result.Result.Faces)
-                {
-                    DefaultVertex[] faceVertices = face.Vertices;
-                    for (int index = 0; index < faceVertices.Length; index++)
-                    {
-                        int indexA = Array.IndexOf(vertices, faceVertices[(index)]);
-                        int indexB = Array.IndexOf(vertices, faceVertices[(index + 1) % faceVertices.Length]);
-                        edges.Add((Math.Min(indexA, indexB), Math.Max(indexA, indexB)));
-                    }
-                }
-
-                return edges;
-            }
-            catch
-            {
-                //MIConvexHull失败（如共面点），回退到全连接
-                return EnumerateAllEdges(hullPositions.Count);
-            }
-        }
-        #endregion
-
-        #region # 全连接枚举边 —— static HashSet<(int, int)> EnumerateAllEdges(int count)
-        /// <summary>
-        /// 全连接枚举边
-        /// </summary>
-        /// <param name="count">顶点数</param>
-        /// <returns>所有点对</returns>
-        private static HashSet<(int, int)> EnumerateAllEdges(int count)
-        {
-            HashSet<(int, int)> edges = [];
-            for (int i = 0; i < count; i++)
-            {
-                for (int j = i + 1; j < count; j++)
-                {
-                    edges.Add((i, j));
-                }
-            }
-            return edges;
-        }
-        #endregion
-
-        #region # 剔除内部点 —— static List<Vector3> RemoveInteriorPoints(List<Vector3>...
-        /// <summary>
-        /// 剔除内部点：如果某点落在其他两点的连线上（共线），则它是内部点，丢弃
-        /// </summary>
-        private static List<Vector3> RemoveInteriorPoints(List<Vector3> points, float epsilon)
-        {
-            if (points.Count <= 3)
-            {
-                return points;
-            }
-
-            bool[] isInterior = new bool[points.Count];
-            for (int i = 0; i < points.Count; i++)
-            {
-                for (int j = 0; j < points.Count; j++)
-                {
-                    if (i == j || isInterior[i])
-                    {
-                        continue;
-                    }
-                    for (int k = j + 1; k < points.Count; k++)
-                    {
-                        if (i == k || isInterior[i])
-                        {
-                            continue;
-                        }
-
-                        //判断点i是否在线段jk上
-                        if (IsPointOnSegment(points[i], points[j], points[k], epsilon))
-                        {
-                            isInterior[i] = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            List<Vector3> boundary = [];
-            for (int index = 0; index < points.Count; index++)
-            {
-                if (!isInterior[index])
-                {
-                    boundary.Add(points[index]);
-                }
-            }
-
-            return boundary;
-        }
-        #endregion
-
-        #region # 判断点是否在线段上 —— static bool IsPointOnSegment(Vector3 p, Vector3 a...
-        /// <summary>
-        /// 判断点p是否在线段ab上
-        /// </summary>
-        private static bool IsPointOnSegment(Vector3 p, Vector3 a, Vector3 b, float epsilon)
-        {
-            Vector3 ab = b - a;
-            Vector3 ap = p - a;
-
-            float abLengthSq = ab.LengthSquared;
-            if (abLengthSq < epsilon * epsilon)
-            {
-                return false;  //a和b重合
-            }
-
-            //投影参数 t = (ap·ab) / |ab|²
-            float t = Vector3.Dot(ap, ab) / abLengthSq;
-
-            //t必须在[0, 1]之间
-            if (t < 0 || t > 1)
-            {
-                return false;
-            }
-
-            //投影点
-            Vector3 projection = a + t * ab;
-
-            //距离判断
-            float squaredDistance = (p - projection).LengthSquared;
-            bool isOnSegment = squaredDistance < epsilon * epsilon;
-
-            return isOnSegment;
         }
         #endregion
     }
