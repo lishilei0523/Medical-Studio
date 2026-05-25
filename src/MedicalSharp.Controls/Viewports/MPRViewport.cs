@@ -256,35 +256,6 @@ namespace MedicalSharp.Controls.Viewports
 
         //Public
 
-        #region 投影 —— override Vector2 Project(Vector3 worldPos3D)
-        /// <summary>
-        /// 投影
-        /// </summary>
-        /// <param name="worldPos3D">世界3D位置</param>
-        /// <returns>屏幕2D位置</returns>
-        public override Vector2 Project(Vector3 worldPos3D)
-        {
-            #region # 验证
-
-            if (this._viewportSize.Width == 0 || this._viewportSize.Height == 0)
-            {
-                return Vector2.Zero;
-            }
-
-            #endregion
-
-            Matrix4 viewMatrix = this.Camera.ViewMatrix;
-            if (this.Plane.OriginalPlaneType == MPRPlaneType.Axial)
-            {
-                viewMatrix *= Matrix4.CreateScale(-1, 1, 1);
-            }
-
-            Vector2 screenPos2D = Ray.Project(worldPos3D, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, viewMatrix);
-
-            return screenPos2D;
-        }
-        #endregion
-
         #region 反投影 —— override Ray UnProject(Vector2 screenPos2D)
         /// <summary>
         /// 反投影

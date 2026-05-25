@@ -477,19 +477,6 @@ namespace MedicalSharp.Primitives.Maths
             rayStartCamera /= rayStartCamera.W;
             Vector3 rayStartWorld = (rayStartCamera * viewMatrixInv).Xyz;
 
-            //横断位特殊处理
-            if (this.OriginalPlaneType == MPRPlaneType.Axial)
-            {
-                //分解到U/V/N
-                Vector3 offset = rayStartWorld - this.WorldCenter;
-                float u = Vector3.Dot(offset, this.UAxis);
-                float v = Vector3.Dot(offset, this.VAxis);
-                float n = Vector3.Dot(offset, this.Normal);
-
-                //关于V轴对称 = U取反，V和N不变
-                rayStartWorld = this.WorldCenter - u * this.UAxis + v * this.VAxis + n * this.Normal;
-            }
-
             //创建射线，射线方向固定为相机视角方向
             ray = new Ray(rayStartWorld, camera.LookDirection);
 
@@ -516,12 +503,6 @@ namespace MedicalSharp.Primitives.Maths
                 y = Math.Clamp(y, 0, this.VolumeMetadata.VolumeSize.Y - 1);
                 z = Math.Clamp(z, 0, this.VolumeMetadata.VolumeSize.Z - 1);
                 voxelPosition = new Vector3i(x, y, z);
-
-                //横断位特殊处理
-                if (this.OriginalPlaneType == MPRPlaneType.Axial)
-                {
-                    uv *= new Vector2(-1, 1);
-                }
 
                 return true;
             }

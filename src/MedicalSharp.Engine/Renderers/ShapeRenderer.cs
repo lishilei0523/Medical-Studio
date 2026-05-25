@@ -2,9 +2,7 @@
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
-using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Models;
-using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 
@@ -122,28 +120,20 @@ namespace MedicalSharp.Engine.Renderers
 
             //渲染上下文
             float zoomFactor = 1.0f;
-            Matrix4 viewMatrix = this.Camera.ViewMatrix;
             if (this.Camera is MPRCamera mprCamera)
             {
                 zoomFactor = mprCamera.ZoomFactor;
-
-                //横断位特殊处理
-                if (mprCamera.TargetPlane.OriginalPlaneType == MPRPlaneType.Axial)
-                {
-                    viewMatrix = Matrix4.CreateScale(-1, 1, 1) * viewMatrix;
-                }
             }
-
-            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, viewMatrix, zoomFactor);
+            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, zoomFactor);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.ShapeProgram;
             program.Use();
 
             //设置投影矩阵、视图矩阵、相机位置
-            program.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
-            program.SetUniformMatrix4("u_ViewMatrix", viewMatrix);
-            program.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
+            program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
+            program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
+            program.SetUniformVector3("u_CameraPosition", renderContext.CameraPosition);
 
             foreach (ShapeRenderable renderable in this._renderables)
             {

@@ -305,15 +305,8 @@ namespace MedicalSharp.Engine.Renderers
             //设置相机视口尺寸
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
-            //横断位特殊处理
-            Matrix4 viewMatrix = this.Camera.ViewMatrix;
-            if (this.MPRCamera.TargetPlane.OriginalPlaneType == MPRPlaneType.Axial)
-            {
-                viewMatrix = Matrix4.CreateScale(-1, 1, 1) * viewMatrix;
-            }
-
             //渲染上下文
-            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, viewMatrix, this.MPRCamera.ZoomFactor);
+            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, this.MPRCamera.ZoomFactor);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.MPRProgram;
@@ -412,13 +405,6 @@ namespace MedicalSharp.Engine.Renderers
             //设置相机视口尺寸
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
-            //横断位特殊处理
-            Matrix4 viewMatrix = this.Camera.ViewMatrix;
-            if (this.MPRCamera.TargetPlane.OriginalPlaneType == MPRPlaneType.Axial)
-            {
-                viewMatrix = Matrix4.CreateScale(-1, 1, 1) * viewMatrix;
-            }
-
             //开启Shader程序
             ShaderProgram statProgram = ShaderManager.MPRStatisticProgram;
             statProgram.Use();
@@ -426,7 +412,7 @@ namespace MedicalSharp.Engine.Renderers
             //设置MVP矩阵、相机位置、缩放
             Matrix4 modelMatrix = this._plane.GetModelMatrix();
             statProgram.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
-            statProgram.SetUniformMatrix4("u_ViewMatrix", viewMatrix);
+            statProgram.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
             statProgram.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
             statProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
