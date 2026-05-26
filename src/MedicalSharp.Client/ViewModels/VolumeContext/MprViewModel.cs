@@ -376,15 +376,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand ResetCrosshairCommand => new RelayCommand(_ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             this.Crosshair.UAxis = this.Plane.WorldUAxis.ToVector3();
             this.Crosshair.VAxis = this.Plane.WorldVAxis.ToVector3();
             this.Crosshair.Center = this.Plane.WorldCenter.ToVector3();
@@ -399,7 +390,18 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 Publisher = this
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
-        });
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 重置相机命令 —— ICommand ResetCameraCommand
+        /// <summary>
+        /// 重置相机命令
+        /// </summary>
+        public ICommand ResetCameraCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Camera.Reset();
+            this.FrameToken++;
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 调节协议命令 —— ICommand TuneProtocolCommand
@@ -408,19 +410,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand TuneProtocolCommand => new AsyncRelayCommand(async _ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             MprProtocolViewModel viewModel = ResolveMediator.Resolve<MprProtocolViewModel>();
             viewModel.MprViewModel = this;
             await this._windowManager.ShowWindowAsync(viewModel);
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 截屏命令 —— ICommand CaptureCommand
@@ -429,15 +422,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand CaptureCommand => new AsyncRelayCommand(async _ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             using SKBitmap bitmap = this.MPRViewport.Capture();
 
             //保存文件对话框
@@ -463,7 +447,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
                 await MessageBox.Show($"已保存至\"{storageFile.TryGetLocalPath()}\"");
             }
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #endregion
