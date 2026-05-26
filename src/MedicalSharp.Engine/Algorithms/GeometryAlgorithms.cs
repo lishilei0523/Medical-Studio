@@ -333,20 +333,29 @@ namespace MedicalSharp.Engine.Algorithms
         /// </summary>
         /// <param name="point">待判断的点</param>
         /// <param name="polygon">多边形顶点（按顺序排列）</param>
+        /// <param name="epsilon">容差</param>
         /// <returns>是否在多边形内</returns>
         /// <remarks>射线投射法</remarks>
-        public static bool IsPointInPolygon(in Vector2 point, IReadOnlyList<Vector2> polygon)
+        public static bool IsPointInPolygon(in Vector2 point, IReadOnlyList<Vector2> polygon, float epsilon = 1e-6f)
         {
             bool inside = false;
             for (int i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++)
             {
                 Vector2 vi = polygon[i];
                 Vector2 vj = polygon[j];
-                bool intersect = ((vi.Y > point.Y) != (vj.Y > point.Y)) &&
-                                 (point.X < (vj.X - vi.X) * (point.Y - vi.Y) / (vj.Y - vi.Y) + vi.X);
+
+                //检查射线是否与边相交
+                bool intersect = ((vi.Y > point.Y) != (vj.Y > point.Y));
                 if (intersect)
                 {
-                    inside = !inside;
+                    //计算交点X坐标
+                    float xIntersect = vi.X + (vj.X - vi.X) * (point.Y - vi.Y) / (vj.Y - vi.Y);
+
+                    //使用容差避免浮点误差
+                    if (point.X < xIntersect - epsilon)
+                    {
+                        inside = !inside;
+                    }
                 }
             }
 

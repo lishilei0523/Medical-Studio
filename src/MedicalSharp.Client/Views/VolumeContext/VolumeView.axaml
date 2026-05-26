@@ -20,91 +20,91 @@
 				<!--Toolbar-->
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
 					<sd:ToggleRadioButton cm:Message.Attach="PickVoxel()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.PickVoxelEnabled}">
+										  IsVisible="{Binding ToolbarConfig.PickVoxelEnabled}">
 						<PathIcon Data="{StaticResource Icon-PickVoxel}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.PickShapeEnabled}">
+										  IsVisible="{Binding ToolbarConfig.PickShapeEnabled}">
 						<PathIcon Data="{StaticResource Icon-PickShape}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="TranslateNormal()" Classes="Transparent-Panel" IsChecked="True"
-                                          IsVisible="{Binding ToolbarConfig.TranslateNormalEnabled}">
+										  IsVisible="{Binding ToolbarConfig.TranslateNormalEnabled}">
 						<PathIcon Data="{StaticResource Icon-TranslateNormal}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.Translate3DEnabled}">
+										  IsVisible="{Binding ToolbarConfig.Translate3DEnabled}">
 						<PathIcon Data="{StaticResource Icon-Translate3D}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="RotateU()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.RotateUEnabled}">
+										  IsVisible="{Binding ToolbarConfig.RotateUEnabled}">
 						<PathIcon Data="{StaticResource Icon-RotateU}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="RotateV()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.RotateVEnabled}">
+										  IsVisible="{Binding ToolbarConfig.RotateVEnabled}">
 						<PathIcon Data="{StaticResource Icon-RotateV}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Rotate3D()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.Rotate3DEnabled}">
+										  IsVisible="{Binding ToolbarConfig.Rotate3DEnabled}">
 						<PathIcon Data="{StaticResource Icon-Rotate3D}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Resize()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.ResizeEnabled}">
+										  IsVisible="{Binding ToolbarConfig.ResizeEnabled}">
 						<PathIcon Data="{StaticResource Icon-Resize}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="EditVertex()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.EditVertexEnabled}">
+										  IsVisible="{Binding ToolbarConfig.EditVertexEnabled}">
 						<PathIcon Data="{StaticResource Icon-EditVertex}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPoint()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawPointEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawPointEnabled}">
 						<PathIcon Data="{StaticResource Icon-Point}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawLineSegment()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawLineSegmentEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawLineSegmentEnabled}">
 						<PathIcon Data="{StaticResource Icon-LineSegment}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPolyline()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawPolylineEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawPolylineEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polyline}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawCurve()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawCurveEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawCurveEnabled}">
 						<PathIcon Data="{StaticResource Icon-Curve}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawRectangle()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawRectangleEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawRectangleEnabled}">
 						<PathIcon Data="{StaticResource Icon-Rectangle}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawCircle()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawCircleEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawCircleEnabled}">
 						<PathIcon Data="{StaticResource Icon-Circle}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawEllipse()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawEllipseEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawEllipseEnabled}">
 						<PathIcon Data="{StaticResource Icon-Ellipse}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPolygon()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawPolygonEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawPolygonEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polygon}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawClosedCurve()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawClosedCurveEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawClosedCurveEnabled}">
 						<PathIcon Data="{StaticResource Icon-ClosedCurve}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawBox()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawBoxEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawBoxEnabled}">
 						<PathIcon Data="{StaticResource Icon-Cube}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawSphere()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawSphereEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawSphereEnabled}">
 						<PathIcon Data="{StaticResource Icon-Sphere}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawCylinder()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawCylinderEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawCylinderEnabled}">
 						<PathIcon Data="{StaticResource Icon-Cylinder}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawConvexPolyhedron()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawConvexPolyhedronEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawConvexPolyhedronEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polyhedron}" />
 					</sd:ToggleRadioButton>
 				</WrapPanel>
@@ -113,20 +113,20 @@
 					<DropDownButton Content="VR" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
 							<MenuFlyout>
-                                <MenuItem Header="预览模式(_V)">
-                                    <MenuItem >
-                                        <MenuItem.Header>
-                                            <RadioButton Content="预览模式" GroupName="PreviewMode" 
-                                                         IsChecked="{Binding PreviewModeChecked}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                    <MenuItem >
-                                        <MenuItem.Header>
-                                            <RadioButton Content="原始模式" GroupName="PreviewMode" 
-                                                         IsChecked="{Binding OriginalModeChecked}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                </MenuItem>
+								<MenuItem Header="预览模式(_V)">
+									<MenuItem >
+										<MenuItem.Header>
+											<RadioButton Content="预览模式" GroupName="PreviewMode"
+														 IsChecked="{Binding PreviewModeChecked}" />
+										</MenuItem.Header>
+									</MenuItem>
+									<MenuItem >
+										<MenuItem.Header>
+											<RadioButton Content="原始模式" GroupName="PreviewMode"
+														 IsChecked="{Binding OriginalModeChecked}" />
+										</MenuItem.Header>
+									</MenuItem>
+								</MenuItem>
 								<MenuItem Header="渲染模式(_M)">
 									<MenuItem >
 										<MenuItem.Header>
@@ -167,6 +167,10 @@
 									</MenuItem>
 									<MenuItem Header="复位(_R)" Command="{Binding ResetMprPlanesCommand}" />
 								</MenuItem>
+								<MenuItem Header="相机设置(_S)">
+									<MenuItem Header="调节相机(_T)" Command="{Binding TuneCameraCommand}" />
+									<MenuItem Header="重置相机(_R)" Command="{Binding ResetCameraCommand}" />
+								</MenuItem>
 								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />
 								<MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
 							</MenuFlyout>
@@ -181,8 +185,8 @@
 						   Camera="{Binding Camera}"
 						   InputManager="{Binding InputManager}"
 						   VolumeData="{Binding VolumeData}"
-                           PreviewMode="{Binding PreviewMode}"
-                           RenderMode="{Binding RenderMode}"
+						   PreviewMode="{Binding PreviewMode}"
+						   RenderMode="{Binding RenderMode}"
 						   WindowWidth="{Binding WindowWidth}"
 						   WindowCenter="{Binding WindowCenter}"
 						   Brightness="{Binding Brightness}"

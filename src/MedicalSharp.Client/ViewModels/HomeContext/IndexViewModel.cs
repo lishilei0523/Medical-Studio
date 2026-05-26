@@ -1,4 +1,5 @@
 ﻿using Avalonia.Collections;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Caliburn.Micro;
@@ -6,6 +7,7 @@ using FluentAvalonia.UI.Controls;
 using MedicalSharp.Client.ViewModels.AlgorithmContext;
 using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Client.ViewModels.TissueContext;
+using MedicalSharp.Client.Views.HomeContext;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Managers;
@@ -28,6 +30,7 @@ using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -74,16 +77,33 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.Tissues =
             [
                 new TissueInfo("Base", 0, MarkMode.Visible, Colors.Transparent, true),
-                new TissueInfo("骨骼", 1, MarkMode.Tinted, colors[1].ToColor()),
-                new TissueInfo("血管", 2, MarkMode.Tinted, colors[2].ToColor()),
-                new TissueInfo("软组织", 3, MarkMode.Visible, colors[3].ToColor()),
-                new TissueInfo("心脏", 4, MarkMode.Visible, colors[4].ToColor()),
-                new TissueInfo("肺", 5, MarkMode.Visible, colors[5].ToColor()),
-                new TissueInfo("肝脏", 6, MarkMode.Tinted, colors[6].ToColor()),
-                new TissueInfo("肾脏", 7, MarkMode.Tinted, colors[7].ToColor()),
+    
+                //体壁
+                new TissueInfo("皮肤", 1, MarkMode.Collapsed, colors[1].ToColor()),
+                new TissueInfo("软组织", 2, MarkMode.Visible, colors[2].ToColor()),
+                new TissueInfo("骨骼", 3, MarkMode.Tinted, colors[3].ToColor()),
+    
+                //循环系统
+                new TissueInfo("血管", 4, MarkMode.Tinted, colors[4].ToColor()),
+                new TissueInfo("心脏", 5, MarkMode.Visible, colors[5].ToColor()),
+    
+                //呼吸系统
+                new TissueInfo("肺", 6, MarkMode.Visible, colors[6].ToColor()),
+    
+                //消化系统
+                new TissueInfo("肝脏", 7, MarkMode.Tinted, colors[7].ToColor()),
                 new TissueInfo("脾脏", 8, MarkMode.Collapsed, colors[8].ToColor()),
-                new TissueInfo("病变", 9, MarkMode.Tinted, colors[9].ToColor()),
-                new TissueInfo("钙化", 10, MarkMode.Tinted, colors[10].ToColor()),
+                new TissueInfo("胃", 9, MarkMode.Tinted, colors[9].ToColor()),
+                new TissueInfo("肠", 10, MarkMode.Tinted, colors[10].ToColor()),
+    
+                //泌尿系统
+                new TissueInfo("肾脏", 11, MarkMode.Tinted, colors[11].ToColor()),
+                new TissueInfo("膀胱", 12, MarkMode.Tinted, colors[12].ToColor()),
+    
+                //病理
+                new TissueInfo("病变", 13, MarkMode.Tinted, colors[13].ToColor()),
+                new TissueInfo("钙化", 14, MarkMode.Tinted, colors[14].ToColor()),
+                new TissueInfo("淋巴结", 15, MarkMode.Tinted, colors[15].ToColor())
             ];
         }
 
@@ -1123,6 +1143,41 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.SelectedTissue = this.Tissues[1];
 
             return base.OnInitializedAsync(cancellationToken);
+        }
+        #endregion
+
+        #region 复制统计信息 —— void CopyStatistics()
+        /// <summary>
+        /// 复制统计信息
+        /// </summary>
+        public async Task CopyStatistics()
+        {
+            #region # 验证
+
+            if (this.StatisticInfo == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            IndexView view = (IndexView)this.GetView();
+            TopLevel topLevel = TopLevel.GetTopLevel(view);
+            if (topLevel != null && topLevel.Clipboard != null)
+            {
+                StringBuilder builder = new StringBuilder();
+                builder.AppendLine($"最小HU：{this.StatisticInfo.MinHU}");
+                builder.AppendLine($"最大HU：{this.StatisticInfo.MaxHU}");
+                builder.AppendLine($"平均HU：{this.StatisticInfo.AverageHU}");
+                builder.AppendLine($"标准差：{this.StatisticInfo.StdDevHU}");
+                builder.AppendLine($"表面积：{this.StatisticInfo.SurfaceArea}");
+                builder.AppendLine($"体积：{this.StatisticInfo.Volume}");
+                builder.AppendLine($"球形度：{this.StatisticInfo.Sphericity}");
+                builder.AppendLine($"体素数：{this.StatisticInfo.VoxelsCount}");
+
+                await topLevel!.Clipboard!.SetTextAsync(builder.ToString());
+                await MessageBox.Show("统计信息已复制到剪贴板！");
+            }
         }
         #endregion
 

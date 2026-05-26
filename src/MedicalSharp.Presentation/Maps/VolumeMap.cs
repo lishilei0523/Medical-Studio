@@ -108,7 +108,16 @@ namespace MedicalSharp.Presentation.Maps
 
             #endregion
 
-            ScanInfo scanInfo = scanData.Map<VolumeScanData, ScanInfo>();
+            ScanInfo scanInfo = new ScanInfo
+            {
+                Modality = scanData.Modality,
+                KVP = $"{scanData.KVP} kVp",
+                XRayTubeCurrent = $"{scanData.XRayTubeCurrent} mA",
+                ExposureTime = $"{scanData.ExposureTime} ms",
+                ConvolutionKernel = $"{scanData.ConvolutionKernel}",
+                ReconstructionDiameter = $"{scanData.ReconstructionDiameter} mm",
+                SliceThickness = $"{scanData.SliceThickness} mm"
+            };
 
             return scanInfo;
         }
