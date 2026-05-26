@@ -57,6 +57,26 @@ namespace MedicalSharp.Presentation.Maps
             #endregion
 
             PatientInfo patientInfo = patientData.Map<VolumePatientData, PatientInfo>();
+            if (!string.IsNullOrWhiteSpace(patientData.Sex))
+            {
+                patientInfo.Sex = patientData.Sex switch
+                {
+                    "M" => "男",
+                    "F" => "女",
+                    _ => patientData.Sex
+                };
+            }
+            if (!string.IsNullOrWhiteSpace(patientData.Age))
+            {
+                patientInfo.Age = int.TryParse(patientData.Age.Replace("Y", string.Empty), out int age)
+                    ? $"{age}岁"
+                    : patientData.Age;
+            }
+            if (!string.IsNullOrWhiteSpace(patientData.BirthDate))
+            {
+                DateOnly birthDate = DateOnly.ParseExact(patientData.BirthDate, "yyyyMMdd");
+                patientInfo.BirthDate = birthDate.ToString("yyyy-MM-dd");
+            }
 
             return patientInfo;
         }

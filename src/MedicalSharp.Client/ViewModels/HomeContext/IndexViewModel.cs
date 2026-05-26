@@ -145,6 +145,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                     this.PatientInfo = null;
                     this.StudyInfo = null;
                     this.ScanInfo = null;
+                    this.StatisticInfo = null;
                 }
             }
         }
