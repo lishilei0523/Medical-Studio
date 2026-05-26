@@ -30,7 +30,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplyRectangleCut(this VolumeRenderable renderable, float width, float height, Vector3 center, Vector3 normal, Vector3 uAxis, Vector3 vAxis, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyRectangleCut(this VolumeRenderable renderable, float width, float height, in Vector3 center, in Vector3 normal, in Vector3 uAxis, in Vector3 vAxis, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -86,7 +86,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplyCircleCut(this VolumeRenderable renderable, float radius, Vector3 center, Vector3 normal, Vector3 uAxis, Vector3 vAxis, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyCircleCut(this VolumeRenderable renderable, float radius, in Vector3 center, in Vector3 normal, in Vector3 uAxis, in Vector3 vAxis, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -142,7 +142,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplyEllipseCut(this VolumeRenderable renderable, float width, float height, Vector3 center, Vector3 normal, Vector3 uAxis, Vector3 vAxis, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyEllipseCut(this VolumeRenderable renderable, float width, float height, in Vector3 center, in Vector3 normal, in Vector3 uAxis, in Vector3 vAxis, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -194,7 +194,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static unsafe void ApplyPolygonCut(this VolumeRenderable renderable, IReadOnlyList<Vector3> vertices3D, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static unsafe void ApplyPolygonCut(this VolumeRenderable renderable, IReadOnlyList<Vector3> vertices3D, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             PolygonFit2D polygon = new PolygonFit2D(vertices3D);
 
@@ -264,7 +264,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplyBoxCut(this VolumeRenderable renderable, Vector3 boxLocalMin, Vector3 boxLocalMax, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyBoxCut(this VolumeRenderable renderable, in Vector3 boxLocalMin, in Vector3 boxLocalMax, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -313,7 +313,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplySphereCut(this VolumeRenderable renderable, float radius, Vector3 center, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplySphereCut(this VolumeRenderable renderable, float radius, in Vector3 center, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -363,7 +363,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值</param>
-        public static void ApplyCylinderCut(this VolumeRenderable renderable, float radius, float height, Vector3 center, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyCylinderCut(this VolumeRenderable renderable, float radius, float height, in Vector3 center, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -412,7 +412,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值</param>
-        public static unsafe void ApplyConvexPolyhedronCut(this VolumeRenderable renderable, Vector4[] planes, Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static unsafe void ApplyConvexPolyhedronCut(this VolumeRenderable renderable, Vector4[] planes, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             #region # 验证
 

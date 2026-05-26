@@ -64,25 +64,6 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 线性插值 —— static Vector3 Lerp(Vector3 start, Vector3 end, float t)
-        /// <summary>
-        /// 线性插值
-        /// </summary>
-        /// <param name="start">起始点</param>
-        /// <param name="end">结束点</param>
-        /// <param name="t">插值系数（0~1）</param>
-        /// <returns>插值点</returns>
-        public static Vector3 Lerp(Vector3 start, Vector3 end, float t)
-        {
-            Vector3 point = new Vector3(
-                start.X + (end.X - start.X) * t,
-                start.Y + (end.Y - start.Y) * t,
-                start.Z + (end.Z - start.Z) * t);
-
-            return point;
-        }
-        #endregion
-
         #region # 判断点是否在顶点列表中 —— static bool ContainsPoint(IReadOnlyList<Vector3> vertices...
         /// <summary>
         /// 判断点是否在顶点列表中
@@ -116,7 +97,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="planeNormal">平面法向量</param>
         /// <returns>逆时针排序后的点集</returns>
         /// <remarks>将平面上的点按逆时针方向排序</remarks>
-        public static IReadOnlyList<Vector3> SortPointsCounterClockwise(IReadOnlyList<Vector3> points, Vector3 planeNormal)
+        public static IReadOnlyList<Vector3> SortPointsCounterClockwise(IReadOnlyList<Vector3> points, in Vector3 planeNormal)
         {
             #region # 验证
 
@@ -286,7 +267,7 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断点是否在线段上(2D) —— static bool IsPointOnSegment(Vector2 point, Vector2 start...
+        #region # 判断点是否在线段上(2D) —— static bool IsPointOnSegment(in Vector2 point, in Vector2 start...
         /// <summary>
         /// 判断点是否在线段上(2D)
         /// </summary>
@@ -295,36 +276,19 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="end">线段终点</param>
         /// <param name="epsilon">容差</param>
         /// <returns>是否在线段上</returns>
-        public static bool IsPointOnSegment(Vector2 point, Vector2 start, Vector2 end, float epsilon)
+        public static bool IsPointOnSegment(in Vector2 point, in Vector2 start, in Vector2 end, float epsilon)
         {
-            //叉积判断是否共线
-            float cross = (end.X - start.X) * (point.Y - start.Y) -
-                          (end.Y - start.Y) * (point.X - start.X);
-            if (Math.Abs(cross) > epsilon)
-            {
-                return false;
-            }
+            //转换为Vector3（Z = 0），复用3D算法
+            Vector3 point3D = new Vector3(point.X, point.Y, 0);
+            Vector3 start3D = new Vector3(start.X, start.Y, 0);
+            Vector3 end3D = new Vector3(end.X, end.Y, 0);
+            bool isPointOnSegment = IsPointOnSegment(point3D, start3D, end3D, epsilon);
 
-            //点积判断是否在线段范围内
-            float dot = (point.X - start.X) * (end.X - start.X) +
-                        (point.Y - start.Y) * (end.Y - start.Y);
-            if (dot < 0)
-            {
-                return false;
-            }
-
-            float squaredLength = (end.X - start.X) * (end.X - start.X) +
-                                  (end.Y - start.Y) * (end.Y - start.Y);
-            if (dot > squaredLength)
-            {
-                return false;
-            }
-
-            return true;
+            return isPointOnSegment;
         }
         #endregion
 
-        #region # 判断点是否在线段上(3D) —— static bool IsPointOnSegment(Vector3 point, Vector3 start...
+        #region # 判断点是否在线段上(3D) —— static bool IsPointOnSegment(in Vector3 point, in Vector3 start...
         /// <summary>
         /// 判断是否在线段上(3D)
         /// </summary>
@@ -333,11 +297,10 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="end">线段终点</param>
         /// <param name="epsilon">容差</param>
         /// <returns>是否在线段上</returns>
-        public static bool IsPointOnSegment(Vector3 point, Vector3 start, Vector3 end, float epsilon)
+        public static bool IsPointOnSegment(in Vector3 point, in Vector3 start, in Vector3 end, float epsilon)
         {
             Vector3 ab = end - start;
             Vector3 ap = point - start;
-
             float abLengthSq = ab.LengthSquared;
             if (abLengthSq < epsilon * epsilon)
             {
@@ -364,7 +327,7 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断点是否在多边形内 —— static bool IsPointInPolygon(Vector2 point, Vector2[] polygon)
+        #region # 判断点是否在多边形内 —— static bool IsPointInPolygon(in Vector2 point, IReadOnlyList<Vector2>...
         /// <summary>
         /// 判断点是否在多边形内
         /// </summary>
@@ -372,10 +335,10 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="polygon">多边形顶点（按顺序排列）</param>
         /// <returns>是否在多边形内</returns>
         /// <remarks>射线投射法</remarks>
-        public static bool IsPointInPolygon(Vector2 point, Vector2[] polygon)
+        public static bool IsPointInPolygon(in Vector2 point, IReadOnlyList<Vector2> polygon)
         {
             bool inside = false;
-            for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
+            for (int i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++)
             {
                 Vector2 vi = polygon[i];
                 Vector2 vj = polygon[j];
@@ -391,7 +354,7 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断点是否在多边形边界 —— static bool IsPointOnPolygonEdge(Vector2 point...
+        #region # 判断点是否在多边形边界 —— static bool IsPointOnPolygonEdge(in Vector2 point...
         /// <summary>
         /// 判断点是否在多边形边界
         /// </summary>
@@ -399,9 +362,9 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="polygon">多边形顶点（按顺序排列）</param>
         /// <param name="tolerance">容差</param>
         /// <returns>是否在多边形边界</returns>
-        public static bool IsPointOnPolygonEdge(Vector2 point, Vector2[] polygon, float tolerance)
+        public static bool IsPointOnPolygonEdge(in Vector2 point, IReadOnlyList<Vector2> polygon, float tolerance)
         {
-            for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
+            for (int i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++)
             {
                 if (IsPointOnSegment(point, polygon[i], polygon[j], tolerance))
                 {

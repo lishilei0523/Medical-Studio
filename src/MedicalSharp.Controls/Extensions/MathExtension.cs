@@ -17,31 +17,31 @@ namespace MedicalSharp.Controls.Extensions
     /// </summary>
     public static class MathExtension
     {
-        #region # Vector3D转Vector3 —— static Vector3 ToVector3(this Vector3D vector3D)
+        #region # Vector3D转Vector3 —— static Vector3 ToVector3(this in Vector3D vector3D)
         /// <summary>
         /// Vector3D转Vector3
         /// </summary>
-        public static Vector3 ToVector3(this Vector3D vector3D)
+        public static Vector3 ToVector3(this in Vector3D vector3D)
         {
             return new Vector3((float)vector3D.X, (float)vector3D.Y, (float)vector3D.Z);
         }
         #endregion
 
-        #region # Vector3转Vector3D —— static Vector3D ToVector3(this Vector3 vector3)
+        #region # Vector3转Vector3D —— static Vector3D ToVector3(this in Vector3 vector3)
         /// <summary>
         /// Vector3转Vector3D
         /// </summary>
-        public static Vector3D ToVector3(this Vector3 vector3)
+        public static Vector3D ToVector3(this in Vector3 vector3)
         {
             return new Vector3D(vector3.X, vector3.Y, vector3.Z);
         }
         #endregion
 
-        #region # Color转Vector4 —— static Vector4 ToVector4(this Color color)
+        #region # Color转Vector4 —— static Vector4 ToVector4(this in Color color)
         /// <summary>
         /// Color转Vector4
         /// </summary>
-        public static Vector4 ToVector4(this Color color)
+        public static Vector4 ToVector4(this in Color color)
         {
             float r = color.R * 1.0f / 255.0f;
             float g = color.G * 1.0f / 255.0f;
@@ -52,11 +52,11 @@ namespace MedicalSharp.Controls.Extensions
         }
         #endregion
 
-        #region # Vector4转Color —— static Color ToColor(this Vector4 vector4)
+        #region # Vector4转Color —— static Color ToColor(this in Vector4 vector4)
         /// <summary>
         /// Vector4转Color
         /// </summary>
-        public static Color ToColor(this Vector4 vector4)
+        public static Color ToColor(this in Vector4 vector4)
         {
             byte r = (byte)Math.Floor(vector4.X * 255.0f);
             byte g = (byte)Math.Floor(vector4.Y * 255.0f);
@@ -67,31 +67,31 @@ namespace MedicalSharp.Controls.Extensions
         }
         #endregion
 
-        #region # Point转Vector2 —— static Vector2 ToVector2(this Point point)
+        #region # Point转Vector2 —— static Vector2 ToVector2(this in Point point)
         /// <summary>
         /// Point转Vector2
         /// </summary>
-        public static Vector2 ToVector2(this Point point)
+        public static Vector2 ToVector2(this in Point point)
         {
             return new Vector2((float)point.X, (float)point.Y);
         }
         #endregion
 
-        #region # Vector2转Point —— static Point ToPoint(this Vector2 vector2)
+        #region # Vector2转Point —— static Point ToPoint(this in Vector2 vector2)
         /// <summary>
         /// Vector2转Point
         /// </summary>
-        public static Point ToPoint(this Vector2 vector2)
+        public static Point ToPoint(this in Vector2 vector2)
         {
             return new Point(vector2.X, vector2.Y);
         }
         #endregion
 
-        #region # PixelSize转Vector2 —— static Vector2 ToVector2(this PixelSize pixelSize)
+        #region # PixelSize转Vector2 —— static Vector2 ToVector2(this in PixelSize pixelSize)
         /// <summary>
         /// PixelSize转Vector2
         /// </summary>
-        public static Vector2 ToVector2(this PixelSize pixelSize)
+        public static Vector2 ToVector2(this in PixelSize pixelSize)
         {
             return new Vector2(pixelSize.Width, pixelSize.Height);
         }
@@ -105,7 +105,7 @@ namespace MedicalSharp.Controls.Extensions
         /// <param name="plane">MPR平面</param>
         /// <param name="epsilon">容差</param>
         /// <returns>是否在MPR平面上</returns>
-        public static bool IsOnPlane(this Visual3D visual3D, MPRPlane plane, float epsilon = 0.001f)
+        public static bool IsOnPlane(this Visual3D visual3D, in MPRPlane plane, float epsilon = 0.001f)
         {
             //线条类：始终显示
             if (visual3D is ILineBasedVisual3D)
@@ -177,7 +177,7 @@ namespace MedicalSharp.Controls.Extensions
         /// <param name="hullPositions">凸包位置列表（世界空间）</param>
         /// <param name="plane">MPR平面</param>
         /// <returns>有序交点列表（用于构建闭合Polyline）</returns>
-        public static IReadOnlyList<Vector3D> IntersectConvexHullWithPlane(IReadOnlyList<Vector3> hullPositions, MPRPlane plane)
+        public static IReadOnlyList<Vector3D> IntersectConvexHullWithPlane(IReadOnlyList<Vector3> hullPositions, in MPRPlane plane)
         {
             #region # 验证
 
@@ -225,7 +225,7 @@ namespace MedicalSharp.Controls.Extensions
 
                 //插值求交点
                 float t = distance1 / (distance1 - distance2);
-                Vector3 intersection = GeometryAlgorithms.Lerp(hullPositions[i], hullPositions[j], t);
+                Vector3 intersection = Vector3.Lerp(hullPositions[i], hullPositions[j], t);
 
                 //去重
                 if (!GeometryAlgorithms.ContainsPoint(intersections, intersection, epsilon))
@@ -257,7 +257,7 @@ namespace MedicalSharp.Controls.Extensions
         /// <summary>
         /// 创建纯3D元素截面多边形
         /// </summary>
-        public static PolylineVisual3D CreateSectionPolygon(this IPureVisual3D pureVisual3D, MPRPlane plane)
+        public static PolylineVisual3D CreateSectionPolygon(this IPureVisual3D pureVisual3D, in MPRPlane plane)
         {
             IReadOnlyList<Vector3> hullPositions = pureVisual3D.GetConvexHullPositions();
 

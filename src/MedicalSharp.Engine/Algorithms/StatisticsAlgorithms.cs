@@ -21,7 +21,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="markValue">标记值（null=全部，0~255=指定标记值）</param>
         /// <returns>统计结果</returns>
-        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeData volumeData, Vector3 boxLocalMin, Vector3 boxLocalMax, Matrix4 localToWorld, byte? markValue)
+        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeData volumeData, Vector3 boxLocalMin, Vector3 boxLocalMax, in Matrix4 localToWorld, byte? markValue)
         {
             Vector3i volumeSize = volumeData.Metadata.VolumeSize;
             Vector3 volumeScale = volumeData.Metadata.VolumeScale;
@@ -104,7 +104,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="layerPixels">层像素指针</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        public static StatisticResult ApplyRectangleAnalyse(this VolumeData volumeData, Vector2 pointA, Vector2 pointB, Vector2 pointC, Vector2 pointD, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
+        public static StatisticResult ApplyRectangleAnalyse(this VolumeData volumeData, in Vector2 pointA, in Vector2 pointB, in Vector2 pointC, in Vector2 pointD, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
         {
             Vector2[] screenCorners = [pointA, pointB, pointC, pointD];
             float rescaleSlope = volumeData.Metadata.RescaleSlope;
