@@ -4,6 +4,7 @@ using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
+using MedicalSharp.Client.ViewModels.CameraContext;
 using MedicalSharp.Client.ViewModels.ProtocolContext;
 using MedicalSharp.Client.Views.VolumeContext;
 using MedicalSharp.Controls.Commands;
@@ -456,15 +457,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand ResetMprPlanesCommand => new RelayCommand(_ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             this.AxialPlane.Transform?.SetMatrix(Matrix4.Identity);
             this.CoronalPlane.Transform?.SetMatrix(Matrix4.Identity);
             this.SagittalPlane.Transform?.SetMatrix(Matrix4.Identity);
@@ -486,7 +478,42 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this._eventAggregator.PublishOnUIThreadAsync(messageAxial);
             this._eventAggregator.PublishOnUIThreadAsync(messageCoronal);
             this._eventAggregator.PublishOnUIThreadAsync(messageSagittal);
-        });
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 调节相机命令 —— ICommand TuneCameraCommand
+        /// <summary>
+        /// 调节相机命令
+        /// </summary>
+        public ICommand TuneCameraCommand => new AsyncRelayCommand(async _ =>
+        {
+            TuneOrbitCameraViewModel viewModel = ResolveMediator.Resolve<TuneOrbitCameraViewModel>();
+            viewModel.PanSpeed = this.Camera.PanSpeed;
+            viewModel.RotateSpeed = this.Camera.RotateSpeed;
+            viewModel.ZoomSpeed = this.Camera.ZoomSpeed;
+            viewModel.MinDistance = this.Camera.MinDistance;
+            viewModel.MaxDistance = this.Camera.MaxDistance;
+            bool? result = await this._windowManager.ShowDialogAsync(viewModel);
+            if (result == true)
+            {
+                this.Camera.SetSpeeds(viewModel.PanSpeed, viewModel.RotateSpeed, viewModel.ZoomSpeed);
+                this.Camera.SetDistanceLimits(viewModel.MinDistance, viewModel.MaxDistance);
+            }
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 重置相机命令 —— ICommand ResetCameraCommand
+        /// <summary>
+        /// 重置相机命令
+        /// </summary>
+        public ICommand ResetCameraCommand => new AsyncRelayCommand(async _ =>
+        {
+            Vector3 cameraPosition = new Vector3(0, 2, 0);
+            Vector3 targetPosition = Vector3.Zero;
+            this.Camera.SetPositions(cameraPosition, targetPosition);
+            this.Camera.SetRotation(-90.0f, 0);
+            this.FrameToken++;
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 调节协议命令 —— ICommand TuneProtocolCommand
@@ -495,19 +522,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand TuneProtocolCommand => new AsyncRelayCommand(async _ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             VolumeProtocolViewModel viewModel = ResolveMediator.Resolve<VolumeProtocolViewModel>();
             viewModel.VolumeViewModel = this;
             await this._windowManager.ShowWindowAsync(viewModel);
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #region 截屏命令 —— ICommand CaptureCommand
@@ -516,15 +534,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand CaptureCommand => new AsyncRelayCommand(async _ =>
         {
-            #region # 验证
-
-            if (this.VolumeData == null)
-            {
-                return;
-            }
-
-            #endregion
-
             using SKBitmap bitmap = this.VolumeViewport.Capture();
 
             //保存文件对话框
@@ -550,7 +559,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
                 await MessageBox.Show($"已保存至\"{storageFile.TryGetLocalPath()}\"");
             }
-        });
+        }, _ => this.VolumeData != null);
         #endregion
 
         #endregion

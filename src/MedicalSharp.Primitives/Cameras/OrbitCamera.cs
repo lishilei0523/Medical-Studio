@@ -39,7 +39,7 @@ namespace MedicalSharp.Primitives.Cameras
         /// <summary>
         /// 默认平移速度
         /// </summary>
-        private const float DefaultMoveSpeed = 3.0f;
+        private const float DefaultPanSpeed = 3.0f;
 
         /// <summary>
         /// 默认旋转速度
@@ -112,11 +112,11 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region # 属性
 
-        #region 平移速度 —— float MoveSpeed
+        #region 平移速度 —— float PanSpeed
         /// <summary>
         /// 平移速度
         /// </summary>
-        public float MoveSpeed { get; private set; }
+        public float PanSpeed { get; private set; }
         #endregion
 
         #region 旋转速度 —— float RotateSpeed
@@ -199,16 +199,16 @@ namespace MedicalSharp.Primitives.Cameras
 
         //Public
 
-        #region 设置速度 —— void SetSpeeds(float moveSpeed, float rotateSpeed...
+        #region 设置速度 —— void SetSpeeds(float panSpeed, float rotateSpeed...
         /// <summary>
         /// 设置速度
         /// </summary>
-        /// <param name="moveSpeed">移动速度</param>
+        /// <param name="panSpeed">平移速度</param>
         /// <param name="rotateSpeed">旋转速度</param>
         /// <param name="zoomSpeed">缩放速度</param>
-        public void SetSpeeds(float moveSpeed, float rotateSpeed, float zoomSpeed)
+        public void SetSpeeds(float panSpeed, float rotateSpeed, float zoomSpeed)
         {
-            this.MoveSpeed = moveSpeed;
+            this.PanSpeed = panSpeed;
             this.RotateSpeed = rotateSpeed;
             this.ZoomSpeed = zoomSpeed;
         }
@@ -290,6 +290,24 @@ namespace MedicalSharp.Primitives.Cameras
             {
                 this.CalculateAngles(this.LookDirection);
             }
+
+            this.UpdateCameraVectors();
+            this.UpdateProjectionMatrix();
+            this.UpdateViewMatrix();
+        }
+        #endregion
+
+        #region 设置位置 —— void SetPositions(Vector3 cameraPosition, Vector3 targetPosition)
+        /// <summary>
+        /// 设置位置
+        /// </summary>
+        /// <param name="cameraPosition">相机位置</param>
+        /// <param name="targetPosition">目标位置</param>
+        public void SetPositions(Vector3 cameraPosition, Vector3 targetPosition)
+        {
+            this.CameraPosition = cameraPosition;
+            this.TargetPosition = targetPosition;
+            this.Distance = (cameraPosition - targetPosition).Length;
 
             this.UpdateCameraVectors();
             this.UpdateProjectionMatrix();
@@ -380,7 +398,7 @@ namespace MedicalSharp.Primitives.Cameras
         public override void Pan(float deltaX, float deltaY)
         {
             //计算平移向量
-            float actualMoveSpeed = this.MoveSpeed * this.Distance * 0.01f;
+            float actualMoveSpeed = this.PanSpeed * this.Distance * 0.01f;
             Vector3 panOffset = this.RightDirection * (-deltaX * actualMoveSpeed) + this.UpDirection * (deltaY * actualMoveSpeed);
 
             //平移目标点和相机位置
@@ -422,7 +440,7 @@ namespace MedicalSharp.Primitives.Cameras
             this.MaxDistance = DefaultMaxDistance;
             this.MinPitch = DefaultMinPitch;
             this.MaxPitch = DefaultMaxPitch;
-            this.MoveSpeed = DefaultMoveSpeed;
+            this.PanSpeed = OrbitCamera.DefaultPanSpeed;
             this.RotateSpeed = DefaultRotateSpeed;
             this.ZoomSpeed = DefaultZoomSpeed;
         }
