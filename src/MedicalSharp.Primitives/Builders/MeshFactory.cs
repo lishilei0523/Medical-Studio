@@ -22,7 +22,7 @@ namespace MedicalSharp.Primitives.Builders
         /// <returns>网格模型</returns>
         public static MeshGeometry CreatePoint(Vector3 position)
         {
-            Vertex vertex = new()
+            Vertex vertex = new Vertex
             {
                 Position = position,
                 TextureCoord = Vector2.Zero,
@@ -74,13 +74,13 @@ namespace MedicalSharp.Primitives.Builders
             Vector3 direction = Vector3.Normalize(end - start);
             List<Vertex> vertices =
             [
-                new()
+                new Vertex
                 {
                     Position = start,
                     TextureCoord = new Vector2(0, 0),
                     Normal = direction
                 },
-                new()
+                new Vertex
                 {
                     Position = end,
                     TextureCoord = new Vector2(1, 0),
@@ -1480,37 +1480,37 @@ namespace MedicalSharp.Primitives.Builders
         {
             List<Vertex> vertices =
             [
-                new()
+                new Vertex
                 {
                     Position = Vector3.Zero,
                     TextureCoord = Vector2.Zero,
                     Normal = Vector3.UnitX
                 },
-                new()
+                new Vertex
                 {
                     Position = new Vector3(length, 0, 0),
                     TextureCoord = Vector2.UnitX,
                     Normal = Vector3.UnitX
                 },
-                new()
+                new Vertex
                 {
                     Position = Vector3.Zero,
                     TextureCoord = Vector2.Zero,
                     Normal = Vector3.UnitY
                 },
-                new()
+                new Vertex
                 {
                     Position = new Vector3(0, length, 0),
                     TextureCoord = Vector2.UnitX,
                     Normal = Vector3.UnitY
                 },
-                new()
+                new Vertex
                 {
                     Position = Vector3.Zero,
                     TextureCoord = Vector2.Zero,
                     Normal = Vector3.UnitZ
                 },
-                new()
+                new Vertex
                 {
                     Position = new Vector3(0, 0, length),
                     TextureCoord = Vector2.UnitX,

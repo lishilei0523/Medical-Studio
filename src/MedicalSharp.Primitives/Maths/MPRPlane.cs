@@ -306,13 +306,13 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 重定位平面 —— void Relocate(Vector3 worldCenter...
+        #region 重定位平面 —— void Relocate(in Vector3 worldCenter...
         /// <summary>
         /// 重定位平面
         /// </summary>
         /// <param name="worldCenter">世界中心位置</param>
         /// <param name="triggerSource">触发源</param>
-        public void Relocate(Vector3 worldCenter, MPRPlaneChangeSource triggerSource = MPRPlaneChangeSource.CrosshairDrag)
+        public void Relocate(in Vector3 worldCenter, MPRPlaneChangeSource triggerSource = MPRPlaneChangeSource.CrosshairDrag)
         {
             //将世界坐标转换到逻辑空间
             Vector3 localCenter = worldCenter / this.VolumeMetadata.VolumeScale;
@@ -332,7 +332,7 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 重定位平面 —— void Relocate(Vector3 worldUAxis, Vector3 worldVAxis...
+        #region 重定位平面 —— void Relocate(in Vector3 worldUAxis, in Vector3 worldVAxis...
         /// <summary>
         /// 重定位平面
         /// </summary>
@@ -340,7 +340,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="worldVAxis">世界V轴</param>
         /// <param name="worldCenter">世界中心位置</param>
         /// <param name="worldNormal">世界法向量</param>
-        public void Relocate(Vector3 worldUAxis, Vector3 worldVAxis, Vector3 worldCenter, Vector3 worldNormal)
+        public void Relocate(in Vector3 worldUAxis, in Vector3 worldVAxis, in Vector3 worldCenter, in Vector3 worldNormal)
         {
             //更新MPR平面U/V/N轴
             this.UAxis = worldUAxis;
@@ -445,7 +445,7 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 查找最近元素 —— bool FindNearest(Vector2 mousePos2D, Camera camera...
+        #region 查找最近元素 —— bool FindNearest(in Vector2 mousePos2D, Camera camera...
         /// <summary>
         /// 查找最近元素
         /// </summary>
@@ -457,7 +457,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="voxelPosition">体素位置</param>
         /// <param name="ray">射线</param>
         /// <returns>是否成功</returns>
-        public bool FindNearest(Vector2 mousePos2D, Camera camera, out Vector2 uv, out Vector3 textureCoord, out Vector3 worldPosition, out Vector3i voxelPosition, out Ray ray)
+        public bool FindNearest(in Vector2 mousePos2D, Camera camera, out Vector2 uv, out Vector3 textureCoord, out Vector3 worldPosition, out Vector3i voxelPosition, out Ray ray)
         {
             uv = Vector2.Zero;
             textureCoord = Vector3.Zero;
@@ -648,14 +648,14 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 投影点到平面 —— Vector2 ProjectPoint(Vector3 localPoint)
+        #region 投影点到平面 —— Vector2 ProjectPoint(in Vector3 localPoint)
         /// <summary>
         /// 投影点到平面
         /// </summary>
         /// <param name="localPoint">逻辑空间中的点，范围[-0.5, 0.5]</param>
         /// <returns>平面U/V坐标，范围[-1, 1]</returns>
         /// <remarks>逻辑空间</remarks>
-        private Vector2 ProjectPoint(Vector3 localPoint)
+        private Vector2 ProjectPoint(in Vector3 localPoint)
         {
             const float halfSize = 0.5f;
             float sliceOffset = this.CalculateSliceOffset();

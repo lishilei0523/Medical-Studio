@@ -123,7 +123,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool PreviewModeChecked
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -139,7 +139,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool OriginalModeChecked
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -155,7 +155,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool RaycastChecked
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -171,7 +171,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool AIPChecked
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -187,7 +187,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool MIPChecked
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -203,7 +203,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool MinIPChecked
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -219,7 +219,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool AxialPlaneVisible
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -236,7 +236,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool CoronalPlaneVisible
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -253,7 +253,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool SagittalPlaneVisible
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -585,7 +585,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 if (textureCoord.HasValue)
                 {
                     StringBuilder builder = new StringBuilder();
-                    builder.AppendLine($"点击2D坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
+                    builder.AppendLine($"点击屏幕坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
                     builder.AppendLine($"点击纹理坐标: X:{textureCoord.Value.X}, Y:{textureCoord.Value.Y}, Z:{textureCoord.Value.Z}");
                     builder.AppendLine($"点击世界坐标: X:{worldPosition.Value.X}, Y:{worldPosition.Value.Y}, Z:{worldPosition.Value.Z}");
                     builder.AppendLine($"点击体素坐标: X:{voxelPostion.Value.X}, Y:{voxelPostion.Value.Y}, Z:{voxelPostion.Value.Z}");

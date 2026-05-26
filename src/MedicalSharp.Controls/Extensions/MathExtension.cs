@@ -105,7 +105,7 @@ namespace MedicalSharp.Controls.Extensions
         /// <param name="plane">MPR平面</param>
         /// <param name="epsilon">容差</param>
         /// <returns>是否在MPR平面上</returns>
-        public static bool IsOnPlane(this Visual3D visual3D, in MPRPlane plane, float epsilon = 0.001f)
+        public static bool IsOnPlane(this Visual3D visual3D, MPRPlane plane, float epsilon = 0.001f)
         {
             //线条类：始终显示
             if (visual3D is ILineBasedVisual3D)
@@ -177,7 +177,7 @@ namespace MedicalSharp.Controls.Extensions
         /// <param name="hullPositions">凸包位置列表（世界空间）</param>
         /// <param name="plane">MPR平面</param>
         /// <returns>有序交点列表（用于构建闭合Polyline）</returns>
-        public static IReadOnlyList<Vector3D> IntersectConvexHullWithPlane(IReadOnlyList<Vector3> hullPositions, in MPRPlane plane)
+        public static IReadOnlyList<Vector3D> IntersectConvexHullWithPlane(IReadOnlyList<Vector3> hullPositions, MPRPlane plane)
         {
             #region # 验证
 
@@ -257,7 +257,7 @@ namespace MedicalSharp.Controls.Extensions
         /// <summary>
         /// 创建纯3D元素截面多边形
         /// </summary>
-        public static PolylineVisual3D CreateSectionPolygon(this IPureVisual3D pureVisual3D, in MPRPlane plane)
+        public static PolylineVisual3D CreateSectionPolygon(this IPureVisual3D pureVisual3D, MPRPlane plane)
         {
             IReadOnlyList<Vector3> hullPositions = pureVisual3D.GetConvexHullPositions();
 

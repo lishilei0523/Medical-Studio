@@ -75,7 +75,7 @@
 							<MenuItem Header="均值滤波(_M)" Command="{Binding MeanBlurCommand}" />
 							<MenuItem Header="中值滤波(_C)" Command="{Binding MedianBlurCommand}" />
 						</MenuItem>
-						<MenuItem Header="边缘检测(_B)">
+						<MenuItem Header="边缘检测(_G)">
 							<MenuItem Header="Sobel边缘检测(_S)" Command="{Binding SobelCommand}" />
 							<MenuItem Header="Scharr边缘检测(_A)" Command="{Binding ScharrCommand}" />
 							<MenuItem Header="Canny边缘检测(_C)" Command="{Binding CannyCommand}" />
