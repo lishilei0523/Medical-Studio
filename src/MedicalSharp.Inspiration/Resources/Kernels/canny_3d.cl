@@ -1,8 +1,8 @@
 ﻿/// <summary>
-/// 边缘 = 3071（骨骼及以上）
+/// 边缘 = 100
 /// </summary>
 /// <remarks>归一化到SNORM范围[-1, 1]：除以32767</remarks>
-__constant float canny_edge_value = 3071.0f / 32767.0f;
+__constant float canny_edge_value = 100.0f / 32767.0f;
 
 /// <summary>
 /// 背景 = -1024（空气）
@@ -22,7 +22,7 @@ __constant float canny_background_value = -1024.0f / 32767.0f;
 /// 双阈值检测 + 形态学滞后跟踪
 /// 对应OpenCV的Cv2.Canny简化版
 /// </remarks>
-__kernel void canny_3D(__read_only image3d_t input, __write_only image3d_t output, const float lower, const float upper, const int radius)
+__kernel void canny_3d(__read_only image3d_t input, __write_only image3d_t output, const float lower, const float upper, const int radius)
 {
 	int x = get_global_id(0);
 	int y = get_global_id(1);

@@ -957,6 +957,54 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }, _ => this.VolumeData != null);
         #endregion
 
+        #region Sobel边缘检测命令 —— ICommand SobelCommand
+        /// <summary>
+        /// Sobel边缘检测命令
+        /// </summary>
+        public ICommand SobelCommand => new AsyncRelayCommand(async _ =>
+        {
+            SobelViewModel viewModel = ResolveMediator.Resolve<SobelViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region Scharr边缘检测命令 —— ICommand ScharrCommand
+        /// <summary>
+        /// Scharr边缘检测命令
+        /// </summary>
+        public ICommand ScharrCommand => new AsyncRelayCommand(async _ =>
+        {
+            ScharrViewModel viewModel = ResolveMediator.Resolve<ScharrViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region Canny边缘检测命令 —— ICommand CannyCommand
+        /// <summary>
+        /// Canny边缘检测命令
+        /// </summary>
+        public ICommand CannyCommand => new AsyncRelayCommand(async _ =>
+        {
+            CannyViewModel viewModel = ResolveMediator.Resolve<CannyViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region Laplacian边缘检测命令 —— ICommand LaplacianCommand
+        /// <summary>
+        /// Laplacian边缘检测命令
+        /// </summary>
+        public ICommand LaplacianCommand => new AsyncRelayCommand(async _ =>
+        {
+            LaplacianViewModel viewModel = ResolveMediator.Resolve<LaplacianViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
         #region 阈值分割命令 —— ICommand ThresholdSegmentCommand
         /// <summary>
         /// 阈值分割命令

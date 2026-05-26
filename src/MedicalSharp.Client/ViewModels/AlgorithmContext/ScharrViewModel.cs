@@ -1,0 +1,135 @@
+﻿using Caliburn.Micro;
+using MedicalSharp.Engine.Algorithms;
+using MedicalSharp.Engine.Managers;
+using MedicalSharp.Engine.Resources;
+using MedicalSharp.Inspiration.Algorithms;
+using MedicalSharp.Inspiration.Managers;
+using MedicalSharp.Inspiration.Resources;
+using MedicalSharp.Presentation.Events;
+using MedicalSharp.Primitives.Models;
+using SD.Infrastructure.Avalonia.Caliburn.Aspects;
+using SD.Infrastructure.Avalonia.Caliburn.Base;
+using Silk.NET.OpenCL;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace MedicalSharp.Client.ViewModels.AlgorithmContext
+{
+    /// <summary>
+    /// Scharr边缘检测视图模型
+    /// </summary>
+    public class ScharrViewModel : ScreenBase
+    {
+        #region # 字段及构造器
+
+        /// <summary>
+        /// 事件聚合器
+        /// </summary>
+        private readonly IEventAggregator _eventAggregator;
+
+        /// <summary>
+        /// 依赖注入构造器
+        /// </summary>
+        public ScharrViewModel(IEventAggregator eventAggregator)
+        {
+            this._eventAggregator = eventAggregator;
+        }
+
+        #endregion
+
+        #region # 属性
+
+        #region 体积数据 —— VolumeData VolumeData
+        /// <summary>
+        /// 体积数据
+        /// </summary>
+        public VolumeData VolumeData { get; set; }
+        #endregion
+
+        #region X方向权重 —— float Alpha
+        /// <summary>
+        /// X方向权重
+        /// </summary>
+        [DependencyProperty]
+        public float Alpha { get; set; }
+        #endregion
+
+        #region Y方向权重 —— float Beta
+        /// <summary>
+        /// X方向权重
+        /// </summary>
+        [DependencyProperty]
+        public float Beta { get; set; }
+        #endregion
+
+        #region 偏移量 —— float Gamma
+        /// <summary>
+        /// 偏移量
+        /// </summary>
+        [DependencyProperty]
+        public float Gamma { get; set; }
+        #endregion
+
+        #endregion
+
+        #region # 方法
+
+        #region 初始化 —— override Task OnActivatedAsync(CancellationToken cancellationToken)
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected override Task OnActivatedAsync(CancellationToken cancellationToken)
+        {
+            //默认值
+            this.Alpha = 0.5f;
+            this.Beta = 0.5f;
+            this.Gamma = 0.0f;
+
+            return base.OnActivatedAsync(cancellationToken);
+        }
+        #endregion
+
+        #region 应用 —— async Task Apply()
+        /// <summary>
+        /// 应用
+        /// </summary>
+        public async Task Apply()
+        {
+            VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+            ClContext clContext = ClContextManager.Current;
+
+            int width = this.VolumeData.Metadata.VolumeSize.X;
+            int height = this.VolumeData.Metadata.VolumeSize.Y;
+            int depth = this.VolumeData.Metadata.VolumeSize.Z;
+
+            this.Busy();
+            await Task.Run(() =>
+            {
+                //创建图像
+                using ClImage3D inputImage = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
+                inputImage.Write(clContext.CommandQueue, this.VolumeData.PreviewData);
+                clContext.Finish();
+
+                //执行算法
+                using Scharr3D scharr = new Scharr3D(clContext);
+                scharr.ExecuteInPlace(inputImage, this.Alpha, this.Beta, this.Gamma);
+
+                //读回CPU
+                inputImage.Read(clContext.CommandQueue, this.VolumeData.PreviewData);
+            });
+            this.Idle();
+
+            //同步到预览纹理
+            SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, volumeSession.PreviewTexture);
+
+            //发布消息
+            SyncViewportEvent message = new SyncViewportEvent();
+            await this._eventAggregator.PublishOnUIThreadAsync(message);
+        }
+        #endregion
+
+        #endregion
+    }
+}

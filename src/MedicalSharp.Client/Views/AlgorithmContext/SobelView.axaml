@@ -1,0 +1,56 @@
+<fa:AppWindow x:Class="MedicalSharp.Client.Views.AlgorithmContext.SobelView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  xmlns:cm="http://caliburnmicro.com"
+			  mc:Ignorable="d"
+			  Width="460" Height="300" CanResize="False" ShowAsDialog="True"
+			  WindowStartupLocation="CenterScreen"
+			  Title="Sobel边缘检测">
+
+	<sd:BusyMask IsBusy="{Binding IsBusy}">
+		<Grid>
+			<Grid.RowDefinitions>
+				<!--表单区-->
+				<RowDefinition Height="240" />
+				<!--占位区-->
+				<RowDefinition Height="*" />
+				<!--控制区-->
+				<RowDefinition Height="50" />
+			</Grid.RowDefinitions>
+			<!--表单区-->
+			<StackPanel Grid.Row="0" Grid.IsSharedSizeScope="True" Margin="20,20">
+				<sd:FormItem Label="X方向权重：">
+					<NumericUpDown Width="300" HorizontalAlignment="Left"
+								   Minimum="0" Maximum="1" Increment="0.1"
+								   ParsingNumberStyle="Float" FormatString="F1"
+								   Text="{Binding Alpha}" />
+				</sd:FormItem>
+				<sd:FormItem Label="Y方向权重：">
+					<NumericUpDown Width="300" HorizontalAlignment="Left"
+								   Minimum="0" Maximum="1" Increment="0.1"
+								   ParsingNumberStyle="Float" FormatString="F1"
+								   Text="{Binding Beta}" />
+				</sd:FormItem>
+				<sd:FormItem Label="偏移量：">
+					<NumericUpDown Width="300" HorizontalAlignment="Left"
+								   Minimum="-0.05" Maximum="0.05" Increment="0.01"
+								   ParsingNumberStyle="Float" FormatString="F2"
+								   Text="{Binding Gamma}" />
+				</sd:FormItem>
+			</StackPanel>
+			<!--占位区-->
+			<Grid Grid.Row="1" />
+			<!--控制区-->
+			<Grid Grid.Row="2" Classes="Submit-Grid">
+				<WrapPanel Classes="Submit-WrapPanel">
+					<Button Content="应用" cm:Message.Attach="Apply()" Classes="Focus" />
+					<Button Content="取消" cm:Message.Attach="TryCloseAsync('false')" />
+				</WrapPanel>
+			</Grid>
+		</Grid>
+	</sd:BusyMask>
+</fa:AppWindow>
