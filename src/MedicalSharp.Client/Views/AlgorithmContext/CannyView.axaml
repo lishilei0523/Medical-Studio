@@ -25,14 +25,14 @@
 			<StackPanel Grid.Row="0" Grid.IsSharedSizeScope="True" Margin="20,20">
 				<sd:FormItem Label="低阈值：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
-								   Minimum="5" Maximum="50" Increment="1"
-								   ParsingNumberStyle="Float" FormatString="F1"
+								   Minimum="0.01" Maximum="0.3" Increment="0.01" 
+                                   ParsingNumberStyle="Float" FormatString="F2"
 								   Text="{Binding LowerThreshold}" />
 				</sd:FormItem>
 				<sd:FormItem Label="高阈值：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
-								   Minimum="20" Maximum="200" Increment="1"
-								   ParsingNumberStyle="Float" FormatString="F1"
+                                   Minimum="0.05" Maximum="0.5" Increment="0.01"
+                                   ParsingNumberStyle="Float" FormatString="F2"
 								   Text="{Binding UpperThreshold}" />
 				</sd:FormItem>
 				<sd:FormItem Label="标准差：">

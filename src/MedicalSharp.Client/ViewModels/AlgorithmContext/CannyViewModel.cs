@@ -91,8 +91,8 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         protected override Task OnActivatedAsync(CancellationToken cancellationToken)
         {
             //默认值
-            this.LowerThreshold = 10;
-            this.UpperThreshold = 30;
+            this.LowerThreshold = 0.05f;
+            this.UpperThreshold = 0.15f;
             this.Sigma = 1;
             this.DilateRadius = 1;
 
