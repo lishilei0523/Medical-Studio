@@ -1,0 +1,21 @@
+﻿<fa:AppWindow x:Class="MedicalSharp.Client.Views.CommonContext.ImageView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  mc:Ignorable="d"
+			  Width="1440" Height="900" FontSize="14"
+			  WindowStartupLocation="CenterScreen"
+			  Title="{Binding Title}" >
+
+	<Grid Background="LightGray">
+		<sd:ImageViewer ImageSource="{Binding Image}" />
+		<Grid.ContextFlyout>
+			<MenuFlyout>
+				<MenuItem Header="另存为(_A)" Command="{Binding SaveAsImageCommand}" />
+			</MenuFlyout>
+		</Grid.ContextFlyout>
+	</Grid>
+</fa:AppWindow>
