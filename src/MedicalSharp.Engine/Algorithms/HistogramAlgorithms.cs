@@ -43,7 +43,7 @@ namespace MedicalSharp.Engine.Algorithms
             #endregion
 
             long totalVoxels = volumeData.Metadata.VoxelsCount;
-            short* dataPtr = (short*)volumeData.OriginalData.ToPointer();
+            short* dataPtr = (short*)volumeData.PreviewData.ToPointer();
             float scale = bins / (maxHU - minHU);
 
             //局部直方图容器
@@ -140,6 +140,97 @@ namespace MedicalSharp.Engine.Algorithms
             }
 
             return cdf;
+        }
+        #endregion
+
+        #region # 适用直方图均衡化 —— static void ApplyHistogramEqualization(this VolumeData volumeData...
+        /// <summary>
+        /// 适用直方图均衡化
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="bins">桶数量（默认4096，覆盖[-1024, 3071]）</param>
+        /// <param name="minHU">最小HU</param>
+        /// <param name="maxHU">最大HU</param>
+        /// <remarks>原地修改PreviewData，仅用于增强预览，不可用于定量分析</remarks>
+        public static unsafe void ApplyHistogramEqualization(this VolumeData volumeData, int bins = 4096, float minHU = -1024f, float maxHU = 3071f)
+        {
+            #region # 验证
+
+            if (volumeData == null)
+            {
+                throw new ArgumentNullException(nameof(volumeData), "体积数据不可为空！");
+            }
+            if (volumeData.PreviewData == IntPtr.Zero)
+            {
+                throw new ArgumentNullException(nameof(volumeData), "预览数据指针未分配！");
+            }
+            if (bins <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(bins), "桶数量必须大于0！");
+            }
+            if (minHU >= maxHU)
+            {
+                throw new ArgumentOutOfRangeException(nameof(minHU), "最小HU必须小于最大HU！");
+            }
+
+            #endregion
+
+            //统计直方图
+            uint[] histogram = volumeData.ApplyHistogram(bins, minHU, maxHU);
+
+            //计算累积分布函数
+            float[] cdf = new float[bins];
+            cdf[0] = (float)histogram[0] / volumeData.Metadata.VoxelsCount;
+            for (int index = 1; index < bins; index++)
+            {
+                cdf[index] = cdf[index - 1] + (float)histogram[index] / volumeData.Metadata.VoxelsCount;
+            }
+
+            //构建LUT表
+            short[] lut = new short[65536];  //short范围[-32768, 32767]
+            for (int index = 0; index < 65536; index++)
+            {
+                short huValue = (short)(index - 32768);  //无符号索引 -> 有符号HU
+
+                //计算桶索引
+                float binFloat = (huValue - minHU) / (maxHU - minHU) * bins;
+                int bin = (int)binFloat;
+                if (bin < 0)
+                {
+                    bin = 0;
+                }
+                if (bin >= bins)
+                {
+                    bin = bins - 1;
+                }
+
+                //CDF映射到HU范围
+                float equalizedHU = minHU + cdf[bin] * (maxHU - minHU);
+                int result = (int)equalizedHU;
+                if (result < short.MinValue)
+                {
+                    result = short.MinValue;
+                }
+                if (result > short.MaxValue)
+                {
+                    result = short.MaxValue;
+                }
+
+                lut[index] = (short)result;
+            }
+
+            //逐体素LUT替换
+            short* dataPtr = (short*)volumeData.PreviewData.ToPointer();
+            long totalVoxels = volumeData.Metadata.VoxelsCount;
+            OrderablePartitioner<Tuple<long, long>> partitioner = Partitioner.Create(0L, totalVoxels);
+            Parallel.ForEach(partitioner, range =>
+            {
+                for (long i = range.Item1; i < range.Item2; i++)
+                {
+                    int index = dataPtr[i] + 32768;  //short -> uint16索引
+                    dataPtr[i] = lut[index];
+                }
+            });
         }
         #endregion
     }

@@ -65,6 +65,7 @@
                             <MenuItem Header="HU直方图(_G)" Command="{Binding HUHistogramCommand}" />
                             <MenuItem Header="归一化直方图(_N)" Command="{Binding NormalizedHistogramCommand}" />
                             <MenuItem Header="累积分布函数(_C)" Command="{Binding CDFHistogramCommand}" />
+                            <MenuItem Header="直方图均衡化(_E)" Command="{Binding HistogramEqualizationCommand}" />
                         </MenuItem>
 						<MenuItem Header="形态学(_M)">
 							<MenuItem Header="腐蚀(_E)" Command="{Binding MorphErodeCommand}" />

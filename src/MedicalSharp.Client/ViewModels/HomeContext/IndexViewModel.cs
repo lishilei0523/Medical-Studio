@@ -1007,6 +1007,33 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }, _ => this.VolumeData != null);
         #endregion
 
+        #region 直方图均衡化命令 —— ICommand HistogramEqualizationCommand
+        /// <summary>
+        /// 直方图均衡化命令
+        /// </summary>
+        public ICommand HistogramEqualizationCommand => new AsyncRelayCommand(async _ =>
+        {
+            VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+
+            this.Busy();
+
+            //执行算法
+            int bins = this.VolumeData.Metadata.MaxHU - this.VolumeData.Metadata.MinHU;
+            float minHU = this.VolumeData.Metadata.MinHU;
+            float maxHU = this.VolumeData.Metadata.MaxHU;
+            await Task.Run(() => this.VolumeData.ApplyHistogramEqualization(bins, minHU, maxHU));
+
+            this.Idle();
+
+            //同步到预览纹理
+            SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, volumeSession.PreviewTexture);
+
+            //发布消息
+            SyncViewportEvent message = new SyncViewportEvent();
+            await this._eventAggregator.PublishOnUIThreadAsync(message);
+        }, _ => this.VolumeData != null);
+        #endregion
+
         #region 形态学腐蚀命令 —— ICommand MorphErodeCommand
         /// <summary>
         /// 形态学腐蚀命令
