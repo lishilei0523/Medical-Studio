@@ -1,7 +1,7 @@
 <Project DefaultTargets="Build">
   <PropertyGroup>
     <LangVersion>Latest</LangVersion>
-    <BaseOutputPath>$(SolutionDir)\bin\</BaseOutputPath>
+    <BaseOutputPath>$(SolutionDir)\bin</BaseOutputPath>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <NoDefaultLaunchSettingsFile>True</NoDefaultLaunchSettingsFile>
   </PropertyGroup>
@@ -30,7 +30,7 @@
     </None>
     <None Include="*.config.transform">
       <Pack>True</Pack>
-      <PackagePath>content\</PackagePath>
+      <PackagePath>content</PackagePath>
     </None>
   </ItemGroup>
 </Project>

@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Resources\Kernels\*.cl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="Resources\Kernels\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

@@ -4,8 +4,8 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>MedicalSharp</AssemblyName>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
-    <Description>MedicalSharp 客户端</Description>
     <IsPackable>False</IsPackable>
+    <Description>MedicalSharp 客户端</Description>
     <AvaloniaUseCompiledBindingsByDefault>False</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
