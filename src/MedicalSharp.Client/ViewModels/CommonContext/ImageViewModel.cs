@@ -35,16 +35,6 @@ namespace MedicalSharp.Client.ViewModels.CommonContext
 
         #region # 属性
 
-        //属性
-
-        #region 标题 —— string Title
-        /// <summary>
-        /// 标题
-        /// </summary>
-        [DependencyProperty]
-        public string Title { get; set; }
-        #endregion
-
         #region 图像源 —— Bitmap Image
         /// <summary>
         /// 图像源
@@ -52,9 +42,6 @@ namespace MedicalSharp.Client.ViewModels.CommonContext
         [DependencyProperty]
         public Bitmap Image { get; set; }
         #endregion
-
-
-        //命令
 
         #region 另存为图像命令 —— ICommand SaveAsImageCommand
         /// <summary>
@@ -68,7 +55,6 @@ namespace MedicalSharp.Client.ViewModels.CommonContext
             FilePickerSaveOptions openOptions = new FilePickerSaveOptions
             {
                 Title = "保存图像",
-                SuggestedFileName = this.Title,
                 FileTypeChoices = [
                     new FilePickerFileType("JPEG图像")
                     {
@@ -106,16 +92,14 @@ namespace MedicalSharp.Client.ViewModels.CommonContext
 
         #region # 方法
 
-        #region 加载 —— void Load(Bitmap image...
+        #region 加载 —— void Load(Bitmap image)
         /// <summary>
         /// 加载
         /// </summary>
         /// <param name="image">图像</param>
-        /// <param name="title">标题</param>
-        public void Load(Bitmap image, string title = "查看图像")
+        public void Load(Bitmap image)
         {
             this.Image = image;
-            this.Title = title;
         }
         #endregion
 

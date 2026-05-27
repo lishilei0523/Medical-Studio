@@ -25,7 +25,12 @@ namespace MedicalSharp.Presentation.Maps
         {
             //ScottPlot绘图
             double[] values = histogram.Select(x => (double)x).ToArray();
-            double[] positions = Enumerable.Range(1, histogram.Length).Select(x => (double)x).ToArray();
+            double[] positions = new double[values.Length];
+            for (int index = 0; index < positions.Length; index++)
+            {
+                positions[index] = index - 1024;
+            }
+
             using Plot plot = new Plot();
             plot.Add.Bars(positions, values);
             byte[] imageBytes = plot.GetImageBytes(width, height);

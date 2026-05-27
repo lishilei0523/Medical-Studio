@@ -7,6 +7,9 @@ namespace MedicalSharp.Client.Views.CommonContext
     /// </summary>
     public partial class ImageView : AppWindow
     {
+        /// <summary>
+        /// 默认构造器
+        /// </summary>
         public ImageView()
         {
             this.InitializeComponent();

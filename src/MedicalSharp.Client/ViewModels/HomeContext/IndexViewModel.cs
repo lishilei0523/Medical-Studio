@@ -14,9 +14,6 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Resources;
-using MedicalSharp.Inspiration.Algorithms;
-using MedicalSharp.Inspiration.Managers;
-using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
@@ -33,7 +30,6 @@ using SD.Infrastructure.Avalonia.Commands;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
-using Silk.NET.OpenCL;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -954,34 +950,18 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand GrayHistogramCommand => new AsyncRelayCommand(async _ =>
         {
-            ClContext clContext = ClContextManager.Current;
-            int width = this.VolumeData.Metadata.VolumeSize.X;
-            int height = this.VolumeData.Metadata.VolumeSize.Y;
-            int depth = this.VolumeData.Metadata.VolumeSize.Z;
-
             this.Busy();
-            Bitmap histImage = null;
-            await Task.Run(() =>
-            {
-                //创建图像
-                using ClImage3D inputImage = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
-                inputImage.Write(clContext.CommandQueue, this.VolumeData.PreviewData);
-                clContext.Finish();
 
-                //执行算法
-                using Histogram3D histogram = new Histogram3D(clContext);
-                uint[] histArray = histogram.Execute(inputImage);
-                histImage = histArray.GenerateHistogramImage();
-            });
+            //计算灰度直方图
+            uint[] histogram = await Task.Run(() => this.VolumeData.ApplyHistogram());
+            Bitmap histImage = await Task.Run(() => histogram.GenerateHistogramImage(1440, 898));
+
             this.Idle();
 
-            if (histImage != null)
-            {
-                //打开窗口
-                ImageViewModel viewModel = ResolveMediator.Resolve<ImageViewModel>();
-                viewModel.Image = histImage;
-                await this._windowManager.ShowWindowAsync(viewModel);
-            }
+            //打开窗口
+            ImageViewModel viewModel = ResolveMediator.Resolve<ImageViewModel>();
+            viewModel.Load(histImage);
+            await this._windowManager.ShowWindowAsync(viewModel);
         }, _ => this.VolumeData != null);
         #endregion
 

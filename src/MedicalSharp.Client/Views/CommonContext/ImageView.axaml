@@ -8,9 +8,9 @@
 			  mc:Ignorable="d"
 			  Width="1440" Height="900" FontSize="14"
 			  WindowStartupLocation="CenterScreen"
-			  Title="{Binding Title}" >
+			  Title="">
 
-	<Grid Background="LightGray">
+	<Grid Background="#FF202020">
 		<sd:ImageViewer ImageSource="{Binding Image}" />
 		<Grid.ContextFlyout>
 			<MenuFlyout>
