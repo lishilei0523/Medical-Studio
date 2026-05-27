@@ -62,7 +62,9 @@
 							<MenuItem Header="布局13(_B)" Command="{Binding Layout13Command}" />
 						</MenuItem>
 						<MenuItem Header="直方图(_H)">
-                            <MenuItem Header="灰度直方图(_G)" Command="{Binding GrayHistogramCommand}" />
+                            <MenuItem Header="HU直方图(_G)" Command="{Binding HUHistogramCommand}" />
+                            <MenuItem Header="归一化直方图(_N)" Command="{Binding NormalizedHistogramCommand}" />
+                            <MenuItem Header="累积分布函数(_C)" Command="{Binding CDFHistogramCommand}" />
                         </MenuItem>
 						<MenuItem Header="形态学(_M)">
 							<MenuItem Header="腐蚀(_E)" Command="{Binding MorphErodeCommand}" />

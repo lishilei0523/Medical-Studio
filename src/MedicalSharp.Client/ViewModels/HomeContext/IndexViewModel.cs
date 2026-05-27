@@ -944,16 +944,58 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }, _ => this.VolumeData != null && this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
         #endregion
 
-        #region 灰度直方图命令 —— ICommand GrayHistogramCommand
+        #region HU直方图命令 —— ICommand HUHistogramCommand
         /// <summary>
-        /// 灰度直方图命令
+        /// HU直方图命令
         /// </summary>
-        public ICommand GrayHistogramCommand => new AsyncRelayCommand(async _ =>
+        public ICommand HUHistogramCommand => new AsyncRelayCommand(async _ =>
         {
             this.Busy();
 
-            //计算灰度直方图
+            //计算HU直方图
             uint[] histogram = await Task.Run(() => this.VolumeData.ApplyHistogram());
+            Bitmap histImage = await Task.Run(() => histogram.GenerateHistogramImage(1440, 898));
+
+            this.Idle();
+
+            //打开窗口
+            ImageViewModel viewModel = ResolveMediator.Resolve<ImageViewModel>();
+            viewModel.Load(histImage);
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 归一化直方图命令 —— ICommand NormalizedHistogramCommand
+        /// <summary>
+        /// 归一化直方图命令
+        /// </summary>
+        public ICommand NormalizedHistogramCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //计算归一化直方图
+            float[] histogram = await Task.Run(() => this.VolumeData.ApplyNormalizedHistogram());
+            Bitmap histImage = await Task.Run(() => histogram.GenerateHistogramImage(1440, 898));
+
+            this.Idle();
+
+            //打开窗口
+            ImageViewModel viewModel = ResolveMediator.Resolve<ImageViewModel>();
+            viewModel.Load(histImage);
+            await this._windowManager.ShowWindowAsync(viewModel);
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 累积分布函数命令 —— ICommand CDFHistogramCommand
+        /// <summary>
+        /// 累积分布函数命令
+        /// </summary>
+        public ICommand CDFHistogramCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //计算累积分布函数
+            float[] histogram = await Task.Run(() => this.VolumeData.ApplyCDF());
             Bitmap histImage = await Task.Run(() => histogram.GenerateHistogramImage(1440, 898));
 
             this.Idle();

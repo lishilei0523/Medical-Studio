@@ -20,15 +20,52 @@ namespace MedicalSharp.Presentation.Maps
         /// <param name="histogram">直方图数组</param>
         /// <param name="width">直方图图像宽度</param>
         /// <param name="height">直方图图像高度</param>
+        /// <param name="indexOffset">索引偏移量</param>
         /// <returns>直方图图像矩阵</returns>
-        public static Bitmap GenerateHistogramImage(this uint[] histogram, int width = 1024, int height = 768)
+        public static Bitmap GenerateHistogramImage(this uint[] histogram, int width = 1024, int height = 768, int indexOffset = -1024)
+        {
+            double[] values = histogram.Select(x => (double)x).ToArray();
+            Bitmap bitmap = GenerateHistogramImage(values, width, height, indexOffset);
+
+            return bitmap;
+        }
+        #endregion
+
+        #region # 生成直方图图像 —— static Bitmap GenerateHistogramImage(this float[] histogram...
+        /// <summary>
+        /// 生成直方图图像
+        /// </summary>
+        /// <param name="histogram">直方图数组</param>
+        /// <param name="width">直方图图像宽度</param>
+        /// <param name="height">直方图图像高度</param>
+        /// <param name="indexOffset">索引偏移量</param>
+        /// <returns>直方图图像矩阵</returns>
+        public static Bitmap GenerateHistogramImage(this float[] histogram, int width = 1024, int height = 768, int indexOffset = -1024)
+        {
+            double[] values = histogram.Select(x => (double)x).ToArray();
+            Bitmap bitmap = GenerateHistogramImage(values, width, height, indexOffset);
+
+            return bitmap;
+        }
+        #endregion
+
+        #region # 生成直方图图像 —— static Bitmap GenerateHistogramImage(this double[] histogram...
+        /// <summary>
+        /// 生成直方图图像
+        /// </summary>
+        /// <param name="histogram">直方图数组</param>
+        /// <param name="width">直方图图像宽度</param>
+        /// <param name="height">直方图图像高度</param>
+        /// <param name="indexOffset">索引偏移量</param>
+        /// <returns>直方图图像矩阵</returns>
+        public static Bitmap GenerateHistogramImage(this double[] histogram, int width = 1024, int height = 768, int indexOffset = -1024)
         {
             //ScottPlot绘图
-            double[] values = histogram.Select(x => (double)x).ToArray();
+            double[] values = histogram;
             double[] positions = new double[values.Length];
             for (int index = 0; index < positions.Length; index++)
             {
-                positions[index] = index - 1024;
+                positions[index] = index + indexOffset;
             }
 
             using Plot plot = new Plot();
