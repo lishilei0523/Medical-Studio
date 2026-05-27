@@ -144,8 +144,8 @@ namespace MedicalSharp.Inspiration.Algorithms
                 return;
             }
 
-            this._program?.Dispose();
             this._kernel?.Dispose();
+            this._program?.Dispose();
             this._disposed = true;
         }
         #endregion
