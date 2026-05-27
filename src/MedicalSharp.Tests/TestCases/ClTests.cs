@@ -607,5 +607,88 @@ namespace MedicalSharp.Tests.TestCases
             Assert.IsTrue(nearValue > 0);
         }
         #endregion
+
+        #region # 测试3D灰度直方图统计算法 —— void TestHistogram3D()
+        /// <summary>
+        /// 测试3D灰度直方图统计算法
+        /// </summary>
+        [TestMethod]
+        public void TestHistogram3D()
+        {
+            const int size = 32;
+            const int bins = 256;
+            const float minHU = -1024f;
+            const float maxHU = 3071f;
+
+            //创建上下文
+            using ClContext context = ClContext.Create();
+            Trace.WriteLine($"设备: {context.DeviceName}");
+
+            //创建3D图像并写入已知数据
+            using ClImage3D image = ClImage3D.Create(context, size, size, size, MemFlags.ReadWrite, ChannelOrder.Intensity, ChannelType.SNormInt16);
+
+            //填充统一值0.5（SNORM约16383，HU约0）
+            image.Fill(context.CommandQueue, 0.0f);  //HU=0 ≈ 背景
+            context.Finish();
+
+            //在中心位置放置一个亮点（HU=500）
+            short[] spotData = new short[size * size * size];
+            const int centerIndex = (size / 2) * size * size + (size / 2) * size + (size / 2);
+            spotData[centerIndex] = 500;  //HU=500的体素
+            image.Write(context.CommandQueue, spotData);
+            context.Finish();
+
+            //执行直方图统计
+            using Histogram3D histogram = new Histogram3D(context);
+            uint[] result = histogram.Execute(image, bins, minHU, maxHU);
+
+            //验证
+            int totalVoxels = size * size * size;
+            uint totalCount = 0;
+            uint maxBinValue = 0;
+            int maxBinIndex = 0;
+            for (int index = 0; index < bins; index++)
+            {
+                totalCount += result[index];
+                if (result[index] > maxBinValue)
+                {
+                    maxBinValue = result[index];
+                    maxBinIndex = index;
+                }
+            }
+
+            //总计数应等于总体素
+            Assert.AreEqual(totalVoxels, (int)totalCount, "直方图总计数不匹配总体素数");
+
+            //最大值应该在HU=0附近（大部分体素填充了0）
+            float huAtMaxBin = minHU + (maxBinIndex + 0.5f) * (maxHU - minHU) / bins;
+            Assert.IsTrue(Math.Abs(huAtMaxBin - 0) < 100, $"峰值HU值偏离0: {huAtMaxBin}");
+
+            //HU=500的体素应该被统计到对应的桶
+            const int spotBin = (int)((500 - minHU) / (maxHU - minHU) * bins);
+            Assert.AreEqual(1u, result[spotBin], $"HU=500 的体素未被正确统计，桶 {spotBin} 的值 = {result[spotBin]}");
+
+            Trace.WriteLine("直方图统计测试通过");
+            Trace.WriteLine($"总体素: {totalVoxels}");
+            Trace.WriteLine($"峰值桶: {maxBinIndex} (HU ≈ {huAtMaxBin:F0})");
+            Trace.WriteLine($"HU=500 在桶: {spotBin} (值 = {result[spotBin]})");
+
+            //测试归一化直方图
+            float[] normalized = histogram.ExecuteNormalized(image, bins, minHU, maxHU);
+            float normSum = 0;
+            for (int i = 0; i < bins; i++)
+            {
+                normSum += normalized[i];
+            }
+            Assert.AreEqual(1.0f, normSum, 0.001f, "归一化直方图总和不等于 1.0");
+
+            //测试CDF
+            float[] cdf = histogram.ExecuteCDF(image, bins, minHU, maxHU);
+            Assert.AreEqual(normalized[0], cdf[0], 0.001f, "CDF第一个值应等于归一化第一个值");
+            Assert.AreEqual(1.0f, cdf[bins - 1], 0.001f, "CDF最后一个值应接近1.0");
+
+            Trace.WriteLine("归一化直方图和CDF测试通过");
+        }
+        #endregion
     }
 }

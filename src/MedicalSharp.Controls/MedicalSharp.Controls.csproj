@@ -8,12 +8,10 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.16" />
     <PackageReference Include="OpenTK.Graphics" Version="4.9.4" />
-    <PackageReference Include="MIConvexHull" Version="1.1.19.1019" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MedicalSharp.Engine\MedicalSharp.Engine.csproj" />
-    <ProjectReference Include="..\MedicalSharp.Inspiration\MedicalSharp.Inspiration.csproj" />
     <ProjectReference Include="..\MedicalSharp.Primitives\MedicalSharp.Primitives.csproj" />
   </ItemGroup>
 </Project>
