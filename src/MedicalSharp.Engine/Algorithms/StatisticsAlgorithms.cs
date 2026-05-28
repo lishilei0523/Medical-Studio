@@ -343,6 +343,133 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
+        #region # 适用椭圆形统计 —— static StatisticResult ApplyEllipseAnalyse(this VolumeData volumeData...
+        /// <summary>
+        /// 适用椭圆形统计
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="center">椭圆中心（屏幕坐标）</param>
+        /// <param name="halfWidth">半宽（像素）</param>
+        /// <param name="halfHeight">半高（像素）</param>
+        /// <param name="viewportWidth">视口宽度</param>
+        /// <param name="viewportHeight">视口高度</param>
+        /// <param name="zoomFactor">缩放因子</param>
+        /// <param name="layerPixels">层像素指针</param>
+        /// <param name="markValue">标记值</param>
+        /// <returns>统计结果</returns>
+        public static StatisticResult ApplyEllipseAnalyse(this VolumeData volumeData, Vector2 center, float halfWidth, float halfHeight, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
+        {
+            float rescaleSlope = volumeData.Metadata.RescaleSlope;
+            float rescaleIntercept = volumeData.Metadata.RescaleIntercept;
+
+            //椭圆方程参数
+            float aSq = halfWidth * halfWidth;   // 半宽平方
+            float bSq = halfHeight * halfHeight; // 半高平方
+
+            //统计变量
+            float minHu = float.MaxValue;
+            float maxHu = float.MinValue;
+            double huSum = 0;
+            double huSumSq = 0;
+            int boundaryPixelsCount = 0;
+            int pixelsCount = 0;
+
+            //计算椭圆包围盒
+            int minX = (int)Math.Max(0, center.X - halfWidth - 1);
+            int maxX = (int)Math.Min(viewportWidth - 1, center.X + halfWidth + 1);
+            int minY = (int)Math.Max(0, center.Y - halfHeight - 1);
+            int maxY = (int)Math.Min(viewportHeight - 1, center.Y + halfHeight + 1);
+
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    Vector2 pixelPos = new Vector2(x + 0.5f, y + 0.5f);
+
+                    //计算相对于椭圆中心的偏移
+                    float dx = pixelPos.X - center.X;
+                    float dy = pixelPos.Y - center.Y;
+
+                    //椭圆判断：(dx²/a²) + (dy²/b²) ≤ 1
+                    float value = (dx * dx) / aSq + (dy * dy) / bSq;
+
+                    if (value > 1.0f)
+                    {
+                        continue;
+                    }
+
+                    //翻转Y轴
+                    int flippedY = viewportHeight - 1 - y;
+                    int index = (flippedY * viewportWidth + x) * 4;
+                    byte pixelValue = layerPixels[index];
+                    byte currentMark = layerPixels[index + 3];
+
+                    //跳过背景
+                    if (pixelValue == 0 && currentMark == 0)
+                    {
+                        continue;
+                    }
+
+                    //标记值过滤
+                    if (markValue.HasValue && currentMark != markValue.Value)
+                    {
+                        continue;
+                    }
+
+                    //还原HU值
+                    float normalized = pixelValue / 255.0f;
+                    float snormValue = normalized * 2.0f - 1.0f;
+                    float rawValue = snormValue * 32767.0f;
+                    float huValue = rawValue * rescaleSlope + rescaleIntercept;
+
+                    //累加统计
+                    if (huValue < minHu)
+                    {
+                        minHu = huValue;
+                    }
+                    if (huValue > maxHu)
+                    {
+                        maxHu = huValue;
+                    }
+                    huSum += huValue;
+                    huSumSq += huValue * huValue;
+
+                    //边界判断：像素在椭圆边上（0.9 ≤ value ≤ 1.1）
+                    if (Math.Abs(value - 1.0f) <= 0.15f)
+                    {
+                        boundaryPixelsCount++;
+                    }
+
+                    pixelsCount++;
+                }
+            }
+
+            //像素数量转体素数量
+            float areaScale = zoomFactor * zoomFactor;
+            int boundaryVoxelsCount = (int)Math.Round(boundaryPixelsCount / areaScale);
+            int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
+
+            //计算统计指标
+            float averageHu = voxelsCount > 0 ? (float)(huSum / voxelsCount) : 0;
+            float variance = voxelsCount > 0 ? (float)((huSumSq / voxelsCount) - (averageHu * averageHu)) : 0;
+            float stdDevHu = variance > 0 ? MathF.Sqrt(variance) : 0;
+
+            //构造结果
+            StatisticResult result = new StatisticResult
+            {
+                MinHU = minHu.Equals(float.MaxValue) ? 0 : minHu,
+                MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
+                AverageHU = averageHu,
+                StdDevHU = stdDevHu,
+                BoundaryCount = boundaryVoxelsCount,
+                VoxelsCount = voxelsCount
+            };
+            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
+
+            return result;
+        }
+        #endregion
+
 
         //Private
 

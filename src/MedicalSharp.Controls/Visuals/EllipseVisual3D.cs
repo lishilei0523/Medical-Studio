@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
@@ -16,7 +17,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 椭圆形3D元素
     /// </summary>
-    public class EllipseVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D, IRotatable, IResizable2D, IResizable3D, ICutVolume
+    public class EllipseVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D, IRotatable, IResizable2D, IResizable3D, ICutVolume, IAnalyseVolume2D
     {
         #region # 字段及构造器
 
@@ -360,6 +361,62 @@ namespace MedicalSharp.Controls.Visuals
             Vector3 vAxis = this.VAxis.ToVector3();
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyEllipseCut(this.Width, this.Height, center, normal, uAxis, vAxis, localToWorld, cutMode, markValue);
+        }
+        #endregion
+
+        #region 适用统计体积 —— StatisticResult ApplyAnalyseVolume(MPRViewport viewport...
+        /// <summary>
+        /// 适用统计体积
+        /// </summary>
+        /// <param name="viewport">MPR视口</param>
+        /// <param name="markValue">标记值</param>
+        /// <returns>统计结果</returns>
+        public StatisticResult ApplyAnalyseVolume(MPRViewport viewport, byte? markValue)
+        {
+            #region # 验证
+
+            if (viewport.VolumeData == null)
+            {
+                return default;
+            }
+            if (viewport.MPRRenderer == null)
+            {
+                return default;
+            }
+            if (viewport.MPRCamera == null)
+            {
+                return default;
+            }
+            if (viewport.Plane == null)
+            {
+                return default;
+            }
+
+            #endregion
+
+            //计算中心点世界坐标
+            Vector3 localCenter = this.Center.ToVector3();
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, this.Transform.Matrix);
+
+            //计算U轴和V轴方向上的点
+            Vector3 worldUEdge = worldCenter + this.UAxis.ToVector3() * this.Width / 2;
+            Vector3 worldVEdge = worldCenter + this.VAxis.ToVector3() * this.Height / 2;
+
+            //投影到屏幕坐标
+            Vector2 screenCenter = viewport.Project(worldCenter);
+            Vector2 screenUEdge = viewport.Project(worldUEdge);
+            Vector2 screenVEdge = viewport.Project(worldVEdge);
+
+            //计算屏幕上的半轴长度
+            float screenHalfWidth = Vector2.Distance(screenCenter, screenUEdge);
+            float screenHalfHeight = Vector2.Distance(screenCenter, screenVEdge);
+
+            int viewportWidth = viewport.ViewportSize.Width;
+            int viewportHeight = viewport.ViewportSize.Height;
+            byte[] pixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
+            StatisticResult result = viewport.VolumeData.ApplyEllipseAnalyse(screenCenter, screenHalfWidth, screenHalfHeight, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, pixels, markValue);
+
+            return result;
         }
         #endregion
 
