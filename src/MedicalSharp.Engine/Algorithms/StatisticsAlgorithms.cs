@@ -1,7 +1,9 @@
 ﻿using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MedicalSharp.Engine.Algorithms
@@ -207,9 +209,235 @@ namespace MedicalSharp.Engine.Algorithms
             result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
 
             //保存图像测试
-            //Task.Run(() => GeometryAlgorithms.SaveImage(viewportWidth, viewportHeight, layerPixels, screenCorners));
+            //Task.Run(() => SaveImage(viewportWidth, viewportHeight, layerPixels, screenCorners));
 
             return result;
+        }
+        #endregion
+
+        #region # 适用圆形统计 —— static StatisticResult ApplyCircleAnalyse(this VolumeData volumeData...
+        /// <summary>
+        /// 适用圆形统计
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="center">圆心（屏幕坐标）</param>
+        /// <param name="radius">半径（像素）</param>
+        /// <param name="viewportWidth">视口宽度</param>
+        /// <param name="viewportHeight">视口高度</param>
+        /// <param name="zoomFactor">缩放因子</param>
+        /// <param name="layerPixels">层像素指针</param>
+        /// <param name="markValue">标记值</param>
+        /// <returns>统计结果</returns>
+        public static StatisticResult ApplyCircleAnalyse(this VolumeData volumeData, Vector2 center, float radius,
+            int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
+        {
+            float rescaleSlope = volumeData.Metadata.RescaleSlope;
+            float rescaleIntercept = volumeData.Metadata.RescaleIntercept;
+            float radiusSq = radius * radius;
+
+            //统计变量
+            float minHu = float.MaxValue;
+            float maxHu = float.MinValue;
+            double huSum = 0;
+            double huSumSq = 0;
+            int boundaryPixelsCount = 0;
+            int pixelsCount = 0;
+
+            //计算圆形的包围盒（优化遍历范围）
+            int minX = (int)Math.Max(0, center.X - radius - 1);
+            int maxX = (int)Math.Min(viewportWidth - 1, center.X + radius + 1);
+            int minY = (int)Math.Max(0, center.Y - radius - 1);
+            int maxY = (int)Math.Min(viewportHeight - 1, center.Y + radius + 1);
+
+            //遍历包围盒内的像素
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    Vector2 pixelPos = new Vector2(x + 0.5f, y + 0.5f);
+
+                    //计算到圆心的距离平方
+                    float dx = pixelPos.X - center.X;
+                    float dy = pixelPos.Y - center.Y;
+                    float distSq = dx * dx + dy * dy;
+
+                    //判断是否在圆内
+                    if (distSq > radiusSq)
+                    {
+                        continue;
+                    }
+
+                    //翻转Y轴
+                    int flippedY = viewportHeight - 1 - y;
+                    int index = (flippedY * viewportWidth + x) * 4;
+                    byte pixelValue = layerPixels[index];
+                    byte currentMark = layerPixels[index + 3];
+
+                    //跳过背景
+                    if (pixelValue == 0 && currentMark == 0)
+                    {
+                        continue;
+                    }
+
+                    //标记值过滤
+                    if (markValue.HasValue && currentMark != markValue.Value)
+                    {
+                        continue;
+                    }
+
+                    //还原HU值
+                    float normalized = pixelValue / 255.0f;
+                    float snormValue = normalized * 2.0f - 1.0f;
+                    float rawValue = snormValue * 32767.0f;
+                    float huValue = rawValue * rescaleSlope + rescaleIntercept;
+
+                    //累加统计
+                    if (huValue < minHu)
+                    {
+                        minHu = huValue;
+                    }
+                    if (huValue > maxHu)
+                    {
+                        maxHu = huValue;
+                    }
+                    huSum += huValue;
+                    huSumSq += huValue * huValue;
+
+                    //边界判断：像素在圆边上（距离在半径附近）
+                    float distance = MathF.Sqrt(distSq);
+                    if (Math.Abs(distance - radius) <= 0.8f)
+                    {
+                        boundaryPixelsCount++;
+                    }
+
+                    pixelsCount++;
+                }
+            }
+
+            //像素数量转体素数量
+            float areaScale = zoomFactor * zoomFactor;
+            int boundaryVoxelsCount = (int)Math.Round(boundaryPixelsCount / areaScale);
+            int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
+
+            //计算统计指标
+            float averageHu = voxelsCount > 0 ? (float)(huSum / voxelsCount) : 0;
+            float variance = voxelsCount > 0 ? (float)((huSumSq / voxelsCount) - (averageHu * averageHu)) : 0;
+            float stdDevHu = variance > 0 ? MathF.Sqrt(variance) : 0;
+
+            //构造结果
+            StatisticResult result = new StatisticResult
+            {
+                MinHU = minHu.Equals(float.MaxValue) ? 0 : minHu,
+                MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
+                AverageHU = averageHu,
+                StdDevHU = stdDevHu,
+                BoundaryCount = boundaryVoxelsCount,
+                VoxelsCount = voxelsCount
+            };
+            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
+
+            //保存图像测试
+            //Task.Run(() => SaveImage(viewportWidth, viewportHeight, layerPixels, center, radius));
+
+            return result;
+        }
+        #endregion
+
+
+        //Private
+
+        #region # 保存图像 —— static void SaveImage(int viewportWidth, int viewportHeight...
+        /// <summary>
+        /// 保存图像
+        /// </summary>
+        /// <remarks>用于调试</remarks>
+        public static unsafe void SaveImage(int viewportWidth, int viewportHeight, byte[] layerPixels, Vector2[] screenCorners)
+        {
+            //翻转生成SK图像
+            using SKBitmap bitmap = new SKBitmap(viewportWidth, viewportHeight, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+            byte* targetPtr = (byte*)bitmap.GetPixels().ToPointer();
+            fixed (byte* sourcePtr = layerPixels)
+            {
+                int stride = viewportWidth * 4;
+                for (int y = 0; y < viewportHeight; y++)
+                {
+                    int sourceY = viewportHeight - 1 - y;  //翻转Y轴
+                    byte* sourceRow = sourcePtr + sourceY * stride;
+                    byte* targetRow = targetPtr + y * stride;
+
+                    //复制整行（RGBA -> RGBA，顺序相同）
+                    Buffer.MemoryCopy(sourceRow, targetRow, stride, stride);
+                }
+            }
+
+            //定义矩形
+            int minX = (int)Math.Min(Math.Min(screenCorners[0].X, screenCorners[1].X), Math.Min(screenCorners[2].X, screenCorners[3].X));
+            int maxX = (int)Math.Max(Math.Max(screenCorners[0].X, screenCorners[1].X), Math.Max(screenCorners[2].X, screenCorners[3].X));
+            int minY = (int)Math.Min(Math.Min(screenCorners[0].Y, screenCorners[1].Y), Math.Min(screenCorners[2].Y, screenCorners[3].Y));
+            int maxY = (int)Math.Max(Math.Max(screenCorners[0].Y, screenCorners[1].Y), Math.Max(screenCorners[2].Y, screenCorners[3].Y));
+            SKRect reactangle = SKRect.Create(minX, minY, maxX - minX, maxY - minY);
+
+            //绘制矩形
+            using SKCanvas canvas = new SKCanvas(bitmap);
+            using SKPaint fill = new SKPaint();
+            using SKPaint stroke = new SKPaint();
+            fill.Style = SKPaintStyle.Fill;
+            fill.Color = SKColors.White;
+            fill.IsAntialias = true;
+            stroke.Style = SKPaintStyle.Stroke;
+            stroke.Color = SKColors.Black;
+            stroke.StrokeWidth = 1;
+            stroke.IsAntialias = true;
+            canvas.DrawRect(reactangle, fill);
+            canvas.DrawRect(reactangle, stroke);
+
+            //保存文件
+            using FileStream stream = File.OpenWrite("MPR.png");
+            bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
+        }
+        #endregion
+
+        #region # 保存图像 —— static void SaveImage(int viewportWidth, int viewportHeight...
+        /// <summary>
+        /// 保存图像
+        /// </summary>
+        /// <remarks>用于调试</remarks>
+        public static unsafe void SaveImage(int viewportWidth, int viewportHeight, byte[] layerPixels, Vector2 center, float radius)
+        {
+            //翻转生成SK图像
+            using SKBitmap bitmap = new SKBitmap(viewportWidth, viewportHeight, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+            byte* targetPtr = (byte*)bitmap.GetPixels().ToPointer();
+            fixed (byte* sourcePtr = layerPixels)
+            {
+                int stride = viewportWidth * 4;
+                for (int y = 0; y < viewportHeight; y++)
+                {
+                    int sourceY = viewportHeight - 1 - y;  //翻转Y轴
+                    byte* sourceRow = sourcePtr + sourceY * stride;
+                    byte* targetRow = targetPtr + y * stride;
+
+                    //复制整行（RGBA -> RGBA，顺序相同）
+                    Buffer.MemoryCopy(sourceRow, targetRow, stride, stride);
+                }
+            }
+
+            //绘制圆形
+            using SKCanvas canvas = new SKCanvas(bitmap);
+            using SKPaint fill = new SKPaint();
+            using SKPaint stroke = new SKPaint();
+            fill.Style = SKPaintStyle.Fill;
+            fill.Color = SKColors.White;
+            fill.IsAntialias = true;
+            stroke.Style = SKPaintStyle.Stroke;
+            stroke.Color = SKColors.Black;
+            stroke.StrokeWidth = 1;
+            stroke.IsAntialias = true;
+            canvas.DrawCircle(center.X, center.Y, radius, fill);
+            canvas.DrawCircle(center.X, center.Y, radius, stroke);
+
+            //保存文件
+            using FileStream stream = File.OpenWrite("MPR-Circle.png");
+            bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
         }
         #endregion
     }

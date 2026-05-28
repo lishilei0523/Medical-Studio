@@ -1,9 +1,7 @@
 ﻿using MIConvexHull;
 using OpenTK.Mathematics;
-using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace MedicalSharp.Engine.Algorithms
@@ -13,57 +11,6 @@ namespace MedicalSharp.Engine.Algorithms
     /// </summary>
     public static class GeometryAlgorithms
     {
-        #region # 保存图像 —— static void SaveImage(int viewportWidth, int viewportHeight...
-        /// <summary>
-        /// 保存图像
-        /// </summary>
-        /// <remarks>用于调试</remarks>
-        public static unsafe void SaveImage(int viewportWidth, int viewportHeight, byte[] layerPixels, Vector2[] screenCorners)
-        {
-            //翻转生成SK图像
-            using SKBitmap bitmap = new SKBitmap(viewportWidth, viewportHeight, SKColorType.Rgba8888, SKAlphaType.Unpremul);
-            byte* targetPtr = (byte*)bitmap.GetPixels().ToPointer();
-            fixed (byte* sourcePtr = layerPixels)
-            {
-                int stride = viewportWidth * 4;
-                for (int y = 0; y < viewportHeight; y++)
-                {
-                    int sourceY = viewportHeight - 1 - y;  //翻转Y轴
-                    byte* sourceRow = sourcePtr + sourceY * stride;
-                    byte* targetRow = targetPtr + y * stride;
-
-                    //复制整行（RGBA -> RGBA，顺序相同）
-                    Buffer.MemoryCopy(sourceRow, targetRow, stride, stride);
-                }
-            }
-
-            //定义矩形
-            int minX = (int)Math.Min(Math.Min(screenCorners[0].X, screenCorners[1].X), Math.Min(screenCorners[2].X, screenCorners[3].X));
-            int maxX = (int)Math.Max(Math.Max(screenCorners[0].X, screenCorners[1].X), Math.Max(screenCorners[2].X, screenCorners[3].X));
-            int minY = (int)Math.Min(Math.Min(screenCorners[0].Y, screenCorners[1].Y), Math.Min(screenCorners[2].Y, screenCorners[3].Y));
-            int maxY = (int)Math.Max(Math.Max(screenCorners[0].Y, screenCorners[1].Y), Math.Max(screenCorners[2].Y, screenCorners[3].Y));
-            SKRect reactangle = SKRect.Create(minX, minY, maxX - minX, maxY - minY);
-
-            //绘制矩形
-            using SKCanvas canvas = new SKCanvas(bitmap);
-            using SKPaint fill = new SKPaint();
-            using SKPaint stroke = new SKPaint();
-            fill.Style = SKPaintStyle.Fill;
-            fill.Color = SKColors.White;
-            fill.IsAntialias = true;
-            stroke.Style = SKPaintStyle.Stroke;
-            stroke.Color = SKColors.Black;
-            stroke.StrokeWidth = 1;
-            stroke.IsAntialias = true;
-            canvas.DrawRect(reactangle, fill);
-            canvas.DrawRect(reactangle, stroke);
-
-            //保存文件
-            using FileStream stream = File.OpenWrite("MPR.png");
-            bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
-        }
-        #endregion
-
         #region # 判断点是否在顶点列表中 —— static bool ContainsPoint(IReadOnlyList<Vector3> vertices...
         /// <summary>
         /// 判断点是否在顶点列表中
