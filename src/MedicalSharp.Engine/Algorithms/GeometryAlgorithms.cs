@@ -422,9 +422,9 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断体素是否是球体边界体素 —— static bool IsVoxelOnSphereBoundary(in Vector3i voxelPosition...
+        #region # 判断体素是否在球体边界 —— static bool IsVoxelOnSphereBoundary(in Vector3i voxelPosition...
         /// <summary>
-        /// 判断体素是否是球体边界体素
+        /// 判断体素是否在球体边界
         /// </summary>
         /// <param name="voxelPosition">体素坐标</param>
         /// <param name="volumeSize">体积尺寸</param>
@@ -432,8 +432,8 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="sphereCenter">球心（世界坐标）</param>
         /// <param name="sphereRadius">半径（世界单位）</param>
         /// <param name="epsilon">容差</param>
-        /// <returns>是否是边界体素</returns>
-        public static bool IsVoxelOnSphereBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 sphereCenter, float sphereRadius, float epsilon = 0.5f)
+        /// <returns>是否在球体边界</returns>
+        public static bool IsVoxelOnSphereBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 sphereCenter, float sphereRadius, float epsilon = 0.005f)
         {
             //体素坐标 -> 世界坐标
             Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
@@ -446,6 +446,83 @@ namespace MedicalSharp.Engine.Algorithms
             bool isVoxelOn = Math.Abs(distance - sphereRadius) <= epsilon;
 
             return isVoxelOn;
+        }
+        #endregion
+
+        #region # 判断体素是否在圆柱体内 —— static bool IsVoxelInCylinder(in Vector3i voxelPosition...
+        /// <summary>
+        /// 判断体素是否在圆柱体内
+        /// </summary>
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="volumeSize">体积尺寸</param>
+        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="cylinderCenter">圆柱中心（世界坐标）</param>
+        /// <param name="cylinderAxis">圆柱轴方向（归一化）</param>
+        /// <param name="cylinderRadius">半径（世界单位）</param>
+        /// <param name="cylinderHeight">高度（世界单位）</param>
+        /// <returns>是否在圆柱体内</returns>
+        public static bool IsVoxelInCylinder(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale,
+            in Vector3 cylinderCenter, in Vector3 cylinderAxis, float cylinderRadius, float cylinderHeight)
+        {
+            //体素坐标 -> 世界坐标
+            Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
+            Vector3 worldPos = (texCoord - new Vector3(0.5f)) * volumeScale;
+
+            //计算相对圆柱中心的偏移
+            Vector3 delta = worldPos - cylinderCenter;
+
+            //沿轴方向的投影距离
+            float along = Vector3.Dot(delta, cylinderAxis);
+
+            //超出高度范围
+            if (Math.Abs(along) > cylinderHeight / 2.0f)
+            {
+                return false;
+            }
+
+            //垂直轴方向的径向距离
+            Vector3 radial = delta - along * cylinderAxis;
+            float radialDist = radial.Length;
+            bool isVoxelIn = radialDist <= cylinderRadius;
+
+            return isVoxelIn;
+        }
+        #endregion
+
+        #region # 判断体素是否在圆柱体边界 —— static bool IsVoxelOnCylinderBoundary(in Vector3i voxelPosition...
+        /// <summary>
+        /// 判断体素是否在圆柱体边界
+        /// </summary>
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="volumeSize">体积尺寸</param>
+        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="cylinderCenter">圆柱中心（世界坐标）</param>
+        /// <param name="cylinderAxis">圆柱轴方向（归一化）</param>
+        /// <param name="cylinderRadius">半径（世界单位）</param>
+        /// <param name="cylinderHeight">高度（世界单位）</param>
+        /// <param name="epsilon">容差</param>
+        /// <returns>是否在圆柱体边界</returns>
+        public static bool IsVoxelOnCylinderBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 cylinderCenter, in Vector3 cylinderAxis, float cylinderRadius, float cylinderHeight, float epsilon = 0.005f)
+        {
+            //体素坐标 -> 世界坐标
+            Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
+            Vector3 worldPos = (texCoord - new Vector3(0.5f)) * volumeScale;
+
+            //计算相对圆柱中心的偏移
+            Vector3 delta = worldPos - cylinderCenter;
+
+            //沿轴方向的投影距离
+            float along = Vector3.Dot(delta, cylinderAxis);
+
+            //垂直轴方向的径向距离
+            Vector3 radial = delta - along * cylinderAxis;
+            float radialDist = radial.Length;
+
+            //边界判断：侧面边界（径向距离接近半径）或 顶/底边界（沿轴距离接近半高）
+            bool onSide = Math.Abs(radialDist - cylinderRadius) <= epsilon;
+            bool onTopBottom = Math.Abs(Math.Abs(along) - cylinderHeight / 2.0f) <= epsilon && radialDist <= cylinderRadius;
+
+            return onSide || onTopBottom;
         }
         #endregion
     }
