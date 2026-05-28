@@ -74,8 +74,15 @@ namespace MedicalSharp.Presentation.Maps
             }
             if (!string.IsNullOrWhiteSpace(patientData.BirthDate))
             {
-                DateOnly birthDate = DateOnly.ParseExact(patientData.BirthDate, "yyyyMMdd");
-                patientInfo.BirthDate = birthDate.ToString("yyyy-MM-dd");
+                try
+                {
+                    DateOnly birthDate = DateOnly.ParseExact(patientData.BirthDate[..8], "yyyyMMdd");
+                    patientInfo.BirthDate = birthDate.ToString("yyyy-MM-dd");
+                }
+                catch
+                {
+                    patientInfo.BirthDate = patientData.BirthDate;
+                }
             }
 
             return patientInfo;
@@ -100,13 +107,27 @@ namespace MedicalSharp.Presentation.Maps
             StudyInfo studyInfo = studyData.Map<VolumeStudyData, StudyInfo>();
             if (!string.IsNullOrWhiteSpace(studyData.StudyDate))
             {
-                DateOnly studyDate = DateOnly.ParseExact(studyData.StudyDate, "yyyyMMdd");
-                studyInfo.StudyDate = studyDate.ToString("yyyy-MM-dd");
+                try
+                {
+                    DateOnly studyDate = DateOnly.ParseExact(studyData.StudyDate[..8], "yyyyMMdd");
+                    studyInfo.StudyDate = studyDate.ToString("yyyy-MM-dd");
+                }
+                catch
+                {
+                    studyInfo.StudyDate = studyData.StudyDate;
+                }
             }
             if (!string.IsNullOrWhiteSpace(studyData.StudyTime))
             {
-                TimeOnly studyTime = TimeOnly.ParseExact(studyData.StudyTime, "HHmmss");
-                studyInfo.StudyTime = studyTime.ToString("HH:mm:ss");
+                try
+                {
+                    TimeOnly studyTime = TimeOnly.ParseExact(studyData.StudyTime[..6], "HHmmss");
+                    studyInfo.StudyTime = studyTime.ToString("HH:mm:ss");
+                }
+                catch
+                {
+                    studyInfo.StudyTime = studyData.StudyTime;
+                }
             }
 
             return studyInfo;

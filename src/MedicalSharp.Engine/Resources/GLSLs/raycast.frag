@@ -12,8 +12,6 @@ uniform sampler1D u_MarkStrategy;
 
 uniform vec3 u_CameraPosition;
 uniform vec3 u_VolumeScale;
-uniform float u_RescaleSlope;
-uniform float u_RescaleIntercept;
 uniform float u_WindowWidth;
 uniform float u_WindowCenter;
 uniform float u_Brightness;             //亮度
@@ -98,8 +96,7 @@ float getMedicalValue(vec3 texCoord)
         snormValue = texture(u_OriginalTexture, texCoord).r;
     }
 
-    float rawValue = snormValue * MAX_16BIT_SIGNED;
-    float medicalValue = rawValue * u_RescaleSlope + u_RescaleIntercept;
+    float medicalValue = snormValue * MAX_16BIT_SIGNED;
     
     return medicalValue;
 }

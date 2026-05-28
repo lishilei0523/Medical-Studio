@@ -319,10 +319,6 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
-            //设置DICOM重缩放参数
-            program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
-            program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
-
             //设置预览、渲染模式
             program.SetUniformInt("u_PreviewMode", (int)this.PreviewMode);
             program.SetUniformInt("u_RenderMode", (int)this.RenderMode);

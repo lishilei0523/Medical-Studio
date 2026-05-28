@@ -329,8 +329,6 @@ namespace MedicalSharp.Engine.Algorithms
         public static StatisticResult ApplyRectangleAnalyse(this VolumeData volumeData, in Vector2 pointA, in Vector2 pointB, in Vector2 pointC, in Vector2 pointD, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
         {
             Vector2[] screenCorners = [pointA, pointB, pointC, pointD];
-            float rescaleSlope = volumeData.Metadata.RescaleSlope;
-            float rescaleIntercept = volumeData.Metadata.RescaleIntercept;
 
             //统计变量
             float minHu = float.MaxValue;
@@ -374,8 +372,7 @@ namespace MedicalSharp.Engine.Algorithms
                     //还原HU值
                     float normalized = pixelValue / 255.0f;
                     float snormValue = normalized * 2.0f - 1.0f;
-                    float rawValue = snormValue * 32767.0f;
-                    float huValue = rawValue * rescaleSlope + rescaleIntercept;
+                    float huValue = snormValue * 32767.0f;
 
                     //累加统计
                     if (huValue < minHu)
@@ -443,11 +440,8 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="layerPixels">层像素指针</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        public static StatisticResult ApplyCircleAnalyse(this VolumeData volumeData, Vector2 center, float radius,
-            int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
+        public static StatisticResult ApplyCircleAnalyse(this VolumeData volumeData, Vector2 center, float radius, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
         {
-            float rescaleSlope = volumeData.Metadata.RescaleSlope;
-            float rescaleIntercept = volumeData.Metadata.RescaleIntercept;
             float radiusSq = radius * radius;
 
             //统计变量
@@ -503,8 +497,7 @@ namespace MedicalSharp.Engine.Algorithms
                     //还原HU值
                     float normalized = pixelValue / 255.0f;
                     float snormValue = normalized * 2.0f - 1.0f;
-                    float rawValue = snormValue * 32767.0f;
-                    float huValue = rawValue * rescaleSlope + rescaleIntercept;
+                    float huValue = snormValue * 32767.0f;
 
                     //累加统计
                     if (huValue < minHu)
@@ -574,9 +567,6 @@ namespace MedicalSharp.Engine.Algorithms
         /// <returns>统计结果</returns>
         public static StatisticResult ApplyEllipseAnalyse(this VolumeData volumeData, Vector2 center, float halfWidth, float halfHeight, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
         {
-            float rescaleSlope = volumeData.Metadata.RescaleSlope;
-            float rescaleIntercept = volumeData.Metadata.RescaleIntercept;
-
             //椭圆方程参数
             float aSq = halfWidth * halfWidth;   // 半宽平方
             float bSq = halfHeight * halfHeight; // 半高平方
@@ -634,8 +624,7 @@ namespace MedicalSharp.Engine.Algorithms
                     //还原HU值
                     float normalized = pixelValue / 255.0f;
                     float snormValue = normalized * 2.0f - 1.0f;
-                    float rawValue = snormValue * 32767.0f;
-                    float huValue = rawValue * rescaleSlope + rescaleIntercept;
+                    float huValue = snormValue * 32767.0f;
 
                     //累加统计
                     if (huValue < minHu)
@@ -699,9 +688,6 @@ namespace MedicalSharp.Engine.Algorithms
         /// <returns>统计结果</returns>
         public static StatisticResult ApplyPolygonAnalyse(this VolumeData volumeData, Vector2[] screenVertices, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
         {
-            float rescaleSlope = volumeData.Metadata.RescaleSlope;
-            float rescaleIntercept = volumeData.Metadata.RescaleIntercept;
-
             //计算多边形包围盒（优化遍历范围）
             float minX = screenVertices.Min(v => v.X);
             float maxX = screenVertices.Max(v => v.X);
@@ -754,8 +740,7 @@ namespace MedicalSharp.Engine.Algorithms
                     //还原HU值
                     float normalized = pixelValue / 255.0f;
                     float snormValue = normalized * 2.0f - 1.0f;
-                    float rawValue = snormValue * 32767.0f;
-                    float huValue = rawValue * rescaleSlope + rescaleIntercept;
+                    float huValue = snormValue * 32767.0f;
 
                     //累加统计
                     if (huValue < minHu)

@@ -301,10 +301,6 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformVector3("u_CameraPosition", renderContext.CameraPosition);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
-            //设置DICOM重缩放参数
-            program.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
-            program.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
-
             //设置预览、渲染模式
             program.SetUniformInt("u_PreviewMode", (int)this.PreviewMode);
             program.SetUniformInt("u_RenderMode", (int)this.RenderMode);
@@ -496,10 +492,6 @@ namespace MedicalSharp.Engine.Renderers
 
             //设置预览模式
             pickProgram.SetUniformInt("u_PreviewMode", (int)this.PreviewMode);
-
-            //设置DICOM重缩放参数
-            pickProgram.SetUniformFloat("u_RescaleSlope", this.Renderable.VolumeMetadata.RescaleSlope);
-            pickProgram.SetUniformFloat("u_RescaleIntercept", this.Renderable.VolumeMetadata.RescaleIntercept);
 
             //设置渲染参数
             pickProgram.SetUniformFloat("u_WindowCenter", this.WindowCenter);

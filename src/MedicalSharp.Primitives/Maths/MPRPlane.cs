@@ -533,7 +533,10 @@ namespace MedicalSharp.Primitives.Maths
                 new Vector4(0, 0, 0, 1)
             );
 
-            Matrix4 modelMatrix = rotation * translation;
+            //构建缩放矩阵
+            Matrix4 scale = Matrix4.CreateScale(this.VolumeMetadata.VolumeScale);
+
+            Matrix4 modelMatrix = rotation * scale * translation;
 
             return modelMatrix;
         }
