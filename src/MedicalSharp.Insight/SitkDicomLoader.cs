@@ -570,7 +570,7 @@ namespace MedicalSharp.Insight
                 volumeData.Metadata.WindowCenter = int.Parse(windowCenter);
             }
 
-            //提取患者信息
+            //提取患者数据
             volumeData.PatientData.PatientId = getTagValue(slice, DicomTags.PatientID);
             volumeData.PatientData.Name = getTagValue(slice, DicomTags.PatientName);
             volumeData.PatientData.BirthDate = getTagValue(slice, DicomTags.PatientBirthDate);
@@ -588,6 +588,16 @@ namespace MedicalSharp.Insight
             volumeData.StudyData.AccessionNumber = getTagValue(slice, DicomTags.AccessionNumber);
             volumeData.StudyData.ReferringPhysician = getTagValue(slice, DicomTags.ReferringPhysicianName);
             volumeData.StudyData.InstitutionName = getTagValue(slice, DicomTags.InstitutionName);
+
+            //提取序列数据
+            volumeData.SeriesData.SeriesInstanceUId = getTagValue(slice, DicomTags.SeriesInstanceUID);
+            volumeData.SeriesData.SeriesNumber = getTagValue(slice, DicomTags.SeriesNumber);
+            volumeData.SeriesData.SeriesDate = getTagValue(slice, DicomTags.SeriesDate);
+            volumeData.SeriesData.SeriesTime = getTagValue(slice, DicomTags.SeriesTime);
+            volumeData.SeriesData.BodyPartExamined = getTagValue(slice, DicomTags.BodyPartExamined);
+            volumeData.SeriesData.SliceThickness = getTagValue(slice, DicomTags.SliceThickness);
+            volumeData.SeriesData.SpacingBetweenSlices = getTagValue(slice, DicomTags.SpacingBetweenSlices);
+            volumeData.SeriesData.SeriesDescription = getTagValue(slice, DicomTags.SeriesDescription);
 
             //提取扫描数据
             volumeData.ScanData.Modality = getTagValue(slice, DicomTags.Modality);
