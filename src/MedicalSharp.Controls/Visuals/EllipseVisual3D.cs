@@ -368,7 +368,7 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 适用统计体积
         /// </summary>
-        /// <param name="viewport">MPR视口</param>
+        /// <param name="viewport">MPR渲染视口</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
         public StatisticResult ApplyAnalyseVolume(MPRViewport viewport, byte? markValue)

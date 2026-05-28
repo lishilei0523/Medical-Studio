@@ -2,6 +2,7 @@
 using Avalonia.Collections;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Builders;
@@ -18,7 +19,7 @@ namespace MedicalSharp.Controls.Visuals
     /// <summary>
     /// 曲线3D元素
     /// </summary>
-    public class CurveVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable, ICutVolume
+    public class CurveVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable, ICutVolume, IAnalyseVolume2D
     {
         #region # 字段及构造器
 
@@ -336,6 +337,63 @@ namespace MedicalSharp.Controls.Visuals
 
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplyPolygonCut(this.SampledPositions, localToWorld, cutMode, markValue);
+        }
+        #endregion
+
+        #region 适用统计体积 —— StatisticResult ApplyAnalyseVolume(MPRViewport viewport...
+        /// <summary>
+        /// 适用统计体积
+        /// </summary>
+        /// <param name="viewport">MPR渲染视口</param>
+        /// <param name="markValue">标记值</param>
+        /// <returns>统计结果</returns>
+        public StatisticResult ApplyAnalyseVolume(MPRViewport viewport, byte? markValue)
+        {
+            #region # 验证
+
+            if (viewport.VolumeData == null)
+            {
+                return default;
+            }
+            if (viewport.MPRRenderer == null)
+            {
+                return default;
+            }
+            if (viewport.MPRCamera == null)
+            {
+                return default;
+            }
+            if (viewport.Plane == null)
+            {
+                return default;
+            }
+            if (!this.Closed)
+            {
+                return default;
+            }
+            if (this.SampledPositions == null || this.SampledPositions.Count < 3)
+            {
+                return default;
+            }
+
+            #endregion
+
+            //获取所有顶点世界坐标
+            Vector3[] worldVertices = this.SampledPositions.Select(pos => Vector3.TransformPosition(pos, this.Transform.Matrix)).ToArray();
+
+            //投影到屏幕坐标
+            Vector2[] screenVertices = new Vector2[worldVertices.Length];
+            for (int index = 0; index < worldVertices.Length; index++)
+            {
+                screenVertices[index] = viewport.Project(worldVertices[index]);
+            }
+
+            int viewportWidth = viewport.ViewportSize.Width;
+            int viewportHeight = viewport.ViewportSize.Height;
+            byte[] layerPixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
+            StatisticResult result = viewport.VolumeData.ApplyPolygonAnalyse(screenVertices, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, layerPixels, markValue);
+
+            return result;
         }
         #endregion
 
