@@ -11,13 +11,14 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
     /// 包围球3D元素
     /// </summary>
-    public class BoundingSphereVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IResizable3D, ICutVolume
+    public class BoundingSphereVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IResizable3D, ICutVolume, IAnalyseVolume3D
     {
         #region # 字段及构造器
 
@@ -262,6 +263,34 @@ namespace MedicalSharp.Controls.Visuals
             Vector3 center = this.Center.ToVector3();
             Matrix4 localToWorld = this.Transform.Matrix;
             renderable.ApplySphereCut(this.Radius, center, localToWorld, cutMode, markValue);
+        }
+        #endregion
+
+        #region 适用球体统计 —— async Task<StatisticResult> ApplySphereAnalyse(VolumeRenderable renderable...
+        /// <summary>
+        /// 适用球体统计
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="markValue">标记值</param>
+        /// <returns>统计结果</returns>
+        public async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable, byte? markValue)
+        {
+            #region # 验证
+
+            if (renderable == null || renderable.VolumeData == null)
+            {
+                return default;
+            }
+
+            #endregion
+
+            Vector3 localCenter = this.Center.ToVector3();
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, this.Transform.Matrix);
+            float worldRadius = this.Radius;
+
+            StatisticResult result = await Task.Run(() => renderable.VolumeData.ApplySphereAnalyse(worldCenter, worldRadius, markValue));
+
+            return result;
         }
         #endregion
 

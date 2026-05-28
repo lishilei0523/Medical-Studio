@@ -19,22 +19,19 @@ namespace MedicalSharp.Engine.Algorithms
         /// 适用立方体统计
         /// </summary>
         /// <param name="volumeData">体积数据</param>
-        /// <param name="boxLocalMin">立方体局部最小点</param>
-        /// <param name="boxLocalMax">立方体局部最大点</param>
-        /// <param name="localToWorld">局部到世界变换矩阵</param>
+        /// <param name="boxMin">立方体最小点</param>
+        /// <param name="boxMax">立方体最大点</param>
         /// <param name="markValue">标记值（null=全部，0~255=指定标记值）</param>
         /// <returns>统计结果</returns>
-        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeData volumeData, Vector3 boxLocalMin, Vector3 boxLocalMax, in Matrix4 localToWorld, byte? markValue)
+        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeData volumeData, Vector3 boxMin, Vector3 boxMax, byte? markValue)
         {
             Vector3i volumeSize = volumeData.Metadata.VolumeSize;
             Vector3 volumeScale = volumeData.Metadata.VolumeScale;
-            Matrix4 worldToLocal = localToWorld.Inverted();
             byte* markPtr = (byte*)volumeData.MarkData.ToPointer();
             short* volumePtr = (short*)volumeData.PreviewData.ToPointer();
 
             //使用Partitioner分块
-            OrderablePartitioner<Tuple<long, long>>
-                partitioner = Partitioner.Create(0, volumeData.Metadata.VoxelsCount);
+            OrderablePartitioner<Tuple<long, long>> partitioner = Partitioner.Create(0, volumeData.Metadata.VoxelsCount);
             ConcurrentBag<StatisticResult> localResults = [];
             Parallel.ForEach(partitioner, range =>
             {
@@ -48,8 +45,7 @@ namespace MedicalSharp.Engine.Algorithms
                     Vector3i voxelPosition = new Vector3i(x, y, z);
 
                     //判断体素是否在立方体内
-                    if (!GeometryAlgorithms.IsVoxelInBox(voxelPosition, volumeSize, volumeScale, boxLocalMin,
-                            boxLocalMax, worldToLocal))
+                    if (!GeometryAlgorithms.IsVoxelInBox(voxelPosition, volumeSize, volumeScale, boxMin, boxMax))
                     {
                         continue;
                     }
@@ -66,18 +62,91 @@ namespace MedicalSharp.Engine.Algorithms
                     {
                         localResult.MinHU = huValue;
                     }
-
                     if (huValue > localResult.MaxHU)
                     {
                         localResult.MaxHU = huValue;
                     }
-
                     localResult.HuSum += huValue;
                     localResult.HuSumSq += huValue * huValue;
 
                     //边界判断
-                    if (GeometryAlgorithms.IsVoxelOnBoxBoundary(voxelPosition, volumeSize, volumeScale, boxLocalMin,
-                            boxLocalMax, worldToLocal))
+                    if (GeometryAlgorithms.IsVoxelOnBoxBoundary(voxelPosition, volumeSize, volumeScale, boxMin, boxMax))
+                    {
+                        localResult.BoundaryCount++;
+                    }
+
+                    localResult.VoxelsCount++;
+                }
+
+                localResults.Add(localResult);
+            });
+
+            //合并结果
+            StatisticResult result = StatisticResult.MergeResults(localResults);
+            result.CalculateExpectations();
+            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
+
+            return result;
+        }
+        #endregion
+
+        #region # 适用球体统计 —— static StatisticResult ApplySphereAnalyse(this VolumeData volumeData...
+        /// <summary>
+        /// 适用球体统计
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="sphereCenter">球心（世界坐标）</param>
+        /// <param name="sphereRadius">半径（世界单位）</param>
+        /// <param name="markValue">标记值（null=全部，0~255=指定标记值）</param>
+        /// <returns>统计结果</returns>
+        public static unsafe StatisticResult ApplySphereAnalyse(this VolumeData volumeData, Vector3 sphereCenter, float sphereRadius, byte? markValue)
+        {
+            Vector3i volumeSize = volumeData.Metadata.VolumeSize;
+            Vector3 volumeScale = volumeData.Metadata.VolumeScale;
+            byte* markPtr = (byte*)volumeData.MarkData.ToPointer();
+            short* volumePtr = (short*)volumeData.PreviewData.ToPointer();
+
+            //使用Partitioner分块
+            OrderablePartitioner<Tuple<long, long>> partitioner = Partitioner.Create(0, volumeData.Metadata.VoxelsCount);
+            ConcurrentBag<StatisticResult> localResults = [];
+            Parallel.ForEach(partitioner, range =>
+            {
+                StatisticResult localResult = new StatisticResult();
+                for (long index = range.Item1; index < range.Item2; index++)
+                {
+                    //将线性索引转换为3D坐标
+                    int x = (int)(index % volumeSize.X);
+                    int y = (int)((index % (volumeSize.X * volumeSize.Y)) / volumeSize.X);
+                    int z = (int)(index / (volumeSize.X * volumeSize.Y));
+                    Vector3i voxelPosition = new Vector3i(x, y, z);
+
+                    //判断体素是否在球体内
+                    if (!GeometryAlgorithms.IsVoxelInSphere(voxelPosition, volumeSize, volumeScale, sphereCenter, sphereRadius))
+                    {
+                        continue;
+                    }
+
+                    //标记值检查
+                    if (markValue.HasValue && markPtr[index] != markValue.Value)
+                    {
+                        continue;
+                    }
+
+                    //统计
+                    float huValue = volumePtr[index];
+                    if (huValue < localResult.MinHU)
+                    {
+                        localResult.MinHU = huValue;
+                    }
+                    if (huValue > localResult.MaxHU)
+                    {
+                        localResult.MaxHU = huValue;
+                    }
+                    localResult.HuSum += huValue;
+                    localResult.HuSumSq += huValue * huValue;
+
+                    //边界判断
+                    if (GeometryAlgorithms.IsVoxelOnSphereBoundary(voxelPosition, volumeSize, volumeScale, sphereCenter, sphereRadius, 0.5f))
                     {
                         localResult.BoundaryCount++;
                     }

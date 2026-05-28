@@ -341,17 +341,15 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="volumeScale">体积缩放</param>
         /// <param name="boxMin">立方体最小点（局部空间）</param>
         /// <param name="boxMax">立方体最大点（局部空间）</param>
-        /// <param name="worldToLocal">世界到局部变换矩阵</param>
         /// <returns>是否在立方体内</returns>
-        public static bool IsVoxelInBox(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxMin, in Vector3 boxMax, in Matrix4 worldToLocal)
+        public static bool IsVoxelInBox(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxMin, in Vector3 boxMax)
         {
-            //体素坐标 -> 纹理坐标 -> 世界坐标 -> 局部坐标
+            //体素坐标 -> 纹理坐标 -> 世界坐标
             Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
             Vector3 worldPos = (texCoord - new Vector3(0.5f)) * volumeScale;
-            Vector3 localPos = Vector3.TransformPosition(worldPos, worldToLocal);
-            bool isInBox = localPos.X >= boxMin.X && localPos.X <= boxMax.X &&
-                           localPos.Y >= boxMin.Y && localPos.Y <= boxMax.Y &&
-                           localPos.Z >= boxMin.Z && localPos.Z <= boxMax.Z;
+            bool isInBox = worldPos.X >= boxMin.X && worldPos.X <= boxMax.X &&
+                           worldPos.Y >= boxMin.Y && worldPos.Y <= boxMax.Y &&
+                           worldPos.Z >= boxMin.Z && worldPos.Z <= boxMax.Z;
 
             return isInBox;
         }
@@ -366,10 +364,9 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="volumeScale">体积缩放</param>
         /// <param name="boxMin">立方体最小点（局部空间）</param>
         /// <param name="boxMax">立方体最大点（局部空间）</param>
-        /// <param name="worldToLocal">世界到局部变换矩阵</param>
         /// <returns>是否在立方体边界</returns>
         /// <remarks>6个面</remarks>
-        public static bool IsVoxelOnBoxBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxMin, in Vector3 boxMax, in Matrix4 worldToLocal)
+        public static bool IsVoxelOnBoxBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxMin, in Vector3 boxMax)
         {
             //定义6个方向的偏移量
             int[] offsetX = [1, -1, 0, 0, 0, 0];  //右、左、无、无、无、无
@@ -391,13 +388,64 @@ namespace MedicalSharp.Engine.Algorithms
 
                 //邻居不在立方体内 -> 当前体素是边界
                 Vector3i neighborPosition = new Vector3i(neighborX, neighborY, neighborZ);
-                if (!IsVoxelInBox(neighborPosition, volumeSize, volumeScale, boxMin, boxMax, worldToLocal))
+                if (!IsVoxelInBox(neighborPosition, volumeSize, volumeScale, boxMin, boxMax))
                 {
                     return true;
                 }
             }
 
             return false;
+        }
+        #endregion
+
+        #region # 判断体素是否在球体内 —— static bool IsVoxelInSphere(in Vector3i voxelPosition, in Vector3 center...
+        /// <summary>
+        /// 判断体素是否在球体内
+        /// </summary>
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="volumeSize">体积尺寸</param>
+        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="sphereCenter">球心（世界坐标）</param>
+        /// <param name="sphereRadius">半径（世界单位）</param>
+        /// <returns>是否在球体内</returns>
+        public static bool IsVoxelInSphere(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 sphereCenter, float sphereRadius)
+        {
+            //体素坐标 -> 世界坐标
+            Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
+            Vector3 worldPos = (texCoord - new Vector3(0.5f)) * volumeScale;
+
+            //计算到球心的距离
+            float distance = Vector3.Distance(worldPos, sphereCenter);
+            bool isVoxelIn = distance <= sphereRadius;
+
+            return isVoxelIn;
+        }
+        #endregion
+
+        #region # 判断体素是否是球体边界体素 —— static bool IsVoxelOnSphereBoundary(in Vector3i voxelPosition...
+        /// <summary>
+        /// 判断体素是否是球体边界体素
+        /// </summary>
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="volumeSize">体积尺寸</param>
+        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="sphereCenter">球心（世界坐标）</param>
+        /// <param name="sphereRadius">半径（世界单位）</param>
+        /// <param name="epsilon">容差</param>
+        /// <returns>是否是边界体素</returns>
+        public static bool IsVoxelOnSphereBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 sphereCenter, float sphereRadius, float epsilon = 0.5f)
+        {
+            //体素坐标 -> 世界坐标
+            Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
+            Vector3 worldPos = (texCoord - new Vector3(0.5f)) * volumeScale;
+
+            //计算到球心的距离
+            float distance = Vector3.Distance(worldPos, sphereCenter);
+
+            //边界判断：距离在半径附近
+            bool isVoxelOn = Math.Abs(distance - sphereRadius) <= epsilon;
+
+            return isVoxelOn;
         }
         #endregion
     }

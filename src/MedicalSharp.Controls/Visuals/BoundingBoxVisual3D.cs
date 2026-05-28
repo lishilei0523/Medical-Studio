@@ -340,10 +340,9 @@ namespace MedicalSharp.Controls.Visuals
         /// <returns>统计结果</returns>
         public async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable, byte? markValue)
         {
-            Vector3 minimum = this.Minimum;
-            Vector3 maximum = this.Maximum;
-            Matrix4 localToWorld = this.Transform.Matrix;
-            StatisticResult result = await Task.Run(() => renderable.VolumeData.ApplyBoxAnalyse(minimum, maximum, localToWorld, markValue));
+            Vector3 minimum = Vector3.TransformPosition(this.Minimum, this.Transform.Matrix);
+            Vector3 maximum = Vector3.TransformPosition(this.Maximum, this.Transform.Matrix);
+            StatisticResult result = await Task.Run(() => renderable.VolumeData.ApplyBoxAnalyse(minimum, maximum, markValue));
 
             return result;
         }
