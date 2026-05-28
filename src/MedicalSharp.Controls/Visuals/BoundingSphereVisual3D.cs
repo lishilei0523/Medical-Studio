@@ -266,9 +266,9 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 适用球体统计 —— async Task<StatisticResult> ApplySphereAnalyse(VolumeRenderable renderable...
+        #region 适用统计体积 —— async Task<StatisticResult> ApplySphereAnalyse(VolumeRenderable renderable...
         /// <summary>
-        /// 适用球体统计
+        /// 适用统计体积
         /// </summary>
         /// <param name="renderable">体积渲染对象</param>
         /// <param name="markValue">标记值</param>

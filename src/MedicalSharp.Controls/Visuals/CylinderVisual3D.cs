@@ -314,9 +314,9 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 适用圆柱体统计 —— async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable...
+        #region 适用统计体积 —— async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable...
         /// <summary>
-        /// 适用圆柱体统计
+        /// 适用统计体积
         /// </summary>
         /// <param name="renderable">体积渲染对象</param>
         /// <param name="markValue">标记值</param>

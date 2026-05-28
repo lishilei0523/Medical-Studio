@@ -394,22 +394,26 @@ namespace MedicalSharp.Controls.Visuals
 
             #endregion
 
-            //计算中心点世界坐标
+            //计算世界坐标
             Vector3 localCenter = this.Center.ToVector3();
             Vector3 worldCenter = Vector3.TransformPosition(localCenter, this.Transform.Matrix);
-
-            //计算U轴和V轴方向上的点
-            Vector3 worldUEdge = worldCenter + this.UAxis.ToVector3() * this.Width / 2;
-            Vector3 worldVEdge = worldCenter + this.VAxis.ToVector3() * this.Height / 2;
+            Vector3 worldUAxis = Vector3.TransformNormal(this.UAxis.ToVector3(), this.Transform.Matrix);
+            Vector3 worldVAxis = Vector3.TransformNormal(this.VAxis.ToVector3(), this.Transform.Matrix);
 
             //投影到屏幕坐标
             Vector2 screenCenter = viewport.Project(worldCenter);
-            Vector2 screenUEdge = viewport.Project(worldUEdge);
-            Vector2 screenVEdge = viewport.Project(worldVEdge);
 
             //计算屏幕上的半轴长度
-            float screenHalfWidth = Vector2.Distance(screenCenter, screenUEdge);
-            float screenHalfHeight = Vector2.Distance(screenCenter, screenVEdge);
+            Vector3 worldUEdgePos = worldCenter + worldUAxis * this.Width / 2;
+            Vector3 worldUEdgeNeg = worldCenter - worldUAxis * this.Width / 2;
+            Vector3 worldVEdgePos = worldCenter + worldVAxis * this.Height / 2;
+            Vector3 worldVEdgeNeg = worldCenter - worldVAxis * this.Height / 2;
+            Vector2 screenUEdgePos = viewport.Project(worldUEdgePos);
+            Vector2 screenUEdgeNeg = viewport.Project(worldUEdgeNeg);
+            Vector2 screenVEdgePos = viewport.Project(worldVEdgePos);
+            Vector2 screenVEdgeNeg = viewport.Project(worldVEdgeNeg);
+            float screenHalfWidth = Vector2.Distance(screenUEdgePos, screenUEdgeNeg) / 2;
+            float screenHalfHeight = Vector2.Distance(screenVEdgePos, screenVEdgeNeg) / 2;
 
             int viewportWidth = viewport.ViewportSize.Width;
             int viewportHeight = viewport.ViewportSize.Height;
