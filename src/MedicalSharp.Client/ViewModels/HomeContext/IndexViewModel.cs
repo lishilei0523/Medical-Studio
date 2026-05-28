@@ -1265,7 +1265,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 builder.AppendLine($"标准差：{this.StatisticInfo.StdDevHU}");
                 builder.AppendLine($"表面积：{this.StatisticInfo.SurfaceArea}");
                 builder.AppendLine($"体积：{this.StatisticInfo.Volume}");
-                builder.AppendLine($"球形度：{this.StatisticInfo.Sphericity}");
                 builder.AppendLine($"体素数：{this.StatisticInfo.VoxelsCount}");
 
                 await topLevel!.Clipboard!.SetTextAsync(builder.ToString());

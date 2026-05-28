@@ -58,15 +58,6 @@ namespace MedicalSharp.Presentation.Models
         public string Volume { get; set; }
         #endregion
 
-        #region 球形度 —— string Sphericity
-        /// <summary>
-        /// 球形度
-        /// </summary>
-        /// <remarks>值域：0~1，越接近1越接近球体</remarks>
-        [DependencyProperty]
-        public string Sphericity { get; set; }
-        #endregion
-
         #region 体素数 —— string VoxelsCount
         /// <summary>
         /// 体素数

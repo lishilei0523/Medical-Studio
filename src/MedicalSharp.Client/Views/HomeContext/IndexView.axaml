@@ -197,7 +197,7 @@
 				<Grid Grid.Column="2" Margin="2,1,4,5">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="*" />
-						<RowDefinition Height="340" />
+						<RowDefinition Height="295" />
 					</Grid.RowDefinitions>
 					<sd:GroupBox Grid.Row="0" Header="组织管理" Margin="0,0,0,2">
 						<ListBox ItemsSource="{Binding Tissues}" SelectedItem="{Binding SelectedTissue}">
@@ -263,7 +263,7 @@
 								</WrapPanel>
 							</Grid>
 						</sd:GroupBox.Header>
-						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,10">
+						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,7">
 							<sd:FormItem Label="最小HU：">
 								<TextBlock Text="{Binding StatisticInfo.MinHU}" />
 							</sd:FormItem>
@@ -281,9 +281,6 @@
 							</sd:FormItem>
 							<sd:FormItem Label="体积：">
 								<TextBlock Text="{Binding StatisticInfo.Volume}" />
-							</sd:FormItem>
-							<sd:FormItem Label="球形度：">
-								<TextBlock Text="{Binding StatisticInfo.Sphericity}" />
 							</sd:FormItem>
 							<sd:FormItem Label="体素数：">
 								<TextBlock Text="{Binding StatisticInfo.VoxelsCount}" />

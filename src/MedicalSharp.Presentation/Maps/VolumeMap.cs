@@ -157,7 +157,6 @@ namespace MedicalSharp.Presentation.Maps
                 StdDevHU = result.StdDevHU.ToString("F0"),
                 SurfaceArea = $"{result.SurfaceArea:F2}mm²",
                 Volume = $"{result.Volume:F2}mm³",
-                Sphericity = result.Sphericity.ToString("F2"),
                 VoxelsCount = result.VoxelsCount.ToString()
             };
 

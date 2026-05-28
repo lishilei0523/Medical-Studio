@@ -74,12 +74,6 @@ namespace MedicalSharp.Primitives.Models
         public float Volume;
 
         /// <summary>
-        /// 球形度
-        /// </summary>
-        /// <remarks>值域：0~1，越接近1越接近球体</remarks>
-        public float Sphericity;
-
-        /// <summary>
         /// 计算统计指标
         /// </summary>
         public void CalculateExpectations()
@@ -111,19 +105,6 @@ namespace MedicalSharp.Primitives.Models
 
             //计算表面积 = 边界体素数 × 单个体素表面积
             this.SurfaceArea = this.BoundaryCount * voxelArea;
-
-            //计算球形度，V: 体积, S: 表面积
-            if (this.Volume > 0 && this.SurfaceArea > 0)
-            {
-                //球形度 = (π^(1/3) × (6V)^(2/3)) / S
-                float numerator = MathF.Pow(MathF.PI, 1.0f / 3.0f) * MathF.Pow(6 * this.Volume, 2.0f / 3.0f);
-                this.Sphericity = numerator / this.SurfaceArea;
-                this.Sphericity = Math.Clamp(this.Sphericity, 0, 1);
-            }
-            else
-            {
-                this.Sphericity = 0;
-            }
         }
 
         /// <summary>
