@@ -1,4 +1,5 @@
-﻿using MIConvexHull;
+﻿using MedicalSharp.Primitives.Maths;
+using MIConvexHull;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -523,6 +524,65 @@ namespace MedicalSharp.Engine.Algorithms
             bool onTopBottom = Math.Abs(Math.Abs(along) - cylinderHeight / 2.0f) <= epsilon && radialDist <= cylinderRadius;
 
             return onSide || onTopBottom;
+        }
+        #endregion
+
+        #region # 判断体素是否在凸多面体内 —— static bool IsVoxelInConvexPolyhedron(in Vector3i voxelPosition...
+        /// <summary>
+        /// 判断体素是否在凸多面体内
+        /// </summary>
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="volumeSize">体积尺寸</param>
+        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="faces">凸多面体的面列表（平面方程，满足 dot(normal, point) + d ≤ 0 为内部）</param>
+        /// <returns>是否在凸多面体内</returns>
+        public static bool IsVoxelInConvexPolyhedron(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, IReadOnlyList<Plane> faces)
+        {
+            //体素坐标 -> 世界坐标
+            Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
+            Vector3 worldPos = (texCoord - new Vector3(0.5f)) * volumeScale;
+
+            //检查是否在所有面的内侧
+            foreach (Plane face in faces)
+            {
+                float distance = Vector3.Dot(face.Normal, worldPos) + face.Distance;
+                if (distance > 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        #endregion
+
+        #region # 判断体素是否在凸多面体边界 —— static bool IsVoxelOnConvexPolyhedronBoundary(in Vector3i voxelPosition...
+        /// <summary>
+        /// 判断体素是否在凸多面体边界
+        /// </summary>
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="volumeSize">体积尺寸</param>
+        /// <param name="volumeScale">体积缩放</param>
+        /// <param name="faces">凸多面体的面列表</param>
+        /// <param name="epsilon">容差</param>
+        /// <returns>是否在凸多面体边界</returns>
+        public static bool IsVoxelOnConvexPolyhedronBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, IReadOnlyList<Plane> faces, float epsilon = 0.005f)
+        {
+            //体素坐标 -> 世界坐标
+            Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
+            Vector3 worldPos = (texCoord - new Vector3(0.5f)) * volumeScale;
+
+            //检查是否有面距离接近0（在边界上）
+            foreach (Plane face in faces)
+            {
+                float distance = Vector3.Dot(face.Normal, worldPos) + face.Distance;
+                if (Math.Abs(distance) <= epsilon)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         #endregion
     }

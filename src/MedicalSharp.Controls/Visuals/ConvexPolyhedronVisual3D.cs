@@ -12,13 +12,14 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Controls.Visuals
 {
     /// <summary>
     /// 凸多面体3D元素
     /// </summary>
-    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IVertexEditable, ICutVolume
+    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IVertexEditable, ICutVolume, IAnalyseVolume3D
     {
         #region # 字段及构造器
 
@@ -311,6 +312,63 @@ namespace MedicalSharp.Controls.Visuals
             Matrix4 localToWorld = this.Transform.Matrix;
             Vector4[] planes = this.MeshGeometry.ExtractPlanes();
             renderable.ApplyConvexPolyhedronCut(planes, localToWorld, cutMode, markValue);
+        }
+        #endregion
+
+        #region 适用统计体积 —— async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable...
+        /// <summary>
+        /// 适用统计体积
+        /// </summary>
+        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="markValue">标记值</param>
+        /// <returns>统计结果</returns>
+        public async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable, byte? markValue)
+        {
+            #region # 验证
+
+            if (renderable == null || renderable.VolumeData == null)
+            {
+                return default;
+            }
+            if (this.MeshGeometry == null)
+            {
+                return default;
+            }
+
+            #endregion
+
+            //获取局部空间的面
+            Vector4[] localPlanes = this.MeshGeometry.ExtractPlanes();
+            Matrix4 localToWorld = this.Transform.Matrix;
+
+            //转换到世界空间
+            List<Plane> worldFaces = [];
+            foreach (Vector4 localPlane in localPlanes)
+            {
+                //局部法向量
+                Vector3 localNormal = new Vector3(localPlane.X, localPlane.Y, localPlane.Z);
+                float localDistance = localPlane.W;
+
+                //局部平面上一点（法向量方向上距离原点最近的点的反方向）
+                Vector3 localPoint = -localNormal * localDistance;
+
+                //转换到世界空间
+                Vector3 worldPoint = Vector3.TransformPosition(localPoint, localToWorld);
+
+                //转换法向量（使用逆转置矩阵）
+                Matrix4 worldToLocal = localToWorld.Inverted();
+                Matrix4 inverseTranspose = Matrix4.Transpose(worldToLocal);
+                Vector3 worldNormal = Vector3.TransformNormal(localNormal, inverseTranspose).Normalized();
+
+                //计算新的距离
+                float worldDistance = -Vector3.Dot(worldNormal, worldPoint);
+
+                worldFaces.Add(new Plane(worldNormal, worldDistance));
+            }
+
+            StatisticResult result = await Task.Run(() => renderable.VolumeData.ApplyConvexPolyhedronAnalyse(worldFaces, markValue));
+
+            return result;
         }
         #endregion
 

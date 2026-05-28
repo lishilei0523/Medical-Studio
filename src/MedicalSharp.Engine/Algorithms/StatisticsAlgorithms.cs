@@ -1,8 +1,10 @@
-﻿using MedicalSharp.Primitives.Models;
+﻿using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -221,6 +223,75 @@ namespace MedicalSharp.Engine.Algorithms
                     //边界判断
                     if (GeometryAlgorithms.IsVoxelOnCylinderBoundary(voxelPosition, volumeSize, volumeScale,
                         cylinderCenter, cylinderAxis, cylinderRadius, cylinderHeight, 0.5f))
+                    {
+                        localResult.BoundaryCount++;
+                    }
+
+                    localResult.VoxelsCount++;
+                }
+
+                localResults.Add(localResult);
+            });
+
+            //合并结果
+            StatisticResult result = StatisticResult.MergeResults(localResults);
+            result.CalculateExpectations();
+            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
+
+            return result;
+        }
+        #endregion
+
+        #region # 适用凸多面体统计 —— static StatisticResult ApplyConvexPolyhedronAnalyse(this VolumeData volumeData...
+        /// <summary>
+        /// 适用凸多面体统计
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="faces">凸多面体的面列表（平面方程）</param>
+        /// <param name="markValue">标记值（null=全部，0~255=指定标记值）</param>
+        /// <returns>统计结果</returns>
+        public static unsafe StatisticResult ApplyConvexPolyhedronAnalyse(this VolumeData volumeData, IReadOnlyList<Plane> faces, byte? markValue)
+        {
+            Vector3i volumeSize = volumeData.Metadata.VolumeSize;
+            Vector3 volumeScale = volumeData.Metadata.VolumeScale;
+            byte* markPtr = (byte*)volumeData.MarkData.ToPointer();
+            short* volumePtr = (short*)volumeData.PreviewData.ToPointer();
+
+            //使用Partitioner分块
+            OrderablePartitioner<Tuple<long, long>> partitioner = Partitioner.Create(0, volumeData.Metadata.VoxelsCount);
+            ConcurrentBag<StatisticResult> localResults = [];
+            Parallel.ForEach(partitioner, range =>
+            {
+                StatisticResult localResult = new StatisticResult();
+                for (long index = range.Item1; index < range.Item2; index++)
+                {
+                    //将线性索引转换为3D坐标
+                    int x = (int)(index % volumeSize.X);
+                    int y = (int)((index % (volumeSize.X * volumeSize.Y)) / volumeSize.X);
+                    int z = (int)(index / (volumeSize.X * volumeSize.Y));
+                    Vector3i voxelPosition = new Vector3i(x, y, z);
+
+                    //判断体素是否在凸多面体内
+                    if (!GeometryAlgorithms.IsVoxelInConvexPolyhedron(voxelPosition, volumeSize, volumeScale, faces))
+                    {
+                        continue;
+                    }
+
+                    //标记值检查
+                    if (markValue.HasValue && markPtr[index] != markValue.Value)
+                    {
+                        continue;
+                    }
+
+                    //统计
+                    float huValue = volumePtr[index];
+                    if (huValue < localResult.MinHU) localResult.MinHU = huValue;
+                    if (huValue > localResult.MaxHU) localResult.MaxHU = huValue;
+                    localResult.HuSum += huValue;
+                    localResult.HuSumSq += huValue * huValue;
+
+                    //边界判断
+                    if (GeometryAlgorithms.IsVoxelOnConvexPolyhedronBoundary(voxelPosition, volumeSize, volumeScale, faces, 0.5f))
                     {
                         localResult.BoundaryCount++;
                     }
