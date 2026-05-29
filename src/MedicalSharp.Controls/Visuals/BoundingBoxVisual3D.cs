@@ -349,9 +349,10 @@ namespace MedicalSharp.Controls.Visuals
 
             #endregion
 
-            Vector3 minimum = Vector3.TransformPosition(this.Minimum, this.Transform.Matrix);
-            Vector3 maximum = Vector3.TransformPosition(this.Maximum, this.Transform.Matrix);
-            StatisticResult result = await Task.Run(() => renderable.VolumeData.ApplyBoxAnalyse(minimum, maximum, markValue));
+            Vector3 minimum = this.Minimum;
+            Vector3 maximum = this.Maximum;
+            Matrix4 localToWorld = this.Transform.Matrix;
+            StatisticResult result = await Task.Run(() => renderable.VolumeData.ApplyBoxAnalyse(minimum, maximum, localToWorld, markValue));
 
             return result;
         }

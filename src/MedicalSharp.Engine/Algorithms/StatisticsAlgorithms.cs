@@ -21,16 +21,20 @@ namespace MedicalSharp.Engine.Algorithms
         /// 适用立方体统计
         /// </summary>
         /// <param name="volumeData">体积数据</param>
-        /// <param name="boxMin">立方体最小点</param>
-        /// <param name="boxMax">立方体最大点</param>
+        /// <param name="boxLocalMin">立方体最小点（局部空间）</param>
+        /// <param name="boxLocalMax">立方体最大点（局部空间）</param>
+        /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="markValue">标记值（null=全部，0~255=指定标记值）</param>
         /// <returns>统计结果</returns>
-        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeData volumeData, Vector3 boxMin, Vector3 boxMax, byte? markValue)
+        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeData volumeData, Vector3 boxLocalMin, Vector3 boxLocalMax, Matrix4 localToWorld, byte? markValue)
         {
             Vector3i volumeSize = volumeData.Metadata.VolumeSize;
             Vector3 volumeScale = volumeData.Metadata.VolumeScale;
             byte* markPtr = (byte*)volumeData.MarkData.ToPointer();
             short* volumePtr = (short*)volumeData.PreviewData.ToPointer();
+
+            //计算逆矩阵
+            Matrix4 worldToLocal = localToWorld.Inverted();
 
             //使用Partitioner分块
             OrderablePartitioner<Tuple<long, long>> partitioner = Partitioner.Create(0, volumeData.Metadata.VoxelsCount);
@@ -47,7 +51,7 @@ namespace MedicalSharp.Engine.Algorithms
                     Vector3i voxelPosition = new Vector3i(x, y, z);
 
                     //判断体素是否在立方体内
-                    if (!GeometryAlgorithms.IsVoxelInBox(voxelPosition, volumeSize, volumeScale, boxMin, boxMax))
+                    if (!GeometryAlgorithms.IsVoxelInBox(voxelPosition, volumeSize, volumeScale, boxLocalMin, boxLocalMax, worldToLocal))
                     {
                         continue;
                     }
@@ -72,7 +76,7 @@ namespace MedicalSharp.Engine.Algorithms
                     localResult.HuSumSq += huValue * huValue;
 
                     //边界判断
-                    if (GeometryAlgorithms.IsVoxelOnBoxBoundary(voxelPosition, volumeSize, volumeScale, boxMin, boxMax))
+                    if (GeometryAlgorithms.IsVoxelOnBoxBoundary(voxelPosition, volumeSize, volumeScale, boxLocalMin, boxLocalMax, worldToLocal))
                     {
                         localResult.BoundaryCount++;
                     }

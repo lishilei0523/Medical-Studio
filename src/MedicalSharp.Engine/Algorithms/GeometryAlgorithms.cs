@@ -333,24 +333,29 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 判断体素是否在立方体内 —— static bool IsVoxelInBox(in Vector3i voxelPosition, in Vector3 boxMin...
+        #region # 判断体素是否在立方体内 —— static bool IsVoxelInBox(in Vector3i voxelPosition, in Vector3i volumeSize...
         /// <summary>
         /// 判断体素是否在立方体内
         /// </summary>
         /// <param name="voxelPosition">体素坐标</param>
         /// <param name="volumeSize">体积尺寸</param>
         /// <param name="volumeScale">体积缩放</param>
-        /// <param name="boxMin">立方体最小点（局部空间）</param>
-        /// <param name="boxMax">立方体最大点（局部空间）</param>
+        /// <param name="boxLocalMin">立方体最小点（局部空间）</param>
+        /// <param name="boxLocalMax">立方体最大点（局部空间）</param>
+        /// <param name="worldToLocal">世界到局部变换矩阵</param>
         /// <returns>是否在立方体内</returns>
-        public static bool IsVoxelInBox(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxMin, in Vector3 boxMax)
+        public static bool IsVoxelInBox(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxLocalMin, in Vector3 boxLocalMax, Matrix4 worldToLocal)
         {
             //体素坐标 -> 纹理坐标 -> 世界坐标
             Vector3 texCoord = (voxelPosition + new Vector3(0.5f)) / volumeSize;
             Vector3 worldPos = (texCoord - new Vector3(0.5f)) * volumeScale;
-            bool isInBox = worldPos.X >= boxMin.X && worldPos.X <= boxMax.X &&
-                           worldPos.Y >= boxMin.Y && worldPos.Y <= boxMax.Y &&
-                           worldPos.Z >= boxMin.Z && worldPos.Z <= boxMax.Z;
+
+            //世界坐标 -> 局部坐标
+            Vector3 localPos = Vector3.TransformPosition(worldPos, worldToLocal);
+
+            bool isInBox = localPos.X >= boxLocalMin.X && localPos.X <= boxLocalMax.X &&
+                           localPos.Y >= boxLocalMin.Y && localPos.Y <= boxLocalMax.Y &&
+                           localPos.Z >= boxLocalMin.Z && localPos.Z <= boxLocalMax.Z;
 
             return isInBox;
         }
@@ -363,11 +368,12 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="voxelPosition">体素坐标</param>
         /// <param name="volumeSize">体积尺寸</param>
         /// <param name="volumeScale">体积缩放</param>
-        /// <param name="boxMin">立方体最小点（局部空间）</param>
-        /// <param name="boxMax">立方体最大点（局部空间）</param>
+        /// <param name="boxLocalMin">立方体最小点（局部空间）</param>
+        /// <param name="boxLocalMax">立方体最大点（局部空间）</param>
+        /// <param name="worldToLocal">世界到局部变换矩阵</param>
         /// <returns>是否在立方体边界</returns>
         /// <remarks>6个面</remarks>
-        public static bool IsVoxelOnBoxBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxMin, in Vector3 boxMax)
+        public static bool IsVoxelOnBoxBoundary(in Vector3i voxelPosition, in Vector3i volumeSize, in Vector3 volumeScale, in Vector3 boxLocalMin, in Vector3 boxLocalMax, Matrix4 worldToLocal)
         {
             //定义6个方向的偏移量
             int[] offsetX = [1, -1, 0, 0, 0, 0];  //右、左、无、无、无、无
@@ -389,7 +395,7 @@ namespace MedicalSharp.Engine.Algorithms
 
                 //邻居不在立方体内 -> 当前体素是边界
                 Vector3i neighborPosition = new Vector3i(neighborX, neighborY, neighborZ);
-                if (!IsVoxelInBox(neighborPosition, volumeSize, volumeScale, boxMin, boxMax))
+                if (!IsVoxelInBox(neighborPosition, volumeSize, volumeScale, boxLocalMin, boxLocalMax, worldToLocal))
                 {
                     return true;
                 }
