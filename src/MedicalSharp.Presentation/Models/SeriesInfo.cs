@@ -1,14 +1,18 @@
-﻿namespace MedicalSharp.Primitives.Models
+﻿using Caliburn.Micro;
+using SD.Infrastructure.Avalonia.Caliburn.Aspects;
+
+namespace MedicalSharp.Presentation.Models
 {
     /// <summary>
-    /// 体积序列数据
+    /// 序列信息
     /// </summary>
-    public class VolumeSeriesData
+    public class SeriesInfo : PropertyChangedBase
     {
         #region 序列实例UID —— string SeriesInstanceUId
         /// <summary>
         /// 序列实例UID
         /// </summary>
+        [DependencyProperty]
         public string SeriesInstanceUId { get; set; }
         #endregion
 
@@ -17,6 +21,7 @@
         /// 序列号
         /// </summary>
         /// <remarks>Se203</remarks>
+        [DependencyProperty]
         public string SeriesNumber { get; set; }
         #endregion
 
@@ -25,6 +30,7 @@
         /// 序列日期
         /// </summary>
         /// <remarks>YYYYMMDD</remarks>
+        [DependencyProperty]
         public string SeriesDate { get; set; }
         #endregion
 
@@ -33,6 +39,7 @@
         /// 序列时间
         /// </summary>
         /// <remarks>HHMMSS</remarks>
+        [DependencyProperty]
         public string SeriesTime { get; set; }
         #endregion
 
@@ -41,6 +48,7 @@
         /// 成像设备
         /// </summary>
         /// <remarks>CT/MR/PET/CR</remarks>
+        [DependencyProperty]
         public string Modality { get; set; }
         #endregion
 
@@ -48,6 +56,7 @@
         /// <summary>
         /// 检查部位
         /// </summary>
+        [DependencyProperty]
         public string BodyPartExamined { get; set; }
         #endregion
 
@@ -56,6 +65,7 @@
         /// 层厚
         /// </summary>
         /// <remarks>mm</remarks>
+        [DependencyProperty]
         public string SliceThickness { get; set; }
         #endregion
 
@@ -64,6 +74,7 @@
         /// 层间距
         /// </summary>
         /// <remarks>mm</remarks>
+        [DependencyProperty]
         public string SpacingBetweenSlices { get; set; }
         #endregion
 
@@ -71,6 +82,7 @@
         /// <summary>
         /// 序列描述
         /// </summary>
+        [DependencyProperty]
         public string SeriesDescription { get; set; }
         #endregion
     }

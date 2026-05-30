@@ -8,14 +8,6 @@ namespace MedicalSharp.Presentation.Models
     /// </summary>
     public class VolumeInfo : PropertyChangedBase
     {
-        #region 序列实例UID —— string SeriesInstanceUId
-        /// <summary>
-        /// 序列实例UID
-        /// </summary>
-        [DependencyProperty]
-        public string SeriesInstanceUId { get; set; }
-        #endregion
-
         #region 体积尺寸 —— string VolumeSize
         /// <summary>
         /// 体积尺寸

@@ -16,22 +16,12 @@ namespace MedicalSharp.Presentation.Models
         public string StudyInstanceUId { get; set; }
         #endregion
 
-        #region 检查日期 —— string StudyDate
+        #region 检查日期时间 —— string StudyDateTime
         /// <summary>
-        /// 检查日期
+        /// 检查日期时间
         /// </summary>
-        /// <remarks>YYYYMMDD</remarks>
         [DependencyProperty]
-        public string StudyDate { get; set; }
-        #endregion
-
-        #region 检查时间 —— string StudyTime
-        /// <summary>
-        /// 检查时间
-        /// </summary>
-        /// <remarks>HHMMSS</remarks>
-        [DependencyProperty]
-        public string StudyTime { get; set; }
+        public string StudyDateTime { get; set; }
         #endregion
 
         #region 检查描述 —— string StudyDescription

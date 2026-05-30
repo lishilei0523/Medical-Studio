@@ -131,6 +131,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                     this.VolumeInfo = value.Metadata.ToVolumeInfo();
                     this.PatientInfo = value.PatientData.ToPatientInfo();
                     this.StudyInfo = value.StudyData.ToStudyInfo();
+                    this.SeriesInfo = value.SeriesData.ToSeriesInfo();
                     this.ScanInfo = value.ScanData.ToScanInfo();
 
                     //初始化标记策略
@@ -146,6 +147,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                     this.VolumeInfo = null;
                     this.PatientInfo = null;
                     this.StudyInfo = null;
+                    this.SeriesInfo = null;
                     this.ScanInfo = null;
                     this.StatisticInfo = null;
                 }
@@ -175,6 +177,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         [DependencyProperty]
         public StudyInfo StudyInfo { get; set; }
+        #endregion
+
+        #region 序列信息 —— SeriesInfo SeriesInfo
+        /// <summary>
+        /// 序列信息
+        /// </summary>
+        [DependencyProperty]
+        public SeriesInfo SeriesInfo { get; set; }
         #endregion
 
         #region 扫描信息 —— ScanInfo ScanInfo

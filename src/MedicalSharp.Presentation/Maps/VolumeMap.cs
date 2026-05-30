@@ -27,7 +27,6 @@ namespace MedicalSharp.Presentation.Maps
 
             VolumeInfo volumeInfo = new VolumeInfo
             {
-                SeriesInstanceUId = metadata.SeriesInstanceUId,
                 VolumeSize = $"{metadata.VolumeSize.X}×{metadata.VolumeSize.Y}×{metadata.VolumeSize.Z}",
                 Spacing = $"{metadata.Spacing.X:F2}×{metadata.Spacing.Y:F2}×{metadata.Spacing.Z:F2}",
                 PhysicalSize = $"{metadata.PhysicalSize.X:F0}×{metadata.PhysicalSize.Y:F0}×{metadata.PhysicalSize.Z:F0}",
@@ -62,7 +61,11 @@ namespace MedicalSharp.Presentation.Maps
                 patientInfo.Sex = patientData.Sex switch
                 {
                     "M" => "男",
+                    "Male" => "男",
+                    "male" => "男",
                     "F" => "女",
+                    "Female" => "女",
+                    "female" => "女",
                     _ => patientData.Sex
                 };
             }
@@ -105,16 +108,19 @@ namespace MedicalSharp.Presentation.Maps
             #endregion
 
             StudyInfo studyInfo = studyData.Map<VolumeStudyData, StudyInfo>();
+
+            string date = string.Empty;
+            string time = string.Empty;
             if (!string.IsNullOrWhiteSpace(studyData.StudyDate))
             {
                 try
                 {
                     DateOnly studyDate = DateOnly.ParseExact(studyData.StudyDate[..8], "yyyyMMdd");
-                    studyInfo.StudyDate = studyDate.ToString("yyyy-MM-dd");
+                    date = studyDate.ToString("yyyy-MM-dd");
                 }
                 catch
                 {
-                    studyInfo.StudyDate = studyData.StudyDate;
+                    date = studyData.StudyDate;
                 }
             }
             if (!string.IsNullOrWhiteSpace(studyData.StudyTime))
@@ -122,15 +128,76 @@ namespace MedicalSharp.Presentation.Maps
                 try
                 {
                     TimeOnly studyTime = TimeOnly.ParseExact(studyData.StudyTime[..6], "HHmmss");
-                    studyInfo.StudyTime = studyTime.ToString("HH:mm:ss");
+                    time = studyTime.ToString("HH:mm:ss");
                 }
                 catch
                 {
-                    studyInfo.StudyTime = studyData.StudyTime;
+                    time = studyData.StudyTime;
                 }
             }
 
+            studyInfo.StudyDateTime = $"{date} {time}";
+
             return studyInfo;
+        }
+        #endregion
+
+        #region # 序列信息映射 —— static SeriesInfo ToSeriesInfo(this VolumeSeriesData seriesData)
+        /// <summary>
+        /// 序列信息映射
+        /// </summary>
+        public static SeriesInfo ToSeriesInfo(this VolumeSeriesData seriesData)
+        {
+            #region # 验证
+
+            if (seriesData == null)
+            {
+                return null;
+            }
+
+            #endregion
+
+            SeriesInfo seriesInfo = new SeriesInfo
+            {
+                SeriesInstanceUId = seriesData.SeriesInstanceUId,
+                SeriesNumber = seriesData.SeriesNumber,
+                Modality = seriesData.Modality,
+                BodyPartExamined = seriesData.BodyPartExamined,
+                SliceThickness = string.IsNullOrWhiteSpace(seriesData.SliceThickness)
+                    ? null
+                    : $"{seriesData.SliceThickness} mm",
+                SpacingBetweenSlices = string.IsNullOrWhiteSpace(seriesData.SpacingBetweenSlices)
+                    ? null
+                    : $"{seriesData.SpacingBetweenSlices} mm",
+                SeriesDescription = seriesData.SeriesDescription
+            };
+
+            if (!string.IsNullOrWhiteSpace(seriesData.SeriesDate))
+            {
+                try
+                {
+                    DateOnly studyDate = DateOnly.ParseExact(seriesData.SeriesDate[..8], "yyyyMMdd");
+                    seriesInfo.SeriesDate = studyDate.ToString("yyyy-MM-dd");
+                }
+                catch
+                {
+                    seriesInfo.SeriesDate = seriesData.SeriesDate;
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(seriesData.SeriesTime))
+            {
+                try
+                {
+                    TimeOnly studyTime = TimeOnly.ParseExact(seriesData.SeriesTime[..6], "HHmmss");
+                    seriesInfo.SeriesTime = studyTime.ToString("HH:mm:ss");
+                }
+                catch
+                {
+                    seriesInfo.SeriesTime = seriesData.SeriesTime;
+                }
+            }
+
+            return seriesInfo;
         }
         #endregion
 
@@ -151,13 +218,19 @@ namespace MedicalSharp.Presentation.Maps
 
             ScanInfo scanInfo = new ScanInfo
             {
-                Modality = scanData.Modality,
-                KVP = $"{scanData.KVP} kVp",
-                XRayTubeCurrent = $"{scanData.XRayTubeCurrent} mA",
-                ExposureTime = $"{scanData.ExposureTime} ms",
+                KVP = string.IsNullOrWhiteSpace(scanData.KVP)
+                    ? null
+                    : $"{scanData.KVP} kVp",
+                XRayTubeCurrent = string.IsNullOrWhiteSpace(scanData.XRayTubeCurrent)
+                    ? null
+                    : $"{scanData.XRayTubeCurrent} mA",
+                ExposureTime = string.IsNullOrWhiteSpace(scanData.ExposureTime)
+                    ? null
+                    : $"{scanData.ExposureTime} ms",
                 ConvolutionKernel = $"{scanData.ConvolutionKernel}",
-                ReconstructionDiameter = $"{scanData.ReconstructionDiameter} mm",
-                SliceThickness = $"{scanData.SliceThickness} mm"
+                ReconstructionDiameter = string.IsNullOrWhiteSpace(scanData.ReconstructionDiameter)
+                    ? null
+                    : $"{scanData.ReconstructionDiameter} mm"
             };
 
             return scanInfo;

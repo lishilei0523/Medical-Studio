@@ -30,13 +30,6 @@ namespace MedicalSharp.Primitives.Models
         public string Id { get; private set; }
         #endregion
 
-        #region 序列实例UID —— string SeriesInstanceUId
-        /// <summary>
-        /// 序列实例UID
-        /// </summary>
-        public string SeriesInstanceUId { get; set; }
-        #endregion
-
         #region 体素数量 —— long VoxelsCount
         /// <summary>
         /// 体素数量
@@ -111,6 +104,7 @@ namespace MedicalSharp.Primitives.Models
         /// <summary>
         /// 行向量
         /// </summary>
+        /// <remarks>U轴</remarks>
         public Vector3 RowDirection { get; set; }
         #endregion
 
@@ -118,6 +112,7 @@ namespace MedicalSharp.Primitives.Models
         /// <summary>
         /// 列向量
         /// </summary>
+        /// <remarks>V轴</remarks>
         public Vector3 ColDirection { get; set; }
         #endregion
 
@@ -125,6 +120,7 @@ namespace MedicalSharp.Primitives.Models
         /// <summary>
         /// 切面向量
         /// </summary>
+        /// <remarks>Normal</remarks>
         public Vector3 SliceDirection { get; set; }
         #endregion
 

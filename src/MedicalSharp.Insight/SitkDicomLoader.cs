@@ -540,7 +540,6 @@ namespace MedicalSharp.Insight
             using Image slice = SimpleITK.ReadImage(dicomPaths[0]);
 
             //提取扩展元数据
-            volumeData.Metadata.SeriesInstanceUId = getTagValue(slice, DicomTags.SeriesInstanceUID);
             string rescaleSlope = getTagValue(slice, DicomTags.RescaleSlope);
             string rescaleIntercept = getTagValue(slice, DicomTags.RescaleIntercept);
             string windowWidth = getTagValue(slice, DicomTags.WindowWidth);
@@ -559,7 +558,7 @@ namespace MedicalSharp.Insight
                 {
                     windowWidth = windowWidth.Split('\\')[0];
                 }
-                volumeData.Metadata.WindowWidth = int.Parse(windowWidth);
+                volumeData.Metadata.WindowWidth = (int)MathF.Round(float.Parse(windowWidth));
             }
             if (!string.IsNullOrWhiteSpace(windowCenter))
             {
@@ -567,7 +566,7 @@ namespace MedicalSharp.Insight
                 {
                     windowCenter = windowCenter.Split('\\')[0];
                 }
-                volumeData.Metadata.WindowCenter = int.Parse(windowCenter);
+                volumeData.Metadata.WindowCenter = (int)MathF.Round(float.Parse(windowCenter));
             }
 
             //提取患者数据
@@ -594,21 +593,19 @@ namespace MedicalSharp.Insight
             volumeData.SeriesData.SeriesNumber = getTagValue(slice, DicomTags.SeriesNumber);
             volumeData.SeriesData.SeriesDate = getTagValue(slice, DicomTags.SeriesDate);
             volumeData.SeriesData.SeriesTime = getTagValue(slice, DicomTags.SeriesTime);
+            volumeData.SeriesData.Modality = getTagValue(slice, DicomTags.Modality);
             volumeData.SeriesData.BodyPartExamined = getTagValue(slice, DicomTags.BodyPartExamined);
             volumeData.SeriesData.SliceThickness = getTagValue(slice, DicomTags.SliceThickness);
             volumeData.SeriesData.SpacingBetweenSlices = getTagValue(slice, DicomTags.SpacingBetweenSlices);
             volumeData.SeriesData.SeriesDescription = getTagValue(slice, DicomTags.SeriesDescription);
 
             //提取扫描数据
-            volumeData.ScanData.Modality = getTagValue(slice, DicomTags.Modality);
-            volumeData.ScanData.BodyPartExamined = getTagValue(slice, DicomTags.BodyPartExamined);
             volumeData.ScanData.KVP = getTagValue(slice, DicomTags.KVP);
             volumeData.ScanData.ExposureTime = getTagValue(slice, DicomTags.ExposureTime);
             volumeData.ScanData.XRayTubeCurrent = getTagValue(slice, DicomTags.XRayTubeCurrent);
             volumeData.ScanData.ConvolutionKernel = getTagValue(slice, DicomTags.ConvolutionKernel);
             volumeData.ScanData.ReconstructionDiameter = getTagValue(slice, DicomTags.ReconstructionDiameter);
             volumeData.ScanData.PitchFactor = getTagValue(slice, DicomTags.PitchFactor);
-            volumeData.ScanData.SliceThickness = getTagValue(slice, DicomTags.SliceThickness);
             volumeData.ScanData.ReconstructionAlgorithm = getTagValue(slice, DicomTags.ReconstructionAlgorithm);
             volumeData.ScanData.ContrastAgent = getTagValue(slice, DicomTags.ContrastAgent);
             volumeData.ScanData.ContrastDose = getTagValue(slice, DicomTags.ContrastDose);

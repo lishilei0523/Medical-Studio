@@ -8,15 +8,6 @@ namespace MedicalSharp.Presentation.Models
     /// </summary>
     public class ScanInfo : PropertyChangedBase
     {
-        #region 成像设备 —— string Modality
-        /// <summary>
-        /// 成像设备
-        /// </summary>
-        /// <remarks>CT/MR/PET/CR</remarks>
-        [DependencyProperty]
-        public string Modality { get; set; }
-        #endregion
-
         #region 管电压 —— string KVP
         /// <summary>
         /// 管电压
@@ -59,15 +50,6 @@ namespace MedicalSharp.Presentation.Models
         /// <remarks>FOV，单位 mm</remarks>
         [DependencyProperty]
         public string ReconstructionDiameter { get; set; }
-        #endregion
-
-        #region 层厚 —— string SliceThickness
-        /// <summary>
-        /// 层厚
-        /// </summary>
-        /// <remarks>mm</remarks>
-        [DependencyProperty]
-        public string SliceThickness { get; set; }
         #endregion
     }
 }

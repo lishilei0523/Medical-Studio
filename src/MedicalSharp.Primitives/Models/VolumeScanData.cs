@@ -5,24 +5,6 @@
     /// </summary>
     public class VolumeScanData
     {
-        //通用
-
-        #region 成像设备模态 —— string Modality
-        /// <summary>
-        /// 成像设备模态
-        /// </summary>
-        /// <remarks>CT / MR / PET / CR</remarks>
-        public string Modality { get; set; }
-        #endregion
-
-        #region 检查部位 —— string BodyPartExamined
-        /// <summary>
-        /// 检查部位
-        /// </summary>
-        public string BodyPartExamined { get; set; }
-        #endregion
-
-
         //CT
 
         #region 管电压 —— string KVP
@@ -69,14 +51,6 @@
         /// 螺距因子
         /// </summary>
         public string PitchFactor { get; set; }
-        #endregion
-
-        #region 层厚 —— string SliceThickness
-        /// <summary>
-        /// 层厚
-        /// </summary>
-        /// <remarks>mm</remarks>
-        public string SliceThickness { get; set; }
         #endregion
 
         #region 重建算法 —— string ReconstructionAlgorithm
