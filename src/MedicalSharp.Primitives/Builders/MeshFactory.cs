@@ -949,7 +949,7 @@ namespace MedicalSharp.Primitives.Builders
         /// <param name="primitiveType">图元类型</param>
         /// <param name="withCaps">是否封闭（仅填充模式有效）</param>
         /// <returns>网格模型</returns>
-        public static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f, Vector3 center = default, int segments = 32, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Lines, bool withCaps = true)
+        public static MeshGeometry CreateCylinder(float radius = 0.5f, float height = 1.0f, Vector3 center = default, int segments = 32, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Triangles, bool withCaps = true)
         {
             float halfH = height * 0.5f;  //Z轴方向的一半
             List<Vertex> vertices = [];
@@ -1067,6 +1067,122 @@ namespace MedicalSharp.Primitives.Builders
                         indices.Add((uint)(idx2 + 1));
                         indices.Add((uint)(idx1 + 1));
                     }
+                }
+            }
+
+            MeshGeometry meshGeometry = new(vertices, indices);
+            if (primitiveType != GraphicPrimitiveType.Lines)
+            {
+                CalculateNormals(meshGeometry);
+            }
+
+            return meshGeometry;
+        }
+        #endregion
+
+        #region # 创建圆锥体 —— static MeshGeometry CreateCone(float radius = 0.5f, float height = 1.0f...
+        /// <summary>
+        /// 创建圆锥体
+        /// </summary>
+        /// <param name="radius">底面半径</param>
+        /// <param name="height">高度（从底面到尖端的Z轴方向距离）</param>
+        /// <param name="center">底面中心点位置</param>
+        /// <param name="segments">细分数量</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreateCone(float radius = 0.5f, float height = 1.0f, Vector3 center = default, int segments = 32, GraphicPrimitiveType primitiveType = GraphicPrimitiveType.Triangles)
+        {
+            Vector3 tip = center + new Vector3(0, 0, height);   //尖端Z坐标（相对于底面中心）
+            Vector3 bottomCenter = center;
+            List<Vertex> vertices = [];
+            List<uint> indices = [];
+            if (primitiveType == GraphicPrimitiveType.Lines)
+            {
+                //==========线框模式==========
+                //底面圆
+                for (int i = 0; i < segments; i++)
+                {
+                    float angle1 = 2.0f * MathHelper.Pi * i / segments;
+                    float angle2 = 2.0f * MathHelper.Pi * (i + 1) / segments;
+                    float x1 = (float)Math.Cos(angle1) * radius;
+                    float y1 = (float)Math.Sin(angle1) * radius;
+                    float x2 = (float)Math.Cos(angle2) * radius;
+                    float y2 = (float)Math.Sin(angle2) * radius;
+
+                    //底面圆边
+                    vertices.Add(new Vertex { Position = bottomCenter + new Vector3(x1, y1, 0), Normal = Vector3.Zero });
+                    vertices.Add(new Vertex { Position = bottomCenter + new Vector3(x2, y2, 0), Normal = Vector3.Zero });
+                    indices.Add((uint)(vertices.Count - 2));
+                    indices.Add((uint)(vertices.Count - 1));
+
+                    //侧面线条（从底面边缘到尖端）
+                    vertices.Add(new Vertex { Position = bottomCenter + new Vector3(x1, y1, 0), Normal = Vector3.Zero });
+                    vertices.Add(new Vertex { Position = tip, Normal = Vector3.Zero });
+                    indices.Add((uint)(vertices.Count - 2));
+                    indices.Add((uint)(vertices.Count - 1));
+                }
+            }
+            else
+            {
+                //==========填充模式==========
+                //计算侧面法向量（每个顶点的法向量需要根据位置计算）
+                for (int i = 0; i <= segments; i++)
+                {
+                    float angle = 2.0f * MathHelper.Pi * i / segments;
+                    float x = (float)Math.Cos(angle) * radius;
+                    float y = (float)Math.Sin(angle) * radius;
+
+                    //底面边缘点
+                    Vector3 bottomEdge = bottomCenter + new Vector3(x, y, 0);
+
+                    //计算侧面法向量（从底面边缘指向外的方向与向上方向的组合）
+                    Vector3 radialDir = new Vector3(x, y, 0).Normalized();
+                    Vector3 sideNormal = (radialDir + Vector3.UnitZ * (radius / height)).Normalized();
+
+                    vertices.Add(new Vertex
+                    {
+                        Position = bottomEdge,
+                        TextureCoord = new Vector2(i / (float)segments, 1),
+                        Normal = sideNormal
+                    });
+                }
+
+                //尖端
+                uint tipIndex = (uint)vertices.Count;
+                vertices.Add(new Vertex
+                {
+                    Position = tip,
+                    TextureCoord = new Vector2(0.5f, 0),
+                    Normal = Vector3.UnitZ
+                });
+
+                //侧面三角形
+                for (int i = 0; i < segments; i++)
+                {
+                    int current = i;
+                    int next = (i + 1) % segments;
+
+                    indices.Add((uint)current);
+                    indices.Add(tipIndex);
+                    indices.Add((uint)next);
+                }
+
+                //底面（如果需要封闭）
+                uint bottomCenterIndex = (uint)vertices.Count;
+                vertices.Add(new Vertex
+                {
+                    Position = bottomCenter,
+                    TextureCoord = new Vector2(0.5f, 0.5f),
+                    Normal = -Vector3.UnitZ
+                });
+
+                for (int index = 0; index < segments; index++)
+                {
+                    int current = index;
+                    int next = (index + 1) % segments;
+                    indices.Add(bottomCenterIndex);
+                    indices.Add((uint)next);
+                    indices.Add((uint)current);
                 }
             }
 
@@ -1465,60 +1581,6 @@ namespace MedicalSharp.Primitives.Builders
                     indices.Add((uint)bottomRight);
                 }
             }
-
-            return new MeshGeometry(vertices, indices);
-        }
-        #endregion
-
-        #region # 创建坐标轴 —— static MeshGeometry CreateAxes(float length = 1.0f)
-        /// <summary>
-        /// 创建坐标轴
-        /// </summary>
-        /// <param name="length">长度</param>
-        /// <returns>网格模型</returns>
-        public static MeshGeometry CreateAxes(float length = 1.0f)
-        {
-            List<Vertex> vertices =
-            [
-                new Vertex
-                {
-                    Position = Vector3.Zero,
-                    TextureCoord = Vector2.Zero,
-                    Normal = Vector3.UnitX
-                },
-                new Vertex
-                {
-                    Position = new Vector3(length, 0, 0),
-                    TextureCoord = Vector2.UnitX,
-                    Normal = Vector3.UnitX
-                },
-                new Vertex
-                {
-                    Position = Vector3.Zero,
-                    TextureCoord = Vector2.Zero,
-                    Normal = Vector3.UnitY
-                },
-                new Vertex
-                {
-                    Position = new Vector3(0, length, 0),
-                    TextureCoord = Vector2.UnitX,
-                    Normal = Vector3.UnitY
-                },
-                new Vertex
-                {
-                    Position = Vector3.Zero,
-                    TextureCoord = Vector2.Zero,
-                    Normal = Vector3.UnitZ
-                },
-                new Vertex
-                {
-                    Position = new Vector3(0, 0, length),
-                    TextureCoord = Vector2.UnitX,
-                    Normal = Vector3.UnitZ
-                }
-            ];
-
-            List<uint> indices = [0, 1, 2, 3, 4, 5];
 
             return new MeshGeometry(vertices, indices);
         }
