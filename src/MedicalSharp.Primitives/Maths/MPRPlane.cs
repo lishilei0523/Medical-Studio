@@ -52,6 +52,7 @@ namespace MedicalSharp.Primitives.Maths
 
             //默认值
             this._firstChanged = true;
+            this.DirectionIndicator = new FourDirection();
         }
 
         #endregion
@@ -128,6 +129,13 @@ namespace MedicalSharp.Primitives.Maths
         /// 切片偏移差分量
         /// </summary>
         public float SliceOffsetDelta { get; private set; }
+        #endregion
+
+        #region 方向指示 —— FourDirection DirectionIndicator
+        /// <summary>
+        /// 方向指示
+        /// </summary>
+        public FourDirection DirectionIndicator { get; private set; }
         #endregion
 
         #region 只读属性 - 世界平面中心 —— Vector3 WorldCenter
@@ -692,6 +700,9 @@ namespace MedicalSharp.Primitives.Maths
                 this.SliceOffsetDelta = currentOffset - this._previousSliceOffset;
             }
             this._previousSliceOffset = currentOffset;
+
+            //更新方向
+            this.DirectionIndicator.CalculateDirections(this.UAxis, this.VAxis);
 
             this.PlaneChangedEvent?.Invoke(this, eventArgs);
         }
