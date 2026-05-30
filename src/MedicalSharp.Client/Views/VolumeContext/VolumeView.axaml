@@ -5,7 +5,6 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:cm="http://caliburnmicro.com"
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
-			 xmlns:visual3Ds="clr-namespace:MedicalSharp.Controls.Visual3Ds;assembly=MedicalSharp.Controls"
 			 mc:Ignorable="d">
 
 	<sd:GroupBox>
@@ -194,10 +193,10 @@
 						   MaxStepsCount="{Binding MaxStepsCount}"
 						   OpacityThreshold="{Binding OpacityThreshold}"
 						   TFControlPoints="{Binding TFControlPoints}">
-			<visual3Ds:ShapePresenter3D Content="{Binding AxialPlane}" />
-			<visual3Ds:ShapePresenter3D Content="{Binding CoronalPlane}" />
-			<visual3Ds:ShapePresenter3D Content="{Binding SagittalPlane}" />
-			<visual3Ds:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
+			<sd:ShapePresenter3D Content="{Binding AxialPlane}" />
+			<sd:ShapePresenter3D Content="{Binding CoronalPlane}" />
+			<sd:ShapePresenter3D Content="{Binding SagittalPlane}" />
+			<sd:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
 		</sd:VolumeViewport>
 	</sd:GroupBox>
 </UserControl>
