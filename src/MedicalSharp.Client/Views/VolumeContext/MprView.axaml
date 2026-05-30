@@ -20,63 +20,63 @@
 				<!--Toolbar-->
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
 					<sd:ToggleRadioButton cm:Message.Attach="PickVoxel()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.PickVoxelEnabled}">
+										  IsVisible="{Binding ToolbarConfig.PickVoxelEnabled}">
 						<PathIcon Data="{StaticResource Icon-PickVoxel}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.PickShapeEnabled}">
+										  IsVisible="{Binding ToolbarConfig.PickShapeEnabled}">
 						<PathIcon Data="{StaticResource Icon-PickShape}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel" IsChecked="True"
-                                          IsVisible="{Binding ToolbarConfig.Translate3DEnabled}">
+										  IsVisible="{Binding ToolbarConfig.Translate3DEnabled}">
 						<PathIcon Data="{StaticResource Icon-Translate3D}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Rotate2D()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.Rotate2DEnabled}">
+										  IsVisible="{Binding ToolbarConfig.Rotate2DEnabled}">
 						<PathIcon Data="{StaticResource Icon-Rotate2D}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Resize()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.ResizeEnabled}">
+										  IsVisible="{Binding ToolbarConfig.ResizeEnabled}">
 						<PathIcon Data="{StaticResource Icon-Resize}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="EditVertex()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.EditVertexEnabled}">
+										  IsVisible="{Binding ToolbarConfig.EditVertexEnabled}">
 						<PathIcon Data="{StaticResource Icon-EditVertex}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPoint()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawPointEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawPointEnabled}">
 						<PathIcon Data="{StaticResource Icon-Point}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawLineSegment()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawLineSegmentEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawLineSegmentEnabled}">
 						<PathIcon Data="{StaticResource Icon-LineSegment}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPolyline()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawPolylineEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawPolylineEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polyline}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawCurve()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawCurveEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawCurveEnabled}">
 						<PathIcon Data="{StaticResource Icon-Curve}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawRectangle()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawRectangleEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawRectangleEnabled}">
 						<PathIcon Data="{StaticResource Icon-Rectangle}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawCircle()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawCircleEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawCircleEnabled}">
 						<PathIcon Data="{StaticResource Icon-Circle}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawEllipse()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawEllipseEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawEllipseEnabled}">
 						<PathIcon Data="{StaticResource Icon-Ellipse}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPolygon()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawPolygonEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawPolygonEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polygon}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawClosedCurve()" Classes="Transparent-Panel"
-                                          IsVisible="{Binding ToolbarConfig.DrawClosedCurveEnabled}">
+										  IsVisible="{Binding ToolbarConfig.DrawClosedCurveEnabled}">
 						<PathIcon Data="{StaticResource Icon-ClosedCurve}" />
 					</sd:ToggleRadioButton>
 				</WrapPanel>
@@ -85,43 +85,48 @@
 					<DropDownButton Content="{Binding Title}" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
 							<MenuFlyout>
-                                <MenuItem Header="预览模式(_V)">
-                                    <MenuItem >
-                                        <MenuItem.Header>
-                                            <RadioButton Content="预览模式" GroupName="PreviewMode" 
-                                                         IsChecked="{Binding PreviewModeChecked}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                    <MenuItem >
-                                        <MenuItem.Header>
-                                            <RadioButton Content="原始模式" GroupName="PreviewMode" 
-                                                         IsChecked="{Binding OriginalModeChecked}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                </MenuItem>
+								<MenuItem Header="预览模式(_V)">
+									<MenuItem>
+										<MenuItem.Header>
+											<RadioButton Content="预览模式" GroupName="PreviewMode"
+														 IsChecked="{Binding PreviewModeChecked}" />
+										</MenuItem.Header>
+									</MenuItem>
+									<MenuItem>
+										<MenuItem.Header>
+											<RadioButton Content="原始模式" GroupName="PreviewMode"
+														 IsChecked="{Binding OriginalModeChecked}" />
+										</MenuItem.Header>
+									</MenuItem>
+								</MenuItem>
 								<MenuItem Header="渲染模式(_M)">
-                                    <MenuItem >
-                                        <MenuItem.Header>
-                                            <RadioButton Content="灰度" GroupName="RenderMode" IsChecked="{Binding GrayModeChecked}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                    <MenuItem >
-                                        <MenuItem.Header>
-                                            <RadioButton Content="伪彩" GroupName="RenderMode" IsChecked="{Binding PseudoColorChecked}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
+									<MenuItem>
+										<MenuItem.Header>
+											<RadioButton Content="灰度" GroupName="RenderMode" IsChecked="{Binding GrayModeChecked}" />
+										</MenuItem.Header>
+									</MenuItem>
+									<MenuItem>
+										<MenuItem.Header>
+											<RadioButton Content="伪彩" GroupName="RenderMode" IsChecked="{Binding PseudoColorChecked}" />
+										</MenuItem.Header>
+									</MenuItem>
 								</MenuItem>
-								<MenuItem Header="十字线(_C)" >
-                                    <MenuItem >
+								<MenuItem Header="显示设置(_D)" >
+									<MenuItem>
+										<MenuItem.Header>
+											<CheckBox Content="十字线" IsChecked="{Binding CrosshairVisible}" />
+										</MenuItem.Header>
+									</MenuItem>
+                                    <MenuItem>
                                         <MenuItem.Header>
-                                            <CheckBox Content="显示" IsChecked="{Binding CrosshairVisible}" />
+                                            <CheckBox Content="方向标识" IsChecked="{Binding DirectionVisible}" />
                                         </MenuItem.Header>
                                     </MenuItem>
-									<MenuItem Header="复位(_R)" Command="{Binding ResetCrosshairCommand}" />
+									<MenuItem Header="十字线复位(_R)" Command="{Binding ResetCrosshairCommand}" />
 								</MenuItem>
-                                <MenuItem Header="重置相机(_R)" Command="{Binding ResetCameraCommand}" />
+								<MenuItem Header="重置相机(_R)" Command="{Binding ResetCameraCommand}" />
 								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />
-                                <MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
+								<MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
 							</MenuFlyout>
 						</DropDownButton.Flyout>
 					</DropDownButton>
@@ -129,21 +134,49 @@
 			</Grid>
 		</sd:GroupBox.Header>
 		<!--Content-->
-		<sd:MPRViewport x:Name="MPRViewport"
-                        FrameToken="{Binding FrameToken}"
-                        Camera="{Binding Camera}"
-                        InputManager="{Binding InputManager}"
-                        Plane="{Binding Plane}"
-                        VolumeData="{Binding VolumeData}"
-                        PreviewMode="{Binding PreviewMode}"
-                        RenderMode="{Binding RenderMode}"
-						WindowWidth="{Binding WindowWidth}"
-						WindowCenter="{Binding WindowCenter}"
-						Brightness="{Binding Brightness}"
-						Contrast="{Binding Contrast}"
-                        TFControlPoints="{Binding TFControlPoints}">
-			<sd:ShapePresenter Content="{Binding Crosshair}" />
-			<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
-		</sd:MPRViewport>
+		<sd:GroupBox.Content>
+			<Grid>
+				<sd:MPRViewport x:Name="MPRViewport"
+								FrameToken="{Binding FrameToken}"
+								Camera="{Binding Camera}"
+								InputManager="{Binding InputManager}"
+								Plane="{Binding Plane}"
+								VolumeData="{Binding VolumeData}"
+								PreviewMode="{Binding PreviewMode}"
+								RenderMode="{Binding RenderMode}"
+								WindowWidth="{Binding WindowWidth}"
+								WindowCenter="{Binding WindowCenter}"
+								Brightness="{Binding Brightness}"
+								Contrast="{Binding Contrast}"
+								TFControlPoints="{Binding TFControlPoints}">
+					<sd:ShapePresenter Content="{Binding Crosshair}" />
+					<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
+				</sd:MPRViewport>
+				<Grid IsVisible="{Binding DirectionVisible}">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+					<WrapPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+						<TextBlock Text="A" Foreground="DarkGray" />
+					</WrapPanel>
+					<WrapPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+						<TextBlock Text="R" Foreground="DarkGray" />
+					</WrapPanel>
+					<WrapPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+						<TextBlock Text="L" Foreground="DarkGray" />
+					</WrapPanel>
+					<WrapPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+						<TextBlock Text="P" Foreground="DarkGray" />
+					</WrapPanel>
+				</Grid>
+			</Grid>
+		</sd:GroupBox.Content>
 	</sd:GroupBox>
 </UserControl>

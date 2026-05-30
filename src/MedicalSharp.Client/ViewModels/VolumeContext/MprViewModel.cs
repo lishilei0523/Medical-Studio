@@ -77,6 +77,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.GrayModeChecked = true;
             this.Crosshair = new CrosshairVisual3D();
             this.CrosshairVisible = true;
+            this.DirectionVisible = true;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
             this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.RainbowControlPoints);
@@ -183,6 +184,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this.FrameToken++;
             }
         }
+        #endregion
+
+        #region 方向标识是否可见 —— bool CrosshairVisible
+        /// <summary>
+        /// 方向标识是否可见
+        /// </summary>
+        [DependencyProperty]
+        public bool DirectionVisible { get; set; }
         #endregion
 
         #region 帧令牌 —— int FrameToken

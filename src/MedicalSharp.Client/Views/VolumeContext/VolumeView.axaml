@@ -114,13 +114,13 @@
 						<DropDownButton.Flyout>
 							<MenuFlyout>
 								<MenuItem Header="预览模式(_V)">
-									<MenuItem >
+									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="预览模式" GroupName="PreviewMode"
 														 IsChecked="{Binding PreviewModeChecked}" />
 										</MenuItem.Header>
 									</MenuItem>
-									<MenuItem >
+									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="原始模式" GroupName="PreviewMode"
 														 IsChecked="{Binding OriginalModeChecked}" />
@@ -128,39 +128,39 @@
 									</MenuItem>
 								</MenuItem>
 								<MenuItem Header="渲染模式(_M)">
-									<MenuItem >
+									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="Raycast" GroupName="RenderMode" IsChecked="{Binding RaycastChecked}" />
 										</MenuItem.Header>
 									</MenuItem>
-									<MenuItem >
+									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="AIP" GroupName="RenderMode" IsChecked="{Binding AIPChecked}" />
 										</MenuItem.Header>
 									</MenuItem>
-									<MenuItem >
+									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="MIP" GroupName="RenderMode" IsChecked="{Binding MIPChecked}" />
 										</MenuItem.Header>
 									</MenuItem>
-									<MenuItem >
+									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="MinIP" GroupName="RenderMode" IsChecked="{Binding MinIPChecked}" />
 										</MenuItem.Header>
 									</MenuItem>
 								</MenuItem>
 								<MenuItem Header="MPR平面(_P)">
-									<MenuItem >
+									<MenuItem>
 										<MenuItem.Header>
 											<CheckBox Content="横断面" IsChecked="{Binding AxialPlaneVisible}" />
 										</MenuItem.Header>
 									</MenuItem>
-									<MenuItem >
+									<MenuItem>
 										<MenuItem.Header>
 											<CheckBox Content="冠状面" IsChecked="{Binding CoronalPlaneVisible}" />
 										</MenuItem.Header>
 									</MenuItem>
-									<MenuItem >
+									<MenuItem>
 										<MenuItem.Header>
 											<CheckBox Content="矢状面" IsChecked="{Binding SagittalPlaneVisible}" />
 										</MenuItem.Header>
