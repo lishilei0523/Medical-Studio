@@ -78,7 +78,7 @@ namespace MedicalSharp.Controls.Visuals
             Vector3 position = this.Position.ToVector3();
             if (this.Renderable == null)
             {
-                AxisRenderable renderable = new AxisRenderable(position, this.ShaftLength);
+                AxisRenderable renderable = new AxisRenderable(position, this.ShaftLength, 30);
                 this.Renderable = renderable;
             }
         }

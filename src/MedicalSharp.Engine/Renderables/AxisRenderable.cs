@@ -45,30 +45,62 @@ namespace MedicalSharp.Engine.Renderables
         private VertexBuffer _zArrowBuffer;
 
         /// <summary>
+        /// X轴文本
+        /// </summary>
+        private TextRenderable _xText;
+
+        /// <summary>
+        /// Y轴文本
+        /// </summary>
+        private TextRenderable _yText;
+
+        /// <summary>
+        /// Z轴文本
+        /// </summary>
+        private TextRenderable _zText;
+
+        /// <summary>
+        /// X轴颜色
+        /// </summary>
+        private readonly Vector4 _xColor;
+
+        /// <summary>
+        /// Y轴颜色
+        /// </summary>
+        private readonly Vector4 _yColor;
+
+        /// <summary>
+        /// Z轴颜色
+        /// </summary>
+        private readonly Vector4 _zColor;
+
+        /// <summary>
         /// 创建坐标轴渲染对象
         /// </summary>
         /// <param name="position">位置</param>
         /// <param name="shaftLength">轴线长度</param>
-        public AxisRenderable(Vector3 position, float shaftLength)
+        /// <param name="fontSize">文字尺寸</param>
+        public AxisRenderable(Vector3 position, float shaftLength, float fontSize)
         {
+            this.Transform.SetPosition(position);
             this.ShaftLength = shaftLength;
+            this.FontSize = fontSize;
 
             //计算派生参数
             this.ArrowLength = shaftLength * 0.2f;
             this.ShaftRadius = shaftLength * 0.03f;
             this.ArrowRadius = shaftLength * 0.06f;
+            this.TextOffset = shaftLength * 0.15f;
 
             //颜色配置
-            this.XColor = new Vector4(1.0f, 0.2f, 0.2f, 1.0f);
-            this.YColor = new Vector4(0.2f, 1.0f, 0.2f, 1.0f);
-            this.ZColor = new Vector4(0.2f, 0.2f, 1.0f, 1.0f);
-
-            //设置位置
-            this.Transform.SetPosition(position);
+            this._xColor = new Vector4(1.0f, 0.2f, 0.2f, 1.0f);
+            this._yColor = new Vector4(0.2f, 1.0f, 0.2f, 1.0f);
+            this._zColor = new Vector4(0.2f, 0.2f, 1.0f, 1.0f);
 
             //创建几何体
             this.CreateShafts();
             this.CreateArrows();
+            this.CreateTexts();
         }
 
         #endregion
@@ -103,28 +135,18 @@ namespace MedicalSharp.Engine.Renderables
         public float ArrowRadius { get; private set; }
         #endregion
 
-        #region X轴颜色 —— Vector4 XColor
+        #region 文字偏移量 —— float TextOffset
         /// <summary>
-        /// X轴颜色
+        /// 文字偏移量
         /// </summary>
-        /// <remarks>红色</remarks>
-        public Vector4 XColor { get; private set; }
+        public float TextOffset { get; private set; }
         #endregion
 
-        #region Y轴颜色 —— Vector4 YColor
+        #region 文字尺寸 —— float FontSize
         /// <summary>
-        /// Y轴颜色
+        /// 文字尺寸
         /// </summary>
-        /// <remarks>绿色</remarks>
-        public Vector4 YColor { get; private set; }
-        #endregion
-
-        #region Z轴颜色 —— Vector4 ZColor 
-        /// <summary>
-        /// Z轴颜色
-        /// </summary>
-        /// <remarks>蓝色</remarks>
-        public Vector4 ZColor { get; private set; }
+        public float FontSize { get; private set; }
         #endregion
 
         #endregion
@@ -143,21 +165,34 @@ namespace MedicalSharp.Engine.Renderables
         {
             //渲染X轴
             program.SetUniformInt("u_HasTexture", 0);
-            program.SetUniformVector4("u_Color", this.XColor);
+            program.SetUniformVector4("u_Color", this._xColor);
             this._xShaftBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
             this._xArrowBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
             //渲染Y轴
             program.SetUniformInt("u_HasTexture", 0);
-            program.SetUniformVector4("u_Color", this.YColor);
+            program.SetUniformVector4("u_Color", this._yColor);
             this._yShaftBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
             this._yArrowBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
             //渲染Z轴
             program.SetUniformInt("u_HasTexture", 0);
-            program.SetUniformVector4("u_Color", this.ZColor);
+            program.SetUniformVector4("u_Color", this._zColor);
             this._zShaftBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
             this._zArrowBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
+
+            //渲染文本
+            float textPosition = this.ShaftLength + this.TextOffset;
+            Vector3 worldPosition = this.Transform.Position;
+            Vector3 xTextPosition = worldPosition + new Vector3(textPosition, 0, 0);
+            Vector3 yTextPosition = worldPosition + new Vector3(0, textPosition, 0);
+            Vector3 zTextPosition = worldPosition + new Vector3(0, 0, textPosition);
+            this._xText.Transform.SetPosition(xTextPosition);
+            this._yText.Transform.SetPosition(yTextPosition);
+            this._zText.Transform.SetPosition(zTextPosition);
+            this._xText.Render(program, context);
+            this._yText.Render(program, context);
+            this._zText.Render(program, context);
         }
         #endregion
 
@@ -178,6 +213,9 @@ namespace MedicalSharp.Engine.Renderables
             this._xArrowBuffer?.Dispose();
             this._yArrowBuffer?.Dispose();
             this._zArrowBuffer?.Dispose();
+            this._xText?.Dispose();
+            this._yText?.Dispose();
+            this._zText?.Dispose();
             this._disposed = true;
         }
         #endregion
@@ -256,6 +294,18 @@ namespace MedicalSharp.Engine.Renderables
             Matrix4 zArrowTranslation = Matrix4.CreateTranslation(new Vector3(0, 0, shaftLength));
             MeshFactory.Transform(zArrowMesh, zArrowTranslation);
             this._zArrowBuffer = new VertexBuffer(zArrowMesh);
+        }
+        #endregion
+
+        #region 创建文本几何体 —— void CreateTexts()
+        /// <summary>
+        /// 创建文本几何体
+        /// </summary>
+        private void CreateTexts()
+        {
+            this._xText = new TextRenderable("X", Vector3.Zero, this.FontSize, this._xColor, lockYAxis: true);
+            this._yText = new TextRenderable("Y", Vector3.Zero, this.FontSize, this._yColor, lockYAxis: true);
+            this._zText = new TextRenderable("Z", Vector3.Zero, this.FontSize, this._zColor, lockYAxis: true);
         }
         #endregion
 
