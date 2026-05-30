@@ -1,14 +1,15 @@
 ﻿using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Protocols;
+using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Models;
 using System;
 
-namespace MedicalSharp.Engine.Resources
+namespace MedicalSharp.Engine.Base
 {
     /// <summary>
     /// 体积会话
     /// </summary>
-    public class VolumeSession : IDisposable
+    public sealed class VolumeSession : IDisposable
     {
         #region # 字段及构造器
 

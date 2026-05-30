@@ -1,7 +1,7 @@
 ﻿using Caliburn.Micro;
 using MedicalSharp.Engine.Algorithms;
+using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
-using MedicalSharp.Engine.Resources;
 using MedicalSharp.Inspiration.Algorithms;
 using MedicalSharp.Inspiration.Managers;
 using MedicalSharp.Inspiration.Resources;

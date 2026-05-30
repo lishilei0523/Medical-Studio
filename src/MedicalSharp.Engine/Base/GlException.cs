@@ -1,12 +1,12 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using System;
 
-namespace MedicalSharp.Engine.Resources
+namespace MedicalSharp.Engine.Base
 {
     /// <summary>
     /// OpenGL异常
     /// </summary>
-    public class GlException : Exception
+    public sealed class GlException : Exception
     {
         #region # 字段及构造器
 

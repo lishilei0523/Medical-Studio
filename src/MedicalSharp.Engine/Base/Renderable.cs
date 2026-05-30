@@ -2,7 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 
-namespace MedicalSharp.Engine.Renderables
+namespace MedicalSharp.Engine.Base
 {
     /// <summary>
     /// 渲染对象

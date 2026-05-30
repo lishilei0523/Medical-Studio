@@ -1,7 +1,7 @@
 ﻿using MedicalSharp.Primitives.Cameras;
 using System;
 
-namespace MedicalSharp.Engine.Renderers
+namespace MedicalSharp.Engine.Base
 {
     /// <summary>
     /// 渲染器
