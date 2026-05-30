@@ -3,7 +3,7 @@ using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
-using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;

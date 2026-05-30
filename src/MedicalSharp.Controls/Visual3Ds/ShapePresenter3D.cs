@@ -4,12 +4,12 @@ using Avalonia.Metadata;
 using MedicalSharp.Primitives.Maths;
 using System;
 
-namespace MedicalSharp.Controls.Visuals
+namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
     /// 形状3D元素容器
     /// </summary>
-    public class ShapePresenter : Visual3D
+    public class ShapePresenter3D : Visual3D
     {
         #region # 字段及构造器
 
@@ -21,12 +21,12 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static ShapePresenter()
+        static ShapePresenter3D()
         {
-            ContentProperty = AvaloniaProperty.Register<ShapePresenter, ShapeVisual3D>(nameof(Content));
+            ContentProperty = AvaloniaProperty.Register<ShapePresenter3D, ShapeVisual3D>(nameof(Content));
 
             //属性改变事件
-            ContentProperty.Changed.AddClassHandler<ShapePresenter, ShapeVisual3D>(OnContentChanged);
+            ContentProperty.Changed.AddClassHandler<ShapePresenter3D, ShapeVisual3D>(OnContentChanged);
         }
 
         #endregion
@@ -79,11 +79,11 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 形状3D元素改变事件 —— static void OnContentChanged(ShapePresenter...
+        #region 形状3D元素改变事件 —— static void OnContentChanged(ShapePresenter3D...
         /// <summary>
         /// 形状3D元素改变事件
         /// </summary>
-        private static void OnContentChanged(ShapePresenter shapePresenter, AvaloniaPropertyChangedEventArgs<ShapeVisual3D> eventArgs)
+        private static void OnContentChanged(ShapePresenter3D shapePresenter, AvaloniaPropertyChangedEventArgs<ShapeVisual3D> eventArgs)
         {
             eventArgs.OldValue.Value?.Renderable?.Dispose();
         }

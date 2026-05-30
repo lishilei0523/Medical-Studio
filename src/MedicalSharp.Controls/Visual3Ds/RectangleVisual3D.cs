@@ -12,7 +12,7 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 
-namespace MedicalSharp.Controls.Visuals
+namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
     /// 矩形3D元素

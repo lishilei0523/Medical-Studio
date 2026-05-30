@@ -8,7 +8,7 @@ using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 
-namespace MedicalSharp.Controls.Visuals
+namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
     /// MPR平面3D元素

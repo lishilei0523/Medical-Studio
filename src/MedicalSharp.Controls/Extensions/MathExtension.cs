@@ -2,7 +2,7 @@
 using Avalonia.Collections;
 using Avalonia.Media;
 using MedicalSharp.Controls.Interfaces;
-using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;

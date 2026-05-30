@@ -3,7 +3,7 @@ using Avalonia.Collections;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Interfaces;
-using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;

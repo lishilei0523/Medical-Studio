@@ -5,12 +5,12 @@ using MedicalSharp.Primitives.Maths;
 using System;
 using System.Collections.Specialized;
 
-namespace MedicalSharp.Controls.Visuals
+namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
     /// 形状3D元素列表容器
     /// </summary>
-    public class ShapesPresenter : Visual3D
+    public class ShapesPresenter3D : Visual3D
     {
         #region # 字段及构造器
 
@@ -22,18 +22,18 @@ namespace MedicalSharp.Controls.Visuals
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static ShapesPresenter()
+        static ShapesPresenter3D()
         {
-            ItemsSourceProperty = AvaloniaProperty.Register<ShapesPresenter, AvaloniaList<ShapeVisual3D>>(nameof(ItemsSource), []);
+            ItemsSourceProperty = AvaloniaProperty.Register<ShapesPresenter3D, AvaloniaList<ShapeVisual3D>>(nameof(ItemsSource), []);
 
             //属性改变事件
-            ItemsSourceProperty.Changed.AddClassHandler<ShapesPresenter, AvaloniaList<ShapeVisual3D>>(OnItemsSourceChanged);
+            ItemsSourceProperty.Changed.AddClassHandler<ShapesPresenter3D, AvaloniaList<ShapeVisual3D>>(OnItemsSourceChanged);
         }
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public ShapesPresenter()
+        public ShapesPresenter3D()
         {
             this.ItemsSource.CollectionChanged += this.OnItemsSourceItemChanged;
         }
@@ -90,11 +90,11 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 形状3D元素列表改变事件 —— static void OnItemsSourceChanged(ShapesPresenter...
+        #region 形状3D元素列表改变事件 —— static void OnItemsSourceChanged(ShapesPresenter3D...
         /// <summary>
         /// 形状3D元素列表改变事件
         /// </summary>
-        private static void OnItemsSourceChanged(ShapesPresenter presenter, AvaloniaPropertyChangedEventArgs<AvaloniaList<ShapeVisual3D>> eventArgs)
+        private static void OnItemsSourceChanged(ShapesPresenter3D presenter, AvaloniaPropertyChangedEventArgs<AvaloniaList<ShapeVisual3D>> eventArgs)
         {
             if (eventArgs.OldValue.Value != null)
             {

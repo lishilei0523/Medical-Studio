@@ -9,7 +9,7 @@ using OpenTK.Mathematics;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MedicalSharp.Controls.Visuals
+namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
     /// 点云3D元素

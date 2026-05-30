@@ -1,5 +1,5 @@
 ﻿using MedicalSharp.Controls.Base;
-using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 

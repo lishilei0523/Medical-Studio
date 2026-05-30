@@ -2,9 +2,9 @@
 using Avalonia.Collections;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
-using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
+using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
@@ -12,13 +12,14 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace MedicalSharp.Controls.Visuals
+namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
-    /// 折线3D元素
+    /// 凸多面体3D元素
     /// </summary>
-    public class PolylineVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable, IFixable, ICutVolume, IAnalyseVolume2D
+    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IVertexEditable, ICutVolume, IAnalyseVolume3D
     {
         #region # 字段及构造器
 
@@ -28,30 +29,23 @@ namespace MedicalSharp.Controls.Visuals
         public static readonly StyledProperty<AvaloniaList<Vector3D>> PositionsProperty;
 
         /// <summary>
-        /// 是否闭合依赖属性
+        /// 可否旋转依赖属性
         /// </summary>
-        public static readonly StyledProperty<bool> ClosedProperty;
-
-        /// <summary>
-        /// 是否固定依赖属性
-        /// </summary>
-        public static readonly StyledProperty<bool> FixedProperty;
+        public static readonly StyledProperty<bool> CanRotateProperty;
 
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static PolylineVisual3D()
+        static ConvexPolyhedronVisual3D()
         {
-            PositionsProperty = AvaloniaProperty.Register<PolylineVisual3D, AvaloniaList<Vector3D>>(nameof(Positions), []);
-            ClosedProperty = AvaloniaProperty.Register<PolylineVisual3D, bool>(nameof(Closed), false);
-            FixedProperty = AvaloniaProperty.Register<PolylineVisual3D, bool>(nameof(Fixed), false);
+            PositionsProperty = AvaloniaProperty.Register<ConvexPolyhedronVisual3D, AvaloniaList<Vector3D>>(nameof(Positions), []);
+            CanRotateProperty = AvaloniaProperty.Register<ConvexPolyhedronVisual3D, bool>(nameof(CanRotate), true);
         }
-
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public PolylineVisual3D()
+        public ConvexPolyhedronVisual3D()
         {
 
         }
@@ -59,6 +53,13 @@ namespace MedicalSharp.Controls.Visuals
         #endregion
 
         #region # 属性
+
+        #region 网格模型 —— MeshGeometry MeshGeometry
+        /// <summary>
+        /// 网格模型
+        /// </summary>
+        public MeshGeometry MeshGeometry { get; private set; }
+        #endregion
 
         #region 依赖属性 - 位置列表 —— AvaloniaList<Vector3D> Positions
         /// <summary>
@@ -71,25 +72,14 @@ namespace MedicalSharp.Controls.Visuals
         }
         #endregion
 
-        #region 依赖属性 - 是否闭合 —— bool Closed
+        #region 依赖属性 - 可否旋转 —— bool CanRotate
         /// <summary>
-        /// 依赖属性 - 是否闭合
+        /// 依赖属性 - 可否旋转
         /// </summary>
-        public bool Closed
+        public bool CanRotate
         {
-            get => this.GetValue(ClosedProperty);
-            set => this.SetValue(ClosedProperty, value);
-        }
-        #endregion
-
-        #region 依赖属性 - 是否固定 —— bool Fixed
-        /// <summary>
-        /// 依赖属性 - 是否固定
-        /// </summary>
-        public bool Fixed
-        {
-            get => this.GetValue(FixedProperty);
-            set => this.SetValue(FixedProperty, value);
+            get => this.GetValue(CanRotateProperty);
+            set => this.SetValue(CanRotateProperty, value);
         }
         #endregion
 
@@ -113,18 +103,51 @@ namespace MedicalSharp.Controls.Visuals
             #endregion
 
             IReadOnlyList<Vector3> positions = this.Positions.Select(x => x.ToVector3()).ToList();
+            MeshGeometry strokeMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Lines);
+            MeshGeometry fillMesh = MeshFactory.CreateConvexPolyhedron(positions, GraphicPrimitiveType.Triangles);
             if (this.Renderable == null)
             {
-                PolylineRenderable renderable = new PolylineRenderable(positions, this.Closed, !this.Fixed);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                WildframeRenderable renderable = new WildframeRenderable(strokeMesh, fillMesh, true);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
                 this.Renderable = renderable;
             }
             else
             {
-                PolylineRenderable renderable = (PolylineRenderable)this.Renderable;
-                renderable.Update(positions);
-                renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+                WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
+                renderable.Update(strokeMesh, fillMesh);
+                renderable.SetWildframe(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
+
+            this.MeshGeometry = fillMesh;
+        }
+        #endregion
+
+        #region 获取凸包位置列表 —— IReadOnlyList<Vector3> GetConvexHullPositions()
+        /// <summary>
+        /// 获取凸包位置列表
+        /// </summary>
+        /// <returns>位置列表（世界空间）</returns>
+        public IReadOnlyList<Vector3> GetConvexHullPositions()
+        {
+            #region # 验证
+
+            if (this.Positions == null || !this.Positions.Any())
+            {
+                return [];
+            }
+
+            #endregion
+
+            Matrix4 localToWorld = this.Transform.Matrix;
+            Vector3[] convexHullPositions = new Vector3[this.Positions.Count];
+            for (int index = 0; index < this.Positions.Count; index++)
+            {
+                Vector3 localPosition = this.Positions[index].ToVector3();
+                Vector3 worldPostion = Vector3.TransformPosition(localPosition, localToWorld);
+                convexHullPositions[index] = worldPostion;
+            }
+
+            return convexHullPositions;
         }
         #endregion
 
@@ -139,24 +162,19 @@ namespace MedicalSharp.Controls.Visuals
         public bool TryGetVertexDrag(Ray localRay, Vector3 localLookDirection, out VertexDragConstraint constraint)
         {
             constraint = default;
-
-            #region # 验证
-
             if (this.Positions == null || this.Positions.Count == 0)
             {
                 return false;
             }
 
-            #endregion
-
             float minDistance = float.MaxValue;
             int bestIndex = -1;
             Vector3 bestAnchor = Vector3.Zero;
 
-            //遍历所有顶点，找到距离射线最近且在拾取半径内的点
-            for (int i = 0; i < this.Positions.Count; i++)
+            //遍历所有控制点，找到距离射线最近且在拾取半径内的点
+            for (int index = 0; index < this.Positions.Count; index++)
             {
-                Vector3 point = this.Positions[i].ToVector3();
+                Vector3 point = this.Positions[index].ToVector3();
                 float distance = localRay.CalculateDistanceToPoint(point);
 
                 //拾取半径：固定值，可根据需要调整
@@ -164,7 +182,7 @@ namespace MedicalSharp.Controls.Visuals
                 if (distance < pickRadius && distance < minDistance)
                 {
                     minDistance = distance;
-                    bestIndex = i;
+                    bestIndex = index;
                     bestAnchor = point;
                 }
             }
@@ -226,10 +244,8 @@ namespace MedicalSharp.Controls.Visuals
                 return false;
             }
 
-            //计算新点插入位置（最近点之后）
+            //插入新顶点（最近点之后）
             int newIndex = nearestIndex + 1;
-
-            //插入新顶点
             this.Positions.Insert(newIndex, localHitPoint.ToVector3());
 
             constraint = new VertexDragConstraint
@@ -279,6 +295,7 @@ namespace MedicalSharp.Controls.Visuals
                 return;
             }
 
+            //更新控制点位置
             this.Positions[constraint.VertexIndex] = localHitPoint.ToVector3();
         }
         #endregion
@@ -292,73 +309,64 @@ namespace MedicalSharp.Controls.Visuals
         /// <param name="markValue">标记值</param>
         public void ApplyCutVolume(VolumeRenderable renderable, CutMode cutMode, byte markValue)
         {
-            #region # 验证
-
-            if (!this.Closed)
-            {
-                return;
-            }
-
-            #endregion
-
             Matrix4 localToWorld = this.Transform.Matrix;
-            Vector3[] vertices = this.Positions.Select(position => position.ToVector3()).ToArray();
-            renderable.ApplyPolygonCut(vertices, localToWorld, cutMode, markValue);
+            Vector4[] planes = this.MeshGeometry.ExtractPlanes();
+            renderable.ApplyConvexPolyhedronCut(planes, localToWorld, cutMode, markValue);
         }
         #endregion
 
-        #region 适用统计体积 —— StatisticResult ApplyAnalyseVolume(MPRViewport viewport...
+        #region 适用统计体积 —— async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable...
         /// <summary>
         /// 适用统计体积
         /// </summary>
-        /// <param name="viewport">MPR渲染视口</param>
+        /// <param name="renderable">体积渲染对象</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        public StatisticResult ApplyAnalyseVolume(MPRViewport viewport, byte? markValue)
+        public async Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable, byte? markValue)
         {
             #region # 验证
 
-            if (viewport.VolumeData == null)
+            if (renderable == null || renderable.VolumeData == null)
             {
                 return default;
             }
-            if (viewport.MPRRenderer == null)
-            {
-                return default;
-            }
-            if (viewport.MPRCamera == null)
-            {
-                return default;
-            }
-            if (viewport.Plane == null)
-            {
-                return default;
-            }
-            if (!this.Closed)
-            {
-                return default;
-            }
-            if (this.Positions == null || this.Positions.Count < 3)
+            if (this.MeshGeometry == null)
             {
                 return default;
             }
 
             #endregion
 
-            //获取所有顶点世界坐标
-            Vector3[] worldVertices = this.Positions.Select(pos => Vector3.TransformPosition(pos.ToVector3(), this.Transform.Matrix)).ToArray();
+            //获取局部空间的面
+            Vector4[] localPlanes = this.MeshGeometry.ExtractPlanes();
+            Matrix4 localToWorld = this.Transform.Matrix;
 
-            //投影到屏幕坐标
-            Vector2[] screenVertices = new Vector2[worldVertices.Length];
-            for (int index = 0; index < worldVertices.Length; index++)
+            //转换到世界空间
+            List<Plane> worldFaces = [];
+            foreach (Vector4 localPlane in localPlanes)
             {
-                screenVertices[index] = viewport.Project(worldVertices[index]);
+                //局部法向量
+                Vector3 localNormal = new Vector3(localPlane.X, localPlane.Y, localPlane.Z);
+                float localDistance = localPlane.W;
+
+                //局部平面上一点（法向量方向上距离原点最近的点的反方向）
+                Vector3 localPoint = -localNormal * localDistance;
+
+                //转换到世界空间
+                Vector3 worldPoint = Vector3.TransformPosition(localPoint, localToWorld);
+
+                //转换法向量（使用逆转置矩阵）
+                Matrix4 worldToLocal = localToWorld.Inverted();
+                Matrix4 inverseTranspose = Matrix4.Transpose(worldToLocal);
+                Vector3 worldNormal = Vector3.TransformNormal(localNormal, inverseTranspose).Normalized();
+
+                //计算新的距离
+                float worldDistance = -Vector3.Dot(worldNormal, worldPoint);
+
+                worldFaces.Add(new Plane(worldNormal, worldDistance));
             }
 
-            int viewportWidth = viewport.ViewportSize.Width;
-            int viewportHeight = viewport.ViewportSize.Height;
-            byte[] layerPixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
-            StatisticResult result = viewport.VolumeData.ApplyPolygonAnalyse(screenVertices, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, layerPixels, markValue);
+            StatisticResult result = await Task.Run(() => renderable.VolumeData.ApplyConvexPolyhedronAnalyse(worldFaces, markValue));
 
             return result;
         }

@@ -6,7 +6,7 @@ using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Interfaces;
 using OpenTK.Mathematics;
 
-namespace MedicalSharp.Controls.Visuals
+namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
     /// 十字线3D元素

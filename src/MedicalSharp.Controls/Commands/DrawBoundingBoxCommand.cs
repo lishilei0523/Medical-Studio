@@ -2,7 +2,7 @@
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
-using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Controls.Visual3Ds;
 using OpenTK.Mathematics;
 using System;
 using System.Linq;

@@ -4,7 +4,7 @@ using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Interfaces;
-using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Maths;
@@ -251,12 +251,12 @@ namespace MedicalSharp.Controls.Viewports
                     shapeVisual3D.EnsureRenderable();
                     shapeVisual3Ds.Add(shapeVisual3D);
                 }
-                if (visual3D is ShapePresenter shapePresenter && shapePresenter.Content.IsVisible)
+                if (visual3D is ShapePresenter3D shapePresenter && shapePresenter.Content.IsVisible)
                 {
                     shapePresenter.Content.EnsureRenderable();
                     shapeVisual3Ds.Add(shapePresenter.Content);
                 }
-                if (visual3D is ShapesPresenter shapesPresenter)
+                if (visual3D is ShapesPresenter3D shapesPresenter)
                 {
                     foreach (ShapeVisual3D item in shapesPresenter.ItemsSource.Where(x => x.IsVisible))
                     {

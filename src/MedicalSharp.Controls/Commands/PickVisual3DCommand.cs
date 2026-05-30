@@ -4,7 +4,7 @@ using MedicalSharp.Controls.Commands.Arguments;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Viewports;
-using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;

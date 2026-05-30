@@ -5,7 +5,7 @@ using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Maths;
 using Transform = MedicalSharp.Primitives.Maths.Transform;
 
-namespace MedicalSharp.Controls.Visuals
+namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
     /// 形状3D元素

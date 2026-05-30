@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Controls.Visuals;
+﻿using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using SD.Infrastructure.Avalonia.Caliburn.Base;

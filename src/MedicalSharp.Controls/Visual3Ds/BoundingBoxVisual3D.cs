@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MedicalSharp.Controls.Visuals
+namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
     /// 包围盒3D元素

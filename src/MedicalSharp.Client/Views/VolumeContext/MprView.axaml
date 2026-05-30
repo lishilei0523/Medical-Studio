@@ -5,6 +5,7 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:cm="http://caliburnmicro.com"
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			 xmlns:visual3Ds="clr-namespace:MedicalSharp.Controls.Visual3Ds;assembly=MedicalSharp.Controls"
 			 mc:Ignorable="d">
 
 	<sd:GroupBox>
@@ -149,8 +150,8 @@
 								Brightness="{Binding Brightness}"
 								Contrast="{Binding Contrast}"
 								TFControlPoints="{Binding TFControlPoints}">
-					<sd:ShapePresenter Content="{Binding Crosshair}" />
-					<sd:ShapesPresenter ItemsSource="{Binding Shapes}" />
+					<visual3Ds:ShapePresenter3D Content="{Binding Crosshair}" />
+					<visual3Ds:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
 				</sd:MPRViewport>
 				<Grid IsVisible="{Binding DirectionVisible}">
 					<Grid.RowDefinitions>

@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Controls.Visuals;
+﻿using MedicalSharp.Controls.Visual3Ds;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 
 namespace MedicalSharp.Presentation.Events

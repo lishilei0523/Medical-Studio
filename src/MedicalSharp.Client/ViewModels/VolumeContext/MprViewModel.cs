@@ -10,7 +10,7 @@ using MedicalSharp.Controls.Commands.Arguments;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Viewports;
-using MedicalSharp.Controls.Visuals;
+using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Presentation.Events;
