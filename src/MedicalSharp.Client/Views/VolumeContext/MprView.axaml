@@ -164,16 +164,20 @@
 						<ColumnDefinition Width="Auto" />
 					</Grid.ColumnDefinitions>
 					<WrapPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-						<TextBlock Text="A" Foreground="DarkGray" />
+                        <!--Top-->
+                        <TextBlock Text="{Binding FourDirection.Top}" Margin="0,1,0,0" Foreground="DarkGray" />
 					</WrapPanel>
+                    <WrapPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <!--Bottom-->
+                        <TextBlock Text="{Binding FourDirection.Bottom}" Margin="0,0,0,1" Foreground="DarkGray" />
+                    </WrapPanel>
 					<WrapPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-						<TextBlock Text="R" Foreground="DarkGray" />
+						<!--Left-->
+                        <TextBlock Text="{Binding FourDirection.Left}" Margin="1,0,0,0" Foreground="DarkGray" />
 					</WrapPanel>
 					<WrapPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-						<TextBlock Text="L" Foreground="DarkGray" />
-					</WrapPanel>
-					<WrapPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-						<TextBlock Text="P" Foreground="DarkGray" />
+                        <!--Right-->
+                        <TextBlock Text="{Binding FourDirection.Right}" Margin="0,0,1,0" Foreground="DarkGray" />
 					</WrapPanel>
 				</Grid>
 			</Grid>

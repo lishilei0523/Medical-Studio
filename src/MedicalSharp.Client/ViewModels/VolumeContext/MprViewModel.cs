@@ -14,6 +14,7 @@ using MedicalSharp.Controls.Visuals;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Presentation.Events;
+using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
@@ -233,6 +234,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this.Crosshair.VAxis = value.WorldVAxis.Normalized().ToVector3();
                     this.Crosshair.Center = value.WorldCenter.ToVector3();
                     this.Crosshair.Transform?.SetPosition(value.WorldCenter);
+
+                    //更新方向
+                    this.FourDirection = value.DirectionIndicator.ToDirectionInfo();
                 }
 
                 field = value;
@@ -344,6 +348,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public CrosshairVisual3D Crosshair { get; set; }
+        #endregion
+
+        #region 四方向标识 —— FourDirectionInfo FourDirection
+        /// <summary>
+        /// 四方向标识
+        /// </summary>
+        [DependencyProperty]
+        public FourDirectionInfo FourDirection { get; set; }
         #endregion
 
         #region 选中的形状 —— ShapeVisual3D SelectedShape
@@ -882,6 +894,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this.Crosshair.Transform?.SetPosition(plane.WorldCenter);
             }
 
+            //更新方向
+            this.FourDirection = plane.DirectionIndicator.ToDirectionInfo();
+
+            //发布消息
             MPRPlaneChangedEvent message = new MPRPlaneChangedEvent
             {
                 Publisher = this,

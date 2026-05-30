@@ -234,6 +234,7 @@ namespace MedicalSharp.Primitives.Maths
                 SlicesCount = volumeMetadata.VolumeSize.Z
             };
             plane.SetSliceIndex(volumeMetadata.VolumeSize.Z / 2);
+            plane.DirectionIndicator.CalculateDirections(plane.UAxis, plane.VAxis, plane.OriginalPlaneType);
 
             return plane;
         }
@@ -260,6 +261,7 @@ namespace MedicalSharp.Primitives.Maths
                 SlicesCount = volumeMetadata.VolumeSize.Y
             };
             plane.SetSliceIndex(volumeMetadata.VolumeSize.Y / 2);
+            plane.DirectionIndicator.CalculateDirections(plane.UAxis, plane.VAxis, plane.OriginalPlaneType);
 
             return plane;
         }
@@ -286,6 +288,7 @@ namespace MedicalSharp.Primitives.Maths
                 SlicesCount = volumeMetadata.VolumeSize.X
             };
             plane.SetSliceIndex(volumeMetadata.VolumeSize.X / 2);
+            plane.DirectionIndicator.CalculateDirections(plane.UAxis, plane.VAxis, plane.OriginalPlaneType);
 
             return plane;
         }
@@ -702,7 +705,7 @@ namespace MedicalSharp.Primitives.Maths
             this._previousSliceOffset = currentOffset;
 
             //更新方向
-            this.DirectionIndicator.CalculateDirections(this.UAxis, this.VAxis);
+            this.DirectionIndicator.CalculateDirections(this.UAxis, this.VAxis, this.OriginalPlaneType);
 
             this.PlaneChangedEvent?.Invoke(this, eventArgs);
         }

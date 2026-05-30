@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using MedicalSharp.Primitives.Enums;
+using OpenTK.Mathematics;
 using System;
 using System.Text;
 
@@ -85,18 +86,34 @@ namespace MedicalSharp.Primitives.Models
 
         #region # 方法
 
-        #region 计算方向 —— void CalculateDirections(in Vector3 uAxis...
+        #region 计算方向 —— void CalculateDirections(Vector3 uAxis...
         /// <summary>
         /// 计算方向
         /// </summary>
         /// <param name="uAxis">U轴</param>
         /// <param name="vAxis">V轴</param>
-        public void CalculateDirections(in Vector3 uAxis, in Vector3 vAxis)
+        /// <param name="originalPlaneType">原始平面类型</param>
+        public void CalculateDirections(Vector3 uAxis, Vector3 vAxis, MPRPlaneType originalPlaneType)
         {
-            this.Left = GetDirectionIndicator(-uAxis);
-            this.Right = GetDirectionIndicator(uAxis);
+            if (originalPlaneType == MPRPlaneType.Axial)
+            {
+                vAxis = new Vector3(vAxis.X, -vAxis.Y, vAxis.Z);
+            }
+            if (originalPlaneType == MPRPlaneType.Coronal)
+            {
+                uAxis = new Vector3(uAxis.X, -uAxis.Y, uAxis.Z);
+                vAxis = new Vector3(vAxis.X, -vAxis.Y, vAxis.Z);
+            }
+            if (originalPlaneType == MPRPlaneType.Sagittal)
+            {
+                uAxis = new Vector3(uAxis.X, -uAxis.Y, uAxis.Z);
+                vAxis = new Vector3(vAxis.X, -vAxis.Y, vAxis.Z);
+            }
+
             this.Top = GetDirectionIndicator(vAxis);
             this.Bottom = GetDirectionIndicator(-vAxis);
+            this.Left = GetDirectionIndicator(-uAxis);
+            this.Right = GetDirectionIndicator(uAxis);
         }
         #endregion
 

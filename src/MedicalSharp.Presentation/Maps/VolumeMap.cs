@@ -243,6 +243,15 @@ namespace MedicalSharp.Presentation.Maps
         /// </summary>
         public static StatisticInfo ToStatisticInfo(this StatisticResult result)
         {
+            #region # 验证
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            #endregion
+
             StatisticInfo statisticInfo = new StatisticInfo
             {
                 MinHU = result.MinHU.ToString("F0"),
@@ -255,6 +264,33 @@ namespace MedicalSharp.Presentation.Maps
             };
 
             return statisticInfo;
+        }
+        #endregion
+
+        #region # 方向信息映射 —— static FourDirectionInfo ToDirectionInfo(this FourDirection fourDirection)
+        /// <summary>
+        /// 方向信息映射
+        /// </summary>
+        public static FourDirectionInfo ToDirectionInfo(this FourDirection fourDirection)
+        {
+            #region # 验证
+
+            if (fourDirection == null)
+            {
+                return null;
+            }
+
+            #endregion
+
+            FourDirectionInfo directionInfo = new FourDirectionInfo
+            {
+                Top = fourDirection.Top,
+                Bottom = fourDirection.Bottom,
+                Left = fourDirection.Left,
+                Right = fourDirection.Right
+            };
+
+            return directionInfo;
         }
         #endregion
     }
