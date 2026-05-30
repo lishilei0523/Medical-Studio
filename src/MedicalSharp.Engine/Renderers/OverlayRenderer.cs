@@ -1,31 +1,31 @@
 ﻿using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
-using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 
 namespace MedicalSharp.Engine.Renderers
 {
     /// <summary>
-    /// 形状渲染器
+    /// Overlay渲染器
     /// </summary>
-    public class ShapeRenderer : Renderer
+    public class OverlayRenderer : Renderer
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 渲染对象列表
         /// </summary>
-        private readonly HashSet<ShapeRenderable> _renderables;
+        private readonly HashSet<Renderable2D> _renderables;
 
         /// <summary>
-        /// 创建形状渲染器构造器
+        /// 创建Overlay渲染器构造器
         /// </summary>
         /// <param name="camera">相机</param>
-        public ShapeRenderer(Camera camera)
+        public OverlayRenderer(Camera camera)
             : base(camera)
         {
             //默认值
@@ -34,13 +34,13 @@ namespace MedicalSharp.Engine.Renderers
 
         #endregion
 
-        #region # 属性
+        #region 属性
 
-        #region 只读属性 - 渲染对象列表 —— IReadOnlySet<ShapeRenderable> Renderables
+        #region 只读属性 - 渲染对象列表 —— IReadOnlySet<Renderable2D> Renderables
         /// <summary>
         /// 只读属性 - 渲染对象列表
         /// </summary>
-        public IReadOnlySet<ShapeRenderable> Renderables
+        public IReadOnlySet<Renderable2D> Renderables
         {
             get => this._renderables;
         }
@@ -48,37 +48,43 @@ namespace MedicalSharp.Engine.Renderers
 
         #endregion
 
-        #region # 方法
+        #region 方法
 
-        //Public
-
-        #region 追加渲染对象 —— void AppendItem(ShapeRenderable renderable)
+        #region 追加渲染对象 —— void AppendItem(Renderable2D renderable)
         /// <summary>
         /// 追加渲染对象
         /// </summary>
         /// <param name="renderable">渲染对象</param>
-        public void AppendItem(ShapeRenderable renderable)
+        public void AppendItem(Renderable2D renderable)
         {
+            #region # 验证
+
             if (renderable == null)
             {
-                throw new ArgumentNullException(nameof(renderable), "形状渲染对象不可为空！");
+                throw new ArgumentNullException(nameof(renderable), "2D渲染对象不可为空！");
             }
+
+            #endregion
 
             this._renderables.Add(renderable);
         }
         #endregion
 
-        #region 删除渲染对象 —— void RemoveItem(ShapeRenderable renderable)
+        #region 删除渲染对象 —— void RemoveItem(Renderable2D renderable)
         /// <summary>
         /// 删除渲染对象
         /// </summary>
         /// <param name="renderable">渲染对象</param>
-        public void RemoveItem(ShapeRenderable renderable)
+        public void RemoveItem(Renderable2D renderable)
         {
+            #region # 验证
+
             if (renderable == null)
             {
                 return;
             }
+
+            #endregion
 
             this._renderables.Remove(renderable);
         }
@@ -116,30 +122,22 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
-            //设置相机视口尺寸
-            this.Camera.SetViewportSize(viewportWidth, viewportHeight);
+            //获取相机旋转矩阵
+            Matrix4 cameraRotation = this.Camera.GetRotation();
 
             //渲染上下文
-            float zoomFactor = 1.0f;
-            if (this.Camera is MPRCamera mprCamera)
-            {
-                zoomFactor = mprCamera.ZoomFactor;
-            }
-            RenderContext3D renderContext = new RenderContext3D(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, zoomFactor);
+            RenderContext2D renderContext = new RenderContext2D(glContext, (int)viewportWidth, (int)viewportHeight, cameraRotation);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.ShapeProgram;
             program.Use();
 
             //设置投影矩阵、视图矩阵
-            program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
-            program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
+            program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.OrthoMatrix);
+            program.SetUniformMatrix4("u_ViewMatrix", Matrix4.Identity);
 
-            foreach (ShapeRenderable renderable in this._renderables)
+            foreach (Renderable2D renderable in this._renderables)
             {
-                //设置模型矩阵
-                program.SetUniformMatrix4("u_ModelMatrix", renderable.ModelMatrix);
-
                 //渲染
                 renderable.Render(program, renderContext);
             }
@@ -160,7 +158,7 @@ namespace MedicalSharp.Engine.Renderers
                 return;
             }
 
-            foreach (ShapeRenderable renderable in this._renderables)
+            foreach (Renderable2D renderable in this._renderables)
             {
                 renderable.Dispose();
             }

@@ -171,6 +171,26 @@ namespace MedicalSharp.Primitives.Cameras
         public abstract void Reset();
         #endregion
 
+        #region 获取相机旋转 —— Matrix4 GetRotation()
+        /// <summary>
+        /// 获取相机旋转
+        /// </summary>
+        /// <remarks>旋转矩阵</remarks>
+        public Matrix4 GetRotation()
+        {
+            //视图矩阵的逆矩阵的左上角3x3部分就是旋转矩阵
+            Matrix4 viewMatrixInv = Matrix4.Invert(this.ViewMatrix);
+            Matrix4 rotation = new Matrix4(
+                viewMatrixInv.M11, viewMatrixInv.M12, viewMatrixInv.M13, 0,
+                viewMatrixInv.M21, viewMatrixInv.M22, viewMatrixInv.M23, 0,
+                viewMatrixInv.M31, viewMatrixInv.M32, viewMatrixInv.M33, 0,
+                0, 0, 0, 1
+            );
+
+            return rotation;
+        }
+        #endregion
+
 
         //Protected
 
