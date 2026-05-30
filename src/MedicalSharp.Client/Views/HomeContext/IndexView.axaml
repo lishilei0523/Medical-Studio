@@ -143,8 +143,14 @@
                             <sd:FormItem Label="序列号：">
                                 <TextBlock Text="{Binding SeriesInfo.SeriesNumber}" />
                             </sd:FormItem>
-                            <sd:FormItem Label="检查部位：">
-                                <TextBlock Text="{Binding SeriesInfo.BodyPartExamined}" />
+                            <sd:FormItem Label="层厚：">
+                                <TextBlock Text="{Binding SeriesInfo.SliceThickness}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="间距：">
+                                <TextBlock Text="{Binding SeriesInfo.SpacingBetweenSlices}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="序列描述：">
+                                <TextBlock Text="{Binding SeriesInfo.SeriesDescription}" />
                             </sd:FormItem>
 							<sd:FormItem Label="成像设备：">
 								<TextBlock Text="{Binding SeriesInfo.Modality}" />
@@ -164,12 +170,6 @@
 							<sd:FormItem Label="FOV：">
 								<TextBlock Text="{Binding ScanInfo.ReconstructionDiameter}" />
 							</sd:FormItem>
-                            <sd:FormItem Label="层厚：">
-                                <TextBlock Text="{Binding SeriesInfo.SliceThickness}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="间距：">
-                                <TextBlock Text="{Binding SeriesInfo.SpacingBetweenSlices}" />
-                            </sd:FormItem>
 						</StackPanel>
 					</sd:GroupBox>
 					<sd:GroupBox Grid.Row="2" Header="体积信息" Margin="0,2,0,0">
