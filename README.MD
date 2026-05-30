@@ -30,7 +30,7 @@
 
     ✅ 双缓冲架构：OriginalTexture + PreviewTexture 实现非破坏性编辑；
 
-    ✅ 三通道计算引擎：CPU (SimpleITK) + GPU (Compute Shader/OpenCL) + AI (ONNX)；
+    ✅ 三通道计算引擎：GPU (Compute Shader/OpenCL) + CPU (SimpleITK) + AI (ONNX)；
 
     ✅ 跨平台支持：Windows/Linux 双平台发布；
 
@@ -55,7 +55,7 @@
         几何体统计、组织统计；
     
     预处理：
-        形态学、滤波、边缘检测、灰度变换、直方图等；
+        直方图、形态学、滤波、边缘检测、灰度变换等；
     
     分割：
         2D/3D几何体分割、阈值分割、区域生长分割、TotalSegmentor分割等；
