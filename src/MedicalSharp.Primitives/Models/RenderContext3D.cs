@@ -5,12 +5,12 @@ using System;
 namespace MedicalSharp.Primitives.Models
 {
     /// <summary>
-    /// 渲染上下文
+    /// 渲染上下文(3D)
     /// </summary>
-    public sealed class RenderContext
+    public sealed class RenderContext3D
     {
         /// <summary>
-        /// 创建渲染上下文构造器
+        /// 创建渲染上下文(3D)构造器
         /// </summary>
         /// <param name="glContext">OpenGL上下文句柄</param>
         /// <param name="viewportWidth">视口宽度</param>
@@ -21,7 +21,7 @@ namespace MedicalSharp.Primitives.Models
         /// <param name="projectionMatrix">投影矩阵</param>
         /// <param name="viewMatrix">视图矩阵</param>
         /// <param name="zoomFactor">缩放因子</param>
-        public RenderContext(IntPtr glContext, float viewportWidth, float viewportHeight, CameraMode cameraMode, Vector3 cameraPosition, Vector3 lookDirection, Matrix4 projectionMatrix, Matrix4 viewMatrix, float zoomFactor = 1.0f)
+        public RenderContext3D(IntPtr glContext, float viewportWidth, float viewportHeight, CameraMode cameraMode, Vector3 cameraPosition, Vector3 lookDirection, Matrix4 projectionMatrix, Matrix4 viewMatrix, float zoomFactor = 1.0f)
         {
             this.GlContext = glContext;
             this.ViewportWidth = viewportWidth;

@@ -11,7 +11,7 @@ namespace MedicalSharp.Engine.Renderables
     /// <summary>
     /// 形状渲染对象
     /// </summary>
-    public abstract class ShapeRenderable : Renderable, IDisposable
+    public abstract class ShapeRenderable : Renderable3D, IDisposable
     {
         #region # 字段及构造器
 
@@ -38,13 +38,13 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 方法
 
-        #region 渲染 —— abstract void Render(ShaderProgram program, RenderContext context)
+        #region 渲染 —— abstract void Render(ShaderProgram program, RenderContext3D context)
         /// <summary>
         /// 渲染
         /// </summary>
         /// <param name="program">Shader程序</param>
         /// <param name="context">渲染上下文</param>
-        public abstract void Render(ShaderProgram program, RenderContext context);
+        public abstract void Render(ShaderProgram program, RenderContext3D context);
         #endregion
 
         #region 检测射线相交 —— virtual bool IntersectsRay(Ray ray, out float distance...

@@ -198,13 +198,13 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 渲染 —— override void Render(ShaderProgram program, RenderContext context)
+        #region 渲染 —— override void Render(ShaderProgram program, RenderContext3D context)
         /// <summary>
         /// 渲染
         /// </summary>
         /// <param name="program">Shader程序</param>
         /// <param name="context">渲染上下文</param>
-        public override void Render(ShaderProgram program, RenderContext context)
+        public override void Render(ShaderProgram program, RenderContext3D context)
         {
             //禁用深度写入、让透明面可以互相混合
             GL.DepthMask(false);

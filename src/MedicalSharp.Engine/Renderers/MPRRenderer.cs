@@ -307,7 +307,7 @@ namespace MedicalSharp.Engine.Renderers
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
             //渲染上下文
-            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, this.MPRCamera.ZoomFactor);
+            RenderContext3D renderContext = new RenderContext3D(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, this.MPRCamera.ZoomFactor);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.MPRProgram;

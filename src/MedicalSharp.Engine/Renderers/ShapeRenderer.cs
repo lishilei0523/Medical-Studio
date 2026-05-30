@@ -125,7 +125,7 @@ namespace MedicalSharp.Engine.Renderers
             {
                 zoomFactor = mprCamera.ZoomFactor;
             }
-            RenderContext renderContext = new RenderContext(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, zoomFactor);
+            RenderContext3D renderContext = new RenderContext3D(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, zoomFactor);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.ShapeProgram;
