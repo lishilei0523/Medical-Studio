@@ -113,7 +113,7 @@
 					<DropDownButton Content="VR" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
 							<MenuFlyout>
-								<MenuItem Header="预览模式(_V)">
+								<MenuItem Header="预览模式(_P)">
 									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="预览模式" GroupName="PreviewMode"
@@ -127,7 +127,7 @@
 										</MenuItem.Header>
 									</MenuItem>
 								</MenuItem>
-								<MenuItem Header="渲染模式(_M)">
+								<MenuItem Header="渲染模式(_R)">
 									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="Raycast" GroupName="RenderMode" IsChecked="{Binding RaycastChecked}" />
@@ -149,7 +149,7 @@
 										</MenuItem.Header>
 									</MenuItem>
 								</MenuItem>
-								<MenuItem Header="MPR平面(_P)">
+								<MenuItem Header="显示设置(_D)">
 									<MenuItem>
 										<MenuItem.Header>
 											<CheckBox Content="横断面" IsChecked="{Binding AxialPlaneVisible}" />
@@ -165,11 +165,9 @@
 											<CheckBox Content="矢状面" IsChecked="{Binding SagittalPlaneVisible}" />
 										</MenuItem.Header>
 									</MenuItem>
-									<MenuItem Header="复位(_R)" Command="{Binding ResetMprPlanesCommand}" />
-								</MenuItem>
-								<MenuItem Header="相机设置(_S)">
-									<MenuItem Header="调节相机(_T)" Command="{Binding TuneCameraCommand}" />
-									<MenuItem Header="重置相机(_R)" Command="{Binding ResetCameraCommand}" />
+									<MenuItem Header="重置平面(_R)" Command="{Binding ResetMprPlanesCommand}" />
+                                    <MenuItem Header="重置相机(_C)" Command="{Binding ResetCameraCommand}" />
+                                    <MenuItem Header="调节相机(_T)" Command="{Binding TuneCameraCommand}" />
 								</MenuItem>
 								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />
 								<MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />

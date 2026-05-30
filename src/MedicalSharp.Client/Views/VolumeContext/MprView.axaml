@@ -85,7 +85,7 @@
 					<DropDownButton Content="{Binding Title}" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
 							<MenuFlyout>
-								<MenuItem Header="预览模式(_V)">
+								<MenuItem Header="预览模式(_P)">
 									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="预览模式" GroupName="PreviewMode"
@@ -99,7 +99,7 @@
 										</MenuItem.Header>
 									</MenuItem>
 								</MenuItem>
-								<MenuItem Header="渲染模式(_M)">
+								<MenuItem Header="渲染模式(_R)">
 									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="灰度" GroupName="RenderMode" IsChecked="{Binding GrayModeChecked}" />
@@ -122,9 +122,9 @@
                                             <CheckBox Content="方向标识" IsChecked="{Binding DirectionVisible}" />
                                         </MenuItem.Header>
                                     </MenuItem>
-									<MenuItem Header="十字线复位(_R)" Command="{Binding ResetCrosshairCommand}" />
+									<MenuItem Header="重置十字线(_R)" Command="{Binding ResetCrosshairCommand}" />
+                                    <MenuItem Header="重置相机(_C)" Command="{Binding ResetCameraCommand}" />
 								</MenuItem>
-								<MenuItem Header="重置相机(_R)" Command="{Binding ResetCameraCommand}" />
 								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />
 								<MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
 							</MenuFlyout>
