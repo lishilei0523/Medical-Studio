@@ -1527,6 +1527,58 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
+        #region # 创建Overlay容器 —— static MeshGeometry CreateOverlayContainer(float width, float height)
+        /// <summary>
+        /// 创建Overlay容器
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <returns>网格模型</returns>
+        /// <remarks>
+        /// 用于2D屏幕空间渲染
+        /// 纹理坐标左下角为(0,0)，右上角为(1,1)
+        /// 平面以左上角为基准点（原点），便于屏幕空间定位
+        /// </remarks>
+        public static MeshGeometry CreateOverlayContainer(float width, float height)
+        {
+            Vector3[] positions =
+            [
+                new Vector3(0, 0, 0),           //0: 左上
+                new Vector3(width, 0, 0),       //1: 右上
+                new Vector3(width, height, 0),  //2: 右下
+                new Vector3(0, height, 0)       //3: 左下
+            ];
+
+            Vector2[] texCoords =
+            [
+                new Vector2(0, 0),  //左上 -> 纹理左上（Y=0）
+                new Vector2(1, 0),  //右上 -> 纹理右上（Y=0）
+                new Vector2(1, 1),  //右下 -> 纹理右下（Y=1）
+                new Vector2(0, 1)   //左下 -> 纹理左下（Y=1）
+            ];
+
+            //法向量朝Z（面向相机）
+            Vector3 normal = Vector3.UnitZ;
+
+            //构建顶点列表
+            List<Vertex> vertices = [];
+            for (int index = 0; index < 4; index++)
+            {
+                vertices.Add(new Vertex
+                {
+                    Position = positions[index],
+                    TextureCoord = texCoords[index],
+                    Normal = normal
+                });
+            }
+
+            //构建索引（两个三角形）
+            List<uint> indices = [0, 1, 2, 0, 2, 3];
+
+            return new MeshGeometry(vertices, indices);
+        }
+        #endregion
+
         #region # 创建平面 —— static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f...
         /// <summary>
         /// 创建平面
