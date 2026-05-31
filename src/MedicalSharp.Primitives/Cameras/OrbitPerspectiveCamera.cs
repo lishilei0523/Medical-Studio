@@ -32,8 +32,9 @@ namespace MedicalSharp.Primitives.Cameras
 
         #region 视野角度 —— float FieldOfView
         /// <summary>
-        /// 视野角度（度）
+        /// 视野角度
         /// </summary>
+        /// <remarks>角度</remarks>
         public float FieldOfView { get; private set; }
         #endregion
 

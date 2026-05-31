@@ -82,7 +82,7 @@ namespace MedicalSharp.Engine.Renderables
         {
             //计算派生参数
             this.ShaftLength = 0.1f;
-            this.FontSize = 22;
+            this.FontSize = 12;
             this.ArrowLength = this.ShaftLength * 0.2f;
             this.ShaftRadius = this.ShaftLength * 0.025f;
             this.ArrowRadius = this.ShaftLength * 0.05f;
@@ -165,17 +165,13 @@ namespace MedicalSharp.Engine.Renderables
                                     + context.UpDirection * 0.25f;
             this.Transform.SetPosition(worldPosition);
 
-            // 计算缩放
+            //计算缩放
+            float targetPixels = 600f;
             float distance = Vector3.Distance(context.CameraPosition, worldPosition);
-            float fov = 30;  // 需要添加到 RenderContext3D
-            float targetPixels = 600f;  // 期望屏幕大小 100 像素
-
-            float fovRad = MathHelper.DegreesToRadians(fov);
-            float worldHeightAtDistance = 2.0f * distance * (float)Math.Tan(fovRad * 0.5f);
+            float fieldOfView = MathHelper.DegreesToRadians(context.FieldOfView);
+            float worldHeightAtDistance = 2.0f * distance * MathF.Tan(fieldOfView * 0.5f);
             float scale = worldHeightAtDistance * (targetPixels / context.ViewportHeight);
-
             this.Transform.SetScale(new Vector3(scale));
-
 
             //设置模型矩阵
             program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
@@ -199,7 +195,7 @@ namespace MedicalSharp.Engine.Renderables
             this._zArrowBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
             //渲染文本
-            float textPosition = (this.ShaftLength * scale + this.TextOffset);
+            float textPosition = (this.ShaftLength + this.TextOffset) * scale;
             Vector3 xTextPosition = worldPosition + new Vector3(textPosition, 0, 0);
             Vector3 yTextPosition = worldPosition + new Vector3(0, textPosition, 0);
             Vector3 zTextPosition = worldPosition + new Vector3(0, 0, textPosition);

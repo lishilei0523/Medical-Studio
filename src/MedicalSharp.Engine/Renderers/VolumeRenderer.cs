@@ -286,7 +286,12 @@ namespace MedicalSharp.Engine.Renderers
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
             //渲染上下文
-            RenderContext3D renderContext = new RenderContext3D(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.UpDirection, this.Camera.RightDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            float fieldOfView = 30.0f;
+            if (this.Camera is OrbitPerspectiveCamera perspectiveCamera)
+            {
+                fieldOfView = perspectiveCamera.FieldOfView;
+            }
+            RenderContext3D renderContext = new RenderContext3D(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.UpDirection, this.Camera.RightDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, fieldOfView);
 
             //开启Shader程序
             ShaderProgram program = ShaderManager.RaycastProgram;

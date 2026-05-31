@@ -22,8 +22,9 @@ namespace MedicalSharp.Primitives.Models
         /// <param name="rightDirection">相机右方向</param>
         /// <param name="projectionMatrix">投影矩阵</param>
         /// <param name="viewMatrix">视图矩阵</param>
+        /// <param name="fieldOfView">视野角度</param>
         /// <param name="zoomFactor">缩放因子</param>
-        public RenderContext3D(IntPtr glContext, float viewportWidth, float viewportHeight, CameraMode cameraMode, Vector3 cameraPosition, Vector3 lookDirection, Vector3 upDirection, Vector3 rightDirection, Matrix4 projectionMatrix, Matrix4 viewMatrix, float zoomFactor = 1.0f)
+        public RenderContext3D(IntPtr glContext, float viewportWidth, float viewportHeight, CameraMode cameraMode, Vector3 cameraPosition, Vector3 lookDirection, Vector3 upDirection, Vector3 rightDirection, Matrix4 projectionMatrix, Matrix4 viewMatrix, float fieldOfView = 30.0f, float zoomFactor = 1.0f)
         {
             this.GlContext = glContext;
             this.ViewportWidth = viewportWidth;
@@ -35,6 +36,7 @@ namespace MedicalSharp.Primitives.Models
             this.RightDirection = rightDirection;
             this.ProjectionMatrix = projectionMatrix;
             this.ViewMatrix = viewMatrix;
+            this.FieldOfView = fieldOfView;
             this.ZoomFactor = zoomFactor;
         }
 
@@ -87,6 +89,12 @@ namespace MedicalSharp.Primitives.Models
         /// 视图矩阵
         /// </summary>
         public Matrix4 ViewMatrix { get; private set; }
+
+        /// <summary>
+        /// 视野角度
+        /// </summary>
+        /// <remarks>透视相机适用</remarks>
+        public float FieldOfView { get; private set; }
 
         /// <summary>
         /// 缩放因子
