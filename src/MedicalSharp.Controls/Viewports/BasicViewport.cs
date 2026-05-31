@@ -4,6 +4,7 @@ using Avalonia.Metadata;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Visual2Ds;
 using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Renderers;
 using MedicalSharp.Primitives.Cameras;
@@ -29,17 +30,29 @@ namespace MedicalSharp.Controls.Viewports
         protected ShapeRenderer _shapeRenderer;
 
         /// <summary>
+        /// Overlay渲染器
+        /// </summary>
+        protected OverlayRenderer _overlayRenderer;
+
+        /// <summary>
         /// 形状3D元素列表
         /// </summary>
         protected readonly IList<ShapeVisual3D> _shapeVisual3Ds;
+
+        /// <summary>
+        /// 形状Overly元素列表
+        /// </summary>
+        protected readonly IList<ShapeOverlay2D> _shapeOverlay2Ds;
 
         /// <summary>
         /// 默认构造器
         /// </summary>
         public BasicViewport()
         {
-            this._shapeVisual3Ds = new List<ShapeVisual3D>();
+            this._shapeVisual3Ds = [];
+            this._shapeOverlay2Ds = [];
             this.Children = [];
+            this.Overlays = [];
         }
 
         #endregion
@@ -52,6 +65,13 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         [Content]
         public AvaloniaList<Visual3D> Children { get; private set; }
+        #endregion
+
+        #region 2D元素列表 —— AvaloniaList<Visual2D> Overlays
+        /// <summary>
+        /// 2D元素列表
+        /// </summary>
+        public AvaloniaList<Visual2D> Overlays { get; private set; }
         #endregion
 
         #region 只读属性 - 形状渲染器 —— ShapeRenderer ShapeRenderer
@@ -174,6 +194,10 @@ namespace MedicalSharp.Controls.Viewports
             {
                 visual3D.DataContext = this.DataContext;
             }
+            foreach (Visual2D visual2D in this.Overlays)
+            {
+                visual2D.DataContext = this.DataContext;
+            }
         }
         #endregion
 
@@ -190,6 +214,7 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             this._shapeRenderer = new ShapeRenderer(this.Camera);
+            this._overlayRenderer = new OverlayRenderer(this.Camera);
         }
         #endregion
 
@@ -208,17 +233,27 @@ namespace MedicalSharp.Controls.Viewports
 
             //清空渲染对象
             this._shapeVisual3Ds.Clear();
+            this._shapeOverlay2Ds.Clear();
             this._shapeRenderer.ClearItems();
+            this._overlayRenderer.ClearItems();
 
-            //填充渲染对象
+            //渲染3D对象
             List<ShapeVisual3D> shapeVisual3Ds = this.GetShapeVisual3Ds();
             foreach (ShapeVisual3D shapeVisual3D in shapeVisual3Ds)
             {
                 this._shapeVisual3Ds.Add(shapeVisual3D);
                 this._shapeRenderer.AppendItem(shapeVisual3D.Renderable);
             }
-
             this._shapeRenderer.RenderFrame(viewportSize.Width, viewportSize.Height, this.GlContextHandle);
+
+            //渲染2D对象
+            List<ShapeOverlay2D> shapeOverlay2Ds = this.GetShapeOverlay2Ds();
+            foreach (ShapeOverlay2D shapeOverlay2D in shapeOverlay2Ds)
+            {
+                this._shapeOverlay2Ds.Add(shapeOverlay2D);
+                this._overlayRenderer.AppendItem(shapeOverlay2D.Renderable);
+            }
+            this._overlayRenderer.RenderFrame(viewportSize.Width, viewportSize.Height, this.GlContextHandle);
         }
         #endregion
 
@@ -229,7 +264,9 @@ namespace MedicalSharp.Controls.Viewports
         protected override void OnOpenTKDeinit()
         {
             this._shapeVisual3Ds.Clear();
+            this._shapeOverlay2Ds.Clear();
             this._shapeRenderer.Dispose();
+            this._overlayRenderer.Dispose();
         }
         #endregion
 
@@ -267,6 +304,40 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             return shapeVisual3Ds;
+        }
+        #endregion
+
+        #region 获取形状Overlay元素列表 —— virtual List<ShapeOverlay2D> GetShapeOverlay2Ds()
+        /// <summary>
+        /// 获取形状Overlay元素列表
+        /// </summary>
+        /// <returns>形状Overlay元素列表</returns>
+        protected virtual List<ShapeOverlay2D> GetShapeOverlay2Ds()
+        {
+            List<ShapeOverlay2D> shapeOverlay2Ds = [];
+            foreach (Visual2D visual2D in this.Overlays.Where(x => x.IsVisible))
+            {
+                if (visual2D is ShapeOverlay2D shapeOverlay2D)
+                {
+                    shapeOverlay2D.EnsureRenderable();
+                    shapeOverlay2Ds.Add(shapeOverlay2D);
+                }
+                if (visual2D is ShapePresenter2D shapePresenter && shapePresenter.Content.IsVisible)
+                {
+                    shapePresenter.Content.EnsureRenderable();
+                    shapeOverlay2Ds.Add(shapePresenter.Content);
+                }
+                if (visual2D is ShapesPresenter2D shapesPresenter)
+                {
+                    foreach (ShapeOverlay2D item in shapesPresenter.ItemsSource.Where(x => x.IsVisible))
+                    {
+                        item.EnsureRenderable();
+                        shapeOverlay2Ds.Add(item);
+                    }
+                }
+            }
+
+            return shapeOverlay2Ds;
         }
         #endregion
 

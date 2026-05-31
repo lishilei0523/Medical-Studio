@@ -364,6 +364,7 @@ namespace MedicalSharp.Controls.Viewports
 
             //初始化形状渲染器
             this._shapeRenderer = new ShapeRenderer(this.MPRCamera);
+            this._overlayRenderer = new OverlayRenderer(this.MPRCamera);
 
             //初始化MPR渲染器
             this._mprRenderer = new MPRRenderer(this.MPRCamera);
