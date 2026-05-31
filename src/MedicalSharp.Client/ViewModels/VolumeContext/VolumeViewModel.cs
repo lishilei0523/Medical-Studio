@@ -88,6 +88,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.AxialPlaneVisible = false;
             this.CoronalPlaneVisible = false;
             this.SagittalPlaneVisible = false;
+            this.AxisVisible = false;
             this.Brightness = 1.0f;
             this.DensityScale = 1.0f;
             this.StepSize = 0.0012f;
@@ -259,6 +260,22 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 field = value;
                 this.NotifyOfPropertyChange();
                 this.SagittalPlane.IsVisible = value;
+                this.FrameToken++;
+            }
+        }
+        #endregion
+
+        #region 坐标轴是否可见 —— bool AxisVisible
+        /// <summary>
+        /// 坐标轴是否可见
+        /// </summary>
+        public bool AxisVisible
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
                 this.FrameToken++;
             }
         }
