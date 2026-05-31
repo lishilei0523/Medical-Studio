@@ -19,6 +19,11 @@ namespace MedicalSharp.Engine.Renderables
         #region # 字段及构造器
 
         /// <summary>
+        /// 参考视口高度
+        /// </summary>
+        private const float ReferenceViewportHeight = 1000.0f;
+
+        /// <summary>
         /// 参考距离
         /// </summary>
         private const float ReferenceDistance = 7.0f;
@@ -247,13 +252,14 @@ namespace MedicalSharp.Engine.Renderables
             {
                 float orthoSize = context.ZoomFactor;  //正交相机的大小
                 float screenHeight = context.ViewportHeight;
-                float targetScreenHeight = 1.2f;  //期望的屏幕像素高度
+                float targetScreenHeight = 1.3f;  //期望的屏幕像素高度
                 this._referenceScale = (targetScreenHeight / screenHeight) / orthoSize;
             }
             else
             {
+                float viewportScale = ReferenceViewportHeight / context.ViewportHeight;
                 float cameraDistance = Vector3.Distance(context.CameraPosition, this.Transform.Position);
-                this._referenceScale = BaseScale * (cameraDistance / ReferenceDistance);
+                this._referenceScale = BaseScale * (cameraDistance / ReferenceDistance) * viewportScale;
             }
             Matrix4 scaleMatrix = Matrix4.CreateScale(this._referenceScale);
 
