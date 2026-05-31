@@ -17,11 +17,13 @@ namespace MedicalSharp.Primitives.Models
         /// <param name="viewportHeight">视口高度</param>
         /// <param name="cameraMode">相机模式</param>
         /// <param name="cameraPosition">相机位置</param>
-        /// <param name="lookDirection">视角方向</param>
+        /// <param name="lookDirection">相机视角方向</param>
+        /// <param name="upDirection">相机上方向</param>
+        /// <param name="rightDirection">相机右方向</param>
         /// <param name="projectionMatrix">投影矩阵</param>
         /// <param name="viewMatrix">视图矩阵</param>
         /// <param name="zoomFactor">缩放因子</param>
-        public RenderContext3D(IntPtr glContext, float viewportWidth, float viewportHeight, CameraMode cameraMode, Vector3 cameraPosition, Vector3 lookDirection, Matrix4 projectionMatrix, Matrix4 viewMatrix, float zoomFactor = 1.0f)
+        public RenderContext3D(IntPtr glContext, float viewportWidth, float viewportHeight, CameraMode cameraMode, Vector3 cameraPosition, Vector3 lookDirection, Vector3 upDirection, Vector3 rightDirection, Matrix4 projectionMatrix, Matrix4 viewMatrix, float zoomFactor = 1.0f)
         {
             this.GlContext = glContext;
             this.ViewportWidth = viewportWidth;
@@ -29,6 +31,8 @@ namespace MedicalSharp.Primitives.Models
             this.CameraMode = cameraMode;
             this.CameraPosition = cameraPosition;
             this.LookDirection = lookDirection;
+            this.UpDirection = upDirection;
+            this.RightDirection = rightDirection;
             this.ProjectionMatrix = projectionMatrix;
             this.ViewMatrix = viewMatrix;
             this.ZoomFactor = zoomFactor;
@@ -63,6 +67,16 @@ namespace MedicalSharp.Primitives.Models
         /// 视角方向
         /// </summary>
         public Vector3 LookDirection { get; private set; }
+
+        /// <summary>
+        /// 相机上方向
+        /// </summary>
+        public Vector3 UpDirection { get; private set; }
+
+        /// <summary>
+        /// 相机右方向
+        /// </summary>
+        public Vector3 RightDirection { get; private set; }
 
         /// <summary>
         /// 投影矩阵
