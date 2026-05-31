@@ -16,6 +16,16 @@ namespace MedicalSharp.Engine.Renderables
         #region # 字段及构造器
 
         /// <summary>
+        /// 文字尺寸
+        /// </summary>
+        private const float FontSize = 11.0f;
+
+        /// <summary>
+        /// 目标屏幕尺寸
+        /// </summary>
+        private const float TargetScreenSize = 60f;
+
+        /// <summary>
         /// X轴轴线缓冲区
         /// </summary>
         private VertexBuffer _xShaftBuffer;
@@ -78,20 +88,21 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 创建坐标轴渲染对象
         /// </summary>
-        public AxisRenderable()
+        /// <remarks>坐标轴长度</remarks>
+        public AxisRenderable(float shaftLength)
         {
             //计算派生参数
-            this.ShaftLength = 0.1f;
-            this.FontSize = 12;
-            this.ArrowLength = this.ShaftLength * 0.2f;
-            this.ShaftRadius = this.ShaftLength * 0.025f;
+            this.ShaftLength = shaftLength;
+            this.ArrowLength = this.ShaftLength * 0.15f;
+            this.ShaftRadius = this.ShaftLength * 0.02f;
             this.ArrowRadius = this.ShaftLength * 0.05f;
             this.TextOffset = this.ShaftLength * 0.15f;
+            this.Distance = this.ShaftLength * 1.5f;
 
             //颜色配置
             this._xColor = new Vector4(1.0f, 0.2f, 0.2f, 1.0f);
             this._yColor = new Vector4(0.2f, 1.0f, 0.2f, 1.0f);
-            this._zColor = new Vector4(0.2f, 0.2f, 1.0f, 1.0f);
+            this._zColor = new Vector4(0.2f, 0.3f, 1.0f, 1.0f);
 
             //创建几何体
             this.CreateShafts();
@@ -138,11 +149,11 @@ namespace MedicalSharp.Engine.Renderables
         public float TextOffset { get; private set; }
         #endregion
 
-        #region 文字尺寸 —— float FontSize
+        #region 坐标轴距离 —— float Distance
         /// <summary>
-        /// 文字尺寸
+        /// 坐标轴距离
         /// </summary>
-        public float FontSize { get; private set; }
+        public float Distance { get; private set; }
         #endregion
 
         #endregion
@@ -159,19 +170,16 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="context">渲染上下文</param>
         public override void Render(ShaderProgram program, RenderContext3D context)
         {
-            Vector3 worldPosition = context.CameraPosition
-                                    + context.LookDirection * 1.5f
-                                    - context.RightDirection * 0.55f
-                                    + context.UpDirection * 0.25f;
+            //计算位置
+            Vector3 worldPosition = context.CameraPosition + context.LookDirection * this.Distance;
             this.Transform.SetPosition(worldPosition);
 
             //计算缩放
-            float targetPixels = 600f;
-            float distance = Vector3.Distance(context.CameraPosition, worldPosition);
             float fieldOfView = MathHelper.DegreesToRadians(context.FieldOfView);
-            float worldHeightAtDistance = 2.0f * distance * MathF.Tan(fieldOfView * 0.5f);
-            float scale = worldHeightAtDistance * (targetPixels / context.ViewportHeight);
-            this.Transform.SetScale(new Vector3(scale));
+            float worldHeightAtDistance = 2.0f * this.Distance * MathF.Tan(fieldOfView * 0.5f);
+            float scaleFactor = (TargetScreenSize / context.ViewportHeight) * worldHeightAtDistance / this.ShaftLength;
+            Vector3 scale = new Vector3(scaleFactor);
+            this.Transform.SetScale(scale);
 
             //设置模型矩阵
             program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
@@ -179,8 +187,8 @@ namespace MedicalSharp.Engine.Renderables
             //渲染X轴
             program.SetUniformInt("u_HasTexture", 0);
             program.SetUniformVector4("u_Color", this._xColor);
-            this._xShaftBuffer.Draw(context.GlContext, PrimitiveType.Lines);
-            this._xArrowBuffer.Draw(context.GlContext, PrimitiveType.Lines);
+            this._xShaftBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
+            this._xArrowBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
             //渲染Y轴
             program.SetUniformInt("u_HasTexture", 0);
@@ -195,7 +203,7 @@ namespace MedicalSharp.Engine.Renderables
             this._zArrowBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
             //渲染文本
-            float textPosition = (this.ShaftLength + this.TextOffset) * scale;
+            float textPosition = (this.ShaftLength + this.TextOffset) * scaleFactor;
             Vector3 xTextPosition = worldPosition + new Vector3(textPosition, 0, 0);
             Vector3 yTextPosition = worldPosition + new Vector3(0, textPosition, 0);
             Vector3 zTextPosition = worldPosition + new Vector3(0, 0, textPosition);
@@ -315,9 +323,9 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         private void CreateTexts()
         {
-            this._xText = new TextRenderable("X", Vector3.Zero, this.FontSize, this._xColor, lockYAxis: false);
-            this._yText = new TextRenderable("Y", Vector3.Zero, this.FontSize, this._yColor, lockYAxis: false);
-            this._zText = new TextRenderable("Z", Vector3.Zero, this.FontSize, this._zColor, lockYAxis: false);
+            this._xText = new TextRenderable("X", Vector3.Zero, FontSize, this._xColor, lockYAxis: false);
+            this._yText = new TextRenderable("Y", Vector3.Zero, FontSize, this._yColor, lockYAxis: false);
+            this._zText = new TextRenderable("Z", Vector3.Zero, FontSize, this._zColor, lockYAxis: false);
         }
         #endregion
 

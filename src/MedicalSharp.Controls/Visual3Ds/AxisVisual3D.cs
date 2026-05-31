@@ -1,4 +1,5 @@
-﻿using MedicalSharp.Engine.Renderables;
+﻿using Avalonia;
+using MedicalSharp.Engine.Renderables;
 
 namespace MedicalSharp.Controls.Visual3Ds
 {
@@ -8,6 +9,20 @@ namespace MedicalSharp.Controls.Visual3Ds
     public class AxisVisual3D : ShapeVisual3D
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 轴线长度依赖属性
+        /// </summary>
+        public static readonly StyledProperty<float> ShaftLengthProperty;
+
+        /// <summary>
+        /// 静态构造器
+        /// </summary>
+        static AxisVisual3D()
+        {
+            ShaftLengthProperty = AvaloniaProperty.Register<AxisVisual3D, float>(nameof(ShaftLength), 0.1f);
+        }
+
 
         /// <summary>
         /// 默认构造器
@@ -21,7 +36,16 @@ namespace MedicalSharp.Controls.Visual3Ds
 
         #region # 属性
 
-        //
+        #region 依赖属性 - 轴线长度 —— float ShaftLength
+        /// <summary>
+        /// 依赖属性 - 轴线长度
+        /// </summary>
+        public float ShaftLength
+        {
+            get => this.GetValue(ShaftLengthProperty);
+            set => this.SetValue(ShaftLengthProperty, value);
+        }
+        #endregion
 
         #endregion
 
@@ -35,7 +59,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             if (this.Renderable == null)
             {
-                AxisRenderable renderable = new AxisRenderable();
+                AxisRenderable renderable = new AxisRenderable(this.ShaftLength);
                 this.Renderable = renderable;
             }
         }
