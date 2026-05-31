@@ -249,10 +249,7 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            float half = (this.ShaftLength + this.ArrowLength) * 0.5f;
-            BoundingBox boundingBox = new BoundingBox(new Vector3(-half, -half, -half), new Vector3(half, half, half));
-
-            return boundingBox;
+            return default;
         }
         #endregion
 
