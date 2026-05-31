@@ -178,12 +178,10 @@ namespace MedicalSharp.Primitives.Cameras
         /// <remarks>旋转矩阵</remarks>
         public Matrix4 GetRotation()
         {
-            //视图矩阵的逆矩阵的左上角3x3部分就是旋转矩阵
-            Matrix4 viewMatrixInv = Matrix4.Invert(this.ViewMatrix);
             Matrix4 rotation = new Matrix4(
-                viewMatrixInv.M11, viewMatrixInv.M12, viewMatrixInv.M13, 0,
-                viewMatrixInv.M21, viewMatrixInv.M22, viewMatrixInv.M23, 0,
-                viewMatrixInv.M31, viewMatrixInv.M32, viewMatrixInv.M33, 0,
+                this.ViewMatrix.M11, this.ViewMatrix.M12, this.ViewMatrix.M13, 0,
+                this.ViewMatrix.M21, this.ViewMatrix.M22, this.ViewMatrix.M23, 0,
+                this.ViewMatrix.M31, this.ViewMatrix.M32, this.ViewMatrix.M33, 0,
                 0, 0, 0, 1
             );
 
