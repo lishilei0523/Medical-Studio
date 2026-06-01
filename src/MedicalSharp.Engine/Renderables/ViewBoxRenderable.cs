@@ -100,6 +100,27 @@ namespace MedicalSharp.Engine.Renderables
             //设置模型矩阵
             program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
 
+            //设置正交投影矩阵
+            float aspect = context.ViewportWidth / context.ViewportHeight;
+            float size = 0.5f;
+            float left, right, bottom, top;
+            if (aspect >= 1.0f)
+            {
+                left = -size * aspect;
+                right = size * aspect;
+                bottom = -size;
+                top = size;
+            }
+            else
+            {
+                left = -size;
+                right = size;
+                bottom = -size / aspect;
+                top = size / aspect;
+            }
+            Matrix4 projectionMatrix = Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, 0.0f, 2.0f);
+            program.SetUniformMatrix4("u_ProjectionMatrix", projectionMatrix);
+
             //渲染6个面（每个面6个索引）
             for (int index = 0; index < 6; index++)
             {
@@ -110,6 +131,9 @@ namespace MedicalSharp.Engine.Renderables
 
                 this._faceTextures[index].Unbind();
             }
+
+            //恢复透视投影矩阵
+            program.SetUniformMatrix4("u_ProjectionMatrix", context.ProjectionMatrix);
         }
         #endregion
 
@@ -206,7 +230,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制边框
             using SKPaint stroke = new SKPaint();
             stroke.Color = SKColors.LightGray;
-            stroke.StrokeWidth = 8;
+            stroke.StrokeWidth = 10;
             stroke.IsStroke = true;
             SKRect rectangle = new SKRect(2, 2, TextureSize - 2, TextureSize - 2);
             canvas.DrawRect(rectangle, stroke);
