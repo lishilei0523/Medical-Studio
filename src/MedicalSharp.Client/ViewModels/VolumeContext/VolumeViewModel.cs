@@ -88,8 +88,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.AxialPlaneVisible = false;
             this.CoronalPlaneVisible = false;
             this.SagittalPlaneVisible = false;
-            this.AxisVisible = false;
             this.ViewBoxVisible = true;
+            this.AxisVisible = false;
             this.Brightness = 1.0f;
             this.DensityScale = 1.0f;
             this.StepSize = 0.0012f;
@@ -266,11 +266,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region 坐标轴是否可见 —— bool AxisVisible
+        #region ViewBox是否可见 —— bool ViewBoxVisible
         /// <summary>
-        /// 坐标轴是否可见
+        /// ViewBox是否可见
         /// </summary>
-        public bool AxisVisible
+        public bool ViewBoxVisible
         {
             get;
             set
@@ -282,11 +282,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region ViewBox是否可见 —— bool ViewBoxVisible
+        #region 坐标轴是否可见 —— bool AxisVisible
         /// <summary>
-        /// ViewBox是否可见
+        /// 坐标轴是否可见
         /// </summary>
-        public bool ViewBoxVisible
+        public bool AxisVisible
         {
             get;
             set

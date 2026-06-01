@@ -165,16 +165,16 @@
 											<CheckBox Content="矢状面" IsChecked="{Binding SagittalPlaneVisible}" />
 										</MenuItem.Header>
 									</MenuItem>
-                                    <MenuItem>
-                                        <MenuItem.Header>
-                                            <CheckBox Content="坐标轴" IsChecked="{Binding AxisVisible}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                    <MenuItem>
-                                        <MenuItem.Header>
-                                            <CheckBox Content="ViewBox" IsChecked="{Binding ViewBoxVisible}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
+									<MenuItem>
+										<MenuItem.Header>
+											<CheckBox Content="ViewBox" IsChecked="{Binding ViewBoxVisible}" />
+										</MenuItem.Header>
+									</MenuItem>
+									<MenuItem>
+										<MenuItem.Header>
+											<CheckBox Content="坐标轴" IsChecked="{Binding AxisVisible}" />
+										</MenuItem.Header>
+									</MenuItem>
 									<MenuItem Header="重置平面(_R)" Command="{Binding ResetMprPlanesCommand}" />
 									<MenuItem Header="重置相机(_C)" Command="{Binding ResetCameraCommand}" />
 									<MenuItem Header="调节相机(_T)" Command="{Binding TuneCameraCommand}" />
@@ -207,8 +207,8 @@
 			<sd:ShapePresenter3D Content="{Binding CoronalPlane}" />
 			<sd:ShapePresenter3D Content="{Binding SagittalPlane}" />
 			<sd:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
-			<sd:AxisVisual3D IsVisible="{Binding AxisVisible}" />
 			<sd:ViewBoxVisual3D IsVisible="{Binding ViewBoxVisible}" />
+			<sd:AxisVisual3D IsVisible="{Binding AxisVisible}" />
 		</sd:VolumeViewport>
 	</sd:GroupBox>
 </UserControl>
