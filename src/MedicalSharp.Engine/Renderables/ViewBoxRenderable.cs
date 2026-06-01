@@ -101,8 +101,8 @@ namespace MedicalSharp.Engine.Renderables
             program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
 
             //设置正交投影矩阵
+            const float size = 0.5f;
             float aspect = context.ViewportWidth / context.ViewportHeight;
-            float size = 0.5f;
             float left, right, bottom, top;
             if (aspect >= 1.0f)
             {
@@ -125,6 +125,7 @@ namespace MedicalSharp.Engine.Renderables
             for (int index = 0; index < 6; index++)
             {
                 this._faceTextures[index].Bind(0);
+
                 program.SetUniformInt("u_ColorMode", (int)ColorMode.Texture);
                 program.SetUniformInt("u_Texture", 0);
                 this._vertexBuffer.DrawRange(context.GlContext, PrimitiveType.Triangles, index * 6, 6);
