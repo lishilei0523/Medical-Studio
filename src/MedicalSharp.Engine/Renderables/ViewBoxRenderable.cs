@@ -29,11 +29,6 @@ namespace MedicalSharp.Engine.Renderables
         private const int TextureSize = 256;
 
         /// <summary>
-        /// 坐标轴距离
-        /// </summary>
-        private const float Distance = 1.8f;
-
-        /// <summary>
         /// 顶点缓冲区
         /// </summary>
         private readonly VertexBuffer _vertexBuffer;
@@ -50,6 +45,7 @@ namespace MedicalSharp.Engine.Renderables
         public ViewBoxRenderable(float sideLength)
         {
             this.SideLength = sideLength;
+            this.Distance = this.SideLength * 18f;
 
             //创建几何体
             MeshGeometry boxMesh = MeshFactory.CreateViewBox(this.SideLength, this.SideLength, this.SideLength);
@@ -70,6 +66,13 @@ namespace MedicalSharp.Engine.Renderables
         public float SideLength { get; private set; }
         #endregion
 
+        #region ViewBox距离 —— float Distance
+        /// <summary>
+        /// ViewBox距离
+        /// </summary>
+        public float Distance { get; private set; }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -86,14 +89,14 @@ namespace MedicalSharp.Engine.Renderables
         {
             //计算位置（固定在屏幕右下角）
             Vector3 worldPosition = context.CameraPosition
-                                  + context.LookDirection * Distance
-                                  + context.RightDirection * 0.55f
-                                  - context.UpDirection * 0.35f;
+                                  + context.LookDirection * this.Distance
+                                  + context.RightDirection * 0.6f
+                                  - context.UpDirection * 0.36f;
             this.Transform.SetPosition(worldPosition);
 
             //计算缩放
             float fieldOfView = MathHelper.DegreesToRadians(context.FieldOfView);
-            float worldHeightAtDistance = 2.0f * Distance * MathF.Tan(fieldOfView * 0.5f);
+            float worldHeightAtDistance = 2.0f * this.Distance * MathF.Tan(fieldOfView * 0.5f);
             float scale = (TargetScreenSize / context.ViewportHeight) * worldHeightAtDistance / this.SideLength;
             this.Transform.SetScale(new Vector3(scale));
 
