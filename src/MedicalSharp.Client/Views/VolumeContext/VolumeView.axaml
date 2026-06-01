@@ -203,6 +203,7 @@
 			<sd:ShapePresenter3D Content="{Binding SagittalPlane}" />
 			<sd:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
 			<sd:AxisVisual3D IsVisible="{Binding AxisVisible}" />
+			<sd:ViewBoxVisual3D />
 		</sd:VolumeViewport>
 	</sd:GroupBox>
 </UserControl>
