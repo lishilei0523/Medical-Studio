@@ -216,7 +216,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //绘制背景
             using SKCanvas canvas = surface.Canvas;
-            canvas.Clear(background);
+            this.ClearBackground(canvas, background);
 
             //调整角度
             canvas.Translate(TextureSize / 2f, TextureSize / 2f);
@@ -255,6 +255,44 @@ namespace MedicalSharp.Engine.Renderables
             texture.SetWrapMode(TextureWrapMode.ClampToEdge);
 
             return texture;
+        }
+        #endregion
+
+        #region 清空背景色 —— void ClearBackground(SKCanvas canvas, in SKColor background)
+        /// <summary>
+        /// 清空背景色
+        /// </summary>
+        private void ClearBackground(SKCanvas canvas, in SKColor background)
+        {
+            //计算渐变颜色
+            SKColor lightColor = new SKColor(
+                (byte)Math.Min(255, background.Red + (255 - background.Red) * 0.6f),
+                (byte)Math.Min(255, background.Green + (255 - background.Green) * 0.6f),
+                (byte)Math.Min(255, background.Blue + (255 - background.Blue) * 0.6f),
+                background.Alpha
+            );
+            SKColor darkColor = new SKColor(
+                (byte)(background.Red * 0.5f),
+                (byte)(background.Green * 0.5f),
+                (byte)(background.Blue * 0.5f),
+                background.Alpha
+            );
+
+            //对角线渐变
+            using SKPaint gradientPaint = new SKPaint();
+            SKPoint start = new SKPoint(0, 0);
+            SKPoint end = new SKPoint(TextureSize, TextureSize);
+            SKColor[] gradientColors = [lightColor, background, darkColor];
+            float[] gradientPositions = [0.0f, 0.5f, 1.0f];
+            using SKShader shader = SKShader.CreateLinearGradient(start, end, gradientColors, gradientPositions, SKShaderTileMode.Clamp);
+            gradientPaint.Shader = shader;
+            canvas.DrawRect(new SKRect(0, 0, TextureSize, TextureSize), gradientPaint);
+
+            //添加暗角
+            using SKPaint vignettePaint = new SKPaint();
+            vignettePaint.Color = new SKColor(0, 0, 0, 50);
+            vignettePaint.IsAntialias = true;
+            canvas.DrawRect(new SKRect(0, 0, TextureSize, TextureSize), vignettePaint);
         }
         #endregion
 
