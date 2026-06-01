@@ -244,6 +244,7 @@ namespace MedicalSharp.Engine.Renderables
 
             this._texture.Bind(0);
             program.SetUniformInt("u_HasTexture", 1);
+            program.SetUniformInt("u_IsText", 1);
             program.SetUniformInt("u_Texture", 0);
             program.SetUniformVector4("u_Color", this.Color);
 

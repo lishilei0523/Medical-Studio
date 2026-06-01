@@ -20,7 +20,7 @@ namespace MedicalSharp.Engine.Renderables
         /// 目标屏幕尺寸
         /// </summary>
         /// <remarks>像素</remarks>
-        private const float TargetScreenSize = 50f;
+        private const float TargetScreenSize = 40f;
 
         /// <summary>
         /// 纹理尺寸
@@ -51,7 +51,7 @@ namespace MedicalSharp.Engine.Renderables
             this.SideLength = sideLength;
 
             //创建几何体
-            MeshGeometry boxMesh = MeshFactory.CreateBox(this.SideLength, this.SideLength, this.SideLength);
+            MeshGeometry boxMesh = MeshFactory.CreateViewBox(this.SideLength, this.SideLength, this.SideLength);
             this._vertexBuffer = new VertexBuffer(boxMesh);
 
             //创建纹理
@@ -99,7 +99,6 @@ namespace MedicalSharp.Engine.Renderables
             //设置模型矩阵
             program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
             program.SetUniformInt("u_HasTexture", 1);
-            program.SetUniformVector4("u_Color", Vector4.One);
 
             //渲染6个面（每个面6个索引）
             for (int index = 0; index < 6; index++)
@@ -153,81 +152,73 @@ namespace MedicalSharp.Engine.Renderables
 
         #region 创建纹理 —— Texture2D[] CreateFaceTextures()
         /// <summary>
-        /// 创建6个面的纹理
+        /// 创建纹理
         /// </summary>
         private Texture2D[] CreateFaceTextures()
         {
-            //面的顺序与 CreateBox 一致
-            //0: Y+ (Posterior)
-            //1: Y- (Anterior)
-            //2: Z+ (Superior)
-            //3: Z- (Inferior)
-            //4: X- (Right)
-            //5: X+ (Left)
             var faces = new[]
             {
-                new { Name = "P", Color = new SKColor(51, 255, 51), Text = "P", Desc = "Posterior" },  // Y+ - 亮绿
-                new { Name = "A", Color = new SKColor(0, 102, 0), Text = "A", Desc = "Anterior" },     // Y- - 暗绿
-                new { Name = "S", Color = new SKColor(51, 51, 255), Text = "S", Desc = "Superior" },   // Z+ - 亮蓝
-                new { Name = "I", Color = new SKColor(0, 0, 102), Text = "I", Desc = "Inferior" },     // Z- - 暗蓝
-                new { Name = "R", Color = new SKColor(255, 51, 51), Text = "R", Desc = "Right" },      // X- - 亮红
-                new { Name = "L", Color = new SKColor(102, 0, 0), Text = "L", Desc = "Left" }          // X+ - 暗红
+                new { Name = "P", Color = new SKColor(255, 51, 51) },
+                new { Name = "A", Color = new SKColor(255, 51, 51) },
+                new { Name = "S", Color = new SKColor(0, 102, 0) },
+                new { Name = "I", Color = new SKColor(0, 102, 0) },
+                new { Name = "R", Color = new SKColor(51, 51, 255) },
+                new { Name = "L", Color = new SKColor(51, 51, 255) }
             };
 
             Texture2D[] textures = new Texture2D[6];
             for (int index = 0; index < faces.Length; index++)
             {
-                textures[index] = this.CreateFaceTexture(faces[index].Color, faces[index].Text);
+                textures[index] = this.CreateFaceTexture(faces[index].Color, faces[index].Name);
             }
 
             return textures;
         }
         #endregion
 
-        #region 创建单个面纹理 —— Texture2D CreateFaceTexture(SKColor color, string text)
+        #region 创建面纹理 —— Texture2D CreateFaceTexture(SKColor background, string text)
         /// <summary>
-        /// 创建单个面纹理
+        /// 创建面纹理
         /// </summary>
-        private Texture2D CreateFaceTexture(SKColor color, string text)
+        /// <param name="background">背景颜色</param>
+        /// <param name="text">文本</param>
+        private Texture2D CreateFaceTexture(in SKColor background, string text)
         {
-            int size = TextureSize;
+            SKImageInfo imageInfo = new SKImageInfo(TextureSize, TextureSize);
+            using SKSurface surface = SKSurface.Create(imageInfo);
 
-            using SKSurface surface = SKSurface.Create(new SKImageInfo(size, size));
-            SKCanvas canvas = surface.Canvas;
-            canvas.Clear(color);
+            //绘制背景
+            using SKCanvas canvas = surface.Canvas;
+            canvas.Clear(background);
 
             //绘制边框
-            using (SKPaint paint = new SKPaint { Color = SKColors.Black, StrokeWidth = 4, IsStroke = true })
-            {
-                canvas.DrawRect(new SKRect(2, 2, size - 2, size - 2), paint);
-            }
+            using SKPaint stroke = new SKPaint();
+            stroke.Color = SKColors.LightGray;
+            stroke.StrokeWidth = 8;
+            stroke.IsStroke = true;
+            SKRect rectangle = new SKRect(2, 2, TextureSize - 2, TextureSize - 2);
+            canvas.DrawRect(rectangle, stroke);
 
-            //绘制文字
-            using (SKPaint paint = new SKPaint())
-            {
-                paint.Color = SKColors.White;
-                paint.TextSize = size * 0.5f;
-                paint.IsAntialias = true;
-                paint.TextAlign = SKTextAlign.Center;
-                paint.Typeface = SKTypeface.FromFamilyName("Arial", SKFontStyleWeight.Bold, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright);
-
-                float centerX = size / 2f;
-                float centerY = size / 2f + size * 0.15f;
-                canvas.DrawText(text, centerX, centerY, paint);
-            }
+            //绘制文本
+            using SKTypeface typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold);
+            using SKFont font = new SKFont(typeface, TextureSize * 0.5f);
+            using SKPaint textPaint = new SKPaint();
+            textPaint.Color = SKColors.White;
+            textPaint.IsAntialias = true;
+            const float centerX = TextureSize / 2f;
+            const float centerY = TextureSize / 2f + TextureSize * 0.15f;
+            canvas.DrawText(text, centerX, centerY, SKTextAlign.Center, font, textPaint);
 
             //创建纹理
-            using (SKImage image = surface.Snapshot())
-            using (SKBitmap bitmap = SKBitmap.FromImage(image))
-            {
-                IntPtr pixels = bitmap.GetPixels();
-                Texture2D texture = new Texture2D(size, size, PixelInternalFormat.Rgba, PixelFormat.Bgra, PixelType.UnsignedByte);
-                texture.AllocateMemory(pixels);
-                texture.SetFilter(TextureMinFilter.Linear, TextureMagFilter.Linear);
-                texture.SetWrapMode(TextureWrapMode.ClampToEdge);
+            using SKImage image = surface.Snapshot();
+            using SKBitmap bitmap = SKBitmap.FromImage(image);
+            IntPtr pixels = bitmap.GetPixels();
+            Texture2D texture = new Texture2D(TextureSize, TextureSize, PixelInternalFormat.Rgba, PixelFormat.Bgra);
+            texture.AllocateMemory(pixels);
+            texture.SetFilter(TextureMinFilter.Linear, TextureMagFilter.Linear);
+            texture.SetWrapMode(TextureWrapMode.ClampToEdge);
 
-                return texture;
-            }
+            return texture;
         }
         #endregion
 

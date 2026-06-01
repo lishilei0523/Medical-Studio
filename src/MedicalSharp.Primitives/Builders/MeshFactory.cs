@@ -1579,6 +1579,135 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
+        #region # 创建ViewBox —— static MeshGeometry CreateViewBox(float width = 1.0f, float height = 1.0f...
+        /// <summary>
+        /// 创建ViewBox
+        /// </summary>
+        /// <param name="width">宽度</param>
+        /// <param name="height">高度</param>
+        /// <param name="depth">深度</param>
+        /// <param name="center">中心点位置</param>
+        /// <returns>网格模型</returns>
+        public static MeshGeometry CreateViewBox(float width = 1.0f, float height = 1.0f, float depth = 1.0f, Vector3 center = default)
+        {
+            float halfW = width * 0.5f;
+            float halfH = height * 0.5f;
+            float halfD = depth * 0.5f;
+
+            //8个顶点（相对于中心点）
+            Vector3[] vertices =
+            [
+                new Vector3(center.X - halfW, center.Y + halfD, center.Z - halfH), //0: 左前下
+                new Vector3(center.X + halfW, center.Y + halfD, center.Z - halfH), //1: 右前下
+                new Vector3(center.X + halfW, center.Y + halfD, center.Z + halfH), //2: 右前上
+                new Vector3(center.X - halfW, center.Y + halfD, center.Z + halfH), //3: 左前上
+                new Vector3(center.X - halfW, center.Y - halfD, center.Z - halfH), //4: 左后下
+                new Vector3(center.X - halfW, center.Y - halfD, center.Z + halfH), //5: 左后上
+                new Vector3(center.X + halfW, center.Y - halfD, center.Z + halfH), //6: 右后上
+                new Vector3(center.X + halfW, center.Y - halfD, center.Z - halfH)  //7: 右后下
+            ];
+
+            //每个面的顶点索引（每个面4个唯一顶点）
+            uint[][] faceVertices = new uint[][]
+            {
+                [0, 1, 2, 3],   //前（Y正方向）
+                [4, 5, 6, 7],   //后（Y负方向）
+                [3, 2, 6, 5],   //上（Z正方向）
+                [0, 4, 7, 1],   //下（Z负方向）
+                [0, 3, 5, 4],   //左（X负方向）
+                [1, 7, 6, 2]    //右（X正方向）
+            };
+
+            //每个面的法向量
+            Vector3[] normals =
+            [
+                new(0, 1, 0),   //前（Y正）
+                new(0, -1, 0),  //后（Y负）
+                new(0, 0, 1),   //上（Z正）
+                new(0, 0, -1),  //下（Z负）
+                new(-1, 0, 0),  //左（X负）
+                new(1, 0, 0)    //右（X正）
+            ];
+
+            //每个面4个顶点的纹理坐标（左下角为(0,0)，右上角为(1,1)）
+            Vector2[][] faceTexCoords = new Vector2[][]
+            {
+                //前（Y正）
+                [
+                    new Vector2(0, 0), // 左下
+                    new Vector2(1, 0), // 右下
+                    new Vector2(1, 1), // 右上
+                    new Vector2(0, 1) // 左上
+                ],
+                //后（Y负）
+                [
+                    new Vector2(1, 0), //右下
+                    new Vector2(0, 0), //左下
+                    new Vector2(0, 1), //左上
+                    new Vector2(1, 1)  //右上
+                ],
+                //上（Z正）
+                [
+                    new Vector2(0, 1), //左上
+                    new Vector2(1, 1), //右上
+                    new Vector2(1, 0), //右下
+                    new Vector2(0, 0)  //左下
+                ],
+                //下（Z负）
+                [
+                    new Vector2(0, 0), //左下
+                    new Vector2(1, 0), //右下
+                    new Vector2(1, 1), //右上
+                    new Vector2(0, 1)  //左上
+                ],
+                //左（X负）
+                [
+                    new Vector2(1, 0), //右下
+                    new Vector2(0, 0), //左下
+                    new Vector2(0, 1), //左上
+                    new Vector2(1, 1)  //右上
+                ],
+                //右（X正）
+                [
+                    new Vector2(0, 0), //左下
+                    new Vector2(1, 0), //右下
+                    new Vector2(1, 1), //右上
+                    new Vector2(0, 1)  //左上
+                ]
+            };
+
+            List<Vertex> finalVertices = [];
+            List<uint> finalIndices = [];
+
+            for (int face = 0; face < 6; face++)
+            {
+                uint startIndex = (uint)finalVertices.Count;
+
+                //添加4个顶点
+                for (int i = 0; i < 4; i++)
+                {
+                    finalVertices.Add(new Vertex
+                    {
+                        Position = vertices[faceVertices[face][i]],
+                        TextureCoord = faceTexCoords[face][i],
+                        Normal = normals[face]
+                    });
+                }
+
+                //两个三角形：0-1-2 和 0-2-3
+                finalIndices.Add(startIndex);
+                finalIndices.Add(startIndex + 1);
+                finalIndices.Add(startIndex + 2);
+
+                finalIndices.Add(startIndex);
+                finalIndices.Add(startIndex + 2);
+                finalIndices.Add(startIndex + 3);
+            }
+
+            return new MeshGeometry(finalVertices, finalIndices);
+        }
+        #endregion
+
         #region # 创建平面 —— static MeshGeometry CreatePlane(float width = 1.0f, float height = 1.0f...
         /// <summary>
         /// 创建平面
