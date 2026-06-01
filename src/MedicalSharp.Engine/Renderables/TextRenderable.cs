@@ -243,10 +243,9 @@ namespace MedicalSharp.Engine.Renderables
             GL.Enable(EnableCap.DepthTest);
 
             this._texture.Bind(0);
-            program.SetUniformInt("u_HasTexture", 1);
-            program.SetUniformInt("u_IsText", 1);
-            program.SetUniformInt("u_Texture", 0);
+            program.SetUniformInt("u_ColorMode", (int)ColorMode.Mixed);
             program.SetUniformVector4("u_Color", this.Color);
+            program.SetUniformInt("u_Texture", 0);
 
             //计算缩放
             if (context.CameraMode == CameraMode.Orthographic)

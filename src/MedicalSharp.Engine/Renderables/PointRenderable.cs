@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -135,7 +136,7 @@ namespace MedicalSharp.Engine.Renderables
         {
             //绘制点模型
             GL.PointSize(this.PointSize);
-            program.SetUniformInt("u_HasTexture", 0);
+            program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
             program.SetUniformVector4("u_Color", this.Fill);
             this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Points);
         }

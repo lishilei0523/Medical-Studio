@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -204,7 +205,7 @@ namespace MedicalSharp.Engine.Renderables
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
                 //绘制填充模型	
-                program.SetUniformInt("u_HasTexture", 0);
+                program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
                 program.SetUniformVector4("u_Color", this.Fill);
                 this._fillBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
@@ -215,7 +216,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
-            program.SetUniformInt("u_HasTexture", 0);
+            program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
             program.SetUniformVector4("u_Color", this.Stroke);
             this._strokeBuffer.Draw(context.GlContext, PrimitiveType.Lines);
 
@@ -229,7 +230,7 @@ namespace MedicalSharp.Engine.Renderables
                 Vector4 invertedStroke = this.Stroke.Invert();
 
                 //绘制控制点
-                program.SetUniformInt("u_HasTexture", 0);
+                program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
                 program.SetUniformVector4("u_Color", invertedStroke);
                 this._strokeBuffer.Draw(context.GlContext, PrimitiveType.Points);
             }

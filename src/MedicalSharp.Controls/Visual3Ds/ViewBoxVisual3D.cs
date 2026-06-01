@@ -20,7 +20,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// </summary>
         static ViewBoxVisual3D()
         {
-            SideLengthProperty = AvaloniaProperty.Register<AxisVisual3D, float>(nameof(SideLength), 0.1f);
+            SideLengthProperty = AvaloniaProperty.Register<ViewBoxVisual3D, float>(nameof(SideLength), 0.1f);
         }
 
 

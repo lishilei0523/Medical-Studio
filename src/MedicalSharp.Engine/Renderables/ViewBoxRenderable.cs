@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -98,13 +99,12 @@ namespace MedicalSharp.Engine.Renderables
 
             //设置模型矩阵
             program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
-            program.SetUniformInt("u_HasTexture", 1);
 
             //渲染6个面（每个面6个索引）
             for (int index = 0; index < 6; index++)
             {
                 this._faceTextures[index].Bind(0);
-
+                program.SetUniformInt("u_ColorMode", (int)ColorMode.Texture);
                 program.SetUniformInt("u_Texture", 0);
                 this._vertexBuffer.DrawRange(context.GlContext, PrimitiveType.Triangles, index * 6, 6);
 
@@ -158,31 +158,34 @@ namespace MedicalSharp.Engine.Renderables
         {
             var faces = new[]
             {
-                new { Name = "P", Color = new SKColor(255, 51, 51) },
-                new { Name = "A", Color = new SKColor(255, 51, 51) },
-                new { Name = "S", Color = new SKColor(0, 102, 0) },
-                new { Name = "I", Color = new SKColor(0, 102, 0) },
-                new { Name = "R", Color = new SKColor(51, 51, 255) },
-                new { Name = "L", Color = new SKColor(51, 51, 255) }
+                new { Name = "P", Color = new SKColor(255, 51, 51), Rotation = 180, FlipHorizontal = false },
+                new { Name = "A", Color = new SKColor(255, 51, 51), Rotation = -90, FlipHorizontal = false },
+                new { Name = "S", Color = new SKColor(0, 102, 0),   Rotation = 180, FlipHorizontal = true },
+                new { Name = "I", Color = new SKColor(0, 102, 0),   Rotation = 90,  FlipHorizontal = false },
+                new { Name = "R", Color = new SKColor(51, 51, 255), Rotation = -90, FlipHorizontal = true },
+                new { Name = "L", Color = new SKColor(51, 51, 255), Rotation = 180, FlipHorizontal = false }
             };
 
             Texture2D[] textures = new Texture2D[6];
             for (int index = 0; index < faces.Length; index++)
             {
-                textures[index] = this.CreateFaceTexture(faces[index].Color, faces[index].Name);
+                var face = faces[index];
+                textures[index] = this.CreateFaceTexture(face.Color, face.Name, face.Rotation, face.FlipHorizontal);
             }
 
             return textures;
         }
         #endregion
 
-        #region 创建面纹理 —— Texture2D CreateFaceTexture(SKColor background, string text)
+        #region 创建面纹理 —— Texture2D CreateFaceTexture(SKColor background, string text...
         /// <summary>
         /// 创建面纹理
         /// </summary>
         /// <param name="background">背景颜色</param>
         /// <param name="text">文本</param>
-        private Texture2D CreateFaceTexture(in SKColor background, string text)
+        /// <param name="rotation">旋转角度</param>
+        /// <param name="flipHorizontal">水平翻转</param>
+        private Texture2D CreateFaceTexture(in SKColor background, string text, float rotation, bool flipHorizontal = false)
         {
             SKImageInfo imageInfo = new SKImageInfo(TextureSize, TextureSize);
             using SKSurface surface = SKSurface.Create(imageInfo);
@@ -190,6 +193,15 @@ namespace MedicalSharp.Engine.Renderables
             //绘制背景
             using SKCanvas canvas = surface.Canvas;
             canvas.Clear(background);
+
+            //调整角度
+            canvas.Translate(TextureSize / 2f, TextureSize / 2f);
+            canvas.RotateDegrees(rotation);
+            if (flipHorizontal)
+            {
+                canvas.Scale(-1, 1);
+            }
+            canvas.Translate(-TextureSize / 2f, -TextureSize / 2f);
 
             //绘制边框
             using SKPaint stroke = new SKPaint();

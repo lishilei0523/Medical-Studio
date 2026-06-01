@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -185,19 +186,19 @@ namespace MedicalSharp.Engine.Renderables
             program.SetUniformMatrix4("u_ModelMatrix", this.ModelMatrix);
 
             //渲染X轴
-            program.SetUniformInt("u_HasTexture", 0);
+            program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
             program.SetUniformVector4("u_Color", this._xColor);
             this._xShaftBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
             this._xArrowBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
             //渲染Y轴
-            program.SetUniformInt("u_HasTexture", 0);
+            program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
             program.SetUniformVector4("u_Color", this._yColor);
             this._yShaftBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
             this._yArrowBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
             //渲染Z轴
-            program.SetUniformInt("u_HasTexture", 0);
+            program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
             program.SetUniformVector4("u_Color", this._zColor);
             this._zShaftBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
             this._zArrowBuffer.Draw(context.GlContext, PrimitiveType.Triangles);

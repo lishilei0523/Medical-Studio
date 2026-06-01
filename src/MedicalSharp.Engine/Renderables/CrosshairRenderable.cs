@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -246,12 +247,12 @@ namespace MedicalSharp.Engine.Renderables
             GL.LineWidth(this.StrokeThickness);
 
             //绘制水平线
-            program.SetUniformInt("u_HasTexture", 0);
+            program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
             program.SetUniformVector4("u_Color", this.HorizontalStroke);
             this._horizontalBuffer.Draw(context.GlContext, PrimitiveType.Lines);
 
             //绘制垂直线
-            program.SetUniformInt("u_HasTexture", 0);
+            program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
             program.SetUniformVector4("u_Color", this.VerticalStroke);
             this._verticalBuffer.Draw(context.GlContext, PrimitiveType.Lines);
         }
