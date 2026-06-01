@@ -159,6 +159,69 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 绘制顶点缓冲区范围 —— void DrawRange(IntPtr glContext, PrimitiveType...
+        /// <summary>
+        /// 绘制顶点缓冲区范围
+        /// </summary>
+        /// <param name="glContext">OpenGL上下文句柄</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <param name="startIndex">起始索引</param>
+        /// <param name="indicesCount">索引数量</param>
+        public void DrawRange(IntPtr glContext, PrimitiveType primitiveType, int startIndex, int indicesCount)
+        {
+            //确保VAO
+            VertexArray vertexArray = this.Ensure(glContext);
+
+            vertexArray.Bind();
+            this.Bind();
+
+            if (this.MeshGeometry.Indices.Any())
+            {
+                //绘制指定范围的索引（每个索引对应一个顶点）
+                GL.DrawElements(primitiveType, indicesCount, DrawElementsType.UnsignedInt, (IntPtr)(startIndex * sizeof(uint)));
+            }
+            else
+            {
+                //绘制指定范围的顶点
+                GL.DrawArrays(primitiveType, startIndex, indicesCount);
+            }
+
+            this.Unbind();
+            vertexArray.Unbind();
+        }
+        #endregion
+
+        #region 绘制顶点缓冲区范围 —— void DrawRange(IntPtr glContext, PrimitiveType...
+        /// <summary>
+        /// 绘制顶点缓冲区范围
+        /// </summary>
+        /// <param name="glContext">OpenGL上下文句柄</param>
+        /// <param name="primitiveType">图元类型</param>
+        /// <param name="startIndex">起始索引（在索引缓冲区中的偏移）</param>
+        /// <param name="indicesCount">索引数量</param>
+        /// <param name="startVertex">起始顶点偏移（顶点缓冲区中的偏移）</param>
+        public void DrawRange(IntPtr glContext, PrimitiveType primitiveType, int startIndex, int indicesCount, int startVertex)
+        {
+            //确保VAO
+            VertexArray vertexArray = this.Ensure(glContext);
+
+            vertexArray.Bind();
+            this.Bind();
+
+            if (this.MeshGeometry.Indices.Any())
+            {
+                GL.DrawElementsBaseVertex(primitiveType, indicesCount, DrawElementsType.UnsignedInt, (startIndex * sizeof(uint)), startVertex);
+            }
+            else
+            {
+                GL.DrawArrays(primitiveType, startVertex, indicesCount);
+            }
+
+            this.Unbind();
+            vertexArray.Unbind();
+        }
+        #endregion
+
         #region 更新顶点缓冲区 —— void Update(MeshGeometry meshGeometry)
         /// <summary>
         /// 更新顶点缓冲区
