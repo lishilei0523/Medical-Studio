@@ -27,7 +27,7 @@ namespace MedicalSharp.Controls.Base
                 Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
                 if (pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual, out _))
                 {
-                    if (visual is ViewBoxVisual3D && viewport.Camera is OrbitPerspectiveCamera camera)
+                    if (visual is ViewBoxVisual3D && viewport.Camera is OrbitCamera camera)
                     {
                         List<ContextMenuItem> items =
                         [
