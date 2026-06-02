@@ -15,7 +15,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制曲线3D元素命令
     /// </summary>
-    public class DrawCurveCommand : ViewportCommand
+    public class DrawCurveCommand : ShapeCommand
     {
         #region # 字段及构造器
 

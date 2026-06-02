@@ -12,7 +12,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制点3D元素命令
     /// </summary>
-    public class DrawPointCommand : ViewportCommand
+    public class DrawPointCommand : ShapeCommand
     {
         #region # 字段及构造器
 

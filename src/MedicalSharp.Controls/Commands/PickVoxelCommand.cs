@@ -12,7 +12,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 拾取体素命令
     /// </summary>
-    public class PickVoxelCommand : ViewportCommand
+    public class PickVoxelCommand : ShapeCommand
     {
         #region # 字段及构造器
 

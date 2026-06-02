@@ -11,7 +11,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制线段3D元素命令
     /// </summary>
-    public class DrawLineSegmentCommand : ViewportCommand
+    public class DrawLineSegmentCommand : ShapeCommand
     {
         #region # 字段及构造器
 

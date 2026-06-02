@@ -14,7 +14,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制凸多面体3D元素命令
     /// </summary>
-    public class DrawConvexPolyhedronCommand : ViewportCommand
+    public class DrawConvexPolyhedronCommand : ShapeCommand
     {
         #region # 字段及构造器
 

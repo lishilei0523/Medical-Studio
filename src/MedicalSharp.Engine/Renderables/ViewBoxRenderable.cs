@@ -7,6 +7,8 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using SkiaSharp;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Engine.Renderables
 {
@@ -141,6 +143,40 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
+        #region 检测射线相交 —— override bool IntersectsRay(Ray ray, out float distance...
+        /// <summary>
+        /// 检测射线相交
+        /// </summary>
+        /// <param name="ray">射线（世界空间）</param>
+        /// <param name="distance">相交距离</param>
+        /// <param name="hitPoint">命中点坐标</param>
+        /// <param name="hitNormal">命中点法向量</param>
+        /// <param name="hitTriangleIndex">命中三角形索引</param>
+        /// <returns>是否相交</returns>
+        public override bool IntersectsRay(Ray ray, out float distance, out Vector3 hitPoint, out Vector3 hitNormal, out int hitTriangleIndex)
+        {
+            distance = float.MaxValue;
+            hitPoint = Vector3.Zero;
+            hitNormal = Vector3.Zero;
+            hitTriangleIndex = -1;
+
+            //将射线变换到局部空间
+            Matrix4 worldToLocal = Matrix4.Invert(this.ModelMatrix);
+            Ray localRay = ray.Transform(worldToLocal);
+
+            //快速剔除：先检测包围盒
+            if (!this.BoundingBox.Intersects(localRay, out float boxDistance))
+            {
+                return false;
+            }
+
+            distance = boxDistance;
+            hitPoint = ray.GetPoint(distance);
+
+            return true;
+        }
+        #endregion
+
         #region 释放资源 —— override void Dispose()
         /// <summary>
         /// 释放资源
@@ -174,7 +210,10 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            return default;
+            IEnumerable<Vector3> positions = this._vertexBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
+            BoundingBox boundingBox = BoundingBox.FromPoints([.. positions]);
+
+            return boundingBox;
         }
         #endregion
 

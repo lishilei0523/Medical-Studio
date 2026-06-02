@@ -14,7 +14,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 旋转U轴元素命令
     /// </summary>
-    public class RotateVisualUCommand : ViewportCommand
+    public class RotateVisualUCommand : ShapeCommand
     {
         #region # 字段及构造器
 

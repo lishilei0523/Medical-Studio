@@ -13,7 +13,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 平移3D元素命令
     /// </summary>
-    public class TranslateVisual3DCommand : ViewportCommand
+    public class TranslateVisual3DCommand : ShapeCommand
     {
         #region # 字段及构造器
 

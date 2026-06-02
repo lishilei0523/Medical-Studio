@@ -12,7 +12,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制包围盒3D元素命令
     /// </summary>
-    public class DrawBoundingBoxCommand : ViewportCommand
+    public class DrawBoundingBoxCommand : ShapeCommand
     {
         #region # 字段及构造器
 

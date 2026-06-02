@@ -17,7 +17,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 拾取3D元素命令
     /// </summary>
-    public class PickVisual3DCommand : ViewportCommand
+    public class PickVisual3DCommand : ShapeCommand
     {
         #region # 字段及构造器
 
