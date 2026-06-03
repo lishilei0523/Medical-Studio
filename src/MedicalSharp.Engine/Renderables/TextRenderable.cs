@@ -432,8 +432,8 @@ namespace MedicalSharp.Engine.Renderables
         /// <remarks>Z-up</remarks>
         private Matrix4 CalculateBillboardMatrix(Vector3 cameraPosition)
         {
-            Vector3 forward = cameraPosition - this.Transform.Position;
-            forward.Normalize();
+            Vector3 forward = (cameraPosition - this.Transform.Position).Normalized();
+            Matrix4 modelMatrix;
 
             //锁定Y轴：只绕Z轴旋转，保持文本直立
             if (this.LockYAxis)
@@ -442,28 +442,30 @@ namespace MedicalSharp.Engine.Renderables
                 Matrix4 rotation = Matrix4.CreateRotationZ(angle);
                 Matrix4 translation = Matrix4.CreateTranslation(this.Transform.Position);
 
-                return rotation * translation;
+                modelMatrix = rotation * translation;
             }
-            //完全面向相机（球形广告牌）
+            //完全面向相机：球形广告牌
             else
             {
-                //先计算绕Z轴的角度（同锁定Y轴）
+                //计算forward在XY平面上的投影长度
+                float forwardXY = MathF.Sqrt(forward.X * forward.X + forward.Y * forward.Y);
+
+                //计算绕Z轴的角度（同锁定Y轴）
                 float angleZ = MathF.Atan2(forward.Y, forward.X) - MathHelper.PiOver2 + MathHelper.Pi;
                 Matrix4 rotationZ = Matrix4.CreateRotationZ(angleZ);
 
-                //再计算绕X轴的角度（上下倾斜）
-                //计算 forward 在 XY 平面上的投影长度
-                float forwardXY = MathF.Sqrt(forward.X * forward.X + forward.Y * forward.Y);
+                //计算绕X轴的角度（上下倾斜）
                 float angleX = MathF.Atan2(forward.Z, forwardXY);
-
                 Matrix4 rotationX = Matrix4.CreateRotationX(-angleX);
 
                 //组合旋转：先绕Z，再绕X
                 Matrix4 rotation = rotationX * rotationZ;
                 Matrix4 translation = Matrix4.CreateTranslation(this.Transform.Position);
 
-                return rotation * translation;
+                modelMatrix = rotation * translation;
             }
+
+            return modelMatrix;
         }
         #endregion
 
