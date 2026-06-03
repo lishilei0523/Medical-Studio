@@ -80,6 +80,7 @@ namespace MedicalSharp.Controls.Commands
                         Depth = 0.01f,
                         Center = mousePos3D.Value.ToVector3()
                     };
+                    this._isDrawing = true;
                     this._boxDrawStartEvent?.Invoke(this._boundingBox);
                 }
             }
@@ -132,6 +133,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //绘制结束
+            this._isDrawing = false;
             this._boxDrawEndEvent?.Invoke(this._boundingBox);
 
             //清空

@@ -80,6 +80,7 @@ namespace MedicalSharp.Controls.Commands
                         Segments = 32,
                         WithCaps = true
                     };
+                    this._isDrawing = true;
                     this._cylinderDrawStartEvent?.Invoke(this._cylinder);
                 }
             }
@@ -139,6 +140,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //绘制结束
+            this._isDrawing = false;
             this._cylinderDrawEndEvent?.Invoke(this._cylinder);
 
             //清空

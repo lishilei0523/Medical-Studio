@@ -86,6 +86,7 @@ namespace MedicalSharp.Controls.Commands
                         Center = mousePos3D.Value.ToVector3(),
                         Normal = this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };
+                    this._isDrawing = true;
                     this._circleDrawStartEvent?.Invoke(this._circle);
                 }
             }
@@ -136,6 +137,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //绘制结束
+            this._isDrawing = false;
             this._circleDrawEndEvent?.Invoke(this._circle);
 
             //清空

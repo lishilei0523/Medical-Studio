@@ -99,6 +99,7 @@ namespace MedicalSharp.Controls.Commands
                             ControlPositions = [position],
                             Closed = this._closed
                         };
+                        this._isDrawing = true;
                         this._curveDrawStartEvent?.Invoke(this._curve);
                     }
                     else
@@ -161,32 +162,37 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
-            List<ContextMenuItem> items =
-            [
-                new ContextMenuItem
-                {
-                    Header = "完成(_F)",
-                    Command = () => this.CompleteDrawing(viewport),
-                    IsEnabled = this._curve != null
-                },
-                new ContextMenuItem
-                {
-                    Header = "取消(_C)",
-                    Command = () => this.CancelDrawing(viewport),
-                    IsEnabled = this._curve != null
-                }
-            ];
-
-            if (this._curve != null && this._curve.ControlPositions.Count > 1)
+            if (this._isDrawing)
             {
-                items.Add(new ContextMenuItem
+                List<ContextMenuItem> items =
+                [
+                    new ContextMenuItem
+                    {
+                        Header = "完成(_F)",
+                        Command = () => this.CompleteDrawing(viewport),
+                        IsEnabled = this._curve != null
+                    },
+                    new ContextMenuItem
+                    {
+                        Header = "取消(_C)",
+                        Command = () => this.CancelDrawing(viewport),
+                        IsEnabled = this._curve != null
+                    }
+                ];
+
+                if (this._curve != null && this._curve.ControlPositions.Count > 1)
                 {
-                    Header = "撤销上一点(_U)",
-                    Command = () => this.UndoLastPoint(viewport)
-                });
+                    items.Add(new ContextMenuItem
+                    {
+                        Header = "撤销上一点(_U)",
+                        Command = () => this.UndoLastPoint(viewport)
+                    });
+                }
+
+                return items;
             }
 
-            return items;
+            return base.GetContextMenuItems(viewport, eventArgs);
         }
         #endregion
 
@@ -197,6 +203,8 @@ namespace MedicalSharp.Controls.Commands
         public override void Deactivate()
         {
             base.Deactivate();
+
+            this._isDrawing = false;
             this._previewPoint = null;
             this._curve = null;
         }
@@ -247,6 +255,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //绘制结束
+            this._isDrawing = false;
             this._curveDrawEndEvent?.Invoke(this._curve);
 
             //清空引用
@@ -268,6 +277,9 @@ namespace MedicalSharp.Controls.Commands
             {
                 this._curveDrawCancelEvent?.Invoke(this._curve);
             }
+
+            //绘制结束
+            this._isDrawing = false;
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);

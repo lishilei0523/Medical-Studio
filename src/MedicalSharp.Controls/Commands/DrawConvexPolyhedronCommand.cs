@@ -91,6 +91,7 @@ namespace MedicalSharp.Controls.Commands
                             Stroke = new Vector4(0.1f, 0.3f, 0.6f, 1.0f).ToColor(),
                             Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor()
                         };
+                        this._isDrawing = true;
                         this._polyhedronDrawStartEvent?.Invoke(this._polyhedron);
                     }
                     else
@@ -153,32 +154,37 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
-            List<ContextMenuItem> items =
-            [
-                new ContextMenuItem
-                {
-                    Header = "完成(_F)",
-                    Command = () => this.CompleteDrawing(viewport),
-                    IsEnabled = this._polyhedron != null
-                },
-                new ContextMenuItem
-                {
-                    Header = "取消(_C)",
-                    Command = () => this.CancelDrawing(viewport),
-                    IsEnabled = this._polyhedron != null
-                }
-            ];
-
-            if (this._polyhedron != null && this._polyhedron.Positions.Count > 1)
+            if (this._isDrawing)
             {
-                items.Add(new ContextMenuItem
+                List<ContextMenuItem> items =
+                [
+                    new ContextMenuItem
+                    {
+                        Header = "完成(_F)",
+                        Command = () => this.CompleteDrawing(viewport),
+                        IsEnabled = this._polyhedron != null
+                    },
+                    new ContextMenuItem
+                    {
+                        Header = "取消(_C)",
+                        Command = () => this.CancelDrawing(viewport),
+                        IsEnabled = this._polyhedron != null
+                    }
+                ];
+
+                if (this._polyhedron != null && this._polyhedron.Positions.Count > 1)
                 {
-                    Header = "撤销上一点(_U)",
-                    Command = () => this.UndoLastPoint(viewport)
-                });
+                    items.Add(new ContextMenuItem
+                    {
+                        Header = "撤销上一点(_U)",
+                        Command = () => this.UndoLastPoint(viewport)
+                    });
+                }
+
+                return items;
             }
 
-            return items;
+            return base.GetContextMenuItems(viewport, eventArgs);
         }
         #endregion
 
@@ -190,6 +196,7 @@ namespace MedicalSharp.Controls.Commands
         {
             base.Deactivate();
 
+            this._isDrawing = false;
             this._previewPoint = null;
             this._polyhedron = null;
         }
@@ -225,6 +232,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //绘制结束
+            this._isDrawing = false;
             this._polyhedronDrawEndEvent?.Invoke(this._polyhedron);
 
             //清空引用，绘制完成
@@ -249,6 +257,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //绘制结束
+            this._isDrawing = false;
 
             //清空引用
             this._previewPoint = null;

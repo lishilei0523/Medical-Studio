@@ -99,6 +99,7 @@ namespace MedicalSharp.Controls.Commands
                             Positions = [position],
                             Closed = this._closed
                         };
+                        this._isDrawing = true;
                         this._polylineDrawStartEvent?.Invoke(this._polyline);
                     }
                     else
@@ -162,32 +163,37 @@ namespace MedicalSharp.Controls.Commands
         /// <returns>上下文菜单项列表</returns>
         public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
-            List<ContextMenuItem> items =
-            [
-                new ContextMenuItem
-                {
-                    Header = "完成(_F)",
-                    Command = () => this.CompleteDrawing(viewport),
-                    IsEnabled = this._polyline != null
-                },
-                new ContextMenuItem
-                {
-                    Header = "取消(_C)",
-                    Command = () => this.CancelDrawing(viewport),
-                    IsEnabled = this._polyline != null
-                }
-            ];
-
-            if (this._polyline != null && this._polyline.Positions.Count > 1)
+            if (this._isDrawing)
             {
-                items.Add(new ContextMenuItem
+                List<ContextMenuItem> items =
+                [
+                    new ContextMenuItem
+                    {
+                        Header = "完成(_F)",
+                        Command = () => this.CompleteDrawing(viewport),
+                        IsEnabled = this._polyline != null
+                    },
+                    new ContextMenuItem
+                    {
+                        Header = "取消(_C)",
+                        Command = () => this.CancelDrawing(viewport),
+                        IsEnabled = this._polyline != null
+                    }
+                ];
+
+                if (this._polyline != null && this._polyline.Positions.Count > 1)
                 {
-                    Header = "撤销上一点(_U)",
-                    Command = () => this.UndoLastPoint(viewport)
-                });
+                    items.Add(new ContextMenuItem
+                    {
+                        Header = "撤销上一点(_U)",
+                        Command = () => this.UndoLastPoint(viewport)
+                    });
+                }
+
+                return items;
             }
 
-            return items;
+            return base.GetContextMenuItems(viewport, eventArgs);
         }
         #endregion
 
@@ -200,6 +206,7 @@ namespace MedicalSharp.Controls.Commands
         {
             base.Deactivate();
 
+            this._isDrawing = false;
             this._previewPoint = null;
             this._polyline = null;
         }
@@ -252,6 +259,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //绘制结束
+            this._isDrawing = false;
             this._polylineDrawEndEvent?.Invoke(this._polyline);
 
             //清空引用，绘制完成
@@ -276,6 +284,9 @@ namespace MedicalSharp.Controls.Commands
 
             //设置光标
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
+
+            //绘制结束
+            this._isDrawing = false;
 
             //清空引用
             this._previewPoint = null;
@@ -314,6 +325,7 @@ namespace MedicalSharp.Controls.Commands
                 this._polyline.Positions.RemoveAt(this._polyline.Positions.Count - 1);
             }
 
+            //请求下一帧
             viewport.RequestNextFrameRendering();
         }
         #endregion 

@@ -68,6 +68,7 @@ namespace MedicalSharp.Controls.Commands
                     {
                         StartPoint = mousePos3D.Value.ToVector3()
                     };
+                    this._isDrawing = true;
                     this._lineSegmentDrawStartEvent?.Invoke(this._lineSegment);
                 }
             }
@@ -111,6 +112,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //绘制结束
+            this._isDrawing = false;
             this._lineSegmentDrawEndEvent?.Invoke(this._lineSegment);
 
             //清空

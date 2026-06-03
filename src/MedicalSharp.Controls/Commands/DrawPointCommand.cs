@@ -59,12 +59,26 @@ namespace MedicalSharp.Controls.Commands
                         Position = mousePos3D.Value.ToVector3(),
                         PointSize = 5
                     };
+                    this._isDrawing = true;
                     this._pointDrawEndEvent?.Invoke(point);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
                 }
             }
+        }
+        #endregion 
+
+        #region 鼠标松开事件 —— override void OnMouseUp(OpenTKViewport viewport...
+        /// <summary>
+        /// 鼠标松开事件
+        /// </summary>
+        public override void OnMouseUp(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
+        {
+            base.OnMouseUp(viewport, eventArgs);
+
+            //绘制结束
+            this._isDrawing = false;
         }
         #endregion 
 

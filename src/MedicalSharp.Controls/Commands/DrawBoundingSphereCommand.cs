@@ -77,6 +77,7 @@ namespace MedicalSharp.Controls.Commands
                         Radius = 0.01f,
                         Center = mousePos3D.Value.ToVector3()
                     };
+                    this._isDrawing = true;
                     this._sphereDrawStartEvent?.Invoke(this._boundingSphere);
                 }
             }
@@ -127,6 +128,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //绘制结束
+            this._isDrawing = false;
             this._sphereDrawEndEvent?.Invoke(this._boundingSphere);
 
             //清空
