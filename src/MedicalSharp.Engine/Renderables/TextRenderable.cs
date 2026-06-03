@@ -240,7 +240,6 @@ namespace MedicalSharp.Engine.Renderables
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.Enable(EnableCap.DepthTest);
 
             this._texture.Bind(0);
             program.SetUniformInt("u_ColorMode", (int)ColorMode.Mixed);
@@ -278,8 +277,8 @@ namespace MedicalSharp.Engine.Renderables
             }
 
             this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
+            this._texture.Unbind();
 
-            GL.Disable(EnableCap.DepthTest);
             GL.Disable(EnableCap.Blend);
         }
         #endregion

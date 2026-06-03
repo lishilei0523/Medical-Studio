@@ -1,6 +1,7 @@
 ﻿using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -154,14 +155,15 @@ namespace MedicalSharp.Engine.Overlays
 
             //构建模型矩阵
             Matrix4 modelMatrix = Matrix4.CreateTranslation(new Vector3(this.ScreenPosition.X, this.ScreenPosition.Y, 0));
+            program.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
 
             this._texture.Bind(0);
-            program.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
-            program.SetUniformInt("u_HasTexture", 1);
-            program.SetUniformInt("u_Texture", 0);
+            program.SetUniformInt("u_ColorMode", (int)ColorMode.Mixed);
             program.SetUniformVector4("u_Color", this.Color);
+            program.SetUniformInt("u_Texture", 0);
 
             this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
+            this._texture.Unbind();
         }
         #endregion
 
