@@ -22,11 +22,6 @@ namespace MedicalSharp.Controls.Commands
         #region # 字段及构造器
 
         /// <summary>
-        /// 选中的3D元素
-        /// </summary>
-        private Visual3D _selectedVisual;
-
-        /// <summary>
         /// 3D元素拾取事件
         /// </summary>
         private readonly Action<Visual3DPickedEventArgs> _visual3DPickedEvent;
@@ -93,7 +88,6 @@ namespace MedicalSharp.Controls.Commands
                 };
                 if (pickVisual3D.FindNearest(mousePos2D, out Vector3 point, out Vector3 normal, out Visual3D visual, out Ray ray))
                 {
-                    this._selectedVisual = visual;
                     commandEventArgs.HitPoint = point;
                     commandEventArgs.Normal = normal;
                     commandEventArgs.PickedVisual = visual;
@@ -125,81 +119,73 @@ namespace MedicalSharp.Controls.Commands
         /// <returns>上下文菜单项列表</returns>
         public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
-            List<ContextMenuItem> items = [];
-            if (this._selectedVisual != null)
+            if (viewport is IPickVisual3D pickVisual3D)
             {
-                items.Add(new ContextMenuItem
+                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                if (pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual, out _))
                 {
-                    Header = "删除(_D)",
-                    Command = () => this.RemoveVisual(viewport),
-                    IsEnabled = this._selectedVisual is not IFunctionalVisual3D
-                });
-                items.Add(new ContextMenuItem
-                {
-                    Header = "内切(_I)",
-                    Command = () => this.ApplyCut(viewport, CutMode.Inside),
-                    IsEnabled = this._selectedVisual is ICutVolume && this.GetMarkValue != null
-                });
-                items.Add(new ContextMenuItem
-                {
-                    Header = "外切(_O)",
-                    Command = () => this.ApplyCut(viewport, CutMode.OutSide),
-                    IsEnabled = this._selectedVisual is ICutVolume && this.GetMarkValue != null
-                });
-                items.Add(new ContextMenuItem
-                {
-                    Header = "统计(_S)",
-                    Command = () => this.ApplyAnalyse(viewport),
-                    IsEnabled = (this._selectedVisual is IAnalyseVolume2D && viewport is MPRViewport) ||
-                                (this._selectedVisual is IAnalyseVolume3D && viewport is VolumeViewport)
-                });
+                    List<ContextMenuItem> items =
+                    [
+                        new ContextMenuItem
+                        {
+                            Header = "删除(_D)",
+                            Command = () => this.RemoveVisual(viewport,visual),
+                            IsEnabled = visual is not IFunctionalVisual3D
+                        },
+                        new ContextMenuItem
+                        {
+                            Header = "内切(_I)",
+                            Command = () => this.ApplyCut(viewport,visual, CutMode.Inside),
+                            IsEnabled = visual is ICutVolume && this.GetMarkValue != null
+                        },
+                        new ContextMenuItem
+                        {
+                            Header = "外切(_O)",
+                            Command = () => this.ApplyCut(viewport,visual, CutMode.OutSide),
+                            IsEnabled = visual is ICutVolume && this.GetMarkValue != null
+                        },
+                        new ContextMenuItem
+                        {
+                            Header = "统计(_S)",
+                            Command = () => this.ApplyAnalyse(viewport, visual),
+                            IsEnabled = (visual is IAnalyseVolume2D && viewport is MPRViewport) ||
+                                        (visual is IAnalyseVolume3D && viewport is VolumeViewport)
+                        }
+                    ];
+
+                    return items;
+                }
             }
 
-            return items;
+            return base.GetContextMenuItems(viewport, eventArgs);
         }
         #endregion
 
-        #region 失效命令 —— override void Deactivate()
-        /// <summary>
-        /// 失效命令
-        /// </summary>
-        /// <remarks>命令被停用时调用，切换命令前</remarks>
-        public override void Deactivate()
-        {
-            base.Deactivate();
-
-            this._selectedVisual = null;
-        }
-        #endregion
-
-        #region 删除元素 —— void RemoveVisual(OpenTKViewport viewport)
+        #region 删除元素 —— void RemoveVisual(OpenTKViewport viewport, Visual3D visual)
         /// <summary>
         /// 删除元素
         /// </summary>
-        private void RemoveVisual(OpenTKViewport viewport)
+        /// <param name="viewport">OpenTK视口</param>
+        /// <param name="visual">3D元素</param>
+        private void RemoveVisual(OpenTKViewport viewport, Visual3D visual)
         {
-            if (this._selectedVisual != null)
-            {
-                this._visual3DRemovedEvent?.Invoke(this._selectedVisual);
-
-                //清空引用
-                this._selectedVisual = null;
-            }
+            this._visual3DRemovedEvent?.Invoke(visual);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
         }
         #endregion
 
-        #region 适用切割 —— void ApplyCut(OpenTKViewport viewport, CutMode cutMode)
+        #region 适用切割 —— void ApplyCut(OpenTKViewport viewport, Visual3D visual...
         /// <summary>
         /// 适用切割
         /// </summary>
         /// <param name="viewport">OpenTK视口</param>
+        /// <param name="visual">3D元素</param>
         /// <param name="cutMode">切割模式</param>
-        private void ApplyCut(OpenTKViewport viewport, CutMode cutMode)
+        private void ApplyCut(OpenTKViewport viewport, Visual3D visual, CutMode cutMode)
         {
-            if (this._selectedVisual is ICutVolume cutVolume)
+            if (visual is ICutVolume cutVolume)
             {
                 #region # 验证
 
@@ -238,19 +224,20 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion
 
-        #region 适用统计 —— void ApplyAnalyse(OpenTKViewport viewport)
+        #region 适用统计 —— void ApplyAnalyse(OpenTKViewport viewport, Visual3D visual)
         /// <summary>
         /// 适用统计
         /// </summary>
         /// <param name="viewport">OpenTK视口</param>
-        private async void ApplyAnalyse(OpenTKViewport viewport)
+        /// <param name="visual">3D元素</param>
+        private async void ApplyAnalyse(OpenTKViewport viewport, Visual3D visual)
         {
-            if (this._selectedVisual is IAnalyseVolume2D analyseVolume2D && viewport is MPRViewport mprViewport)
+            if (visual is IAnalyseVolume2D analyseVolume2D && viewport is MPRViewport mprViewport)
             {
                 StatisticResult result = analyseVolume2D.ApplyAnalyseVolume(mprViewport, null);
                 this.AnalyseEnd?.Invoke(result);
             }
-            if (this._selectedVisual is IAnalyseVolume3D analyseVolume3D && viewport is VolumeViewport volumeViewport)
+            if (visual is IAnalyseVolume3D analyseVolume3D && viewport is VolumeViewport volumeViewport)
             {
                 StatisticResult result = await analyseVolume3D.ApplyAnalyseVolume(volumeViewport.VolumeRenderable, null);
                 this.AnalyseEnd?.Invoke(result);
