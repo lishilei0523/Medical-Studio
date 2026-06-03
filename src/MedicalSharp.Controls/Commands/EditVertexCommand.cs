@@ -170,29 +170,6 @@ namespace MedicalSharp.Controls.Commands
         /// <returns>上下文菜单项列表</returns>
         public override IReadOnlyList<ContextMenuItem> GetContextMenuItems(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
         {
-            List<ContextMenuItem> items =
-            [
-                new ContextMenuItem
-                {
-                    Header = "删除顶点(_D)",
-                    Command = () => this.RemoveVertex(viewport, eventArgs),
-                    IsEnabled = true
-                }
-            ];
-
-            return items;
-        }
-        #endregion
-
-
-        //Private
-
-        #region 删除顶点 —— void RemoveVertex(OpenTKViewport viewport...
-        /// <summary>
-        /// 删除顶点
-        /// </summary>
-        private void RemoveVertex(OpenTKViewport viewport, PointerReleasedEventArgs eventArgs)
-        {
             if (viewport is IPickVisual3D pickVisual3D)
             {
                 Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
@@ -207,13 +184,37 @@ namespace MedicalSharp.Controls.Commands
                     //找最近顶点
                     if (vertexEditable.TryGetVertexDrag(localRay, localLookDirection, out VertexDragConstraint constraint))
                     {
-                        if (vertexEditable.TryRemoveVertex(constraint.VertexIndex))
-                        {
-                            //请求下一帧
-                            viewport.RequestNextFrameRendering();
-                        }
+                        List<ContextMenuItem> items =
+                        [
+                            new ContextMenuItem
+                            {
+                                Header = "删除顶点(_D)",
+                                Command = () => this.RemoveVertex(viewport,vertexEditable,constraint.VertexIndex )
+                            }
+                        ];
+
+                        return items;
                     }
                 }
+            }
+
+            return base.GetContextMenuItems(viewport, eventArgs);
+        }
+        #endregion
+
+
+        //Private
+
+        #region 删除顶点 —— void RemoveVertex(OpenTKViewport viewport...
+        /// <summary>
+        /// 删除顶点
+        /// </summary>
+        private void RemoveVertex(OpenTKViewport viewport, IVertexEditable vertexEditable, int vertexIndex)
+        {
+            if (vertexEditable.TryRemoveVertex(vertexIndex))
+            {
+                //请求下一帧
+                viewport.RequestNextFrameRendering();
             }
         }
         #endregion
