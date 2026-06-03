@@ -14,7 +14,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制椭圆形3D元素命令
     /// </summary>
-    public class DrawEllipseCommand : ShapeCommand
+    public class DrawEllipseCommand : DrawShapeCommand
     {
         #region # 字段及构造器
 

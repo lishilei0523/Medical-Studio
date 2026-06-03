@@ -16,7 +16,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 编辑顶点命令
     /// </summary>
-    public class EditVertexCommand : ShapeCommand
+    public class EditVertexCommand : EditShapeCommand
     {
         #region # 字段及构造器
 

@@ -14,7 +14,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制矩形3D元素命令
     /// </summary>
-    public class DrawRectangleCommand : ShapeCommand
+    public class DrawRectangleCommand : DrawShapeCommand
     {
         #region # 字段及构造器
 

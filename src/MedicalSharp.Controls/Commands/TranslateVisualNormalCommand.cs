@@ -13,7 +13,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 沿法向量平移元素命令
     /// </summary>
-    public class TranslateVisualNormalCommand : ShapeCommand
+    public class TranslateVisualNormalCommand : EditShapeCommand
     {
         #region # 字段及构造器
 

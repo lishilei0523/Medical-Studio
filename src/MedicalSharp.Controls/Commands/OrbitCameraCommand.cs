@@ -9,7 +9,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 轨道相机命令
     /// </summary>
-    public class OrbitCameraCommand : ViewportCommand
+    public class OrbitCameraCommand : CameraCommand
     {
         #region # 字段及构造器
 

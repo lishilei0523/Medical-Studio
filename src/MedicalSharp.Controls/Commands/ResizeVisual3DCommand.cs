@@ -15,7 +15,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 调整3D元素尺寸命令
     /// </summary>
-    public class ResizeVisual3DCommand : ShapeCommand
+    public class ResizeVisual3DCommand : EditShapeCommand
     {
         #region # 字段及构造器
 

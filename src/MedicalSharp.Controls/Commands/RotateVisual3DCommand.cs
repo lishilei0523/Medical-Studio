@@ -14,7 +14,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 旋转3D元素命令
     /// </summary>
-    public class RotateVisual3DCommand : ShapeCommand
+    public class RotateVisual3DCommand : EditShapeCommand
     {
         #region # 字段及构造器
 

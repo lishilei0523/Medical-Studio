@@ -14,7 +14,7 @@ namespace MedicalSharp.Controls.Commands
     /// 调整2D元素尺寸命令
     /// </summary>
     /// <remarks>MPR视图使用</remarks>
-    public class ResizeVisual2DCommand : ShapeCommand
+    public class ResizeVisual2DCommand : EditShapeCommand
     {
         #region # 字段及构造器
 

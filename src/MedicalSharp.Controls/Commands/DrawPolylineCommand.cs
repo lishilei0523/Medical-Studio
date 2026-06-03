@@ -15,7 +15,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制折线3D元素命令
     /// </summary>
-    public class DrawPolylineCommand : ShapeCommand
+    public class DrawPolylineCommand : DrawShapeCommand
     {
         #region # 字段及构造器
 

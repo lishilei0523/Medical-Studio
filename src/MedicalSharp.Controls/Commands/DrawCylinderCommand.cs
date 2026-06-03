@@ -11,7 +11,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制圆柱体3D元素命令
     /// </summary>
-    public class DrawCylinderCommand : ShapeCommand
+    public class DrawCylinderCommand : DrawShapeCommand
     {
         #region # 字段及构造器
 

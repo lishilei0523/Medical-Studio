@@ -10,7 +10,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// MPR相机命令
     /// </summary>
-    public class MPRCameraCommand : ViewportCommand
+    public class MPRCameraCommand : CameraCommand
     {
         #region # 字段及构造器
 

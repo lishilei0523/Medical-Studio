@@ -15,7 +15,7 @@ namespace MedicalSharp.Controls.Commands
     /// 旋转2D元素命令
     /// </summary>
     /// <remarks>MPR视图使用</remarks>
-    public class RotateVisual2DCommand : ShapeCommand
+    public class RotateVisual2DCommand : EditShapeCommand
     {
         #region # 字段及构造器
 

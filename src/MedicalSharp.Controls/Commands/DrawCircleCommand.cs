@@ -13,7 +13,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制圆形3D元素命令
     /// </summary>
-    public class DrawCircleCommand : ShapeCommand
+    public class DrawCircleCommand : DrawShapeCommand
     {
         #region # 字段及构造器
 

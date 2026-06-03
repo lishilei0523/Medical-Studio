@@ -11,7 +11,7 @@ namespace MedicalSharp.Controls.Commands
     /// <summary>
     /// 绘制包围球3D元素命令
     /// </summary>
-    public class DrawBoundingSphereCommand : ShapeCommand
+    public class DrawBoundingSphereCommand : DrawShapeCommand
     {
         #region # 字段及构造器
 
