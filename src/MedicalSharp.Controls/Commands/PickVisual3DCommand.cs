@@ -6,6 +6,7 @@ using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Primitives.Enums;
+using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
@@ -122,36 +123,49 @@ namespace MedicalSharp.Controls.Commands
             if (viewport is IPickVisual3D pickVisual3D)
             {
                 Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
-                if (pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual, out _))
+                if (pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual, out _) &&
+                    visual is not IFunctionalVisual3D &&
+                    visual is not IFixable)
                 {
                     List<ContextMenuItem> items =
                     [
                         new ContextMenuItem
                         {
                             Header = "删除(_D)",
-                            Command = () => this.RemoveVisual(viewport,visual),
-                            IsEnabled = visual is not IFunctionalVisual3D
-                        },
-                        new ContextMenuItem
-                        {
-                            Header = "内切(_I)",
-                            Command = () => this.ApplyCut(viewport,visual, CutMode.Inside),
-                            IsEnabled = visual is ICutVolume && this.GetMarkValue != null
-                        },
-                        new ContextMenuItem
-                        {
-                            Header = "外切(_O)",
-                            Command = () => this.ApplyCut(viewport,visual, CutMode.OutSide),
-                            IsEnabled = visual is ICutVolume && this.GetMarkValue != null
-                        },
-                        new ContextMenuItem
-                        {
-                            Header = "统计(_S)",
-                            Command = () => this.ApplyAnalyse(viewport, visual),
-                            IsEnabled = (visual is IAnalyseVolume2D && viewport is MPRViewport) ||
-                                        (visual is IAnalyseVolume3D && viewport is VolumeViewport)
+                            Command = () => this.RemoveVisual(viewport, visual)
                         }
                     ];
+                    if (visual is ICutVolume cutVolume && this.GetMarkValue != null)
+                    {
+                        items.Add(new ContextMenuItem
+                        {
+                            Header = "内切(_I)",
+                            Command = () => this.ApplyCut(viewport, cutVolume, CutMode.Inside),
+                            IsEnabled = this.GetMarkValue != null
+                        });
+                        items.Add(new ContextMenuItem
+                        {
+                            Header = "外切(_O)",
+                            Command = () => this.ApplyCut(viewport, cutVolume, CutMode.OutSide),
+                            IsEnabled = this.GetMarkValue != null
+                        });
+                    }
+                    if (visual is IAnalyseVolume2D analyseVolume2D && viewport is MPRViewport mprViewport)
+                    {
+                        items.Add(new ContextMenuItem
+                        {
+                            Header = "统计(_S)",
+                            Command = () => this.ApplyAnalyse2D(mprViewport, analyseVolume2D)
+                        });
+                    }
+                    if (visual is IAnalyseVolume3D analyseVolume3D && viewport is VolumeViewport volumeViewport)
+                    {
+                        items.Add(new ContextMenuItem
+                        {
+                            Header = "统计(_S)",
+                            Command = () => this.ApplyAnalyse3D(volumeViewport, analyseVolume3D)
+                        });
+                    }
 
                     return items;
                 }
@@ -176,72 +190,74 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion
 
-        #region 适用切割 —— void ApplyCut(OpenTKViewport viewport, Visual3D visual...
+        #region 适用切割 —— void ApplyCut(OpenTKViewport viewport, ICutVolume cutVolume...
         /// <summary>
         /// 适用切割
         /// </summary>
         /// <param name="viewport">OpenTK视口</param>
-        /// <param name="visual">3D元素</param>
+        /// <param name="cutVolume">切割体积3D元素</param>
         /// <param name="cutMode">切割模式</param>
-        private void ApplyCut(OpenTKViewport viewport, Visual3D visual, CutMode cutMode)
+        private void ApplyCut(OpenTKViewport viewport, ICutVolume cutVolume, CutMode cutMode)
         {
-            if (visual is ICutVolume cutVolume)
+            #region # 验证
+
+            if (this.GetMarkValue == null)
             {
-                #region # 验证
-
-                if (this.GetMarkValue == null)
-                {
-                    return;
-                }
-
-                #endregion
-
-                byte markValue = this.GetMarkValue.Invoke();
-
-                #region # 验证
-
-                if (markValue == 0)
-                {
-                    return;
-                }
-
-                #endregion
-
-                if (viewport is VolumeViewport volumeViewport)
-                {
-                    cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, cutMode, markValue);
-                }
-                if (viewport is MPRViewport mprViewport)
-                {
-                    cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, cutMode, markValue);
-                }
-
-                //请求下一帧
-                viewport.RequestNextFrameRendering();
-
-                this.CutEnd?.Invoke();
+                return;
             }
+
+            #endregion
+
+            byte markValue = this.GetMarkValue.Invoke();
+
+            #region # 验证
+
+            if (markValue == 0)
+            {
+                return;
+            }
+
+            #endregion
+
+            if (viewport is VolumeViewport volumeViewport)
+            {
+                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, cutMode, markValue);
+            }
+            if (viewport is MPRViewport mprViewport)
+            {
+                cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, cutMode, markValue);
+            }
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+
+            this.CutEnd?.Invoke();
         }
         #endregion
 
-        #region 适用统计 —— void ApplyAnalyse(OpenTKViewport viewport, Visual3D visual)
+        #region 适用统计(2D) —— void ApplyAnalyse2D(MPRViewport viewport, IAnalyseVolume2D analyseVolume2D)
         /// <summary>
-        /// 适用统计
+        /// 适用统计(2D)
         /// </summary>
-        /// <param name="viewport">OpenTK视口</param>
-        /// <param name="visual">3D元素</param>
-        private async void ApplyAnalyse(OpenTKViewport viewport, Visual3D visual)
+        /// <param name="viewport">MPR渲染视口</param>
+        /// <param name="analyseVolume2D">可统计体积2D元素</param>
+        private void ApplyAnalyse2D(MPRViewport viewport, IAnalyseVolume2D analyseVolume2D)
         {
-            if (visual is IAnalyseVolume2D analyseVolume2D && viewport is MPRViewport mprViewport)
-            {
-                StatisticResult result = analyseVolume2D.ApplyAnalyseVolume(mprViewport, null);
-                this.AnalyseEnd?.Invoke(result);
-            }
-            if (visual is IAnalyseVolume3D analyseVolume3D && viewport is VolumeViewport volumeViewport)
-            {
-                StatisticResult result = await analyseVolume3D.ApplyAnalyseVolume(volumeViewport.VolumeRenderable, null);
-                this.AnalyseEnd?.Invoke(result);
-            }
+            StatisticResult result = analyseVolume2D.ApplyAnalyseVolume(viewport, null);
+            this.AnalyseEnd?.Invoke(result);
+        }
+        #endregion
+
+        #region 适用统计(3D) —— void ApplyAnalyse3D(VolumeViewport viewport, IAnalyseVolume3D analyseVolume3D)
+        /// <summary>
+        /// 适用统计(3D)
+        /// </summary>
+        /// <param name="viewport">体积渲染视口</param>
+        /// <param name="analyseVolume3D">可统计体积3D元素</param>
+        private async void ApplyAnalyse3D(VolumeViewport viewport, IAnalyseVolume3D analyseVolume3D)
+        {
+            StatisticResult result = await analyseVolume3D.ApplyAnalyseVolume(viewport.VolumeRenderable, null);
+            this.AnalyseEnd?.Invoke(result);
         }
         #endregion
 
