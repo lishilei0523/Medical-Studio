@@ -14,6 +14,26 @@ namespace MedicalSharp.Controls.Base
     /// </summary>
     public abstract class ShapeCommand : ViewportCommand
     {
+        #region # 字段及构造器
+
+        /// <summary>
+        /// 默认构造器
+        /// </summary>
+        protected ShapeCommand()
+        {
+
+        }
+
+        #endregion
+
+        #region # 属性
+
+        //
+
+        #endregion
+
+        #region # 方法
+
         #region 获取上下文菜单项列表 —— override IReadOnlyList<ContextMenuItem> GetContextMenuItems(...
         /// <summary>
         /// 获取上下文菜单项列表
@@ -94,6 +114,8 @@ namespace MedicalSharp.Controls.Base
 
             return null;
         }
+        #endregion
+
         #endregion
     }
 }

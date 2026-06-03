@@ -131,7 +131,8 @@ namespace MedicalSharp.Controls.Commands
                 items.Add(new ContextMenuItem
                 {
                     Header = "删除(_D)",
-                    Command = () => this.RemoveVisual(viewport)
+                    Command = () => this.RemoveVisual(viewport),
+                    IsEnabled = this._selectedVisual is not IFunctionalVisual3D
                 });
                 items.Add(new ContextMenuItem
                 {

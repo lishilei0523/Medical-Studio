@@ -20,17 +20,11 @@ namespace MedicalSharp.Controls.Base
         protected Vector2? _mousePos2D;
 
         /// <summary>
-        /// OpenTK视口
-        /// </summary>
-        protected OpenTKViewport _viewport;
-
-        /// <summary>
         /// 创建视口命令构造器
         /// </summary>
         protected ViewportCommand()
         {
             this._mousePos2D = null;
-            this._viewport = null;
         }
 
         #endregion
@@ -47,16 +41,6 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region 只读属性 - OpenTK视口 —— OpenTKViewport Viewport
-        /// <summary>
-        /// 只读属性 - OpenTK视口
-        /// </summary>
-        public OpenTKViewport Viewport
-        {
-            get => this._viewport;
-        }
-        #endregion
-
         #endregion
 
         #region # 方法
@@ -68,7 +52,6 @@ namespace MedicalSharp.Controls.Base
         public virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
             this._mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
-            this._viewport = viewport;
         }
         #endregion
 
