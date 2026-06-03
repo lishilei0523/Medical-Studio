@@ -11,7 +11,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 十字线3D元素
     /// </summary>
-    public class CrosshairVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D
+    public class CrosshairVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IFunctionalVisual3D
     {
         #region # 字段及构造器
 

@@ -13,7 +13,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// MPR平面3D元素
     /// </summary>
-    public class MPRPlaneVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatableNormal, IRotatable
+    public class MPRPlaneVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatableNormal, IRotatable, IFunctionalVisual3D
     {
         #region # 字段及构造器
 

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Interactivity;
 using Avalonia.Metadata;
+using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using System;
 
@@ -9,7 +10,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 形状3D元素容器
     /// </summary>
-    public class ShapePresenter3D : Visual3D
+    public class ShapePresenter3D : Visual3D, IFunctionalVisual3D
     {
         #region # 字段及构造器
 

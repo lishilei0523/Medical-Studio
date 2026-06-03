@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Engine.Renderables;
 
 namespace MedicalSharp.Controls.Visual3Ds
@@ -6,7 +7,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// ViewBox 3D元素
     /// </summary>
-    public class ViewBoxVisual3D : ShapeVisual3D
+    public class ViewBoxVisual3D : ShapeVisual3D, IFunctionalVisual3D
     {
         #region # 字段及构造器
 

@@ -13,7 +13,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 网格线3D元素
     /// </summary>
-    public class GridLinesVisual3D : ShapeVisual3D, IVisual2DIn3D
+    public class GridLinesVisual3D : ShapeVisual3D, IVisual2DIn3D, IFunctionalVisual3D
     {
         #region # 字段及构造器
 
