@@ -221,6 +221,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             set
             {
                 field = value;
+                this.NotifyOfPropertyChange();
+
                 TissueSelectedEvent message = new TissueSelectedEvent
                 {
                     TissueInfo = value
