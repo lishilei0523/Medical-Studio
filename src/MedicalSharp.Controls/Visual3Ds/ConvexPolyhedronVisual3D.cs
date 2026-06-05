@@ -246,7 +246,6 @@ namespace MedicalSharp.Controls.Visual3Ds
 
             //插入新顶点（最近点之后）
             int newIndex = nearestIndex + 1;
-            Matrix4 localToWorld = this.Transform.Matrix.Inverted();
             this.Positions.Insert(newIndex, localHitPoint.ToVector3());
 
             constraint = new VertexDragConstraint

@@ -80,8 +80,7 @@ namespace MedicalSharp.Controls.Commands
 
                     #endregion
 
-                    Matrix4 modelMatrix = visual3D.Transform.Matrix;
-                    Matrix4 worldToLocal = modelMatrix.Inverted();
+                    Matrix4 worldToLocal = visual3D.Transform.Matrix.Inverted();
                     Ray localRay = ray.Transform(worldToLocal);
                     Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
 
@@ -128,8 +127,8 @@ namespace MedicalSharp.Controls.Commands
                 Vector3? hitPoint = basicViewport.FindNearestPosition(mousePos2D);
                 if (hitPoint.HasValue)
                 {
-                    Matrix4 modelMatrix = this._selectedVisual.Transform.Matrix;
-                    Vector3 localHitPoint = Vector3.TransformPosition(hitPoint.Value, modelMatrix);
+                    Matrix4 worldToLocal = this._selectedVisual.Transform.Matrix.Inverted();
+                    Vector3 localHitPoint = Vector3.TransformPosition(hitPoint.Value, worldToLocal);
                     VertexDragConstraint constraint = this._selectedVertexConstraint.Value;
                     this._selectedVisual.MoveVertex(constraint, localHitPoint);
 
