@@ -81,7 +81,7 @@ namespace MedicalSharp.Controls.Commands
                     #endregion
 
                     Matrix4 modelMatrix = visual3D.Transform.Matrix;
-                    Matrix4 worldToLocal = Matrix4.Invert(modelMatrix);
+                    Matrix4 worldToLocal = modelMatrix.Inverted();
                     Ray localRay = ray.Transform(worldToLocal);
                     Vector3 localLookDirection = Vector3.TransformNormal(viewport.Camera.LookDirection, worldToLocal).Normalized();
 
