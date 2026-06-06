@@ -1,10 +1,14 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Controls.UserControls
 {
@@ -26,26 +30,6 @@ namespace MedicalSharp.Controls.UserControls
         private const short HUMax = 3071;
 
         /// <summary>
-        /// 默认解剖色控制点
-        /// </summary>
-        private static readonly ColorControlPoint[] _DefaultAnatomyColorPoints =
-        [
-            new ColorControlPoint { HU = -1024, Color = Color.FromRgb(0, 0, 0) },
-            new ColorControlPoint { HU = -800, Color = Color.FromRgb(46, 31, 38) },
-            new ColorControlPoint { HU = -400, Color = Color.FromRgb(89, 56, 71) },
-            new ColorControlPoint { HU = -200, Color = Color.FromRgb(77, 51, 64) },
-            new ColorControlPoint { HU = 0, Color = Color.FromRgb(140, 64, 46) },
-            new ColorControlPoint { HU = 100, Color = Color.FromRgb(173, 82, 56) },
-            new ColorControlPoint { HU = 200, Color = Color.FromRgb(153, 51, 38) },
-            new ColorControlPoint { HU = 400, Color = Color.FromRgb(184, 71, 51) },
-            new ColorControlPoint { HU = 600, Color = Color.FromRgb(191, 102, 77) },
-            new ColorControlPoint { HU = 800, Color = Color.FromRgb(224, 184, 128) },
-            new ColorControlPoint { HU = 1200, Color = Color.FromRgb(242, 224, 184) },
-            new ColorControlPoint { HU = 2000, Color = Color.FromRgb(255, 245, 224) },
-            new ColorControlPoint { HU = 3071, Color = Color.FromRgb(255, 255, 255) },
-        ];
-
-        /// <summary>
         /// 颜色控制点列表依赖属性
         /// </summary>
         public static readonly StyledProperty<AvaloniaList<ColorControlPoint>> ControlPointsProperty;
@@ -61,11 +45,58 @@ namespace MedicalSharp.Controls.UserControls
 
 
         /// <summary>
+        /// 右键菜单
+        /// </summary>
+        private readonly MenuFlyout _contextMenu;
+
+        /// <summary>
+        /// 修改颜色菜单项
+        /// </summary>
+        private readonly MenuItem _editColorMenuItem;
+
+        /// <summary>
+        /// 插入颜色菜单项
+        /// </summary>
+        private readonly MenuItem _insertColorMenuItem;
+
+        /// <summary>
+        /// 删除颜色菜单项
+        /// </summary>
+        private readonly MenuItem _deleteColorMenuItem;
+
+        /// <summary>
+        /// 右键位置的控制点
+        /// </summary>
+        private ColorControlPoint _rightClickTargetPoint;
+
+        /// <summary>
+        /// 右键位置的HU值
+        /// </summary>
+        private short _rightClickHU;
+
+        /// <summary>
         /// 默认构造器
         /// </summary>
         public ColorBand()
         {
             this.ClipToBounds = true;
+            this.Cursor = new Cursor(StandardCursorType.Hand);
+
+            //右键菜单
+            this._editColorMenuItem = new MenuItem { Header = "修改颜色" };
+            this._editColorMenuItem.Click += this.OnEditColorClicked;
+            this._insertColorMenuItem = new MenuItem { Header = "插入颜色" };
+            this._insertColorMenuItem.Click += this.OnInsertColorClicked;
+            this._deleteColorMenuItem = new MenuItem { Header = "删除颜色" };
+            this._deleteColorMenuItem.Click += this.OnDeleteColorClicked;
+
+            this._contextMenu = new MenuFlyout
+            {
+                Items = { this._editColorMenuItem, this._insertColorMenuItem, this._deleteColorMenuItem }
+            };
+            this.ContextFlyout = this._contextMenu;
+
+            this.PointerPressed += this.OnColorBandMouseDown;
         }
 
         #endregion
@@ -101,7 +132,7 @@ namespace MedicalSharp.Controls.UserControls
 
             if (controlPoints == null || !controlPoints.Any())
             {
-                controlPoints = new AvaloniaList<ColorControlPoint>(_DefaultAnatomyColorPoints);
+                return;
             }
             if (this.Bounds.Width <= 0 || this.Bounds.Height <= 0)
             {
@@ -174,6 +205,92 @@ namespace MedicalSharp.Controls.UserControls
         }
         #endregion
 
+        #region 查找指定位置的控制点 —— ColorControlPoint FindControlPointAtPosition(Point position)
+        /// <summary>
+        /// 查找指定位置的控制点
+        /// </summary>
+        private ColorControlPoint FindControlPointAtPosition(Point position)
+        {
+            AvaloniaList<ColorControlPoint> controlPoints = this.ControlPoints;
+            if (controlPoints == null || controlPoints.Count == 0)
+            {
+                return null;
+            }
+
+            const double hitRadius = 6.0;
+            foreach (ColorControlPoint point in controlPoints)
+            {
+                double x = (point.HU - HUMin) / (double)(HUMax - HUMin) * this.Bounds.Width;
+                double distance = Math.Abs(position.X - x);
+                if (distance <= hitRadius)
+                {
+                    return point;
+                }
+            }
+
+            return null;
+        }
+        #endregion
+
+        #region 显示颜色选择面板 —— Task<Color?> ShowColorPicker(Color defaultColor)
+        /// <summary>
+        /// 显示颜色选择面板
+        /// </summary>
+        private async Task<Color?> ShowColorPicker(Color defaultColor)
+        {
+            ColorView colorPicker = new ColorView
+            {
+                Width = 340,
+                Height = 330,
+                Color = defaultColor,
+                IsAlphaEnabled = false,
+                IsAlphaVisible = false
+            };
+
+            Button okButton = new Button { Content = "确定", Width = 70, Margin = new Thickness(0, 0, 8, 0) };
+            Button cancelButton = new Button { Content = "取消", Width = 70 };
+            StackPanel flyoutContent = new StackPanel
+            {
+                Children =
+                {
+                    colorPicker,
+                    new WrapPanel
+                    {
+                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                        Margin = new Thickness(0, 8, 0, 0),
+                        Children = { okButton, cancelButton }
+                    }
+                }
+            };
+
+            Flyout flyout = new Flyout
+            {
+                Content = flyoutContent,
+                Placement = PlacementMode.Bottom
+            };
+
+            Color? selectedColor = null;
+            okButton.Click += (_, _) =>
+            {
+                selectedColor = colorPicker.Color;
+                flyout.Hide();
+            };
+            cancelButton.Click += (_, _) =>
+            {
+                selectedColor = null;
+                flyout.Hide();
+            };
+
+            flyout.ShowAt(this);
+
+            //等待Flyout关闭
+            TaskCompletionSource<Color?> completionSource = new TaskCompletionSource<Color?>();
+            flyout.Closed += (_, _) => completionSource.TrySetResult(selectedColor);
+
+            return await completionSource.Task;
+        }
+        #endregion
+
 
         //Events
 
@@ -202,6 +319,99 @@ namespace MedicalSharp.Controls.UserControls
         private void OnColorPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
             this.InvalidateVisual();
+        }
+        #endregion
+
+        #region 颜色带鼠标按下事件 —— void OnColorBandMouseDown(object sender...
+        /// <summary>
+        /// 颜色带鼠标按下事件
+        /// </summary>
+        private void OnColorBandMouseDown(object sender, PointerPressedEventArgs eventArgs)
+        {
+            if (eventArgs.Properties.IsRightButtonPressed)
+            {
+                Point position = eventArgs.GetPosition(this);
+                this._rightClickHU = (short)(HUMin + (position.X / this.Bounds.Width) * (HUMax - HUMin));
+                this._rightClickTargetPoint = this.FindControlPointAtPosition(position);
+
+                this._editColorMenuItem.IsEnabled = this._rightClickTargetPoint != null;
+                this._deleteColorMenuItem.IsEnabled = this._rightClickTargetPoint != null;
+                this._insertColorMenuItem.IsEnabled = this._rightClickTargetPoint == null;
+
+                this._contextMenu.Placement = PlacementMode.Pointer;
+                this._contextMenu.ShowAt(this, true);
+                eventArgs.Handled = true;
+            }
+        }
+        #endregion
+
+        #region 修改颜色菜单事件 —— async void OnEditColorClicked(object sender...
+        /// <summary>
+        /// 修改颜色菜单事件
+        /// </summary>
+        private async void OnEditColorClicked(object sender, RoutedEventArgs e)
+        {
+            if (this._rightClickTargetPoint == null)
+            {
+                return;
+            }
+
+            Color? newColor = await this.ShowColorPicker(this._rightClickTargetPoint.Color);
+            if (newColor.HasValue)
+            {
+                this._rightClickTargetPoint.Color = newColor.Value;
+                this.InvalidateVisual();
+            }
+        }
+        #endregion
+
+        #region 插入颜色菜单事件 —— async void OnInsertColorClicked(object sender...
+        /// <summary>
+        /// 插入颜色菜单事件
+        /// </summary>
+        private async void OnInsertColorClicked(object sender, RoutedEventArgs e)
+        {
+            AvaloniaList<ColorControlPoint> controlPoints = this.ControlPoints;
+            if (controlPoints == null)
+            {
+                return;
+            }
+
+            List<ColorControlPoint> sorted = controlPoints.OrderBy(p => p.HU).ToList();
+            Color currentColor = this.InterpolateColor(sorted, this._rightClickHU);
+
+            Color? selectedColor = await this.ShowColorPicker(currentColor);
+            if (selectedColor.HasValue)
+            {
+                controlPoints.Add(new ColorControlPoint { HU = this._rightClickHU, Color = selectedColor.Value });
+
+                //原地冒泡排序
+                for (int i = controlPoints.Count - 1; i > 0; i--)
+                {
+                    if (controlPoints[i].HU < controlPoints[i - 1].HU)
+                    {
+                        (controlPoints[i], controlPoints[i - 1]) = (controlPoints[i - 1], controlPoints[i]);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region 删除颜色菜单事件 —— void OnDeleteColorClicked(object sender...
+        /// <summary>
+        /// 删除颜色菜单事件
+        /// </summary>
+        private void OnDeleteColorClicked(object sender, RoutedEventArgs e)
+        {
+            if (this._rightClickTargetPoint != null)
+            {
+                this.ControlPoints?.Remove(this._rightClickTargetPoint);
+                this._rightClickTargetPoint = null;
+            }
         }
         #endregion
 

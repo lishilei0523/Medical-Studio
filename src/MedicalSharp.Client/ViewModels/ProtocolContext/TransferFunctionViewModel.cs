@@ -1,4 +1,5 @@
 ﻿using Avalonia.Collections;
+using Avalonia.Media;
 using Caliburn.Micro;
 using MedicalSharp.Controls.UserControls;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
@@ -32,12 +33,20 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
 
         #region # 属性
 
-        #region 控制点列表 —— AvaloniaList<AlphaControlPoint> ControlPoints
+        #region 颜色控制点列表 —— AvaloniaList<ColorControlPoint> ColorControlPoints
         /// <summary>
-        /// 控制点列表
+        /// 颜色控制点列表
         /// </summary>
         [DependencyProperty]
-        public AvaloniaList<AlphaControlPoint> ControlPoints { get; set; }
+        public AvaloniaList<ColorControlPoint> ColorControlPoints { get; set; }
+        #endregion
+
+        #region 透明度控制点列表 —— AvaloniaList<AlphaControlPoint> AlphaControlPoints
+        /// <summary>
+        /// 透明度控制点列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<AlphaControlPoint> AlphaControlPoints { get; set; }
         #endregion
 
         #endregion
@@ -50,7 +59,23 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         /// </summary>
         protected override Task OnActivatedAsync(CancellationToken cancellationToken)
         {
-            this.ControlPoints =
+            this.ColorControlPoints =
+            [
+                new ColorControlPoint { HU = -1024, Color = Color.FromRgb(0, 0, 0) },
+                new ColorControlPoint { HU = -800, Color = Color.FromRgb(46, 31, 38) },
+                new ColorControlPoint { HU = -400, Color = Color.FromRgb(89, 56, 71) },
+                new ColorControlPoint { HU = -200, Color = Color.FromRgb(77, 51, 64) },
+                new ColorControlPoint { HU = 0, Color = Color.FromRgb(140, 64, 46) },
+                new ColorControlPoint { HU = 100, Color = Color.FromRgb(173, 82, 56) },
+                new ColorControlPoint { HU = 200, Color = Color.FromRgb(153, 51, 38) },
+                new ColorControlPoint { HU = 400, Color = Color.FromRgb(184, 71, 51) },
+                new ColorControlPoint { HU = 600, Color = Color.FromRgb(191, 102, 77) },
+                new ColorControlPoint { HU = 800, Color = Color.FromRgb(224, 184, 128) },
+                new ColorControlPoint { HU = 1200, Color = Color.FromRgb(242, 224, 184) },
+                new ColorControlPoint { HU = 2000, Color = Color.FromRgb(255, 245, 224) },
+                new ColorControlPoint { HU = 3071, Color = Color.FromRgb(255, 255, 255) }
+            ];
+            this.AlphaControlPoints =
             [
                 new AlphaControlPoint { HU = -1024, Alpha = 0 },
                 new AlphaControlPoint { HU = 0, Alpha = 0.1 },
