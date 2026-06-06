@@ -111,17 +111,27 @@ namespace MedicalSharp.Controls.UserControls
             #endregion
 
             //按HU值排序
-            List<ColorControlPoint> sorted = controlPoints.OrderBy(point => point.HU).ToList();
+            List<ColorControlPoint> sortedControlPoints = controlPoints.OrderBy(point => point.HU).ToList();
 
             //逐像素绘制渐变
             for (int x = 0; x < (int)this.Bounds.Width; x++)
             {
                 double hu = HUMin + (x / this.Bounds.Width) * (HUMax - HUMin);
-                Color color = this.InterpolateColor(sorted, hu);
+                Color color = this.InterpolateColor(sortedControlPoints, hu);
 
                 SolidColorBrush brush = new SolidColorBrush(color);
                 Pen pen = new Pen(brush);
                 context.DrawLine(pen, new Point(x, 0), new Point(x, this.Bounds.Height));
+            }
+
+            //绘制控制点标记
+            foreach (ColorControlPoint point in sortedControlPoints)
+            {
+                double x = (point.HU - HUMin) / (double)(HUMax - HUMin) * this.Bounds.Width;
+                double y = this.Bounds.Height / 2;
+                SolidColorBrush markerFill = new SolidColorBrush(point.Color);
+                Pen markerPen = new Pen(Brushes.White, 1);
+                context.DrawEllipse(markerFill, markerPen, new Point(x, y), 4, 4);
             }
         }
         #endregion

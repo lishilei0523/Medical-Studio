@@ -16,7 +16,7 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		<sd:ColorBand Grid.Row="0" Width="550" Height="100" />
+		<sd:ColorBand Grid.Row="0" Width="550" Height="50" />
 		<sd:TransferFunctionCanvas Grid.Row="1" Width="550" Height="500" Background="Gray"
 								   ControlPoints="{Binding ControlPoints}" />
 	</Grid>
