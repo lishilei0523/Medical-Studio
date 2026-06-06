@@ -5,14 +5,13 @@
 			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
 			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
-			  xmlns:protocolContext1="clr-namespace:MedicalSharp.Client.ViewModels.ProtocolContext"
 			  mc:Ignorable="d"
 			  Width="600" Height="560" CanResize="False" ShowAsDialog="True"
 			  WindowStartupLocation="CenterScreen"
 			  Title="传递函数">
 
-	<protocolContext1:TransferFunctionCurve Width="550" Height="500" Background="LightGray"
-											ControlPoints="{Binding ControlPoints}">
+	<sd:TransferFunctionCanvas Width="550" Height="500" Background="LightGray"
+                               ControlPoints="{Binding ControlPoints}">
 
-	</protocolContext1:TransferFunctionCurve>
+	</sd:TransferFunctionCanvas>
 </fa:AppWindow>

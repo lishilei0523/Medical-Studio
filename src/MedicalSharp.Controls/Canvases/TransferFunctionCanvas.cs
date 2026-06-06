@@ -10,12 +10,12 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace MedicalSharp.Client.ViewModels.ProtocolContext
+namespace MedicalSharp.Controls.Canvases
 {
     /// <summary>
-    /// 传递函数曲线编辑器
+    /// 传递函数Canvas
     /// </summary>
-    public class TransferFunctionCurve : Canvas
+    public class TransferFunctionCanvas : Canvas
     {
         #region # 字段及构造器
 
@@ -37,10 +37,10 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static TransferFunctionCurve()
+        static TransferFunctionCanvas()
         {
-            ControlPointsProperty = AvaloniaProperty.Register<TransferFunctionCurve, AvaloniaList<AlphaControlPoint>>(nameof(ControlPoints), []);
-            ControlPointsProperty.Changed.AddClassHandler<TransferFunctionCurve, AvaloniaList<AlphaControlPoint>>(OnControlPointsChanged);
+            ControlPointsProperty = AvaloniaProperty.Register<TransferFunctionCanvas, AvaloniaList<AlphaControlPoint>>(nameof(ControlPoints), []);
+            ControlPointsProperty.Changed.AddClassHandler<TransferFunctionCanvas, AvaloniaList<AlphaControlPoint>>(OnControlPointsChanged);
         }
 
 
@@ -55,16 +55,16 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         private readonly Polyline _polyline;
 
         /// <summary>
-        /// 控制点圆圈列表
+        /// 控制点圆圈字典
         /// </summary>
-        private readonly List<Ellipse> _pointMarkers;
+        private readonly Dictionary<AlphaControlPoint, Ellipse> _pointToMarker;
 
         /// <summary>
         /// 创建传递函数曲线编辑器构造器
         /// </summary>
-        public TransferFunctionCurve()
+        public TransferFunctionCanvas()
         {
-            this._pointMarkers = [];
+            this._pointToMarker = new Dictionary<AlphaControlPoint, Ellipse>();
 
             //折线
             this._polyline = new Polyline
@@ -75,7 +75,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
             };
             this.Children.Add(this._polyline);
 
-            //背景右键添加控制点
+            //画布鼠标按下事件
             this.PointerPressed += this.OnCanvasPointerPressed;
         }
 
@@ -98,6 +98,50 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
 
         #region # 方法
 
+        #region 同步控制点圆圈 —— void SyncMarkers(IReadOnlyList<AlphaControlPoint> controlPoints)
+        /// <summary>
+        /// 同步控制点圆圈
+        /// </summary>
+        private void SyncMarkers(IReadOnlyList<AlphaControlPoint> controlPoints)
+        {
+            //移除已删除控制点的圆圈
+            List<AlphaControlPoint> removedPoints = this._pointToMarker.Keys.Except(controlPoints).ToList();
+            foreach (AlphaControlPoint point in removedPoints)
+            {
+                Ellipse marker = this._pointToMarker[point];
+                marker.PointerPressed -= this.OnControlPointPointerPressed;
+                marker.PointerMoved -= this.OnControlPointPointerMoved;
+                marker.PointerReleased -= this.OnControlPointPointerReleased;
+                this.Children.Remove(marker);
+                this._pointToMarker.Remove(point);
+            }
+
+            //添加新控制点的圆圈
+            foreach (AlphaControlPoint point in controlPoints)
+            {
+                if (!this._pointToMarker.ContainsKey(point))
+                {
+                    Ellipse ellipse = new Ellipse
+                    {
+                        Width = 10,
+                        Height = 10,
+                        Fill = Brushes.Yellow,
+                        Stroke = Brushes.White,
+                        StrokeThickness = 1,
+                        Cursor = new Cursor(StandardCursorType.Hand)
+                    };
+
+                    ellipse.PointerPressed += this.OnControlPointPointerPressed;
+                    ellipse.PointerMoved += this.OnControlPointPointerMoved;
+                    ellipse.PointerReleased += this.OnControlPointPointerReleased;
+
+                    this._pointToMarker[point] = ellipse;
+                    this.Children.Add(ellipse);
+                }
+            }
+        }
+        #endregion
+
         #region 更新曲线 —— void UpdateCurve()
         /// <summary>
         /// 更新曲线
@@ -105,7 +149,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         private void UpdateCurve()
         {
             AvaloniaList<AlphaControlPoint> controlPoints = this.ControlPoints;
-            if (controlPoints == null || controlPoints.Count == 0)
+            if (controlPoints == null || controlPoints.Count == 0 || this.Bounds.Width <= 0 || this.Bounds.Height <= 0)
             {
                 this._polyline.Points.Clear();
                 return;
@@ -123,69 +167,21 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
             }
 
             this._polyline.Points = points;
-            this.UpdateMarkerPositions(sorted);
-        }
-        #endregion
 
-        #region 更新控制点圆圈位置 —— void UpdateMarkerPositions(IReadOnlyList<AlphaControlPoint> controlPoints)
-        /// <summary>
-        /// 更新控制点圆圈位置
-        /// </summary>
-        private void UpdateMarkerPositions(IReadOnlyList<AlphaControlPoint> controlPoints)
-        {
-            for (int index = 0; index < controlPoints.Count; index++)
+            //更新圆圈位置（按控制点引用直接定位）
+            foreach (KeyValuePair<AlphaControlPoint, Ellipse> kvp in this._pointToMarker)
             {
-                double x = this.HUToCanvasX(controlPoints[index].HU);
-                double y = this.AlphaToCanvasY(controlPoints[index].Alpha);
-
-                Canvas.SetLeft(this._pointMarkers[index], x - 5);
-                Canvas.SetTop(this._pointMarkers[index], y - 5);
+                double x = this.HUToCanvasX(kvp.Key.HU);
+                double y = this.AlphaToCanvasY(kvp.Key.Alpha);
+                Canvas.SetLeft(kvp.Value, x - 5);
+                Canvas.SetTop(kvp.Value, y - 5);
             }
         }
         #endregion
 
-        #region 重建控制点圆圈 —— void RebuildMarkers(IReadOnlyList<AlphaControlPoint> controlPoints)
+        #region HU值转X坐标 —— double HUToCanvasX(int hu)
         /// <summary>
-        /// 重建控制点圆圈
-        /// </summary>
-        private void RebuildMarkers(IReadOnlyList<AlphaControlPoint> controlPoints)
-        {
-            //移除旧圆圈
-            foreach (Ellipse marker in this._pointMarkers)
-            {
-                marker.PointerPressed -= this.OnControlPointPointerPressed;
-                marker.PointerMoved -= this.OnControlPointPointerMoved;
-                marker.PointerReleased -= this.OnControlPointPointerReleased;
-                this.Children.Remove(marker);
-            }
-            this._pointMarkers.Clear();
-
-            //创建新圆圈
-            foreach (AlphaControlPoint point in controlPoints)
-            {
-                Ellipse ellipse = new Ellipse
-                {
-                    Width = 10,
-                    Height = 10,
-                    Fill = Brushes.Yellow,
-                    Stroke = Brushes.White,
-                    StrokeThickness = 1,
-                    Cursor = new Cursor(StandardCursorType.Hand)
-                };
-
-                ellipse.PointerPressed += this.OnControlPointPointerPressed;
-                ellipse.PointerMoved += this.OnControlPointPointerMoved;
-                ellipse.PointerReleased += this.OnControlPointPointerReleased;
-
-                this._pointMarkers.Add(ellipse);
-                this.Children.Add(ellipse);
-            }
-        }
-        #endregion
-
-        #region HU值转Canvas X坐标 —— double HUToCanvasX(int hu)
-        /// <summary>
-        /// HU值转Canvas X坐标
+        /// HU值转X坐标
         /// </summary>
         private double HUToCanvasX(int hu)
         {
@@ -198,9 +194,9 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         }
         #endregion
 
-        #region Canvas X坐标转HU值 —— short CanvasXToHU(double x)
+        #region X坐标转HU值 —— short CanvasXToHU(double x)
         /// <summary>
-        /// Canvas X坐标转HU值
+        /// X坐标转HU值
         /// </summary>
         private short CanvasXToHU(double x)
         {
@@ -215,9 +211,9 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         }
         #endregion
 
-        #region Alpha值转Canvas Y坐标 —— double AlphaToCanvasY(double alpha)
+        #region Alpha值转Y坐标 —— double AlphaToCanvasY(double alpha)
         /// <summary>
-        /// Alpha值转Canvas Y坐标
+        /// Alpha值转Y坐标
         /// </summary>
         private double AlphaToCanvasY(double alpha)
         {
@@ -230,9 +226,9 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         }
         #endregion
 
-        #region Canvas Y坐标转Alpha值 —— double CanvasYToAlpha(double y)
+        #region Y坐标转Alpha值 —— double CanvasYToAlpha(double y)
         /// <summary>
-        /// Canvas Y坐标转Alpha值
+        /// Y坐标转Alpha值
         /// </summary>
         private double CanvasYToAlpha(double y)
         {
@@ -252,17 +248,16 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         /// <summary>
         /// 控制点列表改变事件
         /// </summary>
-        private static void OnControlPointsChanged(TransferFunctionCurve control, AvaloniaPropertyChangedEventArgs<AvaloniaList<AlphaControlPoint>> eventArgs)
+        private static void OnControlPointsChanged(TransferFunctionCanvas control, AvaloniaPropertyChangedEventArgs<AvaloniaList<AlphaControlPoint>> eventArgs)
         {
             if (eventArgs.OldValue.Value != null)
             {
                 eventArgs.OldValue.Value.CollectionChanged -= control.OnControlPointsCollectionChanged;
             }
-
             if (eventArgs.NewValue.Value != null)
             {
                 eventArgs.NewValue.Value.CollectionChanged += control.OnControlPointsCollectionChanged;
-                control.RebuildMarkers(eventArgs.NewValue.Value);
+                control.SyncMarkers(eventArgs.NewValue.Value);
                 control.UpdateCurve();
             }
         }
@@ -277,7 +272,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
             AvaloniaList<AlphaControlPoint> controlPoints = this.ControlPoints;
             if (controlPoints != null)
             {
-                this.RebuildMarkers(controlPoints);
+                this.SyncMarkers(controlPoints);
                 this.UpdateCurve();
             }
         }
@@ -290,15 +285,11 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         private void OnControlPointPointerPressed(object sender, PointerPressedEventArgs eventArgs)
         {
             Ellipse ellipse = (Ellipse)sender;
-            int index = this._pointMarkers.IndexOf(ellipse);
-            if (index >= 0)
+
+            //通过圆圈反查控制点引用
+            this._draggingPoint = this._pointToMarker.FirstOrDefault(kvp => kvp.Value == ellipse).Key;
+            if (this._draggingPoint != null)
             {
-                //通过圆圈索引映射到控制点（用当前未排序的controlPoints对应）
-                AvaloniaList<AlphaControlPoint> controlPoints = this.ControlPoints;
-                if (controlPoints != null && index < controlPoints.Count)
-                {
-                    this._draggingPoint = controlPoints[index];
-                }
                 eventArgs.Handled = true;
             }
         }
@@ -337,9 +328,9 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         }
         #endregion
 
-        #region 画布按下事件（添加控制点） —— void OnCanvasPointerPressed(object sender...
+        #region 画布按下事件 —— void OnCanvasPointerPressed(object sender...
         /// <summary>
-        /// 画布按下事件（添加控制点）
+        /// 画布按下事件
         /// </summary>
         private void OnCanvasPointerPressed(object sender, PointerPressedEventArgs eventArgs)
         {
@@ -350,14 +341,20 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                 short hu = Math.Clamp(this.CanvasXToHU(position.X), HUMin, HUMax);
                 double alpha = Math.Clamp(this.CanvasYToAlpha(position.Y), 0.0, 1.0);
 
-                this.ControlPoints.Add(new AlphaControlPoint { HU = hu, Alpha = alpha });
-
-                //原地排序，避免Clear + Add触发多次CollectionChanged
-                for (int i = this.ControlPoints.Count - 1; i > 0; i--)
+                AvaloniaList<AlphaControlPoint> controlPoints = this.ControlPoints;
+                if (controlPoints == null)
                 {
-                    if (this.ControlPoints[i].HU < this.ControlPoints[i - 1].HU)
+                    return;
+                }
+
+                controlPoints.Add(new AlphaControlPoint { HU = hu, Alpha = alpha });
+
+                //原地冒泡排序
+                for (int i = controlPoints.Count - 1; i > 0; i--)
+                {
+                    if (controlPoints[i].HU < controlPoints[i - 1].HU)
                     {
-                        (this.ControlPoints[i], this.ControlPoints[i - 1]) = (this.ControlPoints[i - 1], this.ControlPoints[i]);
+                        (controlPoints[i], controlPoints[i - 1]) = (controlPoints[i - 1], controlPoints[i]);
                     }
                     else
                     {
