@@ -3,6 +3,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using MedicalSharp.Primitives.Models;
 using System;
@@ -55,6 +56,36 @@ namespace MedicalSharp.Controls.Canvases
         private AlphaControlPoint _draggingPoint;
 
         /// <summary>
+        /// 右键位置的控制点
+        /// </summary>
+        private AlphaControlPoint _rightClickTargetPoint;
+
+        /// <summary>
+        /// 右键位置的HU值
+        /// </summary>
+        private short _rightClickHU;
+
+        /// <summary>
+        /// 右键位置的Alpha值
+        /// </summary>
+        private double _rightClickAlpha;
+
+        /// <summary>
+        /// 画布右键菜单
+        /// </summary>
+        private readonly MenuFlyout _canvasContextMenu;
+
+        /// <summary>
+        /// 插入菜单项
+        /// </summary>
+        private readonly MenuItem _insertMenuItem;
+
+        /// <summary>
+        /// 删除菜单项
+        /// </summary>
+        private readonly MenuItem _deleteMenuItem;
+
+        /// <summary>
         /// 折线图形
         /// </summary>
         private readonly Polyline _polyline;
@@ -74,17 +105,34 @@ namespace MedicalSharp.Controls.Canvases
             //折线
             this._polyline = new Polyline
             {
-                Stroke = Brushes.White,
-                StrokeThickness = 2,
+                Stroke = Brushes.Red,
+                StrokeThickness = 1,
                 IsHitTestVisible = false
             };
             this.Children.Add(this._polyline);
+
+            //右键菜单
+            this._insertMenuItem = new MenuItem
+            {
+                Header = "插入控制点"
+            };
+            this._insertMenuItem.Click += this.OnInsertControlPointClicked;
+            this._deleteMenuItem = new MenuItem
+            {
+                Header = "删除控制点"
+            };
+            this._deleteMenuItem.Click += this.OnDeleteControlPointClicked;
+            this._canvasContextMenu = new MenuFlyout
+            {
+                Items = { this._insertMenuItem, this._deleteMenuItem }
+            };
+            this.ContextFlyout = this._canvasContextMenu;
 
             //布局完成后初始绘制
             this.SizeChanged += this.OnSizeChanged;
 
             //画布鼠标按下事件
-            this.PointerPressed += this.OnCanvasPointerPressed;
+            this.PointerPressed += this.OnCanvasMouseDown;
         }
 
         #endregion
@@ -106,6 +154,8 @@ namespace MedicalSharp.Controls.Canvases
 
         #region # 方法
 
+        //Private
+
         #region 同步控制点圆圈 —— void SyncMarkers(IReadOnlyList<AlphaControlPoint> controlPoints)
         /// <summary>
         /// 同步控制点圆圈
@@ -113,76 +163,75 @@ namespace MedicalSharp.Controls.Canvases
         private void SyncMarkers(IReadOnlyList<AlphaControlPoint> controlPoints)
         {
             //移除已删除控制点的圆圈
-            List<AlphaControlPoint> removedPoints = this._pointToMarker.Keys.Except(controlPoints).ToList();
-            foreach (AlphaControlPoint point in removedPoints)
+            IEnumerable<AlphaControlPoint> removedPoints = this._pointToMarker.Keys.Except(controlPoints);
+            foreach (AlphaControlPoint controlPoint in removedPoints)
             {
-                Ellipse marker = this._pointToMarker[point];
-                marker.PointerPressed -= this.OnControlPointPointerPressed;
-                marker.PointerMoved -= this.OnControlPointPointerMoved;
-                marker.PointerReleased -= this.OnControlPointPointerReleased;
+                Ellipse marker = this._pointToMarker[controlPoint];
+                marker.PointerPressed -= this.OnControlPointMouseDown;
+                marker.PointerMoved -= this.OnControlPointMouseMoved;
+                marker.PointerReleased -= this.OnControlPointMouseUp;
+                this._pointToMarker.Remove(controlPoint);
                 this.Children.Remove(marker);
-                this._pointToMarker.Remove(point);
             }
 
             //添加新控制点的圆圈
-            foreach (AlphaControlPoint point in controlPoints)
+            foreach (AlphaControlPoint controlPoint in controlPoints)
             {
-                if (!this._pointToMarker.ContainsKey(point))
+                if (!this._pointToMarker.ContainsKey(controlPoint))
                 {
                     Ellipse ellipse = new Ellipse
                     {
                         Width = 10,
                         Height = 10,
-                        Fill = Brushes.Yellow,
-                        Stroke = Brushes.White,
-                        StrokeThickness = 1,
+                        Stroke = Brushes.Cyan,
+                        StrokeThickness = 2.5,
+                        Fill = Brushes.Black,
                         Cursor = new Cursor(StandardCursorType.Hand)
                     };
 
-                    ellipse.PointerPressed += this.OnControlPointPointerPressed;
-                    ellipse.PointerMoved += this.OnControlPointPointerMoved;
-                    ellipse.PointerReleased += this.OnControlPointPointerReleased;
+                    ellipse.PointerPressed += this.OnControlPointMouseDown;
+                    ellipse.PointerMoved += this.OnControlPointMouseMoved;
+                    ellipse.PointerReleased += this.OnControlPointMouseUp;
 
-                    this._pointToMarker[point] = ellipse;
+                    this._pointToMarker[controlPoint] = ellipse;
                     this.Children.Add(ellipse);
                 }
             }
         }
         #endregion
 
-        #region 更新曲线 —— void UpdateCurve()
+        #region 更新折线 —— void UpdatePolyline()
         /// <summary>
-        /// 更新曲线
+        /// 更新折线
         /// </summary>
-        private void UpdateCurve()
+        private void UpdatePolyline()
         {
-            AvaloniaList<AlphaControlPoint> controlPoints = this.ControlPoints;
-            if (controlPoints == null || controlPoints.Count == 0 || this.Bounds.Width <= 0 || this.Bounds.Height <= 0)
+            if (this.ControlPoints == null || !this.ControlPoints.Any() || this.Bounds.Width <= 0 || this.Bounds.Height <= 0)
             {
                 this._polyline.Points.Clear();
                 return;
             }
 
             //按HU值排序
-            List<AlphaControlPoint> sorted = controlPoints.OrderBy(p => p.HU).ToList();
+            List<AlphaControlPoint> sortedControlPoints = this.ControlPoints.OrderBy(point => point.HU).ToList();
 
-            Points points = new Avalonia.Points();
-            foreach (AlphaControlPoint controlPoint in sorted)
+            Points points = [];
+            foreach (AlphaControlPoint controlPoint in sortedControlPoints)
             {
                 double x = this.HUToCanvasX(controlPoint.HU);
                 double y = this.AlphaToCanvasY(controlPoint.Alpha);
-                points.Add(new Point(x, y));
+                Point point = new Point(x, y);
+                points.Add(point);
             }
-
             this._polyline.Points = points;
 
             //更新圆圈位置（按控制点引用直接定位）
-            foreach (KeyValuePair<AlphaControlPoint, Ellipse> kvp in this._pointToMarker)
+            foreach ((AlphaControlPoint controlPoint, Ellipse ellipse) in this._pointToMarker)
             {
-                double x = this.HUToCanvasX(kvp.Key.HU);
-                double y = this.AlphaToCanvasY(kvp.Key.Alpha);
-                Canvas.SetLeft(kvp.Value, x - 5);
-                Canvas.SetTop(kvp.Value, y - 5);
+                double x = this.HUToCanvasX(controlPoint.HU);
+                double y = this.AlphaToCanvasY(controlPoint.Alpha);
+                SetLeft(ellipse, x - 5);
+                SetTop(ellipse, y - 5);
             }
         }
         #endregion
@@ -249,6 +298,39 @@ namespace MedicalSharp.Controls.Canvases
         }
         #endregion
 
+        #region 查找指定位置的控制点 —— AlphaControlPoint FindControlPointAtPosition(Point position)
+        /// <summary>
+        /// 查找指定位置的控制点
+        /// </summary>
+        private AlphaControlPoint FindControlPointAtPosition(Point position)
+        {
+            #region # 验证
+
+            if (this.Bounds.Width <= 0 || this.Bounds.Height <= 0)
+            {
+                return null;
+            }
+
+            #endregion
+
+            const double hitRadius = 8.0;
+            foreach ((AlphaControlPoint controlPoint, Ellipse ellipse) in this._pointToMarker)
+            {
+                //取圆圈中心点（Left + 半径, Top + 半径）
+                double centerX = GetLeft(ellipse) + ellipse.Width / 2;
+                double centerY = GetTop(ellipse) + ellipse.Height / 2;
+                double distance = Math.Sqrt((position.X - centerX) * (position.X - centerX) +
+                                            (position.Y - centerY) * (position.Y - centerY));
+                if (distance <= hitRadius)
+                {
+                    return controlPoint;
+                }
+            }
+
+            return null;
+        }
+        #endregion
+
 
         //Events
 
@@ -260,136 +342,176 @@ namespace MedicalSharp.Controls.Canvases
         {
             if (!this._initialRendered && eventArgs.NewSize.Width > 0 && eventArgs.NewSize.Height > 0)
             {
-                this._initialRendered = true;
-                AvaloniaList<AlphaControlPoint> controlPoints = this.ControlPoints;
-                if (controlPoints != null && controlPoints.Count > 0)
+                if (this.ControlPoints != null && this.ControlPoints.Count > 0)
                 {
-                    this.SyncMarkers(controlPoints);
-                    this.UpdateCurve();
+                    this.SyncMarkers(this.ControlPoints);
+                    this.UpdatePolyline();
+                }
+                this._initialRendered = true;
+            }
+        }
+        #endregion
+
+        #region 控制点列表改变事件 —— static void OnControlPointsChanged(TransferFunctionCanvas canvas...
+        /// <summary>
+        /// 控制点列表改变事件
+        /// </summary>
+        private static void OnControlPointsChanged(TransferFunctionCanvas canvas, AvaloniaPropertyChangedEventArgs<AvaloniaList<AlphaControlPoint>> eventArgs)
+        {
+            if (eventArgs.OldValue.Value != null)
+            {
+                eventArgs.OldValue.Value.CollectionChanged -= canvas.OnControlPointsCollectionChanged;
+            }
+            if (eventArgs.NewValue.Value != null)
+            {
+                eventArgs.NewValue.Value.CollectionChanged += canvas.OnControlPointsCollectionChanged;
+                canvas.SyncMarkers(eventArgs.NewValue.Value);
+                canvas.UpdatePolyline();
+            }
+        }
+        #endregion
+
+        #region 控制点列表元素改变事件 —— void OnControlPointsCollectionChanged(object sender...
+        /// <summary>
+        /// 控制点列表元素改变事件
+        /// </summary>
+        private void OnControlPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+        {
+            if (this.ControlPoints != null)
+            {
+                this.SyncMarkers(this.ControlPoints);
+                this.UpdatePolyline();
+            }
+        }
+        #endregion
+
+        #region 控制点鼠标按下事件 —— void OnControlPointMouseDown(object sender...
+        /// <summary>
+        /// 控制点鼠标按下事件
+        /// </summary>
+        private void OnControlPointMouseDown(object sender, PointerPressedEventArgs eventArgs)
+        {
+            if (eventArgs.Properties.IsLeftButtonPressed)
+            {
+                Ellipse ellipse = (Ellipse)sender;
+
+                //通过圆圈反查控制点引用
+                this._draggingPoint = this._pointToMarker.FirstOrDefault(kvp => kvp.Value == ellipse).Key;
+                if (this._draggingPoint != null)
+                {
+                    eventArgs.Handled = true;
                 }
             }
         }
         #endregion
 
-        #region 控制点列表改变事件 —— static void OnControlPointsChanged(TransferFunctionCurve control...
+        #region 控制点鼠标移动事件 —— void OnControlPointMouseMoved(object sender...
         /// <summary>
-        /// 控制点列表改变事件
+        /// 控制点鼠标移动事件
         /// </summary>
-        private static void OnControlPointsChanged(TransferFunctionCanvas control, AvaloniaPropertyChangedEventArgs<AvaloniaList<AlphaControlPoint>> eventArgs)
+        private void OnControlPointMouseMoved(object sender, PointerEventArgs eventArgs)
         {
-            if (eventArgs.OldValue.Value != null)
-            {
-                eventArgs.OldValue.Value.CollectionChanged -= control.OnControlPointsCollectionChanged;
-            }
-            if (eventArgs.NewValue.Value != null)
-            {
-                eventArgs.NewValue.Value.CollectionChanged += control.OnControlPointsCollectionChanged;
-                control.SyncMarkers(eventArgs.NewValue.Value);
-                control.UpdateCurve();
-            }
-        }
-        #endregion
+            #region # 验证
 
-        #region 控制点列表集合改变事件 —— void OnControlPointsCollectionChanged(object sender...
-        /// <summary>
-        /// 控制点列表集合改变事件
-        /// </summary>
-        private void OnControlPointsCollectionChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
-        {
-            AvaloniaList<AlphaControlPoint> controlPoints = this.ControlPoints;
-            if (controlPoints != null)
-            {
-                this.SyncMarkers(controlPoints);
-                this.UpdateCurve();
-            }
-        }
-        #endregion
-
-        #region 控制点按下事件 —— void OnControlPointPointerPressed(object sender...
-        /// <summary>
-        /// 控制点按下事件
-        /// </summary>
-        private void OnControlPointPointerPressed(object sender, PointerPressedEventArgs eventArgs)
-        {
-            Ellipse ellipse = (Ellipse)sender;
-
-            //通过圆圈反查控制点引用
-            this._draggingPoint = this._pointToMarker.FirstOrDefault(kvp => kvp.Value == ellipse).Key;
-            if (this._draggingPoint != null)
-            {
-                eventArgs.Handled = true;
-            }
-        }
-        #endregion
-
-        #region 控制点移动事件 —— void OnControlPointPointerMoved(object sender...
-        /// <summary>
-        /// 控制点移动事件
-        /// </summary>
-        private void OnControlPointPointerMoved(object sender, PointerEventArgs eventArgs)
-        {
             if (this._draggingPoint == null)
             {
                 return;
             }
 
-            Point position = eventArgs.GetPosition(this);
-            short hu = Math.Clamp(this.CanvasXToHU(position.X), HUMin, HUMax);
-            double alpha = Math.Clamp(this.CanvasYToAlpha(position.Y), 0.0, 1.0);
+            #endregion
 
-            this._draggingPoint.HU = hu;
-            this._draggingPoint.Alpha = alpha;
-            this.UpdateCurve();
+            if (eventArgs.Properties.IsLeftButtonPressed)
+            {
+                Point position = eventArgs.GetPosition(this);
 
-            eventArgs.Handled = true;
+                short hu = this.CanvasXToHU(position.X);
+                double alpha = this.CanvasYToAlpha(position.Y);
+                hu = Math.Clamp(hu, HUMin, HUMax);
+                alpha = Math.Clamp(alpha, 0.0, 1.0);
+
+                this._draggingPoint.HU = hu;
+                this._draggingPoint.Alpha = alpha;
+                this.UpdatePolyline();
+
+                eventArgs.Handled = true;
+            }
         }
         #endregion
 
-        #region 控制点松开事件 —— void OnControlPointPointerReleased(object sender...
+        #region 控制点鼠标松开事件 —— void OnControlPointMouseUp(object sender...
         /// <summary>
-        /// 控制点松开事件
+        /// 控制点鼠标松开事件
         /// </summary>
-        private void OnControlPointPointerReleased(object sender, PointerReleasedEventArgs e)
+        private void OnControlPointMouseUp(object sender, PointerReleasedEventArgs e)
         {
             this._draggingPoint = null;
         }
         #endregion
 
-        #region 画布按下事件 —— void OnCanvasPointerPressed(object sender...
+        #region 画布鼠标按下事件 —— void OnCanvasMouseDown(object sender...
         /// <summary>
-        /// 画布按下事件
+        /// 画布鼠标按下事件
         /// </summary>
-        private void OnCanvasPointerPressed(object sender, PointerPressedEventArgs eventArgs)
+        private void OnCanvasMouseDown(object sender, PointerPressedEventArgs eventArgs)
         {
-            PointerPoint pointerPoint = eventArgs.GetCurrentPoint(this);
-            if (pointerPoint.Properties.IsRightButtonPressed)
+            if (eventArgs.Properties.IsRightButtonPressed)
             {
                 Point position = eventArgs.GetPosition(this);
-                short hu = Math.Clamp(this.CanvasXToHU(position.X), HUMin, HUMax);
-                double alpha = Math.Clamp(this.CanvasYToAlpha(position.Y), 0.0, 1.0);
+                this._rightClickHU = Math.Clamp(this.CanvasXToHU(position.X), HUMin, HUMax);
+                this._rightClickAlpha = Math.Clamp(this.CanvasYToAlpha(position.Y), 0.0, 1.0);
 
-                AvaloniaList<AlphaControlPoint> controlPoints = this.ControlPoints;
-                if (controlPoints == null)
-                {
-                    return;
-                }
+                //查找右键位置附近是否有控制点
+                this._rightClickTargetPoint = this.FindControlPointAtPosition(position);
 
-                controlPoints.Add(new AlphaControlPoint { HU = hu, Alpha = alpha });
+                //无控制点则启用插入，有则启用删除
+                this._insertMenuItem.IsEnabled = this._rightClickTargetPoint == null;
+                this._deleteMenuItem.IsEnabled = this._rightClickTargetPoint != null;
 
-                //原地冒泡排序
-                for (int i = controlPoints.Count - 1; i > 0; i--)
-                {
-                    if (controlPoints[i].HU < controlPoints[i - 1].HU)
-                    {
-                        (controlPoints[i], controlPoints[i - 1]) = (controlPoints[i - 1], controlPoints[i]);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
+                this._canvasContextMenu.Placement = PlacementMode.Pointer;
+                this._canvasContextMenu.ShowAt(this, true);
                 eventArgs.Handled = true;
+            }
+        }
+        #endregion
+
+        #region 插入控制点菜单事件 —— void OnInsertControlPointClicked(object sender...
+        /// <summary>
+        /// 插入控制点菜单事件
+        /// </summary>
+        private void OnInsertControlPointClicked(object sender, RoutedEventArgs e)
+        {
+            AlphaControlPoint controlPoint = new AlphaControlPoint
+            {
+                HU = this._rightClickHU,
+                Alpha = this._rightClickAlpha
+            };
+            this.ControlPoints.Add(controlPoint);
+
+            //原地冒泡排序
+            for (int i = this.ControlPoints.Count - 1; i > 0; i--)
+            {
+                if (this.ControlPoints[i].HU < this.ControlPoints[i - 1].HU)
+                {
+                    (this.ControlPoints[i], this.ControlPoints[i - 1]) = (this.ControlPoints[i - 1], this.ControlPoints[i]);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        #endregion
+
+        #region 删除控制点菜单事件 —— void OnDeleteControlPointClicked(object sender...
+        /// <summary>
+        /// 删除控制点菜单事件
+        /// </summary>
+        private void OnDeleteControlPointClicked(object sender, RoutedEventArgs e)
+        {
+            if (this._rightClickTargetPoint != null)
+            {
+                this.ControlPoints.Remove(this._rightClickTargetPoint);
+                this._rightClickTargetPoint = null;
             }
         }
         #endregion
