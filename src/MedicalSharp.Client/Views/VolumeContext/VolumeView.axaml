@@ -180,6 +180,7 @@
 									<MenuItem Header="调节相机(_T)" Command="{Binding TuneCameraCommand}" />
 								</MenuItem>
 								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />
+								<MenuItem Header="传递函数(_F)" Command="{Binding TransferFunctionCommand}" />
 								<MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
 							</MenuFlyout>
 						</DropDownButton.Flyout>
