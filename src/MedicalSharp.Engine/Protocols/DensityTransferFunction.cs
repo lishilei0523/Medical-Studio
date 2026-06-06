@@ -153,7 +153,7 @@ namespace MedicalSharp.Engine.Protocols
         {
             #region # 验证
 
-            if (this._controlPoints.Count == 0)
+            if (!this._controlPoints.Any())
             {
                 return new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
             }

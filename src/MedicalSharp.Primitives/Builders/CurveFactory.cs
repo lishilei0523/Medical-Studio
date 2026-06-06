@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Primitives.Builders
 {
@@ -23,7 +24,7 @@ namespace MedicalSharp.Primitives.Builders
         {
             #region # 验证
 
-            if (controlPoints == null || controlPoints.Count == 0)
+            if (controlPoints == null || !controlPoints.Any())
             {
                 return [];
             }

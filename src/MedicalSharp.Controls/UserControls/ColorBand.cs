@@ -118,6 +118,8 @@ namespace MedicalSharp.Controls.UserControls
 
         #region # 方法
 
+        //Private
+
         #region 渲染 —— override void Render(DrawingContext context)
         /// <summary>
         /// 渲染
@@ -173,7 +175,9 @@ namespace MedicalSharp.Controls.UserControls
         /// </summary>
         private Color InterpolateColor(IReadOnlyList<ColorControlPoint> points, double hu)
         {
-            if (points.Count == 0)
+            #region # 验证
+
+            if (!points.Any())
             {
                 return Colors.Black;
             }
@@ -185,6 +189,7 @@ namespace MedicalSharp.Controls.UserControls
             {
                 return points[^1].Color;
             }
+            #endregion
 
             for (int index = 0; index < points.Count - 1; index++)
             {
@@ -211,14 +216,17 @@ namespace MedicalSharp.Controls.UserControls
         /// </summary>
         private ColorControlPoint FindControlPointAtPosition(Point position)
         {
-            AvaloniaList<ColorControlPoint> controlPoints = this.ControlPoints;
-            if (controlPoints == null || controlPoints.Count == 0)
+            #region # 验证
+
+            if (this.ControlPoints == null || !this.ControlPoints.Any())
             {
                 return null;
             }
 
+            #endregion
+
             const double hitRadius = 6.0;
-            foreach (ColorControlPoint point in controlPoints)
+            foreach (ColorControlPoint point in this.ControlPoints)
             {
                 double x = (point.HU - HUMin) / (double)(HUMax - HUMin) * this.Bounds.Width;
                 double distance = Math.Abs(position.X - x);

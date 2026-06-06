@@ -160,7 +160,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             constraint = default;
 
-            if (this.ControlPositions == null || this.ControlPositions.Count == 0)
+            if (this.ControlPositions == null || !this.ControlPositions.Any())
             {
                 return false;
             }
@@ -220,7 +220,7 @@ namespace MedicalSharp.Controls.Visual3Ds
             {
                 return false;
             }
-            if (this.SampledPositions == null || this.SampledPositions.Count == 0)
+            if (this.SampledPositions == null || !this.SampledPositions.Any())
             {
                 return false;
             }
@@ -286,7 +286,7 @@ namespace MedicalSharp.Controls.Visual3Ds
             {
                 return false;
             }
-            if (this.SampledPositions == null || this.SampledPositions.Count == 0)
+            if (this.SampledPositions == null || !this.SampledPositions.Any())
             {
                 return false;
             }

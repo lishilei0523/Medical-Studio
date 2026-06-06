@@ -13,9 +13,9 @@ using System.Linq;
 namespace MedicalSharp.Controls.UserControls
 {
     /// <summary>
-    /// 传递函数Canvas
+    /// Alpha曲线编辑器
     /// </summary>
-    public class TransferFunctionCanvas : Canvas
+    public class AlphaCurveEditor : Canvas
     {
         #region # 字段及构造器
 
@@ -37,10 +37,10 @@ namespace MedicalSharp.Controls.UserControls
         /// <summary>
         /// 静态构造器
         /// </summary>
-        static TransferFunctionCanvas()
+        static AlphaCurveEditor()
         {
-            ControlPointsProperty = AvaloniaProperty.Register<TransferFunctionCanvas, AvaloniaList<AlphaControlPoint>>(nameof(ControlPoints), []);
-            ControlPointsProperty.Changed.AddClassHandler<TransferFunctionCanvas, AvaloniaList<AlphaControlPoint>>(OnControlPointsChanged);
+            ControlPointsProperty = AvaloniaProperty.Register<AlphaCurveEditor, AvaloniaList<AlphaControlPoint>>(nameof(ControlPoints), []);
+            ControlPointsProperty.Changed.AddClassHandler<AlphaCurveEditor, AvaloniaList<AlphaControlPoint>>(OnControlPointsChanged);
         }
 
 
@@ -53,11 +53,6 @@ namespace MedicalSharp.Controls.UserControls
         /// 刻度是否已绘制
         /// </summary>
         private bool _scaleDrawn;
-
-        /// <summary>
-        /// 控制点提示文本
-        /// </summary>
-        private TextBlock _tooltipText;
 
         /// <summary>
         /// 当前拖拽的控制点
@@ -95,6 +90,11 @@ namespace MedicalSharp.Controls.UserControls
         private readonly MenuItem _deleteMenuItem;
 
         /// <summary>
+        /// 控制点提示文本
+        /// </summary>
+        private readonly TextBlock _controlPointTooltip;
+
+        /// <summary>
         /// 折线图形
         /// </summary>
         private readonly Polyline _polyline;
@@ -107,7 +107,7 @@ namespace MedicalSharp.Controls.UserControls
         /// <summary>
         /// 创建传递函数曲线编辑器构造器
         /// </summary>
-        public TransferFunctionCanvas()
+        public AlphaCurveEditor()
         {
             this._pointToMarker = new Dictionary<AlphaControlPoint, Ellipse>();
 
@@ -121,13 +121,13 @@ namespace MedicalSharp.Controls.UserControls
             this.Children.Add(this._polyline);
 
             //提示文本
-            this._tooltipText = new TextBlock
+            this._controlPointTooltip = new TextBlock
             {
                 FontSize = 10,
                 Foreground = Brushes.White,
                 IsHitTestVisible = false
             };
-            this.Children.Add(this._tooltipText);
+            this.Children.Add(this._controlPointTooltip);
 
             //右键菜单
             this._insertMenuItem = new MenuItem
@@ -464,7 +464,7 @@ namespace MedicalSharp.Controls.UserControls
         /// <summary>
         /// 控制点列表改变事件
         /// </summary>
-        private static void OnControlPointsChanged(TransferFunctionCanvas canvas, AvaloniaPropertyChangedEventArgs<AvaloniaList<AlphaControlPoint>> eventArgs)
+        private static void OnControlPointsChanged(AlphaCurveEditor canvas, AvaloniaPropertyChangedEventArgs<AvaloniaList<AlphaControlPoint>> eventArgs)
         {
             if (eventArgs.OldValue.Value != null)
             {
@@ -542,10 +542,10 @@ namespace MedicalSharp.Controls.UserControls
                 this.UpdatePolyline();
 
                 //更新提示文本
-                this._tooltipText.Text = $"({hu}, {alpha:F2})";
-                Canvas.SetLeft(this._tooltipText, position.X + 12);
-                Canvas.SetTop(this._tooltipText, position.Y - 20);
-                this._tooltipText.IsVisible = true;
+                this._controlPointTooltip.Text = $"({hu}, {alpha:F2})";
+                Canvas.SetLeft(this._controlPointTooltip, position.X + 12);
+                Canvas.SetTop(this._controlPointTooltip, position.Y - 20);
+                this._controlPointTooltip.IsVisible = true;
 
                 eventArgs.Handled = true;
             }
@@ -559,7 +559,7 @@ namespace MedicalSharp.Controls.UserControls
         private void OnControlPointMouseUp(object sender, PointerReleasedEventArgs e)
         {
             this._draggingPoint = null;
-            this._tooltipText.IsVisible = false;
+            this._controlPointTooltip.IsVisible = false;
         }
         #endregion
 

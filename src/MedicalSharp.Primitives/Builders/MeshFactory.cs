@@ -104,7 +104,7 @@ namespace MedicalSharp.Primitives.Builders
         {
             #region # 验证
 
-            if (positions == null || positions.Count == 0)
+            if (positions == null || !positions.Any())
             {
                 return new MeshGeometry([]);  //空网格
             }
@@ -180,7 +180,7 @@ namespace MedicalSharp.Primitives.Builders
         {
             #region # 验证
 
-            if (positions == null || positions.Count == 0)
+            if (positions == null || !positions.Any())
             {
                 throw new ArgumentNullException(nameof(positions), "位置列表不可为空！");
             }

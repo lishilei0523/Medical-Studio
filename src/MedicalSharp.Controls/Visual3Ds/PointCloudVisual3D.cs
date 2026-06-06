@@ -119,7 +119,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             constraint = default;
 
-            if (this.Positions == null || this.Positions.Count == 0)
+            if (this.Positions == null || !this.Positions.Any())
             {
                 return false;
             }
@@ -207,7 +207,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             #region # 验证
 
-            if (this.Positions == null || this.Positions.Count == 0)
+            if (this.Positions == null || !this.Positions.Any())
             {
                 return false;
             }
