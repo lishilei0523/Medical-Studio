@@ -10,7 +10,7 @@
 			  WindowStartupLocation="CenterScreen"
 			  Title="传递函数">
 
-	<sd:TransferFunctionCanvas Width="550" Height="500" Background="LightGray"
+	<sd:TransferFunctionCanvas Width="550" Height="500" Background="Gray"
                                ControlPoints="{Binding ControlPoints}">
 
 	</sd:TransferFunctionCanvas>

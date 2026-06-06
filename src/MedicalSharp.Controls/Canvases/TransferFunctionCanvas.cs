@@ -51,6 +51,16 @@ namespace MedicalSharp.Controls.Canvases
         private bool _initialRendered;
 
         /// <summary>
+        /// 刻度是否已绘制
+        /// </summary>
+        private bool _scaleDrawn;
+
+        /// <summary>
+        /// 控制点提示文本
+        /// </summary>
+        private TextBlock _tooltipText;
+
+        /// <summary>
         /// 当前拖拽的控制点
         /// </summary>
         private AlphaControlPoint _draggingPoint;
@@ -111,6 +121,15 @@ namespace MedicalSharp.Controls.Canvases
             };
             this.Children.Add(this._polyline);
 
+            //提示文本
+            this._tooltipText = new TextBlock
+            {
+                FontSize = 10,
+                Foreground = Brushes.White,
+                IsHitTestVisible = false
+            };
+            this.Children.Add(this._tooltipText);
+
             //右键菜单
             this._insertMenuItem = new MenuItem
             {
@@ -155,6 +174,86 @@ namespace MedicalSharp.Controls.Canvases
         #region # 方法
 
         //Private
+
+        #region 绘制坐标轴刻度 —— void DrawScale()
+        /// <summary>
+        /// 绘制坐标轴刻度
+        /// </summary>
+        private void DrawScale()
+        {
+            #region # 验证
+
+            if (this.Bounds.Width <= 0 || this.Bounds.Height <= 0)
+            {
+                return;
+            }
+            if (this._scaleDrawn)
+            {
+                return;
+            }
+
+            #endregion
+
+            this._scaleDrawn = true;
+
+            //横轴刻度（每100HU一条线，每500HU显示数字）
+            for (int hu = -1000; hu <= 3000; hu += 100)
+            {
+                double x = this.HUToCanvasX(hu);
+
+                Line tickLine = new Line
+                {
+                    StartPoint = new Point(x, this.Bounds.Height - 3),
+                    EndPoint = new Point(x, this.Bounds.Height),
+                    Stroke = Brushes.White,
+                    StrokeThickness = 1
+                };
+                this.Children.Add(tickLine);
+
+                if (hu % 500 == 0)
+                {
+                    TextBlock label = new TextBlock
+                    {
+                        Text = hu switch
+                        {
+                            -1000 => "-1024",
+                            3000 => "3071",
+                            _ => hu.ToString()
+                        },
+                        FontSize = 10,
+                        Foreground = Brushes.White
+                    };
+                    Canvas.SetLeft(label, x - 12);
+                    Canvas.SetTop(label, this.Bounds.Height + 2);
+                    this.Children.Add(label);
+                }
+            }
+
+            //纵轴刻度（0到1，每0.2一条线）
+            for (double alpha = 0.0; alpha <= 1.0; alpha += 0.1)
+            {
+                double y = this.AlphaToCanvasY(alpha);
+                Line tickLine = new Line
+                {
+                    StartPoint = new Point(0, y),
+                    EndPoint = new Point(5, y),
+                    Stroke = Brushes.White,
+                    StrokeThickness = 1
+                };
+                this.Children.Add(tickLine);
+
+                TextBlock label = new TextBlock
+                {
+                    Text = alpha.ToString("0.0"),
+                    FontSize = 10,
+                    Foreground = Brushes.White
+                };
+                Canvas.SetLeft(label, -17);
+                Canvas.SetTop(label, y - 7);
+                this.Children.Add(label);
+            }
+        }
+        #endregion
 
         #region 同步控制点圆圈 —— void SyncMarkers(IReadOnlyList<AlphaControlPoint> controlPoints)
         /// <summary>
@@ -304,19 +403,14 @@ namespace MedicalSharp.Controls.Canvases
         /// </summary>
         private AlphaControlPoint FindControlPointAtPosition(Point position)
         {
-            #region # 验证
-
             if (this.Bounds.Width <= 0 || this.Bounds.Height <= 0)
             {
                 return null;
             }
 
-            #endregion
-
             const double hitRadius = 8.0;
             foreach ((AlphaControlPoint controlPoint, Ellipse ellipse) in this._pointToMarker)
             {
-                //取圆圈中心点（Left + 半径, Top + 半径）
                 double centerX = GetLeft(ellipse) + ellipse.Width / 2;
                 double centerY = GetTop(ellipse) + ellipse.Height / 2;
                 double distance = Math.Sqrt((position.X - centerX) * (position.X - centerX) +
@@ -342,6 +436,7 @@ namespace MedicalSharp.Controls.Canvases
         {
             if (!this._initialRendered && eventArgs.NewSize.Width > 0 && eventArgs.NewSize.Height > 0)
             {
+                this.DrawScale();
                 if (this.ControlPoints != null && this.ControlPoints.Count > 0)
                 {
                     this.SyncMarkers(this.ControlPoints);
@@ -433,6 +528,12 @@ namespace MedicalSharp.Controls.Canvases
                 this._draggingPoint.Alpha = alpha;
                 this.UpdatePolyline();
 
+                //更新提示文本
+                this._tooltipText.Text = $"({hu}, {alpha:F2})";
+                Canvas.SetLeft(this._tooltipText, position.X + 12);
+                Canvas.SetTop(this._tooltipText, position.Y - 20);
+                this._tooltipText.IsVisible = true;
+
                 eventArgs.Handled = true;
             }
         }
@@ -445,6 +546,7 @@ namespace MedicalSharp.Controls.Canvases
         private void OnControlPointMouseUp(object sender, PointerReleasedEventArgs e)
         {
             this._draggingPoint = null;
+            this._tooltipText.IsVisible = false;
         }
         #endregion
 
