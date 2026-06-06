@@ -45,6 +45,11 @@ namespace MedicalSharp.Controls.Canvases
 
 
         /// <summary>
+        /// 是否已初始绘制
+        /// </summary>
+        private bool _initialRendered;
+
+        /// <summary>
         /// 当前拖拽的控制点
         /// </summary>
         private AlphaControlPoint _draggingPoint;
@@ -74,6 +79,9 @@ namespace MedicalSharp.Controls.Canvases
                 IsHitTestVisible = false
             };
             this.Children.Add(this._polyline);
+
+            //布局完成后初始绘制
+            this.SizeChanged += this.OnSizeChanged;
 
             //画布鼠标按下事件
             this.PointerPressed += this.OnCanvasPointerPressed;
@@ -243,6 +251,25 @@ namespace MedicalSharp.Controls.Canvases
 
 
         //Events
+
+        #region 尺寸改变事件 —— void OnSizeChanged(object sender, SizeChangedEventArgs eventArgs)
+        /// <summary>
+        /// 尺寸改变事件
+        /// </summary>
+        private void OnSizeChanged(object sender, SizeChangedEventArgs eventArgs)
+        {
+            if (!this._initialRendered && eventArgs.NewSize.Width > 0 && eventArgs.NewSize.Height > 0)
+            {
+                this._initialRendered = true;
+                AvaloniaList<AlphaControlPoint> controlPoints = this.ControlPoints;
+                if (controlPoints != null && controlPoints.Count > 0)
+                {
+                    this.SyncMarkers(controlPoints);
+                    this.UpdateCurve();
+                }
+            }
+        }
+        #endregion
 
         #region 控制点列表改变事件 —— static void OnControlPointsChanged(TransferFunctionCurve control...
         /// <summary>
