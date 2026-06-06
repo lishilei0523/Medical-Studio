@@ -441,6 +441,20 @@ namespace MedicalSharp.Controls.UserControls
                     this.SyncMarkers(this.ControlPoints);
                     this.UpdatePolyline();
                 }
+
+                //设置背景色
+                LinearGradientBrush backgroundBrush = new LinearGradientBrush
+                {
+                    StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+                    EndPoint = new RelativePoint(0, 1, RelativeUnit.Relative),
+                    GradientStops =
+                    {
+                        new GradientStop(Color.FromRgb(15, 15, 15), 0.0),    //底部近黑（Alpha=1.0）
+                        new GradientStop(Color.FromRgb(100, 100, 100), 1.0)  //顶部浅灰（Alpha=0.0）
+                    }
+                };
+                this.Background = backgroundBrush;
+
                 this._initialRendered = true;
             }
         }
