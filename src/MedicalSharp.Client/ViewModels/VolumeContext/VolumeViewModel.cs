@@ -570,7 +570,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             TransferFunctionViewModel viewModel = ResolveMediator.Resolve<TransferFunctionViewModel>();
             await this._windowManager.ShowWindowAsync(viewModel);
-        }, _ => this.VolumeData != null);
+        });
         #endregion
 
         #region 截屏命令 —— ICommand CaptureCommand

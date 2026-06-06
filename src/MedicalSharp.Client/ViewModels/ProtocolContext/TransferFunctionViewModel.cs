@@ -1,6 +1,6 @@
 ﻿using Avalonia.Collections;
 using Caliburn.Micro;
-using MedicalSharp.Primitives.Models;
+using MedicalSharp.Controls.UserControls;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using System.Threading;

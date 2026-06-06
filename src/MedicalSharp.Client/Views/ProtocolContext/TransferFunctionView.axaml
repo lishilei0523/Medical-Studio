@@ -6,12 +6,18 @@
 			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
 			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			  mc:Ignorable="d"
-			  Width="600" Height="560" CanResize="False" ShowAsDialog="True"
+			  Width="600" Height="860" CanResize="False" ShowAsDialog="True"
 			  WindowStartupLocation="CenterScreen"
 			  Title="传递函数">
 
-	<sd:TransferFunctionCanvas Width="550" Height="500" Background="Gray"
-                               ControlPoints="{Binding ControlPoints}">
 
-	</sd:TransferFunctionCanvas>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<sd:ColorBand Grid.Row="0" Width="550" Height="100" />
+		<sd:TransferFunctionCanvas Grid.Row="1" Width="550" Height="500" Background="Gray"
+								   ControlPoints="{Binding ControlPoints}" />
+	</Grid>
 </fa:AppWindow>

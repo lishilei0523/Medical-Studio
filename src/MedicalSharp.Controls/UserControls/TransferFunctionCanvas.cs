@@ -5,13 +5,12 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using MedicalSharp.Primitives.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace MedicalSharp.Controls.Canvases
+namespace MedicalSharp.Controls.UserControls
 {
     /// <summary>
     /// 传递函数Canvas

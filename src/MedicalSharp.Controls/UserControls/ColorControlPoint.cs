@@ -1,9 +1,11 @@
-﻿namespace MedicalSharp.Primitives.Models
+﻿using Avalonia.Media;
+
+namespace MedicalSharp.Controls.UserControls
 {
     /// <summary>
-    /// Alpha控制点
+    /// 颜色控制点
     /// </summary>
-    public class AlphaControlPoint
+    public class ColorControlPoint
     {
         /// <summary>
         /// HU值
@@ -11,8 +13,8 @@
         public short HU { get; set; }
 
         /// <summary>
-        /// 透明度
+        /// 颜色
         /// </summary>
-        public double Alpha { get; set; }
+        public Color Color { get; set; }
     }
 }
