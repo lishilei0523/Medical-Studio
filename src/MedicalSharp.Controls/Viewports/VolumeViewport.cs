@@ -554,21 +554,12 @@ namespace MedicalSharp.Controls.Viewports
         {
             if (eventArgs.OldValue.Value != null)
             {
-                //清除旧元素
-                foreach (DensityControlPoint controlPoint in eventArgs.OldValue.Value)
-                {
-                    viewport._volumeRenderer?.TransferFunction.RemoveControlPoint(controlPoint);
-                }
                 eventArgs.OldValue.Value.CollectionChanged -= viewport.OnTFControlPointsItemChanged;
             }
             if (eventArgs.NewValue.Value != null)
             {
-                //添加新元素
-                foreach (DensityControlPoint controlPoint in eventArgs.NewValue.Value)
-                {
-                    viewport._volumeRenderer?.TransferFunction.AddControlPoint(controlPoint);
-                }
-
+                //重新初始化
+                viewport._volumeRenderer?.TransferFunction.InitFromControlPoints(eventArgs.NewValue.Value);
                 eventArgs.NewValue.Value.CollectionChanged += viewport.OnTFControlPointsItemChanged;
             }
             if (eventArgs.NewValue.Value == null)
