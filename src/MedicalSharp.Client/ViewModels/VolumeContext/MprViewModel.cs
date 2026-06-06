@@ -81,7 +81,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.DirectionVisible = true;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
-            this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.RainbowControlPoints);
+            this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.SolidRainbowControlPoints);
             this.Translate3D();
         }
 

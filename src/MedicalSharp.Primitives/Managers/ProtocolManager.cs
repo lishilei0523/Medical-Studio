@@ -12,14 +12,14 @@ namespace MedicalSharp.Primitives.Managers
         #region # 字段及构造器
 
         /// <summary>
-        /// 彩虹控制点列表
+        /// 固体彩虹控制点列表
         /// </summary>
-        private static readonly HUControlPoint[] _RainbowControlPoints;
+        private static readonly HUControlPoint[] _SolidRainbowControlPoints;
 
         /// <summary>
-        /// 热金属控制点列表
+        /// 固体热金属控制点列表
         /// </summary>
-        private static readonly HUControlPoint[] _HotMetalControlPoints;
+        private static readonly HUControlPoint[] _SolidHotMetalControlPoints;
 
         /// <summary>
         /// 灰度控制点列表
@@ -76,8 +76,8 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         static ProtocolManager()
         {
-            _RainbowControlPoints = GetRainbowControlPoints();
-            _HotMetalControlPoints = GetHotMetalControlPoints();
+            _SolidRainbowControlPoints = GetSolidRainbowControlPoints();
+            _SolidHotMetalControlPoints = GetSolidHotMetalControlPoints();
             _GrayControlPoints = GetGrayControlPoints();
             _AnatomyControlPoints = GetAnatomyControlPoints();
             _BrainControlPoints = GetBrainControlPoints();
@@ -105,23 +105,23 @@ namespace MedicalSharp.Primitives.Managers
 
         #region # 属性
 
-        #region 只读属性 - 彩虹控制点列表 —— static IReadOnlyList<HUControlPoint> RainbowControlPoints
+        #region 只读属性 - 固体彩虹控制点列表 —— static IReadOnlyList<HUControlPoint> SolidRainbowControlPoints
         /// <summary>
-        /// 只读属性 - 彩虹控制点列表
+        /// 只读属性 - 固体彩虹控制点列表
         /// </summary>
-        public static IReadOnlyList<HUControlPoint> RainbowControlPoints
+        public static IReadOnlyList<HUControlPoint> SolidRainbowControlPoints
         {
-            get => _RainbowControlPoints;
+            get => _SolidRainbowControlPoints;
         }
         #endregion 
 
-        #region 只读属性 - 热金属控制点列表 —— static IReadOnlyList<HUControlPoint> HotMetalControlPoints
+        #region 只读属性 - 固体热金属控制点列表 —— static IReadOnlyList<HUControlPoint> SolidHotMetalControlPoints
         /// <summary>
-        /// 只读属性 - 热金属控制点列表
+        /// 只读属性 - 固体热金属控制点列表
         /// </summary>
-        public static IReadOnlyList<HUControlPoint> HotMetalControlPoints
+        public static IReadOnlyList<HUControlPoint> SolidHotMetalControlPoints
         {
-            get => _HotMetalControlPoints;
+            get => _SolidHotMetalControlPoints;
         }
         #endregion 
 
@@ -229,12 +229,12 @@ namespace MedicalSharp.Primitives.Managers
 
         #region # 方法
 
-        #region 获取彩虹控制点列表 —— static HUControlPoint[] GetRainbowControlPoints()
+        #region 获取固体彩虹控制点列表 —— static HUControlPoint[] GetSolidRainbowControlPoints()
         /// <summary>
-        /// 获取彩虹控制点列表
+        /// 获取固体彩虹控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static HUControlPoint[] GetRainbowControlPoints()
+        private static HUControlPoint[] GetSolidRainbowControlPoints()
         {
             HUControlPoint[] controlPoints =
             [
@@ -252,12 +252,12 @@ namespace MedicalSharp.Primitives.Managers
         }
         #endregion
 
-        #region 获取热金属控制点列表 —— static HUControlPoint[] GetHotMetalControlPoints()
+        #region 获取固体热金属控制点列表 —— static HUControlPoint[] GetSolidHotMetalControlPoints()
         /// <summary>
-        /// 获取热金属控制点列表
+        /// 获取固体热金属控制点列表
         /// </summary>
         /// <returns>控制点列表</returns>
-        private static HUControlPoint[] GetHotMetalControlPoints()
+        private static HUControlPoint[] GetSolidHotMetalControlPoints()
         {
             HUControlPoint[] controlPoints =
             [
