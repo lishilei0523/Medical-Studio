@@ -78,8 +78,8 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
             this.AlphaControlPoints =
             [
                 new AlphaControlPoint { HU = -1024, Alpha = 0 },
-                new AlphaControlPoint { HU = 0, Alpha = 0.1 },
-                new AlphaControlPoint { HU = 500, Alpha = 0.5 },
+                new AlphaControlPoint { HU = 0, Alpha = 0.1f },
+                new AlphaControlPoint { HU = 500, Alpha = 0.5f },
                 new AlphaControlPoint { HU = 3071, Alpha = 1 }
             ];
 

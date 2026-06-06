@@ -72,7 +72,7 @@ namespace MedicalSharp.Controls.UserControls
         /// <summary>
         /// 右键位置的Alpha值
         /// </summary>
-        private double _rightClickAlpha;
+        private float _rightClickAlpha;
 
         /// <summary>
         /// 画布右键菜单
@@ -198,7 +198,7 @@ namespace MedicalSharp.Controls.UserControls
             //横轴刻度（每100HU一条线，每500HU显示数字）
             for (int hu = -1000; hu <= 3000; hu += 100)
             {
-                double x = this.HUToCanvasX(hu);
+                float x = this.HUToCanvasX(hu);
 
                 Line tickLine = new Line
                 {
@@ -228,10 +228,10 @@ namespace MedicalSharp.Controls.UserControls
                 }
             }
 
-            //纵轴刻度（0到1，每0.2一条线）
-            for (double alpha = 0.0; alpha <= 1.0; alpha += 0.1)
+            //纵轴刻度（0到1，每0.1一条线）
+            for (float alpha = 0.0f; alpha < 1.1f; alpha += 0.1f)
             {
-                double y = this.AlphaToCanvasY(alpha);
+                float y = this.AlphaToCanvasY(alpha);
                 Line tickLine = new Line
                 {
                     StartPoint = new Point(0, y),
@@ -243,7 +243,7 @@ namespace MedicalSharp.Controls.UserControls
 
                 TextBlock label = new TextBlock
                 {
-                    Text = alpha.ToString("0.0"),
+                    Text = alpha.ToString("F1"),
                     FontSize = 10,
                     Foreground = Brushes.White
                 };
@@ -316,8 +316,8 @@ namespace MedicalSharp.Controls.UserControls
             Points points = [];
             foreach (AlphaControlPoint controlPoint in sortedControlPoints)
             {
-                double x = this.HUToCanvasX(controlPoint.HU);
-                double y = this.AlphaToCanvasY(controlPoint.Alpha);
+                float x = this.HUToCanvasX(controlPoint.HU);
+                float y = this.AlphaToCanvasY(controlPoint.Alpha);
                 Point point = new Point(x, y);
                 points.Add(point);
             }
@@ -326,34 +326,34 @@ namespace MedicalSharp.Controls.UserControls
             //更新圆圈位置（按控制点引用直接定位）
             foreach ((AlphaControlPoint controlPoint, Ellipse ellipse) in this._pointToMarker)
             {
-                double x = this.HUToCanvasX(controlPoint.HU);
-                double y = this.AlphaToCanvasY(controlPoint.Alpha);
+                float x = this.HUToCanvasX(controlPoint.HU);
+                float y = this.AlphaToCanvasY(controlPoint.Alpha);
                 SetLeft(ellipse, x - 5);
                 SetTop(ellipse, y - 5);
             }
         }
         #endregion
 
-        #region HU值转X坐标 —— double HUToCanvasX(int hu)
+        #region HU值转X坐标 —— float HUToCanvasX(int hu)
         /// <summary>
         /// HU值转X坐标
         /// </summary>
-        private double HUToCanvasX(int hu)
+        private float HUToCanvasX(int hu)
         {
             if (this.Bounds.Width <= 0)
             {
                 return 0;
             }
 
-            return (hu * 1.0 - HUMin) / (HUMax - HUMin) * this.Bounds.Width;
+            return (hu * 1.0f - HUMin) / (HUMax - HUMin) * (float)this.Bounds.Width;
         }
         #endregion
 
-        #region X坐标转HU值 —— short CanvasXToHU(double x)
+        #region X坐标转HU值 —— short CanvasXToHU(float x)
         /// <summary>
         /// X坐标转HU值
         /// </summary>
-        private short CanvasXToHU(double x)
+        private short CanvasXToHU(float x)
         {
             if (this.Bounds.Width <= 0)
             {
@@ -366,33 +366,33 @@ namespace MedicalSharp.Controls.UserControls
         }
         #endregion
 
-        #region Alpha值转Y坐标 —— double AlphaToCanvasY(double alpha)
+        #region Alpha值转Y坐标 —— float AlphaToCanvasY(float alpha)
         /// <summary>
         /// Alpha值转Y坐标
         /// </summary>
-        private double AlphaToCanvasY(double alpha)
+        private float AlphaToCanvasY(float alpha)
         {
             if (this.Bounds.Height <= 0)
             {
                 return 0;
             }
 
-            return (1.0 - alpha) * this.Bounds.Height;
+            return (1.0f - alpha) * (float)this.Bounds.Height;
         }
         #endregion
 
-        #region Y坐标转Alpha值 —— double CanvasYToAlpha(double y)
+        #region Y坐标转Alpha值 —— float CanvasYToAlpha(float y)
         /// <summary>
         /// Y坐标转Alpha值
         /// </summary>
-        private double CanvasYToAlpha(double y)
+        private float CanvasYToAlpha(float y)
         {
             if (this.Bounds.Height <= 0)
             {
                 return 0;
             }
 
-            return 1.0 - (y / this.Bounds.Height);
+            return 1.0f - (y / (float)this.Bounds.Height);
         }
         #endregion
 
@@ -402,18 +402,22 @@ namespace MedicalSharp.Controls.UserControls
         /// </summary>
         private AlphaControlPoint FindControlPointAtPosition(Point position)
         {
+            #region # 验证
+
             if (this.Bounds.Width <= 0 || this.Bounds.Height <= 0)
             {
                 return null;
             }
 
-            const double hitRadius = 8.0;
+            #endregion
+
+            const float hitRadius = 8.0f;
             foreach ((AlphaControlPoint controlPoint, Ellipse ellipse) in this._pointToMarker)
             {
-                double centerX = GetLeft(ellipse) + ellipse.Width / 2;
-                double centerY = GetTop(ellipse) + ellipse.Height / 2;
-                double distance = Math.Sqrt((position.X - centerX) * (position.X - centerX) +
-                                            (position.Y - centerY) * (position.Y - centerY));
+                float centerX = (float)(Canvas.GetLeft(ellipse) + ellipse.Width / 2.0);
+                float centerY = (float)(Canvas.GetTop(ellipse) + ellipse.Height / 2.0);
+                float distance = (float)Math.Sqrt((position.X - centerX) * (position.X - centerX) +
+                                                  (position.Y - centerY) * (position.Y - centerY));
                 if (distance <= hitRadius)
                 {
                     return controlPoint;
@@ -532,10 +536,10 @@ namespace MedicalSharp.Controls.UserControls
             {
                 Point position = eventArgs.GetPosition(this);
 
-                short hu = this.CanvasXToHU(position.X);
-                double alpha = this.CanvasYToAlpha(position.Y);
+                short hu = this.CanvasXToHU((float)position.X);
+                float alpha = this.CanvasYToAlpha((float)position.Y);
                 hu = Math.Clamp(hu, HUMin, HUMax);
-                alpha = Math.Clamp(alpha, 0.0, 1.0);
+                alpha = Math.Clamp(alpha, 0.0f, 1.0f);
 
                 this._draggingPoint.HU = hu;
                 this._draggingPoint.Alpha = alpha;
@@ -572,8 +576,8 @@ namespace MedicalSharp.Controls.UserControls
             if (eventArgs.Properties.IsRightButtonPressed)
             {
                 Point position = eventArgs.GetPosition(this);
-                this._rightClickHU = Math.Clamp(this.CanvasXToHU(position.X), HUMin, HUMax);
-                this._rightClickAlpha = Math.Clamp(this.CanvasYToAlpha(position.Y), 0.0, 1.0);
+                this._rightClickHU = Math.Clamp(this.CanvasXToHU((float)position.X), HUMin, HUMax);
+                this._rightClickAlpha = Math.Clamp(this.CanvasYToAlpha((float)position.Y), 0.0f, 1.0f);
 
                 //查找右键位置附近是否有控制点
                 this._rightClickTargetPoint = this.FindControlPointAtPosition(position);

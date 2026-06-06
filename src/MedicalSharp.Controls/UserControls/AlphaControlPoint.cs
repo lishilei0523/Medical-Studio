@@ -13,6 +13,6 @@
         /// <summary>
         /// 透明度
         /// </summary>
-        public double Alpha { get; set; }
+        public float Alpha { get; set; }
     }
 }
