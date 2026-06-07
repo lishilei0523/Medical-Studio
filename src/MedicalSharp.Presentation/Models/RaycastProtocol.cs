@@ -63,11 +63,11 @@ namespace MedicalSharp.Presentation.Models
         public float OpacityThreshold { get; set; }
         #endregion
 
-        #region 控制点列表 —— IList<RaycastProtocolPoint> ControlPoints
+        #region 控制点列表 —— List<RaycastProtocolPoint> ControlPoints
         /// <summary>
         /// 控制点列表
         /// </summary>
-        public IList<RaycastProtocolPoint> ControlPoints { get; set; }
+        public List<RaycastProtocolPoint> ControlPoints { get; set; }
         #endregion
     }
 }
