@@ -85,7 +85,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Shapes = [];
             this.PreviewModeChecked = true;
             this.RaycastChecked = true;
-            this.AxialPlaneVisible = false;
+            this.AxialPlaneVisible = true;
             this.CoronalPlaneVisible = false;
             this.SagittalPlaneVisible = false;
             this.ViewBoxVisible = true;
