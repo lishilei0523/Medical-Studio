@@ -113,20 +113,20 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         public IDictionary<string, DensityControlPoint[]> ControlPointGroups { get; set; }
         #endregion
 
+        #region Alpha控制点列表 —— AvaloniaList<AlphaControlPoint> AlphaControlPoints
+        /// <summary>
+        /// Alpha控制点列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<AlphaControlPoint> AlphaControlPoints { get; set; }
+        #endregion
+
         #region 颜色控制点列表 —— AvaloniaList<ColorControlPoint> ColorControlPoints
         /// <summary>
         /// 颜色控制点列表
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<ColorControlPoint> ColorControlPoints { get; set; }
-        #endregion
-
-        #region 透明度控制点列表 —— AvaloniaList<AlphaControlPoint> AlphaControlPoints
-        /// <summary>
-        /// 透明度控制点列表
-        /// </summary>
-        [DependencyProperty]
-        public AvaloniaList<AlphaControlPoint> AlphaControlPoints { get; set; }
         #endregion
 
         #endregion
