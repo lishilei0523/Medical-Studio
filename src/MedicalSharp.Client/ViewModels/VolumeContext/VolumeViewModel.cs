@@ -562,17 +562,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }, _ => this.VolumeData != null);
         #endregion
 
-        #region 传递函数命令 —— ICommand TransferFunctionCommand
-        /// <summary>
-        /// 传递函数命令
-        /// </summary>
-        public ICommand TransferFunctionCommand => new AsyncRelayCommand(async _ =>
-        {
-            TransferFunctionViewModel viewModel = ResolveMediator.Resolve<TransferFunctionViewModel>();
-            await this._windowManager.ShowWindowAsync(viewModel);
-        });
-        #endregion
-
         #region 截屏命令 —— ICommand CaptureCommand
         /// <summary>
         /// 截屏命令
