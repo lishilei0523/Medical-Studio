@@ -8,11 +8,26 @@ namespace MedicalSharp.Controls.UserControls
     /// </summary>
     public class AlphaControlPoint : INotifyPropertyChanged
     {
+        #region # 字段及构造器
+
         /// <summary>
         /// 属性改变事件
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// 默认构造器
+        /// </summary>
+        public AlphaControlPoint()
+        {
+
+        }
+
+        #endregion
+
+        #region # 属性
+
+        #region HU值 —— short HU
         /// <summary>
         /// HU值
         /// </summary>
@@ -25,7 +40,9 @@ namespace MedicalSharp.Controls.UserControls
                 this.OnPropertyChanged(nameof(this.HU));
             }
         }
+        #endregion
 
+        #region 透明度 —— float Alpha
         /// <summary>
         /// 透明度
         /// </summary>
@@ -38,7 +55,13 @@ namespace MedicalSharp.Controls.UserControls
                 this.OnPropertyChanged(nameof(this.Alpha));
             }
         }
+        #endregion
 
+        #endregion
+
+        #region # 方法
+
+        #region 属性改变事件 —— void OnPropertyChanged(string propertyName = null)
         /// <summary>
         /// 属性改变事件
         /// </summary>
@@ -46,5 +69,8 @@ namespace MedicalSharp.Controls.UserControls
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        #endregion 
+
+        #endregion
     }
 }

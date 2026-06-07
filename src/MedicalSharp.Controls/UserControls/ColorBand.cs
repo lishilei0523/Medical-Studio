@@ -149,8 +149,8 @@ namespace MedicalSharp.Controls.UserControls
             //逐像素绘制渐变
             for (int x = 0; x < (int)this.Bounds.Width; x++)
             {
-                double hu = HUMin + (x / this.Bounds.Width) * (HUMax - HUMin);
-                Color color = this.InterpolateColor(sortedControlPoints, hu);
+                short hu = (short)Math.Round(HUMin + (x / this.Bounds.Width) * (HUMax - HUMin));
+                Color color = ColorControlPoint.InterpolateColor(sortedControlPoints, hu);
 
                 SolidColorBrush brush = new SolidColorBrush(color);
                 Pen pen = new Pen(brush);
@@ -166,47 +166,6 @@ namespace MedicalSharp.Controls.UserControls
                 Pen markerPen = new Pen(Brushes.White, 1);
                 context.DrawEllipse(markerFill, markerPen, new Point(x, y), 4, 4);
             }
-        }
-        #endregion
-
-        #region 插值颜色 —— Color InterpolateColor(IReadOnlyList<ColorControlPoint> points, double hu)
-        /// <summary>
-        /// 插值颜色
-        /// </summary>
-        private Color InterpolateColor(IReadOnlyList<ColorControlPoint> points, double hu)
-        {
-            #region # 验证
-
-            if (!points.Any())
-            {
-                return Colors.Black;
-            }
-            if (hu <= points[0].HU)
-            {
-                return points[0].Color;
-            }
-            if (hu >= points[^1].HU)
-            {
-                return points[^1].Color;
-            }
-            #endregion
-
-            for (int index = 0; index < points.Count - 1; index++)
-            {
-                if (hu >= points[index].HU && hu <= points[index + 1].HU)
-                {
-                    double range = points[index + 1].HU - points[index].HU;
-                    double t = range > 0 ? (hu - points[index].HU) / range : 0.0;
-                    byte r = (byte)(points[index].Color.R + (points[index + 1].Color.R - points[index].Color.R) * t);
-                    byte g = (byte)(points[index].Color.G + (points[index + 1].Color.G - points[index].Color.G) * t);
-                    byte b = (byte)(points[index].Color.B + (points[index + 1].Color.B - points[index].Color.B) * t);
-                    Color color = Color.FromRgb(r, g, b);
-
-                    return color;
-                }
-            }
-
-            return Colors.Black;
         }
         #endregion
 
@@ -386,7 +345,7 @@ namespace MedicalSharp.Controls.UserControls
             }
 
             List<ColorControlPoint> sorted = controlPoints.OrderBy(p => p.HU).ToList();
-            Color currentColor = this.InterpolateColor(sorted, this._rightClickHU);
+            Color currentColor = ColorControlPoint.InterpolateColor(sorted, this._rightClickHU);
 
             Color? selectedColor = await this.ShowColorPicker(currentColor);
             if (selectedColor.HasValue)
