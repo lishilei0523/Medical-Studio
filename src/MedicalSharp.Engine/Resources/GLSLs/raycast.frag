@@ -19,6 +19,8 @@ uniform float u_DensityScale;           //密度缩放
 uniform float u_StepSize;               //步长
 uniform int u_MaxStepsCount;            //最大步数
 uniform float u_OpacityThreshold;       //透明度阈值
+uniform float u_HUMin;
+uniform float u_HUMax;
 
 //预览模式：0=Preview, 1=Original
 uniform int u_PreviewMode;
@@ -149,10 +151,10 @@ void main()
         float medicalValue = getMedicalValue(texCoord);
 
         //应用窗宽窗位
-        float density = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
+        float windowResult = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
 
         //如果密度为负（窗外），跳过这个采样点
-        if (density < 0.0)
+        if (windowResult < 0.0)
         {
             currentPos += step;
             continue;
@@ -166,13 +168,17 @@ void main()
             currentPos += step;
             continue;
         }
+
+        //将HU值映射到传递函数归一化位置
+        float normalizedPosition = (medicalValue - u_HUMin) / (u_HUMax - u_HUMin);
+        normalizedPosition = clamp(normalizedPosition, 0.0, 1.0);
+
+        //采样传递函数
+        vec4 sampleColor = texture(u_TransferFunction, normalizedPosition);
          
         //应用密度缩放
-        density = clamp(density * u_DensityScale, 0.0, 1.0);
-        
-        //采样传递函数
-        vec4 sampleColor = texture(u_TransferFunction, density);
-
+        sampleColor.a *= u_DensityScale;
+  
         //如果透明度很低，跳过
         if (sampleColor.a < 0.01)
         {
@@ -220,7 +226,7 @@ void main()
         }
         if (u_RenderMode == 3)  //MinIP
         {
-            if (density >= 0.1)  
+            if (normalizedPosition >= 0.1)  
             {
                 //有效组织
                 float intensity = (sampleColor.r + sampleColor.g + sampleColor.b) / 3.0;

@@ -70,11 +70,11 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         public AvaloniaList<WindowLevel> WindowLevels { get; set; }
         #endregion
 
-        #region 已选控制点列表 —— {string, DensityControlPoint[]} SelectedControlPoints
+        #region 已选控制点列表 —— {string, HUControlPoint[]} SelectedControlPoints
         /// <summary>
         /// 已选控制点列表
         /// </summary>
-        public KeyValuePair<string, DensityControlPoint[]> SelectedControlPoints
+        public KeyValuePair<string, HUControlPoint[]> SelectedControlPoints
         {
             get;
             set
@@ -83,18 +83,18 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                 this.NotifyOfPropertyChange();
                 if (value.Value != null)
                 {
-                    this.VolumeViewModel?.TFControlPoints = new AvaloniaList<DensityControlPoint>(value.Value);
+                    this.VolumeViewModel?.TFControlPoints = new AvaloniaList<HUControlPoint>(value.Value);
                 }
             }
         }
         #endregion
 
-        #region 预设控制点字典 —— IDictionary<string, DensityControlPoint[]> ControlPointGroups
+        #region 预设控制点字典 —— IDictionary<string, HUControlPoint[]> ControlPointGroups
         /// <summary>
         /// 预设控制点字典
         /// </summary>
         [DependencyProperty]
-        public IDictionary<string, DensityControlPoint[]> ControlPointGroups { get; set; }
+        public IDictionary<string, HUControlPoint[]> ControlPointGroups { get; set; }
         #endregion
 
         #endregion
@@ -122,11 +122,11 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
             ];
             this.SelectedWindowLevel = WindowLevelManager.Default;
 
-            this.ControlPointGroups = new Dictionary<string, DensityControlPoint[]>();
-            KeyValuePair<string, DensityControlPoint[]> defaultControlPoints = new("默认", [.. this.VolumeViewModel.TFControlPoints]);
+            this.ControlPointGroups = new Dictionary<string, HUControlPoint[]>();
+            KeyValuePair<string, HUControlPoint[]> defaultControlPoints = new("默认", [.. this.VolumeViewModel.TFControlPoints]);
             this.ControlPointGroups.Add(defaultControlPoints);
             this.SelectedControlPoints = defaultControlPoints;
-            foreach (KeyValuePair<string, DensityControlPoint[]> controlPoints in ProtocolManager.PresetControlPointGroups)
+            foreach (KeyValuePair<string, HUControlPoint[]> controlPoints in ProtocolManager.PresetControlPointGroups)
             {
                 this.ControlPointGroups.Add(controlPoints);
             }

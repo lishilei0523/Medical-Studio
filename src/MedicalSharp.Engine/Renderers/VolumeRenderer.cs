@@ -112,11 +112,11 @@ namespace MedicalSharp.Engine.Renderers
         public float OpacityThreshold { get; private set; }
         #endregion
 
-        #region 传递函数 —— DensityTransferFunction TransferFunction
+        #region 传递函数 —— HUTransferFunction TransferFunction
         /// <summary>
         /// 传递函数
         /// </summary>
-        public DensityTransferFunction TransferFunction { get; private set; }
+        public HUTransferFunction TransferFunction { get; private set; }
         #endregion
 
         #region 标记策略 —— MarkStrategy MarkStrategy
@@ -202,12 +202,12 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 设置传递函数 —— void SetTransferFunction(DensityTransferFunction transferFunction)
+        #region 设置传递函数 —— void SetTransferFunction(HUTransferFunction transferFunction)
         /// <summary>
         /// 设置传递函数
         /// </summary>
         /// <param name="transferFunction">传递函数</param>
-        public void SetTransferFunction(DensityTransferFunction transferFunction)
+        public void SetTransferFunction(HUTransferFunction transferFunction)
         {
             this.TransferFunction = transferFunction;
         }
@@ -319,6 +319,8 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformFloat("u_StepSize", this.StepSize);
             program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
             program.SetUniformFloat("u_OpacityThreshold", this.OpacityThreshold);
+            program.SetUniformFloat("u_HUMin", this.Renderable.VolumeMetadata.MinHU);
+            program.SetUniformFloat("u_HUMax", this.Renderable.VolumeMetadata.MaxHU);
 
             //设置标记策略
             program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
@@ -506,6 +508,8 @@ namespace MedicalSharp.Engine.Renderers
             pickProgram.SetUniformFloat("u_DensityScale", this.DensityScale);
             pickProgram.SetUniformFloat("u_StepSize", this.StepSize);
             pickProgram.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
+            pickProgram.SetUniformFloat("u_HUMin", this.Renderable.VolumeMetadata.MinHU);
+            pickProgram.SetUniformFloat("u_HUMax", this.Renderable.VolumeMetadata.MaxHU);
 
             //设置标记策略
             pickProgram.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
