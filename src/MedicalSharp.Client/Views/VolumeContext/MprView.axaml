@@ -100,7 +100,7 @@
 					<DropDownButton Content="{Binding Title}" Classes="Transparent-Panel">
 						<DropDownButton.Flyout>
 							<MenuFlyout>
-								<MenuItem Header="预览模式(_P)">
+								<MenuItem Header="预览模式(_P)" IsEnabled="{Binding ViewEnabled}">
 									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="预览模式" GroupName="PreviewMode"
@@ -114,7 +114,7 @@
 										</MenuItem.Header>
 									</MenuItem>
 								</MenuItem>
-								<MenuItem Header="渲染模式(_R)">
+								<MenuItem Header="渲染模式(_R)" IsEnabled="{Binding ViewEnabled}">
 									<MenuItem>
 										<MenuItem.Header>
 											<RadioButton Content="灰度" GroupName="RenderMode" IsChecked="{Binding GrayModeChecked}" />
@@ -126,7 +126,7 @@
 										</MenuItem.Header>
 									</MenuItem>
 								</MenuItem>
-								<MenuItem Header="显示设置(_D)" >
+								<MenuItem Header="显示设置(_D)" IsEnabled="{Binding ViewEnabled}">
 									<MenuItem>
 										<MenuItem.Header>
 											<CheckBox Content="十字线" IsChecked="{Binding CrosshairVisible}" />

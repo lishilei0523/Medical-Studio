@@ -16,7 +16,9 @@ using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Presentation.Events;
+using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
+using MedicalSharp.Primitives;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
@@ -30,9 +32,12 @@ using SD.Infrastructure.Avalonia.Commands;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
+using SD.Toolkits.Json;
 using SkiaSharp;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -80,7 +85,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             //初始化MPR平面
             this.InitMprPlanes();
 
+            //初始化预设协议
+            this.InitPresetProtocols();
+
             //默认值
+            this.ViewEnabled = false;
             this.ToolbarConfig = new VolumeToolbar();
             this.Shapes = [];
             this.PreviewModeChecked = true;
@@ -103,6 +112,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #region # 属性
 
         //属性
+
+        #region 视图是否启用 —— bool ViewEnabled
+        /// <summary>
+        /// 视图是否启用
+        /// </summary>
+        [DependencyProperty]
+        public bool ViewEnabled { get; set; }
+        #endregion
 
         #region 工具栏配置 —— VolumeToolbar ToolbarConfig
         /// <summary>
@@ -336,11 +353,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this.ResetMprPlanes(value);
                 if (value == null)
                 {
+                    this.ViewEnabled = false;
                     this.SelectedShape = null;
                     this.Shapes.Clear();
                 }
                 else
                 {
+                    this.ViewEnabled = true;
                     this.WindowWidth = WindowLevelManager.Default.WindowWidth;
                     this.WindowCenter = WindowLevelManager.Default.WindowCenter;
                 }
@@ -452,9 +471,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public MPRPlaneVisual3D SagittalPlane { get; set; }
         #endregion
 
-        #region 选中的形状 —— ShapeVisual3D SelectedShape
+        #region 已选形状 —— ShapeVisual3D SelectedShape
         /// <summary>
-        /// 选中的形状
+        /// 已选形状
         /// </summary>
         [DependencyProperty]
         public ShapeVisual3D SelectedShape { get; set; }
@@ -466,6 +485,40 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<ShapeVisual3D> Shapes { get; set; }
+        #endregion
+
+        #region 已选协议 —— RaycastProtocol SelectedProtocol
+        /// <summary>
+        /// 已选协议
+        /// </summary>
+        public RaycastProtocol SelectedProtocol
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+
+                //应用协议
+                this.WindowWidth = value.WindowWidth;
+                this.WindowCenter = value.WindowCenter;
+                this.Brightness = value.Brightness;
+                this.DensityScale = value.DensityScale;
+                this.StepSize = value.StepSize;
+                this.MaxStepsCount = value.MaxStepsCount;
+                this.OpacityThreshold = value.OpacityThreshold;
+                this.TFControlPoints = new AvaloniaList<DensityControlPoint>(value.ControlPoints.Select(x => x.ToDensityControlPoint()));
+                this.FrameToken++;
+            }
+        }
+        #endregion
+
+        #region 预设协议列表 —— AvaloniaList<RaycastProtocol> PresetProtocols
+        /// <summary>
+        /// 预设协议列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<RaycastProtocol> PresetProtocols { get; set; }
         #endregion
 
         #region 只读属性 - 体积渲染视口 —— VolumeViewport VolumeViewport
@@ -1353,7 +1406,25 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #endregion
 
 
-        //Private
+        //Methods
+
+        #region 初始化预设协议 —— async Task InitPresetProtocols()
+        /// <summary>
+        /// 初始化预设协议
+        /// </summary>
+        public async Task InitPresetProtocols()
+        {
+            string[] protocolFiles = Directory.GetFiles(Constants.ProtocolPath);
+            List<RaycastProtocol> protocols = [];
+            foreach (string protocolFile in protocolFiles)
+            {
+                string json = await File.ReadAllTextAsync(protocolFile);
+                RaycastProtocol protocol = json.AsJsonTo<RaycastProtocol>();
+                protocols.Add(protocol);
+            }
+            this.PresetProtocols = new AvaloniaList<RaycastProtocol>(protocols);
+        }
+        #endregion
 
         #region 初始化MPR三平面 —— void InitMprPlanes()
         /// <summary>

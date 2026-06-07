@@ -14,18 +14,18 @@ namespace MedicalSharp.Presentation.Models
         public string Name { get; set; }
         #endregion
 
-        #region 窗宽 —— float WindowWidth
+        #region 窗宽 —— int WindowWidth
         /// <summary>
         /// 窗宽
         /// </summary>
-        public float WindowWidth { get; set; }
+        public int WindowWidth { get; set; }
         #endregion
 
-        #region 窗位 —— float WindowCenter
+        #region 窗位 —— int WindowCenter
         /// <summary>
         /// 窗位
         /// </summary>
-        public float WindowCenter { get; set; }
+        public int WindowCenter { get; set; }
         #endregion
 
         #region 亮度 —— float Brightness

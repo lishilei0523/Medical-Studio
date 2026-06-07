@@ -235,14 +235,13 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                     ControlPoints = this.VolumeViewModel.TFControlPoints.Select(x => x.ToRaycastProtocolPoint()).ToList()
                 };
 
-                if (!Directory.Exists(Constants.ProtocolPath))
-                {
-                    Directory.CreateDirectory(Constants.ProtocolPath);
-                }
-
-                string json = protocol.ToJson();
+                //保存文件
                 string path = $"{Constants.ProtocolPath}/{protocol.Name}.json";
+                string json = protocol.ToJson();
                 await File.WriteAllTextAsync(path, json);
+
+                //重新初始化
+                await this.VolumeViewModel.InitPresetProtocols();
 
                 await MessageBox.Show("协议已保存！", "成功");
             }

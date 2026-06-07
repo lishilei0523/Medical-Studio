@@ -1,0 +1,30 @@
+{
+    "Name": "灰度",
+    "WindowWidth": 400,
+    "WindowCenter": 40,
+    "Brightness": 1,
+    "DensityScale": 1,
+    "StepSize": 0.0012,
+    "MaxStepsCount": 1000,
+    "OpacityThreshold": 0.99,
+    "ControlPoints": [
+        {
+            "Position": 0,
+            "Color": {
+                "R": 0,
+                "G": 0,
+                "B": 0,
+                "A": 0
+            }
+        },
+        {
+            "Position": 1,
+            "Color": {
+                "R": 1,
+                "G": 1,
+                "B": 1,
+                "A": 1
+            }
+        }
+    ]
+}

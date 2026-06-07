@@ -72,6 +72,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InputManager = inputManager;
 
             //默认值
+            this.ViewEnabled = false;
             this.ToolbarConfig = new MprToolbar();
             this.Shapes = [];
             this.PreviewModeChecked = true;
@@ -90,6 +91,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         #region # 属性
 
         //属性
+
+        #region 视图是否启用 —— bool ViewEnabled
+        /// <summary>
+        /// 视图是否启用
+        /// </summary>
+        [DependencyProperty]
+        public bool ViewEnabled { get; set; }
+        #endregion
 
         #region 工具栏配置 —— MprToolbar ToolbarConfig
         /// <summary>
@@ -274,11 +283,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this.NotifyOfPropertyChange();
                 if (value == null)
                 {
+                    this.ViewEnabled = false;
                     this.SelectedShape = null;
                     this.Shapes.Clear();
                 }
                 else
                 {
+                    this.ViewEnabled = true;
                     this.WindowWidth = WindowLevelManager.Default.WindowWidth;
                     this.WindowCenter = WindowLevelManager.Default.WindowCenter;
                 }
