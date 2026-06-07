@@ -1,4 +1,8 @@
-﻿// ReSharper disable once CheckNamespace
+﻿
+using System;
+using System.IO;
+
+// ReSharper disable once CheckNamespace
 namespace MedicalSharp.Primitives
 {
     /// <summary>
@@ -19,6 +23,6 @@ namespace MedicalSharp.Primitives
         /// <summary>
         /// 协议路径
         /// </summary>
-        public const string ProtocolPath = "Resources/Protocols";
+        public static readonly string ProtocolPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Protocols");
     }
 }

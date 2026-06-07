@@ -4,14 +4,20 @@ using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.VolumeContext;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.UserControls;
+using MedicalSharp.Presentation.Models;
+using MedicalSharp.Primitives;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
+using SD.Infrastructure.Avalonia.CustomControls;
+using SD.IOC.Core.Mediators;
+using SD.Toolkits.Json;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -204,6 +210,46 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
             }
 
             return base.OnActivatedAsync(cancellationToken);
+        }
+        #endregion
+
+
+        //Actions
+
+        #region 保存协议 —— async Task SaveProtocol()
+        /// <summary>
+        /// 保存协议
+        /// </summary>
+        public async Task SaveProtocol()
+        {
+            SaveProtocolViewModel viewModel = ResolveMediator.Resolve<SaveProtocolViewModel>();
+            bool? result = await this._windowManager.ShowDialogAsync(viewModel);
+            if (result == true)
+            {
+                RaycastProtocol protocol = new RaycastProtocol
+                {
+                    Name = viewModel.ProtocolName,
+                    WindowWidth = this.VolumeViewModel.WindowWidth,
+                    WindowCenter = this.VolumeViewModel.WindowCenter,
+                    Brightness = this.VolumeViewModel.Brightness,
+                    DensityScale = this.VolumeViewModel.DensityScale,
+                    StepSize = this.VolumeViewModel.StepSize,
+                    MaxStepsCount = this.VolumeViewModel.MaxStepsCount,
+                    OpacityThreshold = this.VolumeViewModel.OpacityThreshold,
+                    ControlPoints = this.VolumeViewModel.TFControlPoints.Select(x => new RaycastProtocolPoint(x.Position, x.Color.ToColor4f())).ToList()
+                };
+
+                if (!Directory.Exists(Constants.ProtocolPath))
+                {
+                    Directory.CreateDirectory(Constants.ProtocolPath);
+                }
+
+                string json = protocol.ToJson();
+                string path = $"{Constants.ProtocolPath}/{protocol.Name}.json";
+                await File.WriteAllTextAsync(path, json);
+
+                await MessageBox.Show("协议已保存！", "成功");
+            }
         }
         #endregion
 

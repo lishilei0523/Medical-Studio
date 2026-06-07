@@ -1,5 +1,4 @@
-﻿using MedicalSharp.Primitives.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace MedicalSharp.Presentation.Models
 {
@@ -64,11 +63,11 @@ namespace MedicalSharp.Presentation.Models
         public float OpacityThreshold { get; set; }
         #endregion
 
-        #region 控制点列表 —— IList<DensityControlPoint> ControlPoints
+        #region 控制点列表 —— IList<RaycastProtocolPoint> ControlPoints
         /// <summary>
         /// 控制点列表
         /// </summary>
-        public IList<DensityControlPoint> ControlPoints { get; set; }
+        public IList<RaycastProtocolPoint> ControlPoints { get; set; }
         #endregion
     }
 }
