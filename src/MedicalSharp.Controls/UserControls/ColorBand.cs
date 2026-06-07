@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using MedicalSharp.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -20,16 +21,6 @@ namespace MedicalSharp.Controls.UserControls
         #region # 字段及构造器
 
         /// <summary>
-        /// HU最小值
-        /// </summary>
-        private const short HUMin = -1024;
-
-        /// <summary>
-        /// HU最大值
-        /// </summary>
-        private const short HUMax = 3071;
-
-        /// <summary>
         /// 颜色控制点列表依赖属性
         /// </summary>
         public static readonly StyledProperty<AvaloniaList<ColorControlPoint>> ControlPointsProperty;
@@ -43,6 +34,16 @@ namespace MedicalSharp.Controls.UserControls
             ControlPointsProperty.Changed.AddClassHandler<ColorBand, AvaloniaList<ColorControlPoint>>(OnColorPointsChanged);
         }
 
+
+        /// <summary>
+        /// 右键位置HU值
+        /// </summary>
+        private short _rightClickHU;
+
+        /// <summary>
+        /// 右键位置控制点
+        /// </summary>
+        private ColorControlPoint _rightClickTargetPoint;
 
         /// <summary>
         /// 右键菜单
@@ -63,16 +64,6 @@ namespace MedicalSharp.Controls.UserControls
         /// 删除颜色菜单项
         /// </summary>
         private readonly MenuItem _deleteColorMenuItem;
-
-        /// <summary>
-        /// 右键位置的控制点
-        /// </summary>
-        private ColorControlPoint _rightClickTargetPoint;
-
-        /// <summary>
-        /// 右键位置的HU值
-        /// </summary>
-        private short _rightClickHU;
 
         /// <summary>
         /// 默认构造器
@@ -149,7 +140,7 @@ namespace MedicalSharp.Controls.UserControls
             //逐像素绘制渐变
             for (int x = 0; x < (int)this.Bounds.Width; x++)
             {
-                short hu = (short)Math.Round(HUMin + (x / this.Bounds.Width) * (HUMax - HUMin));
+                short hu = (short)Math.Round(Constants.MinHU + (x / this.Bounds.Width) * (Constants.MaxHU - Constants.MinHU));
                 Color color = ColorControlPoint.InterpolateColor(sortedControlPoints, hu);
 
                 SolidColorBrush brush = new SolidColorBrush(color);
@@ -160,7 +151,7 @@ namespace MedicalSharp.Controls.UserControls
             //绘制控制点标记
             foreach (ColorControlPoint point in sortedControlPoints)
             {
-                double x = (point.HU - HUMin) / (double)(HUMax - HUMin) * this.Bounds.Width;
+                double x = (point.HU - Constants.MinHU) / (double)(Constants.MaxHU - Constants.MinHU) * this.Bounds.Width;
                 double y = this.Bounds.Height / 2;
                 SolidColorBrush markerFill = new SolidColorBrush(point.Color);
                 Pen markerPen = new Pen(Brushes.White, 1);
@@ -187,7 +178,7 @@ namespace MedicalSharp.Controls.UserControls
             const double hitRadius = 6.0;
             foreach (ColorControlPoint point in this.ControlPoints)
             {
-                double x = (point.HU - HUMin) / (double)(HUMax - HUMin) * this.Bounds.Width;
+                double x = (point.HU - Constants.MinHU) / (double)(Constants.MaxHU - Constants.MinHU) * this.Bounds.Width;
                 double distance = Math.Abs(position.X - x);
                 if (distance <= hitRadius)
                 {
@@ -298,7 +289,7 @@ namespace MedicalSharp.Controls.UserControls
             if (eventArgs.Properties.IsRightButtonPressed)
             {
                 Point position = eventArgs.GetPosition(this);
-                this._rightClickHU = (short)(HUMin + (position.X / this.Bounds.Width) * (HUMax - HUMin));
+                this._rightClickHU = (short)(Constants.MinHU + (position.X / this.Bounds.Width) * (Constants.MaxHU - Constants.MinHU));
                 this._rightClickTargetPoint = this.FindControlPointAtPosition(position);
 
                 this._editColorMenuItem.IsEnabled = this._rightClickTargetPoint != null;

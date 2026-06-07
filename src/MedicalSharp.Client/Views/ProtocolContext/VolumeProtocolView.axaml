@@ -24,12 +24,12 @@
                 </sd:FormItem>
                 <sd:FormItem Label="窗宽：">
                     <NumericUpDown Width="300" HorizontalAlignment="Left"
-                                   Minimum="1" Maximum="4095" Increment="1"
+                                   Minimum="1" Maximum="4096" Increment="1"
                                    ParsingNumberStyle="Integer" FormatString="F0"
                                    Text="{Binding VolumeViewModel.WindowWidth}" />
                 </sd:FormItem>
                 <sd:FormItem>
-                    <Slider Minimum="1" Maximum="4095" SmallChange="1" LargeChange="10"
+                    <Slider Minimum="1" Maximum="4096" SmallChange="1" LargeChange="10"
                             TickFrequency="100" TickPlacement="TopLeft"
                             Value="{Binding VolumeViewModel.WindowWidth}" />
                 </sd:FormItem>

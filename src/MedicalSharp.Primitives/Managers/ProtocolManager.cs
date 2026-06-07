@@ -136,9 +136,7 @@ namespace MedicalSharp.Primitives.Managers
         /// <returns>Density值(0~1)</returns>
         public static float HUToDensity(short hu)
         {
-            const short huMin = -1024;
-            const short huMax = 3071;
-            float density = (hu - huMin) / (float)(huMax - huMin);
+            float density = (hu - Constants.MinHU) / (float)(Constants.MaxHU - Constants.MinHU);
 
             return density;
         }
@@ -152,9 +150,7 @@ namespace MedicalSharp.Primitives.Managers
         /// <returns>HU值</returns>
         public static short DensityToHU(float density)
         {
-            const short huMin = -1024;
-            const short huMax = 3071;
-            short hu = (short)Math.Round(huMin + density * (huMax - huMin));
+            short hu = (short)Math.Round(Constants.MinHU + density * (Constants.MaxHU - Constants.MinHU));
 
             return hu;
         }
@@ -169,14 +165,14 @@ namespace MedicalSharp.Primitives.Managers
         {
             HUControlPoint[] controlPoints =
             [
-                new(-1024, new Vector4(0.0f, 0.0f, 0.5f, 1.0f)),  //深蓝 - 空气
-                new(-800, new Vector4(0.0f, 0.0f, 1.0f, 1.0f)),   //蓝 - 肺
-                new(-400, new Vector4(0.0f, 0.8f, 0.8f, 1.0f)),   //青 - 肺纹理
-                new(0, new Vector4(0.0f, 1.0f, 0.0f, 1.0f)),      //绿 - 水/软组织
-                new(100, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),    //黄 - 肌肉
-                new(400, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 松质骨
-                new(1000, new Vector4(1.0f, 0.0f, 0.0f, 1.0f)),   //红 - 密质骨
-                new(3071, new Vector4(0.8f, 0.0f, 0.0f, 1.0f))    //深红 - 致密骨/金属
+                new HUControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.5f, 1.0f)),  //深蓝 - 空气
+                new HUControlPoint(-800, new Vector4(0.0f, 0.0f, 1.0f, 1.0f)),   //蓝 - 肺
+                new HUControlPoint(-400, new Vector4(0.0f, 0.8f, 0.8f, 1.0f)),   //青 - 肺纹理
+                new HUControlPoint(0, new Vector4(0.0f, 1.0f, 0.0f, 1.0f)),      //绿 - 水/软组织
+                new HUControlPoint(100, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),    //黄 - 肌肉
+                new HUControlPoint(400, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 松质骨
+                new HUControlPoint(1000, new Vector4(1.0f, 0.0f, 0.0f, 1.0f)),   //红 - 密质骨
+                new HUControlPoint(3071, new Vector4(0.8f, 0.0f, 0.0f, 1.0f))    //深红 - 致密骨/金属
             ];
 
             return controlPoints;
@@ -192,14 +188,14 @@ namespace MedicalSharp.Primitives.Managers
         {
             HUControlPoint[] controlPoints =
             [
-                new(-1024, new Vector4(0.0f, 0.0f, 0.0f, 1.0f)),  //黑 - 空气
-                new(-400, new Vector4(0.3f, 0.0f, 0.0f, 1.0f)),   //暗红 - 肺
-                new(0, new Vector4(0.8f, 0.2f, 0.0f, 1.0f)),      //红 - 软组织
-                new(200, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 肌肉
-                new(500, new Vector4(1.0f, 0.8f, 0.0f, 1.0f)),    //橙黄 - 松质骨
-                new(1000, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),   //黄 - 密质骨
-                new(2000, new Vector4(1.0f, 1.0f, 0.5f, 1.0f)),   //浅黄 - 致密骨
-                new(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))    //白 - 金属
+                new HUControlPoint(-1024, new Vector4(0.0f, 0.0f, 0.0f, 1.0f)),  //黑 - 空气
+                new HUControlPoint(-400, new Vector4(0.3f, 0.0f, 0.0f, 1.0f)),   //暗红 - 肺
+                new HUControlPoint(0, new Vector4(0.8f, 0.2f, 0.0f, 1.0f)),      //红 - 软组织
+                new HUControlPoint(200, new Vector4(1.0f, 0.5f, 0.0f, 1.0f)),    //橙 - 肌肉
+                new HUControlPoint(500, new Vector4(1.0f, 0.8f, 0.0f, 1.0f)),    //橙黄 - 松质骨
+                new HUControlPoint(1000, new Vector4(1.0f, 1.0f, 0.0f, 1.0f)),   //黄 - 密质骨
+                new HUControlPoint(2000, new Vector4(1.0f, 1.0f, 0.5f, 1.0f)),   //浅黄 - 致密骨
+                new HUControlPoint(3071, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))    //白 - 金属
             ];
 
             return controlPoints;
@@ -215,8 +211,8 @@ namespace MedicalSharp.Primitives.Managers
         {
             DensityControlPoint[] controlPoints =
             [
-                new(0.0f, new Vector4(0.0f, 0.0f, 0.0f, 0.0f)),
-                new(1.0f, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))
+                new DensityControlPoint(0.0f, new Vector4(0.0f, 0.0f, 0.0f, 0.0f)),
+                new DensityControlPoint(1.0f, new Vector4(1.0f, 1.0f, 1.0f, 1.0f))
             ];
 
             return controlPoints;

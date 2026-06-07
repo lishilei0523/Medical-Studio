@@ -1,6 +1,6 @@
 ﻿using itk.simple;
 using MedicalSharp.Insight.Models;
-using MedicalSharp.Primitives.Constants;
+using MedicalSharp.Primitives;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;

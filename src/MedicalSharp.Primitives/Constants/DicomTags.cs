@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 
-namespace MedicalSharp.Primitives.Constants
+// ReSharper disable once CheckNamespace
+namespace MedicalSharp.Primitives
 {
     /// <summary>
     /// DICOM标准常量
