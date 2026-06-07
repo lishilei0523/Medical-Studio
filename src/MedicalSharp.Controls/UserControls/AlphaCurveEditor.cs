@@ -547,7 +547,7 @@ namespace MedicalSharp.Controls.UserControls
 
                 //更新提示文本
                 this._controlPointTooltip.Text = $"({hu}, {alpha:F2})";
-                Canvas.SetLeft(this._controlPointTooltip, position.X + 12);
+                Canvas.SetLeft(this._controlPointTooltip, position.X - 20);
                 Canvas.SetTop(this._controlPointTooltip, position.Y - 20);
                 this._controlPointTooltip.IsVisible = true;
 

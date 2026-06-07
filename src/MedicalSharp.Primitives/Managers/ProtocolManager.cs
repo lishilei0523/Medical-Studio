@@ -1,5 +1,6 @@
 ﻿using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 
 namespace MedicalSharp.Primitives.Managers
@@ -126,6 +127,38 @@ namespace MedicalSharp.Primitives.Managers
         #endregion
 
         #region # 方法
+
+        #region HU值转Density —— static float HUToDensity(short hu)
+        /// <summary>
+        /// HU值转Density
+        /// </summary>
+        /// <param name="hu">HU值</param>
+        /// <returns>Density值(0~1)</returns>
+        public static float HUToDensity(short hu)
+        {
+            const short huMin = -1024;
+            const short huMax = 3071;
+            float density = (hu - huMin) / (float)(huMax - huMin);
+
+            return density;
+        }
+        #endregion
+
+        #region Density转HU值 —— static short DensityToHU(float density)
+        /// <summary>
+        /// Density转HU值
+        /// </summary>
+        /// <param name="density">Density值(0~1)</param>
+        /// <returns>HU值</returns>
+        public static short DensityToHU(float density)
+        {
+            const short huMin = -1024;
+            const short huMax = 3071;
+            short hu = (short)Math.Round(huMin + density * (huMax - huMin));
+
+            return hu;
+        }
+        #endregion
 
         #region 获取固体彩虹控制点列表 —— static HUControlPoint[] GetSolidRainbowControlPoints()
         /// <summary>

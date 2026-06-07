@@ -1,11 +1,14 @@
 ﻿using Avalonia.Collections;
 using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.VolumeContext;
+using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.UserControls;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -84,6 +87,19 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                 if (value.Value != null)
                 {
                     this.VolumeViewModel?.TFControlPoints = new AvaloniaList<DensityControlPoint>(value.Value);
+
+                    IEnumerable<AlphaControlPoint> alphaControlPoints = value.Value.Select(x => new AlphaControlPoint
+                    {
+                        HU = ProtocolManager.DensityToHU(x.Position),
+                        Alpha = x.Color.W
+                    });
+                    IEnumerable<ColorControlPoint> colorControlPoints = value.Value.Select(x => new ColorControlPoint
+                    {
+                        HU = ProtocolManager.DensityToHU(x.Position),
+                        Color = x.Color.ToSolidColor()
+                    });
+                    this.AlphaControlPoints = new AvaloniaList<AlphaControlPoint>(alphaControlPoints);
+                    this.ColorControlPoints = new AvaloniaList<ColorControlPoint>(colorControlPoints);
                 }
             }
         }
@@ -95,6 +111,22 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         /// </summary>
         [DependencyProperty]
         public IDictionary<string, DensityControlPoint[]> ControlPointGroups { get; set; }
+        #endregion
+
+        #region 颜色控制点列表 —— AvaloniaList<ColorControlPoint> ColorControlPoints
+        /// <summary>
+        /// 颜色控制点列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<ColorControlPoint> ColorControlPoints { get; set; }
+        #endregion
+
+        #region 透明度控制点列表 —— AvaloniaList<AlphaControlPoint> AlphaControlPoints
+        /// <summary>
+        /// 透明度控制点列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<AlphaControlPoint> AlphaControlPoints { get; set; }
         #endregion
 
         #endregion

@@ -1,103 +1,123 @@
 <fa:AppWindow x:Class="MedicalSharp.Client.Views.ProtocolContext.VolumeProtocolView"
-			  xmlns="https://github.com/avaloniaui"
-			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
-			  mc:Ignorable="d"
-			  Width="700" Height="940" CanResize="False" ShowAsDialog="True"
-			  WindowStartupLocation="CenterScreen"
-			  Title="体积渲染协议">
-	
-		<StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
-            <sd:FormItem Label="预设窗：">
-                <ComboBox Width="240" ItemsSource="{Binding WindowLevels}"
-                          DisplayMemberBinding="{Binding}"
-                          SelectedValue="{Binding SelectedWindowLevel}" />
-            </sd:FormItem>
-            <sd:FormItem Label="预设控制点：">
-                <ComboBox Width="240" ItemsSource="{Binding ControlPointGroups}"
-                          DisplayMemberBinding="{Binding Key}"
-                          SelectedValue="{Binding SelectedControlPoints}" />
-            </sd:FormItem>
-            <sd:FormItem Label="窗宽：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="1" Maximum="4095" Increment="1"
-                               ParsingNumberStyle="Integer" FormatString="F0"
-                               Text="{Binding VolumeViewModel.WindowWidth}" />
-            </sd:FormItem>
-            <sd:FormItem>
-				<Slider Minimum="1" Maximum="4095" SmallChange="1" LargeChange="10"
-                        TickFrequency="100" TickPlacement="TopLeft"
-                        Value="{Binding VolumeViewModel.WindowWidth}" />
-			</sd:FormItem>
-            <sd:FormItem Label="窗位：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="-1024" Maximum="3071" Increment="1"
-                               ParsingNumberStyle="Integer" FormatString="F0"
-                               Text="{Binding VolumeViewModel.WindowCenter}" />
-            </sd:FormItem>
-			<sd:FormItem>
-                <Slider Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
-                        TickFrequency="100" TickPlacement="TopLeft"
-                        Value="{Binding VolumeViewModel.WindowCenter}" />
-			</sd:FormItem>
-            <sd:FormItem Label="亮度：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="0.1" Maximum="5.0" Increment="0.1"
-                               ParsingNumberStyle="Float" FormatString="F2"
-                               Text="{Binding VolumeViewModel.Brightness}" />
-            </sd:FormItem>
-			<sd:FormItem>
-                <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
-                        TickFrequency="0.1" TickPlacement="TopLeft"
-                        Value="{Binding VolumeViewModel.Brightness}" />
-			</sd:FormItem>
-            <sd:FormItem Label="密度缩放：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="0.1" Maximum="5.0" Increment="0.1"
-                               ParsingNumberStyle="Float" FormatString="F2"
-                               Text="{Binding VolumeViewModel.DensityScale}" />
-            </sd:FormItem>
-			<sd:FormItem>
-                <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="0.5"
-                        TickFrequency="0.1" TickPlacement="TopLeft"
-                        Value="{Binding VolumeViewModel.DensityScale}" />
-			</sd:FormItem>
+              xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+              xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+              mc:Ignorable="d"
+              Width="1440" Height="900" CanResize="False" ShowAsDialog="True"
+              WindowStartupLocation="CenterScreen"
+              Title="体积渲染协议">
 
-            <sd:FormItem Label="步长：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="0.0001" Maximum="0.01" Increment="0.0001"
-                               ParsingNumberStyle="Float" FormatString="F4"
-                               Text="{Binding VolumeViewModel.StepSize}" />
-            </sd:FormItem>
-            <sd:FormItem>
-                <Slider Minimum="0.0001" Maximum="0.01" SmallChange="0.0001" LargeChange="0.001"
-                        TickFrequency="0.0002" TickPlacement="TopLeft"
-                        Value="{Binding VolumeViewModel.StepSize}" />
-            </sd:FormItem>
-            <sd:FormItem Label="最大步数：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="100" Maximum="3000" Increment="1"
-                               ParsingNumberStyle="Integer" FormatString="F0"
-                               Text="{Binding VolumeViewModel.MaxStepsCount}" />
-            </sd:FormItem>
-            <sd:FormItem>
-                <Slider Minimum="100" Maximum="3000" SmallChange="50" LargeChange="200"
-                        TickFrequency="60" TickPlacement="TopLeft"
-                        Value="{Binding VolumeViewModel.MaxStepsCount}" />
-            </sd:FormItem>
-            <sd:FormItem Label="透明度阈值：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="0.5" Maximum="1.0" Increment="0.01"
-                               ParsingNumberStyle="Float" FormatString="F2"
-                               Text="{Binding VolumeViewModel.OpacityThreshold}" />
-            </sd:FormItem>
-            <sd:FormItem>
-                <Slider Minimum="0.5" Maximum="1.0" SmallChange="0.01" LargeChange="0.05"
-                        TickFrequency="0.01" TickPlacement="TopLeft"
-                        Value="{Binding VolumeViewModel.OpacityThreshold}" />
-            </sd:FormItem>
-		</StackPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <sd:GroupBox Grid.Column="0" Header="传递函数" Margin="4,4,2,4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions><StackPanel Grid.IsSharedSizeScope="True" Margin="20,20,0,0">
+                    <sd:FormItem Label="预设控制点：">
+                        <ComboBox Width="300" ItemsSource="{Binding ControlPointGroups}"
+                                  DisplayMemberBinding="{Binding Key}"
+                                  SelectedValue="{Binding SelectedControlPoints}" />
+                    </sd:FormItem>
+                </StackPanel>
+                <sd:ColorBand Grid.Row="1" Width="650" Height="50" Margin="0,0,0,-2" ControlPoints="{Binding ColorControlPoints}" />
+                <sd:AlphaCurveEditor Grid.Row="2" Width="650" Height="700" ControlPoints="{Binding AlphaControlPoints}" />
+            </Grid>
+        </sd:GroupBox>
+        <sd:GroupBox Grid.Column="1" Header="参数设置" Margin="2,4,4,4">
+            <StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
+                <sd:FormItem Label="预设窗：">
+                    <ComboBox Width="240" ItemsSource="{Binding WindowLevels}"
+                              DisplayMemberBinding="{Binding}"
+                              SelectedValue="{Binding SelectedWindowLevel}" />
+                </sd:FormItem>
+                <sd:FormItem Label="窗宽：">
+                    <NumericUpDown Width="240" HorizontalAlignment="Left"
+                                   Minimum="1" Maximum="4095" Increment="1"
+                                   ParsingNumberStyle="Integer" FormatString="F0"
+                                   Text="{Binding VolumeViewModel.WindowWidth}" />
+                </sd:FormItem>
+                <sd:FormItem>
+                    <Slider Minimum="1" Maximum="4095" SmallChange="1" LargeChange="10"
+                            TickFrequency="100" TickPlacement="TopLeft"
+                            Value="{Binding VolumeViewModel.WindowWidth}" />
+                </sd:FormItem>
+                <sd:FormItem Label="窗位：">
+                    <NumericUpDown Width="240" HorizontalAlignment="Left"
+                                   Minimum="-1024" Maximum="3071" Increment="1"
+                                   ParsingNumberStyle="Integer" FormatString="F0"
+                                   Text="{Binding VolumeViewModel.WindowCenter}" />
+                </sd:FormItem>
+                <sd:FormItem>
+                    <Slider Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
+                            TickFrequency="100" TickPlacement="TopLeft"
+                            Value="{Binding VolumeViewModel.WindowCenter}" />
+                </sd:FormItem>
+                <sd:FormItem Label="亮度：">
+                    <NumericUpDown Width="240" HorizontalAlignment="Left"
+                                   Minimum="0.1" Maximum="5.0" Increment="0.1"
+                                   ParsingNumberStyle="Float" FormatString="F2"
+                                   Text="{Binding VolumeViewModel.Brightness}" />
+                </sd:FormItem>
+                <sd:FormItem>
+                    <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
+                            TickFrequency="0.1" TickPlacement="TopLeft"
+                            Value="{Binding VolumeViewModel.Brightness}" />
+                </sd:FormItem>
+                <sd:FormItem Label="密度缩放：">
+                    <NumericUpDown Width="240" HorizontalAlignment="Left"
+                                   Minimum="0.1" Maximum="5.0" Increment="0.1"
+                                   ParsingNumberStyle="Float" FormatString="F2"
+                                   Text="{Binding VolumeViewModel.DensityScale}" />
+                </sd:FormItem>
+                <sd:FormItem>
+                    <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="0.5"
+                            TickFrequency="0.1" TickPlacement="TopLeft"
+                            Value="{Binding VolumeViewModel.DensityScale}" />
+                </sd:FormItem>
+
+                <sd:FormItem Label="步长：">
+                    <NumericUpDown Width="240" HorizontalAlignment="Left"
+                                   Minimum="0.0001" Maximum="0.01" Increment="0.0001"
+                                   ParsingNumberStyle="Float" FormatString="F4"
+                                   Text="{Binding VolumeViewModel.StepSize}" />
+                </sd:FormItem>
+                <sd:FormItem>
+                    <Slider Minimum="0.0001" Maximum="0.01" SmallChange="0.0001" LargeChange="0.001"
+                            TickFrequency="0.0002" TickPlacement="TopLeft"
+                            Value="{Binding VolumeViewModel.StepSize}" />
+                </sd:FormItem>
+                <sd:FormItem Label="最大步数：">
+                    <NumericUpDown Width="240" HorizontalAlignment="Left"
+                                   Minimum="100" Maximum="3000" Increment="1"
+                                   ParsingNumberStyle="Integer" FormatString="F0"
+                                   Text="{Binding VolumeViewModel.MaxStepsCount}" />
+                </sd:FormItem>
+                <sd:FormItem>
+                    <Slider Minimum="100" Maximum="3000" SmallChange="50" LargeChange="200"
+                            TickFrequency="60" TickPlacement="TopLeft"
+                            Value="{Binding VolumeViewModel.MaxStepsCount}" />
+                </sd:FormItem>
+                <sd:FormItem Label="透明度阈值：">
+                    <NumericUpDown Width="240" HorizontalAlignment="Left"
+                                   Minimum="0.5" Maximum="1.0" Increment="0.01"
+                                   ParsingNumberStyle="Float" FormatString="F2"
+                                   Text="{Binding VolumeViewModel.OpacityThreshold}" />
+                </sd:FormItem>
+                <sd:FormItem>
+                    <Slider Minimum="0.5" Maximum="1.0" SmallChange="0.01" LargeChange="0.05"
+                            TickFrequency="0.01" TickPlacement="TopLeft"
+                            Value="{Binding VolumeViewModel.OpacityThreshold}" />
+                </sd:FormItem>
+            </StackPanel>
+        </sd:GroupBox>
+    </Grid>
 </fa:AppWindow>

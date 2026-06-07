@@ -67,6 +67,20 @@ namespace MedicalSharp.Controls.Extensions
         }
         #endregion
 
+        #region # Vector4转Color —— static Color ToSolidColor(this in Vector4 vector4)
+        /// <summary>
+        /// Vector4转Color
+        /// </summary>
+        public static Color ToSolidColor(this in Vector4 vector4)
+        {
+            byte r = (byte)Math.Floor(vector4.X * 255.0f);
+            byte g = (byte)Math.Floor(vector4.Y * 255.0f);
+            byte b = (byte)Math.Floor(vector4.Z * 255.0f);
+
+            return new Color(255, r, g, b);
+        }
+        #endregion
+
         #region # Point转Vector2 —— static Vector2 ToVector2(this in Point point)
         /// <summary>
         /// Point转Vector2
