@@ -81,26 +81,6 @@ namespace MedicalSharp.Controls.Extensions
         }
         #endregion
 
-        #region # Color4f转Vector4 —— static Vector4 ToVector4(this Color4f color)
-        /// <summary>
-        /// Color4f转Vector4
-        /// </summary>
-        public static Vector4 ToVector4(this Color4f color)
-        {
-            return new Vector4(color.R, color.G, color.B, color.A);
-        }
-        #endregion
-
-        #region # Vector4转Color4f —— static Color4f ToColor4f(this in Vector4 vector4)
-        /// <summary>
-        /// Vector4转Color4f
-        /// </summary>
-        public static Color4f ToColor4f(this in Vector4 vector4)
-        {
-            return new Color4f(vector4.X, vector4.Y, vector4.Z, vector4.W);
-        }
-        #endregion
-
         #region # Point转Vector2 —— static Vector2 ToVector2(this in Point point)
         /// <summary>
         /// Point转Vector2

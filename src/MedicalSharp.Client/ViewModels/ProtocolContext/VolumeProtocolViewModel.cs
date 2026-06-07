@@ -4,6 +4,7 @@ using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.VolumeContext;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.UserControls;
+using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives;
 using MedicalSharp.Primitives.Managers;
@@ -177,8 +178,6 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
 
         #region # 方法
 
-        //Initializations
-
         #region 初始化 —— override Task OnActivatedAsync(CancellationToken cancellationToken)
         /// <summary>
         /// 初始化
@@ -213,9 +212,6 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         }
         #endregion
 
-
-        //Actions
-
         #region 保存协议 —— async Task SaveProtocol()
         /// <summary>
         /// 保存协议
@@ -236,7 +232,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                     StepSize = this.VolumeViewModel.StepSize,
                     MaxStepsCount = this.VolumeViewModel.MaxStepsCount,
                     OpacityThreshold = this.VolumeViewModel.OpacityThreshold,
-                    ControlPoints = this.VolumeViewModel.TFControlPoints.Select(x => new RaycastProtocolPoint(x.Position, x.Color.ToColor4f())).ToList()
+                    ControlPoints = this.VolumeViewModel.TFControlPoints.Select(x => x.ToRaycastProtocolPoint()).ToList()
                 };
 
                 if (!Directory.Exists(Constants.ProtocolPath))
@@ -253,8 +249,47 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         }
         #endregion
 
+        #region 同步到体积渲染视图模型 —— void SyncToVolumeViewModel()
+        /// <summary>
+        /// 同步到体积渲染视图模型
+        /// </summary>
+        private void SyncToVolumeViewModel()
+        {
+            #region # 验证
 
-        //Events
+            if (this.AlphaControlPoints == null || this.ColorControlPoints == null)
+            {
+                return;
+            }
+            if (!this.AlphaControlPoints.Any() || !this.ColorControlPoints.Any())
+            {
+                return;
+            }
+
+            #endregion
+
+            //按HU值排序的Alpha控制点
+            List<AlphaControlPoint> sortedAlphas = this.AlphaControlPoints.OrderBy(x => x.HU).ToList();
+            List<ColorControlPoint> sortedColors = this.ColorControlPoints.OrderBy(x => x.HU).ToList();
+            List<DensityControlPoint> densityControlPoints = [];
+            foreach (AlphaControlPoint alphaControlPoint in sortedAlphas)
+            {
+                //在颜色控制点中插值该HU位置的颜色
+                Color interpolatedColor = ColorControlPoint.InterpolateColor(sortedColors, alphaControlPoint.HU);
+                Vector4 color = new Vector4(
+                    interpolatedColor.R / 255f,
+                    interpolatedColor.G / 255f,
+                    interpolatedColor.B / 255f,
+                    alphaControlPoint.Alpha);
+
+                float density = ProtocolManager.HUToDensity(alphaControlPoint.HU);
+                DensityControlPoint densityControlPoint = new DensityControlPoint(density, color);
+                densityControlPoints.Add(densityControlPoint);
+            }
+
+            this.VolumeViewModel.TFControlPoints = new AvaloniaList<DensityControlPoint>(densityControlPoints);
+        }
+        #endregion
 
         #region Alpha控制点列表元素改变事件 —— void OnAlphaControlPointsCollectionChanged(object sender...
         /// <summary>
@@ -313,51 +348,6 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         private void OnControlPointPropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
         {
             this.SyncToVolumeViewModel();
-        }
-        #endregion
-
-
-        //Private
-
-        #region 同步到体积渲染视图模型 —— void SyncToVolumeViewModel()
-        /// <summary>
-        /// 同步到体积渲染视图模型
-        /// </summary>
-        private void SyncToVolumeViewModel()
-        {
-            #region # 验证
-
-            if (this.AlphaControlPoints == null || this.ColorControlPoints == null)
-            {
-                return;
-            }
-            if (!this.AlphaControlPoints.Any() || !this.ColorControlPoints.Any())
-            {
-                return;
-            }
-
-            #endregion
-
-            //按HU值排序的Alpha控制点
-            List<AlphaControlPoint> sortedAlphas = this.AlphaControlPoints.OrderBy(x => x.HU).ToList();
-            List<ColorControlPoint> sortedColors = this.ColorControlPoints.OrderBy(x => x.HU).ToList();
-            List<DensityControlPoint> densityControlPoints = [];
-            foreach (AlphaControlPoint alphaControlPoint in sortedAlphas)
-            {
-                //在颜色控制点中插值该HU位置的颜色
-                Color interpolatedColor = ColorControlPoint.InterpolateColor(sortedColors, alphaControlPoint.HU);
-                Vector4 color = new Vector4(
-                    interpolatedColor.R / 255f,
-                    interpolatedColor.G / 255f,
-                    interpolatedColor.B / 255f,
-                    alphaControlPoint.Alpha);
-
-                float density = ProtocolManager.HUToDensity(alphaControlPoint.HU);
-                DensityControlPoint densityControlPoint = new DensityControlPoint(density, color);
-                densityControlPoints.Add(densityControlPoint);
-            }
-
-            this.VolumeViewModel.TFControlPoints = new AvaloniaList<DensityControlPoint>(densityControlPoints);
         }
         #endregion
 
