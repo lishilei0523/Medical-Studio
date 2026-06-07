@@ -19,8 +19,6 @@ uniform float u_Brightness;             //亮度
 uniform float u_DensityScale;           //密度缩放
 uniform float u_StepSize;               //步长
 uniform int u_MaxStepsCount;            //最大步数
-uniform float u_HUMin;
-uniform float u_HUMax;
 
 //预览模式：0=Preview, 1=Original
 uniform int u_PreviewMode;
@@ -155,25 +153,21 @@ void main()
         float medicalValue = getMedicalValue(texCoord);
         
         //应用窗宽窗位
-        float windowResult = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
+        float density = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
         
         //如果密度为负（窗外），跳过这个采样点
-        if (windowResult < 0.0)
+        if (density < 0.0)
         {
             currentPos += step;
             continue;
         }
-
-        //将HU值映射到传递函数归一化位置
-        float normalizedPosition = (medicalValue - u_HUMin) / (u_HUMax - u_HUMin);
-        normalizedPosition = clamp(normalizedPosition, 0.0, 1.0);
-
-        //采样传递函数
-        vec4 sampleColor = texture(u_TransferFunction, normalizedPosition);
         
         //应用密度缩放
-        sampleColor.a *= u_DensityScale;       
-
+        density = clamp(density * u_DensityScale, 0.0, 1.0);
+        
+        //采样传递函数
+        vec4 sampleColor = texture(u_TransferFunction, density);
+        
         //如果透明度很低，跳过
         if (sampleColor.a < 0.01)
         {
@@ -197,16 +191,15 @@ void main()
             {
                 //找到第一个用户能看到的纹理坐标
                 FragColor = vec4(texCoord, 1);
-                return;
             }
             else
             {
                 //当前体素不符合标记模式要求，继续寻找下一个
                 //注意：需要继续步进，但当前累积颜色需要保持
-                accumulatedColor.a = PICK_OPACITY_THRESHOLD * 0.5;
                 currentPos += step;
                 continue;
             }
+            return;
         }
         
         //步进

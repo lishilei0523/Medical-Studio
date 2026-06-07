@@ -95,7 +95,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.StepSize = 0.0012f;
             this.MaxStepsCount = 1000;
             this.OpacityThreshold = 0.99f;
-            this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.GrayControlPoints);
+            this.TFControlPoints = new AvaloniaList<DensityControlPoint>(ProtocolManager.AnatomyControlPoints);
         }
 
         #endregion
@@ -420,12 +420,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public float OpacityThreshold { get; set; }
         #endregion
 
-        #region 传递函数控制点列表 —— AvaloniaList<HUControlPoint> TFControlPoints
+        #region 传递函数控制点列表 —— AvaloniaList<DensityControlPoint> TFControlPoints
         /// <summary>
         /// 传递函数控制点列表
         /// </summary>
         [DependencyProperty]
-        public AvaloniaList<HUControlPoint> TFControlPoints { get; set; }
+        public AvaloniaList<DensityControlPoint> TFControlPoints { get; set; }
         #endregion
 
         #region 横断面 —— PlaneVisual3D AxialPlane

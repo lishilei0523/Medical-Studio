@@ -43,7 +43,7 @@ namespace MedicalSharp.Engine.Base
             this.OriginalTexture = Texture3D.CreateFromVolume(width, height, depth, this.VolumeData.OriginalData);
             this.PreviewTexture = Texture3D.CreateFromVolume(width, height, depth, this.VolumeData.PreviewData);
             this.MarkTexture = Texture3D.CreateFromMark(width, height, depth, this.VolumeData.MarkData);
-            this.VRTransferFunction = new HUTransferFunction();
+            this.VRTransferFunction = new DensityTransferFunction();
             this.MPRTransferFunction = new HUTransferFunction();
             this.MarkStrategy = new MarkStrategy();
         }
@@ -87,11 +87,11 @@ namespace MedicalSharp.Engine.Base
         public Texture3D MarkTexture { get; private set; }
         #endregion
 
-        #region 体积渲染传递函数 —— HUTransferFunction VRTransferFunction
+        #region 体积渲染传递函数 —— DensityTransferFunction VRTransferFunction
         /// <summary>
         /// 体积渲染传递函数
         /// </summary>
-        public HUTransferFunction VRTransferFunction { get; private set; }
+        public DensityTransferFunction VRTransferFunction { get; private set; }
         #endregion
 
         #region MPR渲染传递函数 —— HUTransferFunction MPRTransferFunction
