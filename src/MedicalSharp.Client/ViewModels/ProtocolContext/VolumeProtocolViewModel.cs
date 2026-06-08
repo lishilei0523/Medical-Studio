@@ -212,7 +212,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
             KeyValuePair<string, DensityControlPoint[]> defaultControlPoints = new("默认", [.. this.VolumeViewModel.TFControlPoints]);
             this.ControlPointGroups.Add(defaultControlPoints);
             this.SelectedControlPoints = defaultControlPoints;
-            foreach (KeyValuePair<string, DensityControlPoint[]> controlPoints in ProtocolManager.PresetControlPointGroups)
+            foreach (KeyValuePair<string, DensityControlPoint[]> controlPoints in ProtocolManager.PresetDensityControlPointGroups)
             {
                 this.ControlPointGroups.Add(controlPoints);
             }
@@ -247,7 +247,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                 };
 
                 //保存文件
-                string path = $"{Constants.ProtocolPath}/{protocol.Name}.json";
+                string path = $"{Constants.VRProtocolPath}/{protocol.Name}.json";
                 string json = protocol.ToJson();
                 await File.WriteAllTextAsync(path, json);
 

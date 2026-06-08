@@ -1414,7 +1414,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public async Task InitPresetProtocols()
         {
-            string[] protocolFiles = Directory.GetFiles(Constants.ProtocolPath);
+            string[] protocolFiles = Directory.GetFiles(Constants.VRProtocolPath);
             List<RaycastProtocol> protocols = [];
             foreach (string protocolFile in protocolFiles)
             {

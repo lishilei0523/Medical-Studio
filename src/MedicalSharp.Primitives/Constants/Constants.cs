@@ -21,8 +21,13 @@ namespace MedicalSharp.Primitives
         public const short MaxHU = 3071;
 
         /// <summary>
-        /// 协议路径
+        /// 体积渲染协议路径
         /// </summary>
-        public static readonly string ProtocolPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Protocols");
+        public static readonly string VRProtocolPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Protocols/Volume");
+
+        /// <summary>
+        /// MPR渲染协议路径
+        /// </summary>
+        public static readonly string MPRProtocolPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Protocols/MPR");
     }
 }

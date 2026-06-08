@@ -1,64 +1,113 @@
 <fa:AppWindow x:Class="MedicalSharp.Client.Views.ProtocolContext.MprProtocolView"
-			  xmlns="https://github.com/avaloniaui"
-			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
-			  mc:Ignorable="d"
-			  Width="600" Height="560" CanResize="False" ShowAsDialog="True"
-			  WindowStartupLocation="CenterScreen"
-			  Title="MPR协议">
-	
-		<StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
+              xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+              xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+              xmlns:cm="http://caliburnmicro.com"
+              mc:Ignorable="d"
+              Width="710" Height="750" CanResize="False" ShowAsDialog="True"
+              WindowStartupLocation="CenterScreen"
+              Title="MPR渲染协议">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Grid.IsSharedSizeScope="True" Margin="10,5,10,0">
             <sd:FormItem Label="预设窗：">
                 <ComboBox Width="240" ItemsSource="{Binding WindowLevels}"
                           DisplayMemberBinding="{Binding}"
                           SelectedValue="{Binding SelectedWindowLevel}" />
             </sd:FormItem>
             <sd:FormItem Label="窗宽：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="1" Maximum="4095" Increment="1"
-                               ParsingNumberStyle="Integer" FormatString="F0"
-                               Text="{Binding MprViewModel.WindowWidth}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                   Minimum="1" Maximum="4096" Increment="1"
+                                   ParsingNumberStyle="Integer" FormatString="F0"
+                                   Text="{Binding MprViewModel.WindowWidth}" />
+                    <Slider Grid.Column="1" Margin="10,0,0,0"
+                            Minimum="1" Maximum="4096" SmallChange="1" LargeChange="10"
+                            TickFrequency="100" TickPlacement="Outside"
+                            Value="{Binding MprViewModel.WindowWidth}" />
+                </Grid>
             </sd:FormItem>
-            <sd:FormItem>
-				<Slider Minimum="1" Maximum="4095" SmallChange="1" LargeChange="10"
-                        TickFrequency="100" TickPlacement="TopLeft"
-                        Value="{Binding MprViewModel.WindowWidth}" />
-			</sd:FormItem>
             <sd:FormItem Label="窗位：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="-1024" Maximum="3071" Increment="1"
-                               ParsingNumberStyle="Integer" FormatString="F0"
-                               Text="{Binding MprViewModel.WindowCenter}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                   Minimum="-1024" Maximum="3071" Increment="1"
+                                   ParsingNumberStyle="Integer" FormatString="F0"
+                                   Text="{Binding MprViewModel.WindowCenter}" />
+                    <Slider Grid.Column="1" Margin="10,0,0,0"
+                            Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
+                            TickFrequency="100" TickPlacement="Outside"
+                            Value="{Binding MprViewModel.WindowCenter}" />
+                </Grid>
             </sd:FormItem>
-			<sd:FormItem>
-                <Slider Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
-                        TickFrequency="100" TickPlacement="TopLeft"
-                        Value="{Binding MprViewModel.WindowCenter}" />
-			</sd:FormItem>
             <sd:FormItem Label="亮度：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="0.1" Maximum="5.0" Increment="0.1"
-                               ParsingNumberStyle="Float" FormatString="F2"
-                               Text="{Binding MprViewModel.Brightness}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                   Minimum="0.1" Maximum="5.0" Increment="0.1"
+                                   ParsingNumberStyle="Float" FormatString="F2"
+                                   Text="{Binding MprViewModel.Brightness}" />
+                    <Slider Grid.Column="1" Margin="10,0,0,0"
+                            Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
+                            TickFrequency="0.1" TickPlacement="Outside"
+                            Value="{Binding MprViewModel.Brightness}" />
+                </Grid>
             </sd:FormItem>
-			<sd:FormItem>
-                <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
-                        TickFrequency="0.1" TickPlacement="TopLeft"
-                        Value="{Binding MprViewModel.Brightness}" />
-			</sd:FormItem>
             <sd:FormItem Label="对比度：">
-                <NumericUpDown Width="240" HorizontalAlignment="Left"
-                               Minimum="0.1" Maximum="5.0" Increment="0.1"
-                               ParsingNumberStyle="Float" FormatString="F2"
-                               Text="{Binding MprViewModel.Contrast}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                   Minimum="0.1" Maximum="5.0" Increment="0.1"
+                                   ParsingNumberStyle="Float" FormatString="F2"
+                                   Text="{Binding MprViewModel.Contrast}" />
+                    <Slider Grid.Column="1" Margin="10,0,0,0"
+                            Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
+                            TickFrequency="0.1" TickPlacement="TopLeft"
+                            Value="{Binding MprViewModel.Contrast}" />
+                </Grid>
+            </sd:FormItem>         <sd:FormItem Label="预设控制点：">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" Width="300" ItemsSource="{Binding ControlPointGroups}"
+                              DisplayMemberBinding="{Binding Key}"
+                              SelectedValue="{Binding SelectedControlPoints}" />
+                    <Button Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" Classes="Focus"
+                            Content="保存协议" cm:Message.Attach="SaveProtocol();" />
+                </Grid>
             </sd:FormItem>
-			<sd:FormItem>
-                <Slider Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
-                        TickFrequency="0.1" TickPlacement="TopLeft"
-                        Value="{Binding MprViewModel.Contrast}" />
-			</sd:FormItem>
-		</StackPanel>
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <sd:ColorBand Grid.Row="0" Width="650" Height="50" Margin="0,0,0,-2" ControlPoints="{Binding ColorControlPoints}" />
+            <sd:AlphaCurveEditor Grid.Row="1" Width="650" Height="300"
+                                 ControlPoints="{Binding AlphaControlPoints}"
+                                 NormalizedHistogram="{Binding NormalizedHistogram}" />
+        </Grid>
+    </Grid>
 </fa:AppWindow>

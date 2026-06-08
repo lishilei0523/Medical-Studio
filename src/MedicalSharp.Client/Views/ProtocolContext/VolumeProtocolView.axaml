@@ -148,15 +148,15 @@
                 </Grid>
             </sd:FormItem>
         </StackPanel>
-            <Grid Grid.Row="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <sd:ColorBand Grid.Row="0" Width="650" Height="50" Margin="0,0,0,-2" ControlPoints="{Binding ColorControlPoints}" />
-                <sd:AlphaCurveEditor Grid.Row="1" Width="650" Height="300"
-                                     ControlPoints="{Binding AlphaControlPoints}"
-                                     NormalizedHistogram="{Binding NormalizedHistogram}" />
-            </Grid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <sd:ColorBand Grid.Row="0" Width="650" Height="50" Margin="0,0,0,-2" ControlPoints="{Binding ColorControlPoints}" />
+            <sd:AlphaCurveEditor Grid.Row="1" Width="650" Height="300"
+                                 ControlPoints="{Binding AlphaControlPoints}"
+                                 NormalizedHistogram="{Binding NormalizedHistogram}" />
+        </Grid>
     </Grid>
 </fa:AppWindow>

@@ -38,9 +38,14 @@ namespace MedicalSharp.Primitives.Managers
         private static readonly DensityControlPoint[] _AnatomyControlPoints;
 
         /// <summary>
-        /// 预设控制点字典
+        /// 预设HU控制点字典
         /// </summary>
-        private static readonly IDictionary<string, DensityControlPoint[]> _PresetControlPointGroups;
+        private static readonly IDictionary<string, HUControlPoint[]> _PresetHUControlPointGroups;
+
+        /// <summary>
+        /// 预设密度控制点字典
+        /// </summary>
+        private static readonly IDictionary<string, DensityControlPoint[]> _PresetDensityControlPointGroups;
 
         /// <summary>
         /// 静态构造器
@@ -52,7 +57,12 @@ namespace MedicalSharp.Primitives.Managers
             _GrayControlPoints = GetGrayControlPoints();
             _RainbowControlPoints = GetRainbowControlPoints();
             _AnatomyControlPoints = GetAnatomyControlPoints();
-            _PresetControlPointGroups = new Dictionary<string, DensityControlPoint[]>
+            _PresetHUControlPointGroups = new Dictionary<string, HUControlPoint[]>
+            {
+                { "彩虹", _SolidRainbowControlPoints },
+                { "热金属", _SolidHotMetalControlPoints }
+            };
+            _PresetDensityControlPointGroups = new Dictionary<string, DensityControlPoint[]>
             {
                 { "灰度", _GrayControlPoints },
                 { "彩虹", _RainbowControlPoints },
@@ -114,13 +124,23 @@ namespace MedicalSharp.Primitives.Managers
         }
         #endregion
 
-        #region 只读属性 - 预设控制点字典 —— IDictionary<string, DensityControlPoint[]> PresetControlPointGroups
+        #region 只读属性 - 预设HU控制点字典 —— IDictionary<string, HUControlPoint[]> PresetHUControlPointGroups
         /// <summary>
-        /// 只读属性 - 预设控制点字典
+        /// 只读属性 - 预设HU控制点字典
         /// </summary>
-        public static IDictionary<string, DensityControlPoint[]> PresetControlPointGroups
+        public static IDictionary<string, HUControlPoint[]> PresetHUControlPointGroups
         {
-            get => _PresetControlPointGroups;
+            get => _PresetHUControlPointGroups;
+        }
+        #endregion
+
+        #region 只读属性 - 预设密度控制点字典 —— IDictionary<string, DensityControlPoint[]> PresetDensityControlPointGroups
+        /// <summary>
+        /// 只读属性 - 预设密度控制点字典
+        /// </summary>
+        public static IDictionary<string, DensityControlPoint[]> PresetDensityControlPointGroups
+        {
+            get => _PresetDensityControlPointGroups;
         }
         #endregion
 

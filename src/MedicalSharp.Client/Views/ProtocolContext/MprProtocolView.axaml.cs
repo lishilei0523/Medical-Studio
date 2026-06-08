@@ -3,7 +3,7 @@ using FluentAvalonia.UI.Windowing;
 namespace MedicalSharp.Client.Views.ProtocolContext
 {
     /// <summary>
-    /// MPR协议视图
+    /// MPR渲染协议视图
     /// </summary>
     public partial class MprProtocolView : AppWindow
     {

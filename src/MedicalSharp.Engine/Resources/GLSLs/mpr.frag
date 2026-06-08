@@ -102,6 +102,7 @@ void main()
 
     //基础颜色
     vec3 color;
+    float alpha = 1.0;
 
     //Gray - 灰度模式
     if (u_RenderMode == 0) 
@@ -132,6 +133,7 @@ void main()
         pseudoColor.rgb = clamp(pseudoColor.rgb, 0.0, 1.0);
         
         color = pseudoColor.rgb;
+        alpha = pseudoColor.a;
     }
 
     //染色模式下，标记区域混合染色颜色
@@ -145,5 +147,5 @@ void main()
         color = mix(color, markColor.rgb, markColor.a);
     }
 
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(color, alpha);
 }
