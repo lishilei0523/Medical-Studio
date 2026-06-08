@@ -4,6 +4,7 @@ using Caliburn.Micro;
 using MedicalSharp.Client.ViewModels.VolumeContext;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.UserControls;
+using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives;
@@ -70,6 +71,14 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<ColorControlPoint> ColorControlPoints { get; set; }
+        #endregion
+
+        #region 归一化直方图 —— float[] NormalizedHistogram
+        /// <summary>
+        /// 归一化直方图
+        /// </summary>
+        [DependencyProperty]
+        public float[] NormalizedHistogram { get; set; }
         #endregion
 
         #region 已选预设窗 —— WindowLevel SelectedWindowLevel
@@ -178,11 +187,11 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
 
         #region # 方法
 
-        #region 初始化 —— override Task OnActivatedAsync(CancellationToken cancellationToken)
+        #region 初始化 —— override async Task OnActivatedAsync(CancellationToken cancellationToken)
         /// <summary>
         /// 初始化
         /// </summary>
-        protected override Task OnActivatedAsync(CancellationToken cancellationToken)
+        protected override async Task OnActivatedAsync(CancellationToken cancellationToken)
         {
             //默认值
             this.WindowLevels =
@@ -208,7 +217,9 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                 this.ControlPointGroups.Add(controlPoints);
             }
 
-            return base.OnActivatedAsync(cancellationToken);
+            this.NormalizedHistogram = await Task.Run(() => this.VolumeViewModel.VolumeData.ApplyNormalizedHistogram(), cancellationToken);
+
+            await base.OnActivatedAsync(cancellationToken);
         }
         #endregion
 

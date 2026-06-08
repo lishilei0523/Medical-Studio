@@ -26,12 +26,25 @@ namespace MedicalSharp.Controls.UserControls
         public static readonly StyledProperty<AvaloniaList<AlphaControlPoint>> ControlPointsProperty;
 
         /// <summary>
+        /// 归一化直方图依赖属性
+        /// </summary>
+        public static readonly StyledProperty<float[]> NormalizedHistogramProperty;
+
+        /// <summary>
+        /// 直方图削峰系数依赖属性
+        /// </summary>
+        public static readonly StyledProperty<float> HistogramCapSigmaProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static AlphaCurveEditor()
         {
             ControlPointsProperty = AvaloniaProperty.Register<AlphaCurveEditor, AvaloniaList<AlphaControlPoint>>(nameof(ControlPoints), []);
+            NormalizedHistogramProperty = AvaloniaProperty.Register<AlphaCurveEditor, float[]>(nameof(NormalizedHistogram), []);
+            HistogramCapSigmaProperty = AvaloniaProperty.Register<AlphaCurveEditor, float>(nameof(HistogramCapSigma), 3.0f);
             ControlPointsProperty.Changed.AddClassHandler<AlphaCurveEditor, AvaloniaList<AlphaControlPoint>>(OnControlPointsChanged);
+            NormalizedHistogramProperty.Changed.AddClassHandler<AlphaCurveEditor, float[]>((s, _) => s.UpdateHistogramCurve());
         }
 
 
@@ -86,9 +99,14 @@ namespace MedicalSharp.Controls.UserControls
         private readonly TextBlock _controlPointTooltip;
 
         /// <summary>
-        /// 折线图形
+        /// 控制点曲线
         /// </summary>
-        private readonly Polyline _polyline;
+        private readonly Polyline _controlPointsCurve;
+
+        /// <summary>
+        /// 直方图曲线
+        /// </summary>
+        private readonly Polyline _histogramCurve;
 
         /// <summary>
         /// 控制点圆圈字典
@@ -102,14 +120,23 @@ namespace MedicalSharp.Controls.UserControls
         {
             this._pointToMarker = new Dictionary<AlphaControlPoint, Ellipse>();
 
-            //折线
-            this._polyline = new Polyline
+            //控制点曲线
+            this._controlPointsCurve = new Polyline
             {
                 Stroke = Brushes.Red,
                 StrokeThickness = 1,
                 IsHitTestVisible = false
             };
-            this.Children.Add(this._polyline);
+            this.Children.Add(this._controlPointsCurve);
+
+            //直方图曲线
+            this._histogramCurve = new Polyline
+            {
+                Stroke = Brushes.GreenYellow,
+                StrokeThickness = 1,
+                IsHitTestVisible = false
+            };
+            this.Children.Add(this._histogramCurve);
 
             //提示文本
             this._controlPointTooltip = new TextBlock
@@ -156,6 +183,28 @@ namespace MedicalSharp.Controls.UserControls
         {
             get => this.GetValue(ControlPointsProperty);
             set => this.SetValue(ControlPointsProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 归一化直方图 —— float[] NormalizedHistogram
+        /// <summary>
+        /// 依赖属性 - 归一化直方图
+        /// </summary>
+        public float[] NormalizedHistogram
+        {
+            get => this.GetValue(NormalizedHistogramProperty);
+            set => this.SetValue(NormalizedHistogramProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 直方图削峰系数 —— float HistogramCapSigma
+        /// <summary>
+        /// 依赖属性 - 直方图削峰系数
+        /// </summary>
+        public float HistogramCapSigma
+        {
+            get => this.GetValue(HistogramCapSigmaProperty);
+            set => this.SetValue(HistogramCapSigmaProperty, value);
         }
         #endregion
 
@@ -289,15 +338,15 @@ namespace MedicalSharp.Controls.UserControls
         }
         #endregion
 
-        #region 更新折线 —— void UpdatePolyline()
+        #region 更新控制点曲线 —— void UpdateControlPointsCurve()
         /// <summary>
-        /// 更新折线
+        /// 更新控制点曲线
         /// </summary>
-        private void UpdatePolyline()
+        private void UpdateControlPointsCurve()
         {
             if (this.ControlPoints == null || !this.ControlPoints.Any() || this.Bounds.Width <= 0 || this.Bounds.Height <= 0)
             {
-                this._polyline.Points.Clear();
+                this._controlPointsCurve.Points.Clear();
                 return;
             }
 
@@ -312,7 +361,7 @@ namespace MedicalSharp.Controls.UserControls
                 Point point = new Point(x, y);
                 points.Add(point);
             }
-            this._polyline.Points = points;
+            this._controlPointsCurve.Points = points;
 
             //更新圆圈位置（按控制点引用直接定位）
             foreach ((AlphaControlPoint controlPoint, Ellipse ellipse) in this._pointToMarker)
@@ -322,6 +371,61 @@ namespace MedicalSharp.Controls.UserControls
                 SetLeft(ellipse, x - 5);
                 SetTop(ellipse, y - 5);
             }
+        }
+        #endregion
+
+        #region 更新直方图曲线 —— void UpdateHistogramCurve()
+        /// <summary>
+        /// 更新直方图曲线
+        /// </summary>
+        private void UpdateHistogramCurve()
+        {
+            float[] histogram = this.NormalizedHistogram;
+
+            #region # 验证
+
+            if (histogram == null || !histogram.Any() || this.Bounds.Width <= 0)
+            {
+                this._histogramCurve.Points.Clear();
+                return;
+            }
+
+            #endregion
+
+            //找到最大值用于归一化（将最大值放大到1.0，撑满Canvas高度）
+            float maxValue = histogram.Max();
+            if (maxValue <= 0)
+            {
+                this._histogramCurve.Points.Clear();
+                return;
+            }
+
+            int binCount = histogram.Length;
+            double binWidth = this.Bounds.Width / binCount;
+
+            //计算均值和标准差，削掉异常高峰
+            float mean = histogram.Average();
+            float stdDev = (float)Math.Sqrt(histogram.Average(v => (v - mean) * (v - mean)));
+            float capValue = mean + this.HistogramCapSigma * stdDev;  //3倍标准差以上的峰值削掉
+
+            //从底部起点开始
+            Points points = new Points();
+            points.Add(new Point(0, this.Bounds.Height));
+
+            //遍历每个bin，绘制竖条
+            for (int index = 0; index < binCount; index++)
+            {
+                double x = index * binWidth;
+                double value = Math.Min(histogram[index], capValue);
+                double barHeight = (value / capValue) * this.Bounds.Height;
+
+                points.Add(new Point(x, this.Bounds.Height - barHeight));
+                points.Add(new Point(x + binWidth, this.Bounds.Height - barHeight));
+            }
+
+            //到底部终点结束
+            points.Add(new Point(this.Bounds.Width, this.Bounds.Height));
+            this._histogramCurve.Points = points;
         }
         #endregion
 
@@ -452,11 +556,20 @@ namespace MedicalSharp.Controls.UserControls
         {
             if (!this._initialRendered && eventArgs.NewSize.Width > 0 && eventArgs.NewSize.Height > 0)
             {
+                //绘制坐标轴
                 this.DrawScale();
-                if (this.ControlPoints != null && this.ControlPoints.Count > 0)
+
+                //绘制控制点曲线
+                if (this.ControlPoints != null && this.ControlPoints.Any())
                 {
                     this.SyncMarkers(this.ControlPoints);
-                    this.UpdatePolyline();
+                    this.UpdateControlPointsCurve();
+                }
+
+                //绘制直方图曲线
+                if (this.NormalizedHistogram != null && this.NormalizedHistogram.Any())
+                {
+                    this.UpdateHistogramCurve();
                 }
 
                 //设置背景色
@@ -491,7 +604,7 @@ namespace MedicalSharp.Controls.UserControls
             {
                 eventArgs.NewValue.Value.CollectionChanged += canvas.OnControlPointsCollectionChanged;
                 canvas.SyncMarkers(eventArgs.NewValue.Value);
-                canvas.UpdatePolyline();
+                canvas.UpdateControlPointsCurve();
             }
         }
         #endregion
@@ -505,7 +618,7 @@ namespace MedicalSharp.Controls.UserControls
             if (this.ControlPoints != null)
             {
                 this.SyncMarkers(this.ControlPoints);
-                this.UpdatePolyline();
+                this.UpdateControlPointsCurve();
             }
         }
         #endregion
@@ -556,7 +669,7 @@ namespace MedicalSharp.Controls.UserControls
 
                 this._draggingPoint.HU = hu;
                 this._draggingPoint.Alpha = alpha;
-                this.UpdatePolyline();
+                this.UpdateControlPointsCurve();
 
                 //更新提示文本
                 this._controlPointTooltip.Text = $"({hu}, {alpha:F2})";

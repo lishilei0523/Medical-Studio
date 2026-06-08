@@ -125,7 +125,9 @@
                     </sd:FormItem>
                 </StackPanel>
                 <sd:ColorBand Grid.Row="1" Width="650" Height="50" Margin="0,0,0,-2" ControlPoints="{Binding ColorControlPoints}" />
-                <sd:AlphaCurveEditor Grid.Row="2" Width="650" Height="700" ControlPoints="{Binding AlphaControlPoints}" />
+                <sd:AlphaCurveEditor Grid.Row="2" Width="650" Height="700" 
+                                     ControlPoints="{Binding AlphaControlPoints}"
+                                     NormalizedHistogram="{Binding NormalizedHistogram}" />
             </Grid>
         </sd:GroupBox>
     </Grid>
