@@ -62,7 +62,7 @@
                     </Grid.ColumnDefinitions>
                     <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                    Minimum="0.1" Maximum="5.0" Increment="0.1"
-                                   ParsingNumberStyle="Float" FormatString="F2"
+                                   ParsingNumberStyle="Float" FormatString="F1"
                                    Text="{Binding MprViewModel.Brightness}" />
                     <Slider Grid.Column="1" Margin="10,0,0,0"
                             Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
@@ -78,14 +78,15 @@
                     </Grid.ColumnDefinitions>
                     <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                    Minimum="0.1" Maximum="5.0" Increment="0.1"
-                                   ParsingNumberStyle="Float" FormatString="F2"
+                                   ParsingNumberStyle="Float" FormatString="F1"
                                    Text="{Binding MprViewModel.Contrast}" />
                     <Slider Grid.Column="1" Margin="10,0,0,0"
                             Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
-                            TickFrequency="0.1" TickPlacement="TopLeft"
+                            TickFrequency="0.1" TickPlacement="Outside"
                             Value="{Binding MprViewModel.Contrast}" />
                 </Grid>
-            </sd:FormItem>         <sd:FormItem Label="预设控制点：">
+            </sd:FormItem>
+            <sd:FormItem Label="预设控制点：">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />

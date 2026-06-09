@@ -62,7 +62,7 @@
                     </Grid.ColumnDefinitions>
                     <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                    Minimum="0.1" Maximum="5.0" Increment="0.1"
-                                   ParsingNumberStyle="Float" FormatString="F2"
+                                   ParsingNumberStyle="Float" FormatString="F1"
                                    Text="{Binding VolumeViewModel.Brightness}" />
                     <Slider Grid.Column="1" Margin="10,0,0,0"
                             Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
@@ -78,7 +78,7 @@
                     </Grid.ColumnDefinitions>
                     <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                    Minimum="0.1" Maximum="5.0" Increment="0.1"
-                                   ParsingNumberStyle="Float" FormatString="F2"
+                                   ParsingNumberStyle="Float" FormatString="F1"
                                    Text="{Binding VolumeViewModel.DensityScale}" />
                     <Slider Grid.Column="1" Margin="10,0,0,0"
                             Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="0.5"
