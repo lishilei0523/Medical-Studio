@@ -62,12 +62,20 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         public float Beta { get; set; }
         #endregion
 
-        #region 偏移量 —— float Gamma
+        #region Z方向权重 —— float Gamma
+        /// <summary>
+        /// Z方向权重
+        /// </summary>
+        [DependencyProperty]
+        public float Gamma { get; set; }
+        #endregion
+
+        #region 偏移量 —— float Offset
         /// <summary>
         /// 偏移量
         /// </summary>
         [DependencyProperty]
-        public float Gamma { get; set; }
+        public float Offset { get; set; }
         #endregion
 
         #endregion
@@ -85,7 +93,8 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
             //默认值
             this.Alpha = 0.5f;
             this.Beta = 0.5f;
-            this.Gamma = 0.0f;
+            this.Gamma = 0.5f;
+            this.Offset = 0.0f;
 
             return base.OnActivatedAsync(cancellationToken);
         }
@@ -114,7 +123,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
 
                 //执行算法
                 using Sobel3D sobel = new Sobel3D(clContext);
-                sobel.ExecuteInPlace(inputImage, this.Alpha, this.Beta, this.Gamma);
+                sobel.ExecuteInPlace(inputImage, this.Alpha, this.Beta, this.Gamma, this.Offset);
 
                 //读回CPU
                 inputImage.Read(clContext.CommandQueue, this.VolumeData.PreviewData);

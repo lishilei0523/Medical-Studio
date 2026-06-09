@@ -7,7 +7,7 @@
 			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			  xmlns:cm="http://caliburnmicro.com"
 			  mc:Ignorable="d"
-			  Width="460" Height="300" CanResize="False" ShowAsDialog="True"
+			  Width="460" Height="340" CanResize="False" ShowAsDialog="True"
 			  WindowStartupLocation="CenterScreen"
 			  Title="Sobel边缘检测">
 
@@ -15,7 +15,7 @@
 		<Grid>
 			<Grid.RowDefinitions>
 				<!--表单区-->
-				<RowDefinition Height="240" />
+				<RowDefinition Height="270" />
 				<!--占位区-->
 				<RowDefinition Height="*" />
 				<!--控制区-->
@@ -35,11 +35,17 @@
 								   ParsingNumberStyle="Float" FormatString="F1"
 								   Text="{Binding Beta}" />
 				</sd:FormItem>
+                <sd:FormItem Label="Z方向权重：">
+                    <NumericUpDown Width="300" HorizontalAlignment="Left"
+                                   Minimum="0" Maximum="1" Increment="0.1"
+                                   ParsingNumberStyle="Float" FormatString="F1"
+                                   Text="{Binding Gamma}" />
+                </sd:FormItem>
 				<sd:FormItem Label="偏移量：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="-0.05" Maximum="0.05" Increment="0.01"
 								   ParsingNumberStyle="Float" FormatString="F2"
-								   Text="{Binding Gamma}" />
+								   Text="{Binding Offset}" />
 				</sd:FormItem>
 			</StackPanel>
 			<!--占位区-->
