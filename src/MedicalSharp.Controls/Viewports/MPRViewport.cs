@@ -28,11 +28,6 @@ namespace MedicalSharp.Controls.Viewports
         #region # 字段及构造器
 
         /// <summary>
-        /// 预览模式依赖属性
-        /// </summary>
-        public static readonly StyledProperty<PreviewMode> PreviewModeProperty;
-
-        /// <summary>
         /// 渲染模式依赖属性
         /// </summary>
         public static readonly StyledProperty<MPRRenderMode> RenderModeProperty;
@@ -77,7 +72,6 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         static MPRViewport()
         {
-            PreviewModeProperty = AvaloniaProperty.Register<MPRViewport, PreviewMode>(nameof(PreviewMode));
             RenderModeProperty = AvaloniaProperty.Register<MPRViewport, MPRRenderMode>(nameof(RenderMode));
             PlaneProperty = AvaloniaProperty.Register<MPRViewport, MPRPlane>(nameof(Plane));
             WindowWidthProperty = AvaloniaProperty.Register<MPRViewport, int>(nameof(WindowWidth), 400);
@@ -88,7 +82,6 @@ namespace MedicalSharp.Controls.Viewports
             VolumeDataProperty = AvaloniaProperty.Register<MPRViewport, VolumeData>(nameof(VolumeData));
 
             //属性改变事件
-            PreviewModeProperty.Changed.AddClassHandler<MPRViewport, PreviewMode>(OnPreviewModeChanged);
             RenderModeProperty.Changed.AddClassHandler<MPRViewport, MPRRenderMode>(OnRenderModeChanged);
             PlaneProperty.Changed.AddClassHandler<MPRViewport, MPRPlane>(OnPlaneChanged);
             WindowWidthProperty.Changed.AddClassHandler<MPRViewport, int>(OnWindowWidthChanged);
@@ -120,17 +113,6 @@ namespace MedicalSharp.Controls.Viewports
         #endregion
 
         #region # 属性
-
-        #region 依赖属性 - 预览模式 —— PreviewMode PreviewMode
-        /// <summary>
-        /// 依赖属性 - 预览模式
-        /// </summary>
-        public PreviewMode PreviewMode
-        {
-            get => this.GetValue(PreviewModeProperty);
-            set => this.SetValue(PreviewModeProperty, value);
-        }
-        #endregion
 
         #region 依赖属性 - 渲染模式 —— MPRRenderMode RenderMode
         /// <summary>
@@ -321,9 +303,7 @@ namespace MedicalSharp.Controls.Viewports
             bool success = this._mprRenderer.Plane.FindNearest(position, this.Camera, out _, out textureCoord, out worldPosition, out voxelPosition, out ray);
             if (success)
             {
-                voxelValue = this.PreviewMode == PreviewMode.Original
-                    ? this.VolumeData.GetOriginalValue(voxelPosition)
-                    : this.VolumeData.GetPreviewValue(voxelPosition);
+                voxelValue = this.VolumeData.GetPreviewValue(voxelPosition);
                 markValue = this.VolumeData.GetMarkValue(voxelPosition);
 
                 return true;
@@ -453,19 +433,6 @@ namespace MedicalSharp.Controls.Viewports
 
 
         //Events
-
-        #region 预览模式改变事件 —— static void OnPreviewModeChanged(MPRViewport viewport...
-        /// <summary>
-        /// 预览模式改变事件
-        /// </summary>
-        private static void OnPreviewModeChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<PreviewMode> eventArgs)
-        {
-            viewport._mprRenderer?.SwitchPreviewMode(eventArgs.NewValue.Value);
-
-            //请求下一帧
-            viewport.RequestNextFrameRendering();
-        }
-        #endregion
 
         #region 渲染模式改变事件 —— static void OnRenderModeChanged(MPRViewport viewport...
         /// <summary>
@@ -647,7 +614,7 @@ namespace MedicalSharp.Controls.Viewports
                 volumeSession = SessionManager.VolumeSessions[volumeData.Metadata.Id];
             }
 
-            viewport._volumeRenderable = new VolumeRenderable(volumeSession.OriginalTexture, volumeSession.PreviewTexture, volumeSession.MarkTexture, volumeData);
+            viewport._volumeRenderable = new VolumeRenderable(volumeSession.PreviewTexture, volumeSession.MarkTexture, volumeData);
 
             //初始化传递函数、标记策略
             viewport._mprRenderer.SetTransferFunction(volumeSession.MPRTransferFunction);

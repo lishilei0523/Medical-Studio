@@ -4,7 +4,6 @@ in vec3 LocalPosition;
 
 out vec4 FragColor;
 
-uniform sampler3D u_OriginalTexture;
 uniform sampler3D u_PreviewTexture;
 uniform usampler3D u_MarkTexture; 
 uniform sampler1D u_TransferFunction;
@@ -19,9 +18,6 @@ uniform float u_DensityScale;           //密度缩放
 uniform float u_StepSize;               //步长
 uniform int u_MaxStepsCount;            //最大步数
 uniform float u_OpacityThreshold;       //透明度阈值
-
-//预览模式：0=Preview, 1=Original
-uniform int u_PreviewMode;
 
 //渲染模式：0=Raycast, 1=AIP, 2=MIP, 3=MinIP, 4=SSD
 uniform int u_RenderMode;
@@ -86,16 +82,7 @@ float getMedicalValue(vec3 texCoord)
         return -1000.0;  //空气的CT值
     }
     
-    float snormValue;
-    if (u_PreviewMode == 0)
-    {
-        snormValue = texture(u_PreviewTexture, texCoord).r;
-    }
-    else
-    {
-        snormValue = texture(u_OriginalTexture, texCoord).r;
-    }
-
+    float snormValue = texture(u_PreviewTexture, texCoord).r;
     float medicalValue = snormValue * MAX_16BIT_SIGNED;
     
     return medicalValue;

@@ -3,7 +3,6 @@ in vec3 WorldPosition;
 
 out vec4 FragColor;
 
-uniform sampler3D u_OriginalTexture;
 uniform sampler3D u_PreviewTexture;
 uniform usampler3D u_MarkTexture;
 uniform sampler1D u_TransferFunction;
@@ -16,9 +15,6 @@ uniform float u_Brightness;             //亮度
 uniform float u_Contrast;               //对比度
 uniform float u_HUMin;
 uniform float u_HUMax;
-
-//预览模式：0=Preview, 1=Original
-uniform int u_PreviewMode;
 
 //渲染模式：0=Gray, 1=PseudoColor
 uniform int u_RenderMode;
@@ -58,16 +54,7 @@ float getMedicalValue(vec3 texCoord)
         return -1000.0;  //空气的CT值
     }
     
-    float snormValue;
-    if (u_PreviewMode == 0)
-    {
-        snormValue = texture(u_PreviewTexture, texCoord).r;
-    }
-    else
-    {
-        snormValue = texture(u_OriginalTexture, texCoord).r;
-    }
-
+    float snormValue = texture(u_PreviewTexture, texCoord).r;
     float medicalValue = snormValue * MAX_16BIT_SIGNED;
     
     return medicalValue;

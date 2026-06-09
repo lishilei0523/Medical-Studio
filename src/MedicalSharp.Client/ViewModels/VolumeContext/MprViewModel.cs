@@ -82,7 +82,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.ViewEnabled = false;
             this.ToolbarConfig = new MprToolbar();
             this.Shapes = [];
-            this.PreviewModeChecked = true;
             this.GrayModeChecked = true;
             this.Crosshair = new CrosshairVisual3D();
             this.CrosshairVisible = true;
@@ -120,38 +119,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// 已选组织
         /// </summary>
         public TissueInfo SelectedTissue { get; set; }
-        #endregion
-
-        #region 预览模式选中 —— bool PreviewModeChecked
-        /// <summary>
-        /// 预览模式选中
-        /// </summary>
-        public bool PreviewModeChecked
-        {
-            get => field;
-            set
-            {
-                field = value;
-                this.NotifyOfPropertyChange();
-                this.PreviewMode = PreviewMode.Preview;
-            }
-        }
-        #endregion
-
-        #region 原始模式选中 —— bool OriginalModeChecked
-        /// <summary>
-        /// 原始模式选中
-        /// </summary>
-        public bool OriginalModeChecked
-        {
-            get => field;
-            set
-            {
-                field = value;
-                this.NotifyOfPropertyChange();
-                this.PreviewMode = PreviewMode.Original;
-            }
-        }
         #endregion
 
         #region 灰度渲染模式选中 —— bool GrayModeChecked
@@ -302,14 +269,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 }
             }
         }
-        #endregion
-
-        #region 预览模式 —— PreviewMode PreviewMode
-        /// <summary>
-        /// 预览模式
-        /// </summary>
-        [DependencyProperty]
-        public PreviewMode PreviewMode { get; set; }
         #endregion
 
         #region 渲染模式 —— MPRRenderMode RenderMode

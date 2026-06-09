@@ -45,7 +45,6 @@ namespace MedicalSharp.Engine.Renderers
             : base(camera)
         {
             this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
-            this.PreviewMode = PreviewMode.Preview;
             this.RenderMode = MPRRenderMode.Gray;
             this.WindowWidth = 400;
             this.WindowCenter = 40;
@@ -56,13 +55,6 @@ namespace MedicalSharp.Engine.Renderers
         #endregion
 
         #region # 属性
-
-        #region 预览模式 —— PreviewMode PreviewMode
-        /// <summary>
-        /// 预览模式
-        /// </summary>
-        public PreviewMode PreviewMode { get; private set; }
-        #endregion
 
         #region 渲染模式 —— MPRRenderMode RenderMode
         /// <summary>
@@ -145,17 +137,6 @@ namespace MedicalSharp.Engine.Renderers
         #region # 方法
 
         //Public
-
-        #region 切换预览模式 —— void SwitchPreviewMode(PreviewMode previewMode)
-        /// <summary>
-        /// 切换预览模式
-        /// </summary>
-        /// <param name="previewMode">预览模式</param>
-        public void SwitchPreviewMode(PreviewMode previewMode)
-        {
-            this.PreviewMode = previewMode;
-        }
-        #endregion
 
         #region 切换渲染模式 —— void SwitchRenderMode(MPRRenderMode renderMode)
         /// <summary>
@@ -320,8 +301,7 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
-            //设置预览、渲染模式
-            program.SetUniformInt("u_PreviewMode", (int)this.PreviewMode);
+            //设置渲染模式
             program.SetUniformInt("u_RenderMode", (int)this.RenderMode);
 
             //设置渲染参数
@@ -336,22 +316,19 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
 
             //绑定纹理
-            this.Renderable.OriginalTexture.Bind(0);
-            this.Renderable.PreviewTexture.Bind(1);
-            this.Renderable.MarkTexture.Bind(2);
-            this.TransferFunction.Texture.Bind(3);
-            this.MarkStrategy.Texture.Bind(4);
-            program.SetUniformInt("u_OriginalTexture", 0);
-            program.SetUniformInt("u_PreviewTexture", 1);
-            program.SetUniformInt("u_MarkTexture", 2);
-            program.SetUniformInt("u_TransferFunction", 3);
-            program.SetUniformInt("u_MarkStrategy", 4);
+            this.Renderable.PreviewTexture.Bind(0);
+            this.Renderable.MarkTexture.Bind(1);
+            this.TransferFunction.Texture.Bind(2);
+            this.MarkStrategy.Texture.Bind(3);
+            program.SetUniformInt("u_PreviewTexture", 0);
+            program.SetUniformInt("u_MarkTexture", 1);
+            program.SetUniformInt("u_TransferFunction", 2);
+            program.SetUniformInt("u_MarkStrategy", 3);
 
             //绘制平面
             this._unitPlane.Draw(glContext, PrimitiveType.Triangles);
 
             //解绑纹理
-            this.Renderable.OriginalTexture.Unbind();
             this.Renderable.PreviewTexture.Unbind();
             this.Renderable.MarkTexture.Unbind();
             this.TransferFunction.Texture.Unbind();
@@ -413,22 +390,16 @@ namespace MedicalSharp.Engine.Renderers
             statProgram.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
             statProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
 
-            //设置预览模式
-            statProgram.SetUniformInt("u_PreviewMode", (int)this.PreviewMode);
-
             //绑定纹理
-            this.Renderable.OriginalTexture.Bind(0);
-            this.Renderable.PreviewTexture.Bind(1);
-            this.Renderable.MarkTexture.Bind(2);
-            statProgram.SetUniformInt("u_OriginalTexture", 0);
-            statProgram.SetUniformInt("u_PreviewTexture", 1);
-            statProgram.SetUniformInt("u_MarkTexture", 2);
+            this.Renderable.PreviewTexture.Bind(0);
+            this.Renderable.MarkTexture.Bind(1);
+            statProgram.SetUniformInt("u_PreviewTexture", 0);
+            statProgram.SetUniformInt("u_MarkTexture", 1);
 
             //绘制平面
             this._unitPlane.Draw(glContext, PrimitiveType.Triangles);
 
             //解绑纹理
-            this.Renderable.OriginalTexture.Unbind();
             this.Renderable.PreviewTexture.Unbind();
             this.Renderable.MarkTexture.Unbind();
 

@@ -197,38 +197,21 @@ namespace MedicalSharp.Engine.Algorithms
         /// 重置预览纹理
         /// </summary>
         /// <param name="volumeData">体积数据</param>
-        /// <param name="originalTexture">原始纹理</param>
         /// <param name="previewTexture">预览纹理</param>
         /// <remarks>将预览纹理重置为原始纹理</remarks>
-        public static void ResetPreviewTexture(VolumeData volumeData, Texture3D originalTexture, Texture3D previewTexture)
+        public static void ResetPreviewTexture(VolumeData volumeData, Texture3D previewTexture)
         {
             #region # 验证
 
-            if (originalTexture == null)
-            {
-                throw new InvalidOperationException("原始纹理未初始化！");
-            }
             if (previewTexture == null)
             {
                 throw new InvalidOperationException("预览纹理未初始化！");
             }
-            if (previewTexture.Width != originalTexture.Width ||
-                previewTexture.Height != originalTexture.Height ||
-                previewTexture.Depth != originalTexture.Depth)
-            {
-                throw new InvalidOperationException("预览纹理与原始纹理尺寸不匹配！");
-            }
 
             #endregion
 
-            //确保之前的GPU操作完成
-            GL.MemoryBarrier(MemoryBarrierFlags.TextureUpdateBarrierBit);
-
-            //从原始纹理复制到预览纹理
-            GL.CopyImageSubData(
-                originalTexture.Id, ImageTarget.Texture3D, 0, 0, 0, 0,
-                previewTexture.Id, ImageTarget.Texture3D, 0, 0, 0, 0,
-                previewTexture.Width, previewTexture.Height, previewTexture.Depth);
+            //从原始数据更新预览纹理
+            previewTexture.Update(volumeData.OriginalData);
 
             //确保复制完成后后续操作能读到数据
             GL.MemoryBarrier(MemoryBarrierFlags.TextureUpdateBarrierBit);
