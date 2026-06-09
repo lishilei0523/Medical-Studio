@@ -140,6 +140,15 @@
 									<MenuItem Header="重置十字线(_R)" Command="{Binding ResetCrosshairCommand}" />
                                     <MenuItem Header="重置相机(_C)" Command="{Binding ResetCameraCommand}" />
 								</MenuItem>
+                                <MenuItem Header="预设协议(_E)" IsEnabled="{Binding ViewEnabled}">
+                                    <ListBox ItemsSource="{Binding PresetProtocols}" SelectedItem="{Binding SelectedProtocol}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}" />
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </MenuItem>
 								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />
 								<MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
 							</MenuFlyout>

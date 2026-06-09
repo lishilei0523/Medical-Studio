@@ -5,6 +5,9 @@ using MedicalSharp.Client.ViewModels.VolumeContext;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.UserControls;
 using MedicalSharp.Engine.Algorithms;
+using MedicalSharp.Presentation.Maps;
+using MedicalSharp.Presentation.Models;
+using MedicalSharp.Primitives;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
@@ -12,9 +15,11 @@ using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.IOC.Core.Mediators;
+using SD.Toolkits.Json;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -228,27 +233,23 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
             bool? result = await this._windowManager.ShowDialogAsync(viewModel);
             if (result == true)
             {
-                //TODO 实现
-                //RaycastProtocol protocol = new RaycastProtocol
-                //{
-                //    Name = viewModel.ProtocolName,
-                //    WindowWidth = this.VolumeViewModel.WindowWidth,
-                //    WindowCenter = this.VolumeViewModel.WindowCenter,
-                //    Brightness = this.VolumeViewModel.Brightness,
-                //    DensityScale = this.VolumeViewModel.DensityScale,
-                //    StepSize = this.VolumeViewModel.StepSize,
-                //    MaxStepsCount = this.VolumeViewModel.MaxStepsCount,
-                //    OpacityThreshold = this.VolumeViewModel.OpacityThreshold,
-                //    ControlPoints = this.VolumeViewModel.TFControlPoints.Select(x => x.ToRaycastProtocolPoint()).ToList()
-                //};
+                MprProtocol protocol = new MprProtocol
+                {
+                    Name = viewModel.ProtocolName,
+                    WindowWidth = this.MprViewModel.WindowWidth,
+                    WindowCenter = this.MprViewModel.WindowCenter,
+                    Brightness = this.MprViewModel.Brightness,
+                    Contrast = this.MprViewModel.Contrast,
+                    ControlPoints = this.MprViewModel.TFControlPoints.Select(x => x.ToMprProtocolPoint()).ToList()
+                };
 
-                ////保存文件
-                //string path = $"{Constants.ProtocolPath}/{protocol.Name}.json";
-                //string json = protocol.ToJson();
-                //await WebRequestMethods.File.WriteAllTextAsync(path, json);
+                //保存文件
+                string path = $"{Constants.MPRProtocolPath}/{protocol.Name}.json";
+                string json = protocol.ToJson();
+                await File.WriteAllTextAsync(path, json);
 
-                ////重新初始化
-                //await this.MprViewModel.InitPresetProtocols();
+                //重新初始化
+                await this.MprViewModel.InitPresetProtocols();
 
                 await MessageBox.Show("协议已保存！", "成功");
             }

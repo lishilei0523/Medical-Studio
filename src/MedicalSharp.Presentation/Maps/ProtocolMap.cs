@@ -38,6 +38,34 @@ namespace MedicalSharp.Presentation.Maps
         }
         #endregion
 
+        #region # HU控制点映射MPR伪彩协议控制点 —— static MprProtocolPoint ToMprProtocolPoint(...
+        /// <summary>
+        /// HU控制点映射MPR伪彩协议控制点
+        /// </summary>
+        public static MprProtocolPoint ToMprProtocolPoint(this HUControlPoint controlPoint)
+        {
+            MprProtocolPoint protocolPoint = new MprProtocolPoint
+            {
+                HU = controlPoint.HU,
+                Color = controlPoint.Color.ToColor4f()
+            };
+
+            return protocolPoint;
+        }
+        #endregion
+
+        #region # MPR伪彩协议控制点映射HU控制点 —— static HUControlPoint ToHUControlPoint(...
+        /// <summary>
+        /// MPR伪彩协议控制点映射HU控制点
+        /// </summary>
+        public static HUControlPoint ToHUControlPoint(this MprProtocolPoint protocolPoint)
+        {
+            HUControlPoint controlPoint = new HUControlPoint(protocolPoint.HU, protocolPoint.Color.ToVector4());
+
+            return controlPoint;
+        }
+        #endregion
+
         #region # Color4f映射Vector4 —— static Vector4 ToVector4(this Color4f color)
         /// <summary>
         /// Color4f映射Vector4

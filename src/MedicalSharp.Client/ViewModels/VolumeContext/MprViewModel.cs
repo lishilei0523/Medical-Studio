@@ -16,6 +16,7 @@ using MedicalSharp.Engine.Managers;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
+using MedicalSharp.Primitives;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
@@ -31,9 +32,12 @@ using SD.Infrastructure.Avalonia.Commands;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
+using SD.Toolkits.Json;
 using SkiaSharp;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -70,6 +74,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Title = title;
             this.Camera = camera;
             this.InputManager = inputManager;
+
+            //初始化预设协议
+            this.InitPresetProtocols();
 
             //默认值
             this.ViewEnabled = false;
@@ -383,6 +390,37 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<ShapeVisual3D> Shapes { get; set; }
+        #endregion
+
+        #region 已选协议 —— MprProtocol SelectedProtocol
+        /// <summary>
+        /// 已选协议
+        /// </summary>
+        public MprProtocol SelectedProtocol
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+
+                //应用协议
+                this.WindowWidth = value.WindowWidth;
+                this.WindowCenter = value.WindowCenter;
+                this.Brightness = value.Brightness;
+                this.Contrast = value.Contrast;
+                this.TFControlPoints = new AvaloniaList<HUControlPoint>(value.ControlPoints.Select(x => x.ToHUControlPoint()));
+                this.FrameToken++;
+            }
+        }
+        #endregion
+
+        #region 预设协议列表 —— AvaloniaList<MprProtocol> PresetProtocols
+        /// <summary>
+        /// 预设协议列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<MprProtocol> PresetProtocols { get; set; }
         #endregion
 
         #region 只读属性 - MPR渲染视口 —— MPRViewport MPRViewport
@@ -1184,6 +1222,27 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             }
 
             return base.OnDeactivateAsync(close, cancellationToken);
+        }
+        #endregion
+
+
+        //Methods
+
+        #region 初始化预设协议 —— async Task InitPresetProtocols()
+        /// <summary>
+        /// 初始化预设协议
+        /// </summary>
+        public async Task InitPresetProtocols()
+        {
+            string[] protocolFiles = Directory.GetFiles(Constants.MPRProtocolPath);
+            List<MprProtocol> protocols = [];
+            foreach (string protocolFile in protocolFiles)
+            {
+                string json = await File.ReadAllTextAsync(protocolFile);
+                MprProtocol protocol = json.AsJsonTo<MprProtocol>();
+                protocols.Add(protocol);
+            }
+            this.PresetProtocols = new AvaloniaList<MprProtocol>(protocols);
         }
         #endregion
 
