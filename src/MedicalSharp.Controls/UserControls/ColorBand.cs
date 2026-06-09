@@ -8,6 +8,7 @@ using MedicalSharp.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,6 +35,20 @@ namespace MedicalSharp.Controls.UserControls
             ControlPointsProperty.Changed.AddClassHandler<ColorBand, AvaloniaList<ColorControlPoint>>(OnColorPointsChanged);
         }
 
+        /// <summary>
+        /// HU值提示文本
+        /// </summary>
+        private string _huTooltipText;
+
+        /// <summary>
+        /// HU值提示位置
+        /// </summary>
+        private Point _huTooltipPosition;
+
+        /// <summary>
+        /// 是否显示HU值提示
+        /// </summary>
+        private bool _showHuTooltip;
 
         /// <summary>
         /// 右键位置HU值
@@ -74,11 +89,20 @@ namespace MedicalSharp.Controls.UserControls
             this.Cursor = new Cursor(StandardCursorType.Hand);
 
             //右键菜单
-            this._editColorMenuItem = new MenuItem { Header = "修改颜色" };
+            this._editColorMenuItem = new MenuItem
+            {
+                Header = "修改颜色"
+            };
             this._editColorMenuItem.Click += this.OnEditColorClicked;
-            this._insertColorMenuItem = new MenuItem { Header = "插入颜色" };
+            this._insertColorMenuItem = new MenuItem
+            {
+                Header = "插入颜色"
+            };
             this._insertColorMenuItem.Click += this.OnInsertColorClicked;
-            this._deleteColorMenuItem = new MenuItem { Header = "删除颜色" };
+            this._deleteColorMenuItem = new MenuItem
+            {
+                Header = "删除颜色"
+            };
             this._deleteColorMenuItem.Click += this.OnDeleteColorClicked;
 
             this._contextMenu = new MenuFlyout
@@ -88,6 +112,8 @@ namespace MedicalSharp.Controls.UserControls
             this.ContextFlyout = this._contextMenu;
 
             this.PointerPressed += this.OnColorBandMouseDown;
+            this.PointerMoved += this.OnColorBandMouseMoved;
+            this.PointerExited += this.OnColorBandMouseLeave;
         }
 
         #endregion
@@ -156,6 +182,18 @@ namespace MedicalSharp.Controls.UserControls
                 SolidColorBrush markerFill = new SolidColorBrush(point.Color);
                 Pen markerPen = new Pen(Brushes.White, 1);
                 context.DrawEllipse(markerFill, markerPen, new Point(x, y), 4, 4);
+            }
+
+            //绘制HU值提示
+            if (this._showHuTooltip && !string.IsNullOrEmpty(this._huTooltipText))
+            {
+                FormattedText text = new FormattedText(this._huTooltipText, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 10, Brushes.White);
+                double textX = this._huTooltipPosition.X + 10;
+                double textY = 2;
+
+                SolidColorBrush tooltipBrush = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+                context.DrawRectangle(tooltipBrush, null, new Rect(textX - 28, textY, text.Width + 8, text.Height + 4));
+                context.DrawText(text, new Point(textX - 24, textY + 2));
             }
         }
         #endregion
@@ -303,11 +341,38 @@ namespace MedicalSharp.Controls.UserControls
         }
         #endregion
 
+        #region 颜色带鼠标移动事件 —— void OnColorBandMouseMoved(object sender...
+        /// <summary>
+        /// 颜色带鼠标移动事件
+        /// </summary>
+        private void OnColorBandMouseMoved(object sender, PointerEventArgs eventArgs)
+        {
+            Point position = eventArgs.GetPosition(this);
+            short hu = (short)(Constants.MinHU + (position.X / this.Bounds.Width) * (Constants.MaxHU - Constants.MinHU));
+
+            this._huTooltipText = $"{hu} HU";
+            this._huTooltipPosition = position;
+            this._showHuTooltip = true;
+            this.InvalidateVisual();
+        }
+        #endregion
+
+        #region 颜色带鼠标离开事件 —— void OnColorBandMouseLeave(object sender...
+        /// <summary>
+        /// 颜色带鼠标离开事件
+        /// </summary>
+        private void OnColorBandMouseLeave(object sender, PointerEventArgs eventArgs)
+        {
+            this._showHuTooltip = false;
+            this.InvalidateVisual();
+        }
+        #endregion
+
         #region 修改颜色菜单事件 —— async void OnEditColorClicked(object sender...
         /// <summary>
         /// 修改颜色菜单事件
         /// </summary>
-        private async void OnEditColorClicked(object sender, RoutedEventArgs e)
+        private async void OnEditColorClicked(object sender, RoutedEventArgs eventArgs)
         {
             if (this._rightClickTargetPoint == null)
             {
@@ -327,7 +392,7 @@ namespace MedicalSharp.Controls.UserControls
         /// <summary>
         /// 插入颜色菜单事件
         /// </summary>
-        private async void OnInsertColorClicked(object sender, RoutedEventArgs e)
+        private async void OnInsertColorClicked(object sender, RoutedEventArgs eventArgs)
         {
             AvaloniaList<ColorControlPoint> controlPoints = this.ControlPoints;
             if (controlPoints == null)
@@ -363,7 +428,7 @@ namespace MedicalSharp.Controls.UserControls
         /// <summary>
         /// 删除颜色菜单事件
         /// </summary>
-        private void OnDeleteColorClicked(object sender, RoutedEventArgs e)
+        private void OnDeleteColorClicked(object sender, RoutedEventArgs eventArgs)
         {
             if (this._rightClickTargetPoint != null)
             {
