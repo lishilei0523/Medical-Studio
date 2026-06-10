@@ -54,7 +54,10 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         protected override Task OnActivatedAsync(CancellationToken cancellationToken)
         {
             //默认值
-            this.ProtocolName = "Protocol_1";
+            if (string.IsNullOrWhiteSpace(this.ProtocolName))
+            {
+                this.ProtocolName = "Protocol_1";
+            }
 
             return base.OnActivatedAsync(cancellationToken);
         }
