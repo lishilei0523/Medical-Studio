@@ -15,6 +15,7 @@ namespace MedicalSharp.Client
         /// </summary>
         public override void Initialize()
         {
+            base.Initialize();
             AvaloniaXamlLoader.Load(this);
         }
 
@@ -29,7 +30,7 @@ namespace MedicalSharp.Client
             Startup startup = new Startup();
             startup.Initialize();
 
-            // 主窗口关闭就退出
+            //主窗口关闭退出应用程序
             if (base.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
