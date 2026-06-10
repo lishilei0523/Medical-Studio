@@ -4,8 +4,14 @@ using System;
 
 namespace MedicalSharp.Client
 {
-    class Program
+    /// <summary>
+    /// 主程序
+    /// </summary>
+    public class Program
     {
+        /// <summary>
+        /// 主入口函数
+        /// </summary>
         [STAThread]
         static void Main(string[] args)
         {
@@ -13,6 +19,9 @@ namespace MedicalSharp.Client
             appBuilder.StartWithClassicDesktopLifetime(args, ShutdownMode.OnLastWindowClose);
         }
 
+        /// <summary>
+        /// 构建Avalonia应用程序
+        /// </summary>
         static AppBuilder BuildAvaloniaApp()
         {
             AppBuilder appBuilder = AppBuilder.Configure<App>();
