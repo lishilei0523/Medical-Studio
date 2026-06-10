@@ -32,7 +32,7 @@ namespace MedicalSharp.Client
             });
             appBuilder.With(new X11PlatformOptions
             {
-                RenderingMode = [X11RenderingMode.Glx, X11RenderingMode.Egl, X11RenderingMode.Vulkan]
+                RenderingMode = [X11RenderingMode.Glx, X11RenderingMode.Egl]
             });
             appBuilder.UseSkia();
 
