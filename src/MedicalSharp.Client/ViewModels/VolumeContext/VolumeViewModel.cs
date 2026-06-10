@@ -457,17 +457,19 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 field = value;
                 this.NotifyOfPropertyChange();
-
-                //应用协议
-                this.WindowWidth = value.WindowWidth;
-                this.WindowCenter = value.WindowCenter;
-                this.Brightness = value.Brightness;
-                this.DensityScale = value.DensityScale;
-                this.StepSize = value.StepSize;
-                this.MaxStepsCount = value.MaxStepsCount;
-                this.OpacityThreshold = value.OpacityThreshold;
-                this.TFControlPoints = new AvaloniaList<DensityControlPoint>(value.ControlPoints.Select(x => x.ToDensityControlPoint()));
-                this.FrameToken++;
+                if (value != null)
+                {
+                    //应用协议
+                    this.WindowWidth = value.WindowWidth;
+                    this.WindowCenter = value.WindowCenter;
+                    this.Brightness = value.Brightness;
+                    this.DensityScale = value.DensityScale;
+                    this.StepSize = value.StepSize;
+                    this.MaxStepsCount = value.MaxStepsCount;
+                    this.OpacityThreshold = value.OpacityThreshold;
+                    this.TFControlPoints = new AvaloniaList<DensityControlPoint>(value.ControlPoints.Select(x => x.ToDensityControlPoint()));
+                    this.FrameToken++;
+                }
             }
         }
         #endregion
@@ -560,6 +562,33 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Camera.SetRotation(-90.0f, 0);
             this.FrameToken++;
         }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 刷新协议命令 —— ICommand ReloadProtocolsCommand
+        /// <summary>
+        /// 刷新协议命令
+        /// </summary>
+        public ICommand ReloadProtocolsCommand => new AsyncRelayCommand(async _ =>
+        {
+            await this.InitPresetProtocols();
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 删除协议命令 —— ICommand RemoveProtocolCommand
+        /// <summary>
+        /// 删除协议命令
+        /// </summary>
+        public ICommand RemoveProtocolCommand => new AsyncRelayCommand(async _ =>
+        {
+            RaycastProtocol protocol = this.SelectedProtocol;
+            string path = $"{Constants.VRProtocolPath}/{protocol.Name}.json";
+            if (File.Exists(path))
+            {
+                await Task.Run(() => File.Delete(path));
+            }
+            this.PresetProtocols.Remove(protocol);
+
+        }, _ => this.VolumeData != null && this.SelectedProtocol != null);
         #endregion
 
         #region 调节协议命令 —— ICommand TuneProtocolCommand

@@ -133,6 +133,12 @@
                                                 <TextBlock Text="{Binding Name}" />
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
+                                        <ListBox.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuItem Header="刷新(_E)" Command="{Binding ReloadProtocolsCommand}" />
+                                                <MenuItem Header="删除(_D)" Command="{Binding RemoveProtocolCommand}" />
+                                            </MenuFlyout>
+                                        </ListBox.ContextFlyout>
                                     </ListBox>
                                 </MenuItem>
 								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />

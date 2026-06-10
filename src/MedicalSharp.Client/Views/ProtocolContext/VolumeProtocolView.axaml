@@ -18,9 +18,17 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Grid.IsSharedSizeScope="True" Margin="10,5,10,0">
             <sd:FormItem Label="预设窗：">
-                <ComboBox Width="300" ItemsSource="{Binding WindowLevels}"
-                          DisplayMemberBinding="{Binding}"
-                          SelectedValue="{Binding SelectedWindowLevel}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Column="0" Width="300" ItemsSource="{Binding WindowLevels}"
+                              DisplayMemberBinding="{Binding}"
+                              SelectedValue="{Binding SelectedWindowLevel}" />
+                    <TextBlock Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" 
+                               Text="{Binding VolumeViewModel.SelectedProtocol.Name}" />
+                </Grid>
             </sd:FormItem>
             <sd:FormItem Label="窗宽：">
                 <Grid>
@@ -125,12 +133,12 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
-                                   Minimum="0.5" Maximum="1.0" Increment="0.01"
+                                   Minimum="0.01" Maximum="1.0" Increment="0.01"
                                    ParsingNumberStyle="Float" FormatString="F2"
                                    Text="{Binding VolumeViewModel.OpacityThreshold}" />
                     <Slider Grid.Column="1" Margin="10,0,0,0"
-                            Minimum="0.5" Maximum="1.0" SmallChange="0.01" LargeChange="0.05"
-                            TickFrequency="0.01" TickPlacement="Outside"
+                            Minimum="0.01" Maximum="1.0" SmallChange="0.01" LargeChange="0.05"
+                            TickFrequency="0.02" TickPlacement="Outside"
                             Value="{Binding VolumeViewModel.OpacityThreshold}" />
                 </Grid>
             </sd:FormItem>

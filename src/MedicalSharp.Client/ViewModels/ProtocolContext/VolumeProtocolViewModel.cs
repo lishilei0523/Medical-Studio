@@ -206,7 +206,6 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                 WindowLevelManager.Vascular,
                 WindowLevelManager.Mediastinum
             ];
-            this.SelectedWindowLevel = WindowLevelManager.Default;
 
             this.ControlPointGroups = new Dictionary<string, DensityControlPoint[]>();
             KeyValuePair<string, DensityControlPoint[]> defaultControlPoints = new("默认", [.. this.VolumeViewModel.TFControlPoints]);
@@ -230,6 +229,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         public async Task SaveProtocol()
         {
             SaveProtocolViewModel viewModel = ResolveMediator.Resolve<SaveProtocolViewModel>();
+            viewModel.ProtocolName = this.VolumeViewModel.SelectedProtocol?.Name;
             bool? result = await this._windowManager.ShowDialogAsync(viewModel);
             if (result == true)
             {
