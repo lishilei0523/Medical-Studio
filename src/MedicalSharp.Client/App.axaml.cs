@@ -1,4 +1,6 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
 namespace MedicalSharp.Client
@@ -26,6 +28,12 @@ namespace MedicalSharp.Client
             //Caliburn启动
             Startup startup = new Startup();
             startup.Initialize();
+
+            // 主窗口关闭就退出
+            if (base.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            }
         }
     }
 }
