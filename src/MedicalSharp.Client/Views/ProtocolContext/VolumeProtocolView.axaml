@@ -7,172 +7,193 @@
               xmlns:sd="https://github.com/lishilei0523/SD.Framework"
               xmlns:cm="http://caliburnmicro.com"
               mc:Ignorable="d"
-              Width="710" Height="985" CanResize="False" ShowAsDialog="True"
+              Width="710" Height="640" CanResize="False" ShowAsDialog="True"
               WindowStartupLocation="CenterScreen"
               Title="体积渲染协议">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Grid.IsSharedSizeScope="True" Margin="10,5,10,0">
-            <sd:FormItem Label="预设窗：">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <ComboBox Grid.Column="0" Width="300" ItemsSource="{Binding WindowLevels}"
-                              DisplayMemberBinding="{Binding}"
-                              SelectedValue="{Binding SelectedWindowLevel}" />
-                    <TextBlock Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" 
-                               Text="{Binding VolumeViewModel.SelectedProtocol.Name}" />
-                </Grid>
-            </sd:FormItem>
-            <sd:FormItem Label="窗宽：">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
-                                   Minimum="1" Maximum="4096" Increment="1"
-                                   ParsingNumberStyle="Integer" FormatString="F0"
-                                   Text="{Binding VolumeViewModel.WindowWidth}" />
-                    <Slider Grid.Column="1" Margin="10,0,0,0"
-                            Minimum="1" Maximum="4096" SmallChange="1" LargeChange="10"
-                            TickFrequency="100" TickPlacement="Outside"
-                            Value="{Binding VolumeViewModel.WindowWidth}" />
-                </Grid>
-            </sd:FormItem>
-            <sd:FormItem Label="窗位：">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
-                                   Minimum="-1024" Maximum="3071" Increment="1"
-                                   ParsingNumberStyle="Integer" FormatString="F0"
-                                   Text="{Binding VolumeViewModel.WindowCenter}" />
-                    <Slider Grid.Column="1" Margin="10,0,0,0"
-                            Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
-                            TickFrequency="100" TickPlacement="Outside"
-                            Value="{Binding VolumeViewModel.WindowCenter}" />
-                </Grid>
-            </sd:FormItem>
-            <sd:FormItem Label="亮度：">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
-                                   Minimum="0.1" Maximum="5.0" Increment="0.1"
-                                   ParsingNumberStyle="Float" FormatString="F1"
-                                   Text="{Binding VolumeViewModel.Brightness}" />
-                    <Slider Grid.Column="1" Margin="10,0,0,0"
-                            Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
-                            TickFrequency="0.1" TickPlacement="Outside"
-                            Value="{Binding VolumeViewModel.Brightness}" />
-                </Grid>
-            </sd:FormItem>
-            <sd:FormItem Label="密度缩放：">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
-                                   Minimum="0.1" Maximum="5.0" Increment="0.1"
-                                   ParsingNumberStyle="Float" FormatString="F1"
-                                   Text="{Binding VolumeViewModel.DensityScale}" />
-                    <Slider Grid.Column="1" Margin="10,0,0,0"
-                            Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="0.5"
-                            TickFrequency="0.1" TickPlacement="Outside"
-                            Value="{Binding VolumeViewModel.DensityScale}" />
-                </Grid>
-            </sd:FormItem>
-            <sd:FormItem Label="步长：">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
-                                   Minimum="0.0001" Maximum="0.01" Increment="0.0001"
-                                   ParsingNumberStyle="Float" FormatString="F4"
-                                   Text="{Binding VolumeViewModel.StepSize}" />
-                    <Slider Grid.Column="1" Margin="10,0,0,0"
-                            Minimum="0.0001" Maximum="0.01" SmallChange="0.0001" LargeChange="0.001"
-                            TickFrequency="0.0002" TickPlacement="Outside"
-                            Value="{Binding VolumeViewModel.StepSize}" />
-                </Grid>
-            </sd:FormItem>
-            <sd:FormItem Label="最大步数：">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
-                                   Minimum="100" Maximum="3000" Increment="1"
-                                   ParsingNumberStyle="Integer" FormatString="F0"
-                                   Text="{Binding VolumeViewModel.MaxStepsCount}" />
-                    <Slider Grid.Column="1" Margin="10,0,0,0"
-                            Minimum="100" Maximum="3000" SmallChange="50" LargeChange="200"
-                            TickFrequency="60" TickPlacement="Outside"
-                            Value="{Binding VolumeViewModel.MaxStepsCount}" />
-                </Grid>
-            </sd:FormItem>
-            <sd:FormItem Label="透明度阈值：">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
-                                   Minimum="0.01" Maximum="1.0" Increment="0.01"
-                                   ParsingNumberStyle="Float" FormatString="F2"
-                                   Text="{Binding VolumeViewModel.OpacityThreshold}" />
-                    <Slider Grid.Column="1" Margin="10,0,0,0"
-                            Minimum="0.01" Maximum="1.0" SmallChange="0.01" LargeChange="0.05"
-                            TickFrequency="0.02" TickPlacement="Outside"
-                            Value="{Binding VolumeViewModel.OpacityThreshold}" />
-                </Grid>
-            </sd:FormItem>
-            <sd:FormItem Label="插值模式：">
-                <ComboBox Width="300"
-                          ItemsSource="{Binding InterpolationModes}"
-                          DisplayMemberBinding="{Binding Value}"
-                          SelectedValue="{Binding SelectedInterpolationMode}" />
-            </sd:FormItem>
-            <sd:FormItem Label="预设控制点：">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <ComboBox Grid.Column="0" Width="300" ItemsSource="{Binding ControlPointGroups}"
-                              DisplayMemberBinding="{Binding Key}"
-                              SelectedValue="{Binding SelectedControlPoints}" />
-                    <Button Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" Classes="Focus"
-                            Content="保存协议" cm:Message.Attach="SaveProtocol();" />
-                </Grid>
-            </sd:FormItem>
-        </StackPanel>
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <sd:ColorBand Grid.Row="0" Width="650" Height="50" Margin="0,0,0,-2"
-                          InterpolationMode="{Binding VolumeViewModel.InterpolationMode}"
-                          ControlPoints="{Binding ColorControlPoints}" />
-            <sd:AlphaCurveEditor Grid.Row="1" Width="650" Height="300"
-                                 ControlPoints="{Binding AlphaControlPoints}"
-                                 NormalizedHistogram="{Binding NormalizedHistogram}" />
-        </Grid>
-    </Grid>
+    <TabControl>
+        <TabItem Header="参数设置" Margin="10,5,0,0">
+            <StackPanel Grid.IsSharedSizeScope="True" Margin="10,20,10,0">
+                <sd:FormItem Label="预设窗：">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Grid.Column="0" Width="300" ItemsSource="{Binding WindowLevels}"
+                                  DisplayMemberBinding="{Binding}"
+                                  SelectedValue="{Binding SelectedWindowLevel}" />
+                        <TextBlock Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right"
+                                   Text="{Binding VolumeViewModel.SelectedProtocol.Name}" />
+                    </Grid>
+                </sd:FormItem>
+                <sd:FormItem Label="窗宽：">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                       Minimum="1" Maximum="4096" Increment="1"
+                                       ParsingNumberStyle="Integer" FormatString="F0"
+                                       Text="{Binding VolumeViewModel.WindowWidth}" />
+                        <Slider Grid.Column="1" Margin="10,0,0,0"
+                                Minimum="1" Maximum="4096" SmallChange="1" LargeChange="10"
+                                TickFrequency="100" TickPlacement="Outside"
+                                Value="{Binding VolumeViewModel.WindowWidth}" />
+                    </Grid>
+                </sd:FormItem>
+                <sd:FormItem Label="窗位：">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                       Minimum="-1024" Maximum="3071" Increment="1"
+                                       ParsingNumberStyle="Integer" FormatString="F0"
+                                       Text="{Binding VolumeViewModel.WindowCenter}" />
+                        <Slider Grid.Column="1" Margin="10,0,0,0"
+                                Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
+                                TickFrequency="100" TickPlacement="Outside"
+                                Value="{Binding VolumeViewModel.WindowCenter}" />
+                    </Grid>
+                </sd:FormItem>
+                <sd:FormItem Label="亮度：">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                       Minimum="0.1" Maximum="5.0" Increment="0.1"
+                                       ParsingNumberStyle="Float" FormatString="F1"
+                                       Text="{Binding VolumeViewModel.Brightness}" />
+                        <Slider Grid.Column="1" Margin="10,0,0,0"
+                                Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
+                                TickFrequency="0.1" TickPlacement="Outside"
+                                Value="{Binding VolumeViewModel.Brightness}" />
+                    </Grid>
+                </sd:FormItem>
+                <sd:FormItem Label="密度缩放：">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                       Minimum="0.1" Maximum="5.0" Increment="0.1"
+                                       ParsingNumberStyle="Float" FormatString="F1"
+                                       Text="{Binding VolumeViewModel.DensityScale}" />
+                        <Slider Grid.Column="1" Margin="10,0,0,0"
+                                Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="0.5"
+                                TickFrequency="0.1" TickPlacement="Outside"
+                                Value="{Binding VolumeViewModel.DensityScale}" />
+                    </Grid>
+                </sd:FormItem>
+                <sd:FormItem Label="步长：">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                       Minimum="0.0001" Maximum="0.01" Increment="0.0001"
+                                       ParsingNumberStyle="Float" FormatString="F4"
+                                       Text="{Binding VolumeViewModel.StepSize}" />
+                        <Slider Grid.Column="1" Margin="10,0,0,0"
+                                Minimum="0.0001" Maximum="0.01" SmallChange="0.0001" LargeChange="0.001"
+                                TickFrequency="0.0002" TickPlacement="Outside"
+                                Value="{Binding VolumeViewModel.StepSize}" />
+                    </Grid>
+                </sd:FormItem>
+                <sd:FormItem Label="最大步数：">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                       Minimum="100" Maximum="3000" Increment="1"
+                                       ParsingNumberStyle="Integer" FormatString="F0"
+                                       Text="{Binding VolumeViewModel.MaxStepsCount}" />
+                        <Slider Grid.Column="1" Margin="10,0,0,0"
+                                Minimum="100" Maximum="3000" SmallChange="50" LargeChange="200"
+                                TickFrequency="60" TickPlacement="Outside"
+                                Value="{Binding VolumeViewModel.MaxStepsCount}" />
+                    </Grid>
+                </sd:FormItem>
+                <sd:FormItem Label="透明度阈值：">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
+                                       Minimum="0.01" Maximum="1.0" Increment="0.01"
+                                       ParsingNumberStyle="Float" FormatString="F2"
+                                       Text="{Binding VolumeViewModel.OpacityThreshold}" />
+                        <Slider Grid.Column="1" Margin="10,0,0,0"
+                                Minimum="0.01" Maximum="1.0" SmallChange="0.01" LargeChange="0.05"
+                                TickFrequency="0.02" TickPlacement="Outside"
+                                Value="{Binding VolumeViewModel.OpacityThreshold}" />
+                    </Grid>
+                </sd:FormItem>
+                <sd:FormItem>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" Classes="Focus"
+                                Content="保存协议" cm:Message.Attach="SaveProtocol();" />
+                    </Grid>
+                </sd:FormItem>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="传递函数" Margin="5,5,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Grid.IsSharedSizeScope="True" Margin="10,20,10,0">
+                    <sd:FormItem Label="插值模式：">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0" Width="300"
+                                      ItemsSource="{Binding InterpolationModes}"
+                                      DisplayMemberBinding="{Binding Value}"
+                                      SelectedValue="{Binding SelectedInterpolationMode}" />
+                            <TextBlock Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right"
+                                       Text="{Binding VolumeViewModel.SelectedProtocol.Name}" />
+                        </Grid>
+                    </sd:FormItem>
+                    <sd:FormItem Label="预设控制点：">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0" Width="300" ItemsSource="{Binding ControlPointGroups}"
+                                      DisplayMemberBinding="{Binding Key}"
+                                      SelectedValue="{Binding SelectedControlPoints}" />
+                            <Button Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" Classes="Focus"
+                                    Content="保存协议" cm:Message.Attach="SaveProtocol();" />
+                        </Grid>
+                    </sd:FormItem>
+                </StackPanel>
+                <sd:ColorBand Grid.Row="1" Width="650" Height="50" Margin="0,0,0,-2"
+                              InterpolationMode="{Binding VolumeViewModel.InterpolationMode}"
+                              ControlPoints="{Binding ColorControlPoints}" />
+                <sd:AlphaCurveEditor Grid.Row="2" Width="650" Height="400"
+                                     ControlPoints="{Binding AlphaControlPoints}"
+                                     NormalizedHistogram="{Binding NormalizedHistogram}" />
+            </Grid>
+        </TabItem>
+    </TabControl>
 </fa:AppWindow>
