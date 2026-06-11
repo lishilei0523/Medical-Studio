@@ -166,11 +166,9 @@ namespace MedicalSharp.Controls.UserControls
         {
             base.Render(context);
 
-            AvaloniaList<ColorControlPoint> controlPoints = this.ControlPoints;
-
             #region # 验证
 
-            if (controlPoints == null || !controlPoints.Any())
+            if (this.ControlPoints == null || !this.ControlPoints.Any())
             {
                 return;
             }
@@ -182,7 +180,7 @@ namespace MedicalSharp.Controls.UserControls
             #endregion
 
             //按HU值排序
-            List<ColorControlPoint> sortedControlPoints = controlPoints.OrderBy(point => point.HU).ToList();
+            List<ColorControlPoint> sortedControlPoints = this.ControlPoints.OrderBy(point => point.HU).ToList();
 
             //逐像素绘制渐变
             for (int x = 0; x < (int)this.Bounds.Width; x++)
@@ -196,17 +194,17 @@ namespace MedicalSharp.Controls.UserControls
             }
 
             //绘制控制点标记
-            foreach (ColorControlPoint point in sortedControlPoints)
+            foreach (ColorControlPoint controlPoint in sortedControlPoints)
             {
-                double x = (point.HU - Constants.MinHU) / (double)(Constants.MaxHU - Constants.MinHU) * this.Bounds.Width;
+                double x = (controlPoint.HU - Constants.MinHU) / (double)(Constants.MaxHU - Constants.MinHU) * this.Bounds.Width;
                 double y = this.Bounds.Height / 2;
-                SolidColorBrush markerFill = new SolidColorBrush(point.Color);
+                SolidColorBrush markerFill = new SolidColorBrush(controlPoint.Color);
                 Pen markerPen = new Pen(Brushes.White, 1);
                 context.DrawEllipse(markerFill, markerPen, new Point(x, y), 4, 4);
             }
 
             //绘制HU值提示
-            if (this._showHuTooltip && !string.IsNullOrEmpty(this._huTooltipText))
+            if (this._showHuTooltip && !string.IsNullOrWhiteSpace(this._huTooltipText))
             {
                 FormattedText text = new FormattedText(this._huTooltipText, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 10, Brushes.White);
                 double textX = this._huTooltipPosition.X + 10;
@@ -311,7 +309,7 @@ namespace MedicalSharp.Controls.UserControls
 
         //Events
 
-        #region 插值模式改变事件 —— static void OnInterpolationModeChanged(VolumeViewport viewport...
+        #region 插值模式改变事件 —— static void OnInterpolationModeChanged(ColorBand control...
         /// <summary>
         /// 插值模式改变事件
         /// </summary>
