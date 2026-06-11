@@ -29,8 +29,8 @@ namespace MedicalSharp.Presentation.Maps
             {
                 VoxelsCount = metadata.VoxelsCount,
                 VolumeSize = $"{metadata.VolumeSize.X}×{metadata.VolumeSize.Y}×{metadata.VolumeSize.Z}",
-                Spacing = $"{metadata.Spacing.X:F2}×{metadata.Spacing.Y:F2}×{metadata.Spacing.Z:F2}",
-                PhysicalSize = $"{metadata.PhysicalSize.X:F0}×{metadata.PhysicalSize.Y:F0}×{metadata.PhysicalSize.Z:F0}",
+                Spacing = $"{metadata.Spacing.X:F2}×{metadata.Spacing.Y:F2}×{metadata.Spacing.Z:F2} mm",
+                PhysicalSize = $"{metadata.PhysicalSize.X:F0}×{metadata.PhysicalSize.Y:F0}×{metadata.PhysicalSize.Z:F0} mm",
                 RescaleSlope = metadata.RescaleSlope.ToString("F2"),
                 RescaleIntercept = metadata.RescaleIntercept.ToString("F2"),
                 HURange = $"{metadata.MinHU} ~ {metadata.MaxHU}",
