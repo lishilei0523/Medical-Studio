@@ -13,6 +13,7 @@
         public string Modality { get; set; }
         #endregion
 
+
         //CT
 
         #region 管电压 —— string KVP
