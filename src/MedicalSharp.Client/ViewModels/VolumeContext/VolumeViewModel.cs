@@ -103,6 +103,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.StepSize = 0.0012f;
             this.MaxStepsCount = 1000;
             this.OpacityThreshold = 0.99f;
+            this.InterpolationMode = InterpolationMode.Linear;
             this.TFControlPoints = new AvaloniaList<DensityControlPoint>(ProtocolManager.AnatomyControlPoints);
         }
 
@@ -398,6 +399,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public float OpacityThreshold { get; set; }
         #endregion
 
+        #region 插值模式 —— InterpolationMode InterpolationMode
+        /// <summary>
+        /// 插值模式
+        /// </summary>
+        [DependencyProperty]
+        public InterpolationMode InterpolationMode { get; set; }
+        #endregion
+
         #region 传递函数控制点列表 —— AvaloniaList<DensityControlPoint> TFControlPoints
         /// <summary>
         /// 传递函数控制点列表
@@ -467,6 +476,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this.StepSize = value.StepSize;
                     this.MaxStepsCount = value.MaxStepsCount;
                     this.OpacityThreshold = value.OpacityThreshold;
+                    this.InterpolationMode = value.InterpolationMode;
                     this.TFControlPoints = new AvaloniaList<DensityControlPoint>(value.ControlPoints.Select(x => x.ToDensityControlPoint()));
                     this.FrameToken++;
                 }

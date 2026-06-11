@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MedicalSharp.Primitives.Enums;
+using System.Collections.Generic;
 
 namespace MedicalSharp.Presentation.Models
 {
@@ -40,6 +41,13 @@ namespace MedicalSharp.Presentation.Models
         /// 对比度
         /// </summary>
         public float Contrast { get; set; }
+        #endregion
+
+        #region 插值模式 —— InterpolationMode InterpolationMode
+        /// <summary>
+        /// 插值模式
+        /// </summary>
+        public InterpolationMode InterpolationMode { get; set; }
         #endregion
 
         #region 控制点列表 —— List<MprProtocolPoint> ControlPoints

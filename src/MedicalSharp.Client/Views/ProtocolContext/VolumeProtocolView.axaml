@@ -7,7 +7,7 @@
               xmlns:sd="https://github.com/lishilei0523/SD.Framework"
               xmlns:cm="http://caliburnmicro.com"
               mc:Ignorable="d"
-              Width="710" Height="935" CanResize="False" ShowAsDialog="True"
+              Width="710" Height="985" CanResize="False" ShowAsDialog="True"
               WindowStartupLocation="CenterScreen"
               Title="体积渲染协议">
 
@@ -142,6 +142,12 @@
                             Value="{Binding VolumeViewModel.OpacityThreshold}" />
                 </Grid>
             </sd:FormItem>
+            <sd:FormItem Label="插值模式：">
+                <ComboBox Width="300"
+                          ItemsSource="{Binding InterpolationModes}"
+                          DisplayMemberBinding="{Binding Value}"
+                          SelectedValue="{Binding SelectedInterpolationMode}" />
+            </sd:FormItem>
             <sd:FormItem Label="预设控制点：">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -161,7 +167,9 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <sd:ColorBand Grid.Row="0" Width="650" Height="50" Margin="0,0,0,-2" ControlPoints="{Binding ColorControlPoints}" />
+            <sd:ColorBand Grid.Row="0" Width="650" Height="50" Margin="0,0,0,-2"
+                          InterpolationMode="{Binding VolumeViewModel.InterpolationMode}"
+                          ControlPoints="{Binding ColorControlPoints}" />
             <sd:AlphaCurveEditor Grid.Row="1" Width="650" Height="300"
                                  ControlPoints="{Binding AlphaControlPoints}"
                                  NormalizedHistogram="{Binding NormalizedHistogram}" />

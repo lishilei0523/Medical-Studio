@@ -58,6 +58,11 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<float> ContrastProperty;
 
         /// <summary>
+        /// 插值模式依赖属性
+        /// </summary>
+        public static readonly StyledProperty<InterpolationMode> InterpolationModeProperty;
+
+        /// <summary>
         /// 传递函数控制点列表依赖属性
         /// </summary>
         public static readonly StyledProperty<AvaloniaList<HUControlPoint>> TFControlPointsProperty;
@@ -78,6 +83,7 @@ namespace MedicalSharp.Controls.Viewports
             WindowCenterProperty = AvaloniaProperty.Register<MPRViewport, int>(nameof(WindowCenter), 40);
             BrightnessProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Brightness), 1.0f);
             ContrastProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Contrast), 1.0f);
+            InterpolationModeProperty = AvaloniaProperty.Register<MPRViewport, InterpolationMode>(nameof(InterpolationMode), InterpolationMode.Linear);
             TFControlPointsProperty = AvaloniaProperty.Register<MPRViewport, AvaloniaList<HUControlPoint>>(nameof(TFControlPoints));
             VolumeDataProperty = AvaloniaProperty.Register<MPRViewport, VolumeData>(nameof(VolumeData));
 
@@ -88,6 +94,7 @@ namespace MedicalSharp.Controls.Viewports
             WindowCenterProperty.Changed.AddClassHandler<MPRViewport, int>(OnWindowCenterChanged);
             BrightnessProperty.Changed.AddClassHandler<MPRViewport, float>(OnBrightnessChanged);
             ContrastProperty.Changed.AddClassHandler<MPRViewport, float>(OnContrastChanged);
+            InterpolationModeProperty.Changed.AddClassHandler<MPRViewport, InterpolationMode>(OnInterpolationModeChanged);
             TFControlPointsProperty.Changed.AddClassHandler<MPRViewport, AvaloniaList<HUControlPoint>>(OnTFControlPointsChanged);
             VolumeDataProperty.Changed.AddClassHandler<MPRViewport, VolumeData>(OnVolumeDataChanged);
         }
@@ -177,6 +184,17 @@ namespace MedicalSharp.Controls.Viewports
         {
             get => this.GetValue(ContrastProperty);
             set => this.SetValue(ContrastProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 插值模式 —— InterpolationMode InterpolationMode
+        /// <summary>
+        /// 依赖属性 - 插值模式
+        /// </summary>
+        public InterpolationMode InterpolationMode
+        {
+            get => this.GetValue(InterpolationModeProperty);
+            set => this.SetValue(InterpolationModeProperty, value);
         }
         #endregion
 
@@ -506,6 +524,19 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnContrastChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._mprRenderer?.SetMaterialOptions(viewport.Brightness, eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 插值模式改变事件 —— static void OnInterpolationModeChanged(MPRViewport viewport...
+        /// <summary>
+        /// 插值模式改变事件
+        /// </summary>
+        private static void OnInterpolationModeChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<InterpolationMode> eventArgs)
+        {
+            viewport._mprRenderer?.TransferFunction.SwitchInterpolationMode(eventArgs.NewValue.Value);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();

@@ -7,6 +7,7 @@
     "StepSize": 0.0012,
     "MaxStepsCount": 1000,
     "OpacityThreshold": 0.99,
+    "InterpolationMode": 0,
     "ControlPoints": [
         {
             "Position": 0,

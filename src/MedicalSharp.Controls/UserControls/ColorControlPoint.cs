@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media;
+using MedicalSharp.Primitives.Enums;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -68,7 +69,7 @@ namespace MedicalSharp.Controls.UserControls
         /// <summary>
         /// 插值颜色
         /// </summary>
-        public static Color InterpolateColor(IReadOnlyList<ColorControlPoint> controlPoints, short hu)
+        public static Color InterpolateColor(IReadOnlyList<ColorControlPoint> controlPoints, short hu, InterpolationMode interpolationMode)
         {
             #region # 验证
 
@@ -93,6 +94,16 @@ namespace MedicalSharp.Controls.UserControls
                 {
                     double range = controlPoints[index + 1].HU - controlPoints[index].HU;
                     double t = range > 0 ? (hu - controlPoints[index].HU) / range : 0.0;
+
+                    //根据插值模式调整t值
+                    t = interpolationMode switch
+                    {
+                        InterpolationMode.Linear => t,
+                        InterpolationMode.Step => t < 0.5 ? 0.0 : 1.0,
+                        InterpolationMode.SmoothStep => t * t * (3.0 - 2.0 * t),
+                        _ => t
+                    };
+
                     byte r = (byte)(controlPoints[index].Color.R + (controlPoints[index + 1].Color.R - controlPoints[index].Color.R) * t);
                     byte g = (byte)(controlPoints[index].Color.G + (controlPoints[index + 1].Color.G - controlPoints[index].Color.G) * t);
                     byte b = (byte)(controlPoints[index].Color.B + (controlPoints[index + 1].Color.B - controlPoints[index].Color.B) * t);

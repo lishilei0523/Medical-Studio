@@ -64,6 +64,11 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<float> OpacityThresholdProperty;
 
         /// <summary>
+        /// 插值模式依赖属性
+        /// </summary>
+        public static readonly StyledProperty<InterpolationMode> InterpolationModeProperty;
+
+        /// <summary>
         /// 传递函数控制点列表依赖属性
         /// </summary>
         public static readonly StyledProperty<AvaloniaList<DensityControlPoint>> TFControlPointsProperty;
@@ -90,6 +95,7 @@ namespace MedicalSharp.Controls.Viewports
             DensityScaleProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(DensityScale), 1.0f);
             StepSizeProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(StepSize), 0.0012f);
             MaxStepsCountProperty = AvaloniaProperty.Register<VolumeViewport, int>(nameof(MaxStepsCount), 1000);
+            InterpolationModeProperty = AvaloniaProperty.Register<VolumeViewport, InterpolationMode>(nameof(InterpolationMode), InterpolationMode.Linear);
             OpacityThresholdProperty = AvaloniaProperty.Register<VolumeViewport, float>(nameof(OpacityThreshold), 0.99f);
             TFControlPointsProperty = AvaloniaProperty.Register<VolumeViewport, AvaloniaList<DensityControlPoint>>(nameof(TFControlPoints));
             DepthMaskEnabledProperty = AvaloniaProperty.Register<VolumeViewport, bool>(nameof(DepthMaskEnabled), false);
@@ -104,6 +110,7 @@ namespace MedicalSharp.Controls.Viewports
             StepSizeProperty.Changed.AddClassHandler<VolumeViewport, float>(OnStepSizeChanged);
             MaxStepsCountProperty.Changed.AddClassHandler<VolumeViewport, int>(OnMaxStepsCountChanged);
             OpacityThresholdProperty.Changed.AddClassHandler<VolumeViewport, float>(OnOpacityThresholdChanged);
+            InterpolationModeProperty.Changed.AddClassHandler<VolumeViewport, InterpolationMode>(OnInterpolationModeChanged);
             TFControlPointsProperty.Changed.AddClassHandler<VolumeViewport, AvaloniaList<DensityControlPoint>>(OnTFControlPointsChanged);
             VolumeDataProperty.Changed.AddClassHandler<VolumeViewport, VolumeData>(OnVolumeDataChanged);
         }
@@ -216,6 +223,17 @@ namespace MedicalSharp.Controls.Viewports
         {
             get => this.GetValue(OpacityThresholdProperty);
             set => this.SetValue(OpacityThresholdProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 插值模式 —— InterpolationMode InterpolationMode
+        /// <summary>
+        /// 依赖属性 - 插值模式
+        /// </summary>
+        public InterpolationMode InterpolationMode
+        {
+            get => this.GetValue(InterpolationModeProperty);
+            set => this.SetValue(InterpolationModeProperty, value);
         }
         #endregion
 
@@ -507,6 +525,19 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnOpacityThresholdChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._volumeRenderer?.SetSamplingOptions(viewport.StepSize, viewport.MaxStepsCount, eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 插值模式改变事件 —— static void OnInterpolationModeChanged(VolumeViewport viewport...
+        /// <summary>
+        /// 插值模式改变事件
+        /// </summary>
+        private static void OnInterpolationModeChanged(VolumeViewport viewport, AvaloniaPropertyChangedEventArgs<InterpolationMode> eventArgs)
+        {
+            viewport._volumeRenderer?.TransferFunction.SwitchInterpolationMode(eventArgs.NewValue.Value);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();

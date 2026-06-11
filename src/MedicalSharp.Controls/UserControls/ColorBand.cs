@@ -5,6 +5,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using MedicalSharp.Primitives;
+using MedicalSharp.Primitives.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -22,6 +23,11 @@ namespace MedicalSharp.Controls.UserControls
         #region # 字段及构造器
 
         /// <summary>
+        /// 插值模式依赖属性
+        /// </summary>
+        public static readonly StyledProperty<InterpolationMode> InterpolationModeProperty;
+
+        /// <summary>
         /// 颜色控制点列表依赖属性
         /// </summary>
         public static readonly StyledProperty<AvaloniaList<ColorControlPoint>> ControlPointsProperty;
@@ -31,7 +37,11 @@ namespace MedicalSharp.Controls.UserControls
         /// </summary>
         static ColorBand()
         {
+            InterpolationModeProperty = AvaloniaProperty.Register<ColorBand, InterpolationMode>(nameof(InterpolationMode), InterpolationMode.Linear);
             ControlPointsProperty = AvaloniaProperty.Register<ColorBand, AvaloniaList<ColorControlPoint>>(nameof(ControlPoints), []);
+
+            //属性改变事件
+            InterpolationModeProperty.Changed.AddClassHandler<ColorBand, InterpolationMode>(OnInterpolationModeChanged);
             ControlPointsProperty.Changed.AddClassHandler<ColorBand, AvaloniaList<ColorControlPoint>>(OnColorPointsChanged);
         }
 
@@ -120,6 +130,17 @@ namespace MedicalSharp.Controls.UserControls
 
         #region # 属性
 
+        #region 依赖属性 - 插值模式 —— InterpolationMode InterpolationMode
+        /// <summary>
+        /// 依赖属性 - 插值模式
+        /// </summary>
+        public InterpolationMode InterpolationMode
+        {
+            get => this.GetValue(InterpolationModeProperty);
+            set => this.SetValue(InterpolationModeProperty, value);
+        }
+        #endregion
+
         #region 依赖属性 - 颜色控制点列表 —— AvaloniaList<ColorControlPoint> ControlPoints
         /// <summary>
         /// 依赖属性 - 颜色控制点列表
@@ -167,7 +188,7 @@ namespace MedicalSharp.Controls.UserControls
             for (int x = 0; x < (int)this.Bounds.Width; x++)
             {
                 short hu = (short)Math.Round(Constants.MinHU + (x / this.Bounds.Width) * (Constants.MaxHU - Constants.MinHU));
-                Color color = ColorControlPoint.InterpolateColor(sortedControlPoints, hu);
+                Color color = ColorControlPoint.InterpolateColor(sortedControlPoints, hu, this.InterpolationMode);
 
                 SolidColorBrush brush = new SolidColorBrush(color);
                 Pen pen = new Pen(brush);
@@ -290,6 +311,16 @@ namespace MedicalSharp.Controls.UserControls
 
         //Events
 
+        #region 插值模式改变事件 —— static void OnInterpolationModeChanged(VolumeViewport viewport...
+        /// <summary>
+        /// 插值模式改变事件
+        /// </summary>
+        private static void OnInterpolationModeChanged(ColorBand control, AvaloniaPropertyChangedEventArgs<InterpolationMode> eventArgs)
+        {
+            control.InvalidateVisual();
+        }
+        #endregion
+
         #region 颜色控制点列表改变事件 —— static void OnColorPointsChanged(ColorBand control...
         /// <summary>
         /// 颜色控制点列表改变事件
@@ -401,7 +432,7 @@ namespace MedicalSharp.Controls.UserControls
             }
 
             List<ColorControlPoint> sorted = controlPoints.OrderBy(p => p.HU).ToList();
-            Color currentColor = ColorControlPoint.InterpolateColor(sorted, this._rightClickHU);
+            Color currentColor = ColorControlPoint.InterpolateColor(sorted, this._rightClickHU, this.InterpolationMode);
 
             Color? selectedColor = await this.ShowColorPicker(currentColor);
             if (selectedColor.HasValue)

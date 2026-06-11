@@ -224,6 +224,7 @@
 						   StepSize="{Binding StepSize}"
 						   MaxStepsCount="{Binding MaxStepsCount}"
 						   OpacityThreshold="{Binding OpacityThreshold}"
+						   InterpolationMode="{Binding InterpolationMode}"
 						   TFControlPoints="{Binding TFControlPoints}">
 			<sd:ShapePresenter3D Content="{Binding AxialPlane}" />
 			<sd:ShapePresenter3D Content="{Binding CoronalPlane}" />

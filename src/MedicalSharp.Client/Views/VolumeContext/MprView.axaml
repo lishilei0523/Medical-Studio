@@ -163,6 +163,7 @@
 								WindowCenter="{Binding WindowCenter}"
 								Brightness="{Binding Brightness}"
 								Contrast="{Binding Contrast}"
+                                InterpolationMode="{Binding InterpolationMode}"
 								TFControlPoints="{Binding TFControlPoints}">
 					<sd:ShapePresenter3D Content="{Binding Crosshair}" />
 					<sd:ShapesPresenter3D ItemsSource="{Binding Shapes}" />

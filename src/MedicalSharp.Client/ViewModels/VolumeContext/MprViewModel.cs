@@ -88,6 +88,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.DirectionVisible = true;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
+            this.InterpolationMode = InterpolationMode.Linear;
             this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.SolidRainbowControlPoints);
             this.Translate3D();
         }
@@ -311,6 +312,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public float Contrast { get; set; }
         #endregion
 
+        #region 插值模式 —— InterpolationMode InterpolationMode
+        /// <summary>
+        /// 插值模式
+        /// </summary>
+        [DependencyProperty]
+        public InterpolationMode InterpolationMode { get; set; }
+        #endregion
+
         #region 传递函数控制点列表 —— AvaloniaList<HUControlPoint> TFControlPoints
         /// <summary>
         /// 传递函数控制点列表
@@ -369,6 +378,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this.WindowCenter = value.WindowCenter;
                     this.Brightness = value.Brightness;
                     this.Contrast = value.Contrast;
+                    this.InterpolationMode = value.InterpolationMode;
                     this.TFControlPoints = new AvaloniaList<HUControlPoint>(value.ControlPoints.Select(x => x.ToHUControlPoint()));
                     this.FrameToken++;
                 }

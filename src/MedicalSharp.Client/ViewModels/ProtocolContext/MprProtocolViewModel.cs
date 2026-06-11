@@ -8,14 +8,17 @@ using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using SD.Common;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.CustomControls;
 using SD.IOC.Core.Mediators;
 using SD.Toolkits.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -109,6 +112,30 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         public AvaloniaList<WindowLevel> WindowLevels { get; set; }
         #endregion
 
+        #region 已选插值模式 —— KeyValuePair<string, string> SelectedInterpolationMode
+        /// <summary>
+        /// 已选插值模式
+        /// </summary>
+        public KeyValuePair<string, string> SelectedInterpolationMode
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.MprViewModel.InterpolationMode = Enum.Parse<InterpolationMode>(value.Key);
+            }
+        }
+        #endregion
+
+        #region 插值模式字典 —— IDictionary<string, string> InterpolationModes
+        /// <summary>
+        /// 插值模式字典
+        /// </summary>
+        [DependencyProperty]
+        public IDictionary<string, string> InterpolationModes { get; set; }
+        #endregion
+
         #region 已选传递函数控制点列表 —— {string, HUControlPoint[]} SelectedControlPoints
         /// <summary>
         /// 已选传递函数控制点列表
@@ -193,7 +220,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
         /// </summary>
         protected override async Task OnActivatedAsync(CancellationToken cancellationToken)
         {
-            //默认值
+            //预设窗
             this.WindowLevels =
             [
                 WindowLevelManager.Default,
@@ -207,6 +234,11 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                 WindowLevelManager.Mediastinum
             ];
 
+            //插值模式
+            this.SelectedInterpolationMode = new KeyValuePair<string, string>(this.MprViewModel.InterpolationMode.ToString(), this.MprViewModel.InterpolationMode.GetEnumMember());
+            this.InterpolationModes = typeof(InterpolationMode).GetEnumMembers();
+
+            //控制点
             this.ControlPointGroups = new Dictionary<string, HUControlPoint[]>();
             KeyValuePair<string, HUControlPoint[]> defaultControlPoints = new("默认", [.. this.MprViewModel.TFControlPoints]);
             this.ControlPointGroups.Add(defaultControlPoints);
@@ -216,6 +248,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                 this.ControlPointGroups.Add(controlPoints);
             }
 
+            //归一化直方图
             this.NormalizedHistogram = await Task.Run(() => this.MprViewModel.VolumeData.ApplyNormalizedHistogram(), cancellationToken);
 
             await base.OnActivatedAsync(cancellationToken);
@@ -240,6 +273,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
                     WindowCenter = this.MprViewModel.WindowCenter,
                     Brightness = this.MprViewModel.Brightness,
                     Contrast = this.MprViewModel.Contrast,
+                    InterpolationMode = this.MprViewModel.InterpolationMode,
                     ControlPoints = this.MprViewModel.TFControlPoints.Select(x => x.ToMprProtocolPoint()).ToList()
                 };
 
@@ -282,7 +316,7 @@ namespace MedicalSharp.Client.ViewModels.ProtocolContext
             foreach (AlphaControlPoint alphaControlPoint in sortedAlphas)
             {
                 //在颜色控制点中插值该HU位置的颜色
-                Color interpolatedColor = ColorControlPoint.InterpolateColor(sortedColors, alphaControlPoint.HU);
+                Color interpolatedColor = ColorControlPoint.InterpolateColor(sortedColors, alphaControlPoint.HU, this.MprViewModel.InterpolationMode);
                 Vector4 color = new Vector4(
                     interpolatedColor.R / 255f,
                     interpolatedColor.G / 255f,

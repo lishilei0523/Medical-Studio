@@ -4,6 +4,7 @@
     "WindowCenter": 40,
     "Brightness": 1,
     "Contrast": 1,
+    "InterpolationMode": 0,
     "ControlPoints": [
         {
             "HU": -1024,
