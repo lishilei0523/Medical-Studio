@@ -1,0 +1,36 @@
+<fa:AppWindow x:Class="MedicalSharp.Client.Views.DicomContext.PatientView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  mc:Ignorable="d"
+			  Width="550" Height="330" CanResize="False" ShowAsDialog="True"
+			  WindowStartupLocation="CenterScreen"
+			  Title="患者信息">
+
+	<StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
+		<sd:FormItem Label="患者ID：">
+			<TextBlock Text="{Binding IndexViewModel.PatientInfo.PatientId}" />
+		</sd:FormItem>
+		<sd:FormItem Label="姓名：">
+			<TextBlock Text="{Binding IndexViewModel.PatientInfo.Name}" />
+		</sd:FormItem>
+		<sd:FormItem Label="性别：">
+			<TextBlock Text="{Binding IndexViewModel.PatientInfo.Sex}" />
+		</sd:FormItem>
+		<sd:FormItem Label="年龄：">
+			<TextBlock Text="{Binding IndexViewModel.PatientInfo.Age}" />
+		</sd:FormItem>
+		<sd:FormItem Label="生日：">
+			<TextBlock Text="{Binding IndexViewModel.PatientInfo.BirthDate}" />
+		</sd:FormItem>
+		<sd:FormItem Label="身高：">
+			<TextBlock Text="{Binding IndexViewModel.PatientInfo.Height}" />
+		</sd:FormItem>
+		<sd:FormItem Label="体重：">
+			<TextBlock Text="{Binding IndexViewModel.PatientInfo.Weight}" />
+		</sd:FormItem>
+	</StackPanel>
+</fa:AppWindow>

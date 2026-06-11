@@ -1,0 +1,57 @@
+<fa:AppWindow x:Class="MedicalSharp.Client.Views.DicomContext.ScanView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  mc:Ignorable="d"
+			  Width="550" Height="580" CanResize="False" ShowAsDialog="True"
+			  WindowStartupLocation="CenterScreen"
+			  Title="扫描信息">
+
+	<StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
+		<sd:FormItem Label="成像设备：">
+			<TextBlock Text="{Binding IndexViewModel.ScanInfo.Modality}" />
+		</sd:FormItem>
+        <sd:FormItem Label="管电压：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.KVP}" />
+        </sd:FormItem>
+        <sd:FormItem Label="管电流：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.XRayTubeCurrent}" />
+        </sd:FormItem>
+        <sd:FormItem Label="曝光时间：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.ExposureTime}" />
+        </sd:FormItem>
+        <sd:FormItem Label="卷积核：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.ConvolutionKernel}" />
+        </sd:FormItem>
+        <sd:FormItem Label="FOV：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.ReconstructionDiameter}" />
+        </sd:FormItem>
+        <sd:FormItem Label="螺距因子：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.PitchFactor}" />
+        </sd:FormItem>
+        <sd:FormItem Label="重建算法：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.ReconstructionAlgorithm}" />
+        </sd:FormItem>
+        <sd:FormItem Label="磁场强度：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.MagneticFieldStrength}" />
+        </sd:FormItem>
+        <sd:FormItem Label="重复时间：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.RepetitionTime}" />
+        </sd:FormItem>
+        <sd:FormItem Label="回波时间：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.EchoTime}" />
+        </sd:FormItem>
+        <sd:FormItem Label="Sequence：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.SequenceName}" />
+        </sd:FormItem>
+        <sd:FormItem Label="造影剂：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.ContrastAgent}" />
+        </sd:FormItem>
+        <sd:FormItem Label="剂量：">
+            <TextBlock Text="{Binding IndexViewModel.ScanInfo.ContrastDose}" />
+        </sd:FormItem>
+	</StackPanel>
+</fa:AppWindow>

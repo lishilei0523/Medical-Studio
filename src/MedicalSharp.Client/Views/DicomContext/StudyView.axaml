@@ -1,0 +1,36 @@
+<fa:AppWindow x:Class="MedicalSharp.Client.Views.DicomContext.StudyView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  mc:Ignorable="d"
+			  Width="550" Height="330" CanResize="False" ShowAsDialog="True"
+			  WindowStartupLocation="CenterScreen"
+			  Title="检查信息">
+
+	<StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
+		<sd:FormItem Label="实例ID：">
+			<TextBlock Text="{Binding IndexViewModel.StudyInfo.StudyInstanceUId}" />
+		</sd:FormItem>
+        <sd:FormItem Label="检查ID：">
+            <TextBlock Text="{Binding IndexViewModel.StudyInfo.StudyId}" />
+        </sd:FormItem>
+		<sd:FormItem Label="登记号：">
+			<TextBlock Text="{Binding IndexViewModel.StudyInfo.AccessionNumber}" />
+		</sd:FormItem>
+		<sd:FormItem Label="检查时间：">
+			<TextBlock Text="{Binding IndexViewModel.StudyInfo.StudyDateTime}" />
+		</sd:FormItem>
+        <sd:FormItem Label="检查描述：">
+            <TextBlock Text="{Binding IndexViewModel.StudyInfo.StudyDescription}" />
+        </sd:FormItem>
+        <sd:FormItem Label="转诊医生：">
+            <TextBlock Text="{Binding IndexViewModel.StudyInfo.ReferringPhysician}" />
+        </sd:FormItem>
+		<sd:FormItem Label="机构名称：">
+			<TextBlock Text="{Binding IndexViewModel.StudyInfo.InstitutionName}" />
+		</sd:FormItem>
+	</StackPanel>
+</fa:AppWindow>

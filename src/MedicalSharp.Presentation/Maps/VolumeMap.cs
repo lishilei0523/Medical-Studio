@@ -27,12 +27,17 @@ namespace MedicalSharp.Presentation.Maps
 
             VolumeInfo volumeInfo = new VolumeInfo
             {
+                VoxelsCount = metadata.VoxelsCount,
                 VolumeSize = $"{metadata.VolumeSize.X}×{metadata.VolumeSize.Y}×{metadata.VolumeSize.Z}",
                 Spacing = $"{metadata.Spacing.X:F2}×{metadata.Spacing.Y:F2}×{metadata.Spacing.Z:F2}",
                 PhysicalSize = $"{metadata.PhysicalSize.X:F0}×{metadata.PhysicalSize.Y:F0}×{metadata.PhysicalSize.Z:F0}",
                 RescaleSlope = metadata.RescaleSlope.ToString("F2"),
                 RescaleIntercept = metadata.RescaleIntercept.ToString("F2"),
                 HURange = $"{metadata.MinHU} ~ {metadata.MaxHU}",
+                Origin = $"{metadata.Origin.X}, {metadata.Origin.Y}, {metadata.Origin.Z}",
+                RowDirection = $"{metadata.RowDirection.X}, {metadata.RowDirection.Y}, {metadata.RowDirection.Z}",
+                ColDirection = $"{metadata.ColDirection.X}, {metadata.ColDirection.Y}, {metadata.ColDirection.Z}",
+                SliceDirection = $"{metadata.SliceDirection.X}, {metadata.SliceDirection.Y}, {metadata.SliceDirection.Z}",
                 WindowLevel = $"{metadata.WindowWidth}, {metadata.WindowCenter}"
             };
 
@@ -161,7 +166,6 @@ namespace MedicalSharp.Presentation.Maps
             {
                 SeriesInstanceUId = seriesData.SeriesInstanceUId,
                 SeriesNumber = seriesData.SeriesNumber,
-                Modality = seriesData.Modality,
                 BodyPartExamined = seriesData.BodyPartExamined,
                 SliceThickness = string.IsNullOrWhiteSpace(seriesData.SliceThickness)
                     ? null
@@ -218,6 +222,7 @@ namespace MedicalSharp.Presentation.Maps
 
             ScanInfo scanInfo = new ScanInfo
             {
+                Modality = scanData.Modality,
                 KVP = string.IsNullOrWhiteSpace(scanData.KVP)
                     ? null
                     : $"{scanData.KVP} kVp",
@@ -230,7 +235,23 @@ namespace MedicalSharp.Presentation.Maps
                 ConvolutionKernel = $"{scanData.ConvolutionKernel}",
                 ReconstructionDiameter = string.IsNullOrWhiteSpace(scanData.ReconstructionDiameter)
                     ? null
-                    : $"{scanData.ReconstructionDiameter} mm"
+                    : $"{scanData.ReconstructionDiameter} mm",
+                PitchFactor = scanData.PitchFactor,
+                ReconstructionAlgorithm = scanData.ReconstructionAlgorithm,
+                MagneticFieldStrength = string.IsNullOrWhiteSpace(scanData.MagneticFieldStrength)
+                    ? null
+                    : $"{scanData.MagneticFieldStrength} T",
+                RepetitionTime = string.IsNullOrWhiteSpace(scanData.RepetitionTime)
+                    ? null
+                    : $"{scanData.RepetitionTime} ms",
+                EchoTime = string.IsNullOrWhiteSpace(scanData.EchoTime)
+                    ? null
+                    : $"{scanData.EchoTime} ms",
+                SequenceName = scanData.SequenceName,
+                ContrastAgent = scanData.ContrastAgent,
+                ContrastDose = string.IsNullOrWhiteSpace(scanData.ContrastDose)
+                    ? null
+                    : $"{scanData.ContrastDose} ml"
             };
 
             return scanInfo;

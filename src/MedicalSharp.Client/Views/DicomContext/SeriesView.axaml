@@ -1,0 +1,39 @@
+<fa:AppWindow x:Class="MedicalSharp.Client.Views.DicomContext.SeriesView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  mc:Ignorable="d"
+			  Width="550" Height="370" CanResize="False" ShowAsDialog="True"
+			  WindowStartupLocation="CenterScreen"
+			  Title="序列信息">
+
+	<StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
+		<sd:FormItem Label="实例ID：">
+			<TextBlock Text="{Binding IndexViewModel.SeriesInfo.SeriesInstanceUId}" />
+		</sd:FormItem>
+		<sd:FormItem Label="序列号：">
+			<TextBlock Text="{Binding IndexViewModel.SeriesInfo.SeriesNumber}" />
+		</sd:FormItem>
+		<sd:FormItem Label="序列日期：">
+			<TextBlock Text="{Binding IndexViewModel.SeriesInfo.SeriesDate}" />
+		</sd:FormItem>
+		<sd:FormItem Label="序列时间：">
+			<TextBlock Text="{Binding IndexViewModel.SeriesInfo.SeriesTime}" />
+		</sd:FormItem>
+		<sd:FormItem Label="检查部位：">
+			<TextBlock Text="{Binding IndexViewModel.SeriesInfo.BodyPartExamined}" />
+		</sd:FormItem>
+		<sd:FormItem Label="层厚：">
+			<TextBlock Text="{Binding IndexViewModel.SeriesInfo.SliceThickness}" />
+		</sd:FormItem>
+		<sd:FormItem Label="层间距：">
+			<TextBlock Text="{Binding IndexViewModel.SeriesInfo.SpacingBetweenSlices}" />
+		</sd:FormItem>
+        <sd:FormItem Label="序列描述：">
+            <TextBlock Text="{Binding IndexViewModel.SeriesInfo.SeriesDescription}" />
+        </sd:FormItem>
+	</StackPanel>
+</fa:AppWindow>

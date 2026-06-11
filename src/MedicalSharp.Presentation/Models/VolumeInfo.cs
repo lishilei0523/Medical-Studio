@@ -8,6 +8,14 @@ namespace MedicalSharp.Presentation.Models
     /// </summary>
     public class VolumeInfo : PropertyChangedBase
     {
+        #region 体素数量 —— long VoxelsCount
+        /// <summary>
+        /// 体素数量
+        /// </summary>
+        [DependencyProperty]
+        public long VoxelsCount { get; set; }
+        #endregion
+
         #region 体积尺寸 —— string VolumeSize
         /// <summary>
         /// 体积尺寸
@@ -51,6 +59,37 @@ namespace MedicalSharp.Presentation.Models
         /// HU范围
         /// </summary>
         public string HURange { get; set; }
+        #endregion
+
+        #region 图像原点 —— string Origin
+        /// <summary>
+        /// 图像原点
+        /// </summary>
+        public string Origin { get; set; }
+        #endregion
+
+        #region 行向量 —— string RowDirection
+        /// <summary>
+        /// 行向量
+        /// </summary>
+        /// <remarks>U轴</remarks>
+        public string RowDirection { get; set; }
+        #endregion
+
+        #region 列向量 —— string ColDirection
+        /// <summary>
+        /// 列向量
+        /// </summary>
+        /// <remarks>V轴</remarks>
+        public string ColDirection { get; set; }
+        #endregion
+
+        #region 切面向量 —— string SliceDirection
+        /// <summary>
+        /// 切面向量
+        /// </summary>
+        /// <remarks>Normal</remarks>
+        public string SliceDirection { get; set; }
         #endregion
 
         #region 默认窗 —— string WindowLevel

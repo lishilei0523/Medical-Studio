@@ -7,6 +7,7 @@ using Caliburn.Micro;
 using FluentAvalonia.UI.Controls;
 using MedicalSharp.Client.ViewModels.AlgorithmContext;
 using MedicalSharp.Client.ViewModels.CommonContext;
+using MedicalSharp.Client.ViewModels.DicomContext;
 using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Client.Views.HomeContext;
@@ -820,6 +821,71 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 ClearShapesEvent message = new ClearShapesEvent();
                 await this._eventAggregator.PublishOnUIThreadAsync(message);
             }
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 查看患者信息命令 —— ICommand LookPatientInfoCommand
+        /// <summary>
+        /// 查看患者信息命令
+        /// </summary>
+        public ICommand LookPatientInfoCommand => new AsyncRelayCommand(async _ =>
+        {
+            PatientViewModel viewModel = ResolveMediator.Resolve<PatientViewModel>();
+            viewModel.IndexViewModel = this;
+            await this._windowManager.ShowWindowAsync(viewModel);
+
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 查看检查信息命令 —— ICommand LookStudyInfoCommand
+        /// <summary>
+        /// 查看检查信息命令
+        /// </summary>
+        public ICommand LookStudyInfoCommand => new AsyncRelayCommand(async _ =>
+        {
+            StudyViewModel viewModel = ResolveMediator.Resolve<StudyViewModel>();
+            viewModel.IndexViewModel = this;
+            await this._windowManager.ShowWindowAsync(viewModel);
+
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 查看序列信息命令 —— ICommand LookSeriesInfoCommand
+        /// <summary>
+        /// 查看序列信息命令
+        /// </summary>
+        public ICommand LookSeriesInfoCommand => new AsyncRelayCommand(async _ =>
+        {
+            SeriesViewModel viewModel = ResolveMediator.Resolve<SeriesViewModel>();
+            viewModel.IndexViewModel = this;
+            await this._windowManager.ShowWindowAsync(viewModel);
+
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 查看扫描信息命令 —— ICommand LookScanInfoCommand
+        /// <summary>
+        /// 查看扫描信息命令
+        /// </summary>
+        public ICommand LookScanInfoCommand => new AsyncRelayCommand(async _ =>
+        {
+            ScanViewModel viewModel = ResolveMediator.Resolve<ScanViewModel>();
+            viewModel.IndexViewModel = this;
+            await this._windowManager.ShowWindowAsync(viewModel);
+
+        }, _ => this.VolumeData != null);
+        #endregion
+
+        #region 查看体积信息命令 —— ICommand LookVolumeInfoCommand
+        /// <summary>
+        /// 查看体积信息命令
+        /// </summary>
+        public ICommand LookVolumeInfoCommand => new AsyncRelayCommand(async _ =>
+        {
+            MetadataViewModel viewModel = ResolveMediator.Resolve<MetadataViewModel>();
+            viewModel.IndexViewModel = this;
+            await this._windowManager.ShowWindowAsync(viewModel);
+
         }, _ => this.VolumeData != null);
         #endregion
 

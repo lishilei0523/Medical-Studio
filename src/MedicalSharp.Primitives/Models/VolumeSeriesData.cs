@@ -36,14 +36,6 @@
         public string SeriesTime { get; set; }
         #endregion
 
-        #region 成像设备 —— string Modality
-        /// <summary>
-        /// 成像设备
-        /// </summary>
-        /// <remarks>CT/MR/PET/CR</remarks>
-        public string Modality { get; set; }
-        #endregion
-
         #region 检查部位 —— string BodyPartExamined
         /// <summary>
         /// 检查部位

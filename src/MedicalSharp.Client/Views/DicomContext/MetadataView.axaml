@@ -1,0 +1,51 @@
+<fa:AppWindow x:Class="MedicalSharp.Client.Views.DicomContext.MetadataView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  mc:Ignorable="d"
+			  Width="550" Height="515" CanResize="False" ShowAsDialog="True"
+			  WindowStartupLocation="CenterScreen"
+			  Title="体积信息">
+
+	<StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
+		<sd:FormItem Label="体素数量：">
+			<TextBlock Text="{Binding IndexViewModel.VolumeInfo.VoxelsCount}" />
+		</sd:FormItem>
+		<sd:FormItem Label="体积尺寸：">
+			<TextBlock Text="{Binding IndexViewModel.VolumeInfo.VolumeSize}" />
+		</sd:FormItem>
+		<sd:FormItem Label="体素间距：">
+			<TextBlock Text="{Binding IndexViewModel.VolumeInfo.Spacing}" />
+		</sd:FormItem>
+		<sd:FormItem Label="物理尺寸：">
+			<TextBlock Text="{Binding IndexViewModel.VolumeInfo.PhysicalSize}" />
+		</sd:FormItem>
+        <sd:FormItem Label="斜率：">
+            <TextBlock Text="{Binding IndexViewModel.VolumeInfo.RescaleSlope}" />
+        </sd:FormItem>
+        <sd:FormItem Label="截距：">
+            <TextBlock Text="{Binding IndexViewModel.VolumeInfo.RescaleIntercept}" />
+        </sd:FormItem>
+        <sd:FormItem Label="原点：">
+            <TextBlock Text="{Binding IndexViewModel.VolumeInfo.Origin}" />
+        </sd:FormItem>
+        <sd:FormItem Label="行向量：">
+            <TextBlock Text="{Binding IndexViewModel.VolumeInfo.RowDirection}" />
+        </sd:FormItem>
+        <sd:FormItem Label="列向量：">
+            <TextBlock Text="{Binding IndexViewModel.VolumeInfo.ColDirection}" />
+        </sd:FormItem>
+        <sd:FormItem Label="切面向量：">
+            <TextBlock Text="{Binding IndexViewModel.VolumeInfo.SliceDirection}" />
+        </sd:FormItem>
+		<sd:FormItem Label="HU范围：">
+			<TextBlock Text="{Binding IndexViewModel.VolumeInfo.HURange}" />
+		</sd:FormItem>
+		<sd:FormItem Label="默认窗：">
+			<TextBlock Text="{Binding IndexViewModel.VolumeInfo.WindowLevel}" />
+		</sd:FormItem>
+	</StackPanel>
+</fa:AppWindow>

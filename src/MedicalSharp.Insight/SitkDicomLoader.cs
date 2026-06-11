@@ -593,13 +593,13 @@ namespace MedicalSharp.Insight
             volumeData.SeriesData.SeriesNumber = getTagValue(slice, DicomTags.SeriesNumber);
             volumeData.SeriesData.SeriesDate = getTagValue(slice, DicomTags.SeriesDate);
             volumeData.SeriesData.SeriesTime = getTagValue(slice, DicomTags.SeriesTime);
-            volumeData.SeriesData.Modality = getTagValue(slice, DicomTags.Modality);
             volumeData.SeriesData.BodyPartExamined = getTagValue(slice, DicomTags.BodyPartExamined);
             volumeData.SeriesData.SliceThickness = getTagValue(slice, DicomTags.SliceThickness);
             volumeData.SeriesData.SpacingBetweenSlices = getTagValue(slice, DicomTags.SpacingBetweenSlices);
             volumeData.SeriesData.SeriesDescription = getTagValue(slice, DicomTags.SeriesDescription);
 
             //提取扫描数据
+            volumeData.ScanData.Modality = getTagValue(slice, DicomTags.Modality);
             volumeData.ScanData.KVP = getTagValue(slice, DicomTags.KVP);
             volumeData.ScanData.ExposureTime = getTagValue(slice, DicomTags.ExposureTime);
             volumeData.ScanData.XRayTubeCurrent = getTagValue(slice, DicomTags.XRayTubeCurrent);

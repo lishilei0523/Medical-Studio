@@ -5,6 +5,14 @@
     /// </summary>
     public class VolumeScanData
     {
+        #region 成像设备 —— string Modality
+        /// <summary>
+        /// 成像设备
+        /// </summary>
+        /// <remarks>CT/MR/PET/CR</remarks>
+        public string Modality { get; set; }
+        #endregion
+
         //CT
 
         #region 管电压 —— string KVP

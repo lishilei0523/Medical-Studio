@@ -58,16 +58,23 @@
 							<MenuItem Header="重置标记(_M)" Command="{Binding ResetMarkCommand}" />
 							<MenuItem Header="清空形状(_S)" Command="{Binding ClearShapesCommand}" />
 						</MenuItem>
+						<MenuItem Header="查看(_V)">
+							<MenuItem Header="患者信息(_P)" Command="{Binding LookPatientInfoCommand}" />
+							<MenuItem Header="检查信息(_S)" Command="{Binding LookStudyInfoCommand}" />
+							<MenuItem Header="序列信息(_E)" Command="{Binding LookSeriesInfoCommand}" />
+							<MenuItem Header="扫描信息(_C)" Command="{Binding LookScanInfoCommand}" />
+							<MenuItem Header="体积信息(_V)" Command="{Binding LookVolumeInfoCommand}" />
+						</MenuItem>
 						<MenuItem Header="布局(_L)">
 							<MenuItem Header="布局22(_A)" Command="{Binding Layout22Command}" />
 							<MenuItem Header="布局13(_B)" Command="{Binding Layout13Command}" />
 						</MenuItem>
 						<MenuItem Header="直方图(_H)">
-                            <MenuItem Header="HU直方图(_G)" Command="{Binding HUHistogramCommand}" />
-                            <MenuItem Header="归一化直方图(_N)" Command="{Binding NormalizedHistogramCommand}" />
-                            <MenuItem Header="累积分布函数(_C)" Command="{Binding CDFHistogramCommand}" />
-                            <MenuItem Header="直方图均衡化(_E)" Command="{Binding HistogramEqualizationCommand}" />
-                        </MenuItem>
+							<MenuItem Header="HU直方图(_G)" Command="{Binding HUHistogramCommand}" />
+							<MenuItem Header="归一化直方图(_N)" Command="{Binding NormalizedHistogramCommand}" />
+							<MenuItem Header="累积分布函数(_C)" Command="{Binding CDFHistogramCommand}" />
+							<MenuItem Header="直方图均衡化(_E)" Command="{Binding HistogramEqualizationCommand}" />
+						</MenuItem>
 						<MenuItem Header="形态学(_M)">
 							<MenuItem Header="腐蚀(_E)" Command="{Binding MorphErodeCommand}" />
 							<MenuItem Header="膨胀(_D)" Command="{Binding MorphDilateCommand}" />
@@ -116,9 +123,9 @@
 							<sd:FormItem Label="患者ID：">
 								<TextBlock Text="{Binding PatientInfo.PatientId}" />
 							</sd:FormItem>
-                            <sd:FormItem Label="登记号：">
-                                <TextBlock Text="{Binding StudyInfo.AccessionNumber}" />
-                            </sd:FormItem>
+							<sd:FormItem Label="登记号：">
+								<TextBlock Text="{Binding StudyInfo.AccessionNumber}" />
+							</sd:FormItem>
 							<sd:FormItem Label="姓名：">
 								<TextBlock Text="{Binding PatientInfo.Name}" />
 							</sd:FormItem>
@@ -141,18 +148,18 @@
 					</sd:GroupBox>
 					<sd:GroupBox Grid.Row="1" Header="序列扫描信息" Margin="0,2,0,2">
 						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,10">
-                            <sd:FormItem Label="序列号：">
-                                <TextBlock Text="{Binding SeriesInfo.SeriesNumber}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="层厚：">
-                                <TextBlock Text="{Binding SeriesInfo.SliceThickness}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="间距：">
-                                <TextBlock Text="{Binding SeriesInfo.SpacingBetweenSlices}" />
-                            </sd:FormItem>
-                            <sd:FormItem Label="序列描述：">
-                                <TextBlock Text="{Binding SeriesInfo.SeriesDescription}" />
-                            </sd:FormItem>
+							<sd:FormItem Label="序列号：">
+								<TextBlock Text="{Binding SeriesInfo.SeriesNumber}" />
+							</sd:FormItem>
+							<sd:FormItem Label="层厚：">
+								<TextBlock Text="{Binding SeriesInfo.SliceThickness}" />
+							</sd:FormItem>
+							<sd:FormItem Label="间距：">
+								<TextBlock Text="{Binding SeriesInfo.SpacingBetweenSlices}" />
+							</sd:FormItem>
+							<sd:FormItem Label="序列描述：">
+								<TextBlock Text="{Binding SeriesInfo.SeriesDescription}" />
+							</sd:FormItem>
 							<sd:FormItem Label="成像设备：">
 								<TextBlock Text="{Binding SeriesInfo.Modality}" />
 							</sd:FormItem>
