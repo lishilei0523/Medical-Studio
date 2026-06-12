@@ -99,18 +99,16 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
     
                 //消化系统
                 new TissueInfo("肝脏", 7, MarkMode.Tinted, colors[7].ToColor()),
-                new TissueInfo("脾脏", 8, MarkMode.Collapsed, colors[8].ToColor()),
-                new TissueInfo("胃", 9, MarkMode.Tinted, colors[9].ToColor()),
-                new TissueInfo("肠", 10, MarkMode.Tinted, colors[10].ToColor()),
+                new TissueInfo("胃", 8, MarkMode.Tinted, colors[8].ToColor()),
+                new TissueInfo("肠", 9, MarkMode.Tinted, colors[9].ToColor()),
     
                 //泌尿系统
-                new TissueInfo("肾脏", 11, MarkMode.Tinted, colors[11].ToColor()),
-                new TissueInfo("膀胱", 12, MarkMode.Tinted, colors[12].ToColor()),
+                new TissueInfo("肾脏", 10, MarkMode.Tinted, colors[10].ToColor()),
+                new TissueInfo("膀胱", 11, MarkMode.Tinted, colors[11].ToColor()),
     
                 //病理
-                new TissueInfo("病变", 13, MarkMode.Tinted, colors[13].ToColor()),
-                new TissueInfo("钙化", 14, MarkMode.Tinted, colors[14].ToColor()),
-                new TissueInfo("淋巴结", 15, MarkMode.Tinted, colors[15].ToColor())
+                new TissueInfo("病变", 12, MarkMode.Tinted, colors[12].ToColor()),
+                new TissueInfo("钙化", 13, MarkMode.Tinted, colors[13].ToColor())
             ];
         }
 

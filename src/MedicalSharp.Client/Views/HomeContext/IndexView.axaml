@@ -1,283 +1,320 @@
 ﻿<fa:AppWindow x:Class="MedicalSharp.Client.Views.HomeContext.IndexView"
-			  xmlns="https://github.com/avaloniaui"
-			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
-			  xmlns:cm="http://caliburnmicro.com"
-			  mc:Ignorable="d"
-			  Title="Medical Studio"
-			  Width="1920" Height="1080"
-			  WindowState="Maximized"
-			  WindowStartupLocation="CenterScreen">
+              xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+              xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+              xmlns:cm="http://caliburnmicro.com"
+              mc:Ignorable="d"
+              Title="Medical Studio"
+              Width="1920" Height="1080"
+              WindowState="Maximized"
+              WindowStartupLocation="CenterScreen">
 
-	<sd:BusyMask IsBusy="{Binding IsBusy}">
-		<Grid>
-			<Grid.RowDefinitions>
-				<!--Header-->
-				<RowDefinition Height="Auto" />
-				<!--Body-->
-				<RowDefinition Height="*" />
-				<!--Footer-->
-				<RowDefinition Height="25" />
-			</Grid.RowDefinitions>
-			<!--Header-->
-			<Grid Grid.Row="0">
-				<Grid>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="*" />
-					</Grid.ColumnDefinitions>
-					<Image Grid.Column="0"
-						   Source="/favicon.ico"
-						   Width="24" Height="24" Margin="10,0,5,0"
-						   IsHitTestVisible="False"
-						   RenderOptions.BitmapInterpolationMode="HighQuality">
-					</Image>
-					<Menu Grid.Column="1">
-						<MenuItem Header="文件(_F)">
-							<MenuItem Header="打开序列文件(_P)" Command="{Binding OpenSeriesFilesCommand}" />
-							<MenuItem Header="打开序列文件夹(_D)" Command="{Binding OpenSeriesFolderCommand}" />
-							<MenuItem Header="打开 (NIFTI)(_N)" Command="{Binding OpenNiiCommand}" />
-							<MenuItem Header="打开 (MHD+RAW)(_M)" Command="{Binding OpenRawCommand}" />
-							<MenuItem Header="保存原始数据 (NIFTI)(_O)" Command="{Binding SaveOriginalNiiCommand}" />
-							<MenuItem Header="保存原始数据 (MHD+RAW)(_H)" Command="{Binding SaveOriginalRawCommand}" />
-							<MenuItem Header="保存预览数据 (NIFTI)(_I)" Command="{Binding SavePreviewNiiCommand}" />
-							<MenuItem Header="保存预览数据 (MHD+RAW)(_R)" Command="{Binding SavePreviewRawCommand}" />
-							<MenuItem Header="保存标记数据 (NIFTI)(_T)" Command="{Binding SaveMarkNiiCommand}" />
-							<MenuItem Header="保存标记数据 (MHD+RAW)(_W)" Command="{Binding SaveMarkRawCommand}" />
-							<MenuItem Header="加载预览数据 (NIFTI)(_V)" Command="{Binding LoadPreviewNiiCommand}" />
-							<MenuItem Header="加载预览数据 (MHD+RAW)(_E)" Command="{Binding LoadPreviewRawCommand}" />
-							<MenuItem Header="加载标记数据 (NIFTI)(_L)" Command="{Binding LoadMarkNiiCommand}" />
-							<MenuItem Header="加载标记数据 (MHD+RAW)(_A)" Command="{Binding LoadMarkRawCommand}" />
-							<MenuItem Header="关闭会话(_C)" Command="{Binding CloseSessionCommand}" />
-						</MenuItem>
-						<MenuItem Header="编辑(_E)">
-							<MenuItem Header="重置预览(_P)" Command="{Binding ResetPreviewCommand}" />
-							<MenuItem Header="重置标记(_M)" Command="{Binding ResetMarkCommand}" />
-							<MenuItem Header="清空形状(_S)" Command="{Binding ClearShapesCommand}" />
-						</MenuItem>
-						<MenuItem Header="查看(_V)">
-							<MenuItem Header="患者信息(_P)" Command="{Binding LookPatientInfoCommand}" />
-							<MenuItem Header="检查信息(_S)" Command="{Binding LookStudyInfoCommand}" />
-							<MenuItem Header="序列信息(_E)" Command="{Binding LookSeriesInfoCommand}" />
-							<MenuItem Header="扫描信息(_C)" Command="{Binding LookScanInfoCommand}" />
-							<MenuItem Header="体积信息(_V)" Command="{Binding LookVolumeInfoCommand}" />
-						</MenuItem>
-						<MenuItem Header="布局(_L)">
-							<MenuItem Header="布局22(_A)" Command="{Binding Layout22Command}" />
-							<MenuItem Header="布局13(_B)" Command="{Binding Layout13Command}" />
-						</MenuItem>
-						<MenuItem Header="直方图(_H)">
-							<MenuItem Header="HU直方图(_G)" Command="{Binding HUHistogramCommand}" />
-							<MenuItem Header="归一化直方图(_N)" Command="{Binding NormalizedHistogramCommand}" />
-							<MenuItem Header="累积分布函数(_C)" Command="{Binding CDFHistogramCommand}" />
-							<MenuItem Header="直方图均衡化(_E)" Command="{Binding HistogramEqualizationCommand}" />
-						</MenuItem>
-						<MenuItem Header="形态学(_M)">
-							<MenuItem Header="腐蚀(_E)" Command="{Binding MorphErodeCommand}" />
-							<MenuItem Header="膨胀(_D)" Command="{Binding MorphDilateCommand}" />
-							<MenuItem Header="开运算(_O)" Command="{Binding MorphOpenCommand}" />
-							<MenuItem Header="闭运算(_C)" Command="{Binding MorphCloseCommand}" />
-							<MenuItem Header="礼帽运算(_T)" Command="{Binding MorphTopHatCommand}" />
-							<MenuItem Header="黑帽运算(_B)" Command="{Binding MorphBlackHatCommand}" />
-							<MenuItem Header="梯度运算(_G)" Command="{Binding MorphGradientCommand}" />
-						</MenuItem>
-						<MenuItem Header="滤波(_B)">
-							<MenuItem Header="高斯滤波(_G)" Command="{Binding GaussianBlurCommand}" />
-							<MenuItem Header="均值滤波(_M)" Command="{Binding MeanBlurCommand}" />
-							<MenuItem Header="中值滤波(_C)" Command="{Binding MedianBlurCommand}" />
-						</MenuItem>
-						<MenuItem Header="边缘检测(_G)">
-							<MenuItem Header="Sobel边缘检测(_S)" Command="{Binding SobelCommand}" />
-							<MenuItem Header="Scharr边缘检测(_A)" Command="{Binding ScharrCommand}" />
-							<MenuItem Header="Canny边缘检测(_C)" Command="{Binding CannyCommand}" />
-							<MenuItem Header="Laplacian边缘检测(_L)" Command="{Binding LaplacianCommand}" />
-						</MenuItem>
-						<MenuItem Header="分割(_S)">
-							<MenuItem Header="阈值分割(_T)" Command="{Binding ThresholdSegmentCommand}" />
-						</MenuItem>
-					</Menu>
-				</Grid>
-			</Grid>
-			<!--Body-->
-			<Grid Grid.Row="1">
-				<Grid.ColumnDefinitions>
-					<!--Left Pannel-->
-					<ColumnDefinition Width="260" />
-					<!--Viewer Pannel-->
-					<ColumnDefinition />
-					<!--Right Pannel-->
-					<ColumnDefinition Width="260" />
-				</Grid.ColumnDefinitions>
-				<!--Left Pannel-->
-				<Grid Grid.Column="0" Margin="4,1,2,5">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="670" />
-						<RowDefinition Height="4" />
-						<RowDefinition Height="*" />
-					</Grid.RowDefinitions>
-					<sd:GroupBox Grid.Row="0" Header="组织管理">
-						<ListBox ItemsSource="{Binding Tissues}" SelectedItem="{Binding SelectedTissue}">
-							<ListBox.ItemTemplate>
-								<DataTemplate>
-									<Grid>
-										<Grid.ColumnDefinitions>
-											<ColumnDefinition Width="40" />
-											<ColumnDefinition Width="50" />
-											<ColumnDefinition Width="40" />
-											<ColumnDefinition Width="100" />
-										</Grid.ColumnDefinitions>
-										<!--标记值-->
-										<TextBlock Grid.Column="0" Text="{Binding MarkValue}"
-												   Width="30" Padding="2" FontSize="12"
-												   HorizontalAlignment="Center" VerticalAlignment="Center" />
-										<!--组织名称-->
-										<TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12"
-												   VerticalAlignment="Center" Margin="3,0" />
-										<!--颜色色块-->
-										<Border Grid.Column="2" Width="18" Height="18" CornerRadius="2"
-												HorizontalAlignment="Center" VerticalAlignment="Center"
-												BorderBrush="LightGray" BorderThickness="0.5">
-											<Border.Background>
-												<SolidColorBrush Color="{Binding Color}" />
-											</Border.Background>
-										</Border>
-										<!--标记模式-->
-										<ComboBox Grid.Column="3" Width="90" FontSize="11"
-												  ItemsSource="{Binding DataContext.MarkModes,
-												  RelativeSource={RelativeSource AncestorType=fa:AppWindow}}"
-												  DisplayMemberBinding="{Binding Value}"
-												  SelectedValue="{Binding SelectedMarkMode}">
-										</ComboBox>
-									</Grid>
-								</DataTemplate>
-							</ListBox.ItemTemplate>
-							<ListBox.ContextFlyout>
-								<MenuFlyout>
-									<MenuItem Header="创建组织(_C)" Command="{Binding AddTissueCommand}" />
-									<MenuItem Header="编辑组织(_E)" Command="{Binding UpdateTissueCommand}" />
-									<MenuItem Header="重置组织(_R)" Command="{Binding ResetTissueCommand}" />
-									<MenuItem Header="删除组织(_D)" Command="{Binding RemoveTissueCommand}" />
-								</MenuFlyout>
-							</ListBox.ContextFlyout>
-						</ListBox>
-					</sd:GroupBox>
-					<GridSplitter Grid.Row="1" Height="4" Background="Transparent" HorizontalAlignment="Stretch" />
-					<sd:GroupBox Grid.Row="2" Header="形状管理">
-						<ListBox ItemsSource="{Binding Shapes}" SelectedItem="{Binding SelectedShape}">
-							<ListBox.ItemTemplate>
-								<DataTemplate>
-									<Grid>
-										<Grid.ColumnDefinitions>
-											<ColumnDefinition />
-											<ColumnDefinition />
-										</Grid.ColumnDefinitions>
-										<TextBlock Grid.Column="0" Text="{Binding DisplayName}" Padding="2" />
-										<WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
-											<Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
-													ToolTip.Tip="重命名"
-													cm:Message.Attach="RenameShape($dataContext);">
-												<PathIcon Data="{StaticResource Icon-Edit}" />
-											</Button>
-											<Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
-													ToolTip.Tip="删除"
-													cm:Message.Attach="RemoveShape($dataContext);">
-												<PathIcon Data="{StaticResource Icon-Remove}" />
-											</Button>
-										</WrapPanel>
-									</Grid>
-								</DataTemplate>
-							</ListBox.ItemTemplate>
-							<ListBox.ContextFlyout>
-								<MenuFlyout>
-									<MenuItem Header="内切(_I)" Command="{Binding ApplyCutInsideCommand}" />
-									<MenuItem Header="外切(_O)" Command="{Binding ApplyCutOutsideCommand}" />
-									<MenuItem Header="统计(_D)" Command="{Binding ApplyAnalyseCommand}" />
-								</MenuFlyout>
-							</ListBox.ContextFlyout>
-						</ListBox>
-					</sd:GroupBox>
-				</Grid>
-				<!--Viewer Pannel-->
-				<Grid Grid.Column="1" Margin="2,0,2,4">
-					<ContentControl cm:View.Model="{Binding LayoutViewModel}" />
-				</Grid>
-				<!--Right Pannel-->
-				<Grid Grid.Column="2" Margin="2,1,4,5">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="*" />
-						<RowDefinition Height="4" />
-						<RowDefinition Height="295" />
-					</Grid.RowDefinitions>
-					<sd:GroupBox Grid.Row="0" Header="控制面板">
-						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,7">
-
-						</StackPanel>
-					</sd:GroupBox>
+    <sd:BusyMask IsBusy="{Binding IsBusy}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <!--Header-->
+                <RowDefinition Height="Auto" />
+                <!--Body-->
+                <RowDefinition Height="*" />
+                <!--Footer-->
+                <RowDefinition Height="25" />
+            </Grid.RowDefinitions>
+            <!--Header-->
+            <Grid Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           Source="/favicon.ico"
+                           Width="24" Height="24" Margin="10,0,5,0"
+                           IsHitTestVisible="False"
+                           RenderOptions.BitmapInterpolationMode="HighQuality">
+                    </Image>
+                    <Menu Grid.Column="1">
+                        <MenuItem Header="文件(_F)">
+                            <MenuItem Header="打开序列文件(_P)" Command="{Binding OpenSeriesFilesCommand}" />
+                            <MenuItem Header="打开序列文件夹(_D)" Command="{Binding OpenSeriesFolderCommand}" />
+                            <MenuItem Header="打开 (NIFTI)(_N)" Command="{Binding OpenNiiCommand}" />
+                            <MenuItem Header="打开 (MHD+RAW)(_M)" Command="{Binding OpenRawCommand}" />
+                            <MenuItem Header="保存原始数据 (NIFTI)(_O)" Command="{Binding SaveOriginalNiiCommand}" />
+                            <MenuItem Header="保存原始数据 (MHD+RAW)(_H)" Command="{Binding SaveOriginalRawCommand}" />
+                            <MenuItem Header="保存预览数据 (NIFTI)(_I)" Command="{Binding SavePreviewNiiCommand}" />
+                            <MenuItem Header="保存预览数据 (MHD+RAW)(_R)" Command="{Binding SavePreviewRawCommand}" />
+                            <MenuItem Header="保存标记数据 (NIFTI)(_T)" Command="{Binding SaveMarkNiiCommand}" />
+                            <MenuItem Header="保存标记数据 (MHD+RAW)(_W)" Command="{Binding SaveMarkRawCommand}" />
+                            <MenuItem Header="加载预览数据 (NIFTI)(_V)" Command="{Binding LoadPreviewNiiCommand}" />
+                            <MenuItem Header="加载预览数据 (MHD+RAW)(_E)" Command="{Binding LoadPreviewRawCommand}" />
+                            <MenuItem Header="加载标记数据 (NIFTI)(_L)" Command="{Binding LoadMarkNiiCommand}" />
+                            <MenuItem Header="加载标记数据 (MHD+RAW)(_A)" Command="{Binding LoadMarkRawCommand}" />
+                            <MenuItem Header="关闭会话(_C)" Command="{Binding CloseSessionCommand}" />
+                        </MenuItem>
+                        <MenuItem Header="编辑(_E)">
+                            <MenuItem Header="重置预览(_P)" Command="{Binding ResetPreviewCommand}" />
+                            <MenuItem Header="重置标记(_M)" Command="{Binding ResetMarkCommand}" />
+                            <MenuItem Header="清空形状(_S)" Command="{Binding ClearShapesCommand}" />
+                        </MenuItem>
+                        <MenuItem Header="查看(_V)">
+                            <MenuItem Header="患者信息(_P)" Command="{Binding LookPatientInfoCommand}" />
+                            <MenuItem Header="检查信息(_S)" Command="{Binding LookStudyInfoCommand}" />
+                            <MenuItem Header="序列信息(_E)" Command="{Binding LookSeriesInfoCommand}" />
+                            <MenuItem Header="扫描信息(_C)" Command="{Binding LookScanInfoCommand}" />
+                            <MenuItem Header="体积信息(_V)" Command="{Binding LookVolumeInfoCommand}" />
+                        </MenuItem>
+                        <MenuItem Header="布局(_L)">
+                            <MenuItem Header="布局22(_A)" Command="{Binding Layout22Command}" />
+                            <MenuItem Header="布局13(_B)" Command="{Binding Layout13Command}" />
+                        </MenuItem>
+                        <MenuItem Header="直方图(_H)">
+                            <MenuItem Header="HU直方图(_G)" Command="{Binding HUHistogramCommand}" />
+                            <MenuItem Header="归一化直方图(_N)" Command="{Binding NormalizedHistogramCommand}" />
+                            <MenuItem Header="累积分布函数(_C)" Command="{Binding CDFHistogramCommand}" />
+                            <MenuItem Header="直方图均衡化(_E)" Command="{Binding HistogramEqualizationCommand}" />
+                        </MenuItem>
+                        <MenuItem Header="形态学(_M)">
+                            <MenuItem Header="腐蚀(_E)" Command="{Binding MorphErodeCommand}" />
+                            <MenuItem Header="膨胀(_D)" Command="{Binding MorphDilateCommand}" />
+                            <MenuItem Header="开运算(_O)" Command="{Binding MorphOpenCommand}" />
+                            <MenuItem Header="闭运算(_C)" Command="{Binding MorphCloseCommand}" />
+                            <MenuItem Header="礼帽运算(_T)" Command="{Binding MorphTopHatCommand}" />
+                            <MenuItem Header="黑帽运算(_B)" Command="{Binding MorphBlackHatCommand}" />
+                            <MenuItem Header="梯度运算(_G)" Command="{Binding MorphGradientCommand}" />
+                        </MenuItem>
+                        <MenuItem Header="滤波(_B)">
+                            <MenuItem Header="高斯滤波(_G)" Command="{Binding GaussianBlurCommand}" />
+                            <MenuItem Header="均值滤波(_M)" Command="{Binding MeanBlurCommand}" />
+                            <MenuItem Header="中值滤波(_C)" Command="{Binding MedianBlurCommand}" />
+                        </MenuItem>
+                        <MenuItem Header="边缘检测(_G)">
+                            <MenuItem Header="Sobel边缘检测(_S)" Command="{Binding SobelCommand}" />
+                            <MenuItem Header="Scharr边缘检测(_A)" Command="{Binding ScharrCommand}" />
+                            <MenuItem Header="Canny边缘检测(_C)" Command="{Binding CannyCommand}" />
+                            <MenuItem Header="Laplacian边缘检测(_L)" Command="{Binding LaplacianCommand}" />
+                        </MenuItem>
+                        <MenuItem Header="分割(_S)">
+                            <MenuItem Header="阈值分割(_T)" Command="{Binding ThresholdSegmentCommand}" />
+                        </MenuItem>
+                    </Menu>
+                </Grid>
+            </Grid>
+            <!--Body-->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <!--Left Pannel-->
+                    <ColumnDefinition Width="260" />
+                    <!--Viewer Pannel-->
+                    <ColumnDefinition />
+                    <!--Right Pannel-->
+                    <ColumnDefinition Width="260" />
+                </Grid.ColumnDefinitions>
+                <!--Left Pannel-->
+                <Grid Grid.Column="0" Margin="4,1,2,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="4" />
+                        <RowDefinition Height="295" />
+                    </Grid.RowDefinitions>
+                    <sd:GroupBox Header="形状管理">
+                        <ListBox ItemsSource="{Binding Shapes}" SelectedItem="{Binding SelectedShape}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding DisplayName}" Padding="2" />
+                                        <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
+                                                    ToolTip.Tip="重命名"
+                                                    cm:Message.Attach="RenameShape($dataContext);">
+                                                <PathIcon Data="{StaticResource Icon-Edit}" />
+                                            </Button>
+                                            <Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
+                                                    ToolTip.Tip="删除"
+                                                    cm:Message.Attach="RemoveShape($dataContext);">
+                                                <PathIcon Data="{StaticResource Icon-Remove}" />
+                                            </Button>
+                                        </WrapPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="内切(_I)" Command="{Binding ApplyCutInsideCommand}" />
+                                    <MenuItem Header="外切(_O)" Command="{Binding ApplyCutOutsideCommand}" />
+                                    <MenuItem Header="统计(_D)" Command="{Binding ApplyAnalyseCommand}" />
+                                </MenuFlyout>
+                            </ListBox.ContextFlyout>
+                        </ListBox>
+                    </sd:GroupBox>
                     <GridSplitter Grid.Row="1" Height="4" Background="Transparent" HorizontalAlignment="Stretch" />
-					<sd:GroupBox Grid.Row="2">
-						<sd:GroupBox.Header>
-							<Grid>
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition />
-									<ColumnDefinition />
-								</Grid.ColumnDefinitions>
-								<WrapPanel Grid.Column="0">
-									<TextBlock Text="统计信息" />
-								</WrapPanel>
-								<WrapPanel Grid.Column="1" HorizontalAlignment="Right">
-									<Button BorderThickness="0" Height="20" Width="20"
-											cm:Message.Attach="CopyStatistics()">
-										<PathIcon Data="{StaticResource Icon-Copy}" />
-									</Button>
-								</WrapPanel>
-							</Grid>
-						</sd:GroupBox.Header>
-						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,7">
-							<sd:FormItem Label="最小HU：">
-								<TextBlock Text="{Binding StatisticInfo.MinHU}" />
-							</sd:FormItem>
-							<sd:FormItem Label="最大HU：">
-								<TextBlock Text="{Binding StatisticInfo.MaxHU}" />
-							</sd:FormItem>
-							<sd:FormItem Label="平均HU：">
-								<TextBlock Text="{Binding StatisticInfo.AverageHU}" />
-							</sd:FormItem>
-							<sd:FormItem Label="标准差：">
-								<TextBlock Text="{Binding StatisticInfo.StdDevHU}" />
-							</sd:FormItem>
-							<sd:FormItem Label="表面积：">
-								<TextBlock Text="{Binding StatisticInfo.SurfaceArea }" />
-							</sd:FormItem>
-							<sd:FormItem Label="体积：">
-								<TextBlock Text="{Binding StatisticInfo.Volume}" />
-							</sd:FormItem>
-							<sd:FormItem Label="体素数：">
-								<TextBlock Text="{Binding StatisticInfo.VoxelsCount}" />
-							</sd:FormItem>
-						</StackPanel>
-					</sd:GroupBox>
-				</Grid>
-			</Grid>
-			<!--Footer-->
-			<Grid Grid.Row="2" Background="#FF6C6C6C">
-				<WrapPanel Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<TextBlock Text="{Binding VolumeInfo.VolumeSize}" FontSize="12" />
-					<TextBlock Text=" | " FontSize="12" IsVisible="{Binding ViewEnabled}" />
-					<TextBlock Text="{Binding VolumeInfo.Spacing}" FontSize="12" />
-					<TextBlock Text=" | " FontSize="12" IsVisible="{Binding ViewEnabled}" />
-					<TextBlock Text="{Binding VolumeInfo.PhysicalSize}" FontSize="12" />
-				</WrapPanel>
-				<WrapPanel Margin="0,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Center">
-					<TextBlock Text="HU范围：" FontSize="12" IsVisible="{Binding ViewEnabled}" />
-					<TextBlock Text="{Binding VolumeInfo.HURange}" FontSize="12" />
-					<TextBlock Text=" | " FontSize="12" IsVisible="{Binding ViewEnabled}" />
-					<TextBlock Text="默认窗：" FontSize="12" IsVisible="{Binding ViewEnabled}" />
-					<TextBlock Text="{Binding VolumeInfo.WindowLevel}" FontSize="12" />
-				</WrapPanel>
-			</Grid>
-		</Grid>
-	</sd:BusyMask>
+                    <sd:GroupBox Grid.Row="2">
+                        <sd:GroupBox.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <WrapPanel Grid.Column="0">
+                                    <TextBlock Text="统计信息" />
+                                </WrapPanel>
+                                <WrapPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
+                                            cm:Message.Attach="CopyStatistics();">
+                                        <PathIcon Data="{StaticResource Icon-Copy}" />
+                                    </Button>
+                                </WrapPanel>
+                            </Grid>
+                        </sd:GroupBox.Header>
+                        <StackPanel Grid.IsSharedSizeScope="True" Margin="5,7">
+                            <sd:FormItem Label="最小HU：">
+                                <TextBlock Text="{Binding StatisticInfo.MinHU}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="最大HU：">
+                                <TextBlock Text="{Binding StatisticInfo.MaxHU}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="平均HU：">
+                                <TextBlock Text="{Binding StatisticInfo.AverageHU}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="标准差：">
+                                <TextBlock Text="{Binding StatisticInfo.StdDevHU}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="表面积：">
+                                <TextBlock Text="{Binding StatisticInfo.SurfaceArea }" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="体积：">
+                                <TextBlock Text="{Binding StatisticInfo.Volume}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="体素数：">
+                                <TextBlock Text="{Binding StatisticInfo.VoxelsCount}" />
+                            </sd:FormItem>
+                        </StackPanel>
+                    </sd:GroupBox>
+                </Grid>
+                <!--Viewer Pannel-->
+                <Grid Grid.Column="1" Margin="2,0,2,4">
+                    <ContentControl cm:View.Model="{Binding LayoutViewModel}" />
+                </Grid>
+                <!--Right Pannel-->
+                <Grid Grid.Column="2" Margin="2,1,4,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="340" />
+                        <RowDefinition Height="4" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <sd:GroupBox Grid.Row="2" Header="组织管理">
+                        <ListBox ItemsSource="{Binding Tissues}" SelectedItem="{Binding SelectedTissue}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="50" />
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="100" />
+                                        </Grid.ColumnDefinitions>
+                                        <!--标记值-->
+                                        <TextBlock Grid.Column="0" Text="{Binding MarkValue}"
+                                                   Width="30" Padding="2" FontSize="12"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <!--组织名称-->
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12"
+                                                   VerticalAlignment="Center" Margin="3,0" />
+                                        <!--颜色色块-->
+                                        <Border Grid.Column="2" Width="18" Height="18" CornerRadius="2"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                BorderBrush="LightGray" BorderThickness="0.5">
+                                            <Border.Background>
+                                                <SolidColorBrush Color="{Binding Color}" />
+                                            </Border.Background>
+                                        </Border>
+                                        <!--标记模式-->
+                                        <ComboBox Grid.Column="3" Width="90" FontSize="11"
+                                                  ItemsSource="{Binding DataContext.MarkModes,
+                                                  RelativeSource={RelativeSource AncestorType=fa:AppWindow}}"
+                                                  DisplayMemberBinding="{Binding Value}"
+                                                  SelectedValue="{Binding SelectedMarkMode}">
+                                        </ComboBox>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="创建组织(_C)" Command="{Binding AddTissueCommand}" />
+                                    <MenuItem Header="编辑组织(_E)" Command="{Binding UpdateTissueCommand}" />
+                                    <MenuItem Header="重置组织(_R)" Command="{Binding ResetTissueCommand}" />
+                                    <MenuItem Header="删除组织(_D)" Command="{Binding RemoveTissueCommand}" />
+                                </MenuFlyout>
+                            </ListBox.ContextFlyout>
+                        </ListBox>
+                    </sd:GroupBox>
+                    <GridSplitter Grid.Row="1" Height="4" Background="Transparent" HorizontalAlignment="Stretch" />
+                    <sd:GroupBox Grid.Row="0" Header="控制面板">
+                        <Grid Margin="10,10,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Margin="5,5,0,0">
+                                <ComboBox Width="225" PlaceholderText="预设协议" />
+                                <ComboBox Width="225" PlaceholderText="预设窗" Margin="0,10,0,0" />
+                            </StackPanel>
+                            <Grid Grid.Row="1" Margin="0,10,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="窗宽：" Margin="10,0,0,0" />
+                                    <Slider Minimum="1" Maximum="4096" SmallChange="1" LargeChange="10"
+                                            TickFrequency="100" TickPlacement="Outside"
+                                            Value="{Binding MprViewModel.WindowWidth}" />
+                                    <TextBlock Text="窗位：" Margin="10,0,0,0" />
+                                    <Slider Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
+                                            TickFrequency="100" TickPlacement="Outside"
+                                            Value="{Binding MprViewModel.WindowCenter}" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="2" Margin="10,10,10,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" >
+                                    <TextBlock Text="三平面：" />
+                                    <ToggleSwitch OnContent="显示" OffContent="隐藏" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <TextBlock Text="十字线：" />
+                                    <ToggleSwitch OnContent="显示" OffContent="隐藏" />
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </sd:GroupBox>
+                </Grid>
+            </Grid>
+            <!--Footer-->
+            <Grid Grid.Row="2" Background="#FF6C6C6C">
+                <WrapPanel Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding VolumeInfo.VolumeSize}" FontSize="12" />
+                    <TextBlock Text=" | " FontSize="12" IsVisible="{Binding ViewEnabled}" />
+                    <TextBlock Text="{Binding VolumeInfo.Spacing}" FontSize="12" />
+                    <TextBlock Text=" | " FontSize="12" IsVisible="{Binding ViewEnabled}" />
+                    <TextBlock Text="{Binding VolumeInfo.PhysicalSize}" FontSize="12" />
+                </WrapPanel>
+                <WrapPanel Margin="0,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="HU范围：" FontSize="12" IsVisible="{Binding ViewEnabled}" />
+                    <TextBlock Text="{Binding VolumeInfo.HURange}" FontSize="12" />
+                    <TextBlock Text=" | " FontSize="12" IsVisible="{Binding ViewEnabled}" />
+                    <TextBlock Text="默认窗：" FontSize="12" IsVisible="{Binding ViewEnabled}" />
+                    <TextBlock Text="{Binding VolumeInfo.WindowLevel}" FontSize="12" />
+                </WrapPanel>
+            </Grid>
+        </Grid>
+    </sd:BusyMask>
 </fa:AppWindow>
