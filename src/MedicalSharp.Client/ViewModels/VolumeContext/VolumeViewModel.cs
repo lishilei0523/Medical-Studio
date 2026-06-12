@@ -987,7 +987,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
             Action<RectangleVisual3D> drawStart = shape => this.Shapes.Add(shape);
-            Action<RectangleVisual3D> drawEnd = null;//不同步
+            Action<RectangleVisual3D> drawEnd = shape =>
+            {
+                ShapeDrawnEvent message = new ShapeDrawnEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
 
             DrawRectangleCommand command = new DrawRectangleCommand(drawStart, drawEnd, getNormal);
             this.InputManager.SwitchCommand(command);
@@ -1002,7 +1010,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
             Action<CircleVisual3D> drawStart = shape => this.Shapes.Add(shape);
-            Action<CircleVisual3D> drawEnd = null;//不同步
+            Action<CircleVisual3D> drawEnd = shape =>
+            {
+                ShapeDrawnEvent message = new ShapeDrawnEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
 
             DrawCircleCommand command = new DrawCircleCommand(drawStart, drawEnd, getNormal);
             this.InputManager.SwitchCommand(command);
@@ -1017,7 +1033,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
             Action<EllipseVisual3D> drawStart = shape => this.Shapes.Add(shape);
-            Action<EllipseVisual3D> drawEnd = null;//不同步
+            Action<EllipseVisual3D> drawEnd = shape =>
+            {
+                ShapeDrawnEvent message = new ShapeDrawnEvent
+                {
+                    Publisher = this,
+                    Shape = shape
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
 
             DrawEllipseCommand command = new DrawEllipseCommand(drawStart, drawEnd, getNormal);
             this.InputManager.SwitchCommand(command);

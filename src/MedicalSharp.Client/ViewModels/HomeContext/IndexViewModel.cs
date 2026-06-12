@@ -12,6 +12,7 @@ using MedicalSharp.Client.ViewModels.LayoutContext;
 using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Client.Views.HomeContext;
 using MedicalSharp.Controls.Extensions;
+using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
@@ -43,7 +44,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
     /// <summary>
     /// 首页视图模型
     /// </summary>
-    public class IndexViewModel : ScreenBase, IHandle<StatisticFinishedEvent>
+    public class IndexViewModel : ScreenBase, IHandle<ShapeDrawnEvent>, IHandle<ShapeRemovedEvent>, IHandle<StatisticFinishedEvent>
     {
         #region # 字段及构造器
 
@@ -75,6 +76,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
             //默认值
             this.ViewEnabled = false;
+            this.Shapes = [];
             this.MarkModes = typeof(MarkMode).GetEnumMembers();
 
             Vector4[] colors = ColorFactory.StandardMarkColors;
@@ -250,6 +252,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<TissueInfo> Tissues { get; set; }
+        #endregion
+
+        #region 形状列表 —— AvaloniaList<ShapeVisual3D> Shapes
+        /// <summary>
+        /// 形状列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<ShapeVisual3D> Shapes { get; set; }
         #endregion
 
         #region 标记模式字典 —— IDictionary<string, string> MarkModes
@@ -1359,6 +1369,56 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 await topLevel!.Clipboard!.SetTextAsync(builder.ToString());
                 await MessageBox.Show("统计信息已复制到剪贴板！");
             }
+        }
+        #endregion
+
+        #region 处理形状绘制结束事件 —— Task HandleAsync(ShapeDrawnEvent message...
+        /// <summary>
+        /// 处理形状绘制结束事件
+        /// </summary>
+        public Task HandleAsync(ShapeDrawnEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.Shape == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.Shapes.Add(message.Shape);
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理形状已删除事件 —— Task HandleAsync(ShapeRemovedEvent message...
+        /// <summary>
+        /// 处理形状已删除事件
+        /// </summary>
+        public Task HandleAsync(ShapeRemovedEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+            if (message.Shape == null)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.Shapes.Remove(message.Shape);
+
+            return Task.CompletedTask;
         }
         #endregion
 
