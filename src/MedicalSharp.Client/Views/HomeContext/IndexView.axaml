@@ -161,7 +161,7 @@
 								<TextBlock Text="{Binding SeriesInfo.SeriesDescription}" />
 							</sd:FormItem>
 							<sd:FormItem Label="成像设备：">
-								<TextBlock Text="{Binding SeriesInfo.Modality}" />
+								<TextBlock Text="{Binding ScanInfo.Modality}" />
 							</sd:FormItem>
 							<sd:FormItem Label="管电压：">
 								<TextBlock Text="{Binding ScanInfo.KVP}" />
@@ -303,11 +303,18 @@
 			<!--Footer-->
 			<Grid Grid.Row="2" Background="#FF6C6C6C">
 				<WrapPanel Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<TextBlock Text="{Binding StudyInfo.StudyDescription}" FontSize="12" />
+                    <TextBlock Text="{Binding VolumeInfo.VolumeSize}" FontSize="12" />
+                    <TextBlock Text=" | " FontSize="12" IsVisible="{Binding ViewEnabled}" />
+					<TextBlock Text="{Binding VolumeInfo.Spacing}" FontSize="12" />
+					<TextBlock Text=" | " FontSize="12" IsVisible="{Binding ViewEnabled}" />
+                    <TextBlock Text="{Binding VolumeInfo.PhysicalSize}" FontSize="12" />
 				</WrapPanel>
 				<WrapPanel Margin="0,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Center">
-					<TextBlock Text="Series Instance UID : " FontSize="12" />
-					<TextBlock Text="{Binding SeriesInfo.SeriesInstanceUId}" FontSize="12" />
+                    <TextBlock Text="HU范围：" FontSize="12" IsVisible="{Binding ViewEnabled}" />
+                    <TextBlock Text="{Binding VolumeInfo.HURange}" FontSize="12" />
+                    <TextBlock Text=" | " FontSize="12" IsVisible="{Binding ViewEnabled}" />
+                    <TextBlock Text="默认窗：" FontSize="12" IsVisible="{Binding ViewEnabled}" />
+                    <TextBlock Text="{Binding VolumeInfo.WindowLevel}" FontSize="12" />
 				</WrapPanel>
 			</Grid>
 		</Grid>

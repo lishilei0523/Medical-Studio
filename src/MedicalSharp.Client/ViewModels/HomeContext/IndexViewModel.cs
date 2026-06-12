@@ -74,6 +74,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
 
             //默认值
+            this.ViewEnabled = false;
             this.MarkModes = typeof(MarkMode).GetEnumMembers();
 
             Vector4[] colors = ColorFactory.StandardMarkColors;
@@ -116,6 +117,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
         //属性
 
+        #region 视图是否启用 —— bool ViewEnabled
+        /// <summary>
+        /// 视图是否启用
+        /// </summary>
+        [DependencyProperty]
+        public bool ViewEnabled { get; set; }
+        #endregion
+
         #region 体积数据 —— VolumeData VolumeData
         /// <summary>
         /// 体积数据
@@ -128,6 +137,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 field = value;
                 if (value != null)
                 {
+                    this.ViewEnabled = true;
                     this.LayoutViewModel.SetVolumeData(value);
                     this.VolumeInfo = value.Metadata.ToVolumeInfo();
                     this.PatientInfo = value.PatientData.ToPatientInfo();
@@ -144,6 +154,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 }
                 else
                 {
+                    this.ViewEnabled = false;
                     this.LayoutViewModel.ClearVolumeData();
                     this.VolumeInfo = null;
                     this.PatientInfo = null;
