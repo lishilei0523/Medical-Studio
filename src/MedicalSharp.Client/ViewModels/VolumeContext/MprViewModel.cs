@@ -715,7 +715,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Action<PointVisual3D> drawEnd = shape =>
             {
+                int count = this.Shapes.OfType<PointCloudVisual3D>().Count();
+                shape.DisplayName = $"点{count + 1}";
                 this.Shapes.Add(shape);
+
                 ShapeDrawnEvent message = new ShapeDrawnEvent
                 {
                     Publisher = this,
@@ -735,7 +738,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawLineSegment()
         {
-            Action<LineSegmentVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<LineSegmentVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<LineSegmentVisual3D>().Count();
+                shape.DisplayName = $"线段{count + 1}";
+                this.Shapes.Add(shape);
+            };
             Action<LineSegmentVisual3D> drawEnd = shape =>
             {
                 ShapeDrawnEvent message = new ShapeDrawnEvent
@@ -758,7 +766,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawRectangle()
         {
             Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
-            Action<RectangleVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<RectangleVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<RectangleVisual3D>().Count();
+                shape.DisplayName = $"矩形{count + 1}";
+                this.Shapes.Add(shape);
+            };
             Action<RectangleVisual3D> drawEnd = shape =>
             {
                 ShapeDrawnEvent message = new ShapeDrawnEvent
@@ -781,7 +794,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawCircle()
         {
             Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
-            Action<CircleVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<CircleVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<CircleVisual3D>().Count();
+                shape.DisplayName = $"圆{count + 1}";
+                this.Shapes.Add(shape);
+            };
             Action<CircleVisual3D> drawEnd = shape =>
             {
                 ShapeDrawnEvent message = new ShapeDrawnEvent
@@ -804,7 +822,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public void DrawEllipse()
         {
             Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
-            Action<EllipseVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<EllipseVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<EllipseVisual3D>().Count();
+                shape.DisplayName = $"椭圆{count + 1}";
+                this.Shapes.Add(shape);
+            };
             Action<EllipseVisual3D> drawEnd = shape =>
             {
                 ShapeDrawnEvent message = new ShapeDrawnEvent
@@ -826,7 +849,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawPolyline()
         {
-            Action<PolylineVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<PolylineVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<PolylineVisual3D>().Count(x => !x.Closed);
+                shape.DisplayName = $"折线{count + 1}";
+                this.Shapes.Add(shape);
+            };
             Action<PolylineVisual3D> drawEnd = shape =>
             {
                 ShapeDrawnEvent message = new ShapeDrawnEvent
@@ -849,7 +877,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawCurve()
         {
-            Action<CurveVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<CurveVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<CurveVisual3D>().Count(x => !x.Closed);
+                shape.DisplayName = $"曲线{count + 1}";
+                this.Shapes.Add(shape);
+            };
             Action<CurveVisual3D> drawEnd = shape =>
             {
                 ShapeDrawnEvent message = new ShapeDrawnEvent
@@ -872,7 +905,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawPolygon()
         {
-            Action<PolylineVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<PolylineVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<PolylineVisual3D>().Count(x => x.Closed);
+                shape.DisplayName = $"多边形{count + 1}";
+                this.Shapes.Add(shape);
+            };
             Action<PolylineVisual3D> drawEnd = shape =>
             {
                 ShapeDrawnEvent message = new ShapeDrawnEvent
@@ -895,7 +933,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawClosedCurve()
         {
-            Action<CurveVisual3D> drawStart = shape => this.Shapes.Add(shape);
+            Action<CurveVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<CurveVisual3D>().Count(x => x.Closed);
+                shape.DisplayName = $"闭合曲线{count + 1}";
+                this.Shapes.Add(shape);
+            };
             Action<CurveVisual3D> drawEnd = shape =>
             {
                 ShapeDrawnEvent message = new ShapeDrawnEvent
