@@ -73,7 +73,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this._eventAggregator.SubscribeOnUIThread(this);
 
             //初始化相机
-            Vector3 cameraPosition = new Vector3(0, 2, 0);
+            Vector3 cameraPosition = new Vector3(0, 2.5f, 0);
             Vector3 targetPosition = Vector3.Zero;
             Vector3 worldUpDirection = Vector3.UnitZ;
             this.Camera = new OrbitPerspectiveCamera(cameraPosition, targetPosition, worldUpDirection);
@@ -93,7 +93,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.ToolbarConfig = new VolumeToolbar();
             this.Shapes = [];
             this.RaycastChecked = true;
-            this.AxialPlaneVisible = true;
+            this.AxialPlaneVisible = false;
             this.CoronalPlaneVisible = false;
             this.SagittalPlaneVisible = false;
             this.ViewBoxVisible = true;
@@ -566,7 +566,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand ResetCameraCommand => new AsyncRelayCommand(async _ =>
         {
-            Vector3 cameraPosition = new Vector3(0, 2, 0);
+            Vector3 cameraPosition = new Vector3(0, 2.5f, 0);
             Vector3 targetPosition = Vector3.Zero;
             this.Camera.SetPositions(cameraPosition, targetPosition);
             this.Camera.SetRotation(-90.0f, 0);
@@ -943,7 +943,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Action<PointVisual3D> drawEnd = shape =>
             {
-                int count = this.Shapes.OfType<PointCloudVisual3D>().Count();
+                int count = this.Shapes.OfType<PointVisual3D>().Count();
                 shape.DisplayName = $"点{count + 1}";
                 this.Shapes.Add(shape);
 

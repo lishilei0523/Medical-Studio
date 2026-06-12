@@ -9,6 +9,7 @@ using MedicalSharp.Client.ViewModels.AlgorithmContext;
 using MedicalSharp.Client.ViewModels.CommonContext;
 using MedicalSharp.Client.ViewModels.DicomContext;
 using MedicalSharp.Client.ViewModels.LayoutContext;
+using MedicalSharp.Client.ViewModels.ShapeContext;
 using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Client.Views.HomeContext;
 using MedicalSharp.Controls.Extensions;
@@ -252,6 +253,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<TissueInfo> Tissues { get; set; }
+        #endregion
+
+        #region 已选形状 —— ShapeVisual3D SelectedShape
+        /// <summary>
+        /// 已选形状
+        /// </summary>
+        [DependencyProperty]
+        public ShapeVisual3D SelectedShape { get; set; }
         #endregion
 
         #region 形状列表 —— AvaloniaList<ShapeVisual3D> Shapes
@@ -1338,6 +1347,42 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }
         #endregion
 
+        #region 重命名形状 —— async Task RenameShape(ShapeVisual3D shape)
+        /// <summary>
+        /// 重命名形状
+        /// </summary>
+        /// <param name="shape">形状3D元素</param>
+        public async Task RenameShape(ShapeVisual3D shape)
+        {
+            RenameShapeViewModel viewModel = ResolveMediator.Resolve<RenameShapeViewModel>();
+            viewModel.ShapeName = shape.DisplayName;
+
+            bool? result = await this._windowManager.ShowDialogAsync(viewModel);
+            if (result == true)
+            {
+                shape.DisplayName = viewModel.ShapeName;
+            }
+        }
+        #endregion
+
+        #region 删除形状 —— async Task RemoveShape(ShapeVisual3D shape)
+        /// <summary>
+        /// 删除形状
+        /// </summary>
+        /// <param name="shape">形状3D元素</param>
+        public async Task RemoveShape(ShapeVisual3D shape)
+        {
+            this.Shapes.Remove(shape);
+
+            //发布消息
+            ShapeRemovedEvent message = new ShapeRemovedEvent
+            {
+                Shape = shape
+            };
+            await this._eventAggregator.PublishOnUIThreadAsync(message);
+        }
+        #endregion
+
         #region 复制统计信息 —— void CopyStatistics()
         /// <summary>
         /// 复制统计信息
@@ -1392,6 +1437,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             #endregion
 
             this.Shapes.Add(message.Shape);
+            this.SelectedShape = message.Shape;
 
             return Task.CompletedTask;
         }

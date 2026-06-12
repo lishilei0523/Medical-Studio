@@ -1,0 +1,39 @@
+<fa:AppWindow x:Class="MedicalSharp.Client.Views.ShapeContext.RenameShapeView"
+			  xmlns="https://github.com/avaloniaui"
+			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			  xmlns:cm="http://caliburnmicro.com"
+			  mc:Ignorable="d"
+			  Width="460" Height="280" CanResize="False" ShowAsDialog="True"
+			  WindowStartupLocation="CenterScreen"
+			  Title="重命名形状">
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<!--表单区-->
+			<RowDefinition Height="220" />
+			<!--占位区-->
+			<RowDefinition Height="*" />
+			<!--控制区-->
+			<RowDefinition Height="50" />
+		</Grid.RowDefinitions>
+		<!--表单区-->
+		<StackPanel Grid.Row="0" Grid.IsSharedSizeScope="True" Margin="20,40">
+			<sd:FormItem Label="形状名称：">
+				<TextBox Width="300" HorizontalAlignment="Left" Text="{Binding ShapeName}" />
+			</sd:FormItem>
+		</StackPanel>
+		<!--占位区-->
+		<Grid Grid.Row="1" />
+		<!--控制区-->
+		<Grid Grid.Row="2" Classes="Submit-Grid">
+			<WrapPanel Classes="Submit-WrapPanel">
+				<Button Content="确定" cm:Message.Attach="Submit()" Classes="Focus" />
+				<Button Content="取消" cm:Message.Attach="TryCloseAsync('false')" />
+			</WrapPanel>
+		</Grid>
+	</Grid>
+</fa:AppWindow>

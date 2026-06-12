@@ -86,6 +86,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Crosshair = new CrosshairVisual3D();
             this.CrosshairVisible = true;
             this.DirectionVisible = true;
+            this.WindowLevelVisible = true;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
             this.InterpolationMode = InterpolationMode.Linear;
@@ -171,12 +172,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region 方向标识是否可见 —— bool CrosshairVisible
+        #region 方向标识是否可见 —— bool DirectionVisible
         /// <summary>
         /// 方向标识是否可见
         /// </summary>
         [DependencyProperty]
         public bool DirectionVisible { get; set; }
+        #endregion
+
+        #region 窗宽/窗位是否可见 —— bool WindowLevelVisible
+        /// <summary>
+        /// 窗宽/窗位是否可见
+        /// </summary>
+        [DependencyProperty]
+        public bool WindowLevelVisible { get; set; }
         #endregion
 
         #region 帧令牌 —— int FrameToken
@@ -715,7 +724,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Action<PointVisual3D> drawEnd = shape =>
             {
-                int count = this.Shapes.OfType<PointCloudVisual3D>().Count();
+                int count = this.Shapes.OfType<PointVisual3D>().Count();
                 shape.DisplayName = $"点{count + 1}";
                 this.Shapes.Add(shape);
 

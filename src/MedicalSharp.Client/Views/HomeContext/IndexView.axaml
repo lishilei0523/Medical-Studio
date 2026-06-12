@@ -114,10 +114,11 @@
 				<!--Left Pannel-->
 				<Grid Grid.Column="0" Margin="4,1,2,5">
 					<Grid.RowDefinitions>
-						<RowDefinition />
-						<RowDefinition />
+						<RowDefinition Height="670" />
+						<RowDefinition Height="4" />
+						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
-					<sd:GroupBox Grid.Row="0" Header="组织管理" Margin="0,0,0,2">
+					<sd:GroupBox Grid.Row="0" Header="组织管理">
 						<ListBox ItemsSource="{Binding Tissues}" SelectedItem="{Binding SelectedTissue}">
 							<ListBox.ItemTemplate>
 								<DataTemplate>
@@ -163,7 +164,8 @@
 							</ListBox.ContextFlyout>
 						</ListBox>
 					</sd:GroupBox>
-					<sd:GroupBox Grid.Row="1" Header="形状列表" Margin="0,2,0,0">
+					<GridSplitter Grid.Row="1" Height="4" Background="Transparent" HorizontalAlignment="Stretch" />
+					<sd:GroupBox Grid.Row="2" Header="形状管理">
 						<ListBox ItemsSource="{Binding Shapes}" SelectedItem="{Binding SelectedShape}">
 							<ListBox.ItemTemplate>
 								<DataTemplate>
@@ -173,9 +175,28 @@
 											<ColumnDefinition />
 										</Grid.ColumnDefinitions>
 										<TextBlock Grid.Column="0" Text="{Binding DisplayName}" Padding="2" />
+										<WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+											<Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
+													ToolTip.Tip="重命名"
+													cm:Message.Attach="RenameShape($dataContext);">
+												<PathIcon Data="{StaticResource Icon-Edit}" />
+											</Button>
+											<Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
+													ToolTip.Tip="删除"
+													cm:Message.Attach="RemoveShape($dataContext);">
+												<PathIcon Data="{StaticResource Icon-Remove}" />
+											</Button>
+										</WrapPanel>
 									</Grid>
 								</DataTemplate>
 							</ListBox.ItemTemplate>
+							<ListBox.ContextFlyout>
+								<MenuFlyout>
+									<MenuItem Header="内切(_I)" Command="{Binding ApplyCutInsideCommand}" />
+									<MenuItem Header="外切(_O)" Command="{Binding ApplyCutOutsideCommand}" />
+									<MenuItem Header="统计(_D)" Command="{Binding ApplyAnalyseCommand}" />
+								</MenuFlyout>
+							</ListBox.ContextFlyout>
 						</ListBox>
 					</sd:GroupBox>
 				</Grid>
@@ -187,9 +208,16 @@
 				<Grid Grid.Column="2" Margin="2,1,4,5">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="*" />
+						<RowDefinition Height="4" />
 						<RowDefinition Height="295" />
 					</Grid.RowDefinitions>
-					<sd:GroupBox Grid.Row="1" Margin="0,2,0,0">
+					<sd:GroupBox Grid.Row="0" Header="控制面板">
+						<StackPanel Grid.IsSharedSizeScope="True" Margin="5,7">
+
+						</StackPanel>
+					</sd:GroupBox>
+                    <GridSplitter Grid.Row="1" Height="4" Background="Transparent" HorizontalAlignment="Stretch" />
+					<sd:GroupBox Grid.Row="2">
 						<sd:GroupBox.Header>
 							<Grid>
 								<Grid.ColumnDefinitions>

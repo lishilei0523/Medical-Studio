@@ -20,77 +20,77 @@
 				<!--Toolbar-->
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
 					<sd:ToggleRadioButton cm:Message.Attach="PickVoxel()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="拾取体素"
+										  ToolTip.Tip="拾取体素"
 										  IsVisible="{Binding ToolbarConfig.PickVoxelEnabled}">
 						<PathIcon Data="{StaticResource Icon-PickVoxel}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="拾取形状"
+										  ToolTip.Tip="拾取形状"
 										  IsVisible="{Binding ToolbarConfig.PickShapeEnabled}">
 						<PathIcon Data="{StaticResource Icon-PickShape}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel" IsChecked="True"
-                                          ToolTip.Tip="平移"
+										  ToolTip.Tip="平移"
 										  IsVisible="{Binding ToolbarConfig.Translate3DEnabled}">
 						<PathIcon Data="{StaticResource Icon-Translate3D}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Rotate2D()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="2D旋转"
+										  ToolTip.Tip="2D旋转"
 										  IsVisible="{Binding ToolbarConfig.Rotate2DEnabled}">
 						<PathIcon Data="{StaticResource Icon-Rotate2D}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Resize()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="调整尺寸"
+										  ToolTip.Tip="调整尺寸"
 										  IsVisible="{Binding ToolbarConfig.ResizeEnabled}">
 						<PathIcon Data="{StaticResource Icon-Resize}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="EditVertex()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="编辑顶点"
+										  ToolTip.Tip="编辑顶点"
 										  IsVisible="{Binding ToolbarConfig.EditVertexEnabled}">
 						<PathIcon Data="{StaticResource Icon-EditVertex}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPoint()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="绘制点"
+										  ToolTip.Tip="绘制点"
 										  IsVisible="{Binding ToolbarConfig.DrawPointEnabled}">
 						<PathIcon Data="{StaticResource Icon-Point}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawLineSegment()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="绘制线段"
+										  ToolTip.Tip="绘制线段"
 										  IsVisible="{Binding ToolbarConfig.DrawLineSegmentEnabled}">
 						<PathIcon Data="{StaticResource Icon-LineSegment}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPolyline()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="绘制折线"
+										  ToolTip.Tip="绘制折线"
 										  IsVisible="{Binding ToolbarConfig.DrawPolylineEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polyline}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawCurve()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="绘制曲线"
+										  ToolTip.Tip="绘制曲线"
 										  IsVisible="{Binding ToolbarConfig.DrawCurveEnabled}">
 						<PathIcon Data="{StaticResource Icon-Curve}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawRectangle()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="绘制矩形"
+										  ToolTip.Tip="绘制矩形"
 										  IsVisible="{Binding ToolbarConfig.DrawRectangleEnabled}">
 						<PathIcon Data="{StaticResource Icon-Rectangle}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawCircle()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="绘制圆形"
+										  ToolTip.Tip="绘制圆形"
 										  IsVisible="{Binding ToolbarConfig.DrawCircleEnabled}">
 						<PathIcon Data="{StaticResource Icon-Circle}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawEllipse()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="绘制椭圆形"
+										  ToolTip.Tip="绘制椭圆形"
 										  IsVisible="{Binding ToolbarConfig.DrawEllipseEnabled}">
 						<PathIcon Data="{StaticResource Icon-Ellipse}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPolygon()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="绘制多边形"
+										  ToolTip.Tip="绘制多边形"
 										  IsVisible="{Binding ToolbarConfig.DrawPolygonEnabled}">
 						<PathIcon Data="{StaticResource Icon-Polygon}" />
 					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawClosedCurve()" Classes="Transparent-Panel"
-                                          ToolTip.Tip="绘制闭合曲线"
+										  ToolTip.Tip="绘制闭合曲线"
 										  IsVisible="{Binding ToolbarConfig.DrawClosedCurveEnabled}">
 						<PathIcon Data="{StaticResource Icon-ClosedCurve}" />
 					</sd:ToggleRadioButton>
@@ -118,29 +118,34 @@
 											<CheckBox Content="十字线" IsChecked="{Binding CrosshairVisible}" />
 										</MenuItem.Header>
 									</MenuItem>
-                                    <MenuItem>
-                                        <MenuItem.Header>
-                                            <CheckBox Content="方向标识" IsChecked="{Binding DirectionVisible}" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
+									<MenuItem>
+										<MenuItem.Header>
+											<CheckBox Content="方向标识" IsChecked="{Binding DirectionVisible}" />
+										</MenuItem.Header>
+									</MenuItem>
+									<MenuItem>
+										<MenuItem.Header>
+											<CheckBox Content="窗宽/窗位" IsChecked="{Binding WindowLevelVisible}" />
+										</MenuItem.Header>
+									</MenuItem>
 									<MenuItem Header="重置十字线(_R)" Command="{Binding ResetCrosshairCommand}" />
-                                    <MenuItem Header="重置相机(_C)" Command="{Binding ResetCameraCommand}" />
+									<MenuItem Header="重置相机(_C)" Command="{Binding ResetCameraCommand}" />
 								</MenuItem>
-                                <MenuItem Header="预设协议(_E)" IsEnabled="{Binding ViewEnabled}">
-                                    <ListBox ItemsSource="{Binding PresetProtocols}" SelectedItem="{Binding SelectedProtocol}">
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding Name}" />
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                        <ListBox.ContextFlyout>
-                                            <MenuFlyout>
-                                                <MenuItem Header="刷新(_E)" Command="{Binding ReloadProtocolsCommand}" />
-                                                <MenuItem Header="删除(_D)" Command="{Binding RemoveProtocolCommand}" />
-                                            </MenuFlyout>
-                                        </ListBox.ContextFlyout>
-                                    </ListBox>
-                                </MenuItem>
+								<MenuItem Header="预设协议(_E)" IsEnabled="{Binding ViewEnabled}">
+									<ListBox ItemsSource="{Binding PresetProtocols}" SelectedItem="{Binding SelectedProtocol}">
+										<ListBox.ItemTemplate>
+											<DataTemplate>
+												<TextBlock Text="{Binding Name}" />
+											</DataTemplate>
+										</ListBox.ItemTemplate>
+										<ListBox.ContextFlyout>
+											<MenuFlyout>
+												<MenuItem Header="刷新(_E)" Command="{Binding ReloadProtocolsCommand}" />
+												<MenuItem Header="删除(_D)" Command="{Binding RemoveProtocolCommand}" />
+											</MenuFlyout>
+										</ListBox.ContextFlyout>
+									</ListBox>
+								</MenuItem>
 								<MenuItem Header="调节协议(_T)" Command="{Binding TuneProtocolCommand}" />
 								<MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
 							</MenuFlyout>
@@ -163,7 +168,7 @@
 								WindowCenter="{Binding WindowCenter}"
 								Brightness="{Binding Brightness}"
 								Contrast="{Binding Contrast}"
-                                InterpolationMode="{Binding InterpolationMode}"
+								InterpolationMode="{Binding InterpolationMode}"
 								TFControlPoints="{Binding TFControlPoints}">
 					<sd:ShapePresenter3D Content="{Binding Crosshair}" />
 					<sd:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
@@ -180,20 +185,42 @@
 						<ColumnDefinition Width="Auto" />
 					</Grid.ColumnDefinitions>
 					<WrapPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <!--Top-->
-                        <TextBlock Text="{Binding FourDirection.Top}" Margin="0,1,0,0" Foreground="DarkGray" />
+						<!--Top-->
+						<TextBlock Text="{Binding FourDirection.Top}" Margin="0,1,0,0" Foreground="DarkGray" />
 					</WrapPanel>
-                    <WrapPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <!--Bottom-->
-                        <TextBlock Text="{Binding FourDirection.Bottom}" Margin="0,0,0,1" Foreground="DarkGray" />
-                    </WrapPanel>
+					<WrapPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+						<!--Bottom-->
+						<TextBlock Text="{Binding FourDirection.Bottom}" Margin="0,0,0,1" Foreground="DarkGray" />
+					</WrapPanel>
 					<WrapPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
 						<!--Left-->
-                        <TextBlock Text="{Binding FourDirection.Left}" Margin="1,0,0,0" Foreground="DarkGray" />
+						<TextBlock Text="{Binding FourDirection.Left}" Margin="1,0,0,0" Foreground="DarkGray" />
 					</WrapPanel>
 					<WrapPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <!--Right-->
-                        <TextBlock Text="{Binding FourDirection.Right}" Margin="0,0,1,0" Foreground="DarkGray" />
+						<!--Right-->
+						<TextBlock Text="{Binding FourDirection.Right}" Margin="0,0,1,0" Foreground="DarkGray" />
+					</WrapPanel>
+				</Grid>
+				<Grid IsVisible="{Binding WindowLevelVisible}">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+					<WrapPanel Grid.Row="2" Grid.Column="0" Margin="2,0,0,0" IsVisible="{Binding ViewEnabled}">
+						<!--BottomLeft-->
+						<TextBlock Text="WW : " Foreground="DarkGray" />
+						<TextBlock Text="{Binding WindowWidth}" Foreground="DarkGray" />
+					</WrapPanel>
+					<WrapPanel Grid.Row="2" Grid.Column="2" Margin="0,0,2,0" IsVisible="{Binding ViewEnabled}">
+						<!--BottomLeft-->
+						<TextBlock Text="WL : " Foreground="DarkGray" />
+						<TextBlock Text="{Binding WindowCenter}" Foreground="DarkGray" />
 					</WrapPanel>
 				</Grid>
 			</Grid>
