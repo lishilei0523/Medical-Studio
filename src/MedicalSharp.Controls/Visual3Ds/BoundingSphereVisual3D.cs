@@ -12,7 +12,6 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MedicalSharp.Controls.Visual3Ds
@@ -261,40 +260,25 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// <returns>表面积（mm²）</returns>
         public float CalculateSurfaceArea(VolumeMetadata metadata)
         {
-            //获取世界空间的凸包顶点
-            IReadOnlyList<Vector3> hull = this.GetConvexHullPositions();
-
-            #region # 验证
-
-            if (hull.Count < 4)
-            {
-                return 0;
-            }
-
-            #endregion
-
-            //获取三角形面
-            WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
-            if (renderable?.Triangles == null)
-            {
-                return 0;
-            }
-
-            float area = 0;
             Matrix4 localToWorld = this.Transform.Matrix;
-            foreach (Triangle triangle in renderable.Triangles)
-            {
-                //局部 -> 世界 -> 毫米
-                Vector3 mmA = Vector3.TransformPosition(triangle.PointA, localToWorld).ToMillimeterPosition(metadata);
-                Vector3 mmB = Vector3.TransformPosition(triangle.PointB, localToWorld).ToMillimeterPosition(metadata);
-                Vector3 mmC = Vector3.TransformPosition(triangle.PointC, localToWorld).ToMillimeterPosition(metadata);
+            Vector3 localCenter = this.Center.ToVector3();
 
-                Vector3 ab = mmB - mmA;
-                Vector3 ac = mmC - mmA;
-                area += Vector3.Cross(ab, ac).Length;
-            }
+            //沿X轴方向的偏移向量（半径）
+            Vector3 localRadiusOffset = new Vector3(this.Radius, 0, 0);
 
-            area /= 2.0f;
+            //中心点、边界点的世界坐标
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, localToWorld);
+            Vector3 worldBoundary = Vector3.TransformPosition(localCenter + localRadiusOffset, localToWorld);
+
+            //转换为毫米坐标
+            Vector3 mmCenter = worldCenter.ToMillimeterPosition(metadata);
+            Vector3 mmBoundary = worldBoundary.ToMillimeterPosition(metadata);
+
+            //中心到边界的距离 = 半径
+            float mmRadius = Vector3.Distance(mmCenter, mmBoundary);
+
+            //球体表面积 = 4 × π × r²
+            float area = 4 * MathF.PI * mmRadius * mmRadius;
 
             return area;
         }
@@ -308,29 +292,25 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// <returns>体积（mm³）</returns>
         public float CalculateVolume(VolumeMetadata metadata)
         {
-            //获取世界空间的凸包顶点
-            IReadOnlyList<Vector3> hull = this.GetConvexHullPositions();
+            Matrix4 localToWorld = this.Transform.Matrix;
+            Vector3 localCenter = this.Center.ToVector3();
 
-            #region # 验证
+            //沿X轴方向的偏移向量（半径）
+            Vector3 localRadiusOffset = new Vector3(this.Radius, 0, 0);
 
-            if (hull.Count < 4)
-            {
-                return 0;
-            }
+            //中心点、边界点的世界坐标
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, localToWorld);
+            Vector3 worldBoundary = Vector3.TransformPosition(localCenter + localRadiusOffset, localToWorld);
 
-            #endregion
+            //转换为毫米坐标
+            Vector3 mmCenter = worldCenter.ToMillimeterPosition(metadata);
+            Vector3 mmBoundary = worldBoundary.ToMillimeterPosition(metadata);
 
-            //转换到毫米空间
-            Vector3[] mmHull = hull.Select(position => position.ToMillimeterPosition(metadata)).ToArray();
+            //中心到边界的距离 = 半径
+            float mmRadius = Vector3.Distance(mmCenter, mmBoundary);
 
-            //四面体分解法
-            float volume = 0;
-            Vector3 origin = mmHull[0];
-            for (int index = 1; index < mmHull.Length - 1; index++)
-            {
-                volume += Vector3.Dot(mmHull[index] - origin, Vector3.Cross(mmHull[index + 1] - origin, mmHull[index + 2] - origin));
-            }
-            volume = Math.Abs(volume) / 6.0f;
+            //球体体积 = 4/3 × π × r³
+            float volume = (4.0f / 3.0f) * MathF.PI * mmRadius * mmRadius * mmRadius;
 
             return volume;
         }
