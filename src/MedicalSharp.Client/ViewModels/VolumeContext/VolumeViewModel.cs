@@ -708,13 +708,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 {
                     this.SelectedShape = null;
                     this.Shapes.Remove(shapeVisual3D);
-
-                    ShapeRemovedEvent message = new ShapeRemovedEvent
-                    {
-                        Publisher = this,
-                        Shape = shapeVisual3D
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
             Action cutEnd = () =>
@@ -947,10 +940,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"点{count + 1}";
                 this.Shapes.Add(shape);
 
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -974,10 +966,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<LineSegmentVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1002,10 +993,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<RectangleVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1030,10 +1020,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<CircleVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1058,10 +1047,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<EllipseVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1085,10 +1073,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<PolylineVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1113,10 +1100,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<CurveVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1141,10 +1127,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<PolylineVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1169,10 +1154,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<CurveVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1197,10 +1181,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<BoundingBoxVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1224,10 +1207,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<BoundingSphereVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1251,10 +1233,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<CylinderVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
@@ -1278,10 +1259,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<ConvexPolyhedronVisual3D> drawEnd = shape =>
             {
-                ShapeDrawnEvent message = new ShapeDrawnEvent
+                SyncViewportEvent message = new SyncViewportEvent
                 {
-                    Publisher = this,
-                    Shape = shape
+                    Publisher = this
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };

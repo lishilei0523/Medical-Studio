@@ -1371,21 +1371,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }
         #endregion
 
-        #region 删除形状 —— async Task RemoveShape(ShapeVisual3D shape)
+        #region 删除形状 —— void RemoveShape(ShapeVisual3D shape)
         /// <summary>
         /// 删除形状
         /// </summary>
         /// <param name="shape">形状3D元素</param>
-        public async Task RemoveShape(ShapeVisual3D shape)
+        public void RemoveShape(ShapeVisual3D shape)
         {
             this.Shapes.Remove(shape);
-
-            //发布消息
-            ShapeRemovedEvent message = new ShapeRemovedEvent
-            {
-                Shape = shape
-            };
-            await this._eventAggregator.PublishOnUIThreadAsync(message);
         }
         #endregion
 
@@ -1458,11 +1451,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 this.SelectedShape = null;
                 this.SelectedShape = this.Shapes.LastOrDefault();
-            }
 
-            //发布消息
-            SyncViewportEvent message = new SyncViewportEvent();
-            this._eventAggregator.PublishOnUIThreadAsync(message);
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            }
         }
         #endregion
 
