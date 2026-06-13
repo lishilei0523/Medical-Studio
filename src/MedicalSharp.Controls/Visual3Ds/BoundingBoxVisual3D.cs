@@ -13,7 +13,6 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MedicalSharp.Controls.Visual3Ds
@@ -327,26 +326,38 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// <returns>表面积（mm²）</returns>
         public float CalculateSurfaceArea(VolumeMetadata metadata)
         {
-            WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
-            if (renderable?.Triangles == null)
-            {
-                return 0;
-            }
-
-            float area = 0;
             Matrix4 localToWorld = this.Transform.Matrix;
-            foreach (Triangle triangle in renderable.Triangles)
-            {
-                //局部 -> 世界 -> 毫米
-                Vector3 mmA = Vector3.TransformPosition(triangle.PointA, localToWorld).ToMillimeterPosition(metadata);
-                Vector3 mmB = Vector3.TransformPosition(triangle.PointB, localToWorld).ToMillimeterPosition(metadata);
-                Vector3 mmC = Vector3.TransformPosition(triangle.PointC, localToWorld).ToMillimeterPosition(metadata);
+            Vector3 localCenter = this.Center.ToVector3();
 
-                Vector3 ab = mmB - mmA;
-                Vector3 ac = mmC - mmA;
-                area += Vector3.Cross(ab, ac).Length;
-            }
-            area /= 2.0f;
+            //沿 X、Y、Z 轴方向的偏移向量（半宽、半高、半深）
+            Vector3 localWidthOffset = new Vector3(this.Width / 2, 0, 0);
+            Vector3 localHeightOffset = new Vector3(0, this.Height / 2, 0);
+            Vector3 localDepthOffset = new Vector3(0, 0, this.Depth / 2);
+
+            //中心点、对面边界点的世界坐标
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, localToWorld);
+            Vector3 worldWidthBoundary = Vector3.TransformPosition(localCenter + localWidthOffset, localToWorld);
+            Vector3 worldHeightBoundary = Vector3.TransformPosition(localCenter + localHeightOffset, localToWorld);
+            Vector3 worldDepthBoundary = Vector3.TransformPosition(localCenter + localDepthOffset, localToWorld);
+
+            //转换为毫米坐标
+            Vector3 mmCenter = worldCenter.ToMillimeterPosition(metadata);
+            Vector3 mmWidthBoundary = worldWidthBoundary.ToMillimeterPosition(metadata);
+            Vector3 mmHeightBoundary = worldHeightBoundary.ToMillimeterPosition(metadata);
+            Vector3 mmDepthBoundary = worldDepthBoundary.ToMillimeterPosition(metadata);
+
+            //中心到边界的距离 = 半宽、半高、半深
+            float halfWidth = Vector3.Distance(mmCenter, mmWidthBoundary);
+            float halfHeight = Vector3.Distance(mmCenter, mmHeightBoundary);
+            float halfDepth = Vector3.Distance(mmCenter, mmDepthBoundary);
+
+            //全宽、全高、全深
+            float mmWidth = halfWidth * 2;
+            float mmHeight = halfHeight * 2;
+            float mmDepth = halfDepth * 2;
+
+            //表面积 = (宽×高 + 宽×深 + 高×深) × 2
+            float area = (mmWidth * mmHeight + mmWidth * mmDepth + mmHeight * mmDepth) * 2;
 
             return area;
         }
@@ -360,28 +371,38 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// <returns>体积（mm³）</returns>
         public float CalculateVolume(VolumeMetadata metadata)
         {
-            IReadOnlyList<Vector3> hull = this.GetConvexHullPositions();
+            Matrix4 localToWorld = this.Transform.Matrix;
+            Vector3 localCenter = this.Center.ToVector3();
 
-            #region # 验证
+            //沿 X、Y、Z 轴方向的偏移向量（半宽、半高、半深）
+            Vector3 localWidthOffset = new Vector3(this.Width / 2, 0, 0);
+            Vector3 localHeightOffset = new Vector3(0, this.Height / 2, 0);
+            Vector3 localDepthOffset = new Vector3(0, 0, this.Depth / 2);
 
-            if (hull.Count < 4)
-            {
-                return 0;
-            }
+            //中心点、对面边界点的世界坐标
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, localToWorld);
+            Vector3 worldWidthBoundary = Vector3.TransformPosition(localCenter + localWidthOffset, localToWorld);
+            Vector3 worldHeightBoundary = Vector3.TransformPosition(localCenter + localHeightOffset, localToWorld);
+            Vector3 worldDepthBoundary = Vector3.TransformPosition(localCenter + localDepthOffset, localToWorld);
 
-            #endregion
+            //转换为毫米坐标
+            Vector3 mmCenter = worldCenter.ToMillimeterPosition(metadata);
+            Vector3 mmWidthBoundary = worldWidthBoundary.ToMillimeterPosition(metadata);
+            Vector3 mmHeightBoundary = worldHeightBoundary.ToMillimeterPosition(metadata);
+            Vector3 mmDepthBoundary = worldDepthBoundary.ToMillimeterPosition(metadata);
 
-            //转换到毫米空间
-            Vector3[] mmHull = hull.Select(position => position.ToMillimeterPosition(metadata)).ToArray();
+            //中心到边界的距离 = 半宽、半高、半深
+            float halfWidth = Vector3.Distance(mmCenter, mmWidthBoundary);
+            float halfHeight = Vector3.Distance(mmCenter, mmHeightBoundary);
+            float halfDepth = Vector3.Distance(mmCenter, mmDepthBoundary);
 
-            //四面体分解法
-            float volume = 0;
-            Vector3 origin = mmHull[0];
-            for (int i = 1; i < mmHull.Length - 1; i++)
-            {
-                volume += Vector3.Dot(mmHull[i] - origin, Vector3.Cross(mmHull[i + 1] - origin, mmHull[i + 2] - origin));
-            }
-            volume = Math.Abs(volume) / 6.0f;
+            //全宽、全高、全深
+            float mmWidth = halfWidth * 2;
+            float mmHeight = halfHeight * 2;
+            float mmDepth = halfDepth * 2;
+
+            //体积 = 宽 × 高 × 深
+            float volume = mmWidth * mmHeight * mmDepth;
 
             return volume;
         }
