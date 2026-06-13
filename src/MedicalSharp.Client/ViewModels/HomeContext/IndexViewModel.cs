@@ -34,6 +34,7 @@ using SD.Infrastructure.Avalonia.CustomControls;
 using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -45,7 +46,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
     /// <summary>
     /// 首页视图模型
     /// </summary>
-    public class IndexViewModel : ScreenBase, IHandle<ShapeDrawnEvent>, IHandle<ShapeRemovedEvent>, IHandle<StatisticFinishedEvent>
+    public class IndexViewModel : ScreenBase, IHandle<StatisticFinishedEvent>
     {
         #region # 字段及构造器
 
@@ -73,12 +74,19 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this._eventAggregator = eventAggregator;
             this._eventAggregator.SubscribeOnUIThread(this);
             this._dicomLoader = dicomLoader;
-            this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
 
             //默认值
             this.ViewEnabled = false;
             this.Shapes = [];
+            this.Shapes.CollectionChanged += this.OnShapesItemChanged;
             this.MarkModes = typeof(MarkMode).GetEnumMembers();
+
+            //布局
+            this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
+            this.LayoutViewModel.VolumeViewModel.Shapes = this.Shapes;
+            this.LayoutViewModel.MprAxialViewModel.MprViewModel.Shapes = this.Shapes;
+            this.LayoutViewModel.MprCoronalViewModel.MprViewModel.Shapes = this.Shapes;
+            this.LayoutViewModel.MprSagittalViewModel.MprViewModel.Shapes = this.Shapes;
 
             Vector4[] colors = ColorFactory.StandardMarkColors;
             this.Tissues =
@@ -1415,57 +1423,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }
         #endregion
 
-        #region 处理形状绘制结束事件 —— Task HandleAsync(ShapeDrawnEvent message...
-        /// <summary>
-        /// 处理形状绘制结束事件
-        /// </summary>
-        public Task HandleAsync(ShapeDrawnEvent message, CancellationToken cancellationToken)
-        {
-            #region # 验证
-
-            if (message.Publisher == this)
-            {
-                return Task.CompletedTask;
-            }
-            if (message.Shape == null)
-            {
-                return Task.CompletedTask;
-            }
-
-            #endregion
-
-            this.Shapes.Add(message.Shape);
-            this.SelectedShape = message.Shape;
-
-            return Task.CompletedTask;
-        }
-        #endregion
-
-        #region 处理形状已删除事件 —— Task HandleAsync(ShapeRemovedEvent message...
-        /// <summary>
-        /// 处理形状已删除事件
-        /// </summary>
-        public Task HandleAsync(ShapeRemovedEvent message, CancellationToken cancellationToken)
-        {
-            #region # 验证
-
-            if (message.Publisher == this)
-            {
-                return Task.CompletedTask;
-            }
-            if (message.Shape == null)
-            {
-                return Task.CompletedTask;
-            }
-
-            #endregion
-
-            this.Shapes.Remove(message.Shape);
-
-            return Task.CompletedTask;
-        }
-        #endregion
-
         #region 处理统计完成事件 —— Task HandleAsync(StatisticFinishedEvent message...
         /// <summary>
         /// 处理统计完成事件
@@ -1484,6 +1441,28 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.StatisticInfo = message.StatisticResult.ToStatisticInfo();
 
             return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 形状列表元素改变事件 —— void OnShapesItemChanged(object sender...
+        /// <summary>
+        /// 形状列表元素改变事件
+        /// </summary>
+        private void OnShapesItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+        {
+            if (eventArgs.Action == NotifyCollectionChangedAction.Add && eventArgs.NewItems != null)
+            {
+                this.SelectedShape = (ShapeVisual3D)eventArgs.NewItems[0];
+            }
+            if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
+            {
+                this.SelectedShape = null;
+                this.SelectedShape = this.Shapes.LastOrDefault();
+            }
+
+            //发布消息
+            SyncViewportEvent message = new SyncViewportEvent();
+            this._eventAggregator.PublishOnUIThreadAsync(message);
         }
         #endregion
 

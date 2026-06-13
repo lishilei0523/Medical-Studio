@@ -49,7 +49,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeDrawnEvent>, IHandle<ShapeRemovedEvent>, IHandle<MPRPlaneChangedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -1369,58 +1369,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             #endregion
 
-            this.FrameToken++;
-
-            return Task.CompletedTask;
-        }
-        #endregion
-
-        #region 处理形状绘制结束事件 —— Task HandleAsync(ShapeDrawnEvent message...
-        /// <summary>
-        /// 处理形状绘制结束事件
-        /// </summary>
-        public Task HandleAsync(ShapeDrawnEvent message, CancellationToken cancellationToken)
-        {
-            #region # 验证
-
-            if (message.Publisher == this)
-            {
-                return Task.CompletedTask;
-            }
-            if (message.Shape == null)
-            {
-                return Task.CompletedTask;
-            }
-
-            #endregion
-
-            this.Shapes.Add(message.Shape);
-            this.FrameToken++;
-
-            return Task.CompletedTask;
-        }
-        #endregion
-
-        #region 处理形状已删除事件 —— Task HandleAsync(ShapeRemovedEvent message...
-        /// <summary>
-        /// 处理形状已删除事件
-        /// </summary>
-        public Task HandleAsync(ShapeRemovedEvent message, CancellationToken cancellationToken)
-        {
-            #region # 验证
-
-            if (message.Publisher == this)
-            {
-                return Task.CompletedTask;
-            }
-            if (message.Shape == null)
-            {
-                return Task.CompletedTask;
-            }
-
-            #endregion
-
-            this.Shapes.Remove(message.Shape);
             this.FrameToken++;
 
             return Task.CompletedTask;
