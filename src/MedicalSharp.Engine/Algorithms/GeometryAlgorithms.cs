@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using MIConvexHull;
 using OpenTK.Mathematics;
 using System;
@@ -12,6 +13,36 @@ namespace MedicalSharp.Engine.Algorithms
     /// </summary>
     public static class GeometryAlgorithms
     {
+        #region # 世界坐标转毫米坐标 —— static Vector3 ToMillimeterPosition(this Vector3 worldPosition...
+        /// <summary>
+        /// 世界坐标转毫米坐标
+        /// </summary>
+        /// <param name="worldPosition">世界位置</param>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>毫米位置</returns>
+        public static Vector3 ToMillimeterPosition(this Vector3 worldPosition, VolumeMetadata metadata)
+        {
+            //世界空间 -> 中间坐标（撤销 VolumeScale）
+            Vector3 normalized = new Vector3(
+                worldPosition.X / metadata.VolumeScale.X,
+                worldPosition.Y / metadata.VolumeScale.Y,
+                worldPosition.Z / metadata.VolumeScale.Z
+            );
+
+            //中间坐标 -> 纹理坐标
+            Vector3 texCoord = normalized + new Vector3(0.5f);
+
+            //纹理坐标 -> 毫米坐标
+            Vector3 mmPosition = new Vector3(
+                texCoord.X * metadata.PhysicalSize.X,
+                texCoord.Y * metadata.PhysicalSize.Y,
+                texCoord.Z * metadata.PhysicalSize.Z
+            );
+
+            return mmPosition;
+        }
+        #endregion
+
         #region # 判断点是否在顶点列表中 —— static bool ContainsPoint(IReadOnlyList<Vector3> vertices...
         /// <summary>
         /// 判断点是否在顶点列表中
