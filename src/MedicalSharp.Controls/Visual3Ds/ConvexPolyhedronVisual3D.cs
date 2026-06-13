@@ -321,10 +321,15 @@ namespace MedicalSharp.Controls.Visual3Ds
             Matrix4 localToWorld = this.Transform.Matrix;
             foreach (Triangle triangle in renderable.Triangles)
             {
-                //局部 -> 世界 -> 毫米
-                Vector3 mmA = Vector3.TransformPosition(triangle.PointA, localToWorld).ToMillimeterPosition(metadata);
-                Vector3 mmB = Vector3.TransformPosition(triangle.PointB, localToWorld).ToMillimeterPosition(metadata);
-                Vector3 mmC = Vector3.TransformPosition(triangle.PointC, localToWorld).ToMillimeterPosition(metadata);
+                //局部 -> 世界
+                Vector3 worldA = Vector3.TransformPosition(triangle.PointA, localToWorld);
+                Vector3 worldB = Vector3.TransformPosition(triangle.PointB, localToWorld);
+                Vector3 worldC = Vector3.TransformPosition(triangle.PointC, localToWorld);
+
+                //世界 -> 毫米
+                Vector3 mmA = worldA.ToMillimeterPosition(metadata);
+                Vector3 mmB = worldB.ToMillimeterPosition(metadata);
+                Vector3 mmC = worldC.ToMillimeterPosition(metadata);
 
                 Vector3 ab = mmB - mmA;
                 Vector3 ac = mmC - mmA;
@@ -344,22 +349,52 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// <returns>体积（mm³）</returns>
         public float CalculateVolume(VolumeMetadata metadata)
         {
+            Matrix4 localToWorld = this.Transform.Matrix;
+
             //获取世界空间的凸包顶点
-            IReadOnlyList<Vector3> hull = GetConvexHullPositions();
+            IReadOnlyList<Vector3> hull = this.GetConvexHullPositions();
             if (hull.Count < 4)
             {
                 return 0;
             }
 
-            //转换到毫米空间
-            Vector3[] mmHull = hull.Select(p => p.ToMillimeterPosition(metadata)).ToArray();
-
-            //四面体分解法
-            float volume = 0;
-            Vector3 origin = mmHull[0];
-            for (int index = 1; index < mmHull.Length - 1; index++)
+            //计算质心作为参考点
+            Vector3 centroid = Vector3.Zero;
+            Vector3[] mmHull = hull
+                .Select(localPos => Vector3.TransformPosition(localPos, localToWorld))
+                .Select(worldPos => worldPos.ToMillimeterPosition(metadata))
+                .ToArray();
+            foreach (Vector3 mmPosition in mmHull)
             {
-                volume += Vector3.Dot(mmHull[index] - origin, Vector3.Cross(mmHull[index + 1] - origin, mmHull[index + 2] - origin));
+                centroid += mmPosition;
+            }
+            centroid /= mmHull.Length;
+
+            //获取三角形面
+            WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
+            if (renderable?.Triangles == null)
+            {
+                return 0;
+            }
+
+            float volume = 0;
+            foreach (Triangle triangle in renderable.Triangles)
+            {
+                //局部 -> 世界
+                Vector3 worldA = Vector3.TransformPosition(triangle.PointA, localToWorld);
+                Vector3 worldB = Vector3.TransformPosition(triangle.PointB, localToWorld);
+                Vector3 worldC = Vector3.TransformPosition(triangle.PointC, localToWorld);
+
+                //世界 -> 毫米
+                Vector3 mmA = worldA.ToMillimeterPosition(metadata);
+                Vector3 mmB = worldB.ToMillimeterPosition(metadata);
+                Vector3 mmC = worldC.ToMillimeterPosition(metadata);
+
+                //四面体体积
+                Vector3 a = mmA - centroid;
+                Vector3 b = mmB - centroid;
+                Vector3 c = mmC - centroid;
+                volume += Vector3.Dot(a, Vector3.Cross(b, c));
             }
             volume = Math.Abs(volume) / 6.0f;
 
