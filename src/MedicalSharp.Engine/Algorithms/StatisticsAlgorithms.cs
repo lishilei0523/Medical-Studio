@@ -294,11 +294,15 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
         /// <param name="zoomFactor">缩放因子</param>
+        /// <param name="imageWidth">层图像宽度</param>
+        /// <param name="imageHeight">层图像高度</param>
         /// <param name="layerPixels">层像素指针</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        public static StatisticResult ApplyRectangleAnalyse(this VolumeData volumeData, in Vector2 pointA, in Vector2 pointB, in Vector2 pointC, in Vector2 pointD, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
+        public static StatisticResult ApplyRectangleAnalyse(this VolumeData volumeData, in Vector2 pointA, in Vector2 pointB, in Vector2 pointC, in Vector2 pointD, int viewportWidth, int viewportHeight, float zoomFactor, int imageWidth, int imageHeight, byte[] layerPixels, byte? markValue)
         {
+            //TODO 继续完善
+
             Vector2[] screenCorners = [pointA, pointB, pointC, pointD];
 
             //统计变量
@@ -361,8 +365,13 @@ namespace MedicalSharp.Engine.Algorithms
                 }
             }
 
-            //像素数量转体素数量，面积缩放因子 = ZoomFactor 的平方
-            float areaScale = zoomFactor * zoomFactor;
+            //计算显示缩放因子
+            float scaleX = viewportWidth * 1.0f / imageWidth;
+            float scaleY = viewportHeight * 1.0f / imageHeight;
+            float displayScale = Math.Min(scaleX, scaleY);
+            float areaScale = zoomFactor * zoomFactor * displayScale * displayScale;
+
+            //像素数量转体素数量
             int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
 
             //计算统计指标

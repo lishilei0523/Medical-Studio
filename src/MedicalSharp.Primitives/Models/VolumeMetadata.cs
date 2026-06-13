@@ -137,35 +137,5 @@ namespace MedicalSharp.Primitives.Models
         /// </summary>
         public int WindowCenter { get; set; }
         #endregion
-
-        #region 只读属性 - 体素体积 —— float VoxelVolume
-        /// <summary>
-        /// 只读属性 - 体素体积
-        /// </summary>
-        /// <remarks>mm³</remarks>
-        public float VoxelVolume
-        {
-            get => this.Spacing.X * this.Spacing.Y * this.Spacing.Z;
-        }
-        #endregion
-
-        #region 只读属性 - 平均体素表面积 —— float AverageVoxelArea
-        /// <summary>
-        /// 只读属性 - 平均体素表面积
-        /// </summary>
-        /// <remarks>mm²</remarks>
-        public float AverageVoxelArea
-        {
-            get
-            {
-                float areaXY = this.Spacing.X * this.Spacing.Y;
-                float areaXZ = this.Spacing.X * this.Spacing.Z;
-                float areaYZ = this.Spacing.Y * this.Spacing.Z;
-                float averageArea = (areaXY + areaXZ + areaYZ) / 3.0f;
-
-                return averageArea;
-            }
-        }
-        #endregion
     }
 }
