@@ -272,7 +272,7 @@ namespace MedicalSharp.Engine.Resources
             }
             foreach (VertexArray vertexArray in this._vertexArrays.Values)
             {
-                vertexArray.Dispose();
+                vertexArray.MarkDispose();
             }
 
             this._disposed = true;

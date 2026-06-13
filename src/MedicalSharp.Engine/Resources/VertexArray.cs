@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Engine.Base;
+using MedicalSharp.Engine.Managers;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Graphics.OpenGL4;
 using System;
@@ -43,6 +44,10 @@ namespace MedicalSharp.Engine.Resources
 
             this.GlContext = glContext;
             this.VertexBuffer = vertexBuffer;
+            this.ShouldDipose = false;
+
+            //注册
+            VertexArrayManager.RegisterVertexArray(this.GlContext, this);
         }
 
         #endregion
@@ -54,6 +59,13 @@ namespace MedicalSharp.Engine.Resources
         /// OpenGL上下文句柄
         /// </summary>
         public IntPtr GlContext { get; private set; }
+        #endregion
+
+        #region 是否应释放 —— bool ShouldDipose
+        /// <summary>
+        /// 是否应释放
+        /// </summary>
+        public bool ShouldDipose { get; private set; }
         #endregion
 
         #region 顶点缓冲区 —— VertexBuffer VertexBuffer
@@ -114,6 +126,16 @@ namespace MedicalSharp.Engine.Resources
 
             this.VertexBuffer.Unbind();
             this.Unbind();
+        }
+        #endregion
+
+        #region 标记释放 —— void MarkDispose()
+        /// <summary>
+        /// 标记释放
+        /// </summary>
+        internal void MarkDispose()
+        {
+            this.ShouldDipose = true;
         }
         #endregion
 

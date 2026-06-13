@@ -407,6 +407,9 @@ namespace MedicalSharp.Controls.Base
             //OpenTK渲染
             this.OnOpenTKRender(this._viewportSize);
 
+            //释放VAO
+            VertexArrayManager.ReleaseVertexArrays(this._glContextHandle);
+
             //N卡兼容性处理
             if (IsNvidia)
             {
