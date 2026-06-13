@@ -289,6 +289,36 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
+        #region 适用调整尺寸 —— void ApplyResize(ResizeContext3D resizeContext, Vector3 localHitPoint)
+        /// <summary>
+        /// 适用调整尺寸
+        /// </summary>
+        /// <param name="resizeContext">调整尺寸上下文</param>
+        /// <param name="localHitPoint">命中点（局部空间）</param>
+        public void ApplyResize(ResizeContext3D resizeContext, Vector3 localHitPoint)
+        {
+            Vector3 delta = localHitPoint - resizeContext.Anchor;
+            float newHalf = Math.Abs(Vector3.Dot(delta, resizeContext.Axis));
+            newHalf = Math.Max(newHalf, 0.01f);
+
+            float dotX = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitX));
+            float dotY = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitY));
+            float dotZ = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitZ));
+            if (dotX > 0.99f)
+            {
+                this.Width = newHalf * 2.0f;
+            }
+            else if (dotY > 0.99f)
+            {
+                this.Depth = newHalf * 2.0f;   //Y轴对应Depth
+            }
+            else if (dotZ > 0.99f)
+            {
+                this.Height = newHalf * 2.0f;  //Z轴对应Height
+            }
+        }
+        #endregion
+
         #region 计算表面积 —— float CalculateSurfaceArea(VolumeMetadata metadata)
         /// <summary>
         /// 计算表面积
@@ -354,36 +384,6 @@ namespace MedicalSharp.Controls.Visual3Ds
             volume = Math.Abs(volume) / 6.0f;
 
             return volume;
-        }
-        #endregion
-
-        #region 适用调整尺寸 —— void ApplyResize(ResizeContext3D resizeContext, Vector3 localHitPoint)
-        /// <summary>
-        /// 适用调整尺寸
-        /// </summary>
-        /// <param name="resizeContext">调整尺寸上下文</param>
-        /// <param name="localHitPoint">命中点（局部空间）</param>
-        public void ApplyResize(ResizeContext3D resizeContext, Vector3 localHitPoint)
-        {
-            Vector3 delta = localHitPoint - resizeContext.Anchor;
-            float newHalf = Math.Abs(Vector3.Dot(delta, resizeContext.Axis));
-            newHalf = Math.Max(newHalf, 0.01f);
-
-            float dotX = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitX));
-            float dotY = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitY));
-            float dotZ = Math.Abs(Vector3.Dot(resizeContext.Axis, Vector3.UnitZ));
-            if (dotX > 0.99f)
-            {
-                this.Width = newHalf * 2.0f;
-            }
-            else if (dotY > 0.99f)
-            {
-                this.Depth = newHalf * 2.0f;   //Y轴对应Depth
-            }
-            else if (dotZ > 0.99f)
-            {
-                this.Height = newHalf * 2.0f;  //Z轴对应Height
-            }
         }
         #endregion
 

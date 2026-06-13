@@ -11,6 +11,7 @@ using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 凸多面体3D元素
     /// </summary>
-    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IVertexEditable, ICutVolume, IAnalyseVolume3D
+    public class ConvexPolyhedronVisual3D : ShapeVisual3D, IPureVisual3D, ITranslatable3D, IRotatable, IVertexEditable, IHasSurfaceArea, IHasVolume, ICutVolume, IAnalyseVolume3D
     {
         #region # 字段及构造器
 
@@ -298,6 +299,71 @@ namespace MedicalSharp.Controls.Visual3Ds
 
             //更新控制点位置
             this.Positions[constraint.VertexIndex] = localHitPoint.ToVector3();
+        }
+        #endregion
+
+        #region 计算表面积 —— float CalculateSurfaceArea(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算表面积
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>表面积（mm²）</returns>
+        public float CalculateSurfaceArea(VolumeMetadata metadata)
+        {
+            //获取三角形面
+            WildframeRenderable renderable = (WildframeRenderable)this.Renderable;
+            if (renderable?.Triangles == null)
+            {
+                return 0;
+            }
+
+            float area = 0;
+            Matrix4 localToWorld = this.Transform.Matrix;
+            foreach (Triangle triangle in renderable.Triangles)
+            {
+                //局部 -> 世界 -> 毫米
+                Vector3 mmA = Vector3.TransformPosition(triangle.PointA, localToWorld).ToMillimeterPosition(metadata);
+                Vector3 mmB = Vector3.TransformPosition(triangle.PointB, localToWorld).ToMillimeterPosition(metadata);
+                Vector3 mmC = Vector3.TransformPosition(triangle.PointC, localToWorld).ToMillimeterPosition(metadata);
+
+                Vector3 ab = mmB - mmA;
+                Vector3 ac = mmC - mmA;
+                area += Vector3.Cross(ab, ac).Length;
+            }
+            area /= 2.0f;
+
+            return area;
+        }
+        #endregion
+
+        #region 计算体积 —— float CalculateVolume(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算体积
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>体积（mm³）</returns>
+        public float CalculateVolume(VolumeMetadata metadata)
+        {
+            //获取世界空间的凸包顶点
+            IReadOnlyList<Vector3> hull = GetConvexHullPositions();
+            if (hull.Count < 4)
+            {
+                return 0;
+            }
+
+            //转换到毫米空间
+            Vector3[] mmHull = hull.Select(p => p.ToMillimeterPosition(metadata)).ToArray();
+
+            //四面体分解法
+            float volume = 0;
+            Vector3 origin = mmHull[0];
+            for (int index = 1; index < mmHull.Length - 1; index++)
+            {
+                volume += Vector3.Dot(mmHull[index] - origin, Vector3.Cross(mmHull[index + 1] - origin, mmHull[index + 2] - origin));
+            }
+            volume = Math.Abs(volume) / 6.0f;
+
+            return volume;
         }
         #endregion
 
