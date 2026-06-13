@@ -553,6 +553,29 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
+        #region 获取体素面积 —— float GetVoxelArea()
+        /// <summary>
+        /// 获取体素面积
+        /// </summary>
+        /// <returns>体素面积</returns>
+        public float GetVoxelArea()
+        {
+            //每个轴在体素空间中对应的物理长度 = 轴在 X,Y,Z 上的分量绝对值 × 对应体素间距
+            Vector3 spacing = this.VolumeMetadata.Spacing;
+            float realU = Math.Abs(this.UAxis.X) * spacing.X +
+                          Math.Abs(this.UAxis.Y) * spacing.Y +
+                          Math.Abs(this.UAxis.Z) * spacing.Z;
+            float realV = Math.Abs(this.VAxis.X) * spacing.X +
+                          Math.Abs(this.VAxis.Y) * spacing.Y +
+                          Math.Abs(this.VAxis.Z) * spacing.Z;
+
+            //体素在平面上的面积 ≈ 平行四边形面积
+            float voxelArea = realU * realV;
+
+            return voxelArea;
+        }
+        #endregion
+
 
         //Private
 

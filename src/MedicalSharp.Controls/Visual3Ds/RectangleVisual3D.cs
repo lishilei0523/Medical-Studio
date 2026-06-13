@@ -491,26 +491,16 @@ namespace MedicalSharp.Controls.Visual3Ds
             int viewportWidth = viewport.ViewportSize.Width;
             int viewportHeight = viewport.ViewportSize.Height;
 
-            //TODO 继续完善
-            //获取U轴和V轴的方向向量
-            Vector3 planeUAxis = viewport.Plane.UAxis;
-            Vector3 planeVAxis = viewport.Plane.VAxis;
-            Vector3 volumeSize = viewport.VolumeData.Metadata.PhysicalSize;
-
-            //计算在 X、Y、Z 轴上的投影长度（体素数）
-            float uLength = Math.Abs(planeUAxis.X) * volumeSize.X +
-                            Math.Abs(planeUAxis.Y) * volumeSize.Y +
-                            Math.Abs(planeUAxis.Z) * volumeSize.Z;
-            float vLength = Math.Abs(planeVAxis.X) * volumeSize.X +
-                            Math.Abs(planeVAxis.Y) * volumeSize.Y +
-                            Math.Abs(planeVAxis.Z) * volumeSize.Z;
-            int imageWidth = (int)Math.Round(uLength);
-            int imageHeight = (int)Math.Round(vLength);
+            //计算体素数量
+            float perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
+            float surfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
+            float voxelArea = viewport.Plane.GetVoxelArea(); ;
+            int voxelsCount = (int)Math.Round(surfaceArea / voxelArea);
 
             byte[] layerPixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
-            StatisticResult result = viewport.VolumeData.ApplyRectangleAnalyse(screenPointA, screenPointB, screenPointC, screenPointD, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, imageWidth, imageHeight, layerPixels, markValue);
-            result.Perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
-            result.SurfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
+            StatisticResult result = viewport.VolumeData.ApplyRectangleAnalyse(screenPointA, screenPointB, screenPointC, screenPointD, viewportWidth, viewportHeight, voxelsCount, layerPixels, markValue);
+            result.Perimeter = perimeter;
+            result.SurfaceArea = surfaceArea;
 
             return result;
         }
