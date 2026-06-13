@@ -1,8 +1,8 @@
 ﻿using MedicalSharp.Engine.Managers;
-using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
+using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -16,11 +16,12 @@ namespace MedicalSharp.Engine.Algorithms
     /// </summary>
     public static class CutAlgorithms
     {
-        #region # 应用矩形切割 —— static void ApplyRectangleCut(this VolumeRenderable renderable...
+        #region # 应用矩形切割 —— static void ApplyRectangleCut(this VolumeData volumeData...
         /// <summary>
         /// 应用矩形切割
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
         /// <param name="width">宽度</param>
         /// <param name="height">高度</param>
         /// <param name="center">中心位置</param>
@@ -30,7 +31,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplyRectangleCut(this VolumeRenderable renderable, float width, float height, in Vector3 center, in Vector3 normal, in Vector3 uAxis, in Vector3 vAxis, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyRectangleCut(this VolumeData volumeData, Texture3D markTexture, float width, float height, in Vector3 center, in Vector3 normal, in Vector3 uAxis, in Vector3 vAxis, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -41,7 +42,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Use();
 
             //绑定标记纹理为可读写
-            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //设置矩形参数
             cutComputer.SetUniformFloat("u_RectHalfWidth", width / 2.0f);
@@ -53,8 +54,8 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
-            cutComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
-            cutComputer.SetUniformVector3("u_VolumeScale", renderable.VolumeData.Metadata.VolumeScale);
+            cutComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", volumeData.Metadata.VolumeScale);
 
             //设置切割模式
             cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
@@ -63,21 +64,22 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
 
             //同步CPU端
-            renderable.SyncMarkDataFromGpu();
+            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
         }
         #endregion
 
-        #region # 应用圆形切割 —— static void ApplyCircleCut(this VolumeRenderable renderable...
+        #region # 应用圆形切割 —— static void ApplyCircleCut(this VolumeData volumeData...
         /// <summary>
         /// 应用圆形切割
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
         /// <param name="radius">半径</param>
         /// <param name="center">中心位置</param>
         /// <param name="normal">法向量</param>
@@ -86,7 +88,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplyCircleCut(this VolumeRenderable renderable, float radius, in Vector3 center, in Vector3 normal, in Vector3 uAxis, in Vector3 vAxis, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyCircleCut(this VolumeData volumeData, Texture3D markTexture, float radius, in Vector3 center, in Vector3 normal, in Vector3 uAxis, in Vector3 vAxis, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -97,7 +99,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Use();
 
             //绑定标记纹理为可读写
-            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //设置圆形参数
             cutComputer.SetUniformFloat("u_CircleRadius", radius);
@@ -108,8 +110,8 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
-            cutComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
-            cutComputer.SetUniformVector3("u_VolumeScale", renderable.VolumeData.Metadata.VolumeScale);
+            cutComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", volumeData.Metadata.VolumeScale);
 
             //设置切割模式
             cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
@@ -118,21 +120,22 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
 
             //同步CPU端
-            renderable.SyncMarkDataFromGpu();
+            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
         }
         #endregion
 
-        #region # 应用椭圆形切割 —— static void ApplyEllipseCut(this VolumeRenderable renderable...
+        #region # 应用椭圆形切割 —— static void ApplyEllipseCut(this VolumeData volumeData...
         /// <summary>
         /// 应用椭圆形切割
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
         /// <param name="width">宽度（X轴直径）</param>
         /// <param name="height">高度（Y轴直径）</param>
         /// <param name="center">中心位置</param>
@@ -142,7 +145,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplyEllipseCut(this VolumeRenderable renderable, float width, float height, in Vector3 center, in Vector3 normal, in Vector3 uAxis, in Vector3 vAxis, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyEllipseCut(this VolumeData volumeData, Texture3D markTexture, float width, float height, in Vector3 center, in Vector3 normal, in Vector3 uAxis, in Vector3 vAxis, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -153,7 +156,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Use();
 
             //绑定标记纹理为可读写
-            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //设置椭圆形参数
             cutComputer.SetUniformFloat("u_EllipseRadiusX", width / 2.0f);
@@ -165,8 +168,8 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
-            cutComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
-            cutComputer.SetUniformVector3("u_VolumeScale", renderable.VolumeData.Metadata.VolumeScale);
+            cutComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", volumeData.Metadata.VolumeScale);
 
             //设置切割模式
             cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
@@ -175,26 +178,27 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
 
             //同步CPU端
-            renderable.SyncMarkDataFromGpu();
+            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
         }
         #endregion
 
-        #region # 应用多边形切割 —— static void ApplyPolygonCut(this VolumeRenderable renderable...
+        #region # 应用多边形切割 —— static void ApplyPolygonCut(this VolumeData volumeData...
         /// <summary>
         /// 应用多边形切割
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
         /// <param name="vertices3D">3D顶点列表（按顺序）</param>
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static unsafe void ApplyPolygonCut(this VolumeRenderable renderable, IReadOnlyList<Vector3> vertices3D, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static unsafe void ApplyPolygonCut(this VolumeData volumeData, Texture3D markTexture, IReadOnlyList<Vector3> vertices3D, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             PolygonFit2D polygon = new PolygonFit2D(vertices3D);
 
@@ -216,7 +220,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Use();
 
             //绑定标记纹理为可读写
-            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //构建SSBO数据
             Vector4[] vertices = polygon.Vertices2D.Select(vertex => new Vector4(vertex.X, vertex.Y, 0, 0)).ToArray();
@@ -234,8 +238,8 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
-            cutComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
-            cutComputer.SetUniformVector3("u_VolumeScale", renderable.VolumeData.Metadata.VolumeScale);
+            cutComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", volumeData.Metadata.VolumeScale);
 
             //设置切割模式
             cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
@@ -244,27 +248,28 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
 
             //同步CPU端
-            renderable.SyncMarkDataFromGpu();
+            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
         }
         #endregion
 
-        #region # 应用立方体切割 —— static void ApplyBoxCut(this VolumeRenderable renderable...
+        #region # 应用立方体切割 —— static void ApplyBoxCut(this VolumeData volumeData...
         /// <summary>
         /// 应用立方体切割
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
         /// <param name="boxLocalMin">立方体最小点（局部空间）</param>
         /// <param name="boxLocalMax">立方体最大点（局部空间）</param>
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplyBoxCut(this VolumeRenderable renderable, in Vector3 boxLocalMin, in Vector3 boxLocalMax, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyBoxCut(this VolumeData volumeData, Texture3D markTexture, in Vector3 boxLocalMin, in Vector3 boxLocalMax, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -275,7 +280,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Use();
 
             //绑定标记纹理为可读写
-            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //设置立方体参数
             cutComputer.SetUniformVector3("u_BoxLocalMin", boxLocalMin);
@@ -283,8 +288,8 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
-            cutComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
-            cutComputer.SetUniformVector3("u_VolumeScale", renderable.VolumeData.Metadata.VolumeScale);
+            cutComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", volumeData.Metadata.VolumeScale);
 
             //设置切割模式
             cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
@@ -293,27 +298,28 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
 
             //同步CPU端
-            renderable.SyncMarkDataFromGpu();
+            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
         }
         #endregion
 
-        #region # 应用球体切割 —— static void ApplySphereCut(this VolumeRenderable renderable...
+        #region # 应用球体切割 —— static void ApplySphereCut(this VolumeData volumeData...
         /// <summary>
         /// 应用球体切割
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
         /// <param name="radius">半径</param>
         /// <param name="center">中心位置（局部空间）</param>
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值（1-255，0表示清除）</param>
-        public static void ApplySphereCut(this VolumeRenderable renderable, float radius, in Vector3 center, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplySphereCut(this VolumeData volumeData, Texture3D markTexture, float radius, in Vector3 center, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -324,7 +330,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Use();
 
             //绑定标记纹理为可读写
-            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //设置球体参数
             cutComputer.SetUniformFloat("u_SphereRadius", radius);
@@ -332,8 +338,8 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
-            cutComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
-            cutComputer.SetUniformVector3("u_VolumeScale", renderable.VolumeData.Metadata.VolumeScale);
+            cutComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", volumeData.Metadata.VolumeScale);
 
             //设置切割模式
             cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
@@ -342,28 +348,29 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
 
             //同步CPU端
-            renderable.SyncMarkDataFromGpu();
+            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
         }
         #endregion
 
-        #region # 应用圆柱体切割 —— static void ApplyCylinderCut(this VolumeRenderable renderable...
+        #region # 应用圆柱体切割 —— static void ApplyCylinderCut(this VolumeData volumeData...
         /// <summary>
         /// 应用圆柱体切割
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
         /// <param name="radius">半径</param>
         /// <param name="height">高度（沿Z轴）</param>
         /// <param name="center">中心位置（局部空间）</param>
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值</param>
-        public static void ApplyCylinderCut(this VolumeRenderable renderable, float radius, float height, in Vector3 center, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static void ApplyCylinderCut(this VolumeData volumeData, Texture3D markTexture, float radius, float height, in Vector3 center, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             Matrix4 worldToLocal = localToWorld.Inverted();
 
@@ -374,7 +381,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Use();
 
             //绑定标记纹理为可读写
-            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //设置圆柱体参数
             cutComputer.SetUniformFloat("u_CylinderRadius", radius);
@@ -383,8 +390,8 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
-            cutComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
-            cutComputer.SetUniformVector3("u_VolumeScale", renderable.VolumeData.Metadata.VolumeScale);
+            cutComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", volumeData.Metadata.VolumeScale);
 
             //设置切割模式
             cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
@@ -393,26 +400,27 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
 
             //同步CPU端
-            renderable.SyncMarkDataFromGpu();
+            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
         }
         #endregion
 
-        #region # 应用凸多面体切割 —— static void ApplyConvexPolyhedronCut(this VolumeRenderable renderable...
+        #region # 应用凸多面体切割 —— static void ApplyConvexPolyhedronCut(this VolumeData volumeData...
         /// <summary>
         /// 应用凸多面体切割
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
         /// <param name="planes">平面方程列表（法向量指向外部）</param>
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值</param>
-        public static unsafe void ApplyConvexPolyhedronCut(this VolumeRenderable renderable, Vector4[] planes, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
+        public static unsafe void ApplyConvexPolyhedronCut(this VolumeData volumeData, Texture3D markTexture, Vector4[] planes, in Matrix4 localToWorld, CutMode cutMode, byte markValue)
         {
             #region # 验证
 
@@ -432,7 +440,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Use();
 
             //绑定标记纹理为可读写
-            renderable.MarkTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
 
             //构建SSBO数据
             int bufferSize = sizeof(Vector4) * planes.Length;
@@ -445,8 +453,8 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformMatrix4("u_WorldToLocal", worldToLocal);
 
             //设置体积参数
-            cutComputer.SetUniformVector3i("u_VolumeSize", renderable.VolumeData.Metadata.VolumeSize);
-            cutComputer.SetUniformVector3("u_VolumeScale", renderable.VolumeData.Metadata.VolumeScale);
+            cutComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+            cutComputer.SetUniformVector3("u_VolumeScale", volumeData.Metadata.VolumeScale);
 
             //设置切割模式
             cutComputer.SetUniformInt("u_CutMode", (int)cutMode);
@@ -455,13 +463,13 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.SetUniformUInt("u_MarkValue", markValue);
 
             //调度执行
-            ComputerManager.DispatchCompute3D(renderable.VolumeData.Metadata.VolumeSize);
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
 
             //取消使用
             cutComputer.Unuse();
 
             //同步CPU端
-            renderable.SyncMarkDataFromGpu();
+            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
         }
         #endregion
     }

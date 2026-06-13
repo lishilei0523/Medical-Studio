@@ -221,11 +221,11 @@ namespace MedicalSharp.Controls.Commands
 
             if (viewport is VolumeViewport volumeViewport)
             {
-                cutVolume.ApplyCutVolume(volumeViewport.VolumeRenderable, cutMode, markValue);
+                cutVolume.ApplyCutVolume(volumeViewport.VolumeData, volumeViewport.VolumeRenderable.MarkTexture, cutMode, markValue);
             }
             if (viewport is MPRViewport mprViewport)
             {
-                cutVolume.ApplyCutVolume(mprViewport.VolumeRenderable, cutMode, markValue);
+                cutVolume.ApplyCutVolume(mprViewport.VolumeData, mprViewport.VolumeRenderable.MarkTexture, cutMode, markValue);
             }
 
             //请求下一帧
@@ -256,7 +256,7 @@ namespace MedicalSharp.Controls.Commands
         /// <param name="analyseVolume3D">可统计体积3D元素</param>
         private async void ApplyAnalyse3D(VolumeViewport viewport, IAnalyseVolume3D analyseVolume3D)
         {
-            StatisticResult result = await analyseVolume3D.ApplyAnalyseVolume(viewport.VolumeRenderable, null);
+            StatisticResult result = await analyseVolume3D.ApplyAnalyseVolume(viewport.VolumeData, null);
             this.AnalyseEnd?.Invoke(result);
         }
         #endregion

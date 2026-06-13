@@ -11,7 +11,7 @@ namespace MedicalSharp.Engine.Algorithms
     /// </summary>
     public static class PreprocessAlgorithms
     {
-        #region # 阈值分割 —— static void ThresholdSegment(VolumeData volumeData...
+        #region # 阈值分割 —— static void ThresholdSegment(this VolumeData volumeData...
         /// <summary>
         /// 阈值分割
         /// </summary>
@@ -21,7 +21,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="minHU">最小HU值</param>
         /// <param name="maxHU">最大HU值</param>
         /// <param name="markValue">标记值</param>
-        public static void ThresholdSegment(VolumeData volumeData, Texture3D previewTexture, Texture3D markTexture, float minHU, float maxHU, byte markValue)
+        public static void ThresholdSegment(this VolumeData volumeData, Texture3D previewTexture, Texture3D markTexture, float minHU, float maxHU, byte markValue)
         {
             #region # 验证
 

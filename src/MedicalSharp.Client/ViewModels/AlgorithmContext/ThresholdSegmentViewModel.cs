@@ -145,7 +145,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
             SyncAlgorithms.ResetMarkValue(this.VolumeData, markTexture, markValue);
 
             //再分割
-            PreprocessAlgorithms.ThresholdSegment(this.VolumeData, previewTexture, markTexture, this.MinHU, this.MaxHU, markValue);
+            this.VolumeData.ThresholdSegment(previewTexture, markTexture, this.MinHU, this.MaxHU, markValue);
 
             //发布消息
             SyncViewportEvent message = new SyncViewportEvent();

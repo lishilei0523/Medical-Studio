@@ -1,5 +1,4 @@
 ﻿using MedicalSharp.Engine.Managers;
-using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
@@ -135,18 +134,6 @@ namespace MedicalSharp.Engine.Algorithms
             {
                 volumeData.EndMarkSync();
             }
-        }
-        #endregion
-
-        #region # 同步标记数据GPU->CPU —— static void SyncMarkDataFromGpu(this VolumeRenderable renderable)
-        /// <summary>
-        /// 同步标记数据GPU->CPU
-        /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
-        /// <remarks>将GPU标记纹理数据回读到CPU端的VolumeData.MarkData</remarks>
-        public static void SyncMarkDataFromGpu(this VolumeRenderable renderable)
-        {
-            SyncMarkDataFromGpu(renderable.VolumeData, renderable.MarkTexture);
         }
         #endregion
 

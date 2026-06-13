@@ -5,6 +5,7 @@ using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
+using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
@@ -317,14 +318,15 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
-        #region 适用切割体积 —— void ApplyCutVolume(VolumeRenderable renderable...
+        #region 适用切割体积 —— void ApplyCutVolume(VolumeData volumeData...
         /// <summary>
         /// 适用切割体积
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
         /// <param name="cutMode">切割模式</param>
         /// <param name="markValue">标记值</param>
-        public void ApplyCutVolume(VolumeRenderable renderable, CutMode cutMode, byte markValue)
+        public void ApplyCutVolume(VolumeData volumeData, Texture3D markTexture, CutMode cutMode, byte markValue)
         {
             #region # 验证
 
@@ -336,7 +338,7 @@ namespace MedicalSharp.Controls.Visual3Ds
             #endregion
 
             Matrix4 localToWorld = this.Transform.Matrix;
-            renderable.ApplyPolygonCut(this.SampledPositions, localToWorld, cutMode, markValue);
+            volumeData.ApplyPolygonCut(markTexture, this.SampledPositions, localToWorld, cutMode, markValue);
         }
         #endregion
 

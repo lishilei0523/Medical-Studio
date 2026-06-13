@@ -1,5 +1,4 @@
-﻿using MedicalSharp.Engine.Renderables;
-using MedicalSharp.Primitives.Models;
+﻿using MedicalSharp.Primitives.Models;
 using System.Threading.Tasks;
 
 namespace MedicalSharp.Controls.Interfaces
@@ -12,9 +11,9 @@ namespace MedicalSharp.Controls.Interfaces
         /// <summary>
         /// 适用统计体积
         /// </summary>
-        /// <param name="renderable">体积渲染对象</param>
+        /// <param name="volumeData">体积数据</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        Task<StatisticResult> ApplyAnalyseVolume(VolumeRenderable renderable, byte? markValue);
+        Task<StatisticResult> ApplyAnalyseVolume(VolumeData volumeData, byte? markValue);
     }
 }
