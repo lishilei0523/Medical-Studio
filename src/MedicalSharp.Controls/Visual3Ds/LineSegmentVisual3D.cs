@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
@@ -12,7 +13,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 线段3D元素
     /// </summary>
-    public class LineSegmentVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable
+    public class LineSegmentVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable, IHasPerimeter
     {
         #region # 字段及构造器
 
@@ -187,6 +188,34 @@ namespace MedicalSharp.Controls.Visual3Ds
             {
                 this.EndPoint = localHitPoint.ToVector3();
             }
+        }
+        #endregion
+
+        #region 计算周长 —— float CalculatePerimeter(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算周长
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>周长（mm）</returns>
+        public float CalculatePerimeter(VolumeMetadata metadata)
+        {
+            //获取局部空间的端点
+            Vector3 localStart = this.StartPoint.ToVector3();
+            Vector3 localEnd = this.EndPoint.ToVector3();
+
+            //转换到世界空间
+            Matrix4 localToWorld = this.Transform.Matrix;
+            Vector3 worldStart = Vector3.TransformPosition(localStart, localToWorld);
+            Vector3 worldEnd = Vector3.TransformPosition(localEnd, localToWorld);
+
+            //转换到毫米空间
+            Vector3 mmStart = worldStart.ToMillimeterPosition(metadata);
+            Vector3 mmEnd = worldEnd.ToMillimeterPosition(metadata);
+
+            //计算欧氏距离
+            float length = Vector3.Distance(mmStart, mmEnd);
+
+            return length;
         }
         #endregion
 

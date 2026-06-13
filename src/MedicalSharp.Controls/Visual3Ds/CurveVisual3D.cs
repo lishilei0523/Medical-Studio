@@ -12,6 +12,7 @@ using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +21,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 曲线3D元素
     /// </summary>
-    public class CurveVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable, ICutVolume, IAnalyseVolume2D
+    public class CurveVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable, IHasPerimeter, IHasSurfaceArea, ICutVolume, IAnalyseVolume2D
     {
         #region # 字段及构造器
 
@@ -315,6 +316,108 @@ namespace MedicalSharp.Controls.Visual3Ds
 
             //更新控制点位置
             this.ControlPositions[constraint.VertexIndex] = localHitPoint.ToVector3();
+        }
+        #endregion
+
+        #region 计算周长 —— float CalculatePerimeter(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算周长
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>周长（mm）</returns>
+        public float CalculatePerimeter(VolumeMetadata metadata)
+        {
+            #region # 验证
+
+            if (this.SampledPositions == null || this.SampledPositions.Count < 2)
+            {
+                return 0;
+            }
+
+            #endregion
+
+            Matrix4 localToWorld = this.Transform.Matrix;
+            float perimeter = 0;
+
+            //计算所有线段长度之和
+            for (int index = 0; index < this.SampledPositions.Count - 1; index++)
+            {
+                Vector3 localStart = this.SampledPositions[index];
+                Vector3 localEnd = this.SampledPositions[index + 1];
+
+                //局部 -> 世界 -> 毫米
+                Vector3 worldStart = Vector3.TransformPosition(localStart, localToWorld);
+                Vector3 worldEnd = Vector3.TransformPosition(localEnd, localToWorld);
+                Vector3 mmStart = worldStart.ToMillimeterPosition(metadata);
+                Vector3 mmEnd = worldEnd.ToMillimeterPosition(metadata);
+
+                perimeter += Vector3.Distance(mmStart, mmEnd);
+            }
+
+            //如果是闭合图形，加上首尾相连的线段
+            if (this.Closed && this.SampledPositions.Count >= 3)
+            {
+                Vector3 localStart = this.SampledPositions[^1];
+                Vector3 localEnd = this.SampledPositions[0];
+
+                //局部 -> 世界 -> 毫米
+                Vector3 worldStart = Vector3.TransformPosition(localStart, localToWorld);
+                Vector3 worldEnd = Vector3.TransformPosition(localEnd, localToWorld);
+                Vector3 mmStart = worldStart.ToMillimeterPosition(metadata);
+                Vector3 mmEnd = worldEnd.ToMillimeterPosition(metadata);
+
+                perimeter += Vector3.Distance(mmStart, mmEnd);
+            }
+
+            return perimeter;
+        }
+        #endregion
+
+        #region 计算表面积 —— float CalculateSurfaceArea(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算表面积
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>表面积（mm²）</returns>
+        public float CalculateSurfaceArea(VolumeMetadata metadata)
+        {
+            #region # 验证
+
+            if (!this.Closed || this.SampledPositions == null || this.SampledPositions.Count < 3)
+            {
+                return 0;
+            }
+
+            #endregion
+
+            //获取世界空间的凸包顶点
+            Matrix4 localToWorld = this.Transform.Matrix;
+            List<Vector3> worldVertices = new List<Vector3>(this.SampledPositions.Count);
+            for (int index = 0; index < this.SampledPositions.Count; index++)
+            {
+                Vector3 localPos = this.SampledPositions[index];
+                worldVertices.Add(Vector3.TransformPosition(localPos, localToWorld));
+            }
+
+            //转换到毫米空间
+            Vector3[] mmVertices = worldVertices.Select(position => position.ToMillimeterPosition(metadata)).ToArray();
+
+            //拟合2D多边形
+            PolygonFit2D polygon2D = new PolygonFit2D(mmVertices);
+            Vector2[] vertices = polygon2D.Vertices2D;
+            if (vertices.Length < 3)
+            {
+                return 0;
+            }
+
+            float area = 0;
+            for (int i = 0, j = vertices.Length - 1; i < vertices.Length; j = i++)
+            {
+                area += vertices[i].X * vertices[j].Y - vertices[j].X * vertices[i].Y;
+            }
+            area = Math.Abs(area) / 2.0f;
+
+            return area;
         }
         #endregion
 
