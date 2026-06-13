@@ -279,8 +279,9 @@ namespace MedicalSharp.Presentation.Maps
                 MaxHU = result.MaxHU.ToString("F0"),
                 AverageHU = result.AverageHU.ToString("F0"),
                 StdDevHU = result.StdDevHU.ToString("F0"),
-                SurfaceArea = $"{result.SurfaceArea:F2}mm²",
-                Volume = $"{result.Volume:F2}mm³",
+                Perimeter = $"{result.Perimeter:F2} mm",
+                SurfaceArea = $"{result.SurfaceArea:F2} mm²",
+                Volume = $"{result.Volume:F2} mm³",
                 VoxelsCount = result.VoxelsCount.ToString()
             };
 

@@ -375,6 +375,8 @@ namespace MedicalSharp.Controls.Visual3Ds
             float worldRadius = this.Radius;
 
             StatisticResult result = await Task.Run(() => volumeData.ApplySphereAnalyse(worldCenter, worldRadius, markValue));
+            result.SurfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
+            result.Volume = this.CalculateVolume(volumeData.Metadata);
 
             return result;
         }

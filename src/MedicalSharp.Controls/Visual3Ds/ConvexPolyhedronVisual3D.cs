@@ -435,6 +435,8 @@ namespace MedicalSharp.Controls.Visual3Ds
             }
 
             StatisticResult result = await Task.Run(() => volumeData.ApplyConvexPolyhedronAnalyse(worldFaces, markValue));
+            result.SurfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
+            result.Volume = this.CalculateVolume(volumeData.Metadata);
 
             return result;
         }

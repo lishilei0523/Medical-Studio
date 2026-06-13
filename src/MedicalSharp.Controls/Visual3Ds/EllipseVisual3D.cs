@@ -18,7 +18,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 椭圆形3D元素
     /// </summary>
-    public class EllipseVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D, IRotatable, IResizable2D, IResizable3D, ICutVolume, IAnalyseVolume2D
+    public class EllipseVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D, IRotatable, IResizable2D, IResizable3D, IHasPerimeter, IHasSurfaceArea, ICutVolume, IAnalyseVolume2D
     {
         #region # 字段及构造器
 
@@ -347,6 +347,36 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
+        #region 计算周长 —— float CalculatePerimeter(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算周长
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>周长（mm）</returns>
+        public float CalculatePerimeter(VolumeMetadata metadata)
+        {
+            (float a, float b) = this.GetSemiAxesInMillimeters(metadata);
+            float perimeter = MathF.PI * (3 * (a + b) - MathF.Sqrt((3 * a + b) * (a + 3 * b)));
+
+            return perimeter;
+        }
+        #endregion
+
+        #region 计算表面积 —— float CalculateSurfaceArea(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算表面积
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>表面积（mm²）</returns>
+        public float CalculateSurfaceArea(VolumeMetadata metadata)
+        {
+            (float a, float b) = this.GetSemiAxesInMillimeters(metadata);
+            float area = MathF.PI * a * b;
+
+            return area;
+        }
+        #endregion
+
         #region 适用切割体积 —— void ApplyCutVolume(VolumeData volumeData...
         /// <summary>
         /// 适用切割体积
@@ -421,6 +451,8 @@ namespace MedicalSharp.Controls.Visual3Ds
             int viewportHeight = viewport.ViewportSize.Height;
             byte[] pixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
             StatisticResult result = viewport.VolumeData.ApplyEllipseAnalyse(screenCenter, screenHalfWidth, screenHalfHeight, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, pixels, markValue);
+            result.Perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
+            result.SurfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
 
             return result;
         }
@@ -461,6 +493,46 @@ namespace MedicalSharp.Controls.Visual3Ds
                 this.UAxis = Vector3.Normalize(Vector3.Cross(Vector3.UnitZ, normal)).ToVector3();
                 this.VAxis = Vector3.Normalize(Vector3.Cross(normal, this.UAxis.ToVector3())).ToVector3();
             }
+        }
+        #endregion
+
+        #region 获取毫米空间半轴长度 —— (float a, float b) GetSemiAxesInMillimeters(VolumeMetadata...
+        /// <summary>
+        /// 获取毫米空间半轴长度
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>半轴长度</returns>
+        /// <remarks>
+        /// a为长半轴，b为短半轴，单位mm
+        /// 计算流程：
+        /// 1、将椭圆中心从局部空间转换到毫米空间；
+        /// 2、沿 U 轴（宽度方向）和 V 轴（高度方向）计算边界点；
+        /// 3、计算中心到边界点的距离，得到半轴长度；
+        /// 4、返回时确保 a ≥ b（长半轴在前）；
+        /// </remarks>
+        private (float a, float b) GetSemiAxesInMillimeters(VolumeMetadata metadata)
+        {
+            Matrix4 localToWorld = this.Transform.Matrix;
+
+            Vector3 localCenter = this.Center.ToVector3();
+            Vector3 mmCenter = Vector3.TransformPosition(localCenter, localToWorld).ToMillimeterPosition(metadata);
+
+            //U轴方向（宽度）
+            Vector3 localUEdge = localCenter + this.UAxis.ToVector3() * this.Width / 2;
+            Vector3 mmUEdge = Vector3.TransformPosition(localUEdge, localToWorld).ToMillimeterPosition(metadata);
+
+            //V轴方向（高度）
+            Vector3 localVEdge = localCenter + this.VAxis.ToVector3() * this.Height / 2;
+            Vector3 mmVEdge = Vector3.TransformPosition(localVEdge, localToWorld).ToMillimeterPosition(metadata);
+
+            //计算半轴长度（中心到边界的距离）
+            float a = Vector3.Distance(mmCenter, mmUEdge);
+            float b = Vector3.Distance(mmCenter, mmVEdge);
+
+            //确保长半轴在前（拉马努金周长公式要求 a ≥ b）
+            (float a, float b) ab = a >= b ? (a, b) : (b, a);
+
+            return ab;
         }
         #endregion
 

@@ -1406,6 +1406,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 builder.AppendLine($"最大HU：{this.StatisticInfo.MaxHU}");
                 builder.AppendLine($"平均HU：{this.StatisticInfo.AverageHU}");
                 builder.AppendLine($"标准差：{this.StatisticInfo.StdDevHU}");
+                builder.AppendLine($"周长：{this.StatisticInfo.Perimeter}");
                 builder.AppendLine($"表面积：{this.StatisticInfo.SurfaceArea}");
                 builder.AppendLine($"体积：{this.StatisticInfo.Volume}");
                 builder.AppendLine($"体素数：{this.StatisticInfo.VoxelsCount}");

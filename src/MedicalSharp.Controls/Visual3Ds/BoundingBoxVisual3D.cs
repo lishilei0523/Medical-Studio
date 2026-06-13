@@ -424,6 +424,8 @@ namespace MedicalSharp.Controls.Visual3Ds
             Vector3 maximum = this.Maximum;
             Matrix4 localToWorld = this.Transform.Matrix;
             StatisticResult result = await Task.Run(() => volumeData.ApplyBoxAnalyse(minimum, maximum, localToWorld, markValue));
+            result.SurfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
+            result.Volume = this.CalculateVolume(volumeData.Metadata);
 
             return result;
         }

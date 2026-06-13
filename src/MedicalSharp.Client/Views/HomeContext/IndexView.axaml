@@ -116,7 +116,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="4" />
-                        <RowDefinition Height="295" />
+                        <RowDefinition Height="330" />
                     </Grid.RowDefinitions>
                     <sd:GroupBox Header="形状管理">
                         <ListBox ItemsSource="{Binding Shapes}" SelectedItem="{Binding SelectedShape}">
@@ -183,6 +183,9 @@
                             </sd:FormItem>
                             <sd:FormItem Label="标准差：">
                                 <TextBlock Text="{Binding StatisticInfo.StdDevHU}" />
+                            </sd:FormItem>
+                            <sd:FormItem Label="周长：">
+                                <TextBlock Text="{Binding StatisticInfo.Perimeter }" />
                             </sd:FormItem>
                             <sd:FormItem Label="表面积：">
                                 <TextBlock Text="{Binding StatisticInfo.SurfaceArea }" />

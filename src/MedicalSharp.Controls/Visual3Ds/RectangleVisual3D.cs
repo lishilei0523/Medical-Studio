@@ -18,7 +18,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 矩形3D元素
     /// </summary>
-    public class RectangleVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D, IRotatable, IResizable2D, IResizable3D, ICutVolume, IAnalyseVolume2D
+    public class RectangleVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D, IRotatable, IResizable2D, IResizable3D, IHasPerimeter, IHasSurfaceArea, ICutVolume, IAnalyseVolume2D
     {
         #region # 字段及构造器
 
@@ -337,6 +337,89 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
+        #region 计算周长 —— float CalculatePerimeter(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算周长
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>周长（mm）</returns>
+        public float CalculatePerimeter(VolumeMetadata metadata)
+        {
+            //获取世界空间的尺寸
+            Matrix4 localToWorld = this.Transform.Matrix;
+
+            //计算矩形四个角点的世界坐标
+            Vector3 localCenter = this.Center.ToVector3();
+            Vector3 uAxis = this.UAxis.ToVector3();
+            Vector3 vAxis = this.VAxis.ToVector3();
+
+            Vector3 localCorner1 = localCenter - uAxis * this.Width / 2 - vAxis * this.Height / 2;
+            Vector3 localCorner2 = localCenter + uAxis * this.Width / 2 - vAxis * this.Height / 2;
+            Vector3 localCorner3 = localCenter + uAxis * this.Width / 2 + vAxis * this.Height / 2;
+            Vector3 localCorner4 = localCenter - uAxis * this.Width / 2 + vAxis * this.Height / 2;
+
+            //转换到世界空间
+            Vector3 worldCorner1 = Vector3.TransformPosition(localCorner1, localToWorld);
+            Vector3 worldCorner2 = Vector3.TransformPosition(localCorner2, localToWorld);
+            Vector3 worldCorner3 = Vector3.TransformPosition(localCorner3, localToWorld);
+            Vector3 worldCorner4 = Vector3.TransformPosition(localCorner4, localToWorld);
+
+            //转换到毫米空间
+            Vector3 mmCorner1 = worldCorner1.ToMillimeterPosition(metadata);
+            Vector3 mmCorner2 = worldCorner2.ToMillimeterPosition(metadata);
+            Vector3 mmCorner3 = worldCorner3.ToMillimeterPosition(metadata);
+            Vector3 mmCorner4 = worldCorner4.ToMillimeterPosition(metadata);
+
+            //计算四条边长之和
+            float perimeter = Vector3.Distance(mmCorner1, mmCorner2) +
+                              Vector3.Distance(mmCorner2, mmCorner3) +
+                              Vector3.Distance(mmCorner3, mmCorner4) +
+                              Vector3.Distance(mmCorner4, mmCorner1);
+
+            return perimeter;
+        }
+        #endregion
+
+        #region 计算表面积 —— float CalculateSurfaceArea(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算表面积
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>表面积（mm²）</returns>
+        public float CalculateSurfaceArea(VolumeMetadata metadata)
+        {
+            Matrix4 localToWorld = this.Transform.Matrix;
+
+            //计算矩形在世界空间中的宽度和高度
+            Vector3 localCenter = this.Center.ToVector3();
+            Vector3 uAxis = this.UAxis.ToVector3();
+            Vector3 vAxis = this.VAxis.ToVector3();
+
+            //沿U轴方向（宽度）和V轴方向（高度）的偏移向量
+            Vector3 localWidthOffset = uAxis * this.Width;
+            Vector3 localHeightOffset = vAxis * this.Height;
+
+            //中心点、对面边界点的世界坐标
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, localToWorld);
+            Vector3 worldWidthBoundary = Vector3.TransformPosition(localCenter + localWidthOffset, localToWorld);
+            Vector3 worldHeightBoundary = Vector3.TransformPosition(localCenter + localHeightOffset, localToWorld);
+
+            //转换为毫米坐标
+            Vector3 mmCenter = worldCenter.ToMillimeterPosition(metadata);
+            Vector3 mmWidthBoundary = worldWidthBoundary.ToMillimeterPosition(metadata);
+            Vector3 mmHeightBoundary = worldHeightBoundary.ToMillimeterPosition(metadata);
+
+            //中心到对面边界的距离 = 矩形的全宽、全高
+            float mmWidth = Vector3.Distance(mmCenter, mmWidthBoundary);
+            float mmHeight = Vector3.Distance(mmCenter, mmHeightBoundary);
+
+            //矩形面积 = 宽 × 高
+            float area = mmWidth * mmHeight;
+
+            return area;
+        }
+        #endregion
+
         #region 适用切割体积 —— void ApplyCutVolume(VolumeData volumeData...
         /// <summary>
         /// 适用切割体积
@@ -409,6 +492,8 @@ namespace MedicalSharp.Controls.Visual3Ds
             int viewportHeight = viewport.ViewportSize.Height;
             byte[] layerPixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
             StatisticResult result = viewport.VolumeData.ApplyRectangleAnalyse(screenPointA, screenPointB, screenPointC, screenPointD, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, layerPixels, markValue);
+            result.Perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
+            result.SurfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
 
             return result;
         }

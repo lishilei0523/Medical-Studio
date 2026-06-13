@@ -74,13 +74,6 @@ namespace MedicalSharp.Engine.Algorithms
                     }
                     localResult.HuSum += huValue;
                     localResult.HuSumSq += huValue * huValue;
-
-                    //边界判断
-                    if (GeometryAlgorithms.IsVoxelOnBoxBoundary(voxelPosition, volumeSize, volumeScale, boxLocalMin, boxLocalMax, worldToLocal))
-                    {
-                        localResult.BoundaryCount++;
-                    }
-
                     localResult.VoxelsCount++;
                 }
 
@@ -90,7 +83,6 @@ namespace MedicalSharp.Engine.Algorithms
             //合并结果
             StatisticResult result = StatisticResult.MergeResults(localResults);
             result.CalculateExpectations();
-            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
 
             return result;
         }
@@ -150,13 +142,6 @@ namespace MedicalSharp.Engine.Algorithms
                     }
                     localResult.HuSum += huValue;
                     localResult.HuSumSq += huValue * huValue;
-
-                    //边界判断
-                    if (GeometryAlgorithms.IsVoxelOnSphereBoundary(voxelPosition, volumeSize, volumeScale, sphereCenter, sphereRadius, 0.5f))
-                    {
-                        localResult.BoundaryCount++;
-                    }
-
                     localResult.VoxelsCount++;
                 }
 
@@ -166,7 +151,6 @@ namespace MedicalSharp.Engine.Algorithms
             //合并结果
             StatisticResult result = StatisticResult.MergeResults(localResults);
             result.CalculateExpectations();
-            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
 
             return result;
         }
@@ -223,14 +207,6 @@ namespace MedicalSharp.Engine.Algorithms
                     if (huValue > localResult.MaxHU) localResult.MaxHU = huValue;
                     localResult.HuSum += huValue;
                     localResult.HuSumSq += huValue * huValue;
-
-                    //边界判断
-                    if (GeometryAlgorithms.IsVoxelOnCylinderBoundary(voxelPosition, volumeSize, volumeScale,
-                        cylinderCenter, cylinderAxis, cylinderRadius, cylinderHeight, 0.5f))
-                    {
-                        localResult.BoundaryCount++;
-                    }
-
                     localResult.VoxelsCount++;
                 }
 
@@ -240,7 +216,6 @@ namespace MedicalSharp.Engine.Algorithms
             //合并结果
             StatisticResult result = StatisticResult.MergeResults(localResults);
             result.CalculateExpectations();
-            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
 
             return result;
         }
@@ -293,13 +268,6 @@ namespace MedicalSharp.Engine.Algorithms
                     if (huValue > localResult.MaxHU) localResult.MaxHU = huValue;
                     localResult.HuSum += huValue;
                     localResult.HuSumSq += huValue * huValue;
-
-                    //边界判断
-                    if (GeometryAlgorithms.IsVoxelOnConvexPolyhedronBoundary(voxelPosition, volumeSize, volumeScale, faces, 0.5f))
-                    {
-                        localResult.BoundaryCount++;
-                    }
-
                     localResult.VoxelsCount++;
                 }
 
@@ -309,7 +277,6 @@ namespace MedicalSharp.Engine.Algorithms
             //合并结果
             StatisticResult result = StatisticResult.MergeResults(localResults);
             result.CalculateExpectations();
-            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
 
             return result;
         }
@@ -339,7 +306,6 @@ namespace MedicalSharp.Engine.Algorithms
             float maxHu = float.MinValue;
             double huSum = 0;
             double huSumSq = 0;
-            int boundaryPixelsCount = 0;
             int pixelsCount = 0;
 
             //遍历全部像素
@@ -391,20 +357,12 @@ namespace MedicalSharp.Engine.Algorithms
 
                     huSum += huValue;
                     huSumSq += huValue * huValue;
-
-                    //边界判断：像素在多边形的边上
-                    if (GeometryAlgorithms.IsPointOnPolygonEdge(pixelPosition, screenCorners, 0.5f))
-                    {
-                        boundaryPixelsCount++;
-                    }
-
                     pixelsCount++;
                 }
             }
 
             //像素数量转体素数量，面积缩放因子 = ZoomFactor 的平方
             float areaScale = zoomFactor * zoomFactor;
-            int boundaryVoxelsCount = (int)Math.Round(boundaryPixelsCount / areaScale);
             int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
 
             //计算统计指标
@@ -419,13 +377,8 @@ namespace MedicalSharp.Engine.Algorithms
                 MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
                 AverageHU = averageHu,
                 StdDevHU = stdDevHu,
-                BoundaryCount = boundaryVoxelsCount,
                 VoxelsCount = voxelsCount
             };
-            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
-
-            //保存图像测试
-            //Task.Run(() => SaveImage(viewportWidth, viewportHeight, layerPixels, screenCorners));
 
             return result;
         }
@@ -453,7 +406,6 @@ namespace MedicalSharp.Engine.Algorithms
             float maxHu = float.MinValue;
             double huSum = 0;
             double huSumSq = 0;
-            int boundaryPixelsCount = 0;
             int pixelsCount = 0;
 
             //计算圆形的包围盒（优化遍历范围）
@@ -514,21 +466,12 @@ namespace MedicalSharp.Engine.Algorithms
                     }
                     huSum += huValue;
                     huSumSq += huValue * huValue;
-
-                    //边界判断：像素在圆边上（距离在半径附近）
-                    float distance = MathF.Sqrt(distSq);
-                    if (Math.Abs(distance - radius) <= 0.8f)
-                    {
-                        boundaryPixelsCount++;
-                    }
-
                     pixelsCount++;
                 }
             }
 
             //像素数量转体素数量
             float areaScale = zoomFactor * zoomFactor;
-            int boundaryVoxelsCount = (int)Math.Round(boundaryPixelsCount / areaScale);
             int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
 
             //计算统计指标
@@ -543,13 +486,8 @@ namespace MedicalSharp.Engine.Algorithms
                 MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
                 AverageHU = averageHu,
                 StdDevHU = stdDevHu,
-                BoundaryCount = boundaryVoxelsCount,
                 VoxelsCount = voxelsCount
             };
-            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
-
-            //保存图像测试
-            //Task.Run(() => SaveImage(viewportWidth, viewportHeight, layerPixels, center, radius));
 
             return result;
         }
@@ -580,7 +518,6 @@ namespace MedicalSharp.Engine.Algorithms
             float maxHu = float.MinValue;
             double huSum = 0;
             double huSumSq = 0;
-            int boundaryPixelsCount = 0;
             int pixelsCount = 0;
 
             //计算椭圆包围盒
@@ -641,20 +578,12 @@ namespace MedicalSharp.Engine.Algorithms
                     }
                     huSum += huValue;
                     huSumSq += huValue * huValue;
-
-                    //边界判断：像素在椭圆边上（0.9 ≤ value ≤ 1.1）
-                    if (Math.Abs(value - 1.0f) <= 0.15f)
-                    {
-                        boundaryPixelsCount++;
-                    }
-
                     pixelsCount++;
                 }
             }
 
             //像素数量转体素数量
             float areaScale = zoomFactor * zoomFactor;
-            int boundaryVoxelsCount = (int)Math.Round(boundaryPixelsCount / areaScale);
             int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
 
             //计算统计指标
@@ -669,10 +598,8 @@ namespace MedicalSharp.Engine.Algorithms
                 MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
                 AverageHU = averageHu,
                 StdDevHU = stdDevHu,
-                BoundaryCount = boundaryVoxelsCount,
                 VoxelsCount = voxelsCount
             };
-            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
 
             return result;
         }
@@ -708,9 +635,7 @@ namespace MedicalSharp.Engine.Algorithms
             float maxHu = float.MinValue;
             double huSum = 0;
             double huSumSq = 0;
-            int boundaryPixelsCount = 0;
             int pixelsCount = 0;
-
             for (int y = startY; y <= endY; y++)
             {
                 for (int x = startX; x <= endX; x++)
@@ -757,20 +682,12 @@ namespace MedicalSharp.Engine.Algorithms
                     }
                     huSum += huValue;
                     huSumSq += huValue * huValue;
-
-                    //边界判断：像素在多边形的边上
-                    if (GeometryAlgorithms.IsPointOnPolygonEdge(pixelPos, screenVertices, 0.8f))
-                    {
-                        boundaryPixelsCount++;
-                    }
-
                     pixelsCount++;
                 }
             }
 
             //像素数量转体素数量
             float areaScale = zoomFactor * zoomFactor;
-            int boundaryVoxelsCount = (int)Math.Round(boundaryPixelsCount / areaScale);
             int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
 
             //计算统计指标
@@ -785,10 +702,8 @@ namespace MedicalSharp.Engine.Algorithms
                 MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
                 AverageHU = averageHu,
                 StdDevHU = stdDevHu,
-                BoundaryCount = boundaryVoxelsCount,
                 VoxelsCount = voxelsCount
             };
-            result.CalculateGeometry(volumeData.Metadata.VoxelVolume, volumeData.Metadata.AverageVoxelArea);
 
             return result;
         }

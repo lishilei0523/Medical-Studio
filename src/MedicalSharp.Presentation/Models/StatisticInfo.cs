@@ -40,6 +40,15 @@ namespace MedicalSharp.Presentation.Models
         public string StdDevHU { get; set; }
         #endregion
 
+        #region 周长 —— string Perimeter
+        /// <summary>
+        /// 周长
+        /// </summary>
+        /// <remarks>mm</remarks>
+        [DependencyProperty]
+        public string Perimeter { get; set; }
+        #endregion
+
         #region 表面积 —— string SurfaceArea
         /// <summary>
         /// 表面积

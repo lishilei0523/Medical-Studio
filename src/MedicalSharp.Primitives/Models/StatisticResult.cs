@@ -52,14 +52,15 @@ namespace MedicalSharp.Primitives.Models
         public float StdDevHU;
 
         /// <summary>
-        /// 边界体素数
-        /// </summary>
-        public int BoundaryCount;
-
-        /// <summary>
         /// 体素数
         /// </summary>
         public int VoxelsCount;
+
+        /// <summary>
+        /// 周长
+        /// </summary>
+        /// <remarks>mm</remarks>
+        public float Perimeter;
 
         /// <summary>
         /// 表面积
@@ -94,20 +95,6 @@ namespace MedicalSharp.Primitives.Models
         }
 
         /// <summary>
-        /// 计算几何指标
-        /// </summary>
-        /// <param name="voxelVolume">体素体积（mm³）</param>
-        /// <param name="voxelArea">体素表面积（mm²）</param>
-        public void CalculateGeometry(float voxelVolume, float voxelArea)
-        {
-            //计算体积 = 体素数 × 单个体素体积
-            this.Volume = this.VoxelsCount * voxelVolume;
-
-            //计算表面积 = 边界体素数 × 单个体素表面积
-            this.SurfaceArea = this.BoundaryCount * voxelArea;
-        }
-
-        /// <summary>
         /// 合并单位统计结果
         /// </summary>
         public static StatisticResult MergeResults(IReadOnlyCollection<StatisticResult> results)
@@ -119,7 +106,6 @@ namespace MedicalSharp.Primitives.Models
                 mergedResult.MaxHU = Math.Max(mergedResult.MaxHU, result.MaxHU);
                 mergedResult.HuSum += result.HuSum;
                 mergedResult.HuSumSq += result.HuSumSq;
-                mergedResult.BoundaryCount += result.BoundaryCount;
                 mergedResult.VoxelsCount += result.VoxelsCount;
             }
 

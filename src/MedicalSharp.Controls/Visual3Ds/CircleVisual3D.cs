@@ -18,7 +18,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 圆形3D元素
     /// </summary>
-    public class CircleVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D, IRotatable, IResizable2D, IResizable3D, ICutVolume, IAnalyseVolume2D
+    public class CircleVisual3D : ShapeVisual3D, IVisual2DIn3D, ITranslatable3D, IRotatable, IResizable2D, IResizable3D, IHasPerimeter, IHasSurfaceArea, ICutVolume, IAnalyseVolume2D
     {
         #region # 字段及构造器
 
@@ -274,6 +274,66 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
+        #region 计算周长 —— float CalculatePerimeter(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算周长
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>周长（mm）</returns>
+        public float CalculatePerimeter(VolumeMetadata metadata)
+        {
+            Matrix4 localToWorld = this.Transform.Matrix;
+
+            //圆心
+            Vector3 localCenter = this.Center.ToVector3();
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, localToWorld);
+            Vector3 mmCenter = worldCenter.ToMillimeterPosition(metadata);
+
+            //圆上一点（沿U轴方向）
+            Vector3 localEdge = localCenter + this.UAxis.ToVector3() * this.Radius;
+            Vector3 worldEdge = Vector3.TransformPosition(localEdge, localToWorld);
+            Vector3 mmEdge = worldEdge.ToMillimeterPosition(metadata);
+
+            //半径 = 圆心到圆上点的距离
+            float mmRadius = Vector3.Distance(mmCenter, mmEdge);
+
+            //圆周长 = 2πr
+            float perimeter = 2 * MathF.PI * mmRadius;
+
+            return perimeter;
+        }
+        #endregion
+
+        #region 计算表面积 —— float CalculateSurfaceArea(VolumeMetadata metadata)
+        /// <summary>
+        /// 计算表面积
+        /// </summary>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>表面积（mm²）</returns>
+        public float CalculateSurfaceArea(VolumeMetadata metadata)
+        {
+            Matrix4 localToWorld = this.Transform.Matrix;
+
+            //圆心
+            Vector3 localCenter = this.Center.ToVector3();
+            Vector3 worldCenter = Vector3.TransformPosition(localCenter, localToWorld);
+            Vector3 mmCenter = worldCenter.ToMillimeterPosition(metadata);
+
+            //圆上一点（沿U轴方向）
+            Vector3 localEdge = localCenter + this.UAxis.ToVector3() * this.Radius;
+            Vector3 worldEdge = Vector3.TransformPosition(localEdge, localToWorld);
+            Vector3 mmEdge = worldEdge.ToMillimeterPosition(metadata);
+
+            //半径 = 圆心到圆上点的距离
+            float mmRadius = Vector3.Distance(mmCenter, mmEdge);
+
+            //圆面积 = πr²
+            float area = MathF.PI * mmRadius * mmRadius;
+
+            return area;
+        }
+        #endregion
+
         #region 适用切割体积 —— void ApplyCutVolume(VolumeData volumeData...
         /// <summary>
         /// 适用切割体积
@@ -341,6 +401,8 @@ namespace MedicalSharp.Controls.Visual3Ds
             int viewportHeight = viewport.ViewportSize.Height;
             byte[] layerPixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
             StatisticResult result = viewport.VolumeData.ApplyCircleAnalyse(screenCenter, screenRadius, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, layerPixels, markValue);
+            result.Perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
+            result.SurfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
 
             return result;
         }

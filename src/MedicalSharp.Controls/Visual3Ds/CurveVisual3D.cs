@@ -497,6 +497,8 @@ namespace MedicalSharp.Controls.Visual3Ds
             int viewportHeight = viewport.ViewportSize.Height;
             byte[] layerPixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
             StatisticResult result = viewport.VolumeData.ApplyPolygonAnalyse(screenVertices, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, layerPixels, markValue);
+            result.Perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
+            result.SurfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
 
             return result;
         }

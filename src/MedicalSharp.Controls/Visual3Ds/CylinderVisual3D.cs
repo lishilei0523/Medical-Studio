@@ -412,6 +412,8 @@ namespace MedicalSharp.Controls.Visual3Ds
             float worldRadius = this.Radius;
             float worldHeight = this.Height;
             StatisticResult result = await Task.Run(() => volumeData.ApplyCylinderAnalyse(worldCenter, worldAxis, worldRadius, worldHeight, markValue));
+            result.SurfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
+            result.Volume = this.CalculateVolume(volumeData.Metadata);
 
             return result;
         }
