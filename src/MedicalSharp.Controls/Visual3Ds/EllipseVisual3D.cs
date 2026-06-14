@@ -458,9 +458,11 @@ namespace MedicalSharp.Controls.Visual3Ds
             int voxelsCount = (int)Math.Round(surfaceArea / voxelArea);
 
             byte[] pixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
-            StatisticResult result = viewport.VolumeData.ApplyEllipseAnalyse(screenCenter, screenHalfWidth, screenHalfHeight, viewportWidth, viewportHeight, voxelsCount, pixels, markValue);
+            StatisticResult result = viewport.VolumeData.ApplyEllipseAnalyse(screenCenter, screenHalfWidth, screenHalfHeight, viewportWidth, viewportHeight, pixels, markValue);
             result.Perimeter = perimeter;
             result.SurfaceArea = surfaceArea;
+            result.VoxelsCount = voxelsCount;
+            result.CalculateExpectations();
 
             return result;
         }
