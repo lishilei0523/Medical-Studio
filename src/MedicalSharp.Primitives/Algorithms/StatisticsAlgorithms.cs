@@ -84,64 +84,57 @@ namespace MedicalSharp.Primitives.Algorithms
         /// 适用球体统计
         /// </summary>
         /// <param name="volumeData">体积数据</param>
+        /// <param name="minVoxelPos">最小体素位置</param>
+        /// <param name="maxVoxelPos">最大体素位置</param>
         /// <param name="sphereCenter">球心（世界坐标）</param>
         /// <param name="sphereRadius">半径（世界单位）</param>
         /// <param name="markValue">标记值（null=全部，0~255=指定标记值）</param>
         /// <returns>统计结果</returns>
-        public static unsafe StatisticResult ApplySphereAnalyse(this VolumeData volumeData, Vector3 sphereCenter, float sphereRadius, byte? markValue)
+        public static unsafe StatisticResult ApplySphereAnalyse(this VolumeData volumeData, Vector3i minVoxelPos, Vector3i maxVoxelPos, Vector3 sphereCenter, float sphereRadius, byte? markValue)
         {
             Vector3i volumeSize = volumeData.Metadata.VolumeSize;
             Vector3 volumeScale = volumeData.Metadata.VolumeScale;
             byte* markPtr = (byte*)volumeData.MarkData.ToPointer();
             short* volumePtr = (short*)volumeData.PreviewData.ToPointer();
 
-            //使用Partitioner分块
-            OrderablePartitioner<Tuple<long, long>> partitioner = Partitioner.Create(0, volumeData.Metadata.VoxelsCount);
-            ConcurrentBag<StatisticResult> localResults = [];
-            Parallel.ForEach(partitioner, range =>
+            //遍历包围盒内的体素
+            StatisticResult result = new StatisticResult();
+            for (int z = minVoxelPos.Z; z <= maxVoxelPos.Z; z++)
             {
-                StatisticResult localResult = new StatisticResult();
-                for (long index = range.Item1; index < range.Item2; index++)
+                for (int y = minVoxelPos.Y; y <= maxVoxelPos.Y; y++)
                 {
-                    //将线性索引转换为3D坐标
-                    int x = (int)(index % volumeSize.X);
-                    int y = (int)((index % (volumeSize.X * volumeSize.Y)) / volumeSize.X);
-                    int z = (int)(index / (volumeSize.X * volumeSize.Y));
-                    Vector3i voxelPosition = new Vector3i(x, y, z);
+                    for (int x = minVoxelPos.X; x <= maxVoxelPos.X; x++)
+                    {
+                        long index = (long)z * volumeSize.X * volumeSize.Y + y * volumeSize.X + x;
+                        Vector3i voxelPosition = new Vector3i(x, y, z);
 
-                    //判断体素是否在球体内
-                    if (!GeometryAlgorithms.IsVoxelInSphere(voxelPosition, volumeSize, volumeScale, sphereCenter, sphereRadius))
-                    {
-                        continue;
-                    }
+                        //判断体素是否在球体内
+                        if (!GeometryAlgorithms.IsVoxelInSphere(voxelPosition, volumeSize, volumeScale, sphereCenter, sphereRadius))
+                        {
+                            continue;
+                        }
 
-                    //标记值检查
-                    if (markValue.HasValue && markPtr[index] != markValue.Value)
-                    {
-                        continue;
-                    }
+                        //标记值检查
+                        if (markValue.HasValue && markPtr[index] != markValue.Value)
+                        {
+                            continue;
+                        }
 
-                    //统计
-                    float huValue = volumePtr[index];
-                    if (huValue < localResult.MinHU)
-                    {
-                        localResult.MinHU = huValue;
+                        // 统计
+                        float huValue = volumePtr[index];
+                        if (huValue < result.MinHU)
+                        {
+                            result.MinHU = huValue;
+                        }
+                        if (huValue > result.MaxHU)
+                        {
+                            result.MaxHU = huValue;
+                        }
+                        result.HuSum += huValue;
+                        result.HuSumSq += huValue * huValue;
                     }
-                    if (huValue > localResult.MaxHU)
-                    {
-                        localResult.MaxHU = huValue;
-                    }
-                    localResult.HuSum += huValue;
-                    localResult.HuSumSq += huValue * huValue;
-                    localResult.VoxelsCount++;
                 }
-
-                localResults.Add(localResult);
-            });
-
-            //合并结果
-            StatisticResult result = StatisticResult.MergeResults(localResults);
-            result.CalculateExpectations();
+            }
 
             return result;
         }

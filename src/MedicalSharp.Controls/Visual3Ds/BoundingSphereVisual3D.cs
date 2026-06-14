@@ -355,9 +355,42 @@ namespace MedicalSharp.Controls.Visual3Ds
             Vector3 worldCenter = Vector3.TransformPosition(localCenter, this.Transform.Matrix);
             float worldRadius = this.Radius;
 
-            StatisticResult result = await Task.Run(() => volumeData.ApplySphereAnalyse(worldCenter, worldRadius, markValue));
-            result.SurfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
-            result.Volume = this.CalculateVolume(volumeData.Metadata);
+            //计算球体在世界空间中的包围盒
+            Vector3 minWorld = new Vector3(worldCenter.X - worldRadius, worldCenter.Y - worldRadius, worldCenter.Z - worldRadius);
+            Vector3 maxWorld = new Vector3(worldCenter.X + worldRadius, worldCenter.Y + worldRadius, worldCenter.Z + worldRadius);
+
+            //转换到体素坐标
+            Vector3i volumeSize = volumeData.Metadata.VolumeSize;
+            Vector3 volumeScale = volumeData.Metadata.VolumeScale;
+            Vector3 minTexCoord = (minWorld / volumeScale) + new Vector3(0.5f);
+            Vector3 maxTexCoord = (maxWorld / volumeScale) + new Vector3(0.5f);
+            int minVoxelX = (int)(minTexCoord.X * volumeSize.X);
+            int maxVoxelX = (int)(maxTexCoord.X * volumeSize.X);
+            int minVoxelY = (int)(minTexCoord.Y * volumeSize.Y);
+            int maxVoxelY = (int)(maxTexCoord.Y * volumeSize.Y);
+            int minVoxelZ = (int)(minTexCoord.Z * volumeSize.Z);
+            int maxVoxelZ = (int)(maxTexCoord.Z * volumeSize.Z);
+
+            //裁剪到体积范围
+            minVoxelX = Math.Max(0, minVoxelX);
+            maxVoxelX = Math.Min(volumeSize.X - 1, maxVoxelX);
+            minVoxelY = Math.Max(0, minVoxelY);
+            maxVoxelY = Math.Min(volumeSize.Y - 1, maxVoxelY);
+            minVoxelZ = Math.Max(0, minVoxelZ);
+            maxVoxelZ = Math.Min(volumeSize.Z - 1, maxVoxelZ);
+            Vector3i minVoxelPos = new Vector3i(minVoxelX, minVoxelY, minVoxelZ);
+            Vector3i maxVoxelPos = new Vector3i(maxVoxelX, maxVoxelY, maxVoxelZ);
+
+            //计算几何指标
+            float surfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
+            float volume = this.CalculateVolume(volumeData.Metadata);
+            int voxelsCount = (int)Math.Round(volume / volumeData.Metadata.VoxelVolume);
+
+            StatisticResult result = await Task.Run(() => volumeData.ApplySphereAnalyse(minVoxelPos, maxVoxelPos, worldCenter, worldRadius, markValue));
+            result.SurfaceArea = surfaceArea;
+            result.Volume = volume;
+            result.VoxelsCount = voxelsCount;
+            result.CalculateExpectations();
 
             return result;
         }
