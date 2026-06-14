@@ -279,16 +279,23 @@ namespace MedicalSharp.Primitives.Algorithms
         {
             Vector2[] screenCorners = [pointA, pointB, pointC, pointD];
 
-            //统计变量
-            float minHu = float.MaxValue;
-            float maxHu = float.MinValue;
-            double huSum = 0;
-            double huSumSq = 0;
+            //计算矩形屏幕包围盒
+            float minX = Math.Min(Math.Min(pointA.X, pointB.X), Math.Min(pointC.X, pointD.X));
+            float maxX = Math.Max(Math.Max(pointA.X, pointB.X), Math.Max(pointC.X, pointD.X));
+            float minY = Math.Min(Math.Min(pointA.Y, pointB.Y), Math.Min(pointC.Y, pointD.Y));
+            float maxY = Math.Max(Math.Max(pointA.Y, pointB.Y), Math.Max(pointC.Y, pointD.Y));
 
-            //遍历全部像素
-            for (int y = 0; y < viewportHeight; y++)
+            //裁剪到视口范围
+            int startX = (int)Math.Max(0, minX);
+            int endX = (int)Math.Min(viewportWidth - 1, maxX);
+            int startY = (int)Math.Max(0, minY);
+            int endY = (int)Math.Min(viewportHeight - 1, maxY);
+
+            //遍历包围盒范围内像素
+            StatisticResult result = new StatisticResult();
+            for (int y = startY; y <= endY; y++)
             {
-                for (int x = 0; x < viewportWidth; x++)
+                for (int x = startX; x <= endX; x++)
                 {
                     Vector2 pixelPosition = new Vector2(x + 0.5f, y + 0.5f);
 
@@ -321,28 +328,19 @@ namespace MedicalSharp.Primitives.Algorithms
                     float snormValue = normalized * 2.0f - 1.0f;
                     float huValue = snormValue * 32767.0f;
 
-                    //累加统计
-                    if (huValue < minHu)
+                    //统计
+                    if (huValue < result.MinHU)
                     {
-                        minHu = huValue;
+                        result.MinHU = huValue;
                     }
-                    if (huValue > maxHu)
+                    if (huValue > result.MaxHU)
                     {
-                        maxHu = huValue;
+                        result.MaxHU = huValue;
                     }
-                    huSum += huValue;
-                    huSumSq += huValue * huValue;
+                    result.HuSum += huValue;
+                    result.HuSumSq += huValue * huValue;
                 }
             }
-
-            //构造结果
-            StatisticResult result = new StatisticResult
-            {
-                MinHU = minHu.Equals(float.MaxValue) ? 0 : minHu,
-                MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
-                HuSum = (float)huSum,
-                HuSumSq = (float)huSumSq
-            };
 
             return result;
         }
@@ -364,22 +362,23 @@ namespace MedicalSharp.Primitives.Algorithms
         {
             float radiusSq = radius * radius;
 
-            //统计变量
-            float minHu = float.MaxValue;
-            float maxHu = float.MinValue;
-            double huSum = 0;
-            double huSumSq = 0;
-
-            //计算圆形的包围盒（优化遍历范围）
+            //计算圆形屏幕包围盒
             int minX = (int)Math.Max(0, center.X - radius - 1);
             int maxX = (int)Math.Min(viewportWidth - 1, center.X + radius + 1);
             int minY = (int)Math.Max(0, center.Y - radius - 1);
             int maxY = (int)Math.Min(viewportHeight - 1, center.Y + radius + 1);
 
-            //遍历包围盒内的像素
-            for (int y = minY; y <= maxY; y++)
+            //裁剪到视口范围
+            int startX = (int)Math.Max(0, minX);
+            int endX = (int)Math.Min(viewportWidth - 1, maxX);
+            int startY = (int)Math.Max(0, minY);
+            int endY = (int)Math.Min(viewportHeight - 1, maxY);
+
+            //遍历包围盒范围内像素
+            StatisticResult result = new StatisticResult();
+            for (int y = startY; y <= endY; y++)
             {
-                for (int x = minX; x <= maxX; x++)
+                for (int x = startX; x <= endX; x++)
                 {
                     Vector2 pixelPos = new Vector2(x + 0.5f, y + 0.5f);
 
@@ -417,28 +416,19 @@ namespace MedicalSharp.Primitives.Algorithms
                     float snormValue = normalized * 2.0f - 1.0f;
                     float huValue = snormValue * 32767.0f;
 
-                    //累加统计
-                    if (huValue < minHu)
+                    //统计
+                    if (huValue < result.MinHU)
                     {
-                        minHu = huValue;
+                        result.MinHU = huValue;
                     }
-                    if (huValue > maxHu)
+                    if (huValue > result.MaxHU)
                     {
-                        maxHu = huValue;
+                        result.MaxHU = huValue;
                     }
-                    huSum += huValue;
-                    huSumSq += huValue * huValue;
+                    result.HuSum += huValue;
+                    result.HuSumSq += huValue * huValue;
                 }
             }
-
-            //构造结果
-            StatisticResult result = new StatisticResult
-            {
-                MinHU = minHu.Equals(float.MaxValue) ? 0 : minHu,
-                MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
-                HuSum = (float)huSum,
-                HuSumSq = (float)huSumSq
-            };
 
             return result;
         }
@@ -463,21 +453,23 @@ namespace MedicalSharp.Primitives.Algorithms
             float aSq = halfWidth * halfWidth;   // 半宽平方
             float bSq = halfHeight * halfHeight; // 半高平方
 
-            //统计变量
-            float minHu = float.MaxValue;
-            float maxHu = float.MinValue;
-            double huSum = 0;
-            double huSumSq = 0;
-
-            //计算椭圆包围盒
+            //计算椭圆屏幕包围盒
             int minX = (int)Math.Max(0, center.X - halfWidth - 1);
             int maxX = (int)Math.Min(viewportWidth - 1, center.X + halfWidth + 1);
             int minY = (int)Math.Max(0, center.Y - halfHeight - 1);
             int maxY = (int)Math.Min(viewportHeight - 1, center.Y + halfHeight + 1);
 
-            for (int y = minY; y <= maxY; y++)
+            //裁剪到视口范围
+            int startX = (int)Math.Max(0, minX);
+            int endX = (int)Math.Min(viewportWidth - 1, maxX);
+            int startY = (int)Math.Max(0, minY);
+            int endY = (int)Math.Min(viewportHeight - 1, maxY);
+
+            //遍历包围盒范围内像素
+            StatisticResult result = new StatisticResult();
+            for (int y = startY; y <= endY; y++)
             {
-                for (int x = minX; x <= maxX; x++)
+                for (int x = startX; x <= endX; x++)
                 {
                     Vector2 pixelPos = new Vector2(x + 0.5f, y + 0.5f);
 
@@ -487,7 +479,6 @@ namespace MedicalSharp.Primitives.Algorithms
 
                     //椭圆判断：(dx²/a²) + (dy²/b²) ≤ 1
                     float value = (dx * dx) / aSq + (dy * dy) / bSq;
-
                     if (value > 1.0f)
                     {
                         continue;
@@ -516,28 +507,19 @@ namespace MedicalSharp.Primitives.Algorithms
                     float snormValue = normalized * 2.0f - 1.0f;
                     float huValue = snormValue * 32767.0f;
 
-                    //累加统计
-                    if (huValue < minHu)
+                    //统计
+                    if (huValue < result.MinHU)
                     {
-                        minHu = huValue;
+                        result.MinHU = huValue;
                     }
-                    if (huValue > maxHu)
+                    if (huValue > result.MaxHU)
                     {
-                        maxHu = huValue;
+                        result.MaxHU = huValue;
                     }
-                    huSum += huValue;
-                    huSumSq += huValue * huValue;
+                    result.HuSum += huValue;
+                    result.HuSumSq += huValue * huValue;
                 }
             }
-
-            //构造结果
-            StatisticResult result = new StatisticResult
-            {
-                MinHU = minHu.Equals(float.MaxValue) ? 0 : minHu,
-                MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
-                HuSum = (float)huSum,
-                HuSumSq = (float)huSumSq
-            };
 
             return result;
         }
@@ -556,22 +538,20 @@ namespace MedicalSharp.Primitives.Algorithms
         /// <returns>统计结果</returns>
         public static StatisticResult ApplyPolygonAnalyse(this VolumeData volumeData, Vector2[] screenVertices, int viewportWidth, int viewportHeight, byte[] layerPixels, byte? markValue)
         {
-            //计算多边形包围盒（优化遍历范围）
-            float minX = screenVertices.Min(v => v.X);
-            float maxX = screenVertices.Max(v => v.X);
-            float minY = screenVertices.Min(v => v.Y);
-            float maxY = screenVertices.Max(v => v.Y);
+            //计算多边形屏幕包围盒
+            float minX = screenVertices.Min(vertex => vertex.X);
+            float maxX = screenVertices.Max(vertex => vertex.X);
+            float minY = screenVertices.Min(vertex => vertex.Y);
+            float maxY = screenVertices.Max(vertex => vertex.Y);
 
-            int startX = (int)Math.Max(0, minX - 1);
-            int endX = (int)Math.Min(viewportWidth - 1, maxX + 1);
-            int startY = (int)Math.Max(0, minY - 1);
-            int endY = (int)Math.Min(viewportHeight - 1, maxY + 1);
+            //裁剪到视口范围
+            int startX = (int)Math.Max(0, minX);
+            int endX = (int)Math.Min(viewportWidth - 1, maxX);
+            int startY = (int)Math.Max(0, minY);
+            int endY = (int)Math.Min(viewportHeight - 1, maxY);
 
-            //统计变量
-            float minHu = float.MaxValue;
-            float maxHu = float.MinValue;
-            double huSum = 0;
-            double huSumSq = 0;
+            //遍历包围盒范围内像素
+            StatisticResult result = new StatisticResult();
             for (int y = startY; y <= endY; y++)
             {
                 for (int x = startX; x <= endX; x++)
@@ -607,28 +587,19 @@ namespace MedicalSharp.Primitives.Algorithms
                     float snormValue = normalized * 2.0f - 1.0f;
                     float huValue = snormValue * 32767.0f;
 
-                    //累加统计
-                    if (huValue < minHu)
+                    //统计
+                    if (huValue < result.MinHU)
                     {
-                        minHu = huValue;
+                        result.MinHU = huValue;
                     }
-                    if (huValue > maxHu)
+                    if (huValue > result.MaxHU)
                     {
-                        maxHu = huValue;
+                        result.MaxHU = huValue;
                     }
-                    huSum += huValue;
-                    huSumSq += huValue * huValue;
+                    result.HuSum += huValue;
+                    result.HuSumSq += huValue * huValue;
                 }
             }
-
-            //构造结果
-            StatisticResult result = new StatisticResult
-            {
-                MinHU = minHu.Equals(float.MaxValue) ? 0 : minHu,
-                MaxHU = maxHu.Equals(float.MinValue) ? 0 : maxHu,
-                HuSum = (float)huSum,
-                HuSumSq = (float)huSumSq
-            };
 
             return result;
         }
