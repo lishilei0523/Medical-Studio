@@ -3,7 +3,7 @@ using Avalonia.Collections;
 using Avalonia.Media;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visual3Ds;
-using MedicalSharp.Engine.Algorithms;
+using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using System;
@@ -184,89 +184,6 @@ namespace MedicalSharp.Controls.Extensions
         }
         #endregion
 
-        #region # 求交凸包与平面 —— static IReadOnlyList<Vector3D> IntersectConvexHullWithPlane(...
-        /// <summary>
-        /// 求交凸包与平面
-        /// </summary>
-        /// <param name="hullPositions">凸包位置列表（世界空间）</param>
-        /// <param name="plane">MPR平面</param>
-        /// <returns>有序交点列表（用于构建闭合Polyline）</returns>
-        public static IReadOnlyList<Vector3D> IntersectConvexHullWithPlane(IReadOnlyList<Vector3> hullPositions, MPRPlane plane)
-        {
-            #region # 验证
-
-            if (hullPositions == null || hullPositions.Count < 3)
-            {
-                return [];
-            }
-
-            #endregion
-
-            //提取凸包的真实棱边
-            HashSet<(int, int)> edges = hullPositions.Count <= 8
-                ? GeometryAlgorithms.EnumerateAllEdges(hullPositions.Count)
-                : GeometryAlgorithms.ComputeConvexHullEdges(hullPositions);
-
-            List<Vector3> intersections = [];
-            Vector3 planeNormal = plane.WorldNormal.Normalized();
-            float planeDistance = -Vector3.Dot(planeNormal, plane.WorldCenter);
-
-            //计算每个顶点到平面的有符号距离
-            float[] distances = new float[hullPositions.Count];
-            for (int index = 0; index < hullPositions.Count; index++)
-            {
-                distances[index] = Vector3.Dot(planeNormal, hullPositions[index]) + planeDistance;
-            }
-
-            //遍历凸包的真实棱边
-            const float epsilon = 1e-6f;
-            foreach ((int i, int j) in edges)
-            {
-                float distance1 = distances[i];
-                float distance2 = distances[j];
-
-                //边与平面平行或不相交，跳过
-                if (Math.Abs(distance1 - distance2) < epsilon)
-                {
-                    continue;
-                }
-
-                //边跨越平面
-                if (distance1 * distance2 > 0)
-                {
-                    continue;
-                }
-
-                //插值求交点
-                float t = distance1 / (distance1 - distance2);
-                Vector3 intersection = Vector3.Lerp(hullPositions[i], hullPositions[j], t);
-
-                //去重
-                if (!GeometryAlgorithms.ContainsPoint(intersections, intersection, epsilon))
-                {
-                    intersections.Add(intersection);
-                }
-            }
-
-            //剔除共线内部点
-            intersections = GeometryAlgorithms.RemoveInteriorPoints(intersections, 1e-4f);
-
-            #region # 验证
-
-            if (intersections.Count < 3)
-            {
-                return [];
-            }
-
-            #endregion
-
-            //按逆时针排序
-            IReadOnlyList<Vector3> positions = GeometryAlgorithms.SortPointsCounterClockwise(intersections, planeNormal);
-
-            return positions.Select(x => x.ToVector3()).ToList();
-        }
-        #endregion
-
         #region # 创建纯3D元素截面多边形 —— static PolylineVisual3D CreateSectionPolygon(this IPureVisual3D...
         /// <summary>
         /// 创建纯3D元素截面多边形
@@ -284,11 +201,11 @@ namespace MedicalSharp.Controls.Extensions
 
             #endregion
 
-            IReadOnlyList<Vector3D> intersectionPoints = IntersectConvexHullWithPlane(hullPositions, plane);
+            Vector3D[] intersectionPoints = GeometryAlgorithms.IntersectConvexHullWithPlane(hullPositions, plane)?.Select(x => x.ToVector3()).ToArray();
 
             #region # 验证
 
-            if (intersectionPoints == null || intersectionPoints.Count < 3)
+            if (intersectionPoints == null || intersectionPoints.Length < 3)
             {
                 return null;
             }

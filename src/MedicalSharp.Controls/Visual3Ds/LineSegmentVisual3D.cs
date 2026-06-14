@@ -1,8 +1,8 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
-using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
+using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;

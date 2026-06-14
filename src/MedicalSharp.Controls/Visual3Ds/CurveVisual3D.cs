@@ -6,6 +6,7 @@ using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;

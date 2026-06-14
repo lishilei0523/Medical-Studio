@@ -1,4 +1,5 @@
-﻿using MedicalSharp.Primitives.Maths;
+﻿using MedicalSharp.Primitives.Algorithms;
+using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using SkiaSharp;
