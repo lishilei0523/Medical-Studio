@@ -137,5 +137,16 @@ namespace MedicalSharp.Primitives.Models
         /// </summary>
         public int WindowCenter { get; set; }
         #endregion
+
+        #region 只读属性 - 体素体积 —— float VoxelVolume
+        /// <summary>
+        /// 只读属性 - 体素体积
+        /// </summary>
+        /// <remarks>mm³</remarks>
+        public float VoxelVolume
+        {
+            get => this.Spacing.X * this.Spacing.Y * this.Spacing.Z;
+        }
+        #endregion
     }
 }

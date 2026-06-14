@@ -37,53 +37,82 @@ namespace MedicalSharp.Engine.Algorithms
             //计算逆矩阵
             Matrix4 worldToLocal = localToWorld.Inverted();
 
-            //使用Partitioner分块
-            OrderablePartitioner<Tuple<long, long>> partitioner = Partitioner.Create(0, volumeData.Metadata.VoxelsCount);
-            ConcurrentBag<StatisticResult> localResults = [];
-            Parallel.ForEach(partitioner, range =>
+            //计算立方体的8个角点在世界空间中的位置
+            Vector3[] corners = new Vector3[8];
+            corners[0] = new Vector3(boxLocalMin.X, boxLocalMin.Y, boxLocalMin.Z);
+            corners[1] = new Vector3(boxLocalMax.X, boxLocalMin.Y, boxLocalMin.Z);
+            corners[2] = new Vector3(boxLocalMin.X, boxLocalMax.Y, boxLocalMin.Z);
+            corners[3] = new Vector3(boxLocalMax.X, boxLocalMax.Y, boxLocalMin.Z);
+            corners[4] = new Vector3(boxLocalMin.X, boxLocalMin.Y, boxLocalMax.Z);
+            corners[5] = new Vector3(boxLocalMax.X, boxLocalMin.Y, boxLocalMax.Z);
+            corners[6] = new Vector3(boxLocalMin.X, boxLocalMax.Y, boxLocalMax.Z);
+            corners[7] = new Vector3(boxLocalMax.X, boxLocalMax.Y, boxLocalMax.Z);
+
+            //转换到世界空间，再转换到体素坐标，找出体素索引范围
+            int minX = int.MaxValue, maxX = int.MinValue;
+            int minY = int.MaxValue, maxY = int.MinValue;
+            int minZ = int.MaxValue, maxZ = int.MinValue;
+            for (int index = 0; index < 8; index++)
             {
-                StatisticResult localResult = new StatisticResult();
-                for (long index = range.Item1; index < range.Item2; index++)
+                Vector3 worldPos = Vector3.TransformPosition(corners[index], localToWorld);
+                Vector3 texCoord = (worldPos / volumeScale) + new Vector3(0.5f);
+                int vx = (int)(texCoord.X * volumeSize.X);
+                int vy = (int)(texCoord.Y * volumeSize.Y);
+                int vz = (int)(texCoord.Z * volumeSize.Z);
+                minX = Math.Min(minX, vx);
+                maxX = Math.Max(maxX, vx);
+                minY = Math.Min(minY, vy);
+                maxY = Math.Max(maxY, vy);
+                minZ = Math.Min(minZ, vz);
+                maxZ = Math.Max(maxZ, vz);
+            }
+
+            //裁剪到体积范围
+            minX = Math.Max(0, minX);
+            maxX = Math.Min(volumeSize.X - 1, maxX);
+            minY = Math.Max(0, minY);
+            maxY = Math.Min(volumeSize.Y - 1, maxY);
+            minZ = Math.Max(0, minZ);
+            maxZ = Math.Min(volumeSize.Z - 1, maxZ);
+
+            //遍历包围盒内的体素
+            StatisticResult result = new StatisticResult();
+            for (int z = minZ; z <= maxZ; z++)
+            {
+                for (int y = minY; y <= maxY; y++)
                 {
-                    //将线性索引转换为3D坐标
-                    int x = (int)(index % volumeSize.X);
-                    int y = (int)((index % (volumeSize.X * volumeSize.Y)) / volumeSize.X);
-                    int z = (int)(index / (volumeSize.X * volumeSize.Y));
-                    Vector3i voxelPosition = new Vector3i(x, y, z);
+                    for (int x = minX; x <= maxX; x++)
+                    {
+                        long index = (long)z * volumeSize.X * volumeSize.Y + y * volumeSize.X + x;
+                        Vector3i voxelPosition = new Vector3i(x, y, z);
 
-                    //判断体素是否在立方体内
-                    if (!GeometryAlgorithms.IsVoxelInBox(voxelPosition, volumeSize, volumeScale, boxLocalMin, boxLocalMax, worldToLocal))
-                    {
-                        continue;
-                    }
+                        //判断体素是否在立方体内
+                        if (!GeometryAlgorithms.IsVoxelInBox(voxelPosition, volumeSize, volumeScale, boxLocalMin, boxLocalMax, worldToLocal))
+                        {
+                            continue;
+                        }
 
-                    //标记值检查
-                    if (markValue.HasValue && markPtr[index] != markValue.Value)
-                    {
-                        continue;
-                    }
+                        //标记值检查
+                        if (markValue.HasValue && markPtr[index] != markValue.Value)
+                        {
+                            continue;
+                        }
 
-                    //统计
-                    float huValue = volumePtr[index];
-                    if (huValue < localResult.MinHU)
-                    {
-                        localResult.MinHU = huValue;
+                        //统计
+                        float huValue = volumePtr[index];
+                        if (huValue < result.MinHU)
+                        {
+                            result.MinHU = huValue;
+                        }
+                        if (huValue > result.MaxHU)
+                        {
+                            result.MaxHU = huValue;
+                        }
+                        result.HuSum += huValue;
+                        result.HuSumSq += huValue * huValue;
                     }
-                    if (huValue > localResult.MaxHU)
-                    {
-                        localResult.MaxHU = huValue;
-                    }
-                    localResult.HuSum += huValue;
-                    localResult.HuSumSq += huValue * huValue;
-                    localResult.VoxelsCount++;
                 }
-
-                localResults.Add(localResult);
-            });
-
-            //合并结果
-            StatisticResult result = StatisticResult.MergeResults(localResults);
-            result.CalculateExpectations();
+            }
 
             return result;
         }

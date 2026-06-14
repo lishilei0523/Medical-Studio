@@ -445,9 +445,17 @@ namespace MedicalSharp.Controls.Visual3Ds
             Vector3 minimum = this.Minimum;
             Vector3 maximum = this.Maximum;
             Matrix4 localToWorld = this.Transform.Matrix;
+
+            //计算几何指标
+            float surfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
+            float volume = this.CalculateVolume(volumeData.Metadata);
+            int voxelsCount = (int)Math.Round(volume / volumeData.Metadata.VoxelVolume);
+
             StatisticResult result = await Task.Run(() => volumeData.ApplyBoxAnalyse(minimum, maximum, localToWorld, markValue));
-            result.SurfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
-            result.Volume = this.CalculateVolume(volumeData.Metadata);
+            result.SurfaceArea = surfaceArea;
+            result.Volume = volume;
+            result.VoxelsCount = voxelsCount;
+            result.CalculateExpectations();
 
             return result;
         }
