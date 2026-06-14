@@ -441,11 +441,48 @@ namespace MedicalSharp.Controls.Visual3Ds
 
             #endregion
 
-            //获取局部空间的面
-            Vector4[] localPlanes = this.MeshGeometry.ExtractPlanes();
             Matrix4 localToWorld = this.Transform.Matrix;
 
-            //转换到世界空间
+            //获取所有顶点世界坐标
+            IReadOnlyList<Vector3> worldVertices = this.GetConvexHullPositions();
+
+            //计算凸多面体在世界空间中的包围盒
+            float minX = float.MaxValue, maxX = float.MinValue;
+            float minY = float.MaxValue, maxY = float.MinValue;
+            float minZ = float.MaxValue, maxZ = float.MinValue;
+            foreach (Vector3 vertex in worldVertices)
+            {
+                minX = Math.Min(minX, vertex.X); maxX = Math.Max(maxX, vertex.X);
+                minY = Math.Min(minY, vertex.Y); maxY = Math.Max(maxY, vertex.Y);
+                minZ = Math.Min(minZ, vertex.Z); maxZ = Math.Max(maxZ, vertex.Z);
+            }
+
+            //转换到体素坐标
+            Vector3i volumeSize = volumeData.Metadata.VolumeSize;
+            Vector3 volumeScale = volumeData.Metadata.VolumeScale;
+            Vector3 minWorld = new Vector3(minX, minY, minZ);
+            Vector3 maxWorld = new Vector3(maxX, maxY, maxZ);
+            Vector3 minTexCoord = (minWorld / volumeScale) + new Vector3(0.5f);
+            Vector3 maxTexCoord = (maxWorld / volumeScale) + new Vector3(0.5f);
+            int minVoxelX = (int)(minTexCoord.X * volumeSize.X);
+            int maxVoxelX = (int)(maxTexCoord.X * volumeSize.X);
+            int minVoxelY = (int)(minTexCoord.Y * volumeSize.Y);
+            int maxVoxelY = (int)(maxTexCoord.Y * volumeSize.Y);
+            int minVoxelZ = (int)(minTexCoord.Z * volumeSize.Z);
+            int maxVoxelZ = (int)(maxTexCoord.Z * volumeSize.Z);
+
+            //裁剪到体积范围
+            minVoxelX = Math.Max(0, minVoxelX);
+            maxVoxelX = Math.Min(volumeSize.X - 1, maxVoxelX);
+            minVoxelY = Math.Max(0, minVoxelY);
+            maxVoxelY = Math.Min(volumeSize.Y - 1, maxVoxelY);
+            minVoxelZ = Math.Max(0, minVoxelZ);
+            maxVoxelZ = Math.Min(volumeSize.Z - 1, maxVoxelZ);
+            Vector3i minVoxelPos = new Vector3i(minVoxelX, minVoxelY, minVoxelZ);
+            Vector3i maxVoxelPos = new Vector3i(maxVoxelX, maxVoxelY, maxVoxelZ);
+
+            // 获取局部空间的面并转换到世界空间
+            Vector4[] localPlanes = this.MeshGeometry.ExtractPlanes();
             List<Plane> worldFaces = [];
             foreach (Vector4 localPlane in localPlanes)
             {
@@ -470,9 +507,16 @@ namespace MedicalSharp.Controls.Visual3Ds
                 worldFaces.Add(new Plane(worldNormal, worldDistance));
             }
 
-            StatisticResult result = await Task.Run(() => volumeData.ApplyConvexPolyhedronAnalyse(worldFaces, markValue));
-            result.SurfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
-            result.Volume = this.CalculateVolume(volumeData.Metadata);
+            //计算几何指标
+            float surfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
+            float volume = this.CalculateVolume(volumeData.Metadata);
+            int voxelsCount = (int)Math.Round(volume / volumeData.Metadata.VoxelVolume);
+
+            StatisticResult result = await Task.Run(() => volumeData.ApplyConvexPolyhedronAnalyse(minVoxelPos, maxVoxelPos, worldFaces, markValue));
+            result.SurfaceArea = surfaceArea;
+            result.Volume = volume;
+            result.VoxelsCount = voxelsCount;
+            result.CalculateExpectations();
 
             return result;
         }
