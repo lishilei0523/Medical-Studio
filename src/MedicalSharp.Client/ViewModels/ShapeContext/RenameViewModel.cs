@@ -11,7 +11,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
     /// <summary>
     /// 重命名形状视图模型
     /// </summary>
-    public class RenameShapeViewModel : ScreenBase
+    public class RenameViewModel : ScreenBase
     {
         #region # 字段及构造器
 
@@ -23,7 +23,7 @@ namespace MedicalSharp.Client.ViewModels.ShapeContext
         /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public RenameShapeViewModel(IEventAggregator eventAggregator)
+        public RenameViewModel(IEventAggregator eventAggregator)
         {
             this._eventAggregator = eventAggregator;
         }

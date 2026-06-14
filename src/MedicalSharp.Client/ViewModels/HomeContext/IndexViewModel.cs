@@ -1481,7 +1481,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <param name="shape">形状3D元素</param>
         public async Task RenameShape(ShapeVisual3D shape)
         {
-            RenameShapeViewModel viewModel = ResolveMediator.Resolve<RenameShapeViewModel>();
+            RenameViewModel viewModel = ResolveMediator.Resolve<RenameViewModel>();
             viewModel.ShapeName = shape.DisplayName;
 
             bool? result = await this._windowManager.ShowDialogAsync(viewModel);
