@@ -1,16 +1,13 @@
-﻿using MedicalSharp.Primitives.Algorithms;
-using MedicalSharp.Primitives.Maths;
+﻿using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
-using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MedicalSharp.Engine.Algorithms
+namespace MedicalSharp.Primitives.Algorithms
 {
     /// <summary>
     /// 统计算法
@@ -22,12 +19,14 @@ namespace MedicalSharp.Engine.Algorithms
         /// 适用立方体统计
         /// </summary>
         /// <param name="volumeData">体积数据</param>
+        /// <param name="minVoxelPos">最小体素位置</param>
+        /// <param name="maxVoxelPos">最大体素位置</param>
         /// <param name="boxLocalMin">立方体最小点（局部空间）</param>
         /// <param name="boxLocalMax">立方体最大点（局部空间）</param>
         /// <param name="localToWorld">局部到世界变换矩阵</param>
         /// <param name="markValue">标记值（null=全部，0~255=指定标记值）</param>
         /// <returns>统计结果</returns>
-        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeData volumeData, Vector3 boxLocalMin, Vector3 boxLocalMax, Matrix4 localToWorld, byte? markValue)
+        public static unsafe StatisticResult ApplyBoxAnalyse(this VolumeData volumeData, Vector3i minVoxelPos, Vector3i maxVoxelPos, Vector3 boxLocalMin, Vector3 boxLocalMax, Matrix4 localToWorld, byte? markValue)
         {
             Vector3i volumeSize = volumeData.Metadata.VolumeSize;
             Vector3 volumeScale = volumeData.Metadata.VolumeScale;
@@ -37,51 +36,13 @@ namespace MedicalSharp.Engine.Algorithms
             //计算逆矩阵
             Matrix4 worldToLocal = localToWorld.Inverted();
 
-            //计算立方体的8个角点在世界空间中的位置
-            Vector3[] corners = new Vector3[8];
-            corners[0] = new Vector3(boxLocalMin.X, boxLocalMin.Y, boxLocalMin.Z);
-            corners[1] = new Vector3(boxLocalMax.X, boxLocalMin.Y, boxLocalMin.Z);
-            corners[2] = new Vector3(boxLocalMin.X, boxLocalMax.Y, boxLocalMin.Z);
-            corners[3] = new Vector3(boxLocalMax.X, boxLocalMax.Y, boxLocalMin.Z);
-            corners[4] = new Vector3(boxLocalMin.X, boxLocalMin.Y, boxLocalMax.Z);
-            corners[5] = new Vector3(boxLocalMax.X, boxLocalMin.Y, boxLocalMax.Z);
-            corners[6] = new Vector3(boxLocalMin.X, boxLocalMax.Y, boxLocalMax.Z);
-            corners[7] = new Vector3(boxLocalMax.X, boxLocalMax.Y, boxLocalMax.Z);
-
-            //转换到世界空间，再转换到体素坐标，找出体素索引范围
-            int minX = int.MaxValue, maxX = int.MinValue;
-            int minY = int.MaxValue, maxY = int.MinValue;
-            int minZ = int.MaxValue, maxZ = int.MinValue;
-            for (int index = 0; index < 8; index++)
-            {
-                Vector3 worldPos = Vector3.TransformPosition(corners[index], localToWorld);
-                Vector3 texCoord = (worldPos / volumeScale) + new Vector3(0.5f);
-                int vx = (int)(texCoord.X * volumeSize.X);
-                int vy = (int)(texCoord.Y * volumeSize.Y);
-                int vz = (int)(texCoord.Z * volumeSize.Z);
-                minX = Math.Min(minX, vx);
-                maxX = Math.Max(maxX, vx);
-                minY = Math.Min(minY, vy);
-                maxY = Math.Max(maxY, vy);
-                minZ = Math.Min(minZ, vz);
-                maxZ = Math.Max(maxZ, vz);
-            }
-
-            //裁剪到体积范围
-            minX = Math.Max(0, minX);
-            maxX = Math.Min(volumeSize.X - 1, maxX);
-            minY = Math.Max(0, minY);
-            maxY = Math.Min(volumeSize.Y - 1, maxY);
-            minZ = Math.Max(0, minZ);
-            maxZ = Math.Min(volumeSize.Z - 1, maxZ);
-
             //遍历包围盒内的体素
             StatisticResult result = new StatisticResult();
-            for (int z = minZ; z <= maxZ; z++)
+            for (int z = minVoxelPos.Z; z <= maxVoxelPos.Z; z++)
             {
-                for (int y = minY; y <= maxY; y++)
+                for (int y = minVoxelPos.Y; y <= maxVoxelPos.Y; y++)
                 {
-                    for (int x = minX; x <= maxX; x++)
+                    for (int x = minVoxelPos.X; x <= maxVoxelPos.X; x++)
                     {
                         long index = (long)z * volumeSize.X * volumeSize.Y + y * volumeSize.X + x;
                         Vector3i voxelPosition = new Vector3i(x, y, z);
@@ -695,47 +656,47 @@ namespace MedicalSharp.Engine.Algorithms
         /// <remarks>用于调试</remarks>
         public static unsafe void SaveImage(int viewportWidth, int viewportHeight, byte[] layerPixels, Vector2[] screenCorners)
         {
-            //翻转生成SK图像
-            using SKBitmap bitmap = new SKBitmap(viewportWidth, viewportHeight, SKColorType.Rgba8888, SKAlphaType.Unpremul);
-            byte* targetPtr = (byte*)bitmap.GetPixels().ToPointer();
-            fixed (byte* sourcePtr = layerPixels)
-            {
-                int stride = viewportWidth * 4;
-                for (int y = 0; y < viewportHeight; y++)
-                {
-                    int sourceY = viewportHeight - 1 - y;  //翻转Y轴
-                    byte* sourceRow = sourcePtr + sourceY * stride;
-                    byte* targetRow = targetPtr + y * stride;
+            ////翻转生成SK图像
+            //using SKBitmap bitmap = new SKBitmap(viewportWidth, viewportHeight, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+            //byte* targetPtr = (byte*)bitmap.GetPixels().ToPointer();
+            //fixed (byte* sourcePtr = layerPixels)
+            //{
+            //    int stride = viewportWidth * 4;
+            //    for (int y = 0; y < viewportHeight; y++)
+            //    {
+            //        int sourceY = viewportHeight - 1 - y;  //翻转Y轴
+            //        byte* sourceRow = sourcePtr + sourceY * stride;
+            //        byte* targetRow = targetPtr + y * stride;
 
-                    //复制整行（RGBA -> RGBA，顺序相同）
-                    Buffer.MemoryCopy(sourceRow, targetRow, stride, stride);
-                }
-            }
+            //        //复制整行（RGBA -> RGBA，顺序相同）
+            //        Buffer.MemoryCopy(sourceRow, targetRow, stride, stride);
+            //    }
+            //}
 
-            //定义矩形
-            int minX = (int)Math.Min(Math.Min(screenCorners[0].X, screenCorners[1].X), Math.Min(screenCorners[2].X, screenCorners[3].X));
-            int maxX = (int)Math.Max(Math.Max(screenCorners[0].X, screenCorners[1].X), Math.Max(screenCorners[2].X, screenCorners[3].X));
-            int minY = (int)Math.Min(Math.Min(screenCorners[0].Y, screenCorners[1].Y), Math.Min(screenCorners[2].Y, screenCorners[3].Y));
-            int maxY = (int)Math.Max(Math.Max(screenCorners[0].Y, screenCorners[1].Y), Math.Max(screenCorners[2].Y, screenCorners[3].Y));
-            SKRect reactangle = SKRect.Create(minX, minY, maxX - minX, maxY - minY);
+            ////定义矩形
+            //int minX = (int)Math.Min(Math.Min(screenCorners[0].X, screenCorners[1].X), Math.Min(screenCorners[2].X, screenCorners[3].X));
+            //int maxX = (int)Math.Max(Math.Max(screenCorners[0].X, screenCorners[1].X), Math.Max(screenCorners[2].X, screenCorners[3].X));
+            //int minY = (int)Math.Min(Math.Min(screenCorners[0].Y, screenCorners[1].Y), Math.Min(screenCorners[2].Y, screenCorners[3].Y));
+            //int maxY = (int)Math.Max(Math.Max(screenCorners[0].Y, screenCorners[1].Y), Math.Max(screenCorners[2].Y, screenCorners[3].Y));
+            //SKRect reactangle = SKRect.Create(minX, minY, maxX - minX, maxY - minY);
 
-            //绘制矩形
-            using SKCanvas canvas = new SKCanvas(bitmap);
-            using SKPaint fill = new SKPaint();
-            using SKPaint stroke = new SKPaint();
-            fill.Style = SKPaintStyle.Fill;
-            fill.Color = SKColors.White;
-            fill.IsAntialias = true;
-            stroke.Style = SKPaintStyle.Stroke;
-            stroke.Color = SKColors.Black;
-            stroke.StrokeWidth = 1;
-            stroke.IsAntialias = true;
-            canvas.DrawRect(reactangle, fill);
-            canvas.DrawRect(reactangle, stroke);
+            ////绘制矩形
+            //using SKCanvas canvas = new SKCanvas(bitmap);
+            //using SKPaint fill = new SKPaint();
+            //using SKPaint stroke = new SKPaint();
+            //fill.Style = SKPaintStyle.Fill;
+            //fill.Color = SKColors.White;
+            //fill.IsAntialias = true;
+            //stroke.Style = SKPaintStyle.Stroke;
+            //stroke.Color = SKColors.Black;
+            //stroke.StrokeWidth = 1;
+            //stroke.IsAntialias = true;
+            //canvas.DrawRect(reactangle, fill);
+            //canvas.DrawRect(reactangle, stroke);
 
-            //保存文件
-            using FileStream stream = File.OpenWrite("MPR.png");
-            bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
+            ////保存文件
+            //using FileStream stream = File.OpenWrite("MPR.png");
+            //bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
         }
         #endregion
 
@@ -746,40 +707,40 @@ namespace MedicalSharp.Engine.Algorithms
         /// <remarks>用于调试</remarks>
         public static unsafe void SaveImage(int viewportWidth, int viewportHeight, byte[] layerPixels, Vector2 center, float radius)
         {
-            //翻转生成SK图像
-            using SKBitmap bitmap = new SKBitmap(viewportWidth, viewportHeight, SKColorType.Rgba8888, SKAlphaType.Unpremul);
-            byte* targetPtr = (byte*)bitmap.GetPixels().ToPointer();
-            fixed (byte* sourcePtr = layerPixels)
-            {
-                int stride = viewportWidth * 4;
-                for (int y = 0; y < viewportHeight; y++)
-                {
-                    int sourceY = viewportHeight - 1 - y;  //翻转Y轴
-                    byte* sourceRow = sourcePtr + sourceY * stride;
-                    byte* targetRow = targetPtr + y * stride;
+            ////翻转生成SK图像
+            //using SKBitmap bitmap = new SKBitmap(viewportWidth, viewportHeight, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+            //byte* targetPtr = (byte*)bitmap.GetPixels().ToPointer();
+            //fixed (byte* sourcePtr = layerPixels)
+            //{
+            //    int stride = viewportWidth * 4;
+            //    for (int y = 0; y < viewportHeight; y++)
+            //    {
+            //        int sourceY = viewportHeight - 1 - y;  //翻转Y轴
+            //        byte* sourceRow = sourcePtr + sourceY * stride;
+            //        byte* targetRow = targetPtr + y * stride;
 
-                    //复制整行（RGBA -> RGBA，顺序相同）
-                    Buffer.MemoryCopy(sourceRow, targetRow, stride, stride);
-                }
-            }
+            //        //复制整行（RGBA -> RGBA，顺序相同）
+            //        Buffer.MemoryCopy(sourceRow, targetRow, stride, stride);
+            //    }
+            //}
 
-            //绘制圆形
-            using SKCanvas canvas = new SKCanvas(bitmap);
-            using SKPaint fill = new SKPaint();
-            using SKPaint stroke = new SKPaint();
-            fill.Style = SKPaintStyle.Fill;
-            fill.Color = SKColors.White;
-            fill.IsAntialias = true;
-            stroke.Style = SKPaintStyle.Stroke;
-            stroke.Color = SKColors.Black;
-            stroke.StrokeWidth = 1;
-            stroke.IsAntialias = true;
-            canvas.DrawCircle(center.X, center.Y, radius, fill);
-            canvas.DrawCircle(center.X, center.Y, radius, stroke);
+            ////绘制圆形
+            //using SKCanvas canvas = new SKCanvas(bitmap);
+            //using SKPaint fill = new SKPaint();
+            //using SKPaint stroke = new SKPaint();
+            //fill.Style = SKPaintStyle.Fill;
+            //fill.Color = SKColors.White;
+            //fill.IsAntialias = true;
+            //stroke.Style = SKPaintStyle.Stroke;
+            //stroke.Color = SKColors.Black;
+            //stroke.StrokeWidth = 1;
+            //stroke.IsAntialias = true;
+            //canvas.DrawCircle(center.X, center.Y, radius, fill);
+            //canvas.DrawCircle(center.X, center.Y, radius, stroke);
 
-            //保存文件
-            using FileStream stream = File.OpenWrite("MPR-Circle.png");
-            bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
+            ////保存文件
+            //using FileStream stream = File.OpenWrite("MPR-Circle.png");
+            //bitmap.Encode(SKEncodedImageFormat.Png, 80).SaveTo(stream);
         }
         #endregion
     }

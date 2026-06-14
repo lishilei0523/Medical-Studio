@@ -446,12 +446,43 @@ namespace MedicalSharp.Controls.Visual3Ds
             Vector3 maximum = this.Maximum;
             Matrix4 localToWorld = this.Transform.Matrix;
 
+            //将包围盒角点转换到世界空间，再转换到体素坐标，找出体素索引范围
+            Vector3i volumeSize = volumeData.Metadata.VolumeSize;
+            Vector3 volumeScale = volumeData.Metadata.VolumeScale;
+            int minVoxelX = int.MaxValue, maxVoxelX = int.MinValue;
+            int minVoxelY = int.MaxValue, maxVoxelY = int.MinValue;
+            int minVoxelZ = int.MaxValue, maxVoxelZ = int.MinValue;
+            foreach (Vector3 corner in this.Bounds.Corners)
+            {
+                Vector3 worldPos = Vector3.TransformPosition(corner, localToWorld);
+                Vector3 texCoord = (worldPos / volumeScale) + new Vector3(0.5f);
+                int vx = (int)(texCoord.X * volumeSize.X);
+                int vy = (int)(texCoord.Y * volumeSize.Y);
+                int vz = (int)(texCoord.Z * volumeSize.Z);
+                minVoxelX = Math.Min(minVoxelX, vx);
+                maxVoxelX = Math.Max(maxVoxelX, vx);
+                minVoxelY = Math.Min(minVoxelY, vy);
+                maxVoxelY = Math.Max(maxVoxelY, vy);
+                minVoxelZ = Math.Min(minVoxelZ, vz);
+                maxVoxelZ = Math.Max(maxVoxelZ, vz);
+            }
+
+            //裁剪到体积范围
+            minVoxelX = Math.Max(0, minVoxelX);
+            maxVoxelX = Math.Min(volumeSize.X - 1, maxVoxelX);
+            minVoxelY = Math.Max(0, minVoxelY);
+            maxVoxelY = Math.Min(volumeSize.Y - 1, maxVoxelY);
+            minVoxelZ = Math.Max(0, minVoxelZ);
+            maxVoxelZ = Math.Min(volumeSize.Z - 1, maxVoxelZ);
+            Vector3i minVoxelPos = new Vector3i(minVoxelX, minVoxelY, minVoxelZ);
+            Vector3i maxVoxelPos = new Vector3i(maxVoxelX, maxVoxelY, maxVoxelZ);
+
             //计算几何指标
             float surfaceArea = this.CalculateSurfaceArea(volumeData.Metadata);
             float volume = this.CalculateVolume(volumeData.Metadata);
             int voxelsCount = (int)Math.Round(volume / volumeData.Metadata.VoxelVolume);
 
-            StatisticResult result = await Task.Run(() => volumeData.ApplyBoxAnalyse(minimum, maximum, localToWorld, markValue));
+            StatisticResult result = await Task.Run(() => volumeData.ApplyBoxAnalyse(minVoxelPos, maxVoxelPos, minimum, maximum, localToWorld, markValue));
             result.SurfaceArea = surfaceArea;
             result.Volume = volume;
             result.VoxelsCount = voxelsCount;
