@@ -501,7 +501,7 @@ namespace MedicalSharp.Primitives.Maths
                 Vector3 localPoint = worldPoint / this.VolumeMetadata.VolumeScale;
 
                 //逻辑空间 -> U/V坐标[-1, 1]
-                uv = this.ProjectPoint(localPoint);
+                uv = this.ProjectLocalPoint(localPoint);
 
                 //逻辑空间 -> 纹理坐标[0, 1]
                 textureCoord = localPoint + new Vector3(0.5f);
@@ -519,6 +519,21 @@ namespace MedicalSharp.Primitives.Maths
             }
 
             return false;
+        }
+        #endregion
+
+        #region 投影点到平面 —— Vector2 ProjectPoint(in Vector3 worldPoint)
+        /// <summary>
+        /// 投影点到平面
+        /// </summary>
+        /// <param name="worldPoint">世界空间中的点，范围[-0.5, 0.5]</param>
+        /// <returns>平面U/V坐标，范围[-1, 1]</returns>
+        public Vector2 ProjectPoint(in Vector3 worldPoint)
+        {
+            Vector3 localPoint = worldPoint / this.VolumeMetadata.VolumeScale;
+            Vector2 uv = this.ProjectLocalPoint(localPoint);
+
+            return uv;
         }
         #endregion
 
@@ -550,6 +565,46 @@ namespace MedicalSharp.Primitives.Maths
             Matrix4 modelMatrix = rotation * scale * translation;
 
             return modelMatrix;
+        }
+        #endregion
+
+        #region 获取图像尺寸 —— Vector2i GetImageSize()
+        /// <summary>
+        /// 获取图像尺寸
+        /// </summary>
+        /// <returns>图像尺寸</returns>
+        /// <remarks>当前MPR平面的图像像素尺寸</remarks>
+        public Vector2i GetImageSize()
+        {
+            int width, height;
+            switch (this.PlaneType)
+            {
+                case MPRPlaneType.Axial:
+                    width = this.VolumeMetadata.VolumeSize.X;
+                    height = this.VolumeMetadata.VolumeSize.Y;
+                    break;
+                case MPRPlaneType.Coronal:
+                    width = this.VolumeMetadata.VolumeSize.X;
+                    height = this.VolumeMetadata.VolumeSize.Z;
+                    break;
+                case MPRPlaneType.Sagittal:
+                    width = this.VolumeMetadata.VolumeSize.Y;
+                    height = this.VolumeMetadata.VolumeSize.Z;
+                    break;
+                case MPRPlaneType.Oblique:
+                    float uLength = this.CalculateProjectedLength(this.UAxis, this.VolumeMetadata.VolumeSize);
+                    float vLength = this.CalculateProjectedLength(this.VAxis, this.VolumeMetadata.VolumeSize);
+                    width = (int)Math.Round(uLength);
+                    height = (int)Math.Round(vLength);
+                    break;
+                default:
+                    width = this.VolumeMetadata.VolumeSize.X;
+                    height = this.VolumeMetadata.VolumeSize.Y;
+                    break;
+            }
+            Vector2i imageSize = new Vector2i(width, height);
+
+            return imageSize;
         }
         #endregion
 
@@ -650,6 +705,24 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
+        #region 计算投影长度 —— float CalculateProjectedLength(Vector3 axis...
+        /// <summary>
+        /// 计算投影长度
+        /// </summary>
+        /// <param name="axis">轴</param>
+        /// <param name="volumeSize">体积尺寸</param>
+        /// <returns>投影长度</returns>
+        /// <remarks>获取轴在体积上的投影长度（体素数）</remarks>
+        private float CalculateProjectedLength(Vector3 axis, Vector3i volumeSize)
+        {
+            float projectedLength = Math.Abs(axis.X) * volumeSize.X +
+                                    Math.Abs(axis.Y) * volumeSize.Y +
+                                    Math.Abs(axis.Z) * volumeSize.Z;
+
+            return projectedLength;
+        }
+        #endregion
+
         #region 正交化坐标轴 —— void Orthonormalize()
         /// <summary>
         /// 正交化坐标轴
@@ -685,14 +758,14 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 投影点到平面 —— Vector2 ProjectPoint(in Vector3 localPoint)
+        #region 投影局部点到平面 —— Vector2 ProjectLocalPoint(in Vector3 localPoint)
         /// <summary>
-        /// 投影点到平面
+        /// 投影局部点到平面
         /// </summary>
         /// <param name="localPoint">逻辑空间中的点，范围[-0.5, 0.5]</param>
         /// <returns>平面U/V坐标，范围[-1, 1]</returns>
         /// <remarks>逻辑空间</remarks>
-        private Vector2 ProjectPoint(in Vector3 localPoint)
+        private Vector2 ProjectLocalPoint(in Vector3 localPoint)
         {
             const float halfSize = 0.5f;
             float sliceOffset = this.CalculateSliceOffset();
