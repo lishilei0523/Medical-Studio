@@ -13,7 +13,7 @@
 			<Setter Property="BorderThickness" Value="1" />
 		</Style>
 		<Style Selector="Border.Focusable:focus-within">
-			<Setter Property="BorderBrush" Value="White" />
+			<Setter Property="BorderBrush" Value="#FF9B8AFF" />
 			<Setter Property="BorderThickness" Value="1" />
 		</Style>
 	</UserControl.Styles>
