@@ -400,10 +400,17 @@ namespace MedicalSharp.Controls.Visual3Ds
 
             int viewportWidth = viewport.ViewportSize.Width;
             int viewportHeight = viewport.ViewportSize.Height;
+
+            //计算几何指标
+            float perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
+            float surfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
+            float voxelArea = viewport.Plane.GetVoxelArea();
+            int voxelsCount = (int)Math.Round(surfaceArea / voxelArea);
+
             byte[] layerPixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
-            StatisticResult result = viewport.VolumeData.ApplyCircleAnalyse(screenCenter, screenRadius, viewportWidth, viewportHeight, viewport.MPRCamera.ZoomFactor, layerPixels, markValue);
-            result.Perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
-            result.SurfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
+            StatisticResult result = viewport.VolumeData.ApplyCircleAnalyse(screenCenter, screenRadius, viewportWidth, viewportHeight, voxelsCount, layerPixels, markValue);
+            result.Perimeter = perimeter;
+            result.SurfaceArea = surfaceArea;
 
             return result;
         }

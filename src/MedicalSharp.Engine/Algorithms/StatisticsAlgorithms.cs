@@ -386,11 +386,11 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="radius">半径（像素）</param>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        /// <param name="zoomFactor">缩放因子</param>
+        /// <param name="voxelsCount">体素数量</param>
         /// <param name="layerPixels">层像素指针</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        public static StatisticResult ApplyCircleAnalyse(this VolumeData volumeData, Vector2 center, float radius, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
+        public static StatisticResult ApplyCircleAnalyse(this VolumeData volumeData, Vector2 center, float radius, int viewportWidth, int viewportHeight, int voxelsCount, byte[] layerPixels, byte? markValue)
         {
             float radiusSq = radius * radius;
 
@@ -399,7 +399,6 @@ namespace MedicalSharp.Engine.Algorithms
             float maxHu = float.MinValue;
             double huSum = 0;
             double huSumSq = 0;
-            int pixelsCount = 0;
 
             //计算圆形的包围盒（优化遍历范围）
             int minX = (int)Math.Max(0, center.X - radius - 1);
@@ -459,13 +458,8 @@ namespace MedicalSharp.Engine.Algorithms
                     }
                     huSum += huValue;
                     huSumSq += huValue * huValue;
-                    pixelsCount++;
                 }
             }
-
-            //像素数量转体素数量
-            float areaScale = zoomFactor * zoomFactor;
-            int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
 
             //计算统计指标
             float averageHu = voxelsCount > 0 ? (float)(huSum / voxelsCount) : 0;
@@ -496,11 +490,11 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="halfHeight">半高（像素）</param>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        /// <param name="zoomFactor">缩放因子</param>
+        /// <param name="voxelsCount">体素数量</param>
         /// <param name="layerPixels">层像素指针</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        public static StatisticResult ApplyEllipseAnalyse(this VolumeData volumeData, Vector2 center, float halfWidth, float halfHeight, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
+        public static StatisticResult ApplyEllipseAnalyse(this VolumeData volumeData, Vector2 center, float halfWidth, float halfHeight, int viewportWidth, int viewportHeight, int voxelsCount, byte[] layerPixels, byte? markValue)
         {
             //椭圆方程参数
             float aSq = halfWidth * halfWidth;   // 半宽平方
@@ -511,7 +505,6 @@ namespace MedicalSharp.Engine.Algorithms
             float maxHu = float.MinValue;
             double huSum = 0;
             double huSumSq = 0;
-            int pixelsCount = 0;
 
             //计算椭圆包围盒
             int minX = (int)Math.Max(0, center.X - halfWidth - 1);
@@ -571,13 +564,8 @@ namespace MedicalSharp.Engine.Algorithms
                     }
                     huSum += huValue;
                     huSumSq += huValue * huValue;
-                    pixelsCount++;
                 }
             }
-
-            //像素数量转体素数量
-            float areaScale = zoomFactor * zoomFactor;
-            int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
 
             //计算统计指标
             float averageHu = voxelsCount > 0 ? (float)(huSum / voxelsCount) : 0;
@@ -606,11 +594,11 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="screenVertices">多边形顶点（屏幕坐标，按顺序）</param>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        /// <param name="zoomFactor">缩放因子</param>
+        /// <param name="voxelsCount">体素数量</param>
         /// <param name="layerPixels">层像素指针</param>
         /// <param name="markValue">标记值</param>
         /// <returns>统计结果</returns>
-        public static StatisticResult ApplyPolygonAnalyse(this VolumeData volumeData, Vector2[] screenVertices, int viewportWidth, int viewportHeight, float zoomFactor, byte[] layerPixels, byte? markValue)
+        public static StatisticResult ApplyPolygonAnalyse(this VolumeData volumeData, Vector2[] screenVertices, int viewportWidth, int viewportHeight, int voxelsCount, byte[] layerPixels, byte? markValue)
         {
             //计算多边形包围盒（优化遍历范围）
             float minX = screenVertices.Min(v => v.X);
@@ -628,7 +616,6 @@ namespace MedicalSharp.Engine.Algorithms
             float maxHu = float.MinValue;
             double huSum = 0;
             double huSumSq = 0;
-            int pixelsCount = 0;
             for (int y = startY; y <= endY; y++)
             {
                 for (int x = startX; x <= endX; x++)
@@ -675,13 +662,8 @@ namespace MedicalSharp.Engine.Algorithms
                     }
                     huSum += huValue;
                     huSumSq += huValue * huValue;
-                    pixelsCount++;
                 }
             }
-
-            //像素数量转体素数量
-            float areaScale = zoomFactor * zoomFactor;
-            int voxelsCount = (int)Math.Round(pixelsCount / areaScale);
 
             //计算统计指标
             float averageHu = voxelsCount > 0 ? (float)(huSum / voxelsCount) : 0;

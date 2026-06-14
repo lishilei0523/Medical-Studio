@@ -492,7 +492,7 @@ namespace MedicalSharp.Controls.Visual3Ds
             int viewportWidth = viewport.ViewportSize.Width;
             int viewportHeight = viewport.ViewportSize.Height;
 
-            //计算体素数量
+            //计算几何指标
             float perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
             float surfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
             float voxelArea = viewport.Plane.GetVoxelArea(); ;
