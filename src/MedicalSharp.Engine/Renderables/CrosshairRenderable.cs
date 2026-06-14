@@ -258,6 +258,20 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
+        #region 检测射线相交 —— override bool IntersectsRay(Ray ray, out float distance)
+        /// <summary>
+        /// 检测射线相交
+        /// </summary>
+        /// <param name="ray">射线（世界空间）</param>
+        /// <param name="distance">相交距离</param>
+        /// <returns>是否相交</returns>
+        /// <remarks>世界空间</remarks>
+        public override bool IntersectsRay(Ray ray, out float distance)
+        {
+            return this.IntersectsRay(ray, out distance, out _, out _, out _);
+        }
+        #endregion
+
         #region 检测射线相交 —— override bool IntersectsRay(Ray ray, out float distance...
         /// <summary>
         /// 检测射线相交
@@ -280,9 +294,9 @@ namespace MedicalSharp.Engine.Renderables
             Ray localRay = ray.Transform(worldToLocal);
 
             //快速剔除：先检测包围盒
-            if (this.BoundingBox.Intersects(localRay, out distance))
+            if (this.BoundingBox.Intersects(localRay, out float intersectedDistance))
             {
-                hitPoint = ray.GetPoint(distance);
+                hitPoint = ray.GetPoint(intersectedDistance);
 
                 return true;
             }

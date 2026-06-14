@@ -137,7 +137,7 @@ namespace MedicalSharp.Engine.Base
         }
         #endregion
 
-        #region 检测射线相交 —— bool IntersectsRay(Ray ray, out float distance)
+        #region 检测射线相交 —— virtual bool IntersectsRay(Ray ray, out float distance)
         /// <summary>
         /// 检测射线相交
         /// </summary>
@@ -145,7 +145,7 @@ namespace MedicalSharp.Engine.Base
         /// <param name="distance">相交距离</param>
         /// <returns>是否相交</returns>
         /// <remarks>世界空间</remarks>
-        public bool IntersectsRay(Ray ray, out float distance)
+        public virtual bool IntersectsRay(Ray ray, out float distance)
         {
             distance = 0f;
 
