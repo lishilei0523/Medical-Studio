@@ -268,19 +268,25 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" Margin="5,5,0,0">
-                                <ComboBox Width="225" PlaceholderText="预设协议" />
-                                <ComboBox Width="225" PlaceholderText="预设窗" Margin="0,10,0,0" />
+                                <ComboBox Width="225" PlaceholderText="预设协议"
+                                          DisplayMemberBinding="{Binding Name}"
+                                          SelectedItem="{Binding LayoutViewModel.VolumeViewModel.SelectedProtocol}"
+                                          ItemsSource="{Binding LayoutViewModel.VolumeViewModel.PresetProtocols}" />
+                                <ComboBox Width="225" PlaceholderText="预设窗" Margin="0,10,0,0"
+                                          DisplayMemberBinding="{Binding Name}"
+                                          SelectedItem="{Binding SelectedWindowLevel}"
+                                          ItemsSource="{Binding WindowLevels}" />
                             </StackPanel>
                             <Grid Grid.Row="1" Margin="0,10,0,0">
                                 <StackPanel>
                                     <TextBlock Text="窗宽：" Margin="10,0,0,0" />
                                     <Slider Minimum="1" Maximum="4096" SmallChange="1" LargeChange="10"
                                             TickFrequency="100" TickPlacement="Outside"
-                                            Value="{Binding MprViewModel.WindowWidth}" />
+                                            Value="{Binding WindowWidth}" />
                                     <TextBlock Text="窗位：" Margin="10,0,0,0" />
                                     <Slider Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
                                             TickFrequency="100" TickPlacement="Outside"
-                                            Value="{Binding MprViewModel.WindowCenter}" />
+                                            Value="{Binding WindowCenter}" />
                                 </StackPanel>
                             </Grid>
                             <Grid Grid.Row="2" Margin="10,10,10,0">
@@ -290,11 +296,13 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" >
                                     <TextBlock Text="三平面：" />
-                                    <ToggleSwitch OnContent="显示" OffContent="隐藏" />
+                                    <ToggleSwitch OnContent="显示" OffContent="隐藏" 
+                                                  IsChecked="{Binding MprPlanesVisible}" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" HorizontalAlignment="Right">
                                     <TextBlock Text="十字线：" />
-                                    <ToggleSwitch OnContent="显示" OffContent="隐藏" />
+                                    <ToggleSwitch OnContent="显示" OffContent="隐藏" 
+                                                  IsChecked="{Binding CrosshairVisible}" />
                                 </StackPanel>
                             </Grid>
                         </Grid>

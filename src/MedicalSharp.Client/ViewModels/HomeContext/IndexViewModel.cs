@@ -24,6 +24,7 @@ using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
+using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using SD.Common;
@@ -154,6 +155,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                     this.StudyInfo = value.StudyData.ToStudyInfo();
                     this.SeriesInfo = value.SeriesData.ToSeriesInfo();
                     this.ScanInfo = value.ScanData.ToScanInfo();
+                    this.WindowWidth = value.Metadata.WindowWidth;
+                    this.WindowCenter = value.Metadata.WindowCenter;
 
                     //初始化标记策略
                     VolumeSession session = SessionManager.VolumeSessions[value.Metadata.Id];
@@ -276,6 +279,106 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<ShapeVisual3D> Shapes { get; set; }
+        #endregion
+
+        #region 已选预设窗 —— WindowLevel SelectedWindowLevel
+        /// <summary>
+        /// 已选预设窗
+        /// </summary>
+        public WindowLevel SelectedWindowLevel
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                if (value != null)
+                {
+                    this.WindowWidth = value.WindowWidth;
+                    this.WindowCenter = value.WindowCenter;
+                }
+            }
+        }
+        #endregion
+
+        #region 预设窗列表 —— AvaloniaList<WindowLevel> WindowLevels
+        /// <summary>
+        /// 预设窗列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<WindowLevel> WindowLevels { get; set; }
+        #endregion
+
+        #region 窗宽 —— int WindowWidth
+        /// <summary>
+        /// 窗宽
+        /// </summary>
+        public int WindowWidth
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.LayoutViewModel.MprAxialViewModel.MprViewModel.WindowWidth = value;
+                this.LayoutViewModel.MprCoronalViewModel.MprViewModel.WindowWidth = value;
+                this.LayoutViewModel.MprSagittalViewModel.MprViewModel.WindowWidth = value;
+            }
+        }
+        #endregion
+
+        #region 窗位 —— int WindowCenter
+        /// <summary>
+        /// 窗位
+        /// </summary>
+        public int WindowCenter
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.LayoutViewModel.MprAxialViewModel.MprViewModel.WindowCenter = value;
+                this.LayoutViewModel.MprCoronalViewModel.MprViewModel.WindowCenter = value;
+                this.LayoutViewModel.MprSagittalViewModel.MprViewModel.WindowCenter = value;
+            }
+        }
+        #endregion
+
+        #region 三平面是否显示 —— bool MprPlanesVisible
+        /// <summary>
+        /// 三平面是否显示
+        /// </summary>
+        public bool MprPlanesVisible
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.LayoutViewModel.VolumeViewModel.AxialPlaneVisible = value;
+                this.LayoutViewModel.VolumeViewModel.CoronalPlaneVisible = value;
+                this.LayoutViewModel.VolumeViewModel.SagittalPlaneVisible = value;
+            }
+        }
+        #endregion
+
+        #region 十字线是否显示 —— bool CrosshairVisible
+        /// <summary>
+        /// 十字线是否显示
+        /// </summary>
+        public bool CrosshairVisible
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.LayoutViewModel.MprAxialViewModel.MprViewModel.CrosshairVisible = value;
+                this.LayoutViewModel.MprCoronalViewModel.MprViewModel.CrosshairVisible = value;
+                this.LayoutViewModel.MprSagittalViewModel.MprViewModel.CrosshairVisible = value;
+            }
+        }
         #endregion
 
         #region 标记模式字典 —— IDictionary<string, string> MarkModes
@@ -1348,6 +1451,23 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         protected override Task OnInitializedAsync(CancellationToken cancellationToken)
         {
+            //预设窗
+            this.WindowLevels =
+            [
+                WindowLevelManager.Brain,
+                WindowLevelManager.Cardiac,
+                WindowLevelManager.Liver,
+                WindowLevelManager.Lung,
+                WindowLevelManager.Abdomen,
+                WindowLevelManager.Bone,
+                WindowLevelManager.Vascular,
+                WindowLevelManager.Mediastinum
+            ];
+
+            this.WindowWidth = 400;
+            this.WindowCenter = 40;
+            this.MprPlanesVisible = false;
+            this.CrosshairVisible = true;
             this.SelectedTissue = this.Tissues[1];
 
             return base.OnInitializedAsync(cancellationToken);
