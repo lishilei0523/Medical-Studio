@@ -184,19 +184,23 @@
 						<ColumnDefinition Width="*" />
 						<ColumnDefinition Width="Auto" />
 					</Grid.ColumnDefinitions>
-					<WrapPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<WrapPanel Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               IsVisible="{Binding ViewEnabled}">
 						<!--Top-->
 						<TextBlock Text="{Binding FourDirection.Top}" Margin="0,1,0,0" Foreground="DarkGray" />
 					</WrapPanel>
-					<WrapPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<WrapPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               IsVisible="{Binding ViewEnabled}">
 						<!--Bottom-->
 						<TextBlock Text="{Binding FourDirection.Bottom}" Margin="0,0,0,1" Foreground="DarkGray" />
 					</WrapPanel>
-					<WrapPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<WrapPanel Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               IsVisible="{Binding ViewEnabled}">
 						<!--Left-->
 						<TextBlock Text="{Binding FourDirection.Left}" Margin="1,0,0,0" Foreground="DarkGray" />
 					</WrapPanel>
-					<WrapPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<WrapPanel Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               IsVisible="{Binding ViewEnabled}">
 						<!--Right-->
 						<TextBlock Text="{Binding FourDirection.Right}" Margin="0,0,1,0" Foreground="DarkGray" />
 					</WrapPanel>
@@ -218,7 +222,7 @@
 						<TextBlock Text="{Binding WindowWidth}" Foreground="DarkGray" />
 					</WrapPanel>
 					<WrapPanel Grid.Row="2" Grid.Column="2" Margin="0,0,2,0" IsVisible="{Binding ViewEnabled}">
-						<!--BottomLeft-->
+						<!--BottomRight-->
 						<TextBlock Text="WL : " Foreground="DarkGray" />
 						<TextBlock Text="{Binding WindowCenter}" Foreground="DarkGray" />
 					</WrapPanel>

@@ -124,11 +124,13 @@
                                 <DataTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition />
-                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding DisplayName}" Padding="2" />
-                                        <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <PathIcon Grid.Column="0" Data="{StaticResource Icon-Shape}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding DisplayName}" Margin="5,0,0,0" Padding="2" />
+                                        <WrapPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
                                             <Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
                                                     ToolTip.Tip="重命名"
                                                     cm:Message.Attach="RenameShape($dataContext);">
@@ -297,12 +299,12 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" >
                                     <TextBlock Text="三平面：" />
-                                    <ToggleSwitch OnContent="显示" OffContent="隐藏" 
+                                    <ToggleSwitch OnContent="显示" OffContent="隐藏"
                                                   IsChecked="{Binding MprPlanesVisible}" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" HorizontalAlignment="Right">
                                     <TextBlock Text="十字线：" />
-                                    <ToggleSwitch OnContent="显示" OffContent="隐藏" 
+                                    <ToggleSwitch OnContent="显示" OffContent="隐藏"
                                                   IsChecked="{Binding CrosshairVisible}" />
                                 </StackPanel>
                             </Grid>
