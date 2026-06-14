@@ -20,6 +20,7 @@ using MedicalSharp.Engine.Managers;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
+using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
