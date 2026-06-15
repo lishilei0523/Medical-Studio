@@ -211,7 +211,7 @@ namespace MedicalSharp.Engine.Renderables
 
                 //绘制填充模型	
                 program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
-                program.SetUniformVector4("u_Color", this.Fill);
+                program.SetUniformVector4("u_Color", this.IsSelected ? ColorFactory.SelectedFill : this.Fill);
                 this._fillBuffer.Draw(context.GlContext, PrimitiveType.Triangles);
 
                 //恢复状态
@@ -222,7 +222,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
-            program.SetUniformVector4("u_Color", this.Stroke);
+            program.SetUniformVector4("u_Color", this.IsSelected ? ColorFactory.SelectedStroke : this.Stroke);
             this._curveBuffer.Draw(context.GlContext, PrimitiveType.Lines);
 
             //点尺寸
@@ -234,7 +234,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //绘制控制点
             program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
-            program.SetUniformVector4("u_Color", invertedStroke);
+            program.SetUniformVector4("u_Color", this.IsSelected ? ColorFactory.SelectedSpot : invertedStroke);
             this._pointBuffer.Draw(context.GlContext, PrimitiveType.Points);
         }
         #endregion

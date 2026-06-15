@@ -47,7 +47,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
     /// <summary>
     /// 首页视图模型
     /// </summary>
-    public class IndexViewModel : ScreenBase, IHandle<StatisticFinishedEvent>
+    public class IndexViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<StatisticFinishedEvent>
     {
         #region # 字段及构造器
 
@@ -268,8 +268,30 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 已选形状
         /// </summary>
-        [DependencyProperty]
-        public ShapeVisual3D SelectedShape { get; set; }
+        public ShapeVisual3D SelectedShape
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                foreach (ShapeVisual3D shape in this.Shapes)
+                {
+                    shape.IsSelected = false;
+                }
+                if (value != null)
+                {
+                    value.IsSelected = true;
+
+                    //发布消息
+                    SyncViewportEvent message = new SyncViewportEvent
+                    {
+                        Publisher = this
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            }
+        }
         #endregion
 
         #region 形状列表 —— AvaloniaList<ShapeVisual3D> Shapes
@@ -1537,6 +1559,28 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }
         #endregion
 
+        #region 处理同步视口事件 —— Task HandleAsync(SyncViewportEvent message...
+        /// <summary>
+        /// 处理同步视口事件
+        /// </summary>
+        public Task HandleAsync(SyncViewportEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            ShapeVisual3D selectedShape = this.Shapes.FirstOrDefault(shape => shape.IsSelected);
+            this.SelectedShape = selectedShape;
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
         #region 处理统计完成事件 —— Task HandleAsync(StatisticFinishedEvent message...
         /// <summary>
         /// 处理统计完成事件
@@ -1564,15 +1608,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         private void OnShapesItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
-            if (eventArgs.Action == NotifyCollectionChangedAction.Add && eventArgs.NewItems != null)
-            {
-                this.SelectedShape = (ShapeVisual3D)eventArgs.NewItems[0];
-            }
             if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
             {
-                this.SelectedShape = null;
-                this.SelectedShape = this.Shapes.LastOrDefault();
-
                 //发布消息
                 SyncViewportEvent message = new SyncViewportEvent
                 {

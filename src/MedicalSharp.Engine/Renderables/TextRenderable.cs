@@ -243,7 +243,7 @@ namespace MedicalSharp.Engine.Renderables
 
             this._texture.Bind(0);
             program.SetUniformInt("u_ColorMode", (int)ColorMode.Mixed);
-            program.SetUniformVector4("u_Color", this.Color);
+            program.SetUniformVector4("u_Color", this.IsSelected ? ColorFactory.SelectedFill : this.Color);
             program.SetUniformInt("u_Texture", 0);
 
             //计算缩放

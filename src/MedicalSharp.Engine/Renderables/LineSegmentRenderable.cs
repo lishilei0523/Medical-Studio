@@ -151,7 +151,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制线框模型
             GL.LineWidth(this.StrokeThickness);
             program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
-            program.SetUniformVector4("u_Color", this.Stroke);
+            program.SetUniformVector4("u_Color", this.IsSelected ? ColorFactory.SelectedStroke : this.Stroke);
             this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Lines);
 
             //点尺寸
@@ -163,7 +163,7 @@ namespace MedicalSharp.Engine.Renderables
 
             //绘制控制点
             program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
-            program.SetUniformVector4("u_Color", invertedStroke);
+            program.SetUniformVector4("u_Color", this.IsSelected ? ColorFactory.SelectedSpot : invertedStroke);
             this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Points);
         }
         #endregion

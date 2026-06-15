@@ -30,6 +30,11 @@ namespace MedicalSharp.Controls.Visual3Ds
         public static readonly StyledProperty<Color> FillProperty;
 
         /// <summary>
+        /// 是否选中依赖属性
+        /// </summary>
+        public static readonly StyledProperty<bool> IsSelectedProperty;
+
+        /// <summary>
         /// 静态构造器
         /// </summary>
         static ShapeVisual3D()
@@ -37,6 +42,10 @@ namespace MedicalSharp.Controls.Visual3Ds
             StrokeProperty = AvaloniaProperty.Register<ShapeVisual3D, Color>(nameof(Stroke), Colors.Red);
             StrokeThicknessProperty = AvaloniaProperty.Register<ShapeVisual3D, float>(nameof(StrokeThickness), 1.0f);
             FillProperty = AvaloniaProperty.Register<ShapeVisual3D, Color>(nameof(Fill), Colors.Transparent);
+            IsSelectedProperty = AvaloniaProperty.Register<ShapeVisual3D, bool>(nameof(IsSelected), false);
+
+            //属性改变事件
+            IsSelectedProperty.Changed.AddClassHandler<ShapeVisual3D, bool>(OnIsSelectedChanged);
         }
 
         #endregion
@@ -83,6 +92,17 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
+        #region 依赖属性 - 是否选中 —— bool IsSelected
+        /// <summary>
+        /// 依赖属性 - 是否选中
+        /// </summary>
+        public bool IsSelected
+        {
+            get => this.GetValue(IsSelectedProperty);
+            set => this.SetValue(IsSelectedProperty, value);
+        }
+        #endregion
+
         #region 只读属性 - 变换 —— override Transform Transform
         /// <summary>
         /// 只读属性 - 变换
@@ -121,6 +141,23 @@ namespace MedicalSharp.Controls.Visual3Ds
         protected override void OnUnloaded(RoutedEventArgs eventArgs)
         {
             this.Renderable?.Dispose();
+        }
+        #endregion
+
+        #region 是否选中改变事件 —— static void OnIsSelectedChanged(ShapeVisual3D visual3D...
+        /// <summary>
+        /// 是否选中改变事件
+        /// </summary>
+        private static void OnIsSelectedChanged(ShapeVisual3D visual3D, AvaloniaPropertyChangedEventArgs<bool> eventArgs)
+        {
+            if (eventArgs.NewValue.Value)
+            {
+                visual3D.Renderable?.Select();
+            }
+            else
+            {
+                visual3D.Renderable?.Unselect();
+            }
         }
         #endregion
 

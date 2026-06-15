@@ -32,7 +32,12 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 属性
 
-        //
+        #region 是否选中 —— bool IsSelected
+        /// <summary>
+        /// 是否选中
+        /// </summary>
+        public bool IsSelected { get; private set; }
+        #endregion
 
         #endregion
 
@@ -115,6 +120,26 @@ namespace MedicalSharp.Engine.Renderables
             }
 
             return false;
+        }
+        #endregion
+
+        #region 选中 —— void Select()
+        /// <summary>
+        /// 选中
+        /// </summary>
+        public void Select()
+        {
+            this.IsSelected = true;
+        }
+        #endregion
+
+        #region 取消选中 —— void Unselect()
+        /// <summary>
+        /// 取消选中
+        /// </summary>
+        public void Unselect()
+        {
+            this.IsSelected = false;
         }
         #endregion
 

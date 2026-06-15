@@ -697,10 +697,22 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Action<Visual3DPickedEventArgs> picked = e =>
             {
+                foreach (ShapeVisual3D shape in this.Shapes)
+                {
+                    shape.IsSelected = false;
+                }
                 if (e.PickedVisual is ShapeVisual3D shapeVisual3D)
                 {
                     this.SelectedShape = shapeVisual3D;
+                    this.SelectedShape.IsSelected = true;
                 }
+
+                //发布消息
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
             Action<Visual3D> removed = visual =>
             {
