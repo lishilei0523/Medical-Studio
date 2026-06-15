@@ -33,7 +33,7 @@ namespace MedicalSharp.Insight.Algorithms
     /// using Image slice = resample.ExtractSlice(center, rowDir, colDir);
     /// </code>
     /// </remarks>
-    public sealed class Resample
+    public sealed class Resampler
     {
         #region # 字段及构造器
 
@@ -46,7 +46,7 @@ namespace MedicalSharp.Insight.Algorithms
         /// 创建重采样算法构造器
         /// </summary>
         /// <param name="volumeData">体积数据</param>
-        public Resample(VolumeData volumeData)
+        public Resampler(VolumeData volumeData)
         {
             #region # 验证
 
