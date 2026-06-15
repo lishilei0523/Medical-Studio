@@ -14,7 +14,6 @@ using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Client.Views.HomeContext;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Visual3Ds;
-using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Presentation.Events;
@@ -766,7 +765,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
                 //同步GPU端
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-                SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, session.PreviewTexture);
+                this.VolumeData.SyncPreviewDataToGpu(session.PreviewTexture);
 
                 //发布消息
                 SyncViewportEvent message = new SyncViewportEvent();
@@ -807,7 +806,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
                 //同步GPU端
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-                SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, session.PreviewTexture);
+                this.VolumeData.SyncPreviewDataToGpu(session.PreviewTexture);
 
                 //发布消息
                 SyncViewportEvent message = new SyncViewportEvent();
@@ -848,7 +847,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
                 //同步GPU端
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-                SyncAlgorithms.SyncMarkDataToGpu(this.VolumeData, session.MarkTexture);
+                this.VolumeData.SyncMarkDataToGpu(session.MarkTexture);
 
                 //发布消息
                 SyncViewportEvent message = new SyncViewportEvent();
@@ -889,7 +888,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
 
                 //同步GPU端
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-                SyncAlgorithms.SyncMarkDataToGpu(this.VolumeData, session.MarkTexture);
+                this.VolumeData.SyncMarkDataToGpu(session.MarkTexture);
 
                 //发布消息
                 SyncViewportEvent message = new SyncViewportEvent();
@@ -1244,7 +1243,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.Idle();
 
             //同步到预览纹理
-            SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, volumeSession.PreviewTexture);
+            this.VolumeData.SyncPreviewDataToGpu(volumeSession.PreviewTexture);
 
             //发布消息
             SyncViewportEvent message = new SyncViewportEvent();

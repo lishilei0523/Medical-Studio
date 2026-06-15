@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Engine.Algorithms;
+﻿using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Protocols;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Models;
@@ -111,7 +111,7 @@ namespace MedicalSharp.Engine.Base
         /// <remarks>将预览纹理重置为原始纹理</remarks>
         public void ResetPreviewTexture()
         {
-            SyncAlgorithms.ResetPreviewTexture(this.VolumeData, this.PreviewTexture);
+            this.VolumeData.ResetPreviewTexture(this.PreviewTexture);
         }
         #endregion
 
@@ -122,7 +122,7 @@ namespace MedicalSharp.Engine.Base
         /// <remarks>将标记纹理全部设为0</remarks>
         public void ResetMarkTexture()
         {
-            SyncAlgorithms.ResetMarkTexture(this.VolumeData, this.MarkTexture);
+            this.VolumeData.ResetMarkTexture(this.MarkTexture);
         }
         #endregion
 
@@ -134,7 +134,7 @@ namespace MedicalSharp.Engine.Base
         /// <remarks>将给定标记值重置为0</remarks>
         public void ResetMarkValue(byte targetMarkValue)
         {
-            SyncAlgorithms.ResetMarkValue(this.VolumeData, this.MarkTexture, targetMarkValue);
+            this.VolumeData.ResetMarkValue(this.MarkTexture, targetMarkValue);
         }
         #endregion
 

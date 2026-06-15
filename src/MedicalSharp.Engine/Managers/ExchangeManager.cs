@@ -1,24 +1,23 @@
-﻿using MedicalSharp.Engine.Managers;
-using MedicalSharp.Engine.Resources;
+﻿using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using System;
 
-namespace MedicalSharp.Engine.Algorithms
+namespace MedicalSharp.Engine.Managers
 {
     /// <summary>
-    /// 同步算法
+    /// 数据交换管理器
     /// </summary>
-    public static class SyncAlgorithms
+    public static class ExchangeManager
     {
-        #region # 同步预览数据GPU->CPU —— static void SyncPreviewDataFromGpu(VolumeData volumeData...
+        #region # 同步预览数据GPU->CPU —— static void SyncPreviewDataFromGpu(this VolumeData volumeData...
         /// <summary>
         /// 同步预览数据GPU->CPU
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         /// <param name="previewTexture">预览纹理</param>
         /// <repreviews>将GPU预览纹理数据回读到CPU端的VolumeData.PreviewData</repreviews>
-        public static void SyncPreviewDataFromGpu(VolumeData volumeData, Texture3D previewTexture)
+        public static void SyncPreviewDataFromGpu(this VolumeData volumeData, Texture3D previewTexture)
         {
             #region # 验证
 
@@ -53,14 +52,14 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 同步预览数据CPU->GPU —— static void SyncPreviewDataToGpu(VolumeData volumeData...
+        #region # 同步预览数据CPU->GPU —— static void SyncPreviewDataToGpu(this VolumeData volumeData...
         /// <summary>
         /// 同步预览数据CPU->GPU
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         /// <param name="previewTexture">预览纹理</param>
         /// <repreviews>将CPU端VolumeData.PreviewData上传到GPU预览纹理</repreviews>
-        public static void SyncPreviewDataToGpu(VolumeData volumeData, Texture3D previewTexture)
+        public static void SyncPreviewDataToGpu(this VolumeData volumeData, Texture3D previewTexture)
         {
             #region # 验证
 
@@ -95,14 +94,14 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 同步标记数据GPU->CPU —— static void SyncMarkDataFromGpu(VolumeData volumeData...
+        #region # 同步标记数据GPU->CPU —— static void SyncMarkDataFromGpu(this VolumeData volumeData...
         /// <summary>
         /// 同步标记数据GPU->CPU
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         /// <param name="markTexture">标记纹理</param>
         /// <remarks>将GPU标记纹理数据回读到CPU端的VolumeData.MarkData</remarks>
-        public static void SyncMarkDataFromGpu(VolumeData volumeData, Texture3D markTexture)
+        public static void SyncMarkDataFromGpu(this VolumeData volumeData, Texture3D markTexture)
         {
             #region # 验证
 
@@ -137,14 +136,14 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 同步标记数据CPU->GPU —— static void SyncMarkDataToGpu(VolumeData volumeData...
+        #region # 同步标记数据CPU->GPU —— static void SyncMarkDataToGpu(this VolumeData volumeData...
         /// <summary>
         /// 同步标记数据CPU->GPU
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         /// <param name="markTexture">标记纹理</param>
         /// <remarks>将CPU端VolumeData.MarkData上传到GPU标记纹理</remarks>
-        public static void SyncMarkDataToGpu(VolumeData volumeData, Texture3D markTexture)
+        public static void SyncMarkDataToGpu(this VolumeData volumeData, Texture3D markTexture)
         {
             #region # 验证
 
@@ -179,14 +178,14 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 重置预览纹理 —— static void ResetPreviewTexture(VolumeData volumeData...
+        #region # 重置预览纹理 —— static void ResetPreviewTexture(this VolumeData volumeData...
         /// <summary>
         /// 重置预览纹理
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         /// <param name="previewTexture">预览纹理</param>
         /// <remarks>将预览纹理重置为原始纹理</remarks>
-        public static void ResetPreviewTexture(VolumeData volumeData, Texture3D previewTexture)
+        public static void ResetPreviewTexture(this VolumeData volumeData, Texture3D previewTexture)
         {
             #region # 验证
 
@@ -208,14 +207,14 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 重置标记纹理 —— static void ResetMarkTexture(VolumeData volumeData...
+        #region # 重置标记纹理 —— static void ResetMarkTexture(this VolumeData volumeData...
         /// <summary>
         /// 重置标记纹理
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         /// <param name="markTexture">标记纹理</param>
         /// <remarks>将标记纹理全部设为0</remarks>
-        public static void ResetMarkTexture(VolumeData volumeData, Texture3D markTexture)
+        public static void ResetMarkTexture(this VolumeData volumeData, Texture3D markTexture)
         {
             //清空标记纹理
             markTexture.Clear();
@@ -225,7 +224,7 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 重置标记值 —— static void ResetMarkValue(VolumeData volumeData, Texture3D markTexture...
+        #region # 重置标记值 —— static void ResetMarkValue(this VolumeData volumeData...
         /// <summary>
         /// 重置标记值
         /// </summary>
@@ -233,7 +232,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="markTexture">标记纹理</param>
         /// <param name="targetMarkValue">目标标记值（1~255）</param>
         /// <remarks>将给定标记值重置为0</remarks>
-        public static void ResetMarkValue(VolumeData volumeData, Texture3D markTexture, byte targetMarkValue)
+        public static void ResetMarkValue(this VolumeData volumeData, Texture3D markTexture, byte targetMarkValue)
         {
             #region # 验证
 

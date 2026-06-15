@@ -1,5 +1,4 @@
 ﻿using Caliburn.Micro;
-using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Inspiration.Algorithms;
@@ -131,7 +130,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
             this.Idle();
 
             //同步到预览纹理
-            SyncAlgorithms.SyncPreviewDataToGpu(this.VolumeData, volumeSession.PreviewTexture);
+            this.VolumeData.SyncPreviewDataToGpu(volumeSession.PreviewTexture);
 
             //发布消息
             SyncViewportEvent message = new SyncViewportEvent();

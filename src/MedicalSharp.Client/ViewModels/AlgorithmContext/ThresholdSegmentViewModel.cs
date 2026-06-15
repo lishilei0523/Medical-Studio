@@ -142,7 +142,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
             byte markValue = this.SelectedTissue.MarkValue;
 
             //先重置Mark值
-            SyncAlgorithms.ResetMarkValue(this.VolumeData, markTexture, markValue);
+            this.VolumeData.ResetMarkValue(markTexture, markValue);
 
             //再分割
             this.VolumeData.ThresholdSegment(previewTexture, markTexture, this.MinHU, this.MaxHU, markValue);

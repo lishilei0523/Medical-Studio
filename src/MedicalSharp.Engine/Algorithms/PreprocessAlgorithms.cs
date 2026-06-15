@@ -59,7 +59,7 @@ namespace MedicalSharp.Engine.Algorithms
             segmentShader.Unuse();
 
             //同步CPU端
-            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
+            volumeData.SyncMarkDataFromGpu(markTexture);
         }
         #endregion
     }

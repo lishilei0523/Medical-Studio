@@ -70,7 +70,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Unuse();
 
             //同步CPU端
-            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
+            volumeData.SyncMarkDataFromGpu(markTexture);
         }
         #endregion
 
@@ -126,7 +126,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Unuse();
 
             //同步CPU端
-            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
+            volumeData.SyncMarkDataFromGpu(markTexture);
         }
         #endregion
 
@@ -184,7 +184,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Unuse();
 
             //同步CPU端
-            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
+            volumeData.SyncMarkDataFromGpu(markTexture);
         }
         #endregion
 
@@ -254,7 +254,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Unuse();
 
             //同步CPU端
-            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
+            volumeData.SyncMarkDataFromGpu(markTexture);
         }
         #endregion
 
@@ -304,7 +304,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Unuse();
 
             //同步CPU端
-            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
+            volumeData.SyncMarkDataFromGpu(markTexture);
         }
         #endregion
 
@@ -354,7 +354,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Unuse();
 
             //同步CPU端
-            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
+            volumeData.SyncMarkDataFromGpu(markTexture);
         }
         #endregion
 
@@ -406,7 +406,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Unuse();
 
             //同步CPU端
-            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
+            volumeData.SyncMarkDataFromGpu(markTexture);
         }
         #endregion
 
@@ -469,7 +469,7 @@ namespace MedicalSharp.Engine.Algorithms
             cutComputer.Unuse();
 
             //同步CPU端
-            SyncAlgorithms.SyncMarkDataFromGpu(volumeData, markTexture);
+            volumeData.SyncMarkDataFromGpu(markTexture);
         }
         #endregion
     }
