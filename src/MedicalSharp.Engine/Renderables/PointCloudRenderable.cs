@@ -148,7 +148,7 @@ namespace MedicalSharp.Engine.Renderables
             //绘制点模型
             GL.PointSize(this.PointSize);
             program.SetUniformInt("u_ColorMode", (int)ColorMode.Color);
-            program.SetUniformVector4("u_Color", this.IsSelected ? ColorFactory.SelectedSpot : this.Fill);
+            program.SetUniformVector4("u_Color", this.IsSelected ? this.Fill.Invert() : this.Fill);
             this._vertexBuffer.Draw(context.GlContext, PrimitiveType.Points);
         }
         #endregion
