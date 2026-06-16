@@ -644,41 +644,58 @@ namespace MedicalSharp.Insight
         /// <summary>
         /// 计算体素HU最小最大值
         /// </summary>
-        /// <remarks>SIMD加速</remarks>
+        /// <remarks>
+        /// 使用SIMD向量化加速，一次处理多个体素。
+        /// 算法分三个阶段：
+        /// 1、SIMD向量化循环：每次加载vectorSize个体素，并行比较；
+        /// 2、向量收尾：将累加向量中的各分量合并为标量；
+        /// 3、剩余体素标量处理：SIMD无法整除的尾部体素，逐个体素比较；
+        /// 性能：比纯标量遍历快vectorSize倍（通常8~16倍）
+        /// </remarks>
         private static unsafe void CalculateMinMax(IntPtr originalData, long voxelsCount, out short minHU, out short maxHU)
         {
             short* pointer = (short*)originalData.ToPointer();
 
+            //获取当前硬件支持的short向量宽度，典型值：支持SSE2为8，支持AVX2为16
             int vectorSize = Vector<short>.Count;
-            Vector<short> vecMin = new Vector<short>(short.MaxValue);
-            Vector<short> vecMax = new Vector<short>(short.MinValue);
 
-            long index = 0;
-            long simdEnd = voxelsCount - vectorSize;
-            for (; index <= simdEnd; index += vectorSize)
+            //初始化向量累加器：min初始化为最大值，max初始化为最小值
+            Vector<short> vectorMin = new Vector<short>(short.MaxValue);
+            Vector<short> vectorMax = new Vector<short>(short.MinValue);
+
+            //阶段1：SIMD向量化循环
+            long i = 0;
+            long simdEnd = voxelsCount - vectorSize;//防止越界的上界
+            for (; i <= simdEnd; i += vectorSize)
             {
-                Vector<short> vec = Unsafe.Read<Vector<short>>(pointer + index);
-                vecMin = Vector.Min(vecMin, vec);
-                vecMax = Vector.Max(vecMax, vec);
+                //直接从指针加载一个向量（无需对齐）
+                Vector<short> vector = Unsafe.Read<Vector<short>>(pointer + i);
+
+                //逐分量取最小/最大值
+                vectorMin = Vector.Min(vectorMin, vector);
+                vectorMax = Vector.Max(vectorMax, vector);
             }
 
+            //阶段2：向量收尾，将累加向量中的所有分量合并为单个标量值
             minHU = short.MaxValue;
             maxHU = short.MinValue;
             for (int j = 0; j < vectorSize; j++)
             {
-                minHU = Math.Min(minHU, vecMin[j]);
-                maxHU = Math.Max(maxHU, vecMax[j]);
+                minHU = Math.Min(minHU, vectorMin[j]);
+                maxHU = Math.Max(maxHU, vectorMax[j]);
             }
-            for (; index < voxelsCount; index++)
+
+            //阶段3：剩余体素标量处理，SIMD循环无法整除的尾部体素，逐个体素比较
+            for (; i < voxelsCount; i++)
             {
-                short val = pointer[index];
-                if (val < minHU)
+                short value = pointer[i];
+                if (value < minHU)
                 {
-                    minHU = val;
+                    minHU = value;
                 }
-                if (val > maxHU)
+                if (value > maxHU)
                 {
-                    maxHU = val;
+                    maxHU = value;
                 }
             }
         }
