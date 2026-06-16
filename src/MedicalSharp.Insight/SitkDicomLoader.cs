@@ -21,6 +21,34 @@ namespace MedicalSharp.Insight
     {
         //Implements
 
+        #region # 加载SimpleITK图像 —— VolumeData LoadSitkImage(object image)
+        /// <summary>
+        /// 加载SimpleITK图像
+        /// </summary>
+        /// <param name="image">SimpleITK图像</param>
+        /// <returns>体积数据</returns>
+        public VolumeData LoadSitkImage(object image)
+        {
+            #region # 验证
+
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image), "图像对象不可为空！");
+            }
+            if (image is not Image sitkImage)
+            {
+                throw new ArgumentOutOfRangeException(nameof(image), $"图像必须是SimpleITK Image类型，实际类型为 {image.GetType().FullName}");
+            }
+
+            #endregion
+
+            SitkVolumeData volumeData = new SitkVolumeData();
+            this.ExtractData(volumeData, sitkImage);
+
+            return volumeData;
+        }
+        #endregion
+
         #region # 加载DICOM序列 —— VolumeData LoadSeries(string dicomFolder)
         /// <summary>
         /// 加载DICOM序列

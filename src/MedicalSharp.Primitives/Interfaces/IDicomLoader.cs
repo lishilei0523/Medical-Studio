@@ -8,6 +8,15 @@ namespace MedicalSharp.Primitives.Interfaces
     /// </summary>
     public interface IDicomLoader
     {
+        #region # 加载SimpleITK图像 —— VolumeData LoadSitkImage(object image)
+        /// <summary>
+        /// 加载SimpleITK图像
+        /// </summary>
+        /// <param name="image">SimpleITK图像</param>
+        /// <returns>体积数据</returns>
+        VolumeData LoadSitkImage(object image);
+        #endregion
+
         #region # 加载DICOM序列 —— VolumeData LoadSeries(string dicomFolder)
         /// <summary>
         /// 加载DICOM序列
