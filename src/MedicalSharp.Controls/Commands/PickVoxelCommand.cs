@@ -49,7 +49,7 @@ namespace MedicalSharp.Controls.Commands
             base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is IPickVoxel pickVoxel)
             {
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 VoxelPickedEventArgs commandEventArgs = new VoxelPickedEventArgs
                 {
                     Viewport = viewport,

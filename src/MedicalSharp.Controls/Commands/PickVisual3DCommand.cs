@@ -81,7 +81,7 @@ namespace MedicalSharp.Controls.Commands
             base.OnMouseDown(viewport, eventArgs);
             if (viewport is IPickVisual3D pickVisual3D)
             {
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 Visual3DPickedEventArgs commandEventArgs = new Visual3DPickedEventArgs
                 {
                     Viewport = viewport,
@@ -122,7 +122,7 @@ namespace MedicalSharp.Controls.Commands
         {
             if (viewport is IPickVisual3D pickVisual3D)
             {
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 if (pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual, out _) &&
                     visual is not IFunctionalVisual3D &&
                     visual is not IFixable)

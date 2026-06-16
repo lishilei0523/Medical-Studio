@@ -51,7 +51,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public virtual void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            this._mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+            this._mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
         }
         #endregion
 

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Primitives.Models;
 using System;
@@ -97,7 +98,7 @@ namespace MedicalSharp.Controls.Base
         {
             if (eventArgs.Properties.IsRightButtonPressed)
             {
-                this._rightButtonDownPos = eventArgs.GetPosition(viewport);
+                this._rightButtonDownPos = eventArgs.GetPixelPosition(viewport);
                 this._rightButtonDownTime = DateTime.Now;
             }
 
@@ -114,7 +115,7 @@ namespace MedicalSharp.Controls.Base
             //检查右键单击（非拖拽）
             if (this._rightButtonDownPos.HasValue)
             {
-                Point mousePos2D = eventArgs.GetPosition(viewport);
+                Point mousePos2D = eventArgs.GetPixelPosition(viewport);
                 Point delta = mousePos2D - this._rightButtonDownPos.Value;
                 TimeSpan elapsed = DateTime.Now - this._rightButtonDownTime;
 

@@ -71,7 +71,7 @@ namespace MedicalSharp.Controls.Commands
             base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is IPickVisual3D pickVisual3D)
             {
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 bool success = pickVisual3D.FindNearest(mousePos2D, out Vector3 hitPoint, out _, out Visual3D visual3D, out _);
                 if (success && visual3D is ITranslatableNormal translatable)
                 {
@@ -107,7 +107,7 @@ namespace MedicalSharp.Controls.Commands
                 }
 
                 //获取鼠标射线
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 Ray ray = viewport.UnProject(mousePos2D);
 
                 //移动平面上的交点

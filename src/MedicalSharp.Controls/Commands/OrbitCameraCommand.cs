@@ -51,7 +51,7 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
-            Point position = eventArgs.GetPosition(viewport);
+            Point position = eventArgs.GetPixelPosition(viewport);
             if (this._mousePos2D.HasValue)
             {
                 float deltaX = (float)(position.X - this._mousePos2D.Value.X);

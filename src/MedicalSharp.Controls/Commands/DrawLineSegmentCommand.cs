@@ -60,7 +60,7 @@ namespace MedicalSharp.Controls.Commands
             base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is BasicViewport basicViewport)
             {
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 Vector3? mousePos3D = basicViewport.FindNearestPosition(mousePos2D);
                 if (mousePos3D.HasValue)
                 {
@@ -87,7 +87,7 @@ namespace MedicalSharp.Controls.Commands
                 //设置光标
                 viewport.Cursor = new Cursor(StandardCursorType.Cross);
 
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 Vector3? mousePos3D = basicViewport.FindNearestPosition(mousePos2D);
                 if (mousePos3D.HasValue)
                 {

@@ -67,7 +67,7 @@ namespace MedicalSharp.Controls.Commands
             base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is IPickVisual3D pickVisual3D)
             {
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 bool success = pickVisual3D.FindNearest(mousePos2D, out Vector3 visualHitPoint, out _, out Visual3D visual3D, out Ray ray);
                 if (success && visual3D is IVertexEditable vertexEditable)
                 {
@@ -123,7 +123,7 @@ namespace MedicalSharp.Controls.Commands
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is BasicViewport basicViewport &&
                 this._selectedVisual != null && this._selectedVertexConstraint.HasValue)
             {
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 Vector3? hitPoint = basicViewport.FindNearestPosition(mousePos2D);
                 if (hitPoint.HasValue)
                 {
@@ -171,7 +171,7 @@ namespace MedicalSharp.Controls.Commands
         {
             if (viewport is IPickVisual3D pickVisual3D)
             {
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 bool success = pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual3D, out Ray ray);
                 if (success && visual3D is IVertexEditable vertexEditable)
                 {

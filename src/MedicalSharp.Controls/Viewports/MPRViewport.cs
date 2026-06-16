@@ -256,13 +256,13 @@ namespace MedicalSharp.Controls.Viewports
 
         //Public
 
-        #region 反投影 —— override Ray UnProject(Vector2 screenPos2D)
+        #region 反投影 —— override Ray UnProject(Vector2 screenPixelPos2D)
         /// <summary>
         /// 反投影
         /// </summary>
-        /// <param name="screenPos2D">屏幕2D位置</param>
+        /// <param name="screenPixelPos2D">屏幕像素2D位置</param>
         /// <returns>射线</returns>
-        public override Ray UnProject(Vector2 screenPos2D)
+        public override Ray UnProject(Vector2 screenPixelPos2D)
         {
             #region # 验证
 
@@ -273,13 +273,13 @@ namespace MedicalSharp.Controls.Viewports
 
             #endregion
 
-            bool success = this._mprRenderer.Plane.FindNearest(screenPos2D, this.Camera, out _, out _, out _, out _, out Ray ray);
+            bool success = this._mprRenderer.Plane.FindNearest(screenPixelPos2D, this.Camera, out _, out _, out _, out _, out Ray ray);
             if (success)
             {
                 return ray;
             }
 
-            return base.UnProject(screenPos2D);
+            return base.UnProject(screenPixelPos2D);
         }
         #endregion
 

@@ -318,21 +318,23 @@ namespace MedicalSharp.Controls.Base
 
             #endregion
 
-            Vector2 screenPos2D = Ray.Project(worldPos3D, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            float scaling = (float)this.GetRenderScaling();
+            Vector2 screenPixelPos2D = Ray.Project(worldPos3D, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            Vector2 screenPos2D = screenPixelPos2D / scaling;
 
             return screenPos2D;
         }
         #endregion
 
-        #region 反投影 —— virtual Ray UnProject(Vector2 screenPos2D)
+        #region 反投影 —— virtual Ray UnProject(Vector2 screenPixelPos2D)
         /// <summary>
         /// 反投影
         /// </summary>
-        /// <param name="screenPos2D">屏幕2D位置</param>
+        /// <param name="screenPixelPos2D">屏幕像素2D位置</param>
         /// <returns>射线</returns>
-        public virtual Ray UnProject(Vector2 screenPos2D)
+        public virtual Ray UnProject(Vector2 screenPixelPos2D)
         {
-            Ray ray = Ray.UnProject(screenPos2D, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
+            Ray ray = Ray.UnProject(screenPixelPos2D, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
 
             return ray;
         }
@@ -390,7 +392,10 @@ namespace MedicalSharp.Controls.Base
             this._frameBufferId = frameBufferId;
 
             //设置视口尺寸
-            this._viewportSize = new PixelSize((int)this.Bounds.Width, (int)this.Bounds.Height);
+            double scaling = this.GetRenderScaling();
+            int viewportWidth = (int)Math.Round(this.Bounds.Width * scaling);
+            int viewportHeight = (int)Math.Round(this.Bounds.Height * scaling);
+            this._viewportSize = new PixelSize(viewportWidth, viewportHeight);
             GL.Viewport(0, 0, this._viewportSize.Width, this._viewportSize.Height);
 
             //设置背景色

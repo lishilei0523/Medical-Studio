@@ -67,7 +67,7 @@ namespace MedicalSharp.Controls.Commands
                 this._mprPlane = mprViewport.Plane;
 
                 //获取鼠标在平面上的UV坐标
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 bool success = this._mprPlane.FindNearest(mousePos2D, mprViewport.Camera, out Vector2 uv, out _, out _, out _, out _);
                 if (success && mprViewport.FindNearest(mousePos2D, out _, out _, out Visual3D visual3D, out _))
                 {
@@ -103,7 +103,7 @@ namespace MedicalSharp.Controls.Commands
                 viewport.Cursor = new Cursor(StandardCursorType.Cross);
 
                 //获取鼠标在平面上的UV坐标
-                Vector2 mousePos2D = eventArgs.GetPosition(viewport).ToVector2();
+                Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 bool success = this._mprPlane.FindNearest(mousePos2D, mprViewport.Camera, out Vector2 uv, out _, out _, out _, out _);
                 if (success)
                 {
