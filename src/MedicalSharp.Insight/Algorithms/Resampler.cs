@@ -301,11 +301,11 @@ namespace MedicalSharp.Insight.Algorithms
         }
         #endregion
 
-        #region 执行指定尺寸重采样 —— Image ExecuteToSize(VectorUInt32 newSize)
+        #region 执行指定尺寸重采样 —— Image ExecuteToSize(Vector3i newVolumeSize)
         /// <summary>
         /// 执行指定尺寸重采样
         /// </summary>
-        /// <param name="newSize">目标尺寸（体素数）</param>
+        /// <param name="newVolumeSize">目标体积尺寸（体素数）</param>
         /// <returns>重采样后的3D图像</returns>
         /// <remarks>
         /// 指定目标体素数，自动计算间距以保持物理范围不变。 
@@ -315,17 +315,13 @@ namespace MedicalSharp.Insight.Algorithms
         /// - 多序列对齐：不同尺寸的数据统一到相同体素数 
         /// 示例：512³ -> ExecuteToSize(256³)，间距自动翻倍
         /// </remarks>
-        public Image ExecuteToSize(VectorUInt32 newSize)
+        public Image ExecuteToSize(Vector3i newVolumeSize)
         {
             #region # 验证
 
-            if (newSize == null || newSize.Count < 3)
+            if (newVolumeSize.X == 0 || newVolumeSize.Y == 0 || newVolumeSize.Z == 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(newSize), "目标尺寸必须包含X/Y/Z三个分量！");
-            }
-            if (newSize[0] == 0 || newSize[1] == 0 || newSize[2] == 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(newSize), "目标尺寸各分量必须大于0！");
+                throw new ArgumentOutOfRangeException(nameof(newVolumeSize), "目标尺寸各分量必须大于0！");
             }
 
             #endregion
@@ -337,19 +333,23 @@ namespace MedicalSharp.Insight.Algorithms
             VectorDouble originalDirection = originalImage.GetDirection();
 
             //保持物理范围不变，反算新的间距
-            using VectorDouble newSpacing = new VectorDouble
+            using VectorUInt32 size = new VectorUInt32
             {
-                originalSize[0] * originalSpacing[0] / newSize[0],
-                originalSize[1] * originalSpacing[1] / newSize[1],
-                originalSize[2] * originalSpacing[2] / newSize[2]
+                (uint)newVolumeSize.X, (uint)newVolumeSize.Y, (uint)newVolumeSize.Z
+            };
+            using VectorDouble spacing = new VectorDouble
+            {
+                originalSize[0] * originalSpacing[0] / newVolumeSize.X,
+                originalSize[1] * originalSpacing[1] / newVolumeSize.Y,
+                originalSize[2] * originalSpacing[2] / newVolumeSize.Z
             };
 
             //单位矩阵变换
             using Transform transform = new Transform(3, TransformEnum.sitkIdentity);
 
             using ResampleImageFilter resampler = new ResampleImageFilter();
-            resampler.SetSize(newSize);
-            resampler.SetOutputSpacing(newSpacing);
+            resampler.SetSize(size);
+            resampler.SetOutputSpacing(spacing);
             resampler.SetOutputOrigin(originalOrigin);
             resampler.SetOutputDirection(originalDirection);
             resampler.SetTransform(transform);
@@ -362,7 +362,7 @@ namespace MedicalSharp.Insight.Algorithms
         }
         #endregion
 
-        #region 执行指定间距重采样 —— Image ExecuteToSpacing(VectorDouble newSpacing)
+        #region 执行指定间距重采样 —— Image ExecuteToSpacing(Vector3 newSpacing)
         /// <summary>
         /// 执行指定间距重采样
         /// </summary>
@@ -377,15 +377,11 @@ namespace MedicalSharp.Insight.Algorithms
         /// 和ExecuteIsotropic的区别：允许X/Y/Z方向间距不同。
         /// 多序列比较时，间距一致比体素正方更重要。
         /// </remarks>
-        public Image ExecuteToSpacing(VectorDouble newSpacing)
+        public Image ExecuteToSpacing(Vector3 newSpacing)
         {
             #region # 验证
 
-            if (newSpacing == null || newSpacing.Count < 3)
-            {
-                throw new ArgumentOutOfRangeException(nameof(newSpacing), "目标间距必须包含X/Y/Z三个分量！");
-            }
-            if (newSpacing[0] <= 0 || newSpacing[1] <= 0 || newSpacing[2] <= 0)
+            if (newSpacing.X <= 0 || newSpacing.Y <= 0 || newSpacing.Z <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(newSpacing), "目标间距各分量必须大于0！");
             }
@@ -398,20 +394,26 @@ namespace MedicalSharp.Insight.Algorithms
             VectorDouble originalOrigin = originalImage.GetOrigin();
             VectorDouble originalDirection = originalImage.GetDirection();
 
-            //保持物理范围不变，根据新的间距计算新的体素数量
-            using VectorUInt32 newSize = new VectorUInt32
+            using VectorDouble spacing = new VectorDouble
             {
-                (uint)Math.Ceiling(originalSize[0] * originalSpacing[0] / newSpacing[0]),
-                (uint)Math.Ceiling(originalSize[1] * originalSpacing[1] / newSpacing[1]),
-                (uint)Math.Ceiling(originalSize[2] * originalSpacing[2] / newSpacing[2])
+                newSpacing.X, newSpacing.Y, newSpacing.Z
             };
+
+            //保持物理范围不变，根据新的间距计算新的体素数量
+            using VectorUInt32 size = new VectorUInt32
+            {
+                (uint)Math.Ceiling(originalSize[0] * originalSpacing[0] / newSpacing.X),
+                (uint)Math.Ceiling(originalSize[1] * originalSpacing[1] / newSpacing.Y),
+                (uint)Math.Ceiling(originalSize[2] * originalSpacing[2] / newSpacing.Z)
+            };
+
 
             //单位矩阵变换
             using Transform transform = new Transform(3, TransformEnum.sitkIdentity);
 
             using ResampleImageFilter resampler = new ResampleImageFilter();
-            resampler.SetSize(newSize);
-            resampler.SetOutputSpacing(newSpacing);
+            resampler.SetSize(size);
+            resampler.SetOutputSpacing(spacing);
             resampler.SetOutputOrigin(originalOrigin);
             resampler.SetOutputDirection(originalDirection);
             resampler.SetTransform(transform);
