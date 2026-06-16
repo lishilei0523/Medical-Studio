@@ -30,17 +30,10 @@ namespace MedicalSharp.Controls.Commands
         private ResizeContext3D? _selectedResizeContext;
 
         /// <summary>
-        /// 调整尺寸结束事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<IResizable3D> _resizeEndEvent;
-
-        /// <summary>
-        /// 创建调整3D元素尺寸命令构造器
-        /// </summary>
-        /// <param name="resizeEnd">调整尺寸结束回调</param>
-        public ResizeVisual3DCommand(Action<IResizable3D> resizeEnd)
+        public ResizeVisual3DCommand()
         {
-            this._resizeEndEvent = resizeEnd;
             this._selectedVisual = null;
             this._selectedResizeContext = null;
         }
@@ -49,7 +42,12 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        //
+        #region 调整尺寸结束委托 —— Action<IResizable3D> ResizeEnd
+        /// <summary>
+        /// 调整尺寸结束委托
+        /// </summary>
+        public Action<IResizable3D> ResizeEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -157,7 +155,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //调整尺寸结束
-            this._resizeEndEvent?.Invoke(this._selectedVisual);
+            this.ResizeEnd?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

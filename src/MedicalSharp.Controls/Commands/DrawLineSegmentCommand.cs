@@ -21,31 +21,30 @@ namespace MedicalSharp.Controls.Commands
         private LineSegmentVisual3D _lineSegment;
 
         /// <summary>
-        /// 线段绘制开始事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<LineSegmentVisual3D> _lineSegmentDrawStartEvent;
-
-        /// <summary>
-        /// 线段绘制结束事件
-        /// </summary>
-        private readonly Action<LineSegmentVisual3D> _lineSegmentDrawEndEvent;
-
-        /// <summary>
-        /// 创建绘制线段3D元素命令构造器
-        /// </summary>
-        /// <param name="drawStart">绘制开始回调</param>
-        /// <param name="drawEnd">绘制结束回调</param>
-        public DrawLineSegmentCommand(Action<LineSegmentVisual3D> drawStart, Action<LineSegmentVisual3D> drawEnd)
+        public DrawLineSegmentCommand()
         {
-            this._lineSegmentDrawStartEvent = drawStart;
-            this._lineSegmentDrawEndEvent = drawEnd;
+
         }
 
         #endregion
 
         #region # 属性
 
-        //
+        #region 绘制开始委托 —— Action<LineSegmentVisual3D> DrawStart
+        /// <summary>
+        /// 绘制开始委托
+        /// </summary>
+        public Action<LineSegmentVisual3D> DrawStart { get; set; }
+        #endregion
+
+        #region 绘制结束委托 —— Action<LineSegmentVisual3D> DrawEnd
+        /// <summary>
+        /// 绘制结束委托
+        /// </summary>
+        public Action<LineSegmentVisual3D> DrawEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -69,7 +68,7 @@ namespace MedicalSharp.Controls.Commands
                         StartPoint = mousePos3D.Value.ToVector3()
                     };
                     this._isDrawing = true;
-                    this._lineSegmentDrawStartEvent?.Invoke(this._lineSegment);
+                    this.DrawStart?.Invoke(this._lineSegment);
                 }
             }
         }
@@ -113,7 +112,7 @@ namespace MedicalSharp.Controls.Commands
 
             //绘制结束
             this._isDrawing = false;
-            this._lineSegmentDrawEndEvent?.Invoke(this._lineSegment);
+            this.DrawEnd?.Invoke(this._lineSegment);
 
             //清空
             this._lineSegment = null;

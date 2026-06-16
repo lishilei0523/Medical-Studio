@@ -17,24 +17,23 @@ namespace MedicalSharp.Controls.Commands
         #region # 字段及构造器
 
         /// <summary>
-        /// 体素拾取事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<VoxelPickedEventArgs> _voxelPickedEvent;
-
-        /// <summary>
-        /// 创建拾取体素命令构造器
-        /// </summary>
-        /// <param name="callback">体素拾取回调</param>
-        public PickVoxelCommand(Action<VoxelPickedEventArgs> callback)
+        public PickVoxelCommand()
         {
-            this._voxelPickedEvent = callback;
+
         }
 
         #endregion
 
         #region # 属性
 
-        //
+        #region 体素已拾取委托 —— Action<VoxelPickedEventArgs> VoxelPicked
+        /// <summary>
+        /// 体素已拾取委托
+        /// </summary>
+        public Action<VoxelPickedEventArgs> VoxelPicked { get; set; }
+        #endregion
 
         #endregion
 
@@ -65,7 +64,7 @@ namespace MedicalSharp.Controls.Commands
                     commandEventArgs.Ray = ray;
                 }
 
-                this._voxelPickedEvent?.Invoke(commandEventArgs);
+                this.VoxelPicked?.Invoke(commandEventArgs);
 
                 //看向目标
                 if (KeyModifiers.Shift == (eventArgs.KeyModifiers & KeyModifiers.Shift))

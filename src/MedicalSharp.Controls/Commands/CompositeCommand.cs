@@ -25,7 +25,7 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public CompositeCommand()
         {
-            this._commands = new HashSet<IViewportCommand>();
+            this._commands = [];
         }
 
         /// <summary>

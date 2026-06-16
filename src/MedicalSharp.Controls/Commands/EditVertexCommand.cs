@@ -31,17 +31,10 @@ namespace MedicalSharp.Controls.Commands
         private VertexDragConstraint? _selectedVertexConstraint;
 
         /// <summary>
-        /// 编辑顶点结束事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<IVertexEditable> _editVertexEndEvent;
-
-        /// <summary>
-        /// 创建编辑顶点命令构造器
-        /// </summary>
-        /// <param name="editVertexEnd">编辑顶点结束回调</param>
-        public EditVertexCommand(Action<IVertexEditable> editVertexEnd)
+        public EditVertexCommand()
         {
-            this._editVertexEndEvent = editVertexEnd;
             this._selectedVisual = null;
             this._selectedVertexConstraint = null;
         }
@@ -50,7 +43,12 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        //
+        #region 编辑顶点结束委托 —— Action<IVertexEditable> EditVertexEnd
+        /// <summary>
+        /// 编辑顶点结束委托
+        /// </summary>
+        public Action<IVertexEditable> EditVertexEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -151,7 +149,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //编辑顶点结束
-            this._editVertexEndEvent?.Invoke(this._selectedVisual);
+            this.EditVertexEnd?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

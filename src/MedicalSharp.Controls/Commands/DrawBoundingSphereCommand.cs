@@ -26,31 +26,30 @@ namespace MedicalSharp.Controls.Commands
         private BoundingSphereVisual3D _boundingSphere;
 
         /// <summary>
-        /// 包围球绘制开始事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<BoundingSphereVisual3D> _sphereDrawStartEvent;
-
-        /// <summary>
-        /// 包围球绘制结束事件
-        /// </summary>
-        private readonly Action<BoundingSphereVisual3D> _sphereDrawEndEvent;
-
-        /// <summary>
-        /// 创建绘制包围球3D元素命令构造器
-        /// </summary>
-        /// <param name="drawStart">绘制开始回调</param>
-        /// <param name="drawEnd">绘制结束回调</param>
-        public DrawBoundingSphereCommand(Action<BoundingSphereVisual3D> drawStart, Action<BoundingSphereVisual3D> drawEnd)
+        public DrawBoundingSphereCommand()
         {
-            this._sphereDrawStartEvent = drawStart;
-            this._sphereDrawEndEvent = drawEnd;
+
         }
 
         #endregion
 
         #region # 属性
 
-        //
+        #region 绘制开始委托 —— Action<BoundingSphereVisual3D> DrawStart
+        /// <summary>
+        /// 绘制开始委托
+        /// </summary>
+        public Action<BoundingSphereVisual3D> DrawStart { get; set; }
+        #endregion
+
+        #region 绘制结束委托 —— Action<BoundingSphereVisual3D> DrawEnd
+        /// <summary>
+        /// 绘制结束委托
+        /// </summary>
+        public Action<BoundingSphereVisual3D> DrawEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -62,7 +61,6 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is BasicViewport basicViewport)
             {
                 Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
@@ -78,9 +76,11 @@ namespace MedicalSharp.Controls.Commands
                         Center = mousePos3D.Value.ToVector3()
                     };
                     this._isDrawing = true;
-                    this._sphereDrawStartEvent?.Invoke(this._boundingSphere);
+                    this.DrawStart?.Invoke(this._boundingSphere);
                 }
             }
+
+            base.OnMouseDown(viewport, eventArgs);
         }
         #endregion
 
@@ -129,7 +129,7 @@ namespace MedicalSharp.Controls.Commands
 
             //绘制结束
             this._isDrawing = false;
-            this._sphereDrawEndEvent?.Invoke(this._boundingSphere);
+            this.DrawEnd?.Invoke(this._boundingSphere);
 
             //清空
             this._startPosition = null;

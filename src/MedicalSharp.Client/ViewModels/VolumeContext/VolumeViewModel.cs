@@ -674,7 +674,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 }
             };
 
-            PickVoxelCommand command = new PickVoxelCommand(picked);
+            PickVoxelCommand command = new PickVoxelCommand();
+            command.VoxelPicked = picked;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -768,7 +769,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
-            Action<IRotatable> rotateEnd = rotatable =>
+            Action<IRotatable> rotateEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -777,8 +778,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            RotateVisualUCommand command = new RotateVisualUCommand(rotateEnd);
-            command.RotatingEvent = rotating;
+            RotateVisualUCommand command = new RotateVisualUCommand();
+            command.Rotating = rotating;
+            command.RotateEnd = rotateEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -801,7 +803,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
-            Action<IRotatable> rotateEnd = rotatable =>
+            Action<IRotatable> rotateEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -810,8 +812,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            RotateVisualVCommand command = new RotateVisualVCommand(rotateEnd);
-            command.RotatingEvent = rotating;
+            RotateVisualVCommand command = new RotateVisualVCommand();
+            command.Rotating = rotating;
+            command.RotateEnd = rotateEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -834,7 +837,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
-            Action<IRotatable> rotateEnd = rotatable =>
+            Action<IRotatable> rotateEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -843,8 +846,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            RotateVisual3DCommand command = new RotateVisual3DCommand(rotateEnd);
-            command.RotatingEvent = rotating;
+            RotateVisual3DCommand command = new RotateVisual3DCommand();
+            command.Rotating = rotating;
+            command.RotateEnd = rotateEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -855,7 +859,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Resize()
         {
-            Action<IResizable3D> resizeEnd = resizable =>
+            Action<IResizable3D> resizeEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -864,7 +868,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            ResizeVisual3DCommand command = new ResizeVisual3DCommand(resizeEnd);
+            ResizeVisual3DCommand command = new ResizeVisual3DCommand();
+            command.ResizeEnd = resizeEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -875,7 +880,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void EditVertex()
         {
-            Action<IVertexEditable> vertexEditEnd = vertexEditable =>
+            Action<IVertexEditable> editVertexEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -884,7 +889,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            EditVertexCommand command = new EditVertexCommand(vertexEditEnd);
+            EditVertexCommand command = new EditVertexCommand();
+            command.EditVertexEnd = editVertexEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -908,7 +914,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawPointCommand command = new DrawPointCommand(drawEnd);
+            DrawPointCommand command = new DrawPointCommand();
+            command.DrawEnd = drawEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -925,7 +932,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"线段{count + 1}";
                 this.Shapes.Add(shape);
             };
-            Action<LineSegmentVisual3D> drawEnd = shape =>
+            Action<LineSegmentVisual3D> drawEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -934,7 +941,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawLineSegmentCommand command = new DrawLineSegmentCommand(drawStart, drawEnd);
+            DrawLineSegmentCommand command = new DrawLineSegmentCommand();
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -952,7 +961,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"矩形{count + 1}";
                 this.Shapes.Add(shape);
             };
-            Action<RectangleVisual3D> drawEnd = shape =>
+            Action<RectangleVisual3D> drawEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -961,7 +970,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawRectangleCommand command = new DrawRectangleCommand(drawStart, drawEnd, getNormal);
+            DrawRectangleCommand command = new DrawRectangleCommand();
+            command.GetNormal = getNormal;
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -979,7 +991,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"圆{count + 1}";
                 this.Shapes.Add(shape);
             };
-            Action<CircleVisual3D> drawEnd = shape =>
+            Action<CircleVisual3D> drawEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -988,7 +1000,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawCircleCommand command = new DrawCircleCommand(drawStart, drawEnd, getNormal);
+            DrawCircleCommand command = new DrawCircleCommand();
+            command.GetNormal = getNormal;
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1006,7 +1021,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"椭圆{count + 1}";
                 this.Shapes.Add(shape);
             };
-            Action<EllipseVisual3D> drawEnd = shape =>
+            Action<EllipseVisual3D> drawEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -1015,7 +1030,10 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawEllipseCommand command = new DrawEllipseCommand(drawStart, drawEnd, getNormal);
+            DrawEllipseCommand command = new DrawEllipseCommand();
+            command.GetNormal = getNormal;
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1032,7 +1050,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"折线{count + 1}";
                 this.Shapes.Add(shape);
             };
-            Action<PolylineVisual3D> drawEnd = shape =>
+            Action<PolylineVisual3D> drawEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -1040,9 +1058,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
-            Action<PolylineVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
+            Action<PolylineVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
 
-            DrawPolylineCommand command = new DrawPolylineCommand(drawStart, drawEnd, drawCancel, false);
+            DrawPolylineCommand command = new DrawPolylineCommand(false);
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
+            command.DrawCancelled = drawCancelled;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1059,7 +1080,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"曲线{count + 1}";
                 this.Shapes.Add(shape);
             };
-            Action<CurveVisual3D> drawEnd = shape =>
+            Action<CurveVisual3D> drawEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -1067,9 +1088,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
-            Action<CurveVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
+            Action<CurveVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
 
-            DrawCurveCommand command = new DrawCurveCommand(drawStart, drawEnd, drawCancel, false);
+            DrawCurveCommand command = new DrawCurveCommand(false);
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
+            command.DrawCancelled = drawCancelled;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1094,9 +1118,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
-            Action<PolylineVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
+            Action<PolylineVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
 
-            DrawPolylineCommand command = new DrawPolylineCommand(drawStart, drawEnd, drawCancel, true);
+            DrawPolylineCommand command = new DrawPolylineCommand(true);
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
+            command.DrawCancelled = drawCancelled;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1113,7 +1140,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"闭合曲线{count + 1}";
                 this.Shapes.Add(shape);
             };
-            Action<CurveVisual3D> drawEnd = shape =>
+            Action<CurveVisual3D> drawEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -1121,9 +1148,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
-            Action<CurveVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
+            Action<CurveVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
 
-            DrawCurveCommand command = new DrawCurveCommand(drawStart, drawEnd, drawCancel, true);
+            DrawCurveCommand command = new DrawCurveCommand(true);
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
+            command.DrawCancelled = drawCancelled;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1149,7 +1179,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawBoundingBoxCommand command = new DrawBoundingBoxCommand(drawStart, drawEnd);
+            DrawBoundingBoxCommand command = new DrawBoundingBoxCommand();
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1175,7 +1207,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawBoundingSphereCommand command = new DrawBoundingSphereCommand(drawStart, drawEnd);
+            DrawBoundingSphereCommand command = new DrawBoundingSphereCommand();
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1192,7 +1226,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"圆柱体{count + 1}";
                 this.Shapes.Add(shape);
             };
-            Action<CylinderVisual3D> drawEnd = shape =>
+            Action<CylinderVisual3D> drawEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -1201,7 +1235,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawCylinderCommand command = new DrawCylinderCommand(drawStart, drawEnd);
+            DrawCylinderCommand command = new DrawCylinderCommand();
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -1218,7 +1254,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 shape.DisplayName = $"多面体{count + 1}";
                 this.Shapes.Add(shape);
             };
-            Action<ConvexPolyhedronVisual3D> drawEnd = shape =>
+            Action<ConvexPolyhedronVisual3D> drawEnd = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -1226,9 +1262,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
-            Action<ConvexPolyhedronVisual3D> drawCancel = shape => this.Shapes.Remove(shape);
+            Action<ConvexPolyhedronVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
 
-            DrawConvexPolyhedronCommand command = new DrawConvexPolyhedronCommand(drawStart, drawEnd, drawCancel);
+            DrawConvexPolyhedronCommand command = new DrawConvexPolyhedronCommand();
+            command.DrawStart = drawStart;
+            command.DrawEnd = drawEnd;
+            command.DrawCancelled = drawCancelled;
             this.InputManager.SwitchCommand(command);
         }
         #endregion

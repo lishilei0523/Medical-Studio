@@ -25,17 +25,10 @@ namespace MedicalSharp.Controls.Commands
         private IRotatable _selectedVisual;
 
         /// <summary>
-        /// 旋转结束事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<IRotatable> _rotateEndEvent;
-
-        /// <summary>
-        /// 创建旋转2D元素命令构造器
-        /// </summary>
-        /// <param name="rotateEnd">旋转结束回调</param>
-        public RotateVisual2DCommand(Action<IRotatable> rotateEnd)
+        public RotateVisual2DCommand()
         {
-            this._rotateEndEvent = rotateEnd;
             this._selectedVisual = null;
         }
 
@@ -43,7 +36,12 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        //
+        #region 旋转结束委托 —— Action<IRotatable> RotateEnd
+        /// <summary>
+        /// 旋转结束委托
+        /// </summary>
+        public Action<IRotatable> RotateEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -129,7 +127,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //旋转结束
-            this._rotateEndEvent?.Invoke(this._selectedVisual);
+            this.RotateEnd?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

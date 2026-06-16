@@ -29,17 +29,10 @@ namespace MedicalSharp.Controls.Commands
         private IResizable2D _selectedVisual;
 
         /// <summary>
-        /// 调整尺寸结束事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<IResizable2D> _resizeEndEvent;
-
-        /// <summary>
-        /// 创建调整2D图形尺寸命令构造器
-        /// </summary>
-        /// <param name="resizeEnd">调整尺寸结束回调</param>
-        public ResizeVisual2DCommand(Action<IResizable2D> resizeEnd)
+        public ResizeVisual2DCommand()
         {
-            this._resizeEndEvent = resizeEnd;
             this._mprPlane = null;
             this._selectedVisual = null;
         }
@@ -48,7 +41,12 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        //
+        #region 调整尺寸结束委托 —— Action<IResizable2D> ResizeEnd
+        /// <summary>
+        /// 调整尺寸结束委托
+        /// </summary>
+        public Action<IResizable2D> ResizeEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -128,7 +126,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //调整尺寸结束
-            this._resizeEndEvent?.Invoke(this._selectedVisual);
+            this.ResizeEnd?.Invoke(this._selectedVisual);
 
             //清空选中
             this._mprPlane = null;

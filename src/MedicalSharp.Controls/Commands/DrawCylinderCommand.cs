@@ -26,31 +26,30 @@ namespace MedicalSharp.Controls.Commands
         private CylinderVisual3D _cylinder;
 
         /// <summary>
-        /// 圆柱体绘制开始事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<CylinderVisual3D> _cylinderDrawStartEvent;
-
-        /// <summary>
-        /// 圆柱体绘制结束事件
-        /// </summary>
-        private readonly Action<CylinderVisual3D> _cylinderDrawEndEvent;
-
-        /// <summary>
-        /// 创建绘制圆柱体3D元素命令构造器
-        /// </summary>
-        /// <param name="drawStart">绘制开始回调</param>
-        /// <param name="drawEnd">绘制结束回调</param>
-        public DrawCylinderCommand(Action<CylinderVisual3D> drawStart, Action<CylinderVisual3D> drawEnd)
+        public DrawCylinderCommand()
         {
-            this._cylinderDrawStartEvent = drawStart;
-            this._cylinderDrawEndEvent = drawEnd;
+
         }
 
         #endregion
 
         #region # 属性
 
-        //
+        #region 绘制开始委托 —— Action<CylinderVisual3D> DrawStart
+        /// <summary>
+        /// 绘制开始委托
+        /// </summary>
+        public Action<CylinderVisual3D> DrawStart { get; set; }
+        #endregion
+
+        #region 绘制结束委托 —— Action<CylinderVisual3D> DrawEnd
+        /// <summary>
+        /// 绘制结束委托
+        /// </summary>
+        public Action<CylinderVisual3D> DrawEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -81,7 +80,7 @@ namespace MedicalSharp.Controls.Commands
                         WithCaps = true
                     };
                     this._isDrawing = true;
-                    this._cylinderDrawStartEvent?.Invoke(this._cylinder);
+                    this.DrawStart?.Invoke(this._cylinder);
                 }
             }
         }
@@ -141,7 +140,7 @@ namespace MedicalSharp.Controls.Commands
 
             //绘制结束
             this._isDrawing = false;
-            this._cylinderDrawEndEvent?.Invoke(this._cylinder);
+            this.DrawEnd?.Invoke(this._cylinder);
 
             //清空
             this._startPosition = null;

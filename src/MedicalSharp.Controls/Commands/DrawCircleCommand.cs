@@ -28,38 +28,37 @@ namespace MedicalSharp.Controls.Commands
         private CircleVisual3D _circle;
 
         /// <summary>
-        /// 获取法向量
+        /// 默认构造器
         /// </summary>
-        private readonly Func<Vector3D> _getNormal;
-
-        /// <summary>
-        /// 圆形绘制开始事件
-        /// </summary>
-        private readonly Action<CircleVisual3D> _circleDrawStartEvent;
-
-        /// <summary>
-        /// 圆形绘制结束事件
-        /// </summary>
-        private readonly Action<CircleVisual3D> _circleDrawEndEvent;
-
-        /// <summary>
-        /// 创建绘制圆形3D元素命令构造器
-        /// </summary>
-        /// <param name="drawStart">绘制开始回调</param>
-        /// <param name="drawEnd">绘制结束回调</param>
-        /// <param name="getNormal">获取法向量</param>
-        public DrawCircleCommand(Action<CircleVisual3D> drawStart, Action<CircleVisual3D> drawEnd, Func<Vector3D> getNormal)
+        public DrawCircleCommand()
         {
-            this._circleDrawStartEvent = drawStart;
-            this._circleDrawEndEvent = drawEnd;
-            this._getNormal = getNormal;
+
         }
 
         #endregion
 
         #region # 属性
 
-        //
+        #region 获取法向量委托 —— Func<Vector3D> GetNormal
+        /// <summary>
+        /// 获取法向量委托
+        /// </summary>
+        public Func<Vector3D> GetNormal { get; set; }
+        #endregion
+
+        #region 绘制开始委托 —— Action<CircleVisual3D> DrawStart
+        /// <summary>
+        /// 绘制开始委托
+        /// </summary>
+        public Action<CircleVisual3D> DrawStart { get; set; }
+        #endregion
+
+        #region 绘制结束委托 —— Action<CircleVisual3D> DrawEnd
+        /// <summary>
+        /// 绘制结束委托
+        /// </summary>
+        public Action<CircleVisual3D> DrawEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -84,10 +83,10 @@ namespace MedicalSharp.Controls.Commands
                         Fill = Color.Parse("#0F00FF00"),
                         Radius = 0.01f,
                         Center = mousePos3D.Value.ToVector3(),
-                        Normal = this._getNormal?.Invoke() ?? new Vector3D(0, 1, 0)
+                        Normal = this.GetNormal?.Invoke() ?? new Vector3D(0, 1, 0)
                     };
                     this._isDrawing = true;
-                    this._circleDrawStartEvent?.Invoke(this._circle);
+                    this.DrawStart?.Invoke(this._circle);
                 }
             }
         }
@@ -138,7 +137,7 @@ namespace MedicalSharp.Controls.Commands
 
             //绘制结束
             this._isDrawing = false;
-            this._circleDrawEndEvent?.Invoke(this._circle);
+            this.DrawEnd?.Invoke(this._circle);
 
             //清空
             this._startPosition = null;

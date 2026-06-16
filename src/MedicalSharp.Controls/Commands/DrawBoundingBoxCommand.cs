@@ -27,31 +27,30 @@ namespace MedicalSharp.Controls.Commands
         private BoundingBoxVisual3D _boundingBox;
 
         /// <summary>
-        /// 包围盒绘制开始事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<BoundingBoxVisual3D> _boxDrawStartEvent;
-
-        /// <summary>
-        /// 包围盒绘制结束事件
-        /// </summary>
-        private readonly Action<BoundingBoxVisual3D> _boxDrawEndEvent;
-
-        /// <summary>
-        /// 创建绘制包围盒3D元素命令构造器
-        /// </summary>
-        /// <param name="drawStart">绘制开始回调</param>
-        /// <param name="drawEnd">绘制结束回调</param>
-        public DrawBoundingBoxCommand(Action<BoundingBoxVisual3D> drawStart, Action<BoundingBoxVisual3D> drawEnd)
+        public DrawBoundingBoxCommand()
         {
-            this._boxDrawStartEvent = drawStart;
-            this._boxDrawEndEvent = drawEnd;
+
         }
 
         #endregion
 
         #region # 属性
 
-        //
+        #region 绘制开始委托 —— Action<BoundingBoxVisual3D> DrawStart
+        /// <summary>
+        /// 绘制开始委托
+        /// </summary>
+        public Action<BoundingBoxVisual3D> DrawStart { get; set; }
+        #endregion
+
+        #region 绘制结束委托 —— Action<BoundingBoxVisual3D> DrawEnd
+        /// <summary>
+        /// 绘制结束委托
+        /// </summary>
+        public Action<BoundingBoxVisual3D> DrawEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -63,7 +62,6 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is BasicViewport basicViewport)
             {
                 Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
@@ -81,9 +79,11 @@ namespace MedicalSharp.Controls.Commands
                         Center = mousePos3D.Value.ToVector3()
                     };
                     this._isDrawing = true;
-                    this._boxDrawStartEvent?.Invoke(this._boundingBox);
+                    this.DrawStart?.Invoke(this._boundingBox);
                 }
             }
+
+            base.OnMouseDown(viewport, eventArgs);
         }
         #endregion
 
@@ -134,7 +134,7 @@ namespace MedicalSharp.Controls.Commands
 
             //绘制结束
             this._isDrawing = false;
-            this._boxDrawEndEvent?.Invoke(this._boundingBox);
+            this.DrawEnd?.Invoke(this._boundingBox);
 
             //清空
             this._startPosition = null;

@@ -29,38 +29,37 @@ namespace MedicalSharp.Controls.Commands
         private ConvexPolyhedronVisual3D _polyhedron;
 
         /// <summary>
-        /// 凸多面体绘制开始事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<ConvexPolyhedronVisual3D> _polyhedronDrawStartEvent;
-
-        /// <summary>
-        /// 凸多面体绘制结束事件
-        /// </summary>
-        private readonly Action<ConvexPolyhedronVisual3D> _polyhedronDrawEndEvent;
-
-        /// <summary>
-        /// 凸多面体绘制取消事件
-        /// </summary>
-        private readonly Action<ConvexPolyhedronVisual3D> _polyhedronDrawCancelEvent;
-
-        /// <summary>
-        /// 创建绘制凸多面体3D元素命令构造器
-        /// </summary>
-        /// <param name="drawStart">绘制开始回调</param>
-        /// <param name="drawEnd">绘制结束回调</param>
-        /// <param name="drawCancel">绘制取消回调</param>
-        public DrawConvexPolyhedronCommand(Action<ConvexPolyhedronVisual3D> drawStart, Action<ConvexPolyhedronVisual3D> drawEnd, Action<ConvexPolyhedronVisual3D> drawCancel)
+        public DrawConvexPolyhedronCommand()
         {
-            this._polyhedronDrawStartEvent = drawStart;
-            this._polyhedronDrawEndEvent = drawEnd;
-            this._polyhedronDrawCancelEvent = drawCancel;
+
         }
 
         #endregion
 
         #region # 属性
 
-        //
+        #region 绘制开始委托 —— Action<ConvexPolyhedronVisual3D> DrawStart
+        /// <summary>
+        /// 绘制开始委托
+        /// </summary>
+        public Action<ConvexPolyhedronVisual3D> DrawStart { get; set; }
+        #endregion
+
+        #region 绘制结束委托 —— Action<ConvexPolyhedronVisual3D> DrawEnd
+        /// <summary>
+        /// 绘制结束委托
+        /// </summary>
+        public Action<ConvexPolyhedronVisual3D> DrawEnd { get; set; }
+        #endregion
+
+        #region 绘制已取消委托 —— Action<ConvexPolyhedronVisual3D> DrawCancelled
+        /// <summary>
+        /// 绘制已取消委托
+        /// </summary>
+        public Action<ConvexPolyhedronVisual3D> DrawCancelled { get; set; }
+        #endregion
 
         #endregion
 
@@ -92,7 +91,7 @@ namespace MedicalSharp.Controls.Commands
                             Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor()
                         };
                         this._isDrawing = true;
-                        this._polyhedronDrawStartEvent?.Invoke(this._polyhedron);
+                        this.DrawStart?.Invoke(this._polyhedron);
                     }
                     else
                     {
@@ -233,7 +232,7 @@ namespace MedicalSharp.Controls.Commands
 
             //绘制结束
             this._isDrawing = false;
-            this._polyhedronDrawEndEvent?.Invoke(this._polyhedron);
+            this.DrawEnd?.Invoke(this._polyhedron);
 
             //清空引用，绘制完成
             this._previewPoint = null;
@@ -252,7 +251,7 @@ namespace MedicalSharp.Controls.Commands
         {
             if (this._polyhedron != null)
             {
-                this._polyhedronDrawCancelEvent?.Invoke(this._polyhedron);
+                this.DrawCancelled?.Invoke(this._polyhedron);
             }
 
             //设置光标

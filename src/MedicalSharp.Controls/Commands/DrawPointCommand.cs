@@ -17,24 +17,23 @@ namespace MedicalSharp.Controls.Commands
         #region # 字段及构造器
 
         /// <summary>
-        /// 点绘制结束事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<PointVisual3D> _pointDrawEndEvent;
-
-        /// <summary>
-        /// 创建绘制点3D元素命令构造器
-        /// </summary>
-        /// <param name="drawEnd">绘制结束回调</param>
-        public DrawPointCommand(Action<PointVisual3D> drawEnd)
+        public DrawPointCommand()
         {
-            this._pointDrawEndEvent = drawEnd;
+
         }
 
         #endregion
 
         #region # 属性
 
-        //
+        #region 绘制结束委托 —— Action<PointVisual3D> DrawEnd
+        /// <summary>
+        /// 绘制结束委托
+        /// </summary>
+        public Action<PointVisual3D> DrawEnd { get; set; }
+        #endregion
 
         #endregion
 
@@ -60,7 +59,7 @@ namespace MedicalSharp.Controls.Commands
                         PointSize = 5
                     };
                     this._isDrawing = true;
-                    this._pointDrawEndEvent?.Invoke(point);
+                    this.DrawEnd?.Invoke(point);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
