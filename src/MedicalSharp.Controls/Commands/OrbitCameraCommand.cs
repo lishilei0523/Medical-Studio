@@ -45,7 +45,7 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 方法
 
-        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
+        #region 鼠标移动事件 —— override void OnMouseMove(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标移动事件
         /// </summary>
@@ -75,7 +75,7 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion
 
-        #region 鼠标滚轮事件 —— override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
+        #region 鼠标滚轮事件 —— override void OnMouseWheel(OpenTKViewport viewport...
         /// <summary>
         /// 鼠标滚轮事件
         /// </summary>
@@ -88,7 +88,7 @@ namespace MedicalSharp.Controls.Commands
         }
         #endregion 
 
-        #region 键盘按下事件 —— override void OnKeyDown(OpenTKViewport viewport, KeyEventArgs eventArgs)
+        #region 键盘按下事件 —— override void OnKeyDown(OpenTKViewport viewport...
         /// <summary>
         /// 键盘按下事件
         /// </summary>
