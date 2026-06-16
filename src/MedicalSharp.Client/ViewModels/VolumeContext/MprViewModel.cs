@@ -42,7 +42,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Action = System.Action;
 
 namespace MedicalSharp.Client.ViewModels.VolumeContext
 {
@@ -268,7 +267,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 if (value == null)
                 {
                     this.ViewEnabled = false;
-                    this.SelectedShape = null;
                     this.Shapes.Clear();
                 }
                 else
@@ -351,14 +349,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public FourDirectionInfo FourDirection { get; set; }
-        #endregion
-
-        #region 选中的形状 —— ShapeVisual3D SelectedShape
-        /// <summary>
-        /// 选中的形状
-        /// </summary>
-        [DependencyProperty]
-        public ShapeVisual3D SelectedShape { get; set; }
         #endregion
 
         #region 形状列表 —— AvaloniaList<ShapeVisual3D> Shapes
@@ -575,55 +565,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void PickShape()
         {
-            Action<Visual3DPickedEventArgs> picked = e =>
-            {
-                foreach (ShapeVisual3D shape in this.Shapes)
-                {
-                    shape.IsSelected = false;
-                }
-                if (e.PickedVisual is ShapeVisual3D shapeVisual3D)
-                {
-                    this.SelectedShape = shapeVisual3D;
-                    this.SelectedShape.IsSelected = true;
-                }
-
-                //发布消息
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-            Action<Visual3D> removed = visual =>
-            {
-                if (visual is ShapeVisual3D shapeVisual3D)
-                {
-                    this.SelectedShape = null;
-                    this.Shapes.Remove(shapeVisual3D);
-                }
-            };
-            Action cutEnd = () =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-            Action<StatisticResult> analyseEnd = result =>
-            {
-                StatisticFinishedEvent message = new StatisticFinishedEvent
-                {
-                    Publisher = this,
-                    StatisticResult = result
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            PickVisual3DCommand command = new PickVisual3DCommand(picked, removed);
+            PickVisual3DCommand command = new PickVisual3DCommand();
+            command.VisualPicked = this.OnVisualPicked;
+            command.VisualRemoved = this.OnVisualRemoved;
             command.GetMarkValue = () => this.SelectedTissue.MarkValue;
-            command.CutEnd = cutEnd;
-            command.AnalyseEnd = analyseEnd;
+            command.ShapeCut = this.OnShapeCutEnd;
+            command.ShapeAnalysed = this.OnShapeAnalyseEnd;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -646,7 +593,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
-            Action<ITranslatable3D> translateEnd = translatable =>
+            Action<ITranslatable3D> translated = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -655,8 +602,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            TranslateVisual3DCommand command = new TranslateVisual3DCommand(translateEnd);
-            command.TranslatingEvent = translating;
+            TranslateVisual3DCommand command = new TranslateVisual3DCommand();
+            command.Translating = translating;
+            command.Translated = translated;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -962,6 +910,75 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
 
         //Events
+
+        #region 3D元素已拾取事件 —— void OnVisualPicked(Visual3D visual3D)
+        /// <summary>
+        /// 3D元素已拾取事件
+        /// </summary>
+        /// <param name="visual3D">3D元素</param>
+        private void OnVisualPicked(Visual3D visual3D)
+        {
+            foreach (ShapeVisual3D shape in this.Shapes)
+            {
+                shape.IsSelected = false;
+            }
+            if (visual3D is ShapeVisual3D shapeVisual3D)
+            {
+                shapeVisual3D.IsSelected = true;
+            }
+
+            //发布消息
+            SyncViewportEvent message = new SyncViewportEvent
+            {
+                Publisher = this
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(message);
+        }
+        #endregion
+
+        #region 3D元素已删除事件 —— void OnVisualRemoved(Visual3D visual3D)
+        /// <summary>
+        /// 3D元素已删除事件
+        /// </summary>
+        /// <param name="visual3D">3D元素</param>
+        private void OnVisualRemoved(Visual3D visual3D)
+        {
+            if (visual3D is ShapeVisual3D shapeVisual3D)
+            {
+                this.Shapes.Remove(shapeVisual3D);
+            }
+        }
+        #endregion
+
+        #region 形状切割结束事件 —— void OnShapeCutEnd()
+        /// <summary>
+        /// 形状切割结束事件
+        /// </summary>
+        public void OnShapeCutEnd()
+        {
+            SyncViewportEvent message = new SyncViewportEvent
+            {
+                Publisher = this
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(message);
+        }
+        #endregion
+
+        #region 形状统计结束事件 —— void OnShapeAnalyseEnd(StatisticResult result)
+        /// <summary>
+        /// 形状统计结束事件
+        /// </summary>
+        /// <param name="result">统计结果</param>
+        public void OnShapeAnalyseEnd(StatisticResult result)
+        {
+            StatisticFinishedEvent message = new StatisticFinishedEvent
+            {
+                Publisher = this,
+                StatisticResult = result
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(message);
+        }
+        #endregion
 
         #region MPR平面变化事件 —— void OnMPRPlaneChanged(object sender...
         /// <summary>

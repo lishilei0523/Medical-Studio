@@ -33,17 +33,10 @@ namespace MedicalSharp.Controls.Commands
         private ITranslatableNormal _selectedVisual;
 
         /// <summary>
-        /// 平移结束事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<ITranslatableNormal> _translateEndEvent;
-
-        /// <summary>
-        /// 创建沿法向量平移元素命令构造器
-        /// </summary>
-        /// <param name="translateEnd">平移结束回调</param>
-        public TranslateVisualNormalCommand(Action<ITranslatableNormal> translateEnd)
+        public TranslateVisualNormalCommand()
         {
-            this._translateEndEvent = translateEnd;
             this._selectedVisual = null;
         }
 
@@ -51,11 +44,18 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 平移中事件 —— Action<ITranslatableNormal> TranslatingEvent
+        #region 形状平移中委托 —— Action<ITranslatableNormal> Translating
         /// <summary>
-        /// 平移中事件
+        /// 形状平移中委托
         /// </summary>
-        public Action<ITranslatableNormal> TranslatingEvent { get; set; }
+        public Action<ITranslatableNormal> Translating { get; set; }
+        #endregion
+
+        #region 形状已平移委托 —— Action<ITranslatableNormal> Translated
+        /// <summary>
+        /// 形状已平移委托
+        /// </summary>
+        public Action<ITranslatableNormal> Translated { get; set; }
         #endregion
 
         #endregion
@@ -131,7 +131,7 @@ namespace MedicalSharp.Controls.Commands
                     this._selectedVisual.Transform.SetPosition(newPosition);
 
                     //平移中
-                    this.TranslatingEvent?.Invoke(this._selectedVisual);
+                    this.Translating?.Invoke(this._selectedVisual);
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
@@ -152,7 +152,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //平移结束
-            this._translateEndEvent?.Invoke(this._selectedVisual);
+            this.Translated?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

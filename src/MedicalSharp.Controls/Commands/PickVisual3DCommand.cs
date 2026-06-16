@@ -1,13 +1,11 @@
 ﻿using Avalonia.Input;
 using MedicalSharp.Controls.Base;
-using MedicalSharp.Controls.Commands.Arguments;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
-using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
@@ -23,29 +21,30 @@ namespace MedicalSharp.Controls.Commands
         #region # 字段及构造器
 
         /// <summary>
-        /// 3D元素拾取事件
+        /// 默认构造器
         /// </summary>
-        private readonly Action<Visual3DPickedEventArgs> _visual3DPickedEvent;
-
-        /// <summary>
-        /// 3D元素删除事件
-        /// </summary>
-        private readonly Action<Visual3D> _visual3DRemovedEvent;
-
-        /// <summary>
-        /// 创建拾取3D元素命令构造器
-        /// </summary>
-        /// <param name="picked">3D元素拾取回调</param>
-        /// <param name="removed">3D元素删除回调</param>
-        public PickVisual3DCommand(Action<Visual3DPickedEventArgs> picked, Action<Visual3D> removed)
+        public PickVisual3DCommand()
         {
-            this._visual3DPickedEvent = picked;
-            this._visual3DRemovedEvent = removed;
+
         }
 
         #endregion
 
         #region # 属性
+
+        #region 3D元素已拾取委托 —— Action<Visual3D> VisualPicked
+        /// <summary>
+        /// 3D元素已拾取委托
+        /// </summary>
+        public Action<Visual3D> VisualPicked { get; set; }
+        #endregion
+
+        #region 3D元素已删除委托 —— Action<Visual3D> VisualRemoved
+        /// <summary>
+        /// 3D元素已删除委托
+        /// </summary>
+        public Action<Visual3D> VisualRemoved { get; set; }
+        #endregion
 
         #region 获取标记值委托 —— Func<byte> GetMarkValue
         /// <summary>
@@ -54,18 +53,18 @@ namespace MedicalSharp.Controls.Commands
         public Func<byte> GetMarkValue { get; set; }
         #endregion
 
-        #region 切割结束委托 —— Action CutEnd
+        #region 形状已切割委托 —— Action ShapeCut
         /// <summary>
-        /// 切割结束委托
+        /// 形状已切割委托
         /// </summary>
-        public Action CutEnd { get; set; }
+        public Action ShapeCut { get; set; }
         #endregion
 
-        #region 统计结束委托 —— Action<StatisticResult> AnalyseEnd
+        #region 形状已统计委托 —— Action<StatisticResult> ShapeAnalysed
         /// <summary>
-        /// 统计结束委托
+        /// 形状已统计委托
         /// </summary>
-        public Action<StatisticResult> AnalyseEnd { get; set; }
+        public Action<StatisticResult> ShapeAnalysed { get; set; }
         #endregion
 
         #endregion
@@ -82,18 +81,8 @@ namespace MedicalSharp.Controls.Commands
             if (viewport is IPickVisual3D pickVisual3D)
             {
                 Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
-                Visual3DPickedEventArgs commandEventArgs = new Visual3DPickedEventArgs
+                if (pickVisual3D.FindNearest(mousePos2D, out Vector3 point, out _, out Visual3D visual3D, out _))
                 {
-                    Viewport = viewport,
-                    MousePos2D = mousePos2D
-                };
-                if (pickVisual3D.FindNearest(mousePos2D, out Vector3 point, out Vector3 normal, out Visual3D visual, out Ray ray))
-                {
-                    commandEventArgs.HitPoint = point;
-                    commandEventArgs.Normal = normal;
-                    commandEventArgs.PickedVisual = visual;
-                    commandEventArgs.Ray = ray;
-
                     //看向目标
                     if (KeyModifiers.Shift == (eventArgs.KeyModifiers & KeyModifiers.Shift))
                     {
@@ -102,10 +91,10 @@ namespace MedicalSharp.Controls.Commands
                 }
                 else
                 {
-                    commandEventArgs.PickedVisual = null;
+                    visual3D = null;
                 }
 
-                this._visual3DPickedEvent?.Invoke(commandEventArgs);
+                this.VisualPicked?.Invoke(visual3D);
 
                 //请求下一帧
                 viewport.RequestNextFrameRendering();
@@ -183,7 +172,7 @@ namespace MedicalSharp.Controls.Commands
         /// <param name="visual">3D元素</param>
         private void RemoveVisual(OpenTKViewport viewport, Visual3D visual)
         {
-            this._visual3DRemovedEvent?.Invoke(visual);
+            this.VisualRemoved?.Invoke(visual);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
@@ -231,7 +220,7 @@ namespace MedicalSharp.Controls.Commands
             //请求下一帧
             viewport.RequestNextFrameRendering();
 
-            this.CutEnd?.Invoke();
+            this.ShapeCut?.Invoke();
         }
         #endregion
 
@@ -244,7 +233,7 @@ namespace MedicalSharp.Controls.Commands
         private void ApplyAnalyse2D(MPRViewport viewport, IAnalyseVolume2D analyseVolume2D)
         {
             StatisticResult result = analyseVolume2D.ApplyAnalyseVolume(viewport, null);
-            this.AnalyseEnd?.Invoke(result);
+            this.ShapeAnalysed?.Invoke(result);
         }
         #endregion
 
@@ -257,7 +246,7 @@ namespace MedicalSharp.Controls.Commands
         private async void ApplyAnalyse3D(VolumeViewport viewport, IAnalyseVolume3D analyseVolume3D)
         {
             StatisticResult result = await analyseVolume3D.ApplyAnalyseVolume(viewport.VolumeData, null);
-            this.AnalyseEnd?.Invoke(result);
+            this.ShapeAnalysed?.Invoke(result);
         }
         #endregion
 
