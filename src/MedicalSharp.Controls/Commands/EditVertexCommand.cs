@@ -43,11 +43,11 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 编辑顶点结束委托 —— Action<IVertexEditable> EditVertexEnd
+        #region 已编辑顶点委托 —— Action<IVertexEditable> VertexEdited
         /// <summary>
-        /// 编辑顶点结束委托
+        /// 已编辑顶点委托
         /// </summary>
-        public Action<IVertexEditable> EditVertexEnd { get; set; }
+        public Action<IVertexEditable> VertexEdited { get; set; }
         #endregion
 
         #endregion
@@ -149,7 +149,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //编辑顶点结束
-            this.EditVertexEnd?.Invoke(this._selectedVisual);
+            this.VertexEdited?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

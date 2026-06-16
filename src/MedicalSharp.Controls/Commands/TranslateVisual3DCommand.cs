@@ -34,16 +34,16 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 形状平移中委托 —— Action<ITranslatable3D> Translating
+        #region 平移中委托 —— Action<ITranslatable3D> Translating
         /// <summary>
-        /// 形状平移中委托
+        /// 平移中委托
         /// </summary>
         public Action<ITranslatable3D> Translating { get; set; }
         #endregion
 
-        #region 形状已平移委托 —— Action<ITranslatable3D> Translated
+        #region 已平移委托 —— Action<ITranslatable3D> Translated
         /// <summary>
-        /// 形状已平移委托
+        /// 已平移委托
         /// </summary>
         public Action<ITranslatable3D> Translated { get; set; }
         #endregion

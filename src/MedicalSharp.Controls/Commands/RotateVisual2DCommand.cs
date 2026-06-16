@@ -36,11 +36,11 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 旋转结束委托 —— Action<IRotatable> RotateEnd
+        #region 已旋转委托 —— Action<IRotatable> Rotated
         /// <summary>
-        /// 旋转结束委托
+        /// 已旋转委托
         /// </summary>
-        public Action<IRotatable> RotateEnd { get; set; }
+        public Action<IRotatable> Rotated { get; set; }
         #endregion
 
         #endregion
@@ -127,7 +127,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //旋转结束
-            this.RotateEnd?.Invoke(this._selectedVisual);
+            this.Rotated?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;

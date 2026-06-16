@@ -616,7 +616,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Rotate2D()
         {
-            Action<IRotatable> rotateEnd = _ =>
+            Action<IRotatable> rotated = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -626,7 +626,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             RotateVisual2DCommand command = new RotateVisual2DCommand();
-            command.RotateEnd = rotateEnd;
+            command.Rotated = rotated;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -637,7 +637,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Resize()
         {
-            Action<IResizable2D> resizeEnd = _ =>
+            Action<IResizable2D> resized = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -647,7 +647,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             ResizeVisual2DCommand command = new ResizeVisual2DCommand();
-            command.ResizeEnd = resizeEnd;
+            command.Resized = resized;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -658,7 +658,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void EditVertex()
         {
-            Action<IVertexEditable> editVertexEnd = _ =>
+            Action<IVertexEditable> vertexEdited = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -668,7 +668,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             EditVertexCommand command = new EditVertexCommand();
-            command.EditVertexEnd = editVertexEnd;
+            command.VertexEdited = vertexEdited;
             this.InputManager.SwitchCommand(command);
         }
         #endregion

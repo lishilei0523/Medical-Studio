@@ -769,7 +769,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
-            Action<IRotatable> rotateEnd = _ =>
+            Action<IRotatable> rotated = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -780,7 +780,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             RotateVisualUCommand command = new RotateVisualUCommand();
             command.Rotating = rotating;
-            command.RotateEnd = rotateEnd;
+            command.Rotated = rotated;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -803,7 +803,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
-            Action<IRotatable> rotateEnd = _ =>
+            Action<IRotatable> rotated = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -814,7 +814,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             RotateVisualVCommand command = new RotateVisualVCommand();
             command.Rotating = rotating;
-            command.RotateEnd = rotateEnd;
+            command.Rotated = rotated;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -837,7 +837,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                     this._eventAggregator.PublishOnUIThreadAsync(message);
                 }
             };
-            Action<IRotatable> rotateEnd = _ =>
+            Action<IRotatable> rotated = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -848,7 +848,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             RotateVisual3DCommand command = new RotateVisual3DCommand();
             command.Rotating = rotating;
-            command.RotateEnd = rotateEnd;
+            command.Rotated = rotated;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -859,7 +859,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void Resize()
         {
-            Action<IResizable3D> resizeEnd = _ =>
+            Action<IResizable3D> resized = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -869,7 +869,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             ResizeVisual3DCommand command = new ResizeVisual3DCommand();
-            command.ResizeEnd = resizeEnd;
+            command.Resized = resized;
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -880,7 +880,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void EditVertex()
         {
-            Action<IVertexEditable> editVertexEnd = _ =>
+            Action<IVertexEditable> vertexEdited = _ =>
             {
                 SyncViewportEvent message = new SyncViewportEvent
                 {
@@ -890,7 +890,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
 
             EditVertexCommand command = new EditVertexCommand();
-            command.EditVertexEnd = editVertexEnd;
+            command.VertexEdited = vertexEdited;
             this.InputManager.SwitchCommand(command);
         }
         #endregion

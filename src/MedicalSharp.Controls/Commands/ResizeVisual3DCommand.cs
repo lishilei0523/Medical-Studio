@@ -42,11 +42,11 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 调整尺寸结束委托 —— Action<IResizable3D> ResizeEnd
+        #region 已调整尺寸委托 —— Action<IResizable3D> Resized
         /// <summary>
-        /// 调整尺寸结束委托
+        /// 已调整尺寸委托
         /// </summary>
-        public Action<IResizable3D> ResizeEnd { get; set; }
+        public Action<IResizable3D> Resized { get; set; }
         #endregion
 
         #endregion
@@ -155,7 +155,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //调整尺寸结束
-            this.ResizeEnd?.Invoke(this._selectedVisual);
+            this.Resized?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;
