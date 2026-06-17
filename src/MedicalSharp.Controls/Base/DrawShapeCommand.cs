@@ -1,4 +1,6 @@
-﻿namespace MedicalSharp.Controls.Base
+﻿using Avalonia.Input;
+
+namespace MedicalSharp.Controls.Base
 {
     /// <summary>
     /// 绘制形状命令
@@ -38,7 +40,18 @@
 
         #region # 方法
 
-        //
+        #region 鼠标按下事件 —— override void OnMouseDown(OpenTKViewport viewport...
+        /// <summary>
+        /// 鼠标按下事件
+        /// </summary>
+        public override void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
+        {
+            if (!this.IsDrawing && eventArgs.Properties.IsRightButtonPressed)
+            {
+                base.OnMouseDown(viewport, eventArgs);
+            }
+        }
+        #endregion
 
         #endregion
     }

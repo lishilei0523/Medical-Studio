@@ -16,7 +16,6 @@ namespace MedicalSharp.Presentation.Models
         public VolumeToolbar()
         {
             this.PickVoxelEnabled = true;
-            this.PickShapeEnabled = true;
             this.TranslateNormalEnabled = true;
             this.Translate3DEnabled = true;
             this.RotateUEnabled = true;
@@ -49,14 +48,6 @@ namespace MedicalSharp.Presentation.Models
         /// </summary>
         [DependencyProperty]
         public bool PickVoxelEnabled { get; set; }
-        #endregion
-
-        #region 拾取形状启用 —— bool PickShapeEnabled
-        /// <summary>
-        /// 拾取形状启用
-        /// </summary>
-        [DependencyProperty]
-        public bool PickShapeEnabled { get; set; }
         #endregion
 
         #region 沿法向量平移启用 —— bool TranslateNormalEnabled

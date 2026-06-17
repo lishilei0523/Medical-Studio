@@ -24,11 +24,6 @@
 										  IsVisible="{Binding ToolbarConfig.PickVoxelEnabled}">
 						<PathIcon Data="{StaticResource Icon-PickVoxel}" />
 					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton cm:Message.Attach="PickShape()" Classes="Transparent-Panel"
-										  ToolTip.Tip="拾取形状"
-										  IsVisible="{Binding ToolbarConfig.PickShapeEnabled}">
-						<PathIcon Data="{StaticResource Icon-PickShape}" />
-					</sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="Translate3D()" Classes="Transparent-Panel" IsChecked="True"
 										  ToolTip.Tip="平移"
 										  IsVisible="{Binding ToolbarConfig.Translate3DEnabled}">

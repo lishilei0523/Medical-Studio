@@ -554,24 +554,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 }
             };
 
-            PickVoxelCommand command = new PickVoxelCommand();
-            command.VoxelPicked = picked;
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 拾取形状 —— void PickShape()
-        /// <summary>
-        /// 拾取形状
-        /// </summary>
-        public void PickShape()
-        {
-            PickVisual3DCommand command = new PickVisual3DCommand();
-            command.VisualPicked = this.OnVisualPicked;
-            command.VisualRemoved = this.OnVisualRemoved;
-            command.GetMarkValue = () => this.SelectedTissue.MarkValue;
-            command.ShapeCut = this.OnShapeCutEnd;
-            command.ShapeAnalysed = this.OnShapeAnalyseEnd;
+            PickVoxelCommand command = new PickVoxelCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                VoxelPicked = picked
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -603,9 +594,16 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            TranslateVisual3DCommand command = new TranslateVisual3DCommand();
-            command.Translating = translating;
-            command.Translated = translated;
+            TranslateVisual3DCommand command = new TranslateVisual3DCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                Translating = translating,
+                Translated = translated
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -625,8 +623,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            RotateVisual2DCommand command = new RotateVisual2DCommand();
-            command.Rotated = rotated;
+            RotateVisual2DCommand command = new RotateVisual2DCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                Rotated = rotated
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -646,8 +651,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            ResizeVisual2DCommand command = new ResizeVisual2DCommand();
-            command.Resized = resized;
+            ResizeVisual2DCommand command = new ResizeVisual2DCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                Resized = resized
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -667,8 +679,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            EditVertexCommand command = new EditVertexCommand();
-            command.VertexEdited = vertexEdited;
+            EditVertexCommand command = new EditVertexCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                VertexEdited = vertexEdited
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -692,8 +711,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawPointCommand command = new DrawPointCommand();
-            command.DrawEnd = drawEnd;
+            DrawPointCommand command = new DrawPointCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawEnd = drawEnd
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -719,9 +745,16 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawLineSegmentCommand command = new DrawLineSegmentCommand();
-            command.DrawStart = drawStart;
-            command.DrawEnd = drawEnd;
+            DrawLineSegmentCommand command = new DrawLineSegmentCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -748,10 +781,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawRectangleCommand command = new DrawRectangleCommand();
-            command.GetNormal = getNormal;
-            command.DrawStart = drawStart;
-            command.DrawEnd = drawEnd;
+            DrawRectangleCommand command = new DrawRectangleCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                GetNormal = getNormal,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -778,10 +818,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawCircleCommand command = new DrawCircleCommand();
-            command.GetNormal = getNormal;
-            command.DrawStart = drawStart;
-            command.DrawEnd = drawEnd;
+            DrawCircleCommand command = new DrawCircleCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                GetNormal = getNormal,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -808,10 +855,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
-            DrawEllipseCommand command = new DrawEllipseCommand();
-            command.GetNormal = getNormal;
-            command.DrawStart = drawStart;
-            command.DrawEnd = drawEnd;
+            DrawEllipseCommand command = new DrawEllipseCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                GetNormal = getNormal,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -838,10 +892,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<PolylineVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
 
-            DrawPolylineCommand command = new DrawPolylineCommand(false);
-            command.DrawStart = drawStart;
-            command.DrawEnd = drawEnd;
-            command.DrawCancelled = drawCancelled;
+            DrawPolylineCommand command = new DrawPolylineCommand(false)
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -868,10 +929,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<CurveVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
 
-            DrawCurveCommand command = new DrawCurveCommand(false);
-            command.DrawStart = drawStart;
-            command.DrawEnd = drawEnd;
-            command.DrawCancelled = drawCancelled;
+            DrawCurveCommand command = new DrawCurveCommand(false)
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -898,10 +966,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<PolylineVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
 
-            DrawPolylineCommand command = new DrawPolylineCommand(true);
-            command.DrawStart = drawStart;
-            command.DrawEnd = drawEnd;
-            command.DrawCancelled = drawCancelled;
+            DrawPolylineCommand command = new DrawPolylineCommand(true)
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -928,10 +1003,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             };
             Action<CurveVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
 
-            DrawCurveCommand command = new DrawCurveCommand(true);
-            command.DrawStart = drawStart;
-            command.DrawEnd = drawEnd;
-            command.DrawCancelled = drawCancelled;
+            DrawCurveCommand command = new DrawCurveCommand(true)
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
             this.InputManager.SwitchCommand(command);
         }
         #endregion
@@ -975,6 +1057,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 this.Shapes.Remove(shapeVisual3D);
             }
+        }
+        #endregion
+
+        #region 获取当前标记值 —— byte GetCurrentMarkValue()
+        /// <summary>
+        /// 获取当前标记值
+        /// </summary>
+        /// <returns>标记值</returns>
+        private byte GetCurrentMarkValue()
+        {
+            return this.SelectedTissue.MarkValue;
         }
         #endregion
 
