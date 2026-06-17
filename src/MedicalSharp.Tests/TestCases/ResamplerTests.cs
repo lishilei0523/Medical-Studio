@@ -262,7 +262,7 @@ namespace MedicalSharp.Tests.TestCases
         #endregion
 
 
-        //Helpers
+        //Private
 
         #region # 创建测试图像 —— static Image CreateTestImage(Vector3i volumeSize, Vector3d spacing)
         /// <summary>
