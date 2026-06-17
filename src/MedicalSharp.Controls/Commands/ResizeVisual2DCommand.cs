@@ -58,7 +58,6 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is MPRViewport mprViewport)
             {
                 //获取MPR平面
@@ -85,6 +84,8 @@ namespace MedicalSharp.Controls.Commands
                     }
                 }
             }
+
+            base.OnMouseDown(viewport, eventArgs);
         }
         #endregion
 

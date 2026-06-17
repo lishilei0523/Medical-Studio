@@ -45,7 +45,6 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            base.OnMouseDown(viewport, eventArgs);
             if (eventArgs.Properties.IsLeftButtonPressed && viewport is BasicViewport basicViewport)
             {
                 Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
@@ -65,6 +64,8 @@ namespace MedicalSharp.Controls.Commands
                     viewport.RequestNextFrameRendering();
                 }
             }
+
+            base.OnMouseDown(viewport, eventArgs);
         }
         #endregion 
 
