@@ -69,10 +69,10 @@ namespace MedicalSharp.Controls.Commands
                 if (KeyModifiers.Shift == (eventArgs.KeyModifiers & KeyModifiers.Shift))
                 {
                     viewport.Camera.LookAt(worldPosition);
-                }
 
-                //请求下一帧
-                viewport.RequestNextFrameRendering();
+                    //请求下一帧
+                    viewport.RequestNextFrameRendering();
+                }
             }
             if (eventArgs.Properties.IsRightButtonPressed)
             {

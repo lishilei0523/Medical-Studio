@@ -145,13 +145,6 @@
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
-                            <ListBox.ContextFlyout>
-                                <MenuFlyout>
-                                    <MenuItem Header="内切(_I)" Command="{Binding ApplyCutInsideCommand}" />
-                                    <MenuItem Header="外切(_O)" Command="{Binding ApplyCutOutsideCommand}" />
-                                    <MenuItem Header="统计(_D)" Command="{Binding ApplyAnalyseCommand}" />
-                                </MenuFlyout>
-                            </ListBox.ContextFlyout>
                         </ListBox>
                     </sd:GroupBox>
                     <GridSplitter Grid.Row="1" Height="4" Background="Transparent" HorizontalAlignment="Stretch" />

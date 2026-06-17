@@ -46,7 +46,7 @@ namespace MedicalSharp.Controls.Base
         /// </summary>
         public override void OnMouseDown(OpenTKViewport viewport, PointerPressedEventArgs eventArgs)
         {
-            if (!this.IsDrawing && eventArgs.Properties.IsRightButtonPressed)
+            if (!this._isDrawing && eventArgs.Properties.IsRightButtonPressed)
             {
                 base.OnMouseDown(viewport, eventArgs);
             }
