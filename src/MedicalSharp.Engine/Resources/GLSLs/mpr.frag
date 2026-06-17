@@ -27,7 +27,7 @@ const float EPSILON = 0.0001;
 const float MAX_16BIT_SIGNED = 32767.0;
 
 
-//线性窗宽窗位转换
+//灰度模式：窗宽窗位裁剪 + 线性映射
 float applyWindowLevel(float value, float windowCenter, float windowWidth)
 {
     if (windowWidth < EPSILON)
@@ -40,7 +40,30 @@ float applyWindowLevel(float value, float windowCenter, float windowWidth)
 
     //窗内线性映射
     float result = (value - windowMin) / windowWidth;
-    return clamp(result, 0.0, 1.0);
+    result = clamp(result, 0.0, 1.0);
+
+    return result;
+}
+
+//伪彩模式：只裁剪，窗外返回-1，跳过
+float applyWindowClip(float value, float windowCenter, float windowWidth)
+{
+    if (windowWidth < EPSILON)
+    {   
+        return 0.0;
+    }
+    
+    float windowMin = windowCenter - windowWidth * 0.5;
+    float windowMax = windowCenter + windowWidth * 0.5;
+
+    //窗外返回-1.0（特殊标记，表示跳过）
+    if (value <= windowMin || value >= windowMax)
+    {
+        return -1.0;
+    }
+    
+    //窗内返回原始值
+    return value;
 }
 
 //获取体素的医学值（HU值）
@@ -94,7 +117,7 @@ void main()
     //Gray - 灰度模式
     if (u_RenderMode == 0) 
     {
-        //应用窗宽窗位
+        //应用窗宽窗位（裁剪 + 线性映射）
         float grayValue = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
         
         //应用亮度和对比度
@@ -107,6 +130,15 @@ void main()
     //PseudoColor - 伪彩模式
     else
     {
+        //应用窗宽窗位（只裁剪，窗外直接跳过）
+        //float clippedValue = applyWindowClip(medicalValue, u_WindowCenter, u_WindowWidth);
+        
+        //窗外值跳过
+        //if (clippedValue < 0.0)
+        //{
+            //discard;
+        //}
+
         //将HU值映射到传递函数的归一化位置
         float normalizedPosition = (medicalValue - u_HUMin) / (u_HUMax - u_HUMin);
         normalizedPosition = clamp(normalizedPosition, 0.0, 1.0);
