@@ -112,7 +112,7 @@ namespace MedicalSharp.Tests.TestCases
             VectorUInt32 resultSize = result.GetSize();
             Assert.AreEqual(10u, resultSize[0]);
             Assert.AreEqual(10u, resultSize[1]);
-            Assert.AreEqual(10u, resultSize[2]); // 5 × 1.2 / 0.6 = 10
+            Assert.AreEqual(10u, resultSize[2]); //5 × 1.2 / 0.6 = 10
         }
         #endregion
 
@@ -212,15 +212,15 @@ namespace MedicalSharp.Tests.TestCases
 
             //验证Direction
             VectorDouble resultDirection = result.GetDirection();
-            Assert.AreEqual(rowDirection.X, resultDirection[0], 0.001);  // Row0.X
-            Assert.AreEqual(rowDirection.Y, resultDirection[1], 0.001);  // Row0.Y
-            Assert.AreEqual(rowDirection.Z, resultDirection[2], 0.001);  // Row0.Z
-            Assert.AreEqual(colDirection.X, resultDirection[3], 0.001);  // Row1.X
-            Assert.AreEqual(colDirection.Y, resultDirection[4], 0.001);  // Row1.Y
-            Assert.AreEqual(colDirection.Z, resultDirection[5], 0.001);  // Row1.Z
-            Assert.AreEqual(sliceDirection.X, resultDirection[6], 0.001);  // Row2.X
-            Assert.AreEqual(sliceDirection.Y, resultDirection[7], 0.001);  // Row2.Y
-            Assert.AreEqual(sliceDirection.Z, resultDirection[8], 0.001);  // Row2.Z
+            Assert.AreEqual(rowDirection.X, resultDirection[0], 0.001);
+            Assert.AreEqual(rowDirection.Y, resultDirection[1], 0.001);
+            Assert.AreEqual(rowDirection.Z, resultDirection[2], 0.001);
+            Assert.AreEqual(colDirection.X, resultDirection[3], 0.001);
+            Assert.AreEqual(colDirection.Y, resultDirection[4], 0.001);
+            Assert.AreEqual(colDirection.Z, resultDirection[5], 0.001);
+            Assert.AreEqual(sliceDirection.X, resultDirection[6], 0.001);
+            Assert.AreEqual(sliceDirection.Y, resultDirection[7], 0.001);
+            Assert.AreEqual(sliceDirection.Z, resultDirection[8], 0.001);
         }
         #endregion
 
