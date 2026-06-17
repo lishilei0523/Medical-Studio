@@ -20,6 +20,11 @@ namespace MedicalSharp.Primitives.Algorithms
         /// <param name="worldPosition">世界位置</param>
         /// <param name="metadata">体积元数据</param>
         /// <returns>毫米位置</returns>
+        /// <remarks>
+        /// 世界空间：归一化单位空间（0~1），中心在 (0.5, 0.5, 0.5)。
+        /// 毫米空间：单位毫米，原点由PhysicalSize决定。
+        /// 转换路径：世界坐标 -> 中间坐标（撤销VolumeScale）-> 毫米坐标（乘以PhysicalSize）
+        /// </remarks>
         public static Vector3 ToMillimeterPosition(this Vector3 worldPosition, VolumeMetadata metadata)
         {
             //世界空间 -> 中间坐标（撤销 VolumeScale）
@@ -40,6 +45,27 @@ namespace MedicalSharp.Primitives.Algorithms
             );
 
             return mmPosition;
+        }
+        #endregion
+
+        #region # 世界坐标转患者坐标 —— static Vector3 ToPatientPosition(this Vector3 worldPosition...
+        /// <summary>
+        /// 世界坐标转患者坐标
+        /// </summary>
+        /// <param name="worldPosition">世界位置</param>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>患者位置（DICOM患者坐标系，单位毫米）</returns>
+        /// <remarks>
+        /// 世界空间：归一化单位空间（0~1），中心在 (0.5, 0.5, 0.5)。
+        /// 患者空间：DICOM患者坐标系，单位毫米，原点由DICOM Origin决定。
+        /// 转换路径：世界坐标 -> 毫米坐标 -> 患者坐标（加上Origin）
+        /// </remarks>
+        public static Vector3 ToPatientPosition(this Vector3 worldPosition, VolumeMetadata metadata)
+        {
+            Vector3 mmPosition = worldPosition.ToMillimeterPosition(metadata);
+            Vector3 patientPosition = mmPosition + metadata.Origin;
+
+            return patientPosition;
         }
         #endregion
 
