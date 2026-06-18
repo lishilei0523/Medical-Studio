@@ -240,7 +240,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 已选组织
         /// </summary>
-        [DependencyProperty]
         public TissueInfo SelectedTissue
         {
             get;
