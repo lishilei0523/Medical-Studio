@@ -61,7 +61,7 @@ namespace MedicalSharp.Client.ViewModels.TissueContext
 
             if (this.SelectedTissue == null)
             {
-                await MessageBox.Show("已选组织不可为空！", "错误");
+                await MessageBox.Show("目标组织不可为空！", "错误");
                 return;
             }
 
