@@ -273,7 +273,7 @@ namespace MedicalSharp.Tests.TestCases
         [TestMethod]
         public unsafe void TestObliqueSliceDataCorrectness()
         {
-            //准备：32x32x1 测试数据，中心8×8区域填充为100
+            //准备：32×32×1 测试数据，中心8×8区域填充为100
             Vector3i volumeSize = new Vector3i(32, 32, 1);
             Vector3d spacing = new Vector3d(1.0, 1.0, 1.0);
             SitkDicomLoader loader = new SitkDicomLoader();
@@ -281,8 +281,8 @@ namespace MedicalSharp.Tests.TestCases
             using VolumeData volumeData = loader.LoadSitkImage(originalImage);
             Resampler resampler = new Resampler(volumeData);
 
-            //执行：在中心位置，绕Z轴旋转 45°提取单张斜切片
-            float angle = MathF.PI / 4; // 45°
+            //执行：在中心位置，绕Z轴旋转45°提取单张斜切片
+            float angle = MathF.PI / 4; //45°
             Vector3 sliceCenter = new Vector3(16, 16, 0);
             Vector3 rowDirection = new Vector3(MathF.Cos(angle), MathF.Sin(angle), 0).Normalized();
             Vector3 colDirection = new Vector3(-MathF.Sin(angle), MathF.Cos(angle), 0).Normalized();
@@ -298,13 +298,13 @@ namespace MedicalSharp.Tests.TestCases
             Assert.AreEqual(1u, sliceSize[2], "Z方向尺寸应为1（单层）");
 
             //验证2：斜切后数据中应存在中心标记值100
-            Assert.IsTrue(sliceData.Any(v => v == 100), "45°斜切后应包含中心标记值100");
+            Assert.IsTrue(sliceData.Any(hu => hu == 100), "45°斜切后应包含中心标记值100");
 
-            //验证3：斜切后数据中应存在背景值 0
-            Assert.IsTrue(sliceData.Any(v => v == 0), "45°斜切后应包含背景值0");
+            //验证3：斜切后数据中应存在背景值0
+            Assert.IsTrue(sliceData.Any(hu => hu == 0), "45°斜切后应包含背景值0");
 
-            //验证4：中心区域的线性插值产生中间值（非 0 非 100 的值）
-            Assert.IsTrue(sliceData.Any(v => v > 0 && v < 100), "斜切过程中线性插值应在中心区域边缘产生0~100的中间值");
+            //验证4：中心区域的线性插值产生中间值（非0非100的值）
+            Assert.IsTrue(sliceData.Any(hu => hu > 0 && hu < 100), "斜切过程中线性插值应在中心区域边缘产生0~100的中间值");
         }
         #endregion
 
@@ -319,7 +319,7 @@ namespace MedicalSharp.Tests.TestCases
         [TestMethod]
         public unsafe void TestObliqueSeriesDataContinuity()
         {
-            //准备：16x16x8 测试数据，Z方向梯度 0~7
+            //准备：16×16×8测试数据，Z方向梯度0~7
             Vector3i volumeSize = new Vector3i(16, 16, 8);
             Vector3d spacing = new Vector3d(1.0, 1.0, 1.0);
             SitkDicomLoader loader = new SitkDicomLoader();
@@ -344,7 +344,7 @@ namespace MedicalSharp.Tests.TestCases
             for (int z = 0; z < 4; z++)
             {
                 ReadOnlySpan<short> sliceSpan = new ReadOnlySpan<short>(seriesData, z * voxelsPerSlice, voxelsPerSlice);
-                layerMeans[z] = sliceSpan.ToArray().Select(v => (double)v).Average();
+                layerMeans[z] = sliceSpan.ToArray().Select(hu => (double)hu).Average();
             }
 
             //验证各层均值不同（至少有两层差异大于0.5）
