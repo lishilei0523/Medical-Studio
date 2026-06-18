@@ -10,6 +10,7 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Controls.Base
 {
@@ -46,11 +47,11 @@ namespace MedicalSharp.Controls.Base
         public Action<Visual3D> VisualRemoved { get; set; }
         #endregion
 
-        #region 获取标记值委托 —— Func<byte> GetMarkValue
+        #region 获取标记值委托 —— Func<Task<byte>> GetMarkValue
         /// <summary>
         /// 获取标记值委托
         /// </summary>
-        public Func<byte> GetMarkValue { get; set; }
+        public Func<Task<byte>> GetMarkValue { get; set; }
         #endregion
 
         #region 形状已切割委托 —— Action ShapeCut
@@ -255,14 +256,14 @@ namespace MedicalSharp.Controls.Base
         }
         #endregion
 
-        #region 适用切割 —— void ApplyCut(OpenTKViewport viewport, ICutVolume cutVolume...
+        #region 适用切割 —— async void ApplyCut(OpenTKViewport viewport, ICutVolume cutVolume...
         /// <summary>
         /// 适用切割
         /// </summary>
         /// <param name="viewport">OpenTK视口</param>
         /// <param name="cutVolume">切割体积3D元素</param>
         /// <param name="cutMode">切割模式</param>
-        private void ApplyCut(OpenTKViewport viewport, ICutVolume cutVolume, CutMode cutMode)
+        private async void ApplyCut(OpenTKViewport viewport, ICutVolume cutVolume, CutMode cutMode)
         {
             #region # 验证
 
@@ -273,7 +274,7 @@ namespace MedicalSharp.Controls.Base
 
             #endregion
 
-            byte markValue = this.GetMarkValue.Invoke();
+            byte markValue = await this.GetMarkValue.Invoke();
 
             #region # 验证
 

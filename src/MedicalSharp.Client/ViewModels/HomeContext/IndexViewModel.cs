@@ -25,7 +25,6 @@ using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
-using OpenTK.Mathematics;
 using SD.Common;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
@@ -81,44 +80,46 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             this.Shapes = [];
             this.Shapes.CollectionChanged += this.OnShapesItemChanged;
             this.MarkModes = typeof(MarkMode).GetEnumMembers();
-
-            //布局
-            this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
-            this.LayoutViewModel.VolumeViewModel.Shapes = this.Shapes;
-            this.LayoutViewModel.MprAxialViewModel.MprViewModel.Shapes = this.Shapes;
-            this.LayoutViewModel.MprCoronalViewModel.MprViewModel.Shapes = this.Shapes;
-            this.LayoutViewModel.MprSagittalViewModel.MprViewModel.Shapes = this.Shapes;
-
-            Vector4[] colors = ColorFactory.StandardMarkColors;
             this.Tissues =
             [
                 new TissueInfo("Base", 0, MarkMode.Visible, Colors.Transparent, true),
     
                 //体壁
-                new TissueInfo("皮肤", 1, MarkMode.Collapsed, colors[1].ToColor()),
-                new TissueInfo("软组织", 2, MarkMode.Visible, colors[2].ToColor()),
-                new TissueInfo("骨骼", 3, MarkMode.Tinted, colors[3].ToColor()),
+                new TissueInfo("皮肤", 1, MarkMode.Collapsed, ColorFactory.StandardMarkColors[1].ToColor()),
+                new TissueInfo("软组织", 2, MarkMode.Visible, ColorFactory.StandardMarkColors[2].ToColor()),
+                new TissueInfo("骨骼", 3, MarkMode.Tinted, ColorFactory.StandardMarkColors[3].ToColor()),
     
                 //循环系统
-                new TissueInfo("血管", 4, MarkMode.Tinted, colors[4].ToColor()),
-                new TissueInfo("心脏", 5, MarkMode.Visible, colors[5].ToColor()),
+                new TissueInfo("血管", 4, MarkMode.Tinted, ColorFactory.StandardMarkColors[4].ToColor()),
+                new TissueInfo("心脏", 5, MarkMode.Visible, ColorFactory.StandardMarkColors[5].ToColor()),
     
                 //呼吸系统
-                new TissueInfo("肺", 6, MarkMode.Visible, colors[6].ToColor()),
+                new TissueInfo("肺", 6, MarkMode.Visible, ColorFactory.StandardMarkColors[6].ToColor()),
     
                 //消化系统
-                new TissueInfo("肝脏", 7, MarkMode.Tinted, colors[7].ToColor()),
-                new TissueInfo("胃", 8, MarkMode.Tinted, colors[8].ToColor()),
-                new TissueInfo("肠", 9, MarkMode.Tinted, colors[9].ToColor()),
+                new TissueInfo("肝脏", 7, MarkMode.Tinted, ColorFactory.StandardMarkColors[7].ToColor()),
+                new TissueInfo("胃", 8, MarkMode.Tinted, ColorFactory.StandardMarkColors[8].ToColor()),
+                new TissueInfo("肠", 9, MarkMode.Tinted, ColorFactory.StandardMarkColors[9].ToColor()),
     
                 //泌尿系统
-                new TissueInfo("肾脏", 10, MarkMode.Tinted, colors[10].ToColor()),
-                new TissueInfo("膀胱", 11, MarkMode.Tinted, colors[11].ToColor()),
+                new TissueInfo("肾脏", 10, MarkMode.Tinted, ColorFactory.StandardMarkColors[10].ToColor()),
+                new TissueInfo("膀胱", 11, MarkMode.Tinted, ColorFactory.StandardMarkColors[11].ToColor()),
     
                 //病理
-                new TissueInfo("病变", 12, MarkMode.Tinted, colors[12].ToColor()),
-                new TissueInfo("钙化", 13, MarkMode.Tinted, colors[13].ToColor())
+                new TissueInfo("病变", 12, MarkMode.Tinted, ColorFactory.StandardMarkColors[12].ToColor()),
+                new TissueInfo("钙化", 13, MarkMode.Tinted, ColorFactory.StandardMarkColors[13].ToColor())
             ];
+
+            //布局
+            this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
+            this.LayoutViewModel.VolumeViewModel.Shapes = this.Shapes;
+            this.LayoutViewModel.VolumeViewModel.Tissues = this.Tissues;
+            this.LayoutViewModel.MprAxialViewModel.MprViewModel.Shapes = this.Shapes;
+            this.LayoutViewModel.MprAxialViewModel.MprViewModel.Tissues = this.Tissues;
+            this.LayoutViewModel.MprCoronalViewModel.MprViewModel.Shapes = this.Shapes;
+            this.LayoutViewModel.MprCoronalViewModel.MprViewModel.Tissues = this.Tissues;
+            this.LayoutViewModel.MprSagittalViewModel.MprViewModel.Shapes = this.Shapes;
+            this.LayoutViewModel.MprSagittalViewModel.MprViewModel.Tissues = this.Tissues;
         }
 
         #endregion
@@ -239,6 +240,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 已选组织
         /// </summary>
+        [DependencyProperty]
         public TissueInfo SelectedTissue
         {
             get;
@@ -247,11 +249,10 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 field = value;
                 this.NotifyOfPropertyChange();
 
-                TissueSelectedEvent message = new TissueSelectedEvent
-                {
-                    TissueInfo = value
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
+                this.LayoutViewModel.VolumeViewModel.SelectedTissue = value;
+                this.LayoutViewModel.MprAxialViewModel.MprViewModel.SelectedTissue = value;
+                this.LayoutViewModel.MprCoronalViewModel.MprViewModel.SelectedTissue = value;
+                this.LayoutViewModel.MprSagittalViewModel.MprViewModel.SelectedTissue = value;
             }
         }
         #endregion

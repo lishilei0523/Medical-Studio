@@ -6,6 +6,7 @@ using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Client.ViewModels.CameraContext;
 using MedicalSharp.Client.ViewModels.ProtocolContext;
+using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Client.Views.VolumeContext;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Commands.Arguments;
@@ -48,7 +49,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<TissueSelectedEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<MPRPlaneChangedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -126,13 +127,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public VolumeToolbar ToolbarConfig { get; set; }
-        #endregion
-
-        #region 已选组织 —— TissueInfo SelectedTissue
-        /// <summary>
-        /// 已选组织
-        /// </summary>
-        public TissueInfo SelectedTissue { get; set; }
         #endregion
 
         #region Raycast渲染模式选中 —— bool RaycastChecked
@@ -435,6 +429,22 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public MPRPlaneVisual3D SagittalPlane { get; set; }
+        #endregion
+
+        #region 已选组织 —— TissueInfo SelectedTissue
+        /// <summary>
+        /// 已选组织
+        /// </summary>
+        [DependencyProperty]
+        public TissueInfo SelectedTissue { get; set; }
+        #endregion
+
+        #region 组织列表 —— AvaloniaList<TissueInfo> Tissues
+        /// <summary>
+        /// 组织列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<TissueInfo> Tissues { get; set; }
         #endregion
 
         #region 形状列表 —— AvaloniaList<ShapeVisual3D> Shapes
@@ -1445,14 +1455,24 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
-        #region 获取当前标记值 —— byte GetCurrentMarkValue()
+        #region 获取当前标记值 —— Task<byte> GetCurrentMarkValue()
         /// <summary>
         /// 获取当前标记值
         /// </summary>
         /// <returns>标记值</returns>
-        private byte GetCurrentMarkValue()
+        private async Task<byte> GetCurrentMarkValue()
         {
-            return this.SelectedTissue.MarkValue;
+            SelectViewModel viewModel = ResolveMediator.Resolve<SelectViewModel>();
+            viewModel.Tissues = this.Tissues;
+            viewModel.SelectedTissue = this.SelectedTissue;
+
+            bool? result = await this._windowManager.ShowDialogAsync(viewModel);
+            if (result == true)
+            {
+                return viewModel.SelectedTissue.MarkValue;
+            }
+
+            return 0;
         }
         #endregion
 
@@ -1494,18 +1514,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             this.Shapes.Clear();
             this.FrameToken++;
-
-            return Task.CompletedTask;
-        }
-        #endregion
-
-        #region 处理组织选中事件 —— Task HandleAsync(TissueSelectedEvent message...
-        /// <summary>
-        /// 处理组织选中事件
-        /// </summary>
-        public Task HandleAsync(TissueSelectedEvent message, CancellationToken cancellationToken)
-        {
-            this.SelectedTissue = message.TissueInfo;
 
             return Task.CompletedTask;
         }
