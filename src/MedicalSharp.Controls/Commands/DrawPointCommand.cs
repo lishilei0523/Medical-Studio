@@ -4,6 +4,7 @@ using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Primitives.Builders;
 using OpenTK.Mathematics;
 using System;
 
@@ -53,7 +54,7 @@ namespace MedicalSharp.Controls.Commands
                 {
                     PointVisual3D point = new PointVisual3D
                     {
-                        Fill = Colors.Cyan,
+                        Fill = ColorFactory.PointColor.ToColor(),
                         Position = mousePos3D.Value.ToVector3(),
                         PointSize = 5
                     };

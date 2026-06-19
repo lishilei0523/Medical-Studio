@@ -27,7 +27,7 @@ namespace MedicalSharp.Engine.Renderables
         private LineSegmentRenderable()
         {
             //默认值
-            this.Stroke = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+            this.Stroke = ColorFactory.Stroke2D;
             this.StrokeThickness = 1.0f;
         }
 

@@ -11,9 +11,24 @@ namespace MedicalSharp.Primitives.Builders
         #region # 字段及构造器
 
         /// <summary>
-        /// 选中填充颜色
+        /// 2D线框颜色
         /// </summary>
-        private static readonly Vector4 _SelectedFill;
+        private static readonly Vector4 _Stroke2D;
+
+        /// <summary>
+        /// 3D线框颜色
+        /// </summary>
+        private static readonly Vector4 _Stroke3D;
+
+        /// <summary>
+        /// 2D填充颜色
+        /// </summary>
+        private static readonly Vector4 _Fill2D;
+
+        /// <summary>
+        /// 3D填充颜色
+        /// </summary>
+        private static readonly Vector4 _Fill3D;
 
         /// <summary>
         /// 选中线框颜色
@@ -21,9 +36,24 @@ namespace MedicalSharp.Primitives.Builders
         private static readonly Vector4 _SelectedStroke;
 
         /// <summary>
+        /// 选中填充颜色
+        /// </summary>
+        private static readonly Vector4 _SelectedFill;
+
+        /// <summary>
         /// 选中顶点颜色
         /// </summary>
         private static readonly Vector4 _SelectedSpot;
+
+        /// <summary>
+        /// 点颜色
+        /// </summary>
+        private static readonly Vector4 _PointColor;
+
+        /// <summary>
+        /// 文本颜色
+        /// </summary>
+        private static readonly Vector4 _TextColor;
 
         /// <summary>
         /// 默认标记颜色列表
@@ -40,22 +70,58 @@ namespace MedicalSharp.Primitives.Builders
         /// </summary>
         static ColorFactory()
         {
-            _SelectedFill = new Vector4(1.0f, 1.0f, 0.0f, 0.1f);
+            _Stroke2D = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+            _Stroke3D = new Vector4(0.1f, 0.3f, 0.6f, 1.0f);
+            _Fill2D = new Vector4(0.0f, 1.0f, 0.0f, 0.0588f);
+            _Fill3D = new Vector4(0.6f, 0.8f, 1.0f, 0.2f);
             _SelectedStroke = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+            _SelectedFill = new Vector4(1.0f, 1.0f, 0.0f, 0.1f);
             _SelectedSpot = new Vector4(0.0f, 1.0f, 0.0f, 1.0f);
+            _PointColor = new Vector4(0.0f, 1.0f, 1.0f, 1.0f);
+            _TextColor = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
             _DefaultMarkColors = GetDefaultMarkColors();
             _StandardMarkColors = GetStandardMarkColors();
         }
 
         #endregion
 
-        #region # 选中填充颜色 —— static Vector4 SelectedFill
+        #region # 2D线框颜色 —— static Vector4 Stroke2D
         /// <summary>
-        /// 选中填充颜色
+        /// 2D线框颜色
         /// </summary>
-        public static Vector4 SelectedFill
+        public static Vector4 Stroke2D
         {
-            get => _SelectedFill;
+            get => _Stroke2D;
+        }
+        #endregion
+
+        #region # 3D线框颜色 —— static Vector4 Stroke3D
+        /// <summary>
+        /// 3D线框颜色
+        /// </summary>
+        public static Vector4 Stroke3D
+        {
+            get => _Stroke3D;
+        }
+        #endregion
+
+        #region # 2D填充颜色 —— static Vector4 Fill2D
+        /// <summary>
+        /// 2D填充颜色
+        /// </summary>
+        public static Vector4 Fill2D
+        {
+            get => _Fill2D;
+        }
+        #endregion
+
+        #region # 3D填充颜色 —— static Vector4 Fill3D
+        /// <summary>
+        /// 3D填充颜色
+        /// </summary>
+        public static Vector4 Fill3D
+        {
+            get => _Fill3D;
         }
         #endregion
 
@@ -69,6 +135,16 @@ namespace MedicalSharp.Primitives.Builders
         }
         #endregion
 
+        #region # 选中填充颜色 —— static Vector4 SelectedFill
+        /// <summary>
+        /// 选中填充颜色
+        /// </summary>
+        public static Vector4 SelectedFill
+        {
+            get => _SelectedFill;
+        }
+        #endregion
+
         #region # 选中顶点颜色 —— static Vector4 SelectedSpot
         /// <summary>
         /// 选中顶点颜色
@@ -76,6 +152,26 @@ namespace MedicalSharp.Primitives.Builders
         public static Vector4 SelectedSpot
         {
             get => _SelectedSpot;
+        }
+        #endregion
+
+        #region # 点颜色 —— static Vector4 PointColor
+        /// <summary>
+        /// 点颜色
+        /// </summary>
+        public static Vector4 PointColor
+        {
+            get => _PointColor;
+        }
+        #endregion
+
+        #region # 文本颜色 —— static Vector4 TextColor
+        /// <summary>
+        /// 文本颜色
+        /// </summary>
+        public static Vector4 TextColor
+        {
+            get => _TextColor;
         }
         #endregion
 

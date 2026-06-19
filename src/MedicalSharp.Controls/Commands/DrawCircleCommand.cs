@@ -5,6 +5,7 @@ using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Primitives.Builders;
 using OpenTK.Mathematics;
 using System;
 
@@ -79,7 +80,7 @@ namespace MedicalSharp.Controls.Commands
                     this._startPosition = mousePos3D.Value;
                     this._circle = new CircleVisual3D
                     {
-                        Fill = Color.Parse("#0F00FF00"),
+                        Fill = ColorFactory.Fill2D.ToColor(),
                         Radius = 0.01f,
                         Center = mousePos3D.Value.ToVector3(),
                         Normal = this.GetNormal?.Invoke() ?? new Vector3D(0, 1, 0)

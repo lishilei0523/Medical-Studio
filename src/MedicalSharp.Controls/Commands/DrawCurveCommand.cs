@@ -5,6 +5,7 @@ using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
@@ -92,7 +93,7 @@ namespace MedicalSharp.Controls.Commands
                         //第一次点击：创建曲线，添加第一个控制点
                         this._curve = new CurveVisual3D
                         {
-                            Fill = Color.Parse("#0F00FF00"),
+                            Fill = ColorFactory.Fill2D.ToColor(),
                             ControlPositions = [position],
                             Closed = this._closed
                         };

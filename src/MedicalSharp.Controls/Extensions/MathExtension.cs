@@ -4,6 +4,7 @@ using Avalonia.Media;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Primitives.Algorithms;
+using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using System;
@@ -212,10 +213,11 @@ namespace MedicalSharp.Controls.Extensions
 
             #endregion
 
+            bool isSelected = ((ShapeVisual3D)pureVisual3D).IsSelected;
             PolylineVisual3D polyline = new PolylineVisual3D
             {
-                Stroke = new Vector4(0.1f, 0.3f, 0.6f, 1.0f).ToColor(),
-                Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor(),
+                Stroke = isSelected ? ColorFactory.SelectedStroke.ToColor() : ColorFactory.Stroke3D.ToColor(),
+                Fill = isSelected ? ColorFactory.SelectedFill.ToColor() : ColorFactory.Fill3D.ToColor(),
                 Positions = new AvaloniaList<Vector3D>(intersectionPoints),
                 Closed = true,
                 Fixed = true

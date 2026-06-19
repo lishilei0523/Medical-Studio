@@ -39,9 +39,9 @@ namespace MedicalSharp.Engine.Renderables
         private CurveRenderable()
         {
             //默认值
-            this.Stroke = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+            this.Stroke = ColorFactory.Stroke2D;
             this.StrokeThickness = 1.0f;
-            this.Fill = new Vector4(1.0f, 0.0f, 0.0f, 0.1f);
+            this.Fill = ColorFactory.Fill2D;
         }
 
         /// <summary>

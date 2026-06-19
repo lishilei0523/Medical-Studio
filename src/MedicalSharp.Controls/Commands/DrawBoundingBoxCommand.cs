@@ -3,6 +3,7 @@ using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Primitives.Builders;
 using OpenTK.Mathematics;
 using System;
 using System.Linq;
@@ -71,8 +72,8 @@ namespace MedicalSharp.Controls.Commands
                     this._startPosition = mousePos3D.Value;
                     this._boundingBox = new BoundingBoxVisual3D
                     {
-                        Stroke = new Vector4(0.1f, 0.3f, 0.6f, 1.0f).ToColor(),
-                        Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor(),
+                        Stroke = ColorFactory.Stroke3D.ToColor(),
+                        Fill = ColorFactory.Fill3D.ToColor(),
                         Width = 0.01f,
                         Height = 0.01f,
                         Depth = 0.01f,

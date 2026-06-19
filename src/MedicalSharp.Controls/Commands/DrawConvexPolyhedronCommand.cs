@@ -4,6 +4,7 @@ using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
@@ -86,8 +87,8 @@ namespace MedicalSharp.Controls.Commands
                         this._polyhedron = new ConvexPolyhedronVisual3D
                         {
                             Positions = [position],
-                            Stroke = new Vector4(0.1f, 0.3f, 0.6f, 1.0f).ToColor(),
-                            Fill = new Vector4(0.6f, 0.8f, 1.0f, 0.4f).ToColor()
+                            Stroke = ColorFactory.Stroke3D.ToColor(),
+                            Fill = ColorFactory.Fill3D.ToColor()
                         };
                         this._isDrawing = true;
                         this.DrawStart?.Invoke(this._polyhedron);

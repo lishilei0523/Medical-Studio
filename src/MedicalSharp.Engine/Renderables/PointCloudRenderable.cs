@@ -29,7 +29,7 @@ namespace MedicalSharp.Engine.Renderables
         private PointCloudRenderable()
         {
             //默认值
-            this.Fill = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+            this.Fill = ColorFactory.PointColor;
             this.PointSize = 2.0f;
         }
 

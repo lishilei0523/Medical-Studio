@@ -2,6 +2,7 @@
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
@@ -115,6 +116,15 @@ namespace MedicalSharp.Controls.Base
                 Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 if (pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual, out _))
                 {
+                    #region # 验证
+
+                    if (visual is IFixable fixable && fixable.Fixed)
+                    {
+                        return base.GetContextMenuItems(viewport, eventArgs);
+                    }
+
+                    #endregion
+
                     return visual.GetContextMenuItems(viewport, this);
                 }
             }

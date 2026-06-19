@@ -69,7 +69,7 @@ namespace MedicalSharp.Engine.Renderables
         {
             this.Text = text;
             this.FontSize = fontSize;
-            this.Color = color == default ? ColorFactory.White() : color;
+            this.Color = color == default ? ColorFactory.TextColor : color;
             this.Normal = normal == default ? Vector3.UnitY : normal;
             this.RenderMode = TextRenderMode.Fixed;
             this.LockYAxis = true;

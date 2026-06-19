@@ -5,6 +5,7 @@ using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Primitives.Builders;
 using OpenTK.Mathematics;
 using System;
 using System.Linq;
@@ -80,7 +81,7 @@ namespace MedicalSharp.Controls.Commands
                     this._startPosition = mousePos3D.Value;
                     this._ellipse = new EllipseVisual3D
                     {
-                        Fill = Color.Parse("#0F00FF00"),
+                        Fill = ColorFactory.Fill2D.ToColor(),
                         Width = 0.01f,
                         Height = 0.005f,
                         Center = mousePos3D.Value.ToVector3(),
