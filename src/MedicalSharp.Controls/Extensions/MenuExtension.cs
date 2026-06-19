@@ -28,6 +28,14 @@ namespace MedicalSharp.Controls.Extensions
             {
                 return GetContextMenuItems(viewBox, viewport, command);
             }
+            if (visual is PointVisual3D point)
+            {
+                return GetContextMenuItems(point, viewport, command);
+            }
+            if (visual is LineSegmentVisual3D lineSegment)
+            {
+                return GetContextMenuItems(lineSegment, viewport, command);
+            }
             if (visual is RectangleVisual3D rectangle)
             {
                 return GetContextMenuItems(rectangle, viewport, command);
@@ -139,6 +147,44 @@ namespace MedicalSharp.Controls.Extensions
                     }
                 ];
             }
+
+            return items;
+        }
+        #endregion
+
+        #region # 获取点上下文菜单项列表 —— static IReadOnlyList<ContextMenuItem> GetContextMenuItems(this PointVisual3D...
+        /// <summary>
+        /// 获取点上下文菜单项列表
+        /// </summary>
+        private static IReadOnlyList<ContextMenuItem> GetContextMenuItems(this PointVisual3D point, OpenTKViewport viewport, ShapeCommand shapeCommand)
+        {
+            List<ContextMenuItem> items =
+            [
+                new ContextMenuItem
+                {
+                    Header = "删除(_D)",
+                    Command = () => RemoveVisual(point, viewport, shapeCommand)
+                }
+            ];
+
+            return items;
+        }
+        #endregion
+
+        #region # 获取线段上下文菜单项列表 —— static IReadOnlyList<ContextMenuItem> GetContextMenuItems(this LineSegmentVisual3D...
+        /// <summary>
+        /// 获取线段上下文菜单项列表
+        /// </summary>
+        private static IReadOnlyList<ContextMenuItem> GetContextMenuItems(this LineSegmentVisual3D lineSegment, OpenTKViewport viewport, ShapeCommand shapeCommand)
+        {
+            List<ContextMenuItem> items =
+            [
+                new ContextMenuItem
+                {
+                    Header = "删除(_D)",
+                    Command = () => RemoveVisual(lineSegment, viewport, shapeCommand)
+                }
+            ];
 
             return items;
         }
