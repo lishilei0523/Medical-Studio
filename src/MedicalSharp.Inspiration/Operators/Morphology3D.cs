@@ -2,10 +2,10 @@
 using Silk.NET.OpenCL;
 using System;
 
-namespace MedicalSharp.Inspiration.Algorithms
+namespace MedicalSharp.Inspiration.Operators
 {
     /// <summary>
-    /// 3D形态学算法
+    /// 3D形态学算子
     /// </summary>
     /// <remarks>支持腐蚀、膨胀、开运算、闭运算、礼帽运算、黑帽运算、梯度运算</remarks>
     public sealed class Morphology3D : IDisposable
@@ -43,7 +43,7 @@ namespace MedicalSharp.Inspiration.Algorithms
         private readonly ClKernel _subtractKernel;
 
         /// <summary>
-        /// 创建3D形态学操作构造器
+        /// 创建3D形态学算子构造器
         /// </summary>
         /// <param name="clContext">OpenCL上下文</param>
         public Morphology3D(ClContext clContext)

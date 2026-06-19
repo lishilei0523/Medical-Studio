@@ -2,14 +2,19 @@
 using Silk.NET.OpenCL;
 using System;
 
-namespace MedicalSharp.Inspiration.Algorithms
+namespace MedicalSharp.Inspiration.Operators
 {
     /// <summary>
-    /// Laplacian边缘检测算法
+    /// 3D中值滤波算子
     /// </summary>
-    public sealed class Laplacian3D : IDisposable
+    public sealed class MedianBlur3D : IDisposable
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 核矩阵尺寸
+        /// </summary>
+        private const int KernelSize = 3;
 
         /// <summary>
         /// 释放标识
@@ -32,14 +37,14 @@ namespace MedicalSharp.Inspiration.Algorithms
         private readonly ClKernel _kernel;
 
         /// <summary>
-        /// 创建Laplacian边缘检测算法构造器
+        /// 创建3D中值滤波算子构造器
         /// </summary>
         /// <param name="clContext">OpenCL上下文</param>
-        public Laplacian3D(ClContext clContext)
+        public MedianBlur3D(ClContext clContext)
         {
             this._clContext = clContext;
-            this._program = ClProgram.FromFile(this._clContext, "Resources/Kernels/laplacian_3d.cl");
-            this._kernel = this._program.CreateKernel("laplacian_3d");
+            this._program = ClProgram.FromFile(this._clContext, "Resources/Kernels/median_blur_3d.cl");
+            this._kernel = this._program.CreateKernel("median_blur_3d");
         }
 
         #endregion
@@ -70,35 +75,36 @@ namespace MedicalSharp.Inspiration.Algorithms
 
         #region # 方法
 
-        #region 执行Laplacian边缘检测 —— void Execute(ClImage3D input, ClImage3D output...
+        #region 执行中值滤波 —— void Execute(ClImage3D input, ClImage3D output)
         /// <summary>
-        /// 执行Laplacian边缘检测
+        /// 执行中值滤波
         /// </summary>
         /// <param name="input">输入图像</param>
         /// <param name="output">输出图像</param>
-        /// <param name="kernelSize">核矩阵尺寸（3或5，默认3）</param>
-        public void Execute(ClImage3D input, ClImage3D output, int kernelSize = 3)
+        public void Execute(ClImage3D input, ClImage3D output)
         {
             this._kernel.SetImageKernelArg(0, input.Handle);
             this._kernel.SetImageKernelArg(1, output.Handle);
-            this._kernel.SetKernelArg(2, kernelSize);
+            this._kernel.SetKernelArg(2, KernelSize);
             this._kernel.Enqueue3D(this._clContext.CommandQueue, (uint)input.Width, (uint)input.Height, (uint)input.Depth);
         }
         #endregion
 
-        #region 执行Laplacian边缘检测（写回） —— void ExecuteInPlace(ClImage3D image...
+        #region 执行中值滤波（写回） —— void ExecuteInPlace(ClImage3D image)
         /// <summary>
-        /// 执行Laplacian边缘检测（写回）
+        /// 执行中值滤波（写回）
         /// </summary>
         /// <param name="image">输入图像（结果写回此图像）</param>
-        /// <param name="kernelSize">核矩阵尺寸（3或5，默认3）</param>
-        public void ExecuteInPlace(ClImage3D image, int kernelSize = 3)
+        public void ExecuteInPlace(ClImage3D image)
         {
+            //创建输出图像
             using ClImage3D output = ClImage3D.Create(this._clContext, image.Width, image.Height, image.Depth, MemFlags.ReadWrite, image.ChannelOrder, image.ChannelType);
 
-            this.Execute(image, output, kernelSize);
+            //执行算子
+            this.Execute(image, output);
             this._clContext.Finish();
 
+            //写回原图像
             output.CopyTo(this._clContext.CommandQueue, image);
             this._clContext.Finish();
         }

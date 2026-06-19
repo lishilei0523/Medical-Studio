@@ -4,10 +4,10 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 
-namespace MedicalSharp.Insight.Algorithms
+namespace MedicalSharp.Insight.Operators
 {
     /// <summary>
-    /// 重采样算法
+    /// 重采样算子
     /// </summary>
     public sealed class Resampler
     {
@@ -19,7 +19,7 @@ namespace MedicalSharp.Insight.Algorithms
         private readonly SitkVolumeData _volumeData;
 
         /// <summary>
-        /// 创建重采样算法构造器
+        /// 创建重采样算子构造器
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         public Resampler(VolumeData volumeData)

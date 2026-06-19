@@ -3,10 +3,10 @@ using MedicalSharp.Insight.Models;
 using MedicalSharp.Primitives.Models;
 using System;
 
-namespace MedicalSharp.Insight.Algorithms
+namespace MedicalSharp.Insight.Operators
 {
     /// <summary>
-    /// Canny边缘检测算法
+    /// Canny边缘检测算子
     /// </summary>
     public sealed class Canny3D
     {
@@ -18,7 +18,7 @@ namespace MedicalSharp.Insight.Algorithms
         private readonly SitkVolumeData _volumeData;
 
         /// <summary>
-        /// 创建Canny边缘检测算法构造器
+        /// 创建Canny边缘检测算子构造器
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         public Canny3D(VolumeData volumeData)
@@ -57,9 +57,9 @@ namespace MedicalSharp.Insight.Algorithms
 
         #region # 方法
 
-        #region 执行Canny边缘检测算法 —— void Execute(double lowerThreshold...
+        #region 执行Canny边缘检测算子 —— void Execute(double lowerThreshold...
         /// <summary>
-        /// 执行Canny边缘检测算法
+        /// 执行Canny边缘检测算子
         /// </summary>
         /// <param name="lowerThreshold">低阈值（弱边缘，默认10）</param>
         /// <param name="upperThreshold">高阈值（强边缘，默认30）</param>

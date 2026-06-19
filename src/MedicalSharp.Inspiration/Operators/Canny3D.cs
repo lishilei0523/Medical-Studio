@@ -2,10 +2,10 @@
 using Silk.NET.OpenCL;
 using System;
 
-namespace MedicalSharp.Inspiration.Algorithms
+namespace MedicalSharp.Inspiration.Operators
 {
     /// <summary>
-    /// 3D Canny边缘检测算法
+    /// 3D Canny边缘检测算子
     /// </summary>
     /// <remarks>
     /// 使用形态学膨胀近似滞后跟踪，GPU友好，对应OpenCV的Cv2.Canny
@@ -36,7 +36,7 @@ namespace MedicalSharp.Inspiration.Algorithms
         private readonly ClKernel _kernel;
 
         /// <summary>
-        /// 创建3D Canny边缘检测算法构造器
+        /// 创建3D Canny边缘检测算子构造器
         /// </summary>
         /// <param name="clContext">OpenCL 上下文</param>
         public Canny3D(ClContext clContext)

@@ -2,10 +2,10 @@
 using Silk.NET.OpenCL;
 using System;
 
-namespace MedicalSharp.Inspiration.Algorithms
+namespace MedicalSharp.Inspiration.Operators
 {
     /// <summary>
-    /// Sobel边缘检测算法
+    /// Sobel边缘检测算子
     /// </summary>
     public sealed class Sobel3D : IDisposable
     {
@@ -32,7 +32,7 @@ namespace MedicalSharp.Inspiration.Algorithms
         private readonly ClKernel _kernel;
 
         /// <summary>
-        /// 创建Sobel边缘检测算法构造器
+        /// 创建Sobel边缘检测算子构造器
         /// </summary>
         /// <param name="clContext">OpenCL上下文</param>
         public Sobel3D(ClContext clContext)

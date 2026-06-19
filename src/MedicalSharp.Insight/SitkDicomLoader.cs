@@ -647,9 +647,9 @@ namespace MedicalSharp.Insight
         /// <remarks>
         /// 使用SIMD向量化加速，一次处理多个体素。
         /// 算法分三个阶段：
-        /// 1、SIMD向量化循环：每次加载vectorSize个体素，并行比较；
-        /// 2、向量收尾：将累加向量中的各分量合并为标量；
-        /// 3、剩余体素标量处理：SIMD无法整除的尾部体素，逐个体素比较；
+        ///     1、SIMD向量化循环：每次加载vectorSize个体素，并行比较；
+        ///     2、向量收尾：将累加向量中的各分量合并为标量；
+        ///     3、剩余体素标量处理：SIMD无法整除的尾部体素，逐个体素比较；
         /// 性能：比纯标量遍历快vectorSize倍（通常8~16倍）
         /// </remarks>
         private static unsafe void CalculateMinMax(IntPtr originalData, long voxelsCount, out short minHU, out short maxHU)

@@ -1,8 +1,8 @@
 ﻿using Caliburn.Micro;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
-using MedicalSharp.Inspiration.Algorithms;
 using MedicalSharp.Inspiration.Managers;
+using MedicalSharp.Inspiration.Operators;
 using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Primitives.Enums;
@@ -104,7 +104,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 inputImage.Write(clContext.CommandQueue, this.VolumeData.PreviewData);
                 clContext.Finish();
 
-                //执行算法
+                //执行算子
                 using Morphology3D morphology = new Morphology3D(clContext);
                 switch (this.MorphMode)
                 {

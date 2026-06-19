@@ -2,10 +2,10 @@
 using Silk.NET.OpenCL;
 using System;
 
-namespace MedicalSharp.Inspiration.Algorithms
+namespace MedicalSharp.Inspiration.Operators
 {
     /// <summary>
-    /// 3D高斯滤波算法
+    /// 3D高斯滤波算子
     /// </summary>
     public sealed class GaussianBlur3D : IDisposable
     {
@@ -32,7 +32,7 @@ namespace MedicalSharp.Inspiration.Algorithms
         private readonly ClKernel _kernel;
 
         /// <summary>
-        /// 创建3D高斯滤波算法构造器
+        /// 创建3D高斯滤波算子构造器
         /// </summary>
         /// <param name="clContext">OpenCL上下文</param>
         public GaussianBlur3D(ClContext clContext)
@@ -102,7 +102,7 @@ namespace MedicalSharp.Inspiration.Algorithms
             //创建临时输出图像
             using ClImage3D outputImage = ClImage3D.Create(this._clContext, image.Width, image.Height, image.Depth, MemFlags.ReadWrite, image.ChannelOrder, image.ChannelType);
 
-            //执行算法
+            //执行算子
             this.Execute(image, outputImage, kernelSize, sigma);
             this._clContext.Finish();
 
@@ -128,7 +128,7 @@ namespace MedicalSharp.Inspiration.Algorithms
             //从GL接管纹理
             glTexture.AcquireForCL(this._clContext.CommandQueue);
 
-            //执行算法
+            //执行算子
             this.Execute(glTexture, outputImage, kernelSize, sigma);
             this._clContext.Finish();
 

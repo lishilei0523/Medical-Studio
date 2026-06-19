@@ -1,6 +1,6 @@
 using itk.simple;
 using MedicalSharp.Insight;
-using MedicalSharp.Insight.Algorithms;
+using MedicalSharp.Insight.Operators;
 using MedicalSharp.Primitives.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenTK.Mathematics;
@@ -10,7 +10,7 @@ using System.Linq;
 namespace MedicalSharp.Tests.TestCases
 {
     /// <summary>
-    /// 重采样算法测试
+    /// 重采样算子测试
     /// </summary>
     [TestClass]
     public class ResamplerTests

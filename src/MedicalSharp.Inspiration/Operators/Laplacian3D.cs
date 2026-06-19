@@ -2,12 +2,12 @@
 using Silk.NET.OpenCL;
 using System;
 
-namespace MedicalSharp.Inspiration.Algorithms
+namespace MedicalSharp.Inspiration.Operators
 {
     /// <summary>
-    /// Scharr边缘检测算法
+    /// Laplacian边缘检测算子
     /// </summary>
-    public sealed class Scharr3D : IDisposable
+    public sealed class Laplacian3D : IDisposable
     {
         #region # 字段及构造器
 
@@ -32,14 +32,14 @@ namespace MedicalSharp.Inspiration.Algorithms
         private readonly ClKernel _kernel;
 
         /// <summary>
-        /// 创建Scharr边缘检测算法构造器
+        /// 创建Laplacian边缘检测算子构造器
         /// </summary>
         /// <param name="clContext">OpenCL上下文</param>
-        public Scharr3D(ClContext clContext)
+        public Laplacian3D(ClContext clContext)
         {
             this._clContext = clContext;
-            this._program = ClProgram.FromFile(this._clContext, "Resources/Kernels/scharr_3d.cl");
-            this._kernel = this._program.CreateKernel("scharr_3d");
+            this._program = ClProgram.FromFile(this._clContext, "Resources/Kernels/laplacian_3d.cl");
+            this._kernel = this._program.CreateKernel("laplacian_3d");
         }
 
         #endregion
@@ -70,42 +70,33 @@ namespace MedicalSharp.Inspiration.Algorithms
 
         #region # 方法
 
-        #region 执行Scharr边缘检测 —— void Execute(ClImage3D input, ClImage3D output...
+        #region 执行Laplacian边缘检测 —— void Execute(ClImage3D input, ClImage3D output...
         /// <summary>
-        /// 执行Scharr边缘检测
+        /// 执行Laplacian边缘检测
         /// </summary>
         /// <param name="input">输入图像</param>
         /// <param name="output">输出图像</param>
-        /// <param name="alpha">X方向权重（0.0~1.0，默认0.5）</param>
-        /// <param name="beta">Y方向权重（0.0~1.0，默认0.5）</param>
-        /// <param name="gamma">Z方向权重（0.0~1.0，默认0.5）</param>
-        /// <param name="offset">偏移量（加到最终结果，默认0）</param>
-        public void Execute(ClImage3D input, ClImage3D output, float alpha = 0.5f, float beta = 0.5f, float gamma = 0.5f, float offset = 0.0f)
+        /// <param name="kernelSize">核矩阵尺寸（3或5，默认3）</param>
+        public void Execute(ClImage3D input, ClImage3D output, int kernelSize = 3)
         {
             this._kernel.SetImageKernelArg(0, input.Handle);
             this._kernel.SetImageKernelArg(1, output.Handle);
-            this._kernel.SetKernelArg(2, alpha);
-            this._kernel.SetKernelArg(3, beta);
-            this._kernel.SetKernelArg(4, gamma);
-            this._kernel.SetKernelArg(5, offset);
+            this._kernel.SetKernelArg(2, kernelSize);
             this._kernel.Enqueue3D(this._clContext.CommandQueue, (uint)input.Width, (uint)input.Height, (uint)input.Depth);
         }
         #endregion
 
-        #region 执行Scharr边缘检测（写回） —— void ExecuteInPlace(ClImage3D image...
+        #region 执行Laplacian边缘检测（写回） —— void ExecuteInPlace(ClImage3D image...
         /// <summary>
-        /// 执行Scharr边缘检测（写回）
+        /// 执行Laplacian边缘检测（写回）
         /// </summary>
         /// <param name="image">输入图像（结果写回此图像）</param>
-        /// <param name="alpha">X方向权重（0.0~1.0，默认0.5）</param>
-        /// <param name="beta">Y方向权重（0.0~1.0，默认0.5）</param>
-        /// <param name="gamma">Z方向权重（0.0~1.0，默认0.5）</param>
-        /// <param name="offset">偏移量（加到最终结果，默认0）</param>
-        public void ExecuteInPlace(ClImage3D image, float alpha = 0.5f, float beta = 0.5f, float gamma = 0.5f, float offset = 0.0f)
+        /// <param name="kernelSize">核矩阵尺寸（3或5，默认3）</param>
+        public void ExecuteInPlace(ClImage3D image, int kernelSize = 3)
         {
             using ClImage3D output = ClImage3D.Create(this._clContext, image.Width, image.Height, image.Depth, MemFlags.ReadWrite, image.ChannelOrder, image.ChannelType);
 
-            this.Execute(image, output, alpha, beta, gamma, offset);
+            this.Execute(image, output, kernelSize);
             this._clContext.Finish();
 
             output.CopyTo(this._clContext.CommandQueue, image);

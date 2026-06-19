@@ -1,8 +1,8 @@
 ﻿using Caliburn.Micro;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
-using MedicalSharp.Inspiration.Algorithms;
 using MedicalSharp.Inspiration.Managers;
+using MedicalSharp.Inspiration.Operators;
 using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Primitives.Models;
@@ -120,7 +120,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 inputImage.Write(clContext.CommandQueue, this.VolumeData.PreviewData);
                 clContext.Finish();
 
-                //执行算法
+                //执行算子
                 using Canny3D canny = new Canny3D(clContext);
                 canny.ExecuteInPlace(inputImage, this.LowerThreshold, this.UpperThreshold, this.Sigma, this.DilateRadius);
 

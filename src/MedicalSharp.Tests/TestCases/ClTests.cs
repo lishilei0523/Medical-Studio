@@ -1,4 +1,4 @@
-using MedicalSharp.Inspiration.Algorithms;
+using MedicalSharp.Inspiration.Operators;
 using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Tests.Models;
@@ -566,16 +566,16 @@ namespace MedicalSharp.Tests.TestCases
         }
         #endregion
 
-        #region # 测试3D高斯滤波算法 —— void TestGaussianBlur3D()
+        #region # 测试3D高斯滤波算子 —— void TestGaussianBlur3D()
         /// <summary>
-        /// 测试3D高斯滤波算法
+        /// 测试3D高斯滤波算子
         /// </summary>
         [TestMethod]
         public void TestGaussianBlur3D()
         {
             const int size = 32;
 
-            //实例化算法
+            //实例化算子
             using ClContext context = ClContext.Create();
             using GaussianBlur3D blur = new GaussianBlur3D(context);
 
@@ -591,7 +591,7 @@ namespace MedicalSharp.Tests.TestCases
             inputImage.Write(context.CommandQueue, spot);
             context.Finish();
 
-            //执行算法
+            //执行算子
             blur.Execute(inputImage, outputImage);
             context.Finish();
 

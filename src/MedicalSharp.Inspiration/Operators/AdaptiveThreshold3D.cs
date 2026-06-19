@@ -2,10 +2,10 @@
 using Silk.NET.OpenCL;
 using System;
 
-namespace MedicalSharp.Inspiration.Algorithms
+namespace MedicalSharp.Inspiration.Operators
 {
     /// <summary>
-    /// 3D自适应阈值分割算法
+    /// 3D自适应阈值分割算子
     /// </summary>
     /// <remarks>
     /// 每个体素的阈值由其局部邻域均值动态决定
@@ -37,7 +37,7 @@ namespace MedicalSharp.Inspiration.Algorithms
         private readonly ClKernel _kernel;
 
         /// <summary>
-        /// 创建3D自适应阈值分割算法构造器
+        /// 创建3D自适应阈值分割算子构造器
         /// </summary>
         /// <param name="clContext">OpenCL上下文</param>
         public AdaptiveThreshold3D(ClContext clContext)
