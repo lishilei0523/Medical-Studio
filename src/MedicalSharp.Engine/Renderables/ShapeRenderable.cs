@@ -36,7 +36,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <summary>
         /// 是否选中
         /// </summary>
-        public bool IsSelected { get; private set; }
+        public bool IsSelected { get; protected internal set; }
         #endregion
 
         #endregion
@@ -123,21 +123,21 @@ namespace MedicalSharp.Engine.Renderables
         }
         #endregion
 
-        #region 选中 —— void Select()
+        #region 选中 —— virtual void Select()
         /// <summary>
         /// 选中
         /// </summary>
-        public void Select()
+        public virtual void Select()
         {
             this.IsSelected = true;
         }
         #endregion
 
-        #region 取消选中 —— void Unselect()
+        #region 取消选中 —— virtual void Unselect()
         /// <summary>
         /// 取消选中
         /// </summary>
-        public void Unselect()
+        public virtual void Unselect()
         {
             this.IsSelected = false;
         }
