@@ -5,6 +5,7 @@ using Avalonia.Platform.Storage;
 using Caliburn.Micro;
 using IconPacks.Avalonia.MaterialDesign;
 using MedicalSharp.Client.ViewModels.CameraContext;
+using MedicalSharp.Client.ViewModels.CommonContext;
 using MedicalSharp.Client.ViewModels.ProtocolContext;
 using MedicalSharp.Client.ViewModels.TissueContext;
 using MedicalSharp.Client.Views.VolumeContext;
@@ -951,7 +952,45 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawText()
         {
-            //TODO 实现
+            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
+            Func<TextVisual3D, Task<string>> drawStart = async shape =>
+            {
+                int count = this.Shapes.OfType<LineSegmentVisual3D>().Count();
+                shape.DisplayName = $"文本{count + 1}";
+                this.Shapes.Add(shape);
+
+                TextViewModel viewModel = ResolveMediator.Resolve<TextViewModel>();
+                bool? result = await this._windowManager.ShowDialogAsync(viewModel);
+                if (result == true)
+                {
+                    return viewModel.Content;
+                }
+
+                return null;
+            };
+            Action<TextVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+            Action<TextVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
+
+            DrawTextCommand command = new DrawTextCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                GetNormal = getNormal,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
+            this.InputManager.SwitchCommand(command);
         }
         #endregion
 

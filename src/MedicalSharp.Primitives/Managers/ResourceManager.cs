@@ -1,6 +1,7 @@
 ﻿using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using System.IO;
 
 namespace MedicalSharp.Primitives.Managers
 {
@@ -14,7 +15,12 @@ namespace MedicalSharp.Primitives.Managers
         /// <summary>
         /// 字体路径
         /// </summary>
-        public const string FontPath = "Content/Fonts/msyh.ttf";
+        private const string FontPath = "Resources/Fonts/msyh.ttf";
+
+        /// <summary>
+        /// 字体字节数组
+        /// </summary>
+        private static readonly byte[] _FontBytes;
 
         /// <summary>
         /// 单位平面
@@ -31,6 +37,7 @@ namespace MedicalSharp.Primitives.Managers
         /// </summary>
         static ResourceManager()
         {
+            _FontBytes = File.ReadAllBytes(FontPath);
             _UnitCube = GetUnitCube();
             _UnitPlane = GetUnitPlane();
         }
@@ -38,6 +45,16 @@ namespace MedicalSharp.Primitives.Managers
         #endregion
 
         #region # 属性
+
+        #region 只读属性 - 字体字节数组 —— static byte[] FontBytes
+        /// <summary>
+        /// 只读属性 - 字体字节数组
+        /// </summary>
+        public static byte[] FontBytes
+        {
+            get => _FontBytes;
+        }
+        #endregion
 
         #region 只读属性 - 单位立方体 —— static MeshGeometry UnitCube
         /// <summary>

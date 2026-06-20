@@ -128,6 +128,24 @@ namespace MedicalSharp.Controls.Extensions
                 return true;
             }
 
+            //文本
+            if (visual3D is TextVisual3D text)
+            {
+                Vector3 localNormal = text.Normal.ToVector3();
+                Vector3 worldNormal = Vector3.TransformNormal(localNormal, visual3D.Transform.Matrix).Normalized();
+                Vector3 planeNormal = plane.WorldNormal.Normalized();
+                if (Math.Abs(Vector3.Dot(worldNormal, planeNormal)) < 0.999f)
+                {
+                    return false;
+                }
+
+                float shapeDistance = Vector3.Dot(text.Transform.Position, planeNormal);
+                float planeDistance = Vector3.Dot(plane.WorldCenter, planeNormal);
+                float diffDistance = Math.Abs(shapeDistance - planeDistance);
+
+                return diffDistance < epsilon;
+            }
+
             //点：世界空间点面距离
             if (visual3D is PointVisual3D pointVisual3D)
             {

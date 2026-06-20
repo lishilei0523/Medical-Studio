@@ -8,6 +8,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using SkiaSharp;
 using System;
+using System.IO;
 
 namespace MedicalSharp.Engine.Renderables
 {
@@ -366,7 +367,8 @@ namespace MedicalSharp.Engine.Renderables
                 return;
             }
 
-            using SKTypeface typeface = SKTypeface.FromFile(ResourceManager.FontPath) ?? SKTypeface.Default;
+            using MemoryStream fontStream = new MemoryStream(ResourceManager.FontBytes);
+            using SKTypeface typeface = SKTypeface.FromStream(fontStream) ?? SKTypeface.Default;
             using SKFont font = new SKFont(typeface, this.FontSize);
             using SKPaint paint = new SKPaint();
             paint.Color = SKColors.White;

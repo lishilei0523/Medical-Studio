@@ -15,6 +15,10 @@
     </AppConfigWithTargetPath>
     <AvaloniaResource Include="favicon.ico" />
     <AvaloniaResource Include="Content\**" />
+    <None Update="Content\Fonts\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Resources\Fonts\%(Filename)%(Extension)</TargetPath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
