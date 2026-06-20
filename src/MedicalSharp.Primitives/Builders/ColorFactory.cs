@@ -78,7 +78,7 @@ namespace MedicalSharp.Primitives.Builders
             _SelectedFill = new Vector4(1.0f, 1.0f, 0.0f, 0.1f);
             _SelectedSpot = new Vector4(0.0f, 1.0f, 0.0f, 1.0f);
             _PointColor = new Vector4(0.0f, 1.0f, 1.0f, 1.0f);
-            _TextColor = new Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+            _TextColor = new Vector4(0.0f, 1.0f, 1.0f, 1.0f);
             _DefaultMarkColors = GetDefaultMarkColors();
             _StandardMarkColors = GetStandardMarkColors();
         }
