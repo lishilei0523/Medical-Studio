@@ -945,6 +945,16 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 绘制文本 —— void DrawText()
+        /// <summary>
+        /// 绘制文本
+        /// </summary>
+        public void DrawText()
+        {
+            //TODO 实现
+        }
+        #endregion
+
         #region 绘制点 —— void DrawPoint()
         /// <summary>
         /// 绘制点

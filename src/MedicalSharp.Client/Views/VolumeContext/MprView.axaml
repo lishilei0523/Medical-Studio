@@ -44,6 +44,11 @@
 										  IsVisible="{Binding ToolbarConfig.EditVertexEnabled}">
 						<PathIcon Data="{StaticResource Icon-EditVertex}" />
 					</sd:ToggleRadioButton>
+                    <sd:ToggleRadioButton cm:Message.Attach="DrawText()" Classes="Transparent-Panel"
+                                          ToolTip.Tip="绘制文本"
+                                          IsVisible="{Binding ToolbarConfig.DrawTextEnabled}">
+                        <PathIcon Data="{StaticResource Icon-Text}" />
+                    </sd:ToggleRadioButton>
 					<sd:ToggleRadioButton cm:Message.Attach="DrawPoint()" Classes="Transparent-Panel"
 										  ToolTip.Tip="绘制点"
 										  IsVisible="{Binding ToolbarConfig.DrawPointEnabled}">

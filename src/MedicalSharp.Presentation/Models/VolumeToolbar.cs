@@ -23,6 +23,7 @@ namespace MedicalSharp.Presentation.Models
             this.Rotate3DEnabled = true;
             this.ResizeEnabled = true;
             this.EditVertexEnabled = true;
+            this.DrawTextEnabled = true;
             this.DrawPointEnabled = true;
             this.DrawLineSegmentEnabled = true;
             this.DrawRectangleEnabled = true;
@@ -104,6 +105,14 @@ namespace MedicalSharp.Presentation.Models
         /// </summary>
         [DependencyProperty]
         public bool EditVertexEnabled { get; set; }
+        #endregion
+
+        #region 绘制文本启用 —— bool DrawTextEnabled
+        /// <summary>
+        /// 绘制文本启用
+        /// </summary>
+        [DependencyProperty]
+        public bool DrawTextEnabled { get; set; }
         #endregion
 
         #region 绘制点启用 —— bool DrawPointEnabled
