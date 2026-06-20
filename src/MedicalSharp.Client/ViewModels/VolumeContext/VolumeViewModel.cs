@@ -1427,7 +1427,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             {
                 shape.IsSelected = false;
             }
-            if (visual3D is ShapeVisual3D shapeVisual3D)
+            if (visual3D is ShapeVisual3D shapeVisual3D && this.Shapes.Contains(shapeVisual3D))
             {
                 shapeVisual3D.IsSelected = true;
             }
@@ -1448,7 +1448,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <param name="visual3D">3D元素</param>
         private void OnVisualRemoved(Visual3D visual3D)
         {
-            if (visual3D is ShapeVisual3D shapeVisual3D)
+            if (visual3D is ShapeVisual3D shapeVisual3D && this.Shapes.Contains(shapeVisual3D))
             {
                 this.Shapes.Remove(shapeVisual3D);
             }
