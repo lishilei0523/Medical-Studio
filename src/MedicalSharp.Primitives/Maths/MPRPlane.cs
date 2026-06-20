@@ -568,16 +568,16 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
-        #region 获取图像尺寸 —— Vector2i GetImageSize()
+        #region 获取切片尺寸 —— Vector2i GetSliceSize()
         /// <summary>
-        /// 获取图像尺寸
+        /// 获取切片尺寸
         /// </summary>
-        /// <returns>图像尺寸</returns>
-        /// <remarks>当前MPR平面的图像像素尺寸</remarks>
-        public Vector2i GetImageSize()
+        /// <returns>切片尺寸</returns>
+        /// <remarks>当前MPR平面的切片体素尺寸</remarks>
+        public Vector2i GetSliceSize()
         {
             int width, height;
-            switch (this.PlaneType)
+            switch (this.OriginalPlaneType)
             {
                 case MPRPlaneType.Axial:
                     width = this.VolumeMetadata.VolumeSize.X;
@@ -591,20 +591,12 @@ namespace MedicalSharp.Primitives.Maths
                     width = this.VolumeMetadata.VolumeSize.Y;
                     height = this.VolumeMetadata.VolumeSize.Z;
                     break;
-                case MPRPlaneType.Oblique:
-                    float uLength = this.CalculateProjectedLength(this.UAxis, this.VolumeMetadata.VolumeSize);
-                    float vLength = this.CalculateProjectedLength(this.VAxis, this.VolumeMetadata.VolumeSize);
-                    width = (int)Math.Round(uLength);
-                    height = (int)Math.Round(vLength);
-                    break;
                 default:
-                    width = this.VolumeMetadata.VolumeSize.X;
-                    height = this.VolumeMetadata.VolumeSize.Y;
-                    break;
+                    throw new NotSupportedException();
             }
-            Vector2i imageSize = new Vector2i(width, height);
+            Vector2i sliceSize = new Vector2i(width, height);
 
-            return imageSize;
+            return sliceSize;
         }
         #endregion
 

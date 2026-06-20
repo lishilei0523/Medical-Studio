@@ -62,7 +62,8 @@ namespace MedicalSharp.Insight.Operators
         /// <summary>
         /// 提取单张切片
         /// </summary>
-        /// <param name="sliceCenter">切面中心点（毫米空间）</param>
+        /// <param name="sliceCenter">切面中心（毫米空间）</param>
+        /// <param name="sliceSize">切片尺寸（体素空间）</param>
         /// <param name="rowDirection">行方向单位向量（毫米空间，决定切面的水平方向）</param>
         /// <param name="colDirection">列方向单位向量（毫米空间，决定切面的垂直方向）</param>
         /// <returns>2D切片图像（Z方向尺寸为1）</returns>
@@ -73,7 +74,7 @@ namespace MedicalSharp.Insight.Operators
         /// - 导出单张斜切面供其他工具使用；
         /// 输出Z方向尺寸为1（单层），X/Y尺寸与原始数据一致
         /// </remarks>
-        public Image ExtractSlice(Vector3 sliceCenter, Vector3 rowDirection, Vector3 colDirection)
+        public Image ExtractSlice(Vector3 sliceCenter, Vector2i sliceSize, Vector3 rowDirection, Vector3 colDirection)
         {
             #region # 验证
 
@@ -89,56 +90,51 @@ namespace MedicalSharp.Insight.Operators
             #endregion
 
             Image originalImage = this.SitkImage;
-            VectorUInt32 originalSize = originalImage.GetSize();
             VectorDouble originalSpacing = originalImage.GetSpacing();
 
-            //法向量 = 行方向 × 列方向（右手定则）
-            Vector3 normal = Vector3.Cross(rowDirection, colDirection).Normalized();
+            //切片尺寸
+            using VectorUInt32 sliceUSize = new VectorUInt32
+            {
+                (uint)sliceSize.X, (uint)sliceSize.Y, 1
+            };
 
-            //组装方向矩阵：行方向、列方向、法向量
-            using VectorDouble obliqueDirection = new VectorDouble
+            //切片间距
+            double rowSpacing = ComputeProjectedSpacing(rowDirection, originalSpacing);
+            double colSpacing = ComputeProjectedSpacing(colDirection, originalSpacing);
+            using VectorDouble sliceSpacing = new VectorDouble
+            {
+                rowSpacing, colSpacing, 1.0
+            };
+
+            //切片原点（左上角） = 中心点 - 行方向偏移 - 列方向偏移
+            float mmHalfWidth = (float)(sliceSize.X * rowSpacing * 0.5f);
+            float mmHalfHeight = (float)(sliceSize.Y * colSpacing * 0.5f);
+            Vector3 topLeft = sliceCenter - rowDirection * mmHalfWidth - colDirection * mmHalfHeight;
+            using VectorDouble sliceOrigin = new VectorDouble
+            {
+                topLeft.X, topLeft.Y, topLeft.Z
+            };
+
+            //切片方向：行方向、列方向、法向量
+            Vector3 normal = Vector3.Cross(rowDirection, colDirection).Normalized();
+            using VectorDouble sliceDirection = new VectorDouble
             {
                 rowDirection.X, rowDirection.Y, rowDirection.Z,
                 colDirection.X, colDirection.Y, colDirection.Z,
                 normal.X, normal.Y, normal.Z
             };
 
-            //切面尺寸：用原始图像的X/Y尺寸，Z方向只有一层
-            using VectorUInt32 sliceSize = new VectorUInt32
-            {
-                originalSize[0],
-                originalSize[1],
-                1   // 单张切片
-            };
-
-            //切片间距
-            using VectorDouble sliceSpacing = new VectorDouble
-            {
-                originalSpacing[0],
-                originalSpacing[1],
-                1.0 // Z方向层厚无意义，取1.0避免除零
-            };
-
-            //切片原点
-            using VectorDouble sliceOrigin = new VectorDouble
-            {
-                sliceCenter.X,
-                sliceCenter.Y,
-                sliceCenter.Z
-            };
-
             //单位矩阵变换
             using Transform transform = new Transform(3, TransformEnum.sitkIdentity);
 
             using ResampleImageFilter resampler = new ResampleImageFilter();
-            resampler.SetSize(sliceSize);
+            resampler.SetSize(sliceUSize);
             resampler.SetOutputSpacing(sliceSpacing);
             resampler.SetOutputOrigin(sliceOrigin);
-            resampler.SetOutputDirection(obliqueDirection);
+            resampler.SetOutputDirection(sliceDirection);
             resampler.SetTransform(transform);
             resampler.SetInterpolator(InterpolatorEnum.sitkLinear); //线性插值保证图像质量
-            resampler.SetDefaultPixelValue(-1024); // CT空气HU值
-
+            resampler.SetDefaultPixelValue(-1024); //CT空气HU值
             Image resampledImage = resampler.Execute(originalImage);
 
             return resampledImage;
@@ -423,6 +419,25 @@ namespace MedicalSharp.Insight.Operators
             Image resampledImage = resampler.Execute(originalImage);
 
             return resampledImage;
+        }
+        #endregion
+
+
+        //Private
+
+        #region 计算原始Spacing在指定方向上的投影长度 —— static double ComputeProjectedSpacing(...
+        /// <summary>
+        /// 计算原始Spacing在指定方向上的投影长度
+        /// </summary>
+        private static double ComputeProjectedSpacing(Vector3 direction, VectorDouble originalSpacing)
+        {
+            //方向向量在各轴上的分量平方，加权原始Spacing
+            double dx = direction.X * direction.X * originalSpacing[0] * originalSpacing[0];
+            double dy = direction.Y * direction.Y * originalSpacing[1] * originalSpacing[1];
+            double dz = direction.Z * direction.Z * originalSpacing[2] * originalSpacing[2];
+            double projectionLength = Math.Sqrt(dx + dy + dz);
+
+            return projectionLength;
         }
         #endregion
 

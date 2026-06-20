@@ -286,10 +286,10 @@ namespace MedicalSharp.Primitives.Algorithms
             float maxY = Math.Max(Math.Max(pointA.Y, pointB.Y), Math.Max(pointC.Y, pointD.Y));
 
             //裁剪到视口范围
-            int startX = (int)Math.Max(0, minX);
-            int endX = (int)Math.Min(viewportWidth - 1, maxX);
-            int startY = (int)Math.Max(0, minY);
-            int endY = (int)Math.Min(viewportHeight - 1, maxY);
+            int startX = (int)Math.Floor(Math.Max(0, minX));
+            int endX = (int)Math.Ceiling(Math.Min(viewportWidth - 1, maxX));
+            int startY = (int)Math.Floor(Math.Max(0, minY));
+            int endY = (int)Math.Ceiling(Math.Min(viewportHeight - 1, maxY));
 
             //遍历包围盒范围内像素
             StatisticResult result = new StatisticResult();
@@ -363,16 +363,16 @@ namespace MedicalSharp.Primitives.Algorithms
             float radiusSq = radius * radius;
 
             //计算圆形屏幕包围盒
-            int minX = (int)Math.Max(0, center.X - radius - 1);
-            int maxX = (int)Math.Min(viewportWidth - 1, center.X + radius + 1);
-            int minY = (int)Math.Max(0, center.Y - radius - 1);
-            int maxY = (int)Math.Min(viewportHeight - 1, center.Y + radius + 1);
+            int minX = (int)Math.Floor(center.X - radius - 1);
+            int maxX = (int)Math.Ceiling(center.X + radius + 1);
+            int minY = (int)Math.Floor(center.Y - radius - 1);
+            int maxY = (int)Math.Ceiling(center.Y + radius + 1);
 
             //裁剪到视口范围
-            int startX = (int)Math.Max(0, minX);
-            int endX = (int)Math.Min(viewportWidth - 1, maxX);
-            int startY = (int)Math.Max(0, minY);
-            int endY = (int)Math.Min(viewportHeight - 1, maxY);
+            int startX = Math.Max(0, minX);
+            int endX = Math.Min(viewportWidth - 1, maxX);
+            int startY = Math.Max(0, minY);
+            int endY = Math.Min(viewportHeight - 1, maxY);
 
             //遍历包围盒范围内像素
             StatisticResult result = new StatisticResult();
@@ -454,16 +454,16 @@ namespace MedicalSharp.Primitives.Algorithms
             float bSq = halfHeight * halfHeight; // 半高平方
 
             //计算椭圆屏幕包围盒
-            int minX = (int)Math.Max(0, center.X - halfWidth - 1);
-            int maxX = (int)Math.Min(viewportWidth - 1, center.X + halfWidth + 1);
-            int minY = (int)Math.Max(0, center.Y - halfHeight - 1);
-            int maxY = (int)Math.Min(viewportHeight - 1, center.Y + halfHeight + 1);
+            int minX = (int)Math.Floor(center.X - halfWidth - 1);
+            int maxX = (int)Math.Ceiling(center.X + halfWidth + 1);
+            int minY = (int)Math.Floor(center.Y - halfHeight - 1);
+            int maxY = (int)Math.Ceiling(center.Y + halfHeight + 1);
 
             //裁剪到视口范围
-            int startX = (int)Math.Max(0, minX);
-            int endX = (int)Math.Min(viewportWidth - 1, maxX);
-            int startY = (int)Math.Max(0, minY);
-            int endY = (int)Math.Min(viewportHeight - 1, maxY);
+            int startX = Math.Max(0, minX);
+            int endX = Math.Min(viewportWidth - 1, maxX);
+            int startY = Math.Max(0, minY);
+            int endY = Math.Min(viewportHeight - 1, maxY);
 
             //遍历包围盒范围内像素
             StatisticResult result = new StatisticResult();
@@ -545,10 +545,10 @@ namespace MedicalSharp.Primitives.Algorithms
             float maxY = screenVertices.Max(vertex => vertex.Y);
 
             //裁剪到视口范围
-            int startX = (int)Math.Max(0, minX);
-            int endX = (int)Math.Min(viewportWidth - 1, maxX);
-            int startY = (int)Math.Max(0, minY);
-            int endY = (int)Math.Min(viewportHeight - 1, maxY);
+            int startX = (int)Math.Floor(Math.Max(0, minX));
+            int endX = (int)Math.Ceiling(Math.Min(viewportWidth - 1, maxX));
+            int startY = (int)Math.Floor(Math.Max(0, minY));
+            int endY = (int)Math.Ceiling(Math.Min(viewportHeight - 1, maxY));
 
             //遍历包围盒范围内像素
             StatisticResult result = new StatisticResult();
