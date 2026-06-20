@@ -30,7 +30,7 @@ namespace MedicalSharp.Insight.Algorithms
             //提取切片
             Vector2i sliceSize = plane.GetSliceSize();
             Resampler resampler = new Resampler(volumeData);
-            using Image slice = resampler.ExtractSlice(patientSliceCenter, sliceSize, plane.UAxis, plane.VAxis);
+            using Image slice = resampler.ExtractSlice(patientSliceCenter, sliceSize, plane.UAxis, plane.VAxis, plane.Normal);
             VectorDouble sliceSpacing = slice.GetSpacing();
             VectorDouble sliceOrigin = slice.GetOrigin();
             VectorDouble sliceDirection = slice.GetDirection();

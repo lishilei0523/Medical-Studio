@@ -58,14 +58,17 @@ namespace MedicalSharp.Insight.Operators
 
         #region # 方法
 
+        //Public
+
         #region 提取单张切片 —— Image ExtractSlice(Vector3 sliceCenter...
         /// <summary>
         /// 提取单张切片
         /// </summary>
-        /// <param name="sliceCenter">切面中心（毫米空间）</param>
+        /// <param name="sliceCenter">切片中心（毫米空间）</param>
         /// <param name="sliceSize">切片尺寸（体素空间）</param>
-        /// <param name="rowDirection">行方向单位向量（毫米空间，决定切面的水平方向）</param>
-        /// <param name="colDirection">列方向单位向量（毫米空间，决定切面的垂直方向）</param>
+        /// <param name="uAxis">U轴（单位向量，切片水平方向）</param>
+        /// <param name="vAxis">V轴（单位向量，切片垂直方向）</param>
+        /// <param name="normal">法向量（单位向量，切片法向）</param>
         /// <returns>2D切片图像（Z方向尺寸为1）</returns>
         /// <remarks>
         /// 沿任意方向切出一张2D切片，用于：
@@ -74,17 +77,17 @@ namespace MedicalSharp.Insight.Operators
         /// - 导出单张斜切面供其他工具使用；
         /// 输出Z方向尺寸为1（单层），X/Y尺寸与原始数据一致
         /// </remarks>
-        public Image ExtractSlice(Vector3 sliceCenter, Vector2i sliceSize, Vector3 rowDirection, Vector3 colDirection)
+        public Image ExtractSlice(Vector3 sliceCenter, Vector2i sliceSize, Vector3 uAxis, Vector3 vAxis, Vector3 normal)
         {
             #region # 验证
 
-            if (rowDirection == Vector3.Zero)
+            if (uAxis == Vector3.Zero)
             {
-                throw new ArgumentOutOfRangeException(nameof(rowDirection), "行方向向量不能为零向量！");
+                throw new ArgumentOutOfRangeException(nameof(uAxis), "行方向向量不能为零向量！");
             }
-            if (colDirection == Vector3.Zero)
+            if (vAxis == Vector3.Zero)
             {
-                throw new ArgumentOutOfRangeException(nameof(colDirection), "列方向向量不能为零向量！");
+                throw new ArgumentOutOfRangeException(nameof(vAxis), "列方向向量不能为零向量！");
             }
 
             #endregion
@@ -99,8 +102,8 @@ namespace MedicalSharp.Insight.Operators
             };
 
             //切片间距
-            double rowSpacing = ComputeProjectedSpacing(rowDirection, originalSpacing);
-            double colSpacing = ComputeProjectedSpacing(colDirection, originalSpacing);
+            double rowSpacing = ComputeProjectedSpacing(uAxis, originalSpacing);
+            double colSpacing = ComputeProjectedSpacing(vAxis, originalSpacing);
             using VectorDouble sliceSpacing = new VectorDouble
             {
                 rowSpacing, colSpacing, 1.0
@@ -109,18 +112,17 @@ namespace MedicalSharp.Insight.Operators
             //切片原点（左上角） = 中心点 - 行方向偏移 - 列方向偏移
             float mmHalfWidth = (float)(sliceSize.X * rowSpacing * 0.5f);
             float mmHalfHeight = (float)(sliceSize.Y * colSpacing * 0.5f);
-            Vector3 topLeft = sliceCenter - rowDirection * mmHalfWidth - colDirection * mmHalfHeight;
+            Vector3 topLeft = sliceCenter - uAxis * mmHalfWidth - vAxis * mmHalfHeight;
             using VectorDouble sliceOrigin = new VectorDouble
             {
                 topLeft.X, topLeft.Y, topLeft.Z
             };
 
             //切片方向：行方向、列方向、法向量
-            Vector3 normal = Vector3.Cross(rowDirection, colDirection).Normalized();
             using VectorDouble sliceDirection = new VectorDouble
             {
-                rowDirection.X, rowDirection.Y, rowDirection.Z,
-                colDirection.X, colDirection.Y, colDirection.Z,
+                uAxis.X, uAxis.Y, uAxis.Z,
+                vAxis.X, vAxis.Y, vAxis.Z,
                 normal.X, normal.Y, normal.Z
             };
 

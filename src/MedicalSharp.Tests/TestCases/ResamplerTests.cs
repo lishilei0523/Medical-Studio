@@ -39,7 +39,7 @@ namespace MedicalSharp.Tests.TestCases
 
             //执行：提取横断面切片（尺寸=XY方向体素数）
             Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Y);
-            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, Vector3.UnitX, Vector3.UnitY);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ);
 
             //验证：尺寸
             VectorUInt32 resultSize = slice.GetSize();
@@ -88,7 +88,7 @@ namespace MedicalSharp.Tests.TestCases
 
             //执行：提取冠状面切片（尺寸=XZ方向体素数）
             Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Z);
-            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, Vector3.UnitX, Vector3.UnitZ);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, Vector3.UnitX, Vector3.UnitZ, Vector3.UnitY);
 
             //验证：尺寸
             VectorUInt32 resultSize = slice.GetSize();
@@ -124,9 +124,7 @@ namespace MedicalSharp.Tests.TestCases
 
             //矢状面：行=Y轴，列=Z轴
             Vector2i sliceSize = new Vector2i(volumeSize.Y, volumeSize.Z);
-            using Image slice = resampler.ExtractSlice(
-                patientCenter, sliceSize,
-                Vector3.UnitY, Vector3.UnitZ);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, Vector3.UnitY, Vector3.UnitZ, Vector3.UnitX);
 
             VectorUInt32 resultSize = slice.GetSize();
             Assert.AreEqual((uint)volumeSize.Y, resultSize[0]);
@@ -163,10 +161,11 @@ namespace MedicalSharp.Tests.TestCases
             float angle = MathF.PI / 6; //30°
             Vector3 rowDirection = Vector3.UnitX;
             Vector3 colDirection = new Vector3(0, MathF.Cos(angle), MathF.Sin(angle)).Normalized();
+            Vector3 normal = Vector3.Cross(rowDirection, colDirection).Normalized();
 
             //冠状面尺寸：X × Z
             Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Z);
-            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, rowDirection, colDirection);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, rowDirection, colDirection, normal);
 
             //验证：切片不为空
             int voxelsCount = sliceSize.X * sliceSize.Y;
@@ -200,9 +199,7 @@ namespace MedicalSharp.Tests.TestCases
                 30f + (float)(volumeSize.Z * spacing.Z * 0.5));
 
             Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Y);
-            using Image slice = resampler.ExtractSlice(
-                patientCenter, sliceSize,
-                Vector3.UnitX, Vector3.UnitY);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ);
 
             // 验证：Origin应位于切片左上角（中心点 - 行偏移 - 列偏移）
             VectorDouble sliceOrigin = slice.GetOrigin();
@@ -216,6 +213,154 @@ namespace MedicalSharp.Tests.TestCases
             Assert.AreEqual(1.0, dir[0], 0.001);
             Assert.AreEqual(1.0, dir[4], 0.001);
             Assert.AreEqual(1.0, dir[8], 0.001);
+        }
+        #endregion
+
+        #region # 测试冠状位数据正确性 —— void TestCoronalSliceData()
+        /// <summary>
+        /// 测试斜切数据正确性
+        /// </summary>
+        [TestMethod]
+        public unsafe void TestCoronalSliceData()
+        {
+            //准备：32×32×32，Spacing=1×1×1，中心8×8×8标记为100
+            Vector3i volumeSize = new Vector3i(32, 32, 32);
+            Vector3d spacing = new Vector3d(1.0, 1.0, 1.0);
+            SitkDicomLoader loader = new SitkDicomLoader();
+            using Image originalImage = CreateTestImageWithCenterMark(volumeSize, spacing, 8, 100);
+            using VolumeData volumeData = loader.LoadSitkImage(originalImage);
+            Resampler resampler = new Resampler(volumeData);
+
+            //计算患者空间中心
+            Vector3 patientCenter = new Vector3(15.5f, 15.5f, 15.5f);
+
+            //行方向=X轴，列方向Z轴
+            Vector3 rowDir = Vector3.UnitX;
+            Vector3 colDir = Vector3.UnitZ;
+            Vector3 normal = Vector3.UnitY;
+
+            //冠状面尺寸：X × Z
+            Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Z);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, rowDir, colDir, normal);
+            VectorDouble sliceOrigin = slice.GetOrigin();
+
+            //读取切片数据
+            VectorUInt32 resultSize = slice.GetSize();
+            int voxelCount = (int)(resultSize[0] * resultSize[1] * resultSize[2]);
+            short* data = (short*)slice.GetBufferAsInt16().ToPointer();
+            short[] sliceData = new Span<short>(data, voxelCount).ToArray();
+
+            //验证1：切片尺寸正确
+            Assert.AreEqual((uint)volumeSize.X, resultSize[0], "X方向尺寸=32");
+            Assert.AreEqual((uint)volumeSize.Z, resultSize[1], "Y方向尺寸=32（冠状面Z方向）");
+            Assert.AreEqual(1u, resultSize[2], "单层");
+
+            //验证2：切片数据应包含标记值100和背景值0，不应有填充值-1024
+            Assert.IsTrue(sliceData.Any(hu => hu == 100), "标准冠状面应包含中心标记值100");
+            Assert.IsTrue(sliceData.Any(hu => hu == 0), "标准冠状面应包含背景值0");
+            Assert.IsFalse(sliceData.Any(hu => hu == -1024), "标准冠状面不应包含填充值-1024");
+
+            //验证3：标记值100应出现在切片的中心行附近（行16附近，对应Z=16mm）
+            int sliceWidth = sliceSize.X;
+            int centerRow = sliceSize.Y / 2; //Z方向中心行
+            bool foundCenterMark = false;
+            for (int row = centerRow - 4; row <= centerRow + 4; row++)
+            {
+                for (int col = 0; col < sliceWidth; col++)
+                {
+                    if (data[row * sliceWidth + col] == 100)
+                    {
+                        foundCenterMark = true;
+                        break;
+                    }
+                }
+                if (foundCenterMark)
+                {
+                    break;
+                }
+            }
+            Assert.IsTrue(foundCenterMark, "标记值100应出现在切片中心行附近（Z=16mm附近）");
+
+            // 验证4：SliceOrigin应等于左上角
+            float mmHalfWidth = (float)(sliceSize.X * spacing.X * 0.5f);
+            float mmHalfHeight = (float)(sliceSize.Y * spacing.Z * 0.5f);
+            Vector3 expectedTopLeft = patientCenter - rowDir * mmHalfWidth - colDir * mmHalfHeight;
+            Assert.AreEqual(expectedTopLeft.X, sliceOrigin[0], 0.01, "Origin.X应等于左上角X");
+            Assert.AreEqual(expectedTopLeft.Y, sliceOrigin[1], 0.01, "Origin.Y应等于左上角Y");
+            Assert.AreEqual(expectedTopLeft.Z, sliceOrigin[2], 0.01, "Origin.Z应等于左上角Z");
+
+            //验证5：Spacing正确
+            VectorDouble sliceSpacing = slice.GetSpacing();
+            Assert.AreEqual(spacing.X, sliceSpacing[0], 0.001, "行方向Spacing = 原始X Spacing");
+            Assert.AreEqual(spacing.Z, sliceSpacing[1], 0.001, "列方向Spacing = 原始Z Spacing");
+        }
+        #endregion
+
+        #region # 测试斜切面数据正确性 —— void TestObliqueSliceData()
+        /// <summary>
+        /// 测试斜切面数据正确性
+        /// </summary>
+        /// <remarks>冠状位斜切，绕X轴旋转30°</remarks>
+        [TestMethod]
+        public unsafe void TestObliqueSliceData()
+        {
+            //准备：32×32×16，Spacing=1×1×2，中心8×8×8标记为100
+            Vector3i volumeSize = new Vector3i(32, 32, 16);
+            Vector3d spacing = new Vector3d(1.0, 1.0, 2.0);
+            SitkDicomLoader loader = new SitkDicomLoader();
+            using Image originalImage = CreateTestImageWithCenterMark(volumeSize, spacing, 8, 100);
+            using VolumeData volumeData = loader.LoadSitkImage(originalImage);
+            Resampler resampler = new Resampler(volumeData);
+
+            //计算患者空间中心
+            Vector3 patientCenter = new Vector3(15.5f, 15.5f, 8.5f);
+
+            //绕X轴旋转30°：行方向=X轴，列方向在YZ平面内旋转30°
+            float angle = MathF.PI / 6; // 30°
+            Vector3 rowDir = Vector3.UnitX;
+            Vector3 colDir = new Vector3(0, MathF.Cos(angle), MathF.Sin(angle)).Normalized();
+            Vector3 normal = Vector3.Cross(rowDir, colDir).Normalized();
+            normal = new Vector3(normal.X, -normal.Y, normal.Z);
+
+            //斜切面尺寸：X × Z
+            Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Z);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, rowDir, colDir, normal);
+            VectorDouble sliceOrigin = slice.GetOrigin();
+
+            //读取切片数据
+            VectorUInt32 resultSize = slice.GetSize();
+            int voxelCount = (int)(resultSize[0] * resultSize[1] * resultSize[2]);
+            short* data = (short*)slice.GetBufferAsInt16().ToPointer();
+            short[] sliceData = new Span<short>(data, voxelCount).ToArray();
+
+            //验证1：切片尺寸正确
+            Assert.AreEqual((uint)volumeSize.X, resultSize[0], "X方向尺寸=32");
+            Assert.AreEqual((uint)volumeSize.Z, resultSize[1], "Y方向尺寸={obliqueHeight}");
+            Assert.AreEqual(1u, resultSize[2], "单层");
+
+            //验证2：切片数据应包含标记值100和背景值0，不应有填充值-1024
+            Assert.IsTrue(sliceData.Any(hu => hu == 100), "30°斜切面应包含中心标记值100");
+            Assert.IsTrue(sliceData.Any(hu => hu == 0), "30°斜切面应包含背景值0");
+            Assert.IsFalse(sliceData.Any(hu => hu == -1024), "30°斜切面不应包含填充值-1024");
+
+            //验证3：切片中应存在线性插值产生的中间值（非0非100）
+            Assert.IsTrue(sliceData.Any(hu => hu > 0 && hu < 100), "斜切过程中应在标记区域边缘产生0~100的中间值");
+
+            //验证4：SliceOrigin应等于左上角
+            double rowSpacing = spacing.X; //行方向=X轴
+            double colSpacing = Math.Sqrt(colDir.Y * colDir.Y * spacing.Y * spacing.Y +
+                                          colDir.Z * colDir.Z * spacing.Z * spacing.Z);
+            float mmHalfWidth = (float)(sliceSize.X * rowSpacing * 0.5f);
+            float mmHalfHeight = (float)(sliceSize.Y * colSpacing * 0.5f);
+            Vector3 expectedTopLeft = patientCenter - rowDir * mmHalfWidth - colDir * mmHalfHeight;
+            Assert.AreEqual(expectedTopLeft.X, sliceOrigin[0], 0.01, "Origin.X应等于左上角X");
+            Assert.AreEqual(expectedTopLeft.Y, sliceOrigin[1], 0.01, "Origin.Y应等于左上角Y");
+            Assert.AreEqual(expectedTopLeft.Z, sliceOrigin[2], 0.01, "Origin.Z应等于左上角Z");
+
+            //验证5：Spacing正确
+            VectorDouble sliceSpacing = slice.GetSpacing();
+            Assert.AreEqual(spacing.X, sliceSpacing[0], 0.001, "行方向Spacing = 原始X Spacing");
+            Assert.AreEqual(colSpacing, sliceSpacing[1], 0.001, "列方向Spacing = 投影Spacing");
         }
         #endregion
 
@@ -420,8 +565,8 @@ namespace MedicalSharp.Tests.TestCases
             //行/列方向不能为零向量
             Vector3 center = new Vector3(5, 5, 5);
             Vector2i size = new Vector2i(10, 10);
-            Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSlice(center, size, Vector3.Zero, Vector3.UnitY));
-            Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSlice(center, size, Vector3.UnitX, Vector3.Zero));
+            Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSlice(center, size, Vector3.Zero, Vector3.UnitY, Vector3.UnitZ));
+            Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSlice(center, size, Vector3.UnitX, Vector3.Zero, Vector3.UnitZ));
 
             //层间距必须大于0
             Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSliceSeries(center, Vector3.UnitX, Vector3.UnitY, 0, 5));
@@ -577,11 +722,13 @@ namespace MedicalSharp.Tests.TestCases
             //计算中心区域范围
             int startX = (volumeSize.X - centerSize) / 2;
             int startY = (volumeSize.Y - centerSize) / 2;
+            int startZ = (volumeSize.Z - centerSize) / 2;
             int endX = startX + centerSize;
             int endY = startY + centerSize;
+            int endZ = startZ + centerSize;
 
             //填充中心区域
-            for (int z = 0; z < volumeSize.Z; z++)
+            for (int z = startZ; z < endZ; z++)
             {
                 for (int y = startY; y < endY; y++)
                 {
