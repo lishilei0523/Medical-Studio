@@ -28,6 +28,10 @@ namespace MedicalSharp.Controls.Extensions
             {
                 return GetContextMenuItems(viewBox, viewport, command);
             }
+            if (visual is TextVisual3D text)
+            {
+                return GetContextMenuItems(text, viewport, command);
+            }
             if (visual is PointVisual3D point)
             {
                 return GetContextMenuItems(point, viewport, command);
@@ -147,6 +151,25 @@ namespace MedicalSharp.Controls.Extensions
                     }
                 ];
             }
+
+            return items;
+        }
+        #endregion
+
+        #region # 获取文本上下文菜单项列表 —— static IReadOnlyList<ContextMenuItem> GetContextMenuItems(this TextVisual3D...
+        /// <summary>
+        /// 获取文本上下文菜单项列表
+        /// </summary>
+        private static IReadOnlyList<ContextMenuItem> GetContextMenuItems(this TextVisual3D text, OpenTKViewport viewport, ShapeCommand shapeCommand)
+        {
+            List<ContextMenuItem> items =
+            [
+                new ContextMenuItem
+                {
+                    Header = "删除(_D)",
+                    Command = () => RemoveVisual(text, viewport, shapeCommand)
+                }
+            ];
 
             return items;
         }
