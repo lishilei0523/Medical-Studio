@@ -15,39 +15,207 @@ namespace MedicalSharp.Tests.TestCases
     [TestClass]
     public class ResamplerTests
     {
-        #region # 测试提取单张切片 —— void TestExtractSlice()
+        #region # 测试提取横断面切片 —— void TestExtractAxialSlice()
         /// <summary>
-        /// 测试提取单张切片
+        /// 测试提取横断面切片
         /// </summary>
         [TestMethod]
-        public void TestExtractSlice()
+        public unsafe void TestExtractAxialSlice()
         {
-            //准备：10×10×10, 中心切横断面
-            Vector3i volumeSize = new Vector3i(10, 10, 10);
-            Vector3d spacing = new Vector3d(1.0, 1.0, 1.0);
+            //准备：32×32×16，Spacing=0.7×0.7×2.0，中心切横断面
+            Vector3i volumeSize = new Vector3i(32, 32, 16);
+            Vector3 spacing = new Vector3(0.7f, 0.7f, 2.0f);
             SitkDicomLoader loader = new SitkDicomLoader();
             using Image originalImage = CreateTestImage(volumeSize, spacing);
             using VolumeData volumeData = loader.LoadSitkImage(originalImage);
             Resampler resampler = new Resampler(volumeData);
 
-            //执行
-            Vector3 sliceCenter = new Vector3(5, 5, 5);
-            Vector3 rowDirection = Vector3.UnitX;
-            Vector3 colDirection = Vector3.UnitY;
-            Vector3 sliceDirection = Vector3.Cross(rowDirection, colDirection).Normalized();
-            using Image result = resampler.ExtractSlice(sliceCenter, rowDirection, colDirection);
+            //计算患者空间中心
+            Vector3 patientCenter = new Vector3(
+                (volumeSize.X * spacing.X * 0.5f),
+                (volumeSize.Y * spacing.Y * 0.5f),
+                (volumeSize.Z * spacing.Z * 0.5f)
+            );
 
-            //验证尺寸
-            VectorUInt32 resultSize = result.GetSize();
-            Assert.AreEqual((uint)volumeSize.X, resultSize[0]);
-            Assert.AreEqual((uint)volumeSize.Y, resultSize[1]);
-            Assert.AreEqual(1u, resultSize[2]);
+            //执行：提取横断面切片（尺寸=XY方向体素数）
+            Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Y);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, Vector3.UnitX, Vector3.UnitY);
+
+            //验证：尺寸
+            VectorUInt32 resultSize = slice.GetSize();
+            Assert.AreEqual((uint)volumeSize.X, resultSize[0], "X方向尺寸应等于原始X尺寸");
+            Assert.AreEqual((uint)volumeSize.Y, resultSize[1], "Y方向尺寸应等于原始Y尺寸");
+            Assert.AreEqual(1u, resultSize[2], "Z方向应为单层");
+
+            //验证：Spacing应等于原始X/Y方向Spacing
+            VectorDouble resultSpacing = slice.GetSpacing();
+            Assert.AreEqual(spacing.X, resultSpacing[0], 0.001, "行方向Spacing应等于原始X Spacing");
+            Assert.AreEqual(spacing.Y, resultSpacing[1], 0.001, "列方向Spacing应等于原始Y Spacing");
 
             //验证：法向量 = X × Y = Z
-            VectorDouble resultDirection = result.GetDirection();
-            Assert.AreEqual(sliceDirection.X, resultDirection[6], 0.001);
-            Assert.AreEqual(sliceDirection.Y, resultDirection[7], 0.001);
-            Assert.AreEqual(sliceDirection.Z, resultDirection[8], 0.001);
+            VectorDouble resultDirection = slice.GetDirection();
+            Assert.AreEqual(0.0, resultDirection[6], 0.001);
+            Assert.AreEqual(0.0, resultDirection[7], 0.001);
+            Assert.AreEqual(1.0, resultDirection[8], 0.001);
+
+            //验证：切片数据不为空
+            int voxelCount = (int)(resultSize[0] * resultSize[1]);
+            short[] sliceData = new Span<short>(slice.GetBufferAsInt16().ToPointer(), voxelCount).ToArray();
+            Assert.IsTrue(sliceData.Any(hu => hu == 0), "切片应包含背景值0");
+        }
+        #endregion
+
+        #region # 测试提取冠状面切片 —— void TestExtractCoronalSlice()
+        /// <summary>
+        /// 测试提取冠状面切片
+        /// </summary>
+        [TestMethod]
+        public void TestExtractCoronalSlice()
+        {
+            //准备：32×32×16，Spacing=0.7×0.7×2.0
+            Vector3i volumeSize = new Vector3i(32, 32, 16);
+            Vector3 spacing = new Vector3(0.7f, 0.7f, 2.0f);
+            SitkDicomLoader loader = new SitkDicomLoader();
+            using Image originalImage = CreateTestImage(volumeSize, spacing);
+            using VolumeData volumeData = loader.LoadSitkImage(originalImage);
+            Resampler resampler = new Resampler(volumeData);
+
+            Vector3 patientCenter = new Vector3(
+                (volumeSize.X * spacing.X * 0.5f),
+                (volumeSize.Y * spacing.Y * 0.5f),
+                (volumeSize.Z * spacing.Z * 0.5f)
+            );
+
+            //执行：提取冠状面切片（尺寸=XZ方向体素数）
+            Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Z);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, Vector3.UnitX, Vector3.UnitZ);
+
+            //验证：尺寸
+            VectorUInt32 resultSize = slice.GetSize();
+            Assert.AreEqual((uint)volumeSize.X, resultSize[0], "X方向尺寸应等于原始X尺寸");
+            Assert.AreEqual((uint)volumeSize.Z, resultSize[1], "Y方向尺寸应等于原始Z尺寸");
+
+            //验证：Spacing应等于原始X和Z方向Spacing
+            VectorDouble resultSpacing = slice.GetSpacing();
+            Assert.AreEqual(spacing.X, resultSpacing[0], 0.001, "行方向Spacing应等于原始X Spacing");
+            Assert.AreEqual(spacing.Z, resultSpacing[1], 0.001, "列方向Spacing应等于原始Z Spacing");
+        }
+        #endregion
+
+        #region # 测试提取矢状面切片 —— void TestExtractSagittalSlice()
+        /// <summary>
+        /// 测试提取矢状面切片
+        /// </summary>
+        [TestMethod]
+        public void TestExtractSagittalSlice()
+        {
+            Vector3i volumeSize = new Vector3i(32, 32, 16);
+            Vector3 spacing = new Vector3(0.7f, 0.7f, 2.0f);
+            SitkDicomLoader loader = new SitkDicomLoader();
+            using Image originalImage = CreateTestImage(volumeSize, spacing);
+            using VolumeData volumeData = loader.LoadSitkImage(originalImage);
+            Resampler resampler = new Resampler(volumeData);
+
+            Vector3 patientCenter = new Vector3(
+                (volumeSize.X * spacing.X * 0.5f),
+                (volumeSize.Y * spacing.Y * 0.5f),
+                (volumeSize.Z * spacing.Z * 0.5f)
+            );
+
+            //矢状面：行=Y轴，列=Z轴
+            Vector2i sliceSize = new Vector2i(volumeSize.Y, volumeSize.Z);
+            using Image slice = resampler.ExtractSlice(
+                patientCenter, sliceSize,
+                Vector3.UnitY, Vector3.UnitZ);
+
+            VectorUInt32 resultSize = slice.GetSize();
+            Assert.AreEqual((uint)volumeSize.Y, resultSize[0]);
+            Assert.AreEqual((uint)volumeSize.Z, resultSize[1]);
+
+            VectorDouble resultSpacing = slice.GetSpacing();
+            Assert.AreEqual(spacing.Y, resultSpacing[0], 0.001);
+            Assert.AreEqual(spacing.Z, resultSpacing[1], 0.001);
+        }
+        #endregion
+
+        #region # 测试提取斜切面切片 —— void TestExtractObliqueSlice()
+        /// <summary>
+        /// 测试提取斜切面切片
+        /// </summary>
+        /// <remarks>冠状面绕X轴旋转30°斜切</remarks>
+        [TestMethod]
+        public void TestExtractObliqueSlice()
+        {
+            Vector3i volumeSize = new Vector3i(32, 32, 16);
+            Vector3 spacing = new Vector3(0.7f, 0.7f, 2.0f);
+            SitkDicomLoader loader = new SitkDicomLoader();
+            using Image originalImage = CreateTestImage(volumeSize, spacing);
+            using VolumeData volumeData = loader.LoadSitkImage(originalImage);
+            Resampler resampler = new Resampler(volumeData);
+
+            Vector3 patientCenter = new Vector3(
+                (volumeSize.X * spacing.X * 0.5f),
+                (volumeSize.Y * spacing.Y * 0.5f),
+                (volumeSize.Z * spacing.Z * 0.5f)
+            );
+
+            //绕X轴旋转30°：行方向=X轴，列方向在YZ平面内旋转30°
+            float angle = MathF.PI / 6; //30°
+            Vector3 rowDirection = Vector3.UnitX;
+            Vector3 colDirection = new Vector3(0, MathF.Cos(angle), MathF.Sin(angle)).Normalized();
+
+            //冠状面尺寸：X × Z
+            Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Z);
+            using Image slice = resampler.ExtractSlice(patientCenter, sliceSize, rowDirection, colDirection);
+
+            //验证：切片不为空
+            int voxelsCount = sliceSize.X * sliceSize.Y;
+            unsafe
+            {
+                short* data = (short*)slice.GetBufferAsInt16().ToPointer();
+                short[] sliceData = new Span<short>(data, voxelsCount).ToArray();
+                Assert.IsTrue(sliceData.Any(hu => hu == 0), "斜切切片应包含背景值0");
+                Assert.IsFalse(sliceData.All(hu => hu == -1024), "斜切切片不应全是填充值-1024");
+            }
+        }
+        #endregion
+
+        #region # 测试斜切后几何信息传递 —— void TestObliqueSliceGeometryPreservation()
+        /// <summary>
+        /// 测试斜切后Origin和Direction正确传递
+        /// </summary>
+        [TestMethod]
+        public void TestObliqueSliceGeometryPreservation()
+        {
+            Vector3i volumeSize = new Vector3i(20, 20, 20);
+            Vector3d spacing = new Vector3d(0.8, 0.8, 2.0);
+            SitkDicomLoader loader = new SitkDicomLoader();
+            using Image originalImage = CreateTestImage(volumeSize, spacing, new Vector3d(10, -20, 30), Vector3d.UnitX, Vector3d.UnitY, Vector3d.UnitZ);
+            using VolumeData volumeData = loader.LoadSitkImage(originalImage);
+            Resampler resampler = new Resampler(volumeData);
+
+            Vector3 patientCenter = new Vector3(
+                10f + (float)(volumeSize.X * spacing.X * 0.5),
+                -20f + (float)(volumeSize.Y * spacing.Y * 0.5),
+                30f + (float)(volumeSize.Z * spacing.Z * 0.5));
+
+            Vector2i sliceSize = new Vector2i(volumeSize.X, volumeSize.Y);
+            using Image slice = resampler.ExtractSlice(
+                patientCenter, sliceSize,
+                Vector3.UnitX, Vector3.UnitY);
+
+            // 验证：Origin应位于切片左上角（中心点 - 行偏移 - 列偏移）
+            VectorDouble sliceOrigin = slice.GetOrigin();
+            float mmHalfWidth = (float)(sliceSize.X * spacing.X * 0.5);
+            float mmHalfHeight = (float)(sliceSize.Y * spacing.Y * 0.5);
+            Assert.AreEqual(patientCenter.X - mmHalfWidth, sliceOrigin[0], 0.01, "Origin.X = center.X - halfWidth");
+            Assert.AreEqual(patientCenter.Y - mmHalfHeight, sliceOrigin[1], 0.01, "Origin.Y = center.Y - halfHeight");
+
+            // 验证：Direction矩阵正确（横断面 = 单位矩阵）
+            VectorDouble dir = slice.GetDirection();
+            Assert.AreEqual(1.0, dir[0], 0.001);
+            Assert.AreEqual(1.0, dir[4], 0.001);
+            Assert.AreEqual(1.0, dir[8], 0.001);
         }
         #endregion
 
@@ -251,60 +419,15 @@ namespace MedicalSharp.Tests.TestCases
 
             //行/列方向不能为零向量
             Vector3 center = new Vector3(5, 5, 5);
-            Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSlice(center, Vector3.Zero, Vector3.UnitY));
-            Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSlice(center, Vector3.UnitX, Vector3.Zero));
+            Vector2i size = new Vector2i(10, 10);
+            Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSlice(center, size, Vector3.Zero, Vector3.UnitY));
+            Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSlice(center, size, Vector3.UnitX, Vector3.Zero));
 
             //层间距必须大于0
             Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSliceSeries(center, Vector3.UnitX, Vector3.UnitY, 0, 5));
 
             //层数必须大于0
             Assert.Throws<ArgumentOutOfRangeException>(() => resampler.ExtractSliceSeries(center, Vector3.UnitX, Vector3.UnitY, 1.0, 0));
-        }
-        #endregion
-
-        #region # 测试斜切单张切片数据正确性 —— void TestObliqueSliceDataCorrectness()
-        /// <summary>
-        /// 测试斜切单张切片数据正确性
-        /// </summary>
-        /// <remarks>
-        /// 创建中心区域有标记值的测试数据，沿45°方向提取斜切片
-        /// 验证斜切后中心区域的数据分布符合旋转几何
-        /// </remarks>
-        [TestMethod]
-        public unsafe void TestObliqueSliceDataCorrectness()
-        {
-            //准备：32×32×1 测试数据，中心8×8区域填充为100
-            Vector3i volumeSize = new Vector3i(32, 32, 1);
-            Vector3d spacing = new Vector3d(1.0, 1.0, 1.0);
-            SitkDicomLoader loader = new SitkDicomLoader();
-            using Image originalImage = CreateTestImageWithCenterMark(volumeSize, spacing, 8, 100);
-            using VolumeData volumeData = loader.LoadSitkImage(originalImage);
-            Resampler resampler = new Resampler(volumeData);
-
-            //执行：在中心位置，绕Z轴旋转45°提取单张斜切片
-            float angle = MathF.PI / 4; //45°
-            Vector3 sliceCenter = new Vector3(16, 16, 0);
-            Vector3 rowDirection = new Vector3(MathF.Cos(angle), MathF.Sin(angle), 0).Normalized();
-            Vector3 colDirection = new Vector3(-MathF.Sin(angle), MathF.Cos(angle), 0).Normalized();
-
-            using Image obliqueSlice = resampler.ExtractSlice(sliceCenter, rowDirection, colDirection);
-            int length = volumeSize.X * volumeSize.Y * volumeSize.Z;
-            short[] sliceData = new Span<short>(obliqueSlice.GetBufferAsInt16().ToPointer(), length).ToArray();
-
-            //验证1：斜切后尺寸
-            VectorUInt32 sliceSize = obliqueSlice.GetSize();
-            Assert.AreEqual(32u, sliceSize[0], "X方向尺寸应为32");
-            Assert.AreEqual(32u, sliceSize[1], "Y方向尺寸应为32");
-            Assert.AreEqual(1u, sliceSize[2], "Z方向尺寸应为1（单层）");
-
-            //验证2：斜切后数据中应存在中心标记值100
-            Assert.IsTrue(sliceData.Any(hu => hu == 100), "45°斜切后应包含中心标记值100");
-
-            //验证3：斜切后数据中应存在背景值0
-            Assert.IsTrue(sliceData.Any(hu => hu == 0), "45°斜切后应包含背景值0");
-
-            //验证4：中心区域的线性插值产生中间值（非0非100的值）
-            Assert.IsTrue(sliceData.Any(hu => hu > 0 && hu < 100), "斜切过程中线性插值应在中心区域边缘产生0~100的中间值");
         }
         #endregion
 
