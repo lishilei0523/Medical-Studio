@@ -709,7 +709,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawText()
         {
-            Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
+            Func<Vector3D> getNormal = () => this.Plane.WorldNormal.ToVector3();
             Func<TextVisual3D, Task<string>> drawStart = async shape =>
             {
                 int count = this.Shapes.OfType<LineSegmentVisual3D>().Count();
@@ -824,7 +824,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawRectangle()
         {
-            Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
+            Func<Vector3D> getNormal = () => this.Plane.WorldNormal.ToVector3();
             Action<RectangleVisual3D> drawStart = shape =>
             {
                 int count = this.Shapes.OfType<RectangleVisual3D>().Count();
@@ -861,7 +861,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawCircle()
         {
-            Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
+            Func<Vector3D> getNormal = () => this.Plane.WorldNormal.ToVector3();
             Action<CircleVisual3D> drawStart = shape =>
             {
                 int count = this.Shapes.OfType<CircleVisual3D>().Count();
@@ -898,7 +898,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public void DrawEllipse()
         {
-            Func<Vector3D> getNormal = () => this.Plane.Normal.ToVector3();
+            Func<Vector3D> getNormal = () => this.Plane.WorldNormal.ToVector3();
             Action<EllipseVisual3D> drawStart = shape =>
             {
                 int count = this.Shapes.OfType<EllipseVisual3D>().Count();

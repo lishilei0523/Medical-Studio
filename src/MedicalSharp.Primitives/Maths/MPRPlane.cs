@@ -354,9 +354,9 @@ namespace MedicalSharp.Primitives.Maths
         public void Relocate(in Vector3 worldUAxis, in Vector3 worldVAxis, in Vector3 worldCenter, in Vector3 worldNormal)
         {
             //更新MPR平面U/V/N轴
-            this.UAxis = worldUAxis;
-            this.VAxis = worldVAxis;
-            this.Normal = worldNormal;
+            this.UAxis = worldUAxis / this.VolumeMetadata.VolumeScale;
+            this.VAxis = worldVAxis / this.VolumeMetadata.VolumeScale;
+            this.Normal = worldNormal / this.VolumeMetadata.VolumeScale;
 
             //重新正交化
             this.Orthonormalize();
@@ -376,17 +376,13 @@ namespace MedicalSharp.Primitives.Maths
             }
             else
             {
+                //斜切面重新计算投影范围和切片数量
                 this.PlaneType = MPRPlaneType.Oblique;
-            }
-
-            //斜切面重新计算投影范围和切片数量
-            if (this.PlaneType == MPRPlaneType.Oblique)
-            {
                 this.CalculateProjectionRange();
                 this.SlicesCount = this.CalculateObliqueSlicesCount();
             }
 
-            //复用中心定位
+            //中心定位
             this.Relocate(worldCenter, MPRPlaneChangeSource.ExternalSync);
         }
         #endregion
