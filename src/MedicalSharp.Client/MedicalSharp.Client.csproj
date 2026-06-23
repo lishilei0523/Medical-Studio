@@ -10,12 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AppConfigWithTargetPath Include="App.config" Condition="'$(Configuration)'=='Debug'">
-      <TargetPath>Avalonia.Designer.HostApp.dll.config</TargetPath>
-    </AppConfigWithTargetPath>
     <AvaloniaResource Include="favicon.ico" />
     <AvaloniaResource Include="Content\**" />
-    <None Update="Content\Fonts\**">
+    <None Include="App.config" Condition="'$(Configuration)'=='Debug'">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>Avalonia.Designer.HostApp.dll.config</TargetPath>
+    </None>
+    <None Include="Content\Fonts\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>Resources\Fonts\%(Filename)%(Extension)</TargetPath>
     </None>
