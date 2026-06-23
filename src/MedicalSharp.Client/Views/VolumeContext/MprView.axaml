@@ -3,13 +3,11 @@
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:cm="http://caliburnmicro.com"
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
-			 xmlns:converters="clr-namespace:MedicalSharp.Presentation.Converters;assembly=MedicalSharp.Presentation"
 			 mc:Ignorable="d">
 
 	<UserControl.Resources>
-		<converters:StringToGeometryConverter x:Key="StringToGeometryConverter" />
+		<sd:StringToGeometryConverter x:Key="StringToGeometryConverter" />
 	</UserControl.Resources>
 
 	<sd:GroupBox>
@@ -33,7 +31,6 @@
 						<ItemsControl.ItemTemplate>
 							<DataTemplate>
 								<sd:ToggleRadioButton ToolTip.Tip="{Binding Name}"
-													  Command="{Binding RelayCommand}"
 													  IsChecked="{Binding IsChecked}"
 													  IsVisible="{Binding IsVisible}"
 													  GroupName="{Binding DataContext.Title,

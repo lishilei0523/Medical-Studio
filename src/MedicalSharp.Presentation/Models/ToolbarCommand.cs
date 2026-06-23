@@ -66,8 +66,19 @@ namespace MedicalSharp.Presentation.Models
         /// <summary>
         /// 是否勾选
         /// </summary>
-        [DependencyProperty]
-        public bool IsChecked { get; set; }
+        public bool IsChecked
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                if (value)
+                {
+                    this.RelayCommand?.Execute(null);
+                }
+            }
+        }
         #endregion
 
         #region 是否可见 —— bool IsVisible
