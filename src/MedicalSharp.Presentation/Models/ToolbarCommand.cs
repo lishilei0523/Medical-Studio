@@ -1,11 +1,13 @@
-﻿using System.Windows.Input;
+﻿using Caliburn.Micro;
+using SD.Infrastructure.Avalonia.Caliburn.Aspects;
+using System.Windows.Input;
 
 namespace MedicalSharp.Presentation.Models
 {
     /// <summary>
     /// 工具栏命令
     /// </summary>
-    public class ToolbarCommand
+    public class ToolbarCommand : PropertyChangedBase
     {
         #region # 字段及构造器
 
@@ -23,13 +25,15 @@ namespace MedicalSharp.Presentation.Models
         /// <param name="name">命令名称</param>
         /// <param name="icon">命令图标</param>
         /// <param name="relayCommand">转接命令</param>
+        /// <param name="isChecked">是否勾选</param>
         /// <param name="isVisible">是否可见</param>
-        public ToolbarCommand(string name, string icon, ICommand relayCommand, bool isVisible = true)
+        public ToolbarCommand(string name, string icon, ICommand relayCommand, bool isChecked = false, bool isVisible = true)
             : this()
         {
             this.Name = name;
             this.Icon = icon;
             this.RelayCommand = relayCommand;
+            this.IsChecked = isChecked;
             this.IsVisible = isVisible;
         }
 
@@ -58,10 +62,19 @@ namespace MedicalSharp.Presentation.Models
         public ICommand RelayCommand { get; set; }
         #endregion
 
+        #region 是否勾选 —— bool IsChecked
+        /// <summary>
+        /// 是否勾选
+        /// </summary>
+        [DependencyProperty]
+        public bool IsChecked { get; set; }
+        #endregion
+
         #region 是否可见 —— bool IsVisible
         /// <summary>
         /// 是否可见
         /// </summary>
+        [DependencyProperty]
         public bool IsVisible { get; set; }
         #endregion
 

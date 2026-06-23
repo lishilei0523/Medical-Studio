@@ -5,7 +5,12 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:cm="http://caliburnmicro.com"
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			 xmlns:converters="clr-namespace:MedicalSharp.Presentation.Converters;assembly=MedicalSharp.Presentation"
 			 mc:Ignorable="d">
+
+	<UserControl.Resources>
+		<converters:StringToGeometryConverter x:Key="StringToGeometryConverter" />
+	</UserControl.Resources>
 
 	<sd:GroupBox>
 		<!--Header-->
@@ -19,96 +24,26 @@
 				</Grid.ColumnDefinitions>
 				<!--Toolbar-->
 				<WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<sd:ToggleRadioButton Command="{Binding PickVoxelCommand}"
-										  ToolTip.Tip="拾取体素"
-										  IsVisible="{Binding ToolbarConfig.PickVoxelEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-PickVoxel}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding Translate3DCommand}" IsChecked="True"
-										  ToolTip.Tip="平移"
-										  IsVisible="{Binding ToolbarConfig.Translate3DEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Translate3D}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding Rotate2DCommand}"
-                                          ToolTip.Tip="2D旋转"
-                                          IsVisible="{Binding ToolbarConfig.Rotate2DEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Rotate2D}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding ResizeCommand}"
-                                          ToolTip.Tip="调整尺寸"
-                                          IsVisible="{Binding ToolbarConfig.ResizeEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Resize}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding EditVertexCommand}"
-                                          ToolTip.Tip="编辑顶点"
-                                          IsVisible="{Binding ToolbarConfig.EditVertexEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-EditVertex}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawTextCommand}"
-                                          ToolTip.Tip="绘制文本"
-                                          IsVisible="{Binding ToolbarConfig.DrawTextEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Text}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawPointCommand}"
-                                          ToolTip.Tip="绘制点"
-                                          IsVisible="{Binding ToolbarConfig.DrawPointEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Point}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawLineSegmentCommand}"
-                                          ToolTip.Tip="绘制线段"
-                                          IsVisible="{Binding ToolbarConfig.DrawLineSegmentEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-LineSegment}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawPolylineCommand}"
-                                          ToolTip.Tip="绘制折线"
-                                          IsVisible="{Binding ToolbarConfig.DrawPolylineEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Polyline}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawCurveCommand}"
-                                          ToolTip.Tip="绘制曲线"
-                                          IsVisible="{Binding ToolbarConfig.DrawCurveEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Curve}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawRectangleCommand}"
-                                          ToolTip.Tip="绘制矩形"
-                                          IsVisible="{Binding ToolbarConfig.DrawRectangleEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Rectangle}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawCircleCommand}"
-                                          ToolTip.Tip="绘制圆形"
-                                          IsVisible="{Binding ToolbarConfig.DrawCircleEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Circle}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawEllipseCommand}"
-                                          ToolTip.Tip="绘制椭圆形"
-                                          IsVisible="{Binding ToolbarConfig.DrawEllipseEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Ellipse}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawPolygonCommand}"
-                                          ToolTip.Tip="绘制多边形"
-                                          IsVisible="{Binding ToolbarConfig.DrawPolygonEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-Polygon}" />
-					</sd:ToggleRadioButton>
-					<sd:ToggleRadioButton Command="{Binding DrawClosedCurveCommand}"
-                                          ToolTip.Tip="绘制闭合曲线"
-                                          IsVisible="{Binding ToolbarConfig.DrawClosedCurveEnabled}"
-                                          Classes="Transparent-Panel">
-						<PathIcon Data="{StaticResource Icon-ClosedCurve}" />
-					</sd:ToggleRadioButton>
+					<ItemsControl ItemsSource="{Binding ToolbarCommands}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel Orientation="Horizontal" />
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<sd:ToggleRadioButton ToolTip.Tip="{Binding Name}"
+													  Command="{Binding RelayCommand}"
+													  IsChecked="{Binding IsChecked}"
+													  IsVisible="{Binding IsVisible}"
+													  GroupName="{Binding DataContext.Title,
+													  RelativeSource={RelativeSource AncestorType=UserControl}}"
+													  Classes="Transparent-Panel">
+									<PathIcon Data="{Binding Icon, Converter={StaticResource StringToGeometryConverter}}" />
+								</sd:ToggleRadioButton>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
 				</WrapPanel>
 				<!--More-->
 				<WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">

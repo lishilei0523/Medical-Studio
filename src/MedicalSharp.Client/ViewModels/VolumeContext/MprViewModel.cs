@@ -76,6 +76,9 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Camera = camera;
             this.InputManager = inputManager;
 
+            //初始化工具栏
+            this.InitToolbarCommands();
+
             //初始化预设协议
             this.InitPresetProtocols();
 
@@ -92,7 +95,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.Contrast = 1.0f;
             this.InterpolationMode = InterpolationMode.Linear;
             this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.SolidRainbowControlPoints);
-            this.Translate3DCommand.Execute(null);
         }
 
         #endregion
@@ -402,6 +404,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<MprProtocol> PresetProtocols { get; set; }
+        #endregion
+
+        #region 工具栏命令列表 —— AvaloniaList<ToolbarCommand> ToolbarCommands
+        /// <summary>
+        /// 工具栏命令列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<ToolbarCommand> ToolbarCommands { get; set; }
         #endregion
 
         #region 只读属性 - MPR渲染视口 —— MPRViewport MPRViewport
@@ -1413,6 +1423,33 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
 
         //Methods
+
+        #region 初始化工具栏命令 —— void InitToolbarCommands()
+        /// <summary>
+        /// 初始化工具栏命令
+        /// </summary>
+        private void InitToolbarCommands()
+        {
+            this.ToolbarCommands =
+            [
+                new ToolbarCommand("拾取体素", "Icon-PickVoxel", this.PickVoxelCommand),
+                new ToolbarCommand("平移", "Icon-Translate3D", this.Translate3DCommand, true),
+                new ToolbarCommand("2D旋转", "Icon-Rotate2D", this.Rotate2DCommand),
+                new ToolbarCommand("调整尺寸", "Icon-Resize", this.ResizeCommand),
+                new ToolbarCommand("编辑顶点", "Icon-EditVertex", this.EditVertexCommand),
+                new ToolbarCommand("绘制文本", "Icon-Text", this.DrawTextCommand),
+                new ToolbarCommand("绘制点", "Icon-Point", this.DrawPointCommand),
+                new ToolbarCommand("绘制线段", "Icon-LineSegment", this.DrawLineSegmentCommand),
+                new ToolbarCommand("绘制折线", "Icon-Polyline", this.DrawPolylineCommand),
+                new ToolbarCommand("绘制曲线", "Icon-Curve", this.DrawCurveCommand),
+                new ToolbarCommand("绘制矩形", "Icon-Rectangle", this.DrawRectangleCommand),
+                new ToolbarCommand("绘制圆形", "Icon-Circle", this.DrawCircleCommand),
+                new ToolbarCommand("绘制椭圆形", "Icon-Ellipse", this.DrawEllipseCommand),
+                new ToolbarCommand("绘制多边形", "Icon-Polygon", this.DrawPolygonCommand),
+                new ToolbarCommand("绘制闭合曲线", "Icon-ClosedCurve", this.DrawClosedCurveCommand)
+            ];
+        }
+        #endregion
 
         #region 初始化预设协议 —— async Task InitPresetProtocols()
         /// <summary>
