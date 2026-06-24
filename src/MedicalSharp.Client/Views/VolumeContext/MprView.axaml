@@ -29,7 +29,7 @@
 								<sd:ToggleRadioButton ToolTip.Tip="{Binding Name}"
 													  IsChecked="{Binding IsChecked}"
 													  IsVisible="{Binding IsVisible}"
-													  GroupName="{Binding DataContext.Title,
+													  GroupName="{Binding DataContext.InstanceUId,
 													  RelativeSource={RelativeSource AncestorType=UserControl}}"
 													  Classes="Transparent-Panel">
 									<PathIcon Data="{Binding Icon, Converter={StaticResource StringToGeometryConverter}}" />
