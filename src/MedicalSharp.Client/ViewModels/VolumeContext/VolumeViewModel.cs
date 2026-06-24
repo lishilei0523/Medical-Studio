@@ -50,7 +50,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<MPRPlaneChangedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -81,17 +81,19 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             //初始化输入管理器
             this.InputManager = new OrbitInputManager(this.Camera);
-            this.TranslateNormal();
 
-            //初始化MPR平面
-            this.InitMprPlanes();
+            //初始化工具栏
+            this.InitToolbarCommands();
 
             //初始化预设协议
             this.InitPresetProtocols();
 
+            //初始化MPR平面
+            this.InitMprPlanes();
+
             //默认值
+            this.Title = "VR";
             this.ViewEnabled = false;
-            this.ToolbarConfig = new VolumeToolbar();
             this.Shapes = [];
             this.RaycastChecked = true;
             this.AxialPlaneVisible = false;
@@ -120,14 +122,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public bool ViewEnabled { get; set; }
-        #endregion
-
-        #region 工具栏配置 —— VolumeToolbar ToolbarConfig
-        /// <summary>
-        /// 工具栏配置
-        /// </summary>
-        [DependencyProperty]
-        public VolumeToolbar ToolbarConfig { get; set; }
         #endregion
 
         #region Raycast渲染模式选中 —— bool RaycastChecked
@@ -283,6 +277,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public int FrameToken { get; set; }
+        #endregion
+
+        #region 标题 —— string Title
+        /// <summary>
+        /// 标题
+        /// </summary>
+        [DependencyProperty]
+        public string Title { get; set; }
         #endregion
 
         #region 轨道相机 —— OrbitCamera Camera
@@ -493,6 +495,14 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public AvaloniaList<RaycastProtocol> PresetProtocols { get; set; }
         #endregion
 
+        #region 工具栏命令列表 —— AvaloniaList<ToolbarCommand> ToolbarCommands
+        /// <summary>
+        /// 工具栏命令列表
+        /// </summary>
+        [DependencyProperty]
+        public AvaloniaList<ToolbarCommand> ToolbarCommands { get; set; }
+        #endregion
+
         #region 只读属性 - 体积渲染视口 —— VolumeViewport VolumeViewport
         /// <summary>
         /// 只读属性 - 体积渲染视口
@@ -509,6 +519,814 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
 
         //命令
+
+        #region 拾取体素命令 —— ICommand PickVoxelCommand
+        /// <summary>
+        /// 拾取体素命令
+        /// </summary>
+        public ICommand PickVoxelCommand => new RelayCommand(_ =>
+        {
+            Action<VoxelPickedEventArgs> picked = e =>
+            {
+                Vector2 mousePos2D = e.MousePos2D;
+                Vector3? textureCoord = e.PickedTextureCoord;
+                Vector3? worldPosition = e.PickedWorldPosition;
+                Vector3i? voxelPostion = e.PickedVoxelPosition;
+                short? voxelValue = e.PickedVoxelValue;
+                byte? markValue = e.PickedMarkValue;
+                if (textureCoord.HasValue)
+                {
+                    StringBuilder builder = new StringBuilder();
+                    builder.AppendLine($"点击屏幕坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
+                    builder.AppendLine($"点击纹理坐标: X:{textureCoord.Value.X}, Y:{textureCoord.Value.Y}, Z:{textureCoord.Value.Z}");
+                    builder.AppendLine($"点击世界坐标: X:{worldPosition.Value.X}, Y:{worldPosition.Value.Y}, Z:{worldPosition.Value.Z}");
+                    builder.AppendLine($"点击体素坐标: X:{voxelPostion.Value.X}, Y:{voxelPostion.Value.Y}, Z:{voxelPostion.Value.Z}");
+                    builder.AppendLine($"点击体素HU值: {voxelValue}");
+                    builder.AppendLine($"点击标记值: {markValue}");
+                    MessageBox.Show(builder.ToString(), "成功", MessageBoxButton.OK, PackIconMaterialDesignKind.Info);
+                }
+                else
+                {
+                    MessageBox.Show("拾取失败！", "错误", MessageBoxButton.OK, PackIconMaterialDesignKind.Error);
+                }
+            };
+
+            PickVoxelCommand command = new PickVoxelCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                VoxelPicked = picked
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 3D平移命令 —— ICommand Translate3DCommand
+        /// <summary>
+        /// 3D平移命令
+        /// </summary>
+        public ICommand Translate3DCommand => new RelayCommand(_ =>
+        {
+            Action<ITranslatable3D> translated = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            TranslateVisual3DCommand command = new TranslateVisual3DCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                Translated = translated
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 沿法向量平移命令 —— ICommand TranslateNormalCommand
+        /// <summary>
+        /// 沿法向量平移命令
+        /// </summary>
+        public ICommand TranslateNormalCommand => new RelayCommand(_ =>
+        {
+            Action<ITranslatableNormal> translating = translatable =>
+            {
+                if (translatable is ShapeVisual3D shape)
+                {
+                    ShapeTranslatingEvent message = new ShapeTranslatingEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+            Action<ITranslatableNormal> translated = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            TranslateVisualNormalCommand command = new TranslateVisualNormalCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                Translating = translating,
+                Translated = translated
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region U轴旋转命令 ——ICommand RotateUCommand
+        /// <summary>
+        /// U轴旋转命令
+        /// </summary>
+        public ICommand RotateUCommand => new RelayCommand(_ =>
+        {
+            Action<IRotatable> rotating = rotatable =>
+            {
+                if (rotatable is ShapeVisual3D shape)
+                {
+                    ShapeRotatingEvent message = new ShapeRotatingEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+            Action<IRotatable> rotated = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            RotateVisualUCommand command = new RotateVisualUCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                Rotating = rotating,
+                Rotated = rotated
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region V轴旋转命令 —— ICommand RotateVCommand
+        /// <summary>
+        /// V轴旋转命令
+        /// </summary>
+        public ICommand RotateVCommand => new RelayCommand(_ =>
+        {
+            Action<IRotatable> rotating = rotatable =>
+            {
+                if (rotatable is ShapeVisual3D shape)
+                {
+                    ShapeRotatingEvent message = new ShapeRotatingEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+            Action<IRotatable> rotated = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            RotateVisualVCommand command = new RotateVisualVCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                Rotating = rotating,
+                Rotated = rotated
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 3D旋转命令 —— ICommand Rotate3DCommand
+        /// <summary>
+        /// 3D旋转命令
+        /// </summary>
+        public ICommand Rotate3DCommand => new RelayCommand(_ =>
+        {
+            Action<IRotatable> rotating = rotatable =>
+            {
+                if (rotatable is ShapeVisual3D shape)
+                {
+                    ShapeRotatingEvent message = new ShapeRotatingEvent
+                    {
+                        Publisher = this,
+                        Shape = shape
+                    };
+                    this._eventAggregator.PublishOnUIThreadAsync(message);
+                }
+            };
+            Action<IRotatable> rotated = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            RotateVisual3DCommand command = new RotateVisual3DCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                Rotating = rotating,
+                Rotated = rotated
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 调整尺寸命令 —— ICommand ResizeCommand
+        /// <summary>
+        /// 调整尺寸命令
+        /// </summary>
+        public ICommand ResizeCommand => new RelayCommand(_ =>
+        {
+            Action<IResizable3D> resized = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            ResizeVisual3DCommand command = new ResizeVisual3DCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                Resized = resized
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 编辑顶点命令 —— ICommand EditVertexCommand
+        /// <summary>
+        /// 编辑顶点命令
+        /// </summary>
+        public ICommand EditVertexCommand => new RelayCommand(_ =>
+        {
+            Action<IVertexEditable> vertexEdited = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            EditVertexCommand command = new EditVertexCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                VertexEdited = vertexEdited
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制文本命令 —— ICommand DrawTextCommand
+        /// <summary>
+        /// 绘制文本命令
+        /// </summary>
+        public ICommand DrawTextCommand => new RelayCommand(_ =>
+        {
+            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
+            Func<TextVisual3D, Task<string>> drawStart = async shape =>
+            {
+                int count = this.Shapes.OfType<LineSegmentVisual3D>().Count();
+                shape.DisplayName = $"文本{count + 1}";
+                this.Shapes.Add(shape);
+
+                TextViewModel viewModel = ResolveMediator.Resolve<TextViewModel>();
+                bool? result = await this._windowManager.ShowDialogAsync(viewModel);
+                if (result == true)
+                {
+                    return viewModel.Content;
+                }
+
+                return null;
+            };
+            Action<TextVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+            Action<TextVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
+
+            DrawTextCommand command = new DrawTextCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                GetNormal = getNormal,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制点命令 —— ICommand DrawPointCommand
+        /// <summary>
+        /// 绘制点命令
+        /// </summary>
+        public ICommand DrawPointCommand => new RelayCommand(_ =>
+        {
+            Action<PointVisual3D> drawEnd = shape =>
+            {
+                int count = this.Shapes.OfType<PointVisual3D>().Count();
+                shape.DisplayName = $"点{count + 1}";
+                this.Shapes.Add(shape);
+
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            DrawPointCommand command = new DrawPointCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawEnd = drawEnd
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制线段命令 —— ICommand DrawLineSegmentCommand
+        /// <summary>
+        /// 绘制线段命令
+        /// </summary>
+        public ICommand DrawLineSegmentCommand => new RelayCommand(_ =>
+        {
+            Action<LineSegmentVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<LineSegmentVisual3D>().Count();
+                shape.DisplayName = $"线段{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<LineSegmentVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            DrawLineSegmentCommand command = new DrawLineSegmentCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制矩形命令 —— ICommand DrawRectangleCommand
+        /// <summary>
+        /// 绘制矩形命令
+        /// </summary>
+        public ICommand DrawRectangleCommand => new RelayCommand(_ =>
+        {
+            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
+            Action<RectangleVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<RectangleVisual3D>().Count();
+                shape.DisplayName = $"矩形{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<RectangleVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            DrawRectangleCommand command = new DrawRectangleCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                GetNormal = getNormal,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制圆形命令 —— ICommand DrawCircleCommand
+        /// <summary>
+        /// 绘制圆形命令
+        /// </summary>
+        public ICommand DrawCircleCommand => new RelayCommand(_ =>
+        {
+            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
+            Action<CircleVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<CircleVisual3D>().Count();
+                shape.DisplayName = $"圆{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<CircleVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            DrawCircleCommand command = new DrawCircleCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                GetNormal = getNormal,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制椭圆形命令 —— ICommand DrawEllipseCommand
+        /// <summary>
+        /// 绘制椭圆形命令
+        /// </summary>
+        public ICommand DrawEllipseCommand => new RelayCommand(_ =>
+        {
+            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
+            Action<EllipseVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<EllipseVisual3D>().Count();
+                shape.DisplayName = $"椭圆{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<EllipseVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            DrawEllipseCommand command = new DrawEllipseCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                GetNormal = getNormal,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制折线命令 —— ICommand DrawPolylineCommand
+        /// <summary>
+        /// 绘制折线命令
+        /// </summary>
+        public ICommand DrawPolylineCommand => new RelayCommand(_ =>
+        {
+            Action<PolylineVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<PolylineVisual3D>().Count(x => !x.Closed);
+                shape.DisplayName = $"折线{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<PolylineVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+            Action<PolylineVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
+
+            DrawPolylineCommand command = new DrawPolylineCommand(false)
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制曲线命令 —— ICommand DrawCurveCommand
+        /// <summary>
+        /// 绘制曲线命令
+        /// </summary>
+        public ICommand DrawCurveCommand => new RelayCommand(_ =>
+        {
+            Action<CurveVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<CurveVisual3D>().Count(x => !x.Closed);
+                shape.DisplayName = $"曲线{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<CurveVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+            Action<CurveVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
+
+            DrawCurveCommand command = new DrawCurveCommand(false)
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制多边形命令 —— ICommand DrawPolygonCommand
+        /// <summary>
+        /// 绘制多边形命令
+        /// </summary>
+        public ICommand DrawPolygonCommand => new RelayCommand(_ =>
+        {
+            Action<PolylineVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<PolylineVisual3D>().Count(x => x.Closed);
+                shape.DisplayName = $"多边形{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<PolylineVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+            Action<PolylineVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
+
+            DrawPolylineCommand command = new DrawPolylineCommand(true)
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制闭合曲线命令 —— ICommand DrawClosedCurveCommand
+        /// <summary>
+        /// 绘制闭合曲线命令
+        /// </summary>
+        public ICommand DrawClosedCurveCommand => new RelayCommand(_ =>
+        {
+            Action<CurveVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<CurveVisual3D>().Count(x => x.Closed);
+                shape.DisplayName = $"闭合曲线{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<CurveVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+            Action<CurveVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
+
+            DrawCurveCommand command = new DrawCurveCommand(true)
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制立方体命令 —— ICommand DrawBoxCommand
+        /// <summary>
+        /// 绘制立方体命令
+        /// </summary>
+        public ICommand DrawBoxCommand => new RelayCommand(_ =>
+        {
+            Action<BoundingBoxVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<BoundingBoxVisual3D>().Count();
+                shape.DisplayName = $"立方体{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<BoundingBoxVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            DrawBoundingBoxCommand command = new DrawBoundingBoxCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制球体命令 —— ICommand DrawSphereCommand
+        /// <summary>
+        /// 绘制球体命令
+        /// </summary>
+        public ICommand DrawSphereCommand => new RelayCommand(_ =>
+        {
+            Action<BoundingSphereVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<BoundingSphereVisual3D>().Count();
+                shape.DisplayName = $"球体{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<BoundingSphereVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            DrawBoundingSphereCommand command = new DrawBoundingSphereCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制圆柱体命令 —— ICommand DrawCylinderCommand
+        /// <summary>
+        /// 绘制圆柱体命令
+        /// </summary>
+        public ICommand DrawCylinderCommand => new RelayCommand(_ =>
+        {
+            Action<CylinderVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<CylinderVisual3D>().Count();
+                shape.DisplayName = $"圆柱体{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<CylinderVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+
+            DrawCylinderCommand command = new DrawCylinderCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
+
+        #region 绘制凸多面体命令 —— ICommand DrawConvexPolyhedronCommand
+        /// <summary>
+        /// 绘制凸多面体命令
+        /// </summary>
+        public ICommand DrawConvexPolyhedronCommand => new RelayCommand(_ =>
+        {
+            Action<ConvexPolyhedronVisual3D> drawStart = shape =>
+            {
+                int count = this.Shapes.OfType<ConvexPolyhedronVisual3D>().Count();
+                shape.DisplayName = $"多面体{count + 1}";
+                this.Shapes.Add(shape);
+            };
+            Action<ConvexPolyhedronVisual3D> drawEnd = _ =>
+            {
+                SyncViewportEvent message = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
+            };
+            Action<ConvexPolyhedronVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
+
+            DrawConvexPolyhedronCommand command = new DrawConvexPolyhedronCommand
+            {
+                VisualPicked = this.OnVisualPicked,
+                VisualRemoved = this.OnVisualRemoved,
+                GetMarkValue = this.GetCurrentMarkValue,
+                ShapeCut = this.OnShapeCutEnd,
+                ShapeAnalysed = this.OnShapeAnalyseEnd,
+                DrawStart = drawStart,
+                DrawEnd = drawEnd,
+                DrawCancelled = drawCancelled
+            };
+            this.InputManager.SwitchCommand(command);
+        });
+        #endregion
 
         #region 复位MPR平面命令 —— ICommand ResetMprPlanesCommand
         /// <summary>
@@ -652,817 +1470,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
         #region # 方法
 
-        //Actions
-
-        #region 拾取体素 —— void PickVoxel()
-        /// <summary>
-        /// 拾取体素
-        /// </summary>
-        public void PickVoxel()
-        {
-            Action<VoxelPickedEventArgs> picked = e =>
-            {
-                Vector2 mousePos2D = e.MousePos2D;
-                Vector3? textureCoord = e.PickedTextureCoord;
-                Vector3? worldPosition = e.PickedWorldPosition;
-                Vector3i? voxelPostion = e.PickedVoxelPosition;
-                short? voxelValue = e.PickedVoxelValue;
-                byte? markValue = e.PickedMarkValue;
-                if (textureCoord.HasValue)
-                {
-                    StringBuilder builder = new StringBuilder();
-                    builder.AppendLine($"点击屏幕坐标: X:{mousePos2D.X}, Y:{mousePos2D.Y}");
-                    builder.AppendLine($"点击纹理坐标: X:{textureCoord.Value.X}, Y:{textureCoord.Value.Y}, Z:{textureCoord.Value.Z}");
-                    builder.AppendLine($"点击世界坐标: X:{worldPosition.Value.X}, Y:{worldPosition.Value.Y}, Z:{worldPosition.Value.Z}");
-                    builder.AppendLine($"点击体素坐标: X:{voxelPostion.Value.X}, Y:{voxelPostion.Value.Y}, Z:{voxelPostion.Value.Z}");
-                    builder.AppendLine($"点击体素HU值: {voxelValue}");
-                    builder.AppendLine($"点击标记值: {markValue}");
-                    MessageBox.Show(builder.ToString(), "成功", MessageBoxButton.OK, PackIconMaterialDesignKind.Info);
-                }
-                else
-                {
-                    MessageBox.Show("拾取失败！", "错误", MessageBoxButton.OK, PackIconMaterialDesignKind.Error);
-                }
-            };
-
-            PickVoxelCommand command = new PickVoxelCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                VoxelPicked = picked
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 3D平移 —— void Translate3D()
-        /// <summary>
-        /// 3D平移
-        /// </summary>
-        public void Translate3D()
-        {
-            Action<ITranslatable3D> translated = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            TranslateVisual3DCommand command = new TranslateVisual3DCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                Translated = translated
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 沿法向量平移 —— void TranslateNormal()
-        /// <summary>
-        /// 沿法向量平移
-        /// </summary>
-        public void TranslateNormal()
-        {
-            Action<ITranslatableNormal> translating = translatable =>
-            {
-                if (translatable is ShapeVisual3D shape)
-                {
-                    ShapeTranslatingEvent message = new ShapeTranslatingEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
-            };
-            Action<ITranslatableNormal> translated = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            TranslateVisualNormalCommand command = new TranslateVisualNormalCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                Translating = translating,
-                Translated = translated
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region U轴旋转 —— void RotateU()
-        /// <summary>
-        /// U轴旋转
-        /// </summary>
-        public void RotateU()
-        {
-            Action<IRotatable> rotating = rotatable =>
-            {
-                if (rotatable is ShapeVisual3D shape)
-                {
-                    ShapeRotatingEvent message = new ShapeRotatingEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
-            };
-            Action<IRotatable> rotated = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            RotateVisualUCommand command = new RotateVisualUCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                Rotating = rotating,
-                Rotated = rotated
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region V轴旋转 —— void RotateV()
-        /// <summary>
-        /// V轴旋转
-        /// </summary>
-        public void RotateV()
-        {
-            Action<IRotatable> rotating = rotatable =>
-            {
-                if (rotatable is ShapeVisual3D shape)
-                {
-                    ShapeRotatingEvent message = new ShapeRotatingEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
-            };
-            Action<IRotatable> rotated = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            RotateVisualVCommand command = new RotateVisualVCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                Rotating = rotating,
-                Rotated = rotated
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 3D旋转 —— void Rotate3D()
-        /// <summary>
-        /// 3D旋转
-        /// </summary>
-        public void Rotate3D()
-        {
-            Action<IRotatable> rotating = rotatable =>
-            {
-                if (rotatable is ShapeVisual3D shape)
-                {
-                    ShapeRotatingEvent message = new ShapeRotatingEvent
-                    {
-                        Publisher = this,
-                        Shape = shape
-                    };
-                    this._eventAggregator.PublishOnUIThreadAsync(message);
-                }
-            };
-            Action<IRotatable> rotated = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            RotateVisual3DCommand command = new RotateVisual3DCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                Rotating = rotating,
-                Rotated = rotated
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 调整尺寸 —— void Resize()
-        /// <summary>
-        /// 调整尺寸
-        /// </summary>
-        public void Resize()
-        {
-            Action<IResizable3D> resized = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            ResizeVisual3DCommand command = new ResizeVisual3DCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                Resized = resized
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 编辑顶点 —— void EditVertex()
-        /// <summary>
-        /// 编辑顶点
-        /// </summary>
-        public void EditVertex()
-        {
-            Action<IVertexEditable> vertexEdited = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            EditVertexCommand command = new EditVertexCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                VertexEdited = vertexEdited
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制文本 —— void DrawText()
-        /// <summary>
-        /// 绘制文本
-        /// </summary>
-        public void DrawText()
-        {
-            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
-            Func<TextVisual3D, Task<string>> drawStart = async shape =>
-            {
-                int count = this.Shapes.OfType<LineSegmentVisual3D>().Count();
-                shape.DisplayName = $"文本{count + 1}";
-                this.Shapes.Add(shape);
-
-                TextViewModel viewModel = ResolveMediator.Resolve<TextViewModel>();
-                bool? result = await this._windowManager.ShowDialogAsync(viewModel);
-                if (result == true)
-                {
-                    return viewModel.Content;
-                }
-
-                return null;
-            };
-            Action<TextVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-            Action<TextVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
-
-            DrawTextCommand command = new DrawTextCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                GetNormal = getNormal,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd,
-                DrawCancelled = drawCancelled
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制点 —— void DrawPoint()
-        /// <summary>
-        /// 绘制点
-        /// </summary>
-        public void DrawPoint()
-        {
-            Action<PointVisual3D> drawEnd = shape =>
-            {
-                int count = this.Shapes.OfType<PointVisual3D>().Count();
-                shape.DisplayName = $"点{count + 1}";
-                this.Shapes.Add(shape);
-
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            DrawPointCommand command = new DrawPointCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawEnd = drawEnd
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制线段 —— void DrawLineSegment()
-        /// <summary>
-        /// 绘制线段
-        /// </summary>
-        public void DrawLineSegment()
-        {
-            Action<LineSegmentVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<LineSegmentVisual3D>().Count();
-                shape.DisplayName = $"线段{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<LineSegmentVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            DrawLineSegmentCommand command = new DrawLineSegmentCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制矩形 —— void DrawRectangle()
-        /// <summary>
-        /// 绘制矩形
-        /// </summary>
-        public void DrawRectangle()
-        {
-            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
-            Action<RectangleVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<RectangleVisual3D>().Count();
-                shape.DisplayName = $"矩形{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<RectangleVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            DrawRectangleCommand command = new DrawRectangleCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                GetNormal = getNormal,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制圆形 —— void DrawCircle()
-        /// <summary>
-        /// 绘制圆形
-        /// </summary>
-        public void DrawCircle()
-        {
-            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
-            Action<CircleVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<CircleVisual3D>().Count();
-                shape.DisplayName = $"圆{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<CircleVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            DrawCircleCommand command = new DrawCircleCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                GetNormal = getNormal,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制椭圆形 —— void DrawEllipse()
-        /// <summary>
-        /// 绘制椭圆形
-        /// </summary>
-        public void DrawEllipse()
-        {
-            Func<Vector3D> getNormal = () => -this.Camera.LookDirection.ToVector3();
-            Action<EllipseVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<EllipseVisual3D>().Count();
-                shape.DisplayName = $"椭圆{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<EllipseVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            DrawEllipseCommand command = new DrawEllipseCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                GetNormal = getNormal,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制折线 —— void DrawPolyline()
-        /// <summary>
-        /// 绘制折线
-        /// </summary>
-        public void DrawPolyline()
-        {
-            Action<PolylineVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<PolylineVisual3D>().Count(x => !x.Closed);
-                shape.DisplayName = $"折线{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<PolylineVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-            Action<PolylineVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
-
-            DrawPolylineCommand command = new DrawPolylineCommand(false)
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd,
-                DrawCancelled = drawCancelled
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制曲线 —— void DrawCurve()
-        /// <summary>
-        /// 绘制曲线
-        /// </summary>
-        public void DrawCurve()
-        {
-            Action<CurveVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<CurveVisual3D>().Count(x => !x.Closed);
-                shape.DisplayName = $"曲线{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<CurveVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-            Action<CurveVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
-
-            DrawCurveCommand command = new DrawCurveCommand(false)
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd,
-                DrawCancelled = drawCancelled
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制多边形 —— void DrawPolygon()
-        /// <summary>
-        /// 绘制多边形
-        /// </summary>
-        public void DrawPolygon()
-        {
-            Action<PolylineVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<PolylineVisual3D>().Count(x => x.Closed);
-                shape.DisplayName = $"多边形{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<PolylineVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-            Action<PolylineVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
-
-            DrawPolylineCommand command = new DrawPolylineCommand(true)
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd,
-                DrawCancelled = drawCancelled
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制闭合曲线 —— void DrawClosedCurve()
-        /// <summary>
-        /// 绘制闭合曲线
-        /// </summary>
-        public void DrawClosedCurve()
-        {
-            Action<CurveVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<CurveVisual3D>().Count(x => x.Closed);
-                shape.DisplayName = $"闭合曲线{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<CurveVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-            Action<CurveVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
-
-            DrawCurveCommand command = new DrawCurveCommand(true)
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd,
-                DrawCancelled = drawCancelled
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制立方体 —— void DrawBox()
-        /// <summary>
-        /// 绘制立方体
-        /// </summary>
-        public void DrawBox()
-        {
-            Action<BoundingBoxVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<BoundingBoxVisual3D>().Count();
-                shape.DisplayName = $"立方体{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<BoundingBoxVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            DrawBoundingBoxCommand command = new DrawBoundingBoxCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制球体 —— void DrawSphere()
-        /// <summary>
-        /// 绘制球体
-        /// </summary>
-        public void DrawSphere()
-        {
-            Action<BoundingSphereVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<BoundingSphereVisual3D>().Count();
-                shape.DisplayName = $"球体{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<BoundingSphereVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            DrawBoundingSphereCommand command = new DrawBoundingSphereCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制圆柱体 —— void DrawCylinder()
-        /// <summary>
-        /// 绘制圆柱体
-        /// </summary>
-        public void DrawCylinder()
-        {
-            Action<CylinderVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<CylinderVisual3D>().Count();
-                shape.DisplayName = $"圆柱体{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<CylinderVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            DrawCylinderCommand command = new DrawCylinderCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-        #region 绘制凸多面体 —— void DrawConvexPolyhedron()
-        /// <summary>
-        /// 绘制凸多面体
-        /// </summary>
-        public void DrawConvexPolyhedron()
-        {
-            Action<ConvexPolyhedronVisual3D> drawStart = shape =>
-            {
-                int count = this.Shapes.OfType<ConvexPolyhedronVisual3D>().Count();
-                shape.DisplayName = $"多面体{count + 1}";
-                this.Shapes.Add(shape);
-            };
-            Action<ConvexPolyhedronVisual3D> drawEnd = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-            Action<ConvexPolyhedronVisual3D> drawCancelled = shape => this.Shapes.Remove(shape);
-
-            DrawConvexPolyhedronCommand command = new DrawConvexPolyhedronCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                DrawStart = drawStart,
-                DrawEnd = drawEnd,
-                DrawCancelled = drawCancelled
-            };
-            this.InputManager.SwitchCommand(command);
-        }
-        #endregion
-
-
         //Events
 
         #region 3D元素已拾取事件 —— void OnVisualPicked(Visual3D visual3D)
@@ -1552,19 +1559,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 StatisticResult = result
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
-        }
-        #endregion
-
-        #region 处理清空形状事件 —— Task HandleAsync(ClearShapesEvent message...
-        /// <summary>
-        /// 处理清空形状事件
-        /// </summary>
-        public Task HandleAsync(ClearShapesEvent message, CancellationToken cancellationToken)
-        {
-            this.Shapes.Clear();
-            this.FrameToken++;
-
-            return Task.CompletedTask;
         }
         #endregion
 
@@ -1688,6 +1682,40 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
 
         //Methods
+
+        #region 初始化工具栏命令 —— void InitToolbarCommands()
+        /// <summary>
+        /// 初始化工具栏命令
+        /// </summary>
+        private void InitToolbarCommands()
+        {
+            this.ToolbarCommands =
+            [
+                new ToolbarCommand("拾取体素", "Icon-PickVoxel", this.PickVoxelCommand),
+                new ToolbarCommand("沿法线平移", "Icon-TranslateNormal", this.TranslateNormalCommand, true),
+                new ToolbarCommand("3D平移", "Icon-Translate3D", this.Translate3DCommand),
+                new ToolbarCommand("绕U轴旋转", "Icon-RotateU", this.RotateUCommand),
+                new ToolbarCommand("绕V轴旋转", "Icon-RotateV", this.RotateVCommand),
+                new ToolbarCommand("3D旋转", "Icon-Rotate2D", this.Rotate3DCommand),
+                new ToolbarCommand("调整尺寸", "Icon-Resize", this.ResizeCommand),
+                new ToolbarCommand("编辑顶点", "Icon-EditVertex", this.EditVertexCommand),
+                new ToolbarCommand("绘制文本", "Icon-Text", this.DrawTextCommand),
+                new ToolbarCommand("绘制点", "Icon-Point", this.DrawPointCommand),
+                new ToolbarCommand("绘制线段", "Icon-LineSegment", this.DrawLineSegmentCommand),
+                new ToolbarCommand("绘制折线", "Icon-Polyline", this.DrawPolylineCommand),
+                new ToolbarCommand("绘制曲线", "Icon-Curve", this.DrawCurveCommand),
+                new ToolbarCommand("绘制矩形", "Icon-Rectangle", this.DrawRectangleCommand),
+                new ToolbarCommand("绘制圆形", "Icon-Circle", this.DrawCircleCommand),
+                new ToolbarCommand("绘制椭圆形", "Icon-Ellipse", this.DrawEllipseCommand),
+                new ToolbarCommand("绘制多边形", "Icon-Polygon", this.DrawPolygonCommand),
+                new ToolbarCommand("绘制闭合曲线", "Icon-ClosedCurve", this.DrawClosedCurveCommand),
+                new ToolbarCommand("绘制立方体", "Icon-Cube", this.DrawBoxCommand),
+                new ToolbarCommand("绘制球体", "Icon-Sphere", this.DrawSphereCommand),
+                new ToolbarCommand("绘制圆柱体", "Icon-Cylinder", this.DrawCylinderCommand),
+                new ToolbarCommand("绘制多面体", "Icon-Polyhedron", this.DrawConvexPolyhedronCommand)
+            ];
+        }
+        #endregion
 
         #region 初始化预设协议 —— async Task InitPresetProtocols()
         /// <summary>

@@ -979,8 +979,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             TaskDialogStandardResult result = await MessageBox.Show("确定要清空吗？", "警告", MessageBoxButton.OKCancel);
             if (result == TaskDialogStandardResult.OK)
             {
-                ClearShapesEvent message = new ClearShapesEvent();
-                await this._eventAggregator.PublishOnUIThreadAsync(message);
+                this.Shapes.Clear();
             }
         }, _ => this.VolumeData != null);
         #endregion
@@ -1608,7 +1607,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         private void OnShapesItemChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
-            if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
+            if (eventArgs.Action is NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Reset)
             {
                 //发布消息
                 SyncViewportEvent message = new SyncViewportEvent

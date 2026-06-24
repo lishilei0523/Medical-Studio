@@ -50,7 +50,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// MPR视图模型
     /// </summary>
-    public class MprViewModel : ScreenBase, IHandle<ClearShapesEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<MPRPlaneChangedEvent>, IHandle<MPRPlaneResetEvent>
+    public class MprViewModel : ScreenBase, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<MPRPlaneChangedEvent>, IHandle<MPRPlaneResetEvent>
     {
         #region # 字段及构造器
 
@@ -84,7 +84,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
             //默认值
             this.ViewEnabled = false;
-            this.ToolbarConfig = new MprToolbar();
             this.Shapes = [];
             this.GrayModeChecked = true;
             this.Crosshair = new CrosshairVisual3D();
@@ -109,14 +108,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public bool ViewEnabled { get; set; }
-        #endregion
-
-        #region 工具栏配置 —— MprToolbar ToolbarConfig
-        /// <summary>
-        /// 工具栏配置
-        /// </summary>
-        [DependencyProperty]
-        public MprToolbar ToolbarConfig { get; set; }
         #endregion
 
         #region 灰度渲染模式选中 —— bool GrayModeChecked
@@ -1216,19 +1207,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 SkipVolumeSync = eventArgs.TriggerSource == MPRPlaneChangeSource.ExternalSync
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
-        }
-        #endregion
-
-        #region 处理清空形状事件 —— Task HandleAsync(ClearShapesEvent message...
-        /// <summary>
-        /// 处理清空形状事件
-        /// </summary>
-        public Task HandleAsync(ClearShapesEvent message, CancellationToken cancellationToken)
-        {
-            this.Shapes.Clear();
-            this.FrameToken++;
-
-            return Task.CompletedTask;
         }
         #endregion
 
