@@ -72,7 +72,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this._windowManager = windowManager;
             this._eventAggregator = eventAggregator;
             this._eventAggregator.SubscribeOnUIThread(this);
-            this.Title = title;
+            base.DisplayName = title;
             this.Camera = camera;
             this.InputManager = inputManager;
 
@@ -116,7 +116,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool GrayModeChecked
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -132,7 +132,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool PseudoColorChecked
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -148,7 +148,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public bool CrosshairVisible
         {
-            get => field;
+            get;
             set
             {
                 field = value;
@@ -181,14 +181,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public int FrameToken { get; set; }
-        #endregion
-
-        #region 标题 —— string Title
-        /// <summary>
-        /// 标题
-        /// </summary>
-        [DependencyProperty]
-        public string Title { get; set; }
         #endregion
 
         #region MPR平面 —— MPRPlane Plane

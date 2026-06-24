@@ -92,7 +92,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.InitMprPlanes();
 
             //默认值
-            this.Title = "VR";
             this.ViewEnabled = false;
             this.Shapes = [];
             this.RaycastChecked = true;
@@ -277,14 +276,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         [DependencyProperty]
         public int FrameToken { get; set; }
-        #endregion
-
-        #region 标题 —— string Title
-        /// <summary>
-        /// 标题
-        /// </summary>
-        [DependencyProperty]
-        public string Title { get; set; }
         #endregion
 
         #region 轨道相机 —— OrbitCamera Camera
