@@ -34,7 +34,7 @@
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="3" Maximum="9" Increment="2"
 								   ParsingNumberStyle="Integer" FormatString="F0"
-								   Text="{Binding KernelSize}" />
+                                   Value="{Binding KernelSize}" />
 				</sd:FormItem>
 			</StackPanel>
 			<!--占位区-->

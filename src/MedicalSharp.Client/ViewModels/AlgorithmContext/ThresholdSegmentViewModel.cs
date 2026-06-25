@@ -101,8 +101,6 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         /// <summary>
         /// 初始化
         /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         protected override Task OnActivatedAsync(CancellationToken cancellationToken)
         {
             //默认值

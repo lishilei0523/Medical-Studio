@@ -27,13 +27,13 @@
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="3" Maximum="9" Increment="2" 
 								   ParsingNumberStyle="Integer" FormatString="F0"
-								   Text="{Binding KernelSize}" />
+                                   Value="{Binding KernelSize}" />
 				</sd:FormItem>
 				<sd:FormItem Label="标准差：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="0.5" Maximum="2.5" Increment="0.1"
 								   ParsingNumberStyle="Float" FormatString="F1"
-								   Text="{Binding Sigma}" />
+                                   Value="{Binding Sigma}" />
 				</sd:FormItem>
 			</StackPanel>
 			<!--占位区-->

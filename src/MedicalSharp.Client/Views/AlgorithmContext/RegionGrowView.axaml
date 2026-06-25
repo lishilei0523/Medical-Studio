@@ -1,0 +1,61 @@
+<UserControl x:Class="MedicalSharp.Client.Views.AlgorithmContext.RegionGrowView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:fa="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:cm="http://caliburnmicro.com"
+             xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+             mc:Ignorable="d">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Margin="5,20,7,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <sd:ToggleRadioButton Grid.Column="0" ToolTip.Tip="单点"
+                                  Width="70" HorizontalAlignment="Center">
+                <PathIcon Data="{StaticResource Icon-Point}" />
+            </sd:ToggleRadioButton>
+            <sd:ToggleRadioButton Grid.Column="1" ToolTip.Tip="多点"
+                                  Width="70" HorizontalAlignment="Center">
+                <PathIcon Data="{StaticResource Icon-Points}" />
+            </sd:ToggleRadioButton>
+            <sd:ToggleRadioButton Grid.Column="2" ToolTip.Tip="曲线"
+                                  Width="70" HorizontalAlignment="Center">
+                <PathIcon Data="{StaticResource Icon-Curve}" />
+            </sd:ToggleRadioButton>
+        </Grid>
+        <StackPanel Grid.Row="1" Grid.IsSharedSizeScope="True" Margin="0,5,0,5">
+            <sd:FormItem Label="低阈值：">
+                <NumericUpDown Width="169" HorizontalAlignment="Left"
+                               Minimum="-1024" Maximum="3071" Increment="5"
+                               ParsingNumberStyle="Integer" FormatString="F0"
+                               Value="{Binding MinHU}" />
+            </sd:FormItem>
+            <sd:FormItem Label="高阈值：">
+                <NumericUpDown Width="169" HorizontalAlignment="Left"
+                               Minimum="-1024" Maximum="3071" Increment="10"
+                               ParsingNumberStyle="Integer" FormatString="F0"
+                               Value="{Binding MaxHU}" />
+            </sd:FormItem>
+            <sd:FormItem>
+                <fa:RangeSlider Width="169" HorizontalAlignment="Left"
+                                Minimum="-1024" Maximum="3071"
+                                RangeStart="{Binding MinHU}" RangeEnd="{Binding MaxHU}"
+                                StepFrequency="1" ShowValueToolTip="True" />
+            </sd:FormItem>
+            <sd:FormItem Label="组织：">
+                <ComboBox Width="169" ItemsSource="{Binding Tissues}"
+                          DisplayMemberBinding="{Binding Name}"
+                          SelectedValue="{Binding SelectedTissue}" />
+            </sd:FormItem>
+        </StackPanel>
+    </Grid>
+</UserControl>

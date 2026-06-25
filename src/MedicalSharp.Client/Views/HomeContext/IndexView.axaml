@@ -97,6 +97,7 @@
                         </MenuItem>
                         <MenuItem Header="分割(_S)">
                             <MenuItem Header="阈值分割(_T)" Command="{Binding ThresholdSegmentCommand}" />
+                            <MenuItem Header="区域生长分割(_G)" Command="{Binding RegionGrowCommand}" />
                         </MenuItem>
                     </Menu>
                 </Grid>
@@ -114,11 +115,36 @@
                 <!--Left Pannel-->
                 <Grid Grid.Column="0" Margin="4,1,2,5">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="4" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="330" />
                     </Grid.RowDefinitions>
-                    <sd:GroupBox Header="形状管理">
+                    <sd:GroupBox Grid.Row="0" IsVisible="{Binding FunctionPanel, Converter={StaticResource NullToFalseConverter}}">
+                        <sd:GroupBox.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <WrapPanel Grid.Column="0">
+                                    <TextBlock Text="{Binding FunctionPanel.DisplayName}" />
+                                </WrapPanel>
+                                <WrapPanel Grid.Column="1" HorizontalAlignment="Right">
+                                    <Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
+                                            ToolTip.Tip="关闭" Background="Transparent"
+                                            cm:Message.Attach="CloseFunctionPanel();">
+                                        <PathIcon Data="{StaticResource Icon-Close}" />
+                                    </Button>
+                                </WrapPanel>
+                            </Grid>
+                        </sd:GroupBox.Header>
+                        <ContentControl cm:View.Model="{Binding FunctionPanel}" />
+                    </sd:GroupBox>
+                    <GridSplitter Grid.Row="1" Height="4" Background="Transparent" HorizontalAlignment="Stretch"
+                                  IsVisible="{Binding FunctionPanel, Converter={StaticResource NullToFalseConverter}}" />
+                    <sd:GroupBox Grid.Row="2" Header="形状管理">
                         <ListBox ItemsSource="{Binding Shapes}" SelectedItem="{Binding SelectedShape}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -147,8 +173,8 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </sd:GroupBox>
-                    <GridSplitter Grid.Row="1" Height="4" Background="Transparent" HorizontalAlignment="Stretch" />
-                    <sd:GroupBox Grid.Row="2">
+                    <GridSplitter Grid.Row="3" Height="4" Background="Transparent" HorizontalAlignment="Stretch" />
+                    <sd:GroupBox Grid.Row="4">
                         <sd:GroupBox.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -160,7 +186,7 @@
                                 </WrapPanel>
                                 <WrapPanel Grid.Column="1" HorizontalAlignment="Right">
                                     <Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
-                                            ToolTip.Tip="复制"
+                                            ToolTip.Tip="复制" Background="Transparent"
                                             cm:Message.Attach="CopyStatistics();">
                                         <PathIcon Data="{StaticResource Icon-Copy}" />
                                     </Button>
@@ -203,7 +229,7 @@
                 <Grid Grid.Column="2" Margin="2,1,4,5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="340" />
-                        <RowDefinition Height="4" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <sd:GroupBox Grid.Row="2" Header="组织管理">

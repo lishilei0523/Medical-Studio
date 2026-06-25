@@ -228,6 +228,14 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public StatisticInfo StatisticInfo { get; set; }
         #endregion
 
+        #region 功能面板 —— ScreenBase FunctionPanel
+        /// <summary>
+        /// 功能面板
+        /// </summary>
+        [DependencyProperty]
+        public ScreenBase FunctionPanel { get; set; }
+        #endregion
+
         #region 布局视图模型 —— LayoutViewModel LayoutViewModel
         /// <summary>
         /// 布局视图模型
@@ -1461,6 +1469,21 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }, _ => this.VolumeData != null);
         #endregion
 
+        #region 区域生长分割命令 —— ICommand RegionGrowCommand
+        /// <summary>
+        /// 区域生长分割命令
+        /// </summary>
+        public ICommand RegionGrowCommand => new RelayCommand(_ =>
+        {
+            RegionGrowViewModel viewModel = ResolveMediator.Resolve<RegionGrowViewModel>();
+            viewModel.VolumeData = this.VolumeData;
+            viewModel.VolumeData = this.VolumeData;
+            viewModel.SelectedTissue = this.SelectedTissue;
+            viewModel.Tissues = this.Tissues;
+            this.FunctionPanel = viewModel;
+        }, _ => this.VolumeData != null);
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -1520,6 +1543,25 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public void RemoveShape(ShapeVisual3D shape)
         {
             this.Shapes.Remove(shape);
+        }
+        #endregion
+
+        #region 关闭功能面板 —— void CloseFunctionPanel()
+        /// <summary>
+        /// 关闭功能面板
+        /// </summary>
+        public void CloseFunctionPanel()
+        {
+            #region # 验证
+
+            if (this.FunctionPanel == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            this.FunctionPanel = null;
         }
         #endregion
 

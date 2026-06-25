@@ -30,7 +30,7 @@
 				<NumericUpDown Width="300" HorizontalAlignment="Left"
 							   Minimum="1" Maximum="255" Increment="1"
 							   ParsingNumberStyle="Integer" FormatString="F0"
-							   Text="{Binding MarkValue}" />
+                               Value="{Binding MarkValue}" />
 			</sd:FormItem>
 			<sd:FormItem Label="标记模式：">
 				<ComboBox Width="300"

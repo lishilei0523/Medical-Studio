@@ -27,25 +27,25 @@
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="0" Maximum="1" Increment="0.1"
 								   ParsingNumberStyle="Float" FormatString="F1"
-								   Text="{Binding Alpha}" />
+                                   Value="{Binding Alpha}" />
 				</sd:FormItem>
 				<sd:FormItem Label="Y方向权重：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="0" Maximum="1" Increment="0.1"
 								   ParsingNumberStyle="Float" FormatString="F1"
-								   Text="{Binding Beta}" />
+                                   Value="{Binding Beta}" />
 				</sd:FormItem>
                 <sd:FormItem Label="Z方向权重：">
                     <NumericUpDown Width="300" HorizontalAlignment="Left"
                                    Minimum="0" Maximum="1" Increment="0.1"
                                    ParsingNumberStyle="Float" FormatString="F1"
-                                   Text="{Binding Gamma}" />
+                                   Value="{Binding Gamma}" />
                 </sd:FormItem>
 				<sd:FormItem Label="偏移量：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="-0.05" Maximum="0.05" Increment="0.01"
 								   ParsingNumberStyle="Float" FormatString="F2"
-								   Text="{Binding Offset}" />
+                                   Value="{Binding Offset}" />
 				</sd:FormItem>
 			</StackPanel>
 			<!--占位区-->

@@ -40,7 +40,7 @@
                     <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                    Minimum="1" Maximum="4096" Increment="1"
                                    ParsingNumberStyle="Integer" FormatString="F0"
-                                   Text="{Binding MprViewModel.WindowWidth}" />
+                                   Value="{Binding MprViewModel.WindowWidth}" />
                     <Slider Grid.Column="1" Margin="10,0,0,0"
                             Minimum="1" Maximum="4096" SmallChange="1" LargeChange="10"
                             TickFrequency="100" TickPlacement="Outside"
@@ -56,7 +56,7 @@
                     <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                    Minimum="-1024" Maximum="3071" Increment="1"
                                    ParsingNumberStyle="Integer" FormatString="F0"
-                                   Text="{Binding MprViewModel.WindowCenter}" />
+                                   Value="{Binding MprViewModel.WindowCenter}" />
                     <Slider Grid.Column="1" Margin="10,0,0,0"
                             Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
                             TickFrequency="100" TickPlacement="Outside"
@@ -72,7 +72,7 @@
                     <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                    Minimum="0.1" Maximum="5.0" Increment="0.1"
                                    ParsingNumberStyle="Float" FormatString="F1"
-                                   Text="{Binding MprViewModel.Brightness}" />
+                                   Value="{Binding MprViewModel.Brightness}" />
                     <Slider Grid.Column="1" Margin="10,0,0,0"
                             Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
                             TickFrequency="0.1" TickPlacement="Outside"
@@ -88,7 +88,7 @@
                     <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                    Minimum="0.1" Maximum="5.0" Increment="0.1"
                                    ParsingNumberStyle="Float" FormatString="F1"
-                                   Text="{Binding MprViewModel.Contrast}" />
+                                   Value="{Binding MprViewModel.Contrast}" />
                     <Slider Grid.Column="1" Margin="10,0,0,0"
                             Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
                             TickFrequency="0.1" TickPlacement="Outside"

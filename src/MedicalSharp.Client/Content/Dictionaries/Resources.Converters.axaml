@@ -1,19 +1,24 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sd="https://github.com/lishilei0523/SD.Framework">
+                    xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+                    xmlns:converters="clr-namespace:MedicalSharp.Presentation.Converters;assembly=MedicalSharp.Presentation">
 
-  <!--枚举成员转换器-->
-  <sd:EnumMemberConverter x:Key="Converters.EnumMemberConverter" />
-  <!--字符串-几何图标转换器-->
-  <sd:StringToGeometryConverter x:Key="StringToGeometryConverter" />
-  <!--停/启用描述转换器-->
-  <sd:BooleanDescriptionConverter x:Key="Converters.EnabledDescriptionConverter">
-    <x:String>已停用</x:String>
-    <x:String>已启用</x:String>
-  </sd:BooleanDescriptionConverter>
-  <!--是/否描述转换器-->
-  <sd:BooleanDescriptionConverter x:Key="Converters.YesNoDescriptionConverter">
-    <x:String>否</x:String>
-    <x:String>是</x:String>
-  </sd:BooleanDescriptionConverter>
+    <!--Null-True转换器-->
+    <sd:NullToTrueConverter x:Key="NullToTrueConverter" />
+    <!--Null-False转换器-->
+    <sd:NullToFalseConverter x:Key="NullToFalseConverter" />
+    <!--枚举成员转换器-->
+    <sd:EnumMemberConverter x:Key="Converters.EnumMemberConverter" />
+    <!--字符串-几何图标转换器-->
+    <sd:StringToGeometryConverter x:Key="StringToGeometryConverter" />
+    <!--停/启用描述转换器-->
+    <sd:BooleanDescriptionConverter x:Key="Converters.EnabledDescriptionConverter">
+        <x:String>已停用</x:String>
+        <x:String>已启用</x:String>
+    </sd:BooleanDescriptionConverter>
+    <!--是/否描述转换器-->
+    <sd:BooleanDescriptionConverter x:Key="Converters.YesNoDescriptionConverter">
+        <x:String>否</x:String>
+        <x:String>是</x:String>
+    </sd:BooleanDescriptionConverter>
 </ResourceDictionary>

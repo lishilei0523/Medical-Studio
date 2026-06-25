@@ -27,25 +27,25 @@
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="0.01" Maximum="0.3" Increment="0.01" 
                                    ParsingNumberStyle="Float" FormatString="F2"
-								   Text="{Binding LowerThreshold}" />
+                                   Value="{Binding LowerThreshold}" />
 				</sd:FormItem>
 				<sd:FormItem Label="高阈值：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
                                    Minimum="0.05" Maximum="0.5" Increment="0.01"
                                    ParsingNumberStyle="Float" FormatString="F2"
-								   Text="{Binding UpperThreshold}" />
+                                   Value="{Binding UpperThreshold}" />
 				</sd:FormItem>
 				<sd:FormItem Label="标准差：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="0.5" Maximum="3.0" Increment="0.1"
 								   ParsingNumberStyle="Float" FormatString="F1"
-								   Text="{Binding Sigma}" />
+                                   Value="{Binding Sigma}" />
 				</sd:FormItem>
                 <sd:FormItem Label="膨胀半径：">
                     <NumericUpDown Width="300" HorizontalAlignment="Left"
                                    Minimum="1" Maximum="2" Increment="1"
                                    ParsingNumberStyle="Integer" FormatString="F0"
-                                   Text="{Binding DilateRadius}" />
+                                   Value="{Binding DilateRadius}" />
                 </sd:FormItem>
 			</StackPanel>
 			<!--占位区-->

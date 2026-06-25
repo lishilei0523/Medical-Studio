@@ -37,7 +37,7 @@
                         <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                        Minimum="1" Maximum="4096" Increment="1"
                                        ParsingNumberStyle="Integer" FormatString="F0"
-                                       Text="{Binding VolumeViewModel.WindowWidth}" />
+                                       Value="{Binding VolumeViewModel.WindowWidth}" />
                         <Slider Grid.Column="1" Margin="10,0,0,0"
                                 Minimum="1" Maximum="4096" SmallChange="1" LargeChange="10"
                                 TickFrequency="100" TickPlacement="Outside"
@@ -53,7 +53,7 @@
                         <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                        Minimum="-1024" Maximum="3071" Increment="1"
                                        ParsingNumberStyle="Integer" FormatString="F0"
-                                       Text="{Binding VolumeViewModel.WindowCenter}" />
+                                       Value="{Binding VolumeViewModel.WindowCenter}" />
                         <Slider Grid.Column="1" Margin="10,0,0,0"
                                 Minimum="-1024" Maximum="3071" SmallChange="1" LargeChange="10"
                                 TickFrequency="100" TickPlacement="Outside"
@@ -69,7 +69,7 @@
                         <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                        Minimum="0.1" Maximum="5.0" Increment="0.1"
                                        ParsingNumberStyle="Float" FormatString="F1"
-                                       Text="{Binding VolumeViewModel.Brightness}" />
+                                       Value="{Binding VolumeViewModel.Brightness}" />
                         <Slider Grid.Column="1" Margin="10,0,0,0"
                                 Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="1"
                                 TickFrequency="0.1" TickPlacement="Outside"
@@ -85,7 +85,7 @@
                         <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                        Minimum="0.1" Maximum="5.0" Increment="0.1"
                                        ParsingNumberStyle="Float" FormatString="F1"
-                                       Text="{Binding VolumeViewModel.DensityScale}" />
+                                       Value="{Binding VolumeViewModel.DensityScale}" />
                         <Slider Grid.Column="1" Margin="10,0,0,0"
                                 Minimum="0.1" Maximum="5.0" SmallChange="0.1" LargeChange="0.5"
                                 TickFrequency="0.1" TickPlacement="Outside"
@@ -101,7 +101,7 @@
                         <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                        Minimum="0.0001" Maximum="0.01" Increment="0.0001"
                                        ParsingNumberStyle="Float" FormatString="F4"
-                                       Text="{Binding VolumeViewModel.StepSize}" />
+                                       Value="{Binding VolumeViewModel.StepSize}" />
                         <Slider Grid.Column="1" Margin="10,0,0,0"
                                 Minimum="0.0001" Maximum="0.01" SmallChange="0.0001" LargeChange="0.001"
                                 TickFrequency="0.0002" TickPlacement="Outside"
@@ -117,7 +117,7 @@
                         <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                        Minimum="100" Maximum="3000" Increment="1"
                                        ParsingNumberStyle="Integer" FormatString="F0"
-                                       Text="{Binding VolumeViewModel.MaxStepsCount}" />
+                                       Value="{Binding VolumeViewModel.MaxStepsCount}" />
                         <Slider Grid.Column="1" Margin="10,0,0,0"
                                 Minimum="100" Maximum="3000" SmallChange="50" LargeChange="200"
                                 TickFrequency="60" TickPlacement="Outside"
@@ -133,7 +133,7 @@
                         <NumericUpDown Grid.Column="0" Width="140" Height="30" HorizontalAlignment="Left"
                                        Minimum="0.01" Maximum="1.0" Increment="0.01"
                                        ParsingNumberStyle="Float" FormatString="F2"
-                                       Text="{Binding VolumeViewModel.OpacityThreshold}" />
+                                       Value="{Binding VolumeViewModel.OpacityThreshold}" />
                         <Slider Grid.Column="1" Margin="10,0,0,0"
                                 Minimum="0.01" Maximum="1.0" SmallChange="0.01" LargeChange="0.05"
                                 TickFrequency="0.02" TickPlacement="Outside"

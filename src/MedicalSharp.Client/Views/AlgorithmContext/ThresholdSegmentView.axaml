@@ -12,17 +12,17 @@
               Title="阈值分割">
 
     <StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
-        <sd:FormItem Label="最小HU：">
+        <sd:FormItem Label="低阈值：">
             <NumericUpDown Width="360" HorizontalAlignment="Left"
                            Minimum="-1024" Maximum="3071" Increment="5"
                            ParsingNumberStyle="Integer" FormatString="F0"
-                           Text="{Binding MinHU}" />
+                           Value="{Binding MinHU}" />
         </sd:FormItem>
-        <sd:FormItem Label="最大HU：">
+        <sd:FormItem Label="高阈值：">
             <NumericUpDown Width="360" HorizontalAlignment="Left"
                            Minimum="-1024" Maximum="3071" Increment="10"
                            ParsingNumberStyle="Integer" FormatString="F0"
-                           Text="{Binding MaxHU}" />
+                           Value="{Binding MaxHU}" />
         </sd:FormItem>
         <sd:FormItem>
             <ui:RangeSlider Width="360" HorizontalAlignment="Left"

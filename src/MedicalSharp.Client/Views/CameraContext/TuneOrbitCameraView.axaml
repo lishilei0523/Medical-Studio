@@ -27,31 +27,31 @@
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="1" Maximum="10" Increment="1"
 								   ParsingNumberStyle="Integer" FormatString="F0"
-								   Text="{Binding PanSpeed}" />
+                                   Value="{Binding PanSpeed}" />
 				</sd:FormItem>
 				<sd:FormItem Label="旋转速度：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="0.05" Maximum="0.5" Increment="0.01"
 								   ParsingNumberStyle="Float" FormatString="F2"
-								   Text="{Binding RotateSpeed}" />
+                                   Value="{Binding RotateSpeed}" />
 				</sd:FormItem>
 				<sd:FormItem Label="缩放速度：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="0.1" Maximum="1.0" Increment="0.1"
 								   ParsingNumberStyle="Float" FormatString="F1"
-								   Text="{Binding ZoomSpeed}" />
+                                   Value="{Binding ZoomSpeed}" />
 				</sd:FormItem>
 				<sd:FormItem Label="最小距离：">
 					<NumericUpDown Width="300" HorizontalAlignment="Left"
 								   Minimum="0.1" Maximum="2" Increment="0.1"
 								   ParsingNumberStyle="Float" FormatString="F1"
-								   Text="{Binding MinDistance}" />
+                                   Value="{Binding MinDistance}" />
 				</sd:FormItem>
                 <sd:FormItem Label="最大距离：">
                     <NumericUpDown Width="300" HorizontalAlignment="Left"
                                    Minimum="10" Maximum="150" Increment="1"
                                    ParsingNumberStyle="Integer" FormatString="F0"
-                                   Text="{Binding MaxDistance}" />
+                                   Value="{Binding MaxDistance}" />
                 </sd:FormItem>
 			</StackPanel>
 			<!--占位区-->
