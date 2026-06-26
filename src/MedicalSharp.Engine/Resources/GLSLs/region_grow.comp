@@ -1,0 +1,87 @@
+#version 430 core
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+//预览纹理
+layout(binding = 0, r16_snorm) readonly uniform image3D u_PreviewTexture;
+
+//标记纹理（输出）
+layout(binding = 1, r8ui) writeonly uniform uimage3D u_MarkTexture;
+
+//输入标记纹理（上一轮迭代结果）
+layout(binding = 2, r8ui) readonly uniform uimage3D u_MarkInputTexture;
+
+//参数
+uniform ivec3 u_VolumeSize;          //体积尺寸
+uniform float u_MinHU;               //最小HU值
+uniform float u_MaxHU;               //最大HU值
+uniform uint u_MarkValue;            //种子点标记值
+uniform uint u_PrevTempMark;         //上一轮迭代的临时标记值（本轮检查的"种子"）
+uniform uint u_CurrentTempMark;      //本轮迭代要写入的临时标记值
+
+//常量
+const float MAX_16BIT_SIGNED = 32767.0;
+
+
+void main()
+{
+    ivec3 voxelCoord = ivec3(gl_GlobalInvocationID);
+    
+    //超出体积范围
+    if (voxelCoord.x >= u_VolumeSize.x || voxelCoord.y >= u_VolumeSize.y || voxelCoord.z >= u_VolumeSize.z)
+    {
+        return;
+    }
+
+    //当前体素已经被标记过，跳过
+    uint currentMark = imageLoad(u_MarkInputTexture, voxelCoord).r;
+    if (currentMark == u_MarkValue || currentMark == u_PrevTempMark || currentMark == u_CurrentTempMark)
+    {
+        return;
+    }
+
+    //检查6个相邻体素是否有上一轮的标记值
+    bool hasNeighborSeed = false;
+
+    ivec3 neighbors[6] = {
+        voxelCoord + ivec3( 1,  0,  0),
+        voxelCoord + ivec3(-1,  0,  0),
+        voxelCoord + ivec3( 0,  1,  0),
+        voxelCoord + ivec3( 0, -1,  0),
+        voxelCoord + ivec3( 0,  0,  1),
+        voxelCoord + ivec3( 0,  0, -1)
+    };
+    for (int index = 0; index < 6; index++)
+    {
+        ivec3 neighborCoord = neighbors[index];        
+        if (neighborCoord.x < 0 || neighborCoord.x >= u_VolumeSize.x ||
+            neighborCoord.y < 0 || neighborCoord.y >= u_VolumeSize.y ||
+            neighborCoord.z < 0 || neighborCoord.z >= u_VolumeSize.z)
+        {
+            continue;
+        }
+
+        uint neighborMark = imageLoad(u_MarkInputTexture, neighborCoord).r;
+        
+        //邻居是种子点或上一轮的临时标记，都是本轮检查的"种子"
+        if (neighborMark == u_MarkValue || neighborMark == u_PrevTempMark)
+        {
+            hasNeighborSeed = true;
+            break;
+        }
+    }
+
+    if (!hasNeighborSeed)
+    {
+        return;
+    }
+
+    //检查HU值是否在范围内
+    float huValue = imageLoad(u_PreviewTexture, voxelCoord).r * MAX_16BIT_SIGNED;
+    if (huValue < u_MinHU || huValue > u_MaxHU)
+    {
+        return;
+    }
+
+    //标记为本轮临时标记
+    imageStore(u_MarkTexture, voxelCoord, uvec4(u_CurrentTempMark, 0, 0, 0));
+}
