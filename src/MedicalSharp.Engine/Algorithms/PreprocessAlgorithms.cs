@@ -102,7 +102,7 @@ namespace MedicalSharp.Engine.Algorithms
         }
         #endregion
 
-        #region # 区域生长 —— static void RegionGrowing(this VolumeData volumeData...
+        #region # 区域生长 —— static void RegionGrow(this VolumeData volumeData...
         /// <summary>
         /// 区域生长
         /// </summary>
@@ -112,11 +112,9 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="minHU">最小HU值</param>
         /// <param name="maxHU">最大HU值</param>
         /// <param name="markValue">种子点标记值</param>
-        /// <param name="tempMarkA">临时标记A（内部使用）</param>
-        /// <param name="tempMarkB">临时标记B（内部使用）</param>
         /// <param name="maxIterations">最大迭代次数</param>
         /// <returns>是否成功生长（至少有一个新体素被标记）</returns>
-        public static bool RegionGrowing(this VolumeData volumeData, Texture3D previewTexture, Texture3D markTexture, float minHU, float maxHU, byte markValue, byte tempMarkA = 253, byte tempMarkB = 254, int maxIterations = 100)
+        public static bool RegionGrow(this VolumeData volumeData, Texture3D previewTexture, Texture3D markTexture, float minHU, float maxHU, byte markValue, int maxIterations = 100)
         {
             #region # 验证
 
@@ -130,6 +128,10 @@ namespace MedicalSharp.Engine.Algorithms
             }
 
             #endregion
+
+            //定义临时标记
+            const byte tempMarkA = 254;
+            const byte tempMarkB = 255;
 
             //区域生长计算着色器
             ShaderProgram regionGrowingShader = ComputerManager.RegionGrowComputer;
@@ -149,7 +151,6 @@ namespace MedicalSharp.Engine.Algorithms
             byte prevTempMark = markValue;      //第一轮检查的"种子"是原始种子点
             byte currentTempMark = tempMarkA;   //第一轮写入的临时标记
             bool hasNewVoxels = false;
-
             for (int iteration = 0; iteration < maxIterations; iteration++)
             {
                 //重置原子计数器
@@ -189,11 +190,12 @@ namespace MedicalSharp.Engine.Algorithms
                 currentTempMark = (swap == tempMarkA) ? tempMarkB : tempMarkA;
             }
 
-            //算法结束：将临时标记统一替换为 markValue
-            //TODO: 如果需要，可以在这里添加一个 Shader 将所有 tempMarkA/tempMarkB 替换为 markValue
-
-            //将最终结果拷贝回原始 markTexture
+            //将最终结果拷贝回原始标记纹理
             Texture3D.Copy(pingTexture, markTexture);
+
+            //将临时标记统一替换为种子点标记值
+            volumeData.ReplaceMarkValue(markTexture, tempMarkA, markValue, false);
+            volumeData.ReplaceMarkValue(markTexture, tempMarkB, markValue, false);
 
             //释放临时纹理
             pingTexture.Dispose();
