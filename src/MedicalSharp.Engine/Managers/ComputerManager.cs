@@ -20,7 +20,7 @@ namespace MedicalSharp.Engine.Managers
         private static bool _Initialized;
 
         /// <summary>
-        /// 赋值标记计算着色器
+        /// 分配标记计算着色器
         /// </summary>
         private static ShaderProgram _AssignMarkComputer;
 
@@ -102,9 +102,9 @@ namespace MedicalSharp.Engine.Managers
 
         #region # 属性
 
-        #region 只读属性 - 赋值标记计算着色器 —— static ShaderProgram AssignMarkComputer
+        #region 只读属性 - 分配标记计算着色器 —— static ShaderProgram AssignMarkComputer
         /// <summary>
-        /// 只读属性 - 赋值标记计算着色器
+        /// 只读属性 - 分配标记计算着色器
         /// </summary>
         public static ShaderProgram AssignMarkComputer
         {
@@ -342,9 +342,9 @@ namespace MedicalSharp.Engine.Managers
 
         //Private
 
-        #region 创建赋值标记计算着色器 —— static ShaderProgram CreateAssignMarkComputer()
+        #region 创建分配标记计算着色器 —— static ShaderProgram CreateAssignMarkComputer()
         /// <summary>
-        /// 创建赋值标记计算着色器
+        /// 创建分配标记计算着色器
         /// </summary>
         private static ShaderProgram CreateAssignMarkComputer()
         {

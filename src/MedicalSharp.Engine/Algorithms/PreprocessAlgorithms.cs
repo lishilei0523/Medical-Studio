@@ -12,9 +12,9 @@ namespace MedicalSharp.Engine.Algorithms
     /// </summary>
     public static class PreprocessAlgorithms
     {
-        #region # 赋值标记 —— static void AssignMark(this VolumeData volumeData...
+        #region # 分配标记 —— static void AssignMark(this VolumeData volumeData...
         /// <summary>
-        /// 赋值标记
+        /// 分配标记
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         /// <param name="markTexture">标记纹理</param>
@@ -33,7 +33,7 @@ namespace MedicalSharp.Engine.Algorithms
 
             #endregion
 
-            //赋值标记计算着色器
+            //分配标记计算着色器
             ShaderProgram assignMarkComputer = ComputerManager.AssignMarkComputer;
 
             //开启Shader程序
