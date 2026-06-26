@@ -103,16 +103,23 @@ namespace MedicalSharp.Engine.Algorithms
             Texture3D pingTexture = Texture3D.CreateCopy(markTexture);
             Texture3D pongTexture = Texture3D.CreateCopy(markTexture);
 
+            //创建原子计数器缓冲区
+            using AtomicCounterBuffer counterBuffer = new AtomicCounterBuffer(1);
+            counterBuffer.Bind(3);
+
             byte prevTempMark = markValue;      //第一轮检查的"种子"是原始种子点
             byte currentTempMark = tempMarkA;   //第一轮写入的临时标记
             bool hasNewVoxels = false;
 
             for (int iteration = 0; iteration < maxIterations; iteration++)
             {
-                //绑定输出纹理（本轮结果写入 pong）
+                //重置原子计数器
+                counterBuffer.Reset();
+
+                //绑定输出纹理（本轮结果写入pong）
                 pongTexture.BindImageTexture(1, TextureAccess.WriteOnly);
 
-                //绑定输入纹理（上一轮结果从 ping 读取）
+                //绑定输入纹理（上一轮结果从ping读取）
                 pingTexture.BindImageTexture(2, TextureAccess.ReadOnly);
 
                 //设置参数
@@ -126,10 +133,15 @@ namespace MedicalSharp.Engine.Algorithms
                 //调度执行
                 ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
 
-                //检查本轮是否有新体素加入（TODO 简化方式：假设有，实际应通过原子计数器检测）
-                hasNewVoxels = true;
+                //检查本轮是否有新体素加入
+                uint newVoxelsCount = counterBuffer.ReadValue(0);
+                hasNewVoxels = newVoxelsCount > 0;
+                if (!hasNewVoxels)
+                {
+                    break;
+                }
 
-                //交换绑定纹理：ping ↔ pong
+                //交换绑定纹理：ping <-> pong
                 (pingTexture, pongTexture) = (pongTexture, pingTexture);
 
                 //交换临时标记值

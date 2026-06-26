@@ -10,6 +10,9 @@ layout(binding = 1, r8ui) writeonly uniform uimage3D u_MarkTexture;
 //输入标记纹理（上一轮迭代结果）
 layout(binding = 2, r8ui) readonly uniform uimage3D u_MarkInputTexture;
 
+//新体素计数器
+layout(binding = 3, offset = 0) uniform atomic_uint u_NewVoxelsCount;
+
 //参数
 uniform ivec3 u_VolumeSize;          //体积尺寸
 uniform float u_MinHU;               //最小HU值
@@ -84,4 +87,7 @@ void main()
 
     //标记为本轮临时标记
     imageStore(u_MarkTexture, voxelCoord, uvec4(u_CurrentTempMark, 0, 0, 0));
+
+    //递增新体素计数
+    atomicCounterIncrement(u_NewVoxelsCount);
 }
