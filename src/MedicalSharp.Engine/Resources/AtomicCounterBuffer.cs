@@ -19,14 +19,14 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 创建原子计数器缓冲区构造器
         /// </summary>
-        /// <param name="count">计数器数量（默认1）</param>
-        public AtomicCounterBuffer(int count = 1)
+        /// <param name="count">计数器数量</param>
+        public AtomicCounterBuffer(int count)
         {
             #region # 验证
 
             if (count <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), "计数器数量必须大于 0！");
+                throw new ArgumentOutOfRangeException(nameof(count), "计数器数量必须大于0！");
             }
 
             #endregion
@@ -115,15 +115,16 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 读取计数值
         /// </summary>
-        /// <param name="index">计数器索引（默认0）</param>
+        /// <param name="index">计数器索引</param>
         /// <returns>计数值</returns>
-        public uint ReadValue(int index = 0)
+        /// <remarks>索引是指第几个计数器，对应Count计数器数量</remarks>
+        public uint ReadValue(int index)
         {
             #region # 验证
 
             if (index < 0 || index >= this.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), $"计数器索引超出范围 [0, {this.Count - 1}]！");
+                throw new ArgumentOutOfRangeException(nameof(index), $"计数器索引超出范围[0, {this.Count - 1}]！");
             }
 
             #endregion
