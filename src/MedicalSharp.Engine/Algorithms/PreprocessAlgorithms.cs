@@ -2,6 +2,7 @@
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using System;
 
 namespace MedicalSharp.Engine.Algorithms
@@ -11,7 +12,53 @@ namespace MedicalSharp.Engine.Algorithms
     /// </summary>
     public static class PreprocessAlgorithms
     {
-        #region # 替换标记 —— static void ReplaceMarkValue(this VolumeData volumeData...
+        #region # 赋值标记 —— static void AssignMark(this VolumeData volumeData...
+        /// <summary>
+        /// 赋值标记
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
+        /// <param name="voxelPosition">体素坐标</param>
+        /// <param name="markValue">标记值</param>
+        public static void AssignMark(this VolumeData volumeData, Texture3D markTexture, Vector3i voxelPosition, byte markValue)
+        {
+            #region # 验证
+
+            if (voxelPosition.X < 0 || voxelPosition.X >= volumeData.Metadata.VolumeSize.X ||
+                voxelPosition.Y < 0 || voxelPosition.Y >= volumeData.Metadata.VolumeSize.Y ||
+                voxelPosition.Z < 0 || voxelPosition.Z >= volumeData.Metadata.VolumeSize.Z)
+            {
+                throw new ArgumentOutOfRangeException(nameof(voxelPosition), "体素坐标超出体积范围！");
+            }
+
+            #endregion
+
+            //赋值标记计算着色器
+            ShaderProgram assignMarkComputer = ComputerManager.AssignMarkComputer;
+
+            //开启Shader程序
+            assignMarkComputer.Use();
+
+            //绑定纹理
+            markTexture.BindImageTexture(0, TextureAccess.WriteOnly);
+
+            //设置参数
+            assignMarkComputer.SetUniformVector3i("u_VoxelCoord", voxelPosition);
+            assignMarkComputer.SetUniformUInt("u_MarkValue", markValue);
+
+            //调度执行
+            GL.DispatchCompute(1, 1, 1);
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit);
+
+            //取消使用
+            assignMarkComputer.Unuse();
+
+            //修改CPU端
+            volumeData.SetMarkValue(voxelPosition, markValue);
+        }
+        #endregion
+
+        #region # 替换标记 —— static void ReplaceMark(this VolumeData volumeData...
         /// <summary>
         /// 替换标记
         /// </summary>
@@ -20,7 +67,7 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="sourceMarkValue">源标记值</param>
         /// <param name="targetMarkValue">目标标记值</param>
         /// <param name="syncToCpu">同步CPU端</param>
-        public static void ReplaceMarkValue(this VolumeData volumeData, Texture3D markTexture, byte sourceMarkValue, byte targetMarkValue, bool syncToCpu = true)
+        public static void ReplaceMark(this VolumeData volumeData, Texture3D markTexture, byte sourceMarkValue, byte targetMarkValue, bool syncToCpu = true)
         {
             //替换标记计算着色器
             ShaderProgram replaceShader = ComputerManager.ReplaceMarkComputer;
@@ -194,8 +241,8 @@ namespace MedicalSharp.Engine.Algorithms
             Texture3D.Copy(pingTexture, markTexture);
 
             //将临时标记统一替换为种子点标记值
-            volumeData.ReplaceMarkValue(markTexture, tempMarkA, markValue, false);
-            volumeData.ReplaceMarkValue(markTexture, tempMarkB, markValue, false);
+            volumeData.ReplaceMark(markTexture, tempMarkA, markValue, false);
+            volumeData.ReplaceMark(markTexture, tempMarkB, markValue, false);
 
             //释放临时纹理
             pingTexture.Dispose();

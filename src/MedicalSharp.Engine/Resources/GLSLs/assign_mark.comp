@@ -1,0 +1,14 @@
+#version 430 core
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+//标记纹理（读写）
+layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
+
+//参数
+uniform ivec3 u_VoxelCoord;     //体素坐标
+uniform uint u_MarkValue;       //标记值
+
+void main()
+{
+    imageStore(u_MarkTexture, u_VoxelCoord, uvec4(u_MarkValue, 0, 0, 0));
+}

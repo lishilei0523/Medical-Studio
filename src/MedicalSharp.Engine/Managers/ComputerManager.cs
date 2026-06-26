@@ -20,6 +20,11 @@ namespace MedicalSharp.Engine.Managers
         private static bool _Initialized;
 
         /// <summary>
+        /// 赋值标记计算着色器
+        /// </summary>
+        private static ShaderProgram _AssignMarkComputer;
+
+        /// <summary>
         /// 替换标记计算着色器
         /// </summary>
         private static ShaderProgram _ReplaceMarkComputer;
@@ -96,6 +101,16 @@ namespace MedicalSharp.Engine.Managers
         #endregion
 
         #region # 属性
+
+        #region 只读属性 - 赋值标记计算着色器 —— static ShaderProgram AssignMarkComputer
+        /// <summary>
+        /// 只读属性 - 赋值标记计算着色器
+        /// </summary>
+        public static ShaderProgram AssignMarkComputer
+        {
+            get => _AssignMarkComputer;
+        }
+        #endregion
 
         #region 只读属性 - 替换标记计算着色器 —— static ShaderProgram ReplaceMarkComputer
         /// <summary>
@@ -236,6 +251,7 @@ namespace MedicalSharp.Engine.Managers
                     return;
                 }
 
+                _AssignMarkComputer = CreateAssignMarkComputer();
                 _ReplaceMarkComputer = CreateReplaceMarkComputer();
                 _RectangleCutComputer = CreateRectangleCutComputer();
                 _CircleCutComputer = CreateCircleCutComputer();
@@ -325,6 +341,20 @@ namespace MedicalSharp.Engine.Managers
 
 
         //Private
+
+        #region 创建赋值标记计算着色器 —— static ShaderProgram CreateAssignMarkComputer()
+        /// <summary>
+        /// 创建赋值标记计算着色器
+        /// </summary>
+        private static ShaderProgram CreateAssignMarkComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/assign_mark.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion
 
         #region 创建替换标记计算着色器 —— static ShaderProgram CreateReplaceMarkComputer()
         /// <summary>

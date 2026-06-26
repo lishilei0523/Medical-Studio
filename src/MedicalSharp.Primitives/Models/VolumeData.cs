@@ -169,6 +169,52 @@ namespace MedicalSharp.Primitives.Models
 
         #region # 方法
 
+        #region 设置预览值 —— void SetPreviewValue(Vector3i position, short value)
+        /// <summary>
+        /// 设置预览值
+        /// </summary>
+        /// <param name="position">位置</param>
+        /// <param name="value">体素值</param>
+        public unsafe void SetPreviewValue(Vector3i position, short value)
+        {
+            if (position.X < 0 || position.X >= this.Metadata.VolumeSize.X ||
+                position.Y < 0 || position.Y >= this.Metadata.VolumeSize.Y ||
+                position.Z < 0 || position.Z >= this.Metadata.VolumeSize.Z)
+            {
+                return;
+            }
+
+            int index = position.Z * this.Metadata.VolumeSize.X * this.Metadata.VolumeSize.Y +
+                        position.Y * this.Metadata.VolumeSize.X +
+                        position.X;
+            short* pointer = (short*)this.PreviewData.ToPointer();
+            pointer[index] = value;
+        }
+        #endregion
+
+        #region 设置标记值 —— void SetMarkValue(Vector3i position, byte value)
+        /// <summary>
+        /// 设置标记值
+        /// </summary>
+        /// <param name="position">位置</param>
+        /// <param name="value">标记值</param>
+        public unsafe void SetMarkValue(Vector3i position, byte value)
+        {
+            if (position.X < 0 || position.X >= this.Metadata.VolumeSize.X ||
+                position.Y < 0 || position.Y >= this.Metadata.VolumeSize.Y ||
+                position.Z < 0 || position.Z >= this.Metadata.VolumeSize.Z)
+            {
+                return;
+            }
+
+            int index = position.Z * this.Metadata.VolumeSize.X * this.Metadata.VolumeSize.Y +
+                        position.Y * this.Metadata.VolumeSize.X +
+                        position.X;
+            byte* pointer = (byte*)this.MarkData.ToPointer();
+            pointer[index] = value;
+        }
+        #endregion
+
         #region 获取原始值 —— short GetOriginalValue(Vector3i position)
         /// <summary>
         /// 获取原始值
