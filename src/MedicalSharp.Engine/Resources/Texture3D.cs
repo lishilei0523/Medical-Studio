@@ -124,6 +124,77 @@ namespace MedicalSharp.Engine.Resources
         }
         #endregion
 
+        #region 创建纹理副本 —— static Texture3D CreateCopy(Texture3D sourceTexture)
+        /// <summary>
+        /// 创建纹理副本
+        /// </summary>
+        /// <param name="sourceTexture">源纹理</param>
+        /// <returns>副本纹理</returns>
+        public static Texture3D CreateCopy(Texture3D sourceTexture)
+        {
+            #region # 验证
+
+            if (sourceTexture == null)
+            {
+                throw new ArgumentNullException(nameof(sourceTexture), "源标记纹理不可为空！");
+            }
+
+            #endregion
+
+            int width = sourceTexture.Width;
+            int height = sourceTexture.Height;
+            int depth = sourceTexture.Depth;
+
+            //创建新纹理
+            Texture3D copyTexture = new Texture3D(width, height, depth, sourceTexture.PixelInternalFormat, sourceTexture.PixelFormat, sourceTexture.PixelType);
+            copyTexture.AllocateMemory(IntPtr.Zero);
+
+            //设置默认纹理参数
+            copyTexture.SetFilter(sourceTexture.MinFilter, sourceTexture.MagFilter);
+            copyTexture.SetWrapMode(sourceTexture.WrapMode);
+
+            //拷贝源纹理到新纹理
+            GL.CopyImageSubData(sourceTexture.Id, ImageTarget.Texture3D, 0, 0, 0, 0, copyTexture.Id, ImageTarget.Texture3D, 0, 0, 0, 0, width, height, depth);
+
+            //检查错误
+            GlException.ThrowOnError(nameof(CreateCopy));
+
+            return copyTexture;
+        }
+        #endregion
+
+        #region 复制纹理 —— static void CopyData(Texture3D source, Texture3D target)
+        /// <summary>
+        /// 复制纹理
+        /// </summary>
+        /// <param name="source">源纹理</param>
+        /// <param name="target">目标纹理</param>
+        public static void Copy(Texture3D source, Texture3D target)
+        {
+            #region # 验证
+
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source), "源纹理不可为空！");
+            }
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target), "目标纹理不可为空！");
+            }
+            if (source.Width != target.Width || source.Height != target.Height || source.Depth != target.Depth)
+            {
+                throw new ArgumentException("源纹理和目标纹理尺寸必须相同！");
+            }
+
+            #endregion
+
+            GL.CopyImageSubData(source.Id, ImageTarget.Texture3D, 0, 0, 0, 0, target.Id, ImageTarget.Texture3D, 0, 0, 0, 0, source.Width, source.Height, source.Depth);
+
+            //检查错误
+            GlException.ThrowOnError(nameof(Copy));
+        }
+        #endregion
+
 
         //Public
 

@@ -70,6 +70,11 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _ThresholdSegmentComputer;
 
         /// <summary>
+        /// 区域生长计算着色器
+        /// </summary>
+        private static ShaderProgram _RegionGrowComputer;
+
+        /// <summary>
         /// 同步锁
         /// </summary>
         private static readonly Lock _Sync;
@@ -187,6 +192,16 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - 区域生长计算着色器 —— static ShaderProgram RegionGrowComputer
+        /// <summary>
+        /// 只读属性 - 区域生长计算着色器
+        /// </summary>
+        public static ShaderProgram RegionGrowComputer
+        {
+            get => _RegionGrowComputer;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -216,6 +231,7 @@ namespace MedicalSharp.Engine.Managers
                 _ConvexPolyhedronCutComputer = CreateConvexPolyhedronCutComputer();
                 _ResetMarkValueComputer = CreateResetMarkValueComputer();
                 _ThresholdSegmentComputer = CreateThresholdSegmentComputer();
+                _RegionGrowComputer = CreateRegionGrowComputer();
                 _Initialized = true;
             }
         }
@@ -428,6 +444,20 @@ namespace MedicalSharp.Engine.Managers
         {
             ShaderProgram program = new ShaderProgram();
             program.ReadComputeShaderFromFile("Resources/GLSLs/threshold_segment.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion
+
+        #region 创建区域生长计算着色器 —— static ShaderProgram CreateRegionGrowComputer()
+        /// <summary>
+        /// 创建区域生长计算着色器
+        /// </summary>
+        private static ShaderProgram CreateRegionGrowComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/region_grow.comp");
             program.BuildCompute();
 
             return program;
