@@ -11,6 +11,45 @@ namespace MedicalSharp.Engine.Algorithms
     /// </summary>
     public static class PreprocessAlgorithms
     {
+        #region # 替换标记 —— static void ReplaceMarkValue(this VolumeData volumeData...
+        /// <summary>
+        /// 替换标记
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
+        /// <param name="sourceMarkValue">源标记值</param>
+        /// <param name="targetMarkValue">目标标记值</param>
+        /// <param name="syncToCpu">同步CPU端</param>
+        public static void ReplaceMarkValue(this VolumeData volumeData, Texture3D markTexture, byte sourceMarkValue, byte targetMarkValue, bool syncToCpu = true)
+        {
+            //替换标记计算着色器
+            ShaderProgram replaceShader = ComputerManager.ReplaceMarkComputer;
+
+            //开启Shader程序
+            replaceShader.Use();
+
+            //绑定纹理
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+
+            //设置参数
+            replaceShader.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+            replaceShader.SetUniformUInt("u_SourceMarkValue", sourceMarkValue);
+            replaceShader.SetUniformUInt("u_TargetMarkValue", targetMarkValue);
+
+            //调度执行
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
+
+            //取消使用
+            replaceShader.Unuse();
+
+            //同步CPU端
+            if (syncToCpu)
+            {
+                volumeData.SyncMarkDataFromGpu(markTexture);
+            }
+        }
+        #endregion
+
         #region # 阈值分割 —— static void ThresholdSegment(this VolumeData volumeData...
         /// <summary>
         /// 阈值分割

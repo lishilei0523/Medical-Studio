@@ -20,6 +20,11 @@ namespace MedicalSharp.Engine.Managers
         private static bool _Initialized;
 
         /// <summary>
+        /// 替换标记计算着色器
+        /// </summary>
+        private static ShaderProgram _ReplaceMarkComputer;
+
+        /// <summary>
         /// 矩形切割计算着色器
         /// </summary>
         private static ShaderProgram _RectangleCutComputer;
@@ -91,6 +96,16 @@ namespace MedicalSharp.Engine.Managers
         #endregion
 
         #region # 属性
+
+        #region 只读属性 - 替换标记计算着色器 —— static ShaderProgram ReplaceMarkComputer
+        /// <summary>
+        /// 只读属性 - 替换标记计算着色器
+        /// </summary>
+        public static ShaderProgram ReplaceMarkComputer
+        {
+            get => _ReplaceMarkComputer;
+        }
+        #endregion
 
         #region 只读属性 - 矩形切割计算着色器 —— static ShaderProgram RectangleCutComputer
         /// <summary>
@@ -221,9 +236,10 @@ namespace MedicalSharp.Engine.Managers
                     return;
                 }
 
+                _ReplaceMarkComputer = CreateReplaceMarkComputer();
+                _RectangleCutComputer = CreateRectangleCutComputer();
                 _CircleCutComputer = CreateCircleCutComputer();
                 _EllipseCutComputer = CreateEllipseCutComputer();
-                _RectangleCutComputer = CreateRectangleCutComputer();
                 _PolygonCutComputer = CreatePolygonCutComputer();
                 _BoxCutComputer = CreateBoxCutComputer();
                 _SphereCutComputer = CreateSphereCutComputer();
@@ -309,6 +325,20 @@ namespace MedicalSharp.Engine.Managers
 
 
         //Private
+
+        #region 创建替换标记计算着色器 —— static ShaderProgram CreateReplaceMarkComputer()
+        /// <summary>
+        /// 创建替换标记计算着色器
+        /// </summary>
+        private static ShaderProgram CreateReplaceMarkComputer()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadComputeShaderFromFile("Resources/GLSLs/replace_mark.comp");
+            program.BuildCompute();
+
+            return program;
+        }
+        #endregion
 
         #region 创建矩形切割计算着色器 —— static ShaderProgram CreateRectangleCutComputer()
         /// <summary>

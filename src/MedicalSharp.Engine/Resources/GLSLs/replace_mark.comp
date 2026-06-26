@@ -1,0 +1,25 @@
+#version 430 core
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+//标记纹理（读写）
+layout(binding = 0, r8ui) uniform uimage3D u_MarkTexture;
+
+//参数
+uniform ivec3 u_VolumeSize;      //体积尺寸
+uniform uint u_SourceMarkValue;  //源标记值
+uniform uint u_TargetMarkValue;  //目标标记值
+
+void main()
+{
+    ivec3 voxelCoord = ivec3(gl_GlobalInvocationID);    
+    if (voxelCoord.x >= u_VolumeSize.x || voxelCoord.y >= u_VolumeSize.y || voxelCoord.z >= u_VolumeSize.z)
+    {
+        return;
+    }
+
+    uint currentMark = imageLoad(u_MarkTexture, voxelCoord).r;    
+    if (currentMark == u_SourceMarkValue)
+    {
+        imageStore(u_MarkTexture, voxelCoord, uvec4(u_TargetMarkValue, 0, 0, 0));
+    }
+}
