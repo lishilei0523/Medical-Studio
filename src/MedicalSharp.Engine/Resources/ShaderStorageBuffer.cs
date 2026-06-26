@@ -120,8 +120,9 @@ namespace MedicalSharp.Engine.Resources
         /// <summary>
         /// 绑定着色器存储缓冲区
         /// </summary>
-        /// <param name="bindingPoint">绑定点索引（0-15，与着色器中的 layout(binding = N) 对应）</param>
+        /// <param name="bindingPoint">绑定点索引</param>
         /// <remarks>
+        /// 0-15，与着色器中的 layout(binding = N) 对应
         /// 将缓冲区绑定到指定的索引点，着色器通过相同的 binding 值访问该缓冲区。
         /// 示例：
         ///   C# 端：ssbo.Bind(2);
