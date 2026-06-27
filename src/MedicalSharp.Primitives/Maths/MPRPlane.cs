@@ -494,17 +494,17 @@ namespace MedicalSharp.Primitives.Maths
                 //世界坐标
                 worldPosition = worldPoint;
 
-                //转换到逻辑空间
-                Vector3 localPoint = worldPoint / this.VolumeMetadata.VolumeScale;
-
-                //逻辑空间 -> U/V坐标[-1, 1]
-                uv = this.ProjectLocalPoint(localPoint);
-
                 //世界空间 -> 纹理坐标[0, 1]
                 textureCoord = worldPosition.ToTextureCoord(this.VolumeMetadata);
 
                 //世界空间 -> 体素坐标
                 voxelPosition = worldPosition.ToVoxelPosition(this.VolumeMetadata);
+
+                //转换到逻辑空间
+                Vector3 localPosition = worldPosition / this.VolumeMetadata.VolumeScale;
+
+                //逻辑空间 -> U/V坐标[-1, 1]
+                uv = this.ProjectLocalPoint(localPosition);
 
                 return true;
             }
