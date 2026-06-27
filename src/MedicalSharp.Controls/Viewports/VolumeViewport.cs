@@ -6,6 +6,7 @@ using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Renderers;
+using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Maths;
@@ -328,12 +329,12 @@ namespace MedicalSharp.Controls.Viewports
 
             this.GlContext.MakeCurrent();
             ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
-            Vector3i? pickedVoxelPosition = this._volumeRenderer.PickVoxel(this.GlContextHandle, ray, this._viewportSize.Width, this._viewportSize.Height, out Vector3? texCoord);
-            if (pickedVoxelPosition.HasValue)
+            Vector3? texCoord = this._volumeRenderer.PickVoxel(this.GlContextHandle, ray, this._viewportSize.Width, this._viewportSize.Height);
+            if (texCoord.HasValue)
             {
-                textureCoord = texCoord!.Value;
-                worldPosition = (textureCoord - new Vector3(0.5f)) * this.VolumeData.Metadata.VolumeScale;
-                voxelPosition = pickedVoxelPosition.Value;
+                textureCoord = texCoord.Value;
+                worldPosition = textureCoord.ToWorldPosition(this.VolumeData.Metadata);
+                voxelPosition = worldPosition.ToVoxelPosition(this.VolumeData.Metadata);
                 voxelValue = this.VolumeData.GetPreviewValue(voxelPosition);
                 markValue = this.VolumeData.GetMarkValue(voxelPosition);
 

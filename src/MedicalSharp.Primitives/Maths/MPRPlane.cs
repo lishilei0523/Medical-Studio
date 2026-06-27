@@ -1,4 +1,5 @@
-﻿using MedicalSharp.Primitives.Cameras;
+﻿using MedicalSharp.Primitives.Algorithms;
+using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
@@ -499,17 +500,11 @@ namespace MedicalSharp.Primitives.Maths
                 //逻辑空间 -> U/V坐标[-1, 1]
                 uv = this.ProjectLocalPoint(localPoint);
 
-                //逻辑空间 -> 纹理坐标[0, 1]
-                textureCoord = localPoint + new Vector3(0.5f);
+                //世界空间 -> 纹理坐标[0, 1]
+                textureCoord = worldPosition.ToTextureCoord(this.VolumeMetadata);
 
-                //纹理坐标 -> 体素坐标
-                int x = (int)Math.Round(textureCoord.X * this.VolumeMetadata.VolumeSize.X);
-                int y = (int)Math.Round(textureCoord.Y * this.VolumeMetadata.VolumeSize.Y);
-                int z = (int)Math.Round(textureCoord.Z * this.VolumeMetadata.VolumeSize.Z);
-                x = Math.Clamp(x, 0, this.VolumeMetadata.VolumeSize.X - 1);
-                y = Math.Clamp(y, 0, this.VolumeMetadata.VolumeSize.Y - 1);
-                z = Math.Clamp(z, 0, this.VolumeMetadata.VolumeSize.Z - 1);
-                voxelPosition = new Vector3i(x, y, z);
+                //世界空间 -> 体素坐标
+                voxelPosition = worldPosition.ToVoxelPosition(this.VolumeMetadata);
 
                 return true;
             }

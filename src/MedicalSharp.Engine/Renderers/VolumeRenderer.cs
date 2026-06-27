@@ -327,7 +327,7 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 拾取体素 —— Vector3i? PickVoxel(IntPtr glContext, Ray ray...
+        #region 拾取体素 —— Vector3? PickVoxel(IntPtr glContext, Ray ray...
         /// <summary>
         /// 拾取体素
         /// </summary>
@@ -335,20 +335,17 @@ namespace MedicalSharp.Engine.Renderers
         /// <param name="ray">射线（世界空间）</param>
         /// <param name="viewportWidth">视口宽度</param>
         /// <param name="viewportHeight">视口高度</param>
-        /// <param name="textureCoord">纹理坐标</param>
-        /// <returns>体素坐标，未命中返回null</returns>
-        public Vector3i? PickVoxel(IntPtr glContext, Ray ray, float viewportWidth, float viewportHeight, out Vector3? textureCoord)
+        /// <returns>纹理坐标，未命中返回null</returns>
+        public Vector3? PickVoxel(IntPtr glContext, Ray ray, float viewportWidth, float viewportHeight)
         {
             #region # 验证
 
             if (this.Renderable == null)
             {
-                textureCoord = null;
                 return null;
             }
             if (this.Camera == null)
             {
-                textureCoord = null;
                 return null;
             }
 
@@ -376,23 +373,13 @@ namespace MedicalSharp.Engine.Renderers
             //过滤纹理坐标
             if (pixel[0] < 0.001f && pixel[1] < 0.001f && pixel[2] < 0.001f)
             {
-                textureCoord = null;
                 return null;
             }
 
             //提取纹理坐标
-            textureCoord = new Vector3(pixel[0], pixel[1], pixel[2]);
+            Vector3 textureCoord = new Vector3(pixel[0], pixel[1], pixel[2]);
 
-            //转换体素坐标
-            int voxelX = (int)Math.Ceiling(pixel[0] * this.Renderable.PreviewTexture.Width);
-            int voxelY = (int)Math.Ceiling(pixel[1] * this.Renderable.PreviewTexture.Height);
-            int voxelZ = (int)Math.Ceiling(pixel[2] * this.Renderable.PreviewTexture.Depth);
-            voxelX = Math.Clamp(voxelX, 0, this.Renderable.PreviewTexture.Width - 1);
-            voxelY = Math.Clamp(voxelY, 0, this.Renderable.PreviewTexture.Height - 1);
-            voxelZ = Math.Clamp(voxelZ, 0, this.Renderable.PreviewTexture.Depth - 1);
-            Vector3i voxelPosition = new Vector3i(voxelX, voxelY, voxelZ);
-
-            return voxelPosition;
+            return textureCoord;
         }
         #endregion
 

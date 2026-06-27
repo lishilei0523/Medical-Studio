@@ -287,8 +287,8 @@ namespace MedicalSharp.Controls.Visual3Ds
                     float v = Vector3.Dot(localHit, vAxis);
 
                     bool inBounds = (face == HitFace.Right || face == HitFace.Left)
-                        ? Math.Abs(v) <= Math.Max(this.Height * 0.5f, 0.5f) + 0.1f  // ✅ 用 Height 的一半
-                        : Math.Abs(u) <= Math.Max(this.Width * 0.5f, 0.5f) + 0.1f;  // ✅ 用 Width 的一半
+                        ? Math.Abs(v) <= Math.Max(this.Height * 0.5f, 0.5f) + 0.1f  //用Height的一半
+                        : Math.Abs(u) <= Math.Max(this.Width * 0.5f, 0.5f) + 0.1f;  //用Width的一半
                     if (inBounds && distance < nearestDistance)
                     {
                         nearestDistance = distance;

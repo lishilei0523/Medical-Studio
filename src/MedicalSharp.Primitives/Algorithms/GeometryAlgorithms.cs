@@ -13,6 +13,77 @@ namespace MedicalSharp.Primitives.Algorithms
     /// </summary>
     public static class GeometryAlgorithms
     {
+        #region # 纹理坐标转世界坐标 —— static Vector3 ToWorldPosition(this Vector3 textureCoord...
+        /// <summary>
+        /// 纹理坐标转世界坐标
+        /// </summary>
+        /// <param name="textureCoord">纹理坐标</param>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>世界位置</returns>
+        public static Vector3 ToWorldPosition(this Vector3 textureCoord, VolumeMetadata metadata)
+        {
+            Vector3 worldPosition = (textureCoord - new Vector3(0.5f)) * metadata.VolumeScale;
+
+            return worldPosition;
+        }
+        #endregion
+
+        #region # 世界坐标转纹理坐标 —— static Vector3 ToTextureCoord(this Vector3 worldPosition...
+        /// <summary>
+        /// 世界坐标转纹理坐标
+        /// </summary>
+        /// <param name="worldPosition">世界位置</param>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>纹理坐标</returns>
+        /// 世界空间：归一化单位空间（-0.5~0.5），中心在 (0.0, 0.0, 0.0)。
+        /// 纹理空间：归一化单位空间（0~1）
+        /// 转换路径：世界坐标 -> 中间坐标（撤销VolumeScale）-> 纹理坐标（加0.5）
+        public static Vector3 ToTextureCoord(this Vector3 worldPosition, VolumeMetadata metadata)
+        {
+            //世界空间 -> 中间坐标（撤销VolumeScale）
+            Vector3 normalized = new Vector3(
+                worldPosition.X / metadata.VolumeScale.X,
+                worldPosition.Y / metadata.VolumeScale.Y,
+                worldPosition.Z / metadata.VolumeScale.Z
+            );
+
+            //中间坐标 -> 纹理坐标
+            Vector3 textureCoord = normalized + new Vector3(0.5f);
+
+            return textureCoord;
+        }
+        #endregion
+
+        #region # 世界坐标转体素坐标 —— static Vector3i ToVoxelPosition(this Vector3 worldPosition...
+        /// <summary>
+        /// 世界坐标转体素坐标
+        /// </summary>
+        /// <param name="worldPosition">世界位置</param>
+        /// <param name="metadata">体积元数据</param>
+        /// <returns>体素位置</returns>
+        /// <remarks>
+        /// 世界空间：归一化单位空间（-0.5~0.5），中心在 (0.0, 0.0, 0.0)。
+        /// 体素空间：原点由VolumeSize决定。
+        /// 转换路径：世界坐标 -> 纹理坐标 -> 体素坐标（乘以VolumeSize）
+        /// </remarks>
+        public static Vector3i ToVoxelPosition(this Vector3 worldPosition, VolumeMetadata metadata)
+        {
+            //中间坐标 -> 纹理坐标
+            Vector3 textureCoord = worldPosition.ToTextureCoord(metadata);
+
+            //纹理坐标 -> 体素坐标（Floor取整，因为体素中心在(i+0.5)处）
+            int voxelX = (int)MathF.Floor(textureCoord.X * metadata.VolumeSize.X);
+            int voxelY = (int)MathF.Floor(textureCoord.Y * metadata.VolumeSize.Y);
+            int voxelZ = (int)MathF.Floor(textureCoord.Z * metadata.VolumeSize.Z);
+            voxelX = Math.Clamp(voxelX, 0, metadata.VolumeSize.X - 1);
+            voxelY = Math.Clamp(voxelY, 0, metadata.VolumeSize.Y - 1);
+            voxelZ = Math.Clamp(voxelZ, 0, metadata.VolumeSize.Z - 1);
+            Vector3i voxelPosition = new Vector3i(voxelX, voxelY, voxelZ);
+
+            return voxelPosition;
+        }
+        #endregion
+
         #region # 世界坐标转毫米坐标 —— static Vector3 ToMillimeterPosition(this Vector3 worldPosition...
         /// <summary>
         /// 世界坐标转毫米坐标
@@ -21,27 +92,20 @@ namespace MedicalSharp.Primitives.Algorithms
         /// <param name="metadata">体积元数据</param>
         /// <returns>毫米位置</returns>
         /// <remarks>
-        /// 世界空间：归一化单位空间（0~1），中心在 (0.5, 0.5, 0.5)。
+        /// 世界空间：归一化单位空间（-0.5~0.5），中心在 (0.0, 0.0, 0.0)。
         /// 毫米空间：单位毫米，原点由PhysicalSize决定。
-        /// 转换路径：世界坐标 -> 中间坐标（撤销VolumeScale）-> 毫米坐标（乘以PhysicalSize）
+        /// 转换路径：世界坐标 -> 纹理坐标 -> 毫米坐标（乘以PhysicalSize）
         /// </remarks>
         public static Vector3 ToMillimeterPosition(this Vector3 worldPosition, VolumeMetadata metadata)
         {
-            //世界空间 -> 中间坐标（撤销 VolumeScale）
-            Vector3 normalized = new Vector3(
-                worldPosition.X / metadata.VolumeScale.X,
-                worldPosition.Y / metadata.VolumeScale.Y,
-                worldPosition.Z / metadata.VolumeScale.Z
-            );
-
-            //中间坐标 -> 纹理坐标
-            Vector3 texCoord = normalized + new Vector3(0.5f);
+            //世界坐标 -> 纹理坐标
+            Vector3 textureCoord = worldPosition.ToTextureCoord(metadata);
 
             //纹理坐标 -> 毫米坐标
             Vector3 mmPosition = new Vector3(
-                texCoord.X * metadata.PhysicalSize.X,
-                texCoord.Y * metadata.PhysicalSize.Y,
-                texCoord.Z * metadata.PhysicalSize.Z
+                textureCoord.X * metadata.PhysicalSize.X,
+                textureCoord.Y * metadata.PhysicalSize.Y,
+                textureCoord.Z * metadata.PhysicalSize.Z
             );
 
             return mmPosition;
@@ -56,7 +120,7 @@ namespace MedicalSharp.Primitives.Algorithms
         /// <param name="metadata">体积元数据</param>
         /// <returns>患者位置（DICOM患者坐标系，单位毫米）</returns>
         /// <remarks>
-        /// 世界空间：归一化单位空间（0~1），中心在 (0.5, 0.5, 0.5)。
+        /// 世界空间：归一化单位空间（-0.5~0.5），中心在 (0.0, 0.0, 0.0)。
         /// 患者空间：DICOM患者坐标系，单位毫米，原点由DICOM Origin决定。
         /// 转换路径：世界坐标 -> 毫米坐标 -> 患者坐标（加上Origin）
         /// </remarks>

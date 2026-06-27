@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace MedicalSharp.Primitives.Models
@@ -33,13 +32,13 @@ namespace MedicalSharp.Primitives.Models
         /// HU累加和
         /// </summary>
         /// <remarks>用于计算平均HU</remarks>
-        public float HuSum;
+        public double HuSum;
 
         /// <summary>
         /// HU平方和
         /// </summary>
         /// <remarks>用于计算标准差</remarks>
-        public float HuSumSq;
+        public double HuSumSq;
 
         /// <summary>
         /// 平均HU
@@ -90,26 +89,10 @@ namespace MedicalSharp.Primitives.Models
 
             #endregion
 
-            this.AverageHU = this.HuSum / this.VoxelsCount;
-            this.StdDevHU = MathF.Sqrt((this.HuSumSq / this.VoxelsCount) - (this.AverageHU * this.AverageHU));
-        }
-
-        /// <summary>
-        /// 合并单位统计结果
-        /// </summary>
-        public static StatisticResult MergeResults(IReadOnlyCollection<StatisticResult> results)
-        {
-            StatisticResult mergedResult = new StatisticResult();
-            foreach (StatisticResult result in results)
-            {
-                mergedResult.MinHU = Math.Min(mergedResult.MinHU, result.MinHU);
-                mergedResult.MaxHU = Math.Max(mergedResult.MaxHU, result.MaxHU);
-                mergedResult.HuSum += result.HuSum;
-                mergedResult.HuSumSq += result.HuSumSq;
-                mergedResult.VoxelsCount += result.VoxelsCount;
-            }
-
-            return mergedResult;
+            this.AverageHU = (float)(this.HuSum / this.VoxelsCount);
+            double averageHUSq = (double)this.AverageHU * (double)this.AverageHU;
+            double variance = (this.HuSumSq / this.VoxelsCount) - averageHUSq;
+            this.StdDevHU = MathF.Sqrt((float)Math.Max(variance, 0));
         }
     }
 }
