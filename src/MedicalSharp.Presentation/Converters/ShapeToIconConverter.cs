@@ -7,12 +7,12 @@ using System.Globalization;
 namespace MedicalSharp.Presentation.Converters
 {
     /// <summary>
-    /// 形状To投标转换器
+    /// 形状To图标转换器
     /// </summary>
     public class ShapeToIconConverter : IValueConverter
     {
         /// <summary>
-        /// 转换回
+        /// 转换
         /// </summary>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
