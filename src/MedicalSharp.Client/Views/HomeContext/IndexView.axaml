@@ -158,12 +158,12 @@
                                         <TextBlock Grid.Column="1" Text="{Binding DisplayName}" Margin="5,0,0,0" Padding="2" />
                                         <WrapPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
                                             <Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
-                                                    ToolTip.Tip="重命名"
+                                                    ToolTip.Tip="重命名" Background="Transparent"
                                                     cm:Message.Attach="RenameShape($dataContext);">
                                                 <PathIcon Data="{StaticResource Icon-Edit}" />
                                             </Button>
                                             <Button BorderThickness="0" Height="20" Width="20" Cursor="Hand"
-                                                    ToolTip.Tip="删除"
+                                                    ToolTip.Tip="删除" Background="Transparent"
                                                     cm:Message.Attach="RemoveShape($dataContext);">
                                                 <PathIcon Data="{StaticResource Icon-Remove}" />
                                             </Button>

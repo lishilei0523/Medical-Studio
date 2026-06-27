@@ -1687,7 +1687,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 new ToolbarCommand("3D平移", "Icon-Translate3D", this.Translate3DCommand),
                 new ToolbarCommand("绕U轴旋转", "Icon-RotateU", this.RotateUCommand),
                 new ToolbarCommand("绕V轴旋转", "Icon-RotateV", this.RotateVCommand),
-                new ToolbarCommand("3D旋转", "Icon-Rotate2D", this.Rotate3DCommand),
+                new ToolbarCommand("3D旋转", "Icon-Rotate3D", this.Rotate3DCommand),
                 new ToolbarCommand("调整尺寸", "Icon-Resize", this.ResizeCommand),
                 new ToolbarCommand("编辑顶点", "Icon-EditVertex", this.EditVertexCommand),
                 new ToolbarCommand("绘制文本", "Icon-Text", this.DrawTextCommand),

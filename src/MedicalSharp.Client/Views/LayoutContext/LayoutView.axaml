@@ -7,32 +7,17 @@
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			 mc:Ignorable="d">
 
-	<UserControl.Styles>
-		<Style Selector="Border.Focusable">
-			<Setter Property="BorderBrush" Value="Transparent" />
-			<Setter Property="BorderThickness" Value="1" />
-		</Style>
-		<Style Selector="Border.Focusable:focus-within">
-			<Setter Property="BorderBrush" Value="#FF9B8AFF" />
-			<Setter Property="BorderThickness" Value="1" />
-		</Style>
-	</UserControl.Styles>
-
 	<Grid sd:GridLayout.Config="{Binding Layout}">
-		<Border Focusable="True" Classes="Focusable"
-				sd:GridLayout.Cell="{Binding Layout.Cell1}" sd:GridExpander.CanExpand="True">
+		<Border sd:GridLayout.Cell="{Binding Layout.Cell1}" sd:GridExpander.CanExpand="True">
 			<ContentControl cm:View.Model="{Binding VolumeViewModel}" />
 		</Border>
-		<Border Focusable="True" Classes="Focusable"
-				sd:GridLayout.Cell="{Binding Layout.Cell2}" sd:GridExpander.CanExpand="True">
+		<Border sd:GridLayout.Cell="{Binding Layout.Cell2}" sd:GridExpander.CanExpand="True">
 			<ContentControl cm:View.Model="{Binding MprAxialViewModel}" />
 		</Border>
-		<Border Focusable="True" Classes="Focusable"
-				sd:GridLayout.Cell="{Binding Layout.Cell3}" sd:GridExpander.CanExpand="True">
+		<Border sd:GridLayout.Cell="{Binding Layout.Cell3}" sd:GridExpander.CanExpand="True">
 			<ContentControl cm:View.Model="{Binding MprCoronalViewModel}" />
 		</Border>
-		<Border Focusable="True" Classes="Focusable"
-				sd:GridLayout.Cell="{Binding Layout.Cell4}" sd:GridExpander.CanExpand="True">
+		<Border sd:GridLayout.Cell="{Binding Layout.Cell4}" sd:GridExpander.CanExpand="True">
 			<ContentControl cm:View.Model="{Binding MprSagittalViewModel}" />
 		</Border>
 	</Grid>
