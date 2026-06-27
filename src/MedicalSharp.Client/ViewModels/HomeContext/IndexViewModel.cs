@@ -1477,7 +1477,6 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         {
             RegionGrowViewModel viewModel = ResolveMediator.Resolve<RegionGrowViewModel>();
             viewModel.VolumeData = this.VolumeData;
-            viewModel.VolumeData = this.VolumeData;
             viewModel.SelectedTissue = this.SelectedTissue;
             viewModel.Tissues = this.Tissues;
             this.FunctionPanel = viewModel;

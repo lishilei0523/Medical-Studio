@@ -1,7 +1,10 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sd="https://github.com/lishilei0523/SD.Framework">
+                    xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+                    xmlns:sdm="https://github.com/lishilei0523/Medical-Studio">
 
+    <!--形状-图标转换器-->
+    <sdm:ShapeToIconConverter x:Key="ShapeToIconConverter" />
     <!--Null-True转换器-->
     <sd:NullToTrueConverter x:Key="NullToTrueConverter" />
     <!--Null-False转换器-->
@@ -10,8 +13,6 @@
     <sd:EnumMemberConverter x:Key="Converters.EnumMemberConverter" />
     <!--字符串-几何图标转换器-->
     <sd:StringToGeometryConverter x:Key="StringToGeometryConverter" />
-    <!--形状-图标转换器-->
-    <sd:ShapeToIconConverter x:Key="ShapeToIconConverter" />
     <!--停/启用描述转换器-->
     <sd:BooleanDescriptionConverter x:Key="Converters.EnabledDescriptionConverter">
         <x:String>已停用</x:String>

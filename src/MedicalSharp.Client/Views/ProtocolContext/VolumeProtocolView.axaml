@@ -4,8 +4,9 @@
               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
               xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-              xmlns:sd="https://github.com/lishilei0523/SD.Framework"
               xmlns:cm="http://caliburnmicro.com"
+              xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+              xmlns:sdm="https://github.com/lishilei0523/Medical-Studio"
               mc:Ignorable="d"
               Width="710" Height="640" CanResize="False" ShowAsDialog="True"
               WindowStartupLocation="CenterScreen"
@@ -189,10 +190,10 @@
                         </Grid>
                     </sd:FormItem>
                 </StackPanel>
-                <sd:ColorBand Grid.Row="1" Width="650" Height="50" Margin="0,0,0,-2"
+                <sdm:ColorBand Grid.Row="1" Width="650" Height="50" Margin="0,0,0,-2"
                               InterpolationMode="{Binding VolumeViewModel.InterpolationMode}"
                               ControlPoints="{Binding ColorControlPoints}" />
-                <sd:AlphaCurveEditor Grid.Row="2" Width="650" Height="400"
+                <sdm:AlphaCurveEditor Grid.Row="2" Width="650" Height="400"
                                      ControlPoints="{Binding AlphaControlPoints}"
                                      NormalizedHistogram="{Binding NormalizedHistogram}" />
             </Grid>

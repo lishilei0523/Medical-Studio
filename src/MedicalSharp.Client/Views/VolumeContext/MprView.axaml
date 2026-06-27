@@ -4,6 +4,7 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			 xmlns:sdm="https://github.com/lishilei0523/Medical-Studio"
 			 mc:Ignorable="d">
 
 	<sd:GroupBox>
@@ -100,7 +101,7 @@
 		<!--Content-->
 		<sd:GroupBox.Content>
 			<Grid>
-				<sd:MPRViewport x:Name="MPRViewport"
+				<sdm:MPRViewport x:Name="MPRViewport"
 								FrameToken="{Binding FrameToken}"
 								Camera="{Binding Camera}"
 								InputManager="{Binding InputManager}"
@@ -113,9 +114,9 @@
 								Contrast="{Binding Contrast}"
 								InterpolationMode="{Binding InterpolationMode}"
 								TFControlPoints="{Binding TFControlPoints}">
-					<sd:ShapePresenter3D Content="{Binding Crosshair}" />
-					<sd:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
-				</sd:MPRViewport>
+					<sdm:ShapePresenter3D Content="{Binding Crosshair}" />
+					<sdm:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
+				</sdm:MPRViewport>
 				<Grid IsVisible="{Binding DirectionVisible}">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto" />

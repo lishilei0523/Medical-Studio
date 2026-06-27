@@ -4,6 +4,7 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+			 xmlns:sdm="https://github.com/lishilei0523/Medical-Studio"
 			 mc:Ignorable="d">
 
 	<sd:GroupBox>
@@ -119,7 +120,7 @@
 			</Grid>
 		</sd:GroupBox.Header>
 		<!--Content-->
-		<sd:VolumeViewport x:Name="VolumeViewport"
+		<sdm:VolumeViewport x:Name="VolumeViewport"
 						   FrameToken="{Binding FrameToken}"
 						   Camera="{Binding Camera}"
 						   InputManager="{Binding InputManager}"
@@ -134,12 +135,12 @@
 						   OpacityThreshold="{Binding OpacityThreshold}"
 						   InterpolationMode="{Binding InterpolationMode}"
 						   TFControlPoints="{Binding TFControlPoints}">
-			<sd:ShapePresenter3D Content="{Binding AxialPlane}" />
-			<sd:ShapePresenter3D Content="{Binding CoronalPlane}" />
-			<sd:ShapePresenter3D Content="{Binding SagittalPlane}" />
-			<sd:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
-			<sd:ViewBoxVisual3D IsVisible="{Binding ViewBoxVisible}" />
-			<sd:AxisVisual3D IsVisible="{Binding AxisVisible}" />
-		</sd:VolumeViewport>
+			<sdm:ShapePresenter3D Content="{Binding AxialPlane}" />
+			<sdm:ShapePresenter3D Content="{Binding CoronalPlane}" />
+			<sdm:ShapePresenter3D Content="{Binding SagittalPlane}" />
+			<sdm:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
+			<sdm:ViewBoxVisual3D IsVisible="{Binding ViewBoxVisible}" />
+			<sdm:AxisVisual3D IsVisible="{Binding AxisVisible}" />
+		</sdm:VolumeViewport>
 	</sd:GroupBox>
 </UserControl>
