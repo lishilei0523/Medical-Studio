@@ -10,6 +10,8 @@
     <sd:EnumMemberConverter x:Key="Converters.EnumMemberConverter" />
     <!--字符串-几何图标转换器-->
     <sd:StringToGeometryConverter x:Key="StringToGeometryConverter" />
+    <!--形状-图标转换器-->
+    <sd:ShapeToIconConverter x:Key="ShapeToIconConverter" />
     <!--停/启用描述转换器-->
     <sd:BooleanDescriptionConverter x:Key="Converters.EnabledDescriptionConverter">
         <x:String>已停用</x:String>
