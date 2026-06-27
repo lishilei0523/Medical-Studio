@@ -329,10 +329,10 @@ namespace MedicalSharp.Controls.Viewports
 
             this.GlContext.MakeCurrent();
             ray = Ray.UnProject(position, this.Camera.CameraPosition, this._viewportSize.ToVector2(), this.Camera.ProjectionMatrix, this.Camera.ViewMatrix);
-            Vector3? texCoord = this._volumeRenderer.PickVoxel(this.GlContextHandle, ray, this._viewportSize.Width, this._viewportSize.Height);
-            if (texCoord.HasValue)
+            Vector3? pickedTextureCoord = this._volumeRenderer.PickVoxel(this.GlContextHandle, ray, this._viewportSize.Width, this._viewportSize.Height);
+            if (pickedTextureCoord.HasValue)
             {
-                textureCoord = texCoord.Value;
+                textureCoord = pickedTextureCoord.Value;
                 worldPosition = textureCoord.ToWorldPosition(this.VolumeData.Metadata);
                 voxelPosition = worldPosition.ToVoxelPosition(this.VolumeData.Metadata);
                 voxelValue = this.VolumeData.GetPreviewValue(voxelPosition);
