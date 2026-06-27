@@ -89,10 +89,11 @@ namespace MedicalSharp.Primitives.Models
 
             #endregion
 
-            this.AverageHU = (float)(this.HuSum / this.VoxelsCount);
-            double averageHUSq = (double)this.AverageHU * (double)this.AverageHU;
-            double variance = (this.HuSumSq / this.VoxelsCount) - averageHUSq;
-            this.StdDevHU = MathF.Sqrt((float)Math.Max(variance, 0));
+            double average = this.HuSum / this.VoxelsCount;
+            double averageSq = average * average;
+            double variance = (this.HuSumSq / this.VoxelsCount) - averageSq;
+            this.AverageHU = (float)average;
+            this.StdDevHU = (float)Math.Sqrt(Math.Max(variance, 0));
         }
     }
 }
