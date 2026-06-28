@@ -198,17 +198,15 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 this.VolumeData.AssignMark(markTexture, voxelPosition, markValue);
 
                 //执行算法
-                bool success = this.VolumeData.RegionGrow(previewTexture, markTexture, this.MinHU, this.MaxHU, markValue);
-                if (success)
+                this.VolumeData.RegionGrow(previewTexture, markTexture, this.MinHU, this.MaxHU, markValue);
+
+                //删除当前点
+                RemoveShapeEvent removeMessage = new RemoveShapeEvent
                 {
-                    //删除当前点
-                    RemoveShapeEvent removeMessage = new RemoveShapeEvent
-                    {
-                        Publisher = this,
-                        Shape = current
-                    };
-                    await this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
-                }
+                    Publisher = this,
+                    Shape = current
+                };
+                await this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
             };
             Action<PointVisual3D> cancelled = current =>
             {
