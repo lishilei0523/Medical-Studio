@@ -171,7 +171,7 @@ namespace MedicalSharp.Engine.Algorithms
             }
             if (minHU >= maxHU)
             {
-                throw new ArgumentException("最小HU值必须小于最大HU值！");
+                throw new ArgumentOutOfRangeException(nameof(minHU), "最小HU值必须小于最大HU值！");
             }
 
             #endregion

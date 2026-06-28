@@ -106,6 +106,31 @@ namespace MedicalSharp.Inspiration.Resources
         /// </summary>
         /// <param name="clContext">OpenCL上下文</param>
         /// <param name="flags">内存标识</param>
+        /// <param name="data">数据指针</param>
+        /// <param name="bufferSize">数据大小（字节）</param>
+        public static unsafe ClBuffer Create(ClContext clContext, MemFlags flags, IntPtr data, int bufferSize)
+        {
+            CL cl = CL.GetApi();
+            void* pointer = data.ToPointer();
+            IntPtr handle = cl.CreateBuffer(clContext.Handle, flags | MemFlags.CopyHostPtr, (uint)bufferSize, pointer, out int errorCode);
+            ClException.ThrowOnError(errorCode, "CreateBuffer");
+            if (handle == IntPtr.Zero)
+            {
+                throw new ClException("CreateBuffer 返回空句柄");
+            }
+
+            ClBuffer clBuffer = new ClBuffer(cl, null, handle, (uint)bufferSize, flags);
+
+            return clBuffer;
+        }
+        #endregion
+
+        #region 创建OpenCL内存缓冲区 —— static ClBuffer Create(ClContext clContext...
+        /// <summary>
+        /// 创建OpenCL内存缓冲区
+        /// </summary>
+        /// <param name="clContext">OpenCL上下文</param>
+        /// <param name="flags">内存标识</param>
         /// <param name="elementSize">每个元素的字节数</param>
         /// <param name="data">CPU端数据（byte数组）</param>
         /// <returns>OpenCL内存缓冲区实例</returns>
