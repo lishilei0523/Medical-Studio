@@ -50,7 +50,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// 体积渲染视图模型
     /// </summary>
-    public class VolumeViewModel : ScreenBase, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<MPRPlaneChangedEvent>
+    public class VolumeViewModel : ScreenBase, IHandle<SwitchViewportCommandEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<MPRPlaneChangedEvent>
     {
         #region # 字段及构造器
 
@@ -1553,12 +1553,46 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 处理切换视口命令事件 —— Task HandleAsync(SwitchViewportCommandEvent message...
+        /// <summary>
+        /// 处理切换视口命令事件
+        /// </summary>
+        public Task HandleAsync(SwitchViewportCommandEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.InputManager.SwitchCommand(message.Command);
+            foreach (ToolbarCommand toolbarCommand in this.ToolbarCommands)
+            {
+                toolbarCommand.IsChecked = false;
+            }
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
         #region 处理标记模式切换事件 —— Task HandleAsync(MarkModeSwitchedEvent message...
         /// <summary>
         /// 处理标记模式切换事件
         /// </summary>
         public Task HandleAsync(MarkModeSwitchedEvent message, CancellationToken cancellationToken)
         {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
             if (this.VolumeData != null)
             {
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
@@ -1576,6 +1610,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public Task HandleAsync(MarkColorChangedEvent message, CancellationToken cancellationToken)
         {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
             if (this.VolumeData != null)
             {
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];

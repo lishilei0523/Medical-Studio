@@ -20,15 +20,18 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <sd:ToggleRadioButton Grid.Column="0" ToolTip.Tip="单点"
-                                  Width="70" HorizontalAlignment="Center">
+                                  Width="70" HorizontalAlignment="Center"
+                                  cm:Message.Attach="SwitchToMonoRegionGrow();">
                 <PathIcon Data="{StaticResource Icon-Point}" />
             </sd:ToggleRadioButton>
             <sd:ToggleRadioButton Grid.Column="1" ToolTip.Tip="多点"
-                                  Width="70" HorizontalAlignment="Center">
+                                  Width="70" HorizontalAlignment="Center"
+                                  cm:Message.Attach="SwitchToMultiRegionGrow();">
                 <PathIcon Data="{StaticResource Icon-Points}" />
             </sd:ToggleRadioButton>
             <sd:ToggleRadioButton Grid.Column="2" ToolTip.Tip="曲线"
-                                  Width="70" HorizontalAlignment="Center">
+                                  Width="70" HorizontalAlignment="Center"
+                                  cm:Message.Attach="SwitchToCurveRegionGrow();">
                 <PathIcon Data="{StaticResource Icon-Curve}" />
             </sd:ToggleRadioButton>
         </Grid>

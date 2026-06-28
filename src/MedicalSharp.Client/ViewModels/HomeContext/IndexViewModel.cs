@@ -46,7 +46,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
     /// <summary>
     /// 首页视图模型
     /// </summary>
-    public class IndexViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<StatisticFinishedEvent>
+    public class IndexViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<StatisticFinishedEvent>, IHandle<AppendShapeEvent>, IHandle<RemoveShapeEvent>
     {
         #region # 字段及构造器
 
@@ -1637,6 +1637,55 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             #endregion
 
             this.StatisticInfo = message.StatisticResult.ToStatisticInfo();
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理追加形状事件 —— Task HandleAsync(AppendShapeEvent message...
+        /// <summary>
+        /// 处理追加形状事件
+        /// </summary>
+        public Task HandleAsync(AppendShapeEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.Shapes.Add(message.Shape);
+
+            //发布消息
+            SyncViewportEvent syncMessage = new SyncViewportEvent
+            {
+                Publisher = this
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(syncMessage, cancellationToken);
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理删除形状事件 —— Task HandleAsync(AppendShapeEvent message...
+        /// <summary>
+        /// 处理删除形状事件
+        /// </summary>
+        public Task HandleAsync(RemoveShapeEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.Shapes.Remove(message.Shape);
 
             return Task.CompletedTask;
         }

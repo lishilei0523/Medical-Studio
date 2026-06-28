@@ -50,7 +50,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// MPR视图模型
     /// </summary>
-    public class MprViewModel : ScreenBase, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<MPRPlaneChangedEvent>, IHandle<MPRPlaneResetEvent>
+    public class MprViewModel : ScreenBase, IHandle<SwitchViewportCommandEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<MPRPlaneChangedEvent>, IHandle<MPRPlaneResetEvent>
     {
         #region # 字段及构造器
 
@@ -1199,6 +1199,31 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 SkipVolumeSync = eventArgs.TriggerSource == MPRPlaneChangeSource.ExternalSync
             };
             this._eventAggregator.PublishOnUIThreadAsync(message);
+        }
+        #endregion
+
+        #region 处理切换视口命令事件 —— Task HandleAsync(SwitchViewportCommandEvent message...
+        /// <summary>
+        /// 处理切换视口命令事件
+        /// </summary>
+        public Task HandleAsync(SwitchViewportCommandEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.InputManager.SwitchCommand(message.Command);
+            foreach (ToolbarCommand toolbarCommand in this.ToolbarCommands)
+            {
+                toolbarCommand.IsChecked = false;
+            }
+
+            return Task.CompletedTask;
         }
         #endregion
 

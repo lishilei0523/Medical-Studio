@@ -48,20 +48,18 @@ namespace MedicalSharp.Controls.Commands
         public Action<PointVisual3D, PointVisual3D> SeedPointPicked { get; set; }
         #endregion
 
-        #region 区域生长已确认委托 —— Action<PointVisual3D, PointVisual3D> RegionGrowConfirmed
+        #region 区域生长已确认委托 —— Action<PointVisual3D> RegionGrowConfirmed
         /// <summary>
         /// 区域生长已确认委托
         /// </summary>
-        /// <remarks>当前种子点, 上一种子点</remarks>
-        public Action<PointVisual3D, PointVisual3D> RegionGrowConfirmed { get; set; }
+        public Action<PointVisual3D> RegionGrowConfirmed { get; set; }
         #endregion
 
-        #region 区域生长已取消委托 —— Action<PointVisual3D, PointVisual3D> RegionGrowCancelled
+        #region 区域生长已取消委托 —— Action<PointVisual3D> RegionGrowCancelled
         /// <summary>
         /// 区域生长已取消委托
         /// </summary>
-        /// <remarks>当前种子点, 上一种子点</remarks>
-        public Action<PointVisual3D, PointVisual3D> RegionGrowCancelled { get; set; }
+        public Action<PointVisual3D> RegionGrowCancelled { get; set; }
         #endregion
 
         #endregion
@@ -110,13 +108,13 @@ namespace MedicalSharp.Controls.Commands
                 new ContextMenuItem
                 {
                     Header = "确定(_O)",
-                    Command = () => this.RegionGrowConfirmed?.Invoke(this._currentSeedPoint, this._prevSeedPoint),
+                    Command = this.Confirm,
                     IsEnabled = this._currentSeedPoint != null
                 },
                 new ContextMenuItem
                 {
                     Header = "取消(_C)",
-                    Command = () => this.RegionGrowCancelled?.Invoke(this._currentSeedPoint, this._prevSeedPoint),
+                    Command = this.Cancel,
                     IsEnabled = this._currentSeedPoint != null
                 }
             ];
@@ -134,6 +132,30 @@ namespace MedicalSharp.Controls.Commands
         {
             base.Deactivate();
 
+            this._currentSeedPoint = null;
+            this._prevSeedPoint = null;
+        }
+        #endregion
+
+        #region 确定 —— void Confirm()
+        /// <summary>
+        /// 确定
+        /// </summary>
+        private void Confirm()
+        {
+            this.RegionGrowConfirmed?.Invoke(this._currentSeedPoint);
+            this._currentSeedPoint = null;
+            this._prevSeedPoint = null;
+        }
+        #endregion
+
+        #region 取消 —— void Cancel()
+        /// <summary>
+        /// 取消
+        /// </summary>
+        private void Cancel()
+        {
+            this.RegionGrowCancelled?.Invoke(this._currentSeedPoint);
             this._currentSeedPoint = null;
             this._prevSeedPoint = null;
         }
