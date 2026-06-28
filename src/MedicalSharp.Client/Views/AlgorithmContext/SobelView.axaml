@@ -8,7 +8,7 @@
 			  xmlns:cm="http://caliburnmicro.com"
 			  mc:Ignorable="d"
 			  Width="460" Height="340" CanResize="False" ShowAsDialog="True"
-			  WindowStartupLocation="CenterScreen"
+			  WindowStartupLocation="CenterScreen" Topmost="True"
 			  Title="Sobel边缘检测">
 
 	<sd:BusyMask IsBusy="{Binding IsBusy}">

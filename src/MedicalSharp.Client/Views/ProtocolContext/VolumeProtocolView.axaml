@@ -9,7 +9,7 @@
               xmlns:sdm="https://github.com/lishilei0523/Medical-Studio"
               mc:Ignorable="d"
               Width="710" Height="640" CanResize="False" ShowAsDialog="True"
-              WindowStartupLocation="CenterScreen"
+              WindowStartupLocation="CenterScreen" Topmost="True"
               Title="体积渲染协议">
 
     <TabControl>
