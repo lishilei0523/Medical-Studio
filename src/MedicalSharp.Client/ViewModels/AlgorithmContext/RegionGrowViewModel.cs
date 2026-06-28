@@ -1,12 +1,20 @@
 ﻿using Avalonia.Collections;
 using Caliburn.Micro;
 using MedicalSharp.Controls.Commands;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Engine.Algorithms;
+using MedicalSharp.Engine.Base;
+using MedicalSharp.Engine.Managers;
+using MedicalSharp.Engine.Resources;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Presentation.Models;
+using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
+using SD.Infrastructure.Avalonia.CustomControls;
 using System;
 
 namespace MedicalSharp.Client.ViewModels.AlgorithmContext
@@ -164,19 +172,43 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(appendMessage);
             };
-            Action<PointVisual3D> confirmed = current =>
+            Action<PointVisual3D> confirmed = async current =>
             {
-                //1、设置当前点体素的Mark值为已选组织Mark值；
-                //2、调用区域生长算法；
-                //3、发布事件，删除当前种子点
+                #region # 验证
 
-                //删除当前点
-                RemoveShapeEvent removeMessage = new RemoveShapeEvent
+                if (this.SelectedTissue == null || this.SelectedTissue.MarkValue == 0)
                 {
-                    Publisher = this,
-                    Shape = current
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
+                    await MessageBox.Show("当前未选中有效组织！", "错误");
+                    return;
+                }
+
+                #endregion
+
+                //将世界坐标转为体素坐标
+                Vector3 worldPosition = current.Position.ToVector3();
+                Vector3i voxelPosition = worldPosition.ToVoxelPosition(this.VolumeData.Metadata);
+
+                //获取纹理
+                VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                Texture3D previewTexture = volumeSession.PreviewTexture;
+                Texture3D markTexture = volumeSession.MarkTexture;
+                byte markValue = this.SelectedTissue.MarkValue;
+
+                //设置种子点标记值
+                this.VolumeData.AssignMark(markTexture, voxelPosition, markValue);
+
+                //执行算法
+                bool success = this.VolumeData.RegionGrow(previewTexture, markTexture, this.MinHU, this.MaxHU, markValue);
+                if (success)
+                {
+                    //删除当前点
+                    RemoveShapeEvent removeMessage = new RemoveShapeEvent
+                    {
+                        Publisher = this,
+                        Shape = current
+                    };
+                    await this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
+                }
             };
             Action<PointVisual3D> cancelled = current =>
             {
