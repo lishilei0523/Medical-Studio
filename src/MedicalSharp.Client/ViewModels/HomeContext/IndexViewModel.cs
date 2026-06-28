@@ -1475,6 +1475,15 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand RegionGrowCommand => new RelayCommand(_ =>
         {
+            #region # 验证
+
+            if (this.FunctionPanel is RegionGrowViewModel)
+            {
+                return;
+            }
+
+            #endregion
+
             RegionGrowViewModel viewModel = ResolveMediator.Resolve<RegionGrowViewModel>();
             viewModel.VolumeData = this.VolumeData;
             viewModel.SelectedTissue = this.SelectedTissue;
@@ -1561,6 +1570,13 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             #endregion
 
             this.FunctionPanel = null;
+
+            //发布消息
+            RestoreViewportCommandEvent message = new RestoreViewportCommandEvent
+            {
+                Publisher = this
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(message);
         }
         #endregion
 

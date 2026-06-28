@@ -27,7 +27,8 @@ namespace MedicalSharp.Presentation.Models
         /// <param name="relayCommand">转接命令</param>
         /// <param name="isChecked">是否勾选</param>
         /// <param name="isVisible">是否可见</param>
-        public ToolbarCommand(string name, string icon, ICommand relayCommand, bool isChecked = false, bool isVisible = true)
+        /// <param name="isDefault">是否默认</param>
+        public ToolbarCommand(string name, string icon, ICommand relayCommand, bool isChecked = false, bool isVisible = true, bool isDefault = false)
             : this()
         {
             this.Name = name;
@@ -35,6 +36,7 @@ namespace MedicalSharp.Presentation.Models
             this.RelayCommand = relayCommand;
             this.IsChecked = isChecked;
             this.IsVisible = isVisible;
+            this.IsDefault = isDefault;
         }
 
         #endregion
@@ -87,6 +89,13 @@ namespace MedicalSharp.Presentation.Models
         /// </summary>
         [DependencyProperty]
         public bool IsVisible { get; set; }
+        #endregion
+
+        #region 是否默认 —— bool IsDefault
+        /// <summary>
+        /// 是否默认
+        /// </summary>
+        public bool IsDefault { get; set; }
         #endregion
 
         #endregion

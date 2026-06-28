@@ -54,6 +54,12 @@
                                 RangeStart="{Binding MinHU}" RangeEnd="{Binding MaxHU}"
                                 StepFrequency="1" ShowValueToolTip="True" />
             </sd:FormItem>
+            <sd:FormItem Label="迭代：">
+                <NumericUpDown Width="169" HorizontalAlignment="Left"
+                               Minimum="1" Maximum="1000" Increment="1"
+                               ParsingNumberStyle="Integer" FormatString="F0"
+                               Value="{Binding MaxIterations}" />
+            </sd:FormItem>
             <sd:FormItem Label="组织：">
                 <ComboBox Width="169" ItemsSource="{Binding Tissues}"
                           DisplayMemberBinding="{Binding Name}"

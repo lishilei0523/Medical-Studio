@@ -50,7 +50,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// MPR视图模型
     /// </summary>
-    public class MprViewModel : ScreenBase, IHandle<SwitchViewportCommandEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<MPRPlaneChangedEvent>, IHandle<MPRPlaneResetEvent>
+    public class MprViewModel : ScreenBase, IHandle<SwitchViewportCommandEvent>, IHandle<RestoreViewportCommandEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<ShapeTranslatingEvent>, IHandle<ShapeRotatingEvent>, IHandle<MPRPlaneChangedEvent>, IHandle<MPRPlaneResetEvent>
     {
         #region # 字段及构造器
 
@@ -1227,6 +1227,31 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 处理恢复视口命令事件 —— Task HandleAsync(RestoreViewportCommandEvent message...
+        /// <summary>
+        /// 处理恢复视口命令事件
+        /// </summary>
+        public Task HandleAsync(RestoreViewportCommandEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            if (this.ToolbarCommands.All(x => !x.IsChecked))
+            {
+                ToolbarCommand defaultCommand = this.ToolbarCommands.Single(x => x.IsDefault);
+                defaultCommand.IsChecked = true;
+            }
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
         #region 处理标记模式切换事件 —— Task HandleAsync(MarkModeSwitchedEvent message...
         /// <summary>
         /// 处理标记模式切换事件
@@ -1428,7 +1453,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.ToolbarCommands =
             [
                 new ToolbarCommand("拾取体素", "Icon-PickVoxel", this.PickVoxelCommand),
-                new ToolbarCommand("平移", "Icon-Translate3D", this.Translate3DCommand, true),
+                new ToolbarCommand("平移", "Icon-Translate3D", this.Translate3DCommand, true, true, true),
                 new ToolbarCommand("2D旋转", "Icon-Rotate2D", this.Rotate2DCommand),
                 new ToolbarCommand("调整尺寸", "Icon-Resize", this.ResizeCommand),
                 new ToolbarCommand("编辑顶点", "Icon-EditVertex", this.EditVertexCommand),

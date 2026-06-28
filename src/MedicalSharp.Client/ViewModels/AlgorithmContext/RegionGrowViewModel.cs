@@ -45,6 +45,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
             base.DisplayName = "区域生长";
             this.MinHU = 400;
             this.MaxHU = 1000;
+            this.MaxIterations = 100;
 
             //初始化命令
             this.InitCommands();
@@ -75,6 +76,14 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         /// </summary>
         [DependencyProperty]
         public int MaxHU { get; set; }
+        #endregion
+
+        #region 最大迭代次数 —— int MaxIterations
+        /// <summary>
+        /// 最大迭代次数
+        /// </summary>
+        [DependencyProperty]
+        public int MaxIterations { get; set; }
         #endregion
 
         #region 已选组织 —— TissueInfo SelectedTissue
@@ -198,7 +207,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 this.VolumeData.AssignMark(markTexture, voxelPosition, markValue);
 
                 //执行算法
-                this.VolumeData.RegionGrow(previewTexture, markTexture, this.MinHU, this.MaxHU, markValue);
+                this.VolumeData.RegionGrow(previewTexture, markTexture, this.MinHU, this.MaxHU, markValue, this.MaxIterations);
 
                 //删除当前点
                 RemoveShapeEvent removeMessage = new RemoveShapeEvent
