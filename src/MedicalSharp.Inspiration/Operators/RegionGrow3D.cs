@@ -122,6 +122,8 @@ namespace MedicalSharp.Inspiration.Operators
             //创建原子计数器缓冲区
             using ClBuffer countBuffer = ClBuffer.CreateEmpty<uint>(this._clContext, MemFlags.ReadWrite, 1);
 
+            byte prevTempMark = markValue;      // 第一轮检查的"种子"是原始种子点
+            byte currentTempMark = tempMarkA;   // 第一轮写入的临时标记
             bool hasNewVoxels = false;
             for (int iteration = 0; iteration < maxIterations; iteration++)
             {
@@ -135,7 +137,9 @@ namespace MedicalSharp.Inspiration.Operators
                 this._kernel.SetKernelArg(3, minHU);
                 this._kernel.SetKernelArg(4, maxHU);
                 this._kernel.SetKernelArg(5, markValue);
-                this._kernel.SetBufferKernelArg(6, countBuffer);
+                this._kernel.SetKernelArg(6, prevTempMark);
+                this._kernel.SetKernelArg(7, currentTempMark);
+                this._kernel.SetBufferKernelArg(8, countBuffer);
 
                 //调度执行
                 this._kernel.Enqueue3D(this._clContext.CommandQueue, (uint)width, (uint)height, (uint)depth);
@@ -151,14 +155,15 @@ namespace MedicalSharp.Inspiration.Operators
 
                 //交换绑定缓冲区：ping <-> pong
                 (pingBuffer, pongBuffer) = (pongBuffer, pingBuffer);
+
+                //交换临时标记值
+                byte swap = prevTempMark;
+                prevTempMark = currentTempMark;
+                currentTempMark = (swap == tempMarkA) ? tempMarkB : tempMarkA;
             }
 
-            //将最终结果拷贝回markData
+            //将最终结果拷贝回标记纹理
             pingBuffer.Read(this._clContext.CommandQueue, markData);
-
-            //释放临时缓冲区
-            pingBuffer.Dispose();
-            pongBuffer.Dispose();
 
             //将临时标记统一替换为种子点标记值
             byte* markDataPointer = (byte*)markData.ToPointer();
@@ -173,6 +178,10 @@ namespace MedicalSharp.Inspiration.Operators
                     }
                 }
             });
+
+            //释放临时缓冲区
+            pingBuffer.Dispose();
+            pongBuffer.Dispose();
 
             return hasNewVoxels;
         }

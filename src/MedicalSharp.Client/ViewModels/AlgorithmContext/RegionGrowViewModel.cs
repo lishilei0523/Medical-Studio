@@ -3,10 +3,11 @@ using Caliburn.Micro;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Visual3Ds;
-using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
-using MedicalSharp.Engine.Resources;
+using MedicalSharp.Inspiration.Managers;
+using MedicalSharp.Inspiration.Operators;
+using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Algorithms;
@@ -15,7 +16,9 @@ using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.CustomControls;
+using Silk.NET.OpenCL;
 using System;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Client.ViewModels.AlgorithmContext
 {
@@ -197,17 +200,33 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 Vector3 worldPosition = current.Position.ToVector3();
                 Vector3i voxelPosition = worldPosition.ToVoxelPosition(this.VolumeData.Metadata);
 
-                //获取纹理
+                //获取会话
                 VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-                Texture3D previewTexture = volumeSession.PreviewTexture;
-                Texture3D markTexture = volumeSession.MarkTexture;
+                ClContext clContext = ClContextManager.Current;
+                int width = this.VolumeData.Metadata.VolumeSize.X;
+                int height = this.VolumeData.Metadata.VolumeSize.Y;
+                int depth = this.VolumeData.Metadata.VolumeSize.Z;
+
+                //获取标记值
                 byte markValue = this.SelectedTissue.MarkValue;
 
-                //设置种子点标记值
-                this.VolumeData.AssignMark(markTexture, voxelPosition, markValue);
+                await Task.Run(() =>
+                {
+                    //设置种子点标记值
+                    this.VolumeData.SetMarkValue(voxelPosition, markValue);
 
-                //执行算法
-                this.VolumeData.RegionGrow(previewTexture, markTexture, this.MinHU, this.MaxHU, markValue, this.MaxIterations);
+                    //创建图像
+                    using ClImage3D previewImage = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadOnly, ChannelOrder.Intensity, ChannelType.SNormInt16);
+                    previewImage.Write(clContext.CommandQueue, this.VolumeData.PreviewData);
+                    clContext.Finish();
+
+                    //执行算子
+                    using RegionGrowing3D regionGrowing = new RegionGrowing3D(clContext);
+                    regionGrowing.Execute(previewImage, this.VolumeData.MarkData, this.MinHU, this.MaxHU, markValue, this.MaxIterations);
+                });
+
+                //同步到标记纹理
+                this.VolumeData.SyncMarkDataToGpu(volumeSession.MarkTexture);
 
                 //删除当前点
                 RemoveShapeEvent removeMessage = new RemoveShapeEvent

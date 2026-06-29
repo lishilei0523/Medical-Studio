@@ -4,16 +4,6 @@
 __constant float MAX_16BIT_SIGNED = 32767.0f;
 
 /// <summary>
-/// 临时标记A
-/// </summary>
-__constant uchar TEMP_MARK_A = 254;
-
-/// <summary>
-/// 临时标记B
-/// </summary>
-__constant uchar TEMP_MARK_B = 255;
-
-/// <summary>
 /// 区域生长
 /// </summary>
 /// <param name="preview">预览纹理</param>
@@ -22,11 +12,15 @@ __constant uchar TEMP_MARK_B = 255;
 /// <param name="minHU">最小HU值</param>
 /// <param name="maxHU">最大HU值</param>
 /// <param name="markValue">种子点标记值</param>
+/// <param name="prevTempMark">上轮迭代临时标记值</param>
+/// <param name="currentTempMark">本轮迭代临时标记值</param>
 /// <param name="newVoxelsCount">新体素原子计数器</param>
 __kernel void region_grow(__read_only image3d_t preview, __global uchar* markInput, __global uchar* markOutput,
 	const float minHU,
 	const float maxHU,
 	const uchar markValue,
+	const uchar prevTempMark,
+	const uchar currentTempMark,
 	__global uint* newVoxelsCount)
 {
 	int x = get_global_id(0);
@@ -46,7 +40,7 @@ __kernel void region_grow(__read_only image3d_t preview, __global uchar* markInp
 
 	//当前体素已经被标记过，跳过
 	uchar currentMark = markInput[voxelIndex];
-	if (currentMark == markValue || currentMark == TEMP_MARK_A || currentMark == TEMP_MARK_B)
+	if (currentMark == markValue || currentMark == prevTempMark || currentMark == currentTempMark)
 	{
 		return;
 	}
@@ -77,7 +71,7 @@ __kernel void region_grow(__read_only image3d_t preview, __global uchar* markInp
 		uchar neighborMark = markInput[nz * width * height + ny * width + nx];
 
 		//邻居是种子点或上一轮临时标记，本轮检查的"种子"
-		if (neighborMark == markValue || neighborMark == TEMP_MARK_A)
+		if (neighborMark == markValue || neighborMark == prevTempMark)
 		{
 			hasNeighborSeed = true;
 			break;
@@ -98,7 +92,7 @@ __kernel void region_grow(__read_only image3d_t preview, __global uchar* markInp
 	}
 
 	//标记为本轮临时标记
-	markOutput[voxelIndex] = TEMP_MARK_B;
+	markOutput[voxelIndex] = currentTempMark;
 
 	//递增新体素计数
 	atomic_inc(newVoxelsCount);

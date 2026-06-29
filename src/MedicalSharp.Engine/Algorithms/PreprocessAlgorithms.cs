@@ -237,7 +237,7 @@ namespace MedicalSharp.Engine.Algorithms
                 currentTempMark = (swap == tempMarkA) ? tempMarkB : tempMarkA;
             }
 
-            //将最终结果拷贝回原始标记纹理
+            //将最终结果拷贝回标记纹理
             Texture3D.Copy(pingTexture, markTexture);
 
             //将临时标记统一替换为种子点标记值
