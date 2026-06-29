@@ -210,6 +210,14 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 //获取标记值
                 byte markValue = this.SelectedTissue.MarkValue;
 
+                //全局繁忙
+                GlobalBusyEvent busyMessage = new GlobalBusyEvent
+                {
+                    Publisher = this,
+                    IsBusy = true
+                };
+                await this._eventAggregator.PublishOnUIThreadAsync(busyMessage);
+
                 await Task.Run(() =>
                 {
                     //设置种子点标记值
@@ -227,6 +235,14 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
 
                 //同步到标记纹理
                 this.VolumeData.SyncMarkDataToGpu(volumeSession.MarkTexture);
+
+                //全局空闲
+                GlobalBusyEvent idleMessage = new GlobalBusyEvent
+                {
+                    Publisher = this,
+                    IsBusy = false
+                };
+                await this._eventAggregator.PublishOnUIThreadAsync(idleMessage);
 
                 //删除当前点
                 RemoveShapeEvent removeMessage = new RemoveShapeEvent

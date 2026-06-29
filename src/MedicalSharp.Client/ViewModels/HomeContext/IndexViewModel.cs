@@ -46,7 +46,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
     /// <summary>
     /// 首页视图模型
     /// </summary>
-    public class IndexViewModel : ScreenBase, IHandle<SyncViewportEvent>, IHandle<StatisticFinishedEvent>, IHandle<AppendShapeEvent>, IHandle<RemoveShapeEvent>
+    public class IndexViewModel : ScreenBase, IHandle<GlobalBusyEvent>, IHandle<SyncViewportEvent>, IHandle<StatisticFinishedEvent>, IHandle<AppendShapeEvent>, IHandle<RemoveShapeEvent>
     {
         #region # 字段及构造器
 
@@ -1612,6 +1612,34 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                 await topLevel!.Clipboard!.SetTextAsync(builder.ToString());
                 await MessageBox.Show("统计信息已复制到剪贴板！");
             }
+        }
+        #endregion
+
+        #region 处理全局繁忙事件 —— Task HandleAsync(GlobalBusyEvent message...
+        /// <summary>
+        /// 处理全局繁忙事件
+        /// </summary>
+        public Task HandleAsync(GlobalBusyEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            if (message.IsBusy)
+            {
+                this.Busy();
+            }
+            else
+            {
+                this.Idle();
+            }
+
+            return Task.CompletedTask;
         }
         #endregion
 
