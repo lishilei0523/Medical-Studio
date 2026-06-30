@@ -18,6 +18,8 @@ using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.CustomControls;
 using Silk.NET.OpenCL;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MedicalSharp.Client.ViewModels.AlgorithmContext
@@ -33,6 +35,11 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         /// 单点区域生长命令
         /// </summary>
         private MonoRegionGrowCommand _monoRegionGrowCommand;
+
+        /// <summary>
+        /// 多点区域生长命令
+        /// </summary>
+        private PolyRegionGrowCommand _polyRegionGrowCommand;
 
         /// <summary>
         /// 事件聚合器
@@ -131,7 +138,13 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         /// </summary>
         public void SwitchToMultiRegionGrow()
         {
-            //TODO 实现
+            //发布事件，将this._polyRegionGrowCommand同步给体积渲染和MPR三视图切换命令
+            SwitchViewportCommandEvent message = new SwitchViewportCommandEvent
+            {
+                Publisher = this,
+                Command = this._polyRegionGrowCommand
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(message);
         }
         #endregion
 
@@ -152,6 +165,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         private void InitCommands()
         {
             this.InitMonoCommand();
+            this.InitPolyCommand();
         }
         #endregion
 
@@ -184,7 +198,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(appendMessage);
             };
-            Action<PointVisual3D> confirmed = async current =>
+            Action<PointVisual3D> confirmed = async point =>
             {
                 #region # 验证
 
@@ -197,68 +211,27 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 #endregion
 
                 //将世界坐标转为体素坐标
-                Vector3 worldPosition = current.Position.ToVector3();
+                Vector3 worldPosition = point.Position.ToVector3();
                 Vector3i voxelPosition = worldPosition.ToVoxelPosition(this.VolumeData.Metadata);
 
-                //获取会话
-                VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-                ClContext clContext = ClContextManager.Current;
-                int width = this.VolumeData.Metadata.VolumeSize.X;
-                int height = this.VolumeData.Metadata.VolumeSize.Y;
-                int depth = this.VolumeData.Metadata.VolumeSize.Z;
-
-                //获取标记值
-                byte markValue = this.SelectedTissue.MarkValue;
-
-                //全局繁忙
-                GlobalBusyEvent busyMessage = new GlobalBusyEvent
-                {
-                    Publisher = this,
-                    IsBusy = true
-                };
-                await this._eventAggregator.PublishOnUIThreadAsync(busyMessage);
-
-                await Task.Run(() =>
-                {
-                    //设置种子点标记值
-                    this.VolumeData.SetMarkValue(voxelPosition, markValue);
-
-                    //创建图像
-                    using ClImage3D previewImage = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadOnly, ChannelOrder.Intensity, ChannelType.SNormInt16);
-                    previewImage.Write(clContext.CommandQueue, this.VolumeData.PreviewData);
-                    clContext.Finish();
-
-                    //执行算子
-                    using RegionGrowing3D regionGrowing = new RegionGrowing3D(clContext);
-                    regionGrowing.Execute(previewImage, this.VolumeData.MarkData, this.MinHU, this.MaxHU, markValue, this.MaxIterations);
-                });
-
-                //同步到标记纹理
-                this.VolumeData.SyncMarkDataToGpu(volumeSession.MarkTexture);
-
-                //全局空闲
-                GlobalBusyEvent idleMessage = new GlobalBusyEvent
-                {
-                    Publisher = this,
-                    IsBusy = false
-                };
-                await this._eventAggregator.PublishOnUIThreadAsync(idleMessage);
+                //执行区域生长
+                await this.ExecuteRegionGrow([voxelPosition]);
 
                 //删除当前点
                 RemoveShapeEvent removeMessage = new RemoveShapeEvent
                 {
                     Publisher = this,
-                    Shape = current
+                    Shape = point
                 };
                 await this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
             };
-            Action<PointVisual3D> cancelled = current =>
+            Action<PointVisual3D> cancelled = point =>
             {
                 //删除当前点
                 RemoveShapeEvent removeMessage = new RemoveShapeEvent
                 {
                     Publisher = this,
-                    Shape = current
+                    Shape = point
                 };
                 this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
             };
@@ -268,6 +241,129 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 RegionGrowConfirmed = confirmed,
                 RegionGrowCancelled = cancelled
             };
+        }
+        #endregion
+
+        #region 初始化多点区域生长命令 —— void InitPolyCommand()
+        /// <summary>
+        /// 初始化多点区域生长命令
+        /// </summary>
+        private void InitPolyCommand()
+        {
+            Action<PointCloudVisual3D> picked = cloud =>
+            {
+                cloud.DisplayName = "种子点云";
+
+                //添加当前点云
+                AppendShapeEvent appendMessage = new AppendShapeEvent
+                {
+                    Publisher = this,
+                    Shape = cloud
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(appendMessage);
+            };
+            Action<PointCloudVisual3D> changed = _ =>
+            {
+                //同步视口
+                SyncViewportEvent syncMessage = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(syncMessage);
+            };
+            Action<PointCloudVisual3D> confirmed = async cloud =>
+            {
+                #region # 验证
+
+                if (this.SelectedTissue == null || this.SelectedTissue.MarkValue == 0)
+                {
+                    await MessageBox.Show("当前未选中有效组织！", "错误");
+                    return;
+                }
+
+                #endregion
+
+                //将世界坐标转为体素坐标
+                IEnumerable<Vector3> worldPositions = cloud.Positions.Select(position => position.ToVector3());
+                IEnumerable<Vector3i> voxelPositions = worldPositions.Select(position => position.ToVoxelPosition(this.VolumeData.Metadata));
+
+                //执行区域生长
+                await this.ExecuteRegionGrow(voxelPositions);
+
+                //删除当前点云
+                RemoveShapeEvent removeMessage = new RemoveShapeEvent
+                {
+                    Publisher = this,
+                    Shape = cloud
+                };
+                await this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
+            };
+            Action<PointCloudVisual3D> cancelled = cloud =>
+            {
+                //删除当前点云
+                RemoveShapeEvent removeMessage = new RemoveShapeEvent
+                {
+                    Publisher = this,
+                    Shape = cloud
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
+            };
+            this._polyRegionGrowCommand = new PolyRegionGrowCommand
+            {
+                SeedPointPicked = picked,
+                SeedPointChanged = changed,
+                RegionGrowConfirmed = confirmed,
+                RegionGrowCancelled = cancelled
+            };
+        }
+        #endregion
+
+        #region 执行区域生长 —— async Task ExecuteRegionGrow(IEnumerable<Vector3i> voxelPositions)
+        /// <summary>
+        /// 执行区域生长
+        /// </summary>
+        /// <param name="voxelPositions">种子点体素坐标列表</param>
+        private async Task ExecuteRegionGrow(IEnumerable<Vector3i> voxelPositions)
+        {
+            VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+            ClContext clContext = ClContextManager.Current;
+            int width = this.VolumeData.Metadata.VolumeSize.X;
+            int height = this.VolumeData.Metadata.VolumeSize.Y;
+            int depth = this.VolumeData.Metadata.VolumeSize.Z;
+            byte markValue = this.SelectedTissue.MarkValue;
+
+            //全局繁忙
+            GlobalBusyEvent busyMessage = new GlobalBusyEvent
+            {
+                Publisher = this,
+                IsBusy = true
+            };
+            await this._eventAggregator.PublishOnUIThreadAsync(busyMessage);
+
+            await Task.Run(() =>
+            {
+                //设置种子点标记值
+                foreach (Vector3i voxelPosition in voxelPositions)
+                {
+                    this.VolumeData.SetMarkValue(voxelPosition, markValue);
+                }
+
+                //创建图像
+                using ClImage3D previewImage = ClImage3D.Create(clContext, width, height, depth, MemFlags.ReadOnly, ChannelOrder.Intensity, ChannelType.SNormInt16);
+                previewImage.Write(clContext.CommandQueue, this.VolumeData.PreviewData);
+                clContext.Finish();
+
+                //执行算子
+                using RegionGrowing3D regionGrowing = new RegionGrowing3D(clContext);
+                regionGrowing.Execute(previewImage, this.VolumeData.MarkData, this.MinHU, this.MaxHU, markValue, this.MaxIterations);
+            });
+
+            //同步到标记纹理
+            this.VolumeData.SyncMarkDataToGpu(volumeSession.MarkTexture);
+
+            //全局空闲
+            GlobalBusyEvent idleMessage = new GlobalBusyEvent { Publisher = this, IsBusy = false };
+            await this._eventAggregator.PublishOnUIThreadAsync(idleMessage);
         }
         #endregion
 

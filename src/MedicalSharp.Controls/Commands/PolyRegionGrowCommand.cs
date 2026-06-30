@@ -1,4 +1,5 @@
-﻿using Avalonia.Input;
+﻿using Avalonia;
+using Avalonia.Input;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
@@ -12,26 +13,21 @@ using System.Collections.Generic;
 namespace MedicalSharp.Controls.Commands
 {
     /// <summary>
-    /// 单点区域生长命令
+    /// 多点区域生长命令
     /// </summary>
-    public class MonoRegionGrowCommand : DrawShapeCommand
+    public class PolyRegionGrowCommand : DrawShapeCommand
     {
         #region # 字段及构造器
 
         /// <summary>
-        /// 当前种子点
+        /// 种子点云
         /// </summary>
-        private PointVisual3D _currentSeedPoint;
-
-        /// <summary>
-        /// 上一种子点
-        /// </summary>
-        private PointVisual3D _prevSeedPoint;
+        private PointCloudVisual3D _pointCloud;
 
         /// <summary>
         /// 默认构造器
         /// </summary>
-        public MonoRegionGrowCommand()
+        public PolyRegionGrowCommand()
         {
 
         }
@@ -40,26 +36,32 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 种子点已拾取委托 —— Action<PointVisual3D, PointVisual3D> SeedPointPicked
+        #region 种子点已拾取委托 —— Action<PointCloudVisual3D> SeedPointPicked
         /// <summary>
         /// 种子点已拾取委托
         /// </summary>
-        /// <remarks>当前种子点, 上一种子点</remarks>
-        public Action<PointVisual3D, PointVisual3D> SeedPointPicked { get; set; }
+        public Action<PointCloudVisual3D> SeedPointPicked { get; set; }
         #endregion
 
-        #region 区域生长已确认委托 —— Action<PointVisual3D> RegionGrowConfirmed
+        #region 种子点已变化委托 —— Action<PointCloudVisual3D> SeedPointChanged
+        /// <summary>
+        /// 种子点已变化委托
+        /// </summary>
+        public Action<PointCloudVisual3D> SeedPointChanged { get; set; }
+        #endregion
+
+        #region 区域生长已确认委托 —— Action<PointCloudVisual3D> RegionGrowConfirmed
         /// <summary>
         /// 区域生长已确认委托
         /// </summary>
-        public Action<PointVisual3D> RegionGrowConfirmed { get; set; }
+        public Action<PointCloudVisual3D> RegionGrowConfirmed { get; set; }
         #endregion
 
-        #region 区域生长已取消委托 —— Action<PointVisual3D> RegionGrowCancelled
+        #region 区域生长已取消委托 —— Action<PointCloudVisual3D> RegionGrowCancelled
         /// <summary>
         /// 区域生长已取消委托
         /// </summary>
-        public Action<PointVisual3D> RegionGrowCancelled { get; set; }
+        public Action<PointCloudVisual3D> RegionGrowCancelled { get; set; }
         #endregion
 
         #endregion
@@ -80,14 +82,25 @@ namespace MedicalSharp.Controls.Commands
                 Vector3? mousePos3D = basicViewport.FindNearestPosition(mousePos2D);
                 if (mousePos3D.HasValue)
                 {
-                    this._prevSeedPoint = this._currentSeedPoint;
-                    this._currentSeedPoint = new PointVisual3D
+                    Vector3D position = mousePos3D.Value.ToVector3();
+                    if (this._pointCloud == null)
                     {
-                        Fill = ColorFactory.PointColor.ToColor(),
-                        Position = mousePos3D.Value.ToVector3(),
-                        PointSize = 5
-                    };
-                    this.SeedPointPicked?.Invoke(this._currentSeedPoint, this._prevSeedPoint);
+                        //第一次点击：创建点云，添加第一个种子点
+                        this._pointCloud = new PointCloudVisual3D()
+                        {
+                            Fill = ColorFactory.PointColor.ToColor(),
+                            Positions = [position],
+                            PointSize = 5
+                        };
+                        this._isDrawing = true;
+                        this.SeedPointPicked?.Invoke(this._pointCloud);
+                    }
+                    else
+                    {
+                        //后续点击：添加种子点
+                        this._pointCloud.Positions.Add(position);
+                        this.SeedPointChanged?.Invoke(this._pointCloud);
+                    }
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
@@ -109,15 +122,24 @@ namespace MedicalSharp.Controls.Commands
                 {
                     Header = "确定(_O)",
                     Command = this.Confirm,
-                    IsEnabled = this._currentSeedPoint != null
+                    IsEnabled = this._pointCloud != null
                 },
                 new ContextMenuItem
                 {
                     Header = "取消(_C)",
                     Command = this.Cancel,
-                    IsEnabled = this._currentSeedPoint != null
+                    IsEnabled = this._pointCloud != null
                 }
             ];
+
+            if (this._pointCloud != null && this._pointCloud.Positions.Count > 1)
+            {
+                items.Add(new ContextMenuItem
+                {
+                    Header = "撤销上一点(_U)",
+                    Command = () => this.UndoLastPoint(viewport)
+                });
+            }
 
             return items;
         }
@@ -133,8 +155,7 @@ namespace MedicalSharp.Controls.Commands
             base.Deactivate();
 
             this._isDrawing = false;
-            this._currentSeedPoint = null;
-            this._prevSeedPoint = null;
+            this._pointCloud = null;
         }
         #endregion
 
@@ -145,9 +166,8 @@ namespace MedicalSharp.Controls.Commands
         private void Confirm()
         {
             this._isDrawing = false;
-            this.RegionGrowConfirmed?.Invoke(this._currentSeedPoint);
-            this._currentSeedPoint = null;
-            this._prevSeedPoint = null;
+            this.RegionGrowConfirmed?.Invoke(this._pointCloud);
+            this._pointCloud = null;
         }
         #endregion
 
@@ -158,11 +178,37 @@ namespace MedicalSharp.Controls.Commands
         private void Cancel()
         {
             this._isDrawing = false;
-            this.RegionGrowCancelled?.Invoke(this._currentSeedPoint);
-            this._currentSeedPoint = null;
-            this._prevSeedPoint = null;
+            this.RegionGrowCancelled?.Invoke(this._pointCloud);
+            this._pointCloud = null;
         }
         #endregion
+
+        #region 撤销上一点 —— void UndoLastPoint(OpenTKViewport viewport)
+        /// <summary>
+        /// 撤销上一点
+        /// </summary>
+        private void UndoLastPoint(OpenTKViewport viewport)
+        {
+            #region # 验证
+
+            if (this._pointCloud == null)
+            {
+                return;
+            }
+
+            #endregion
+
+            //移除最后一个种子点
+            if (this._pointCloud.Positions.Count > 1)
+            {
+                this._pointCloud.Positions.RemoveAt(this._pointCloud.Positions.Count - 1);
+                this.SeedPointChanged?.Invoke(this._pointCloud);
+            }
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion 
 
         #endregion
     }

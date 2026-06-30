@@ -122,8 +122,8 @@ namespace MedicalSharp.Controls.Extensions
         /// <returns>是否在MPR平面上</returns>
         public static bool IsOnPlane(this Visual3D visual3D, MPRPlane plane, float epsilon = 0.001f)
         {
-            //线条类：始终显示
-            if (visual3D is ILineBasedVisual3D)
+            //线条类/点云：始终显示
+            if (visual3D is ILineBasedVisual3D or PointCloudVisual3D)
             {
                 return true;
             }

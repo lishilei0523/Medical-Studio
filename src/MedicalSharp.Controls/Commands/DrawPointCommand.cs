@@ -1,5 +1,4 @@
 ﻿using Avalonia.Input;
-using Avalonia.Media;
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
