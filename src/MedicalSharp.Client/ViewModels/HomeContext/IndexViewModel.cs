@@ -1,5 +1,6 @@
 ﻿using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -946,8 +947,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand ResetPreviewCommand => new AsyncRelayCommand(async _ =>
         {
-            TaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
-            if (result == TaskDialogStandardResult.OK)
+            FATaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == FATaskDialogStandardResult.OK)
             {
                 VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
                 volumeSession.ResetPreviewTexture();
@@ -965,8 +966,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand ResetMarkCommand => new AsyncRelayCommand(async _ =>
         {
-            TaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
-            if (result == TaskDialogStandardResult.OK)
+            FATaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == FATaskDialogStandardResult.OK)
             {
                 VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
                 volumeSession.ResetMarkTexture();
@@ -984,8 +985,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand ClearShapesCommand => new AsyncRelayCommand(async _ =>
         {
-            TaskDialogStandardResult result = await MessageBox.Show("确定要清空吗？", "警告", MessageBoxButton.OKCancel);
-            if (result == TaskDialogStandardResult.OK)
+            FATaskDialogStandardResult result = await MessageBox.Show("确定要清空吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == FATaskDialogStandardResult.OK)
             {
                 this.Shapes.Clear();
             }
@@ -1147,8 +1148,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand ResetTissueCommand => new AsyncRelayCommand(async _ =>
         {
-            TaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
-            if (result == TaskDialogStandardResult.OK)
+            FATaskDialogStandardResult result = await MessageBox.Show("确定要重置吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == FATaskDialogStandardResult.OK)
             {
                 //组织Mark值置为0
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
@@ -1168,8 +1169,8 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand RemoveTissueCommand => new AsyncRelayCommand(async _ =>
         {
-            TaskDialogStandardResult result = await MessageBox.Show("确定要删除吗？", "警告", MessageBoxButton.OKCancel);
-            if (result == TaskDialogStandardResult.OK)
+            FATaskDialogStandardResult result = await MessageBox.Show("确定要删除吗？", "警告", MessageBoxButton.OKCancel);
+            if (result == FATaskDialogStandardResult.OK)
             {
                 //组织Mark值置为0
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];

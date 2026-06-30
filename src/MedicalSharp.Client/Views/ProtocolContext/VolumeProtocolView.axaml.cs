@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.ProtocolContext
     /// <summary>
     /// 体积渲染协议视图
     /// </summary>
-    public partial class VolumeProtocolView : AppWindow
+    public partial class VolumeProtocolView : FAAppWindow
     {
         /// <summary>
         /// 默认构造器

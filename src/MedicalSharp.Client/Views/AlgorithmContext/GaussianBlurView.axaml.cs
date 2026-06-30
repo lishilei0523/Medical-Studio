@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.AlgorithmContext
     /// <summary>
     /// 高斯滤波视图
     /// </summary>
-    public partial class GaussianBlurView : AppWindow
+    public partial class GaussianBlurView : FAAppWindow
     {
         /// <summary>
         /// 默认构造器

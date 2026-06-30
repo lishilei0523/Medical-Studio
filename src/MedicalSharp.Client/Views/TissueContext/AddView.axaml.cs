@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.TissueContext
     /// <summary>
     /// 创建组织视图
     /// </summary>
-    public partial class AddView : AppWindow
+    public partial class AddView : FAAppWindow
     {
         /// <summary>
         /// 默认构造器

@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.AlgorithmContext
     /// <summary>
     /// Scharr边缘检测视图
     /// </summary>
-    public partial class ScharrView : AppWindow
+    public partial class ScharrView : FAAppWindow
     {
         /// <summary>
         /// 默认构造器

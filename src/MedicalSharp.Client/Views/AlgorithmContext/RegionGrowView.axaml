@@ -49,7 +49,7 @@
                                Value="{Binding MaxHU}" />
             </sd:FormItem>
             <sd:FormItem>
-                <fa:RangeSlider Width="169" HorizontalAlignment="Left"
+                <fa:FARangeSlider Width="169" HorizontalAlignment="Left"
                                 Minimum="-1024" Maximum="3071"
                                 RangeStart="{Binding MinHU}" RangeEnd="{Binding MaxHU}"
                                 StepFrequency="1" ShowValueToolTip="True" />

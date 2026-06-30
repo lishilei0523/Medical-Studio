@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.AlgorithmContext
     /// <summary>
     /// Laplacian边缘检测视图
     /// </summary>
-    public partial class LaplacianView : AppWindow
+    public partial class LaplacianView : FAAppWindow
     {
         /// <summary>
         /// 默认构造器

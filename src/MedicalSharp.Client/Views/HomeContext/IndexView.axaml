@@ -1,4 +1,4 @@
-﻿<fa:AppWindow x:Class="MedicalSharp.Client.Views.HomeContext.IndexView"
+﻿<fa:FAAppWindow x:Class="MedicalSharp.Client.Views.HomeContext.IndexView"
               xmlns="https://github.com/avaloniaui"
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -25,6 +25,7 @@
             <Grid Grid.Row="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
@@ -99,6 +100,7 @@
                             <MenuItem Header="区域生长分割(_G)" Command="{Binding RegionGrowCommand}" />
                         </MenuItem>
                     </Menu>
+                    <Grid Grid.Column="2" WindowDecorationProperties.ElementRole="TitleBar" />
                 </Grid>
             </Grid>
             <!--Body-->
@@ -260,7 +262,7 @@
                                         <!--标记模式-->
                                         <ComboBox Grid.Column="3" Width="90" FontSize="11"
                                                   ItemsSource="{Binding DataContext.MarkModes,
-                                                  RelativeSource={RelativeSource AncestorType=fa:AppWindow}}"
+                                                  RelativeSource={RelativeSource AncestorType=fa:FAAppWindow}}"
                                                   DisplayMemberBinding="{Binding Value}"
                                                   SelectedValue="{Binding SelectedMarkMode}">
                                         </ComboBox>
@@ -349,4 +351,4 @@
             </Grid>
         </Grid>
     </sd:BusyMask>
-</fa:AppWindow>
+</fa:FAAppWindow>

@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.AlgorithmContext
     /// <summary>
     /// Canny边缘检测视图
     /// </summary>
-    public partial class CannyView : AppWindow
+    public partial class CannyView : FAAppWindow
     {
         /// <summary>
         /// 默认构造器

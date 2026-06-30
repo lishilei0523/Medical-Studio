@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.ShapeContext
     /// <summary>
     /// 重命名形状视图
     /// </summary>
-    public partial class RenameView : AppWindow
+    public partial class RenameView : FAAppWindow
     {
         /// <summary>
         /// 默认构造器
