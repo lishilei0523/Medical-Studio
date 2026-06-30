@@ -9,7 +9,6 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -174,7 +173,7 @@ namespace MedicalSharp.Controls.Commands
                     }
                 ];
 
-                if (this._polyhedron != null && this._polyhedron.Positions.Any())
+                if (this._polyhedron != null && this._polyhedron.Positions.Count > 1)
                 {
                     items.Add(new ContextMenuItem
                     {
@@ -291,7 +290,7 @@ namespace MedicalSharp.Controls.Commands
             }
 
             //移除最后一个控制点
-            if (this._polyhedron.Positions.Any())
+            if (this._polyhedron.Positions.Count > 1)
             {
                 this._polyhedron.Positions.RemoveAt(this._polyhedron.Positions.Count - 1);
             }
