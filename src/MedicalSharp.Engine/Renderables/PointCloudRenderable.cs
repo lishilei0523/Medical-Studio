@@ -30,7 +30,7 @@ namespace MedicalSharp.Engine.Renderables
         {
             //默认值
             this.Fill = ColorFactory.PointColor;
-            this.PointSize = 2.0f;
+            this.PointSize = 5.0f;
         }
 
         /// <summary>

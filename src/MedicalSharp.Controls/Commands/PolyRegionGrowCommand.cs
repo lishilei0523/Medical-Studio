@@ -9,6 +9,7 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -89,8 +90,7 @@ namespace MedicalSharp.Controls.Commands
                         this._pointCloud = new PointCloudVisual3D()
                         {
                             Fill = ColorFactory.PointColor.ToColor(),
-                            Positions = [position],
-                            PointSize = 5
+                            Positions = [position]
                         };
                         this._isDrawing = true;
                         this.SeedPointPicked?.Invoke(this._pointCloud);
@@ -132,7 +132,7 @@ namespace MedicalSharp.Controls.Commands
                 }
             ];
 
-            if (this._pointCloud != null && this._pointCloud.Positions.Count > 1)
+            if (this._pointCloud != null && this._pointCloud.Positions.Any())
             {
                 items.Add(new ContextMenuItem
                 {
@@ -199,7 +199,7 @@ namespace MedicalSharp.Controls.Commands
             #endregion
 
             //移除最后一个种子点
-            if (this._pointCloud.Positions.Count > 1)
+            if (this._pointCloud.Positions.Any())
             {
                 this._pointCloud.Positions.RemoveAt(this._pointCloud.Positions.Count - 1);
                 this.SeedPointChanged?.Invoke(this._pointCloud);

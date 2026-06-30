@@ -54,8 +54,7 @@ namespace MedicalSharp.Controls.Commands
                     PointVisual3D point = new PointVisual3D
                     {
                         Fill = ColorFactory.PointColor.ToColor(),
-                        Position = mousePos3D.Value.ToVector3(),
-                        PointSize = 5
+                        Position = mousePos3D.Value.ToVector3()
                     };
                     this._isDrawing = true;
                     this.DrawEnd?.Invoke(point);

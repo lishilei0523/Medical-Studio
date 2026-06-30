@@ -29,7 +29,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         static PointVisual3D()
         {
             PositionProperty = AvaloniaProperty.Register<PointVisual3D, Vector3D>(nameof(Position), new Vector3D(0, 0, 0));
-            PointSizeProperty = AvaloniaProperty.Register<PointVisual3D, float>(nameof(PointSize), 2.0f);
+            PointSizeProperty = AvaloniaProperty.Register<PointVisual3D, float>(nameof(PointSize), 5.0f);
         }
 
 

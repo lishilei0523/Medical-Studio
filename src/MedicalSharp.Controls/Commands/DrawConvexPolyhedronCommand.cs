@@ -9,6 +9,7 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MedicalSharp.Controls.Commands
 {
@@ -83,7 +84,7 @@ namespace MedicalSharp.Controls.Commands
                     Vector3D position = mousePos3D.Value.ToVector3();
                     if (this._polyhedron == null)
                     {
-                        //第一次点击：创建凸多面体，添加第一个点
+                        //第一次点击：创建凸多面体，添加第一个控制点
                         this._polyhedron = new ConvexPolyhedronVisual3D
                         {
                             Positions = [position],
@@ -173,7 +174,7 @@ namespace MedicalSharp.Controls.Commands
                     }
                 ];
 
-                if (this._polyhedron != null && this._polyhedron.Positions.Count > 1)
+                if (this._polyhedron != null && this._polyhedron.Positions.Any())
                 {
                     items.Add(new ContextMenuItem
                     {
@@ -289,8 +290,8 @@ namespace MedicalSharp.Controls.Commands
                 this._previewPoint = null;
             }
 
-            //移除最后一个固定点
-            if (this._polyhedron.Positions.Count > 1)
+            //移除最后一个控制点
+            if (this._polyhedron.Positions.Any())
             {
                 this._polyhedron.Positions.RemoveAt(this._polyhedron.Positions.Count - 1);
             }
