@@ -298,10 +298,14 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         private void UndoLastPoint(OpenTKViewport viewport)
         {
+            #region # 验证
+
             if (this._curve == null)
             {
                 return;
             }
+
+            #endregion
 
             //移除预览点
             if (this._previewPoint.HasValue)

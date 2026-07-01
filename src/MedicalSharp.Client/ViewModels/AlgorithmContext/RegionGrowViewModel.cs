@@ -42,6 +42,11 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         private PolyRegionGrowCommand _polyRegionGrowCommand;
 
         /// <summary>
+        /// 曲线区域生长命令
+        /// </summary>
+        private CurveRegionGrowCommand _curveRegionGrowCommand;
+
+        /// <summary>
         /// 事件聚合器
         /// </summary>
         private readonly IEventAggregator _eventAggregator;
@@ -154,7 +159,13 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         /// </summary>
         public void SwitchToCurveRegionGrow()
         {
-            //TODO 实现
+            //发布事件，将this._curveRegionGrowCommand同步给体积渲染和MPR三视图切换命令
+            SwitchViewportCommandEvent message = new SwitchViewportCommandEvent
+            {
+                Publisher = this,
+                Command = this._curveRegionGrowCommand
+            };
+            this._eventAggregator.PublishOnUIThreadAsync(message);
         }
         #endregion
 
@@ -166,6 +177,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         {
             this.InitMonoCommand();
             this.InitPolyCommand();
+            this.InitCurveCommand();
         }
         #endregion
 
@@ -309,6 +321,79 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
             };
             this._polyRegionGrowCommand = new PolyRegionGrowCommand
+            {
+                SeedPointPicked = picked,
+                SeedPointChanged = changed,
+                RegionGrowConfirmed = confirmed,
+                RegionGrowCancelled = cancelled
+            };
+        }
+        #endregion
+
+        #region 初始化曲线区域生长命令 —— void InitCurveCommand()
+        /// <summary>
+        /// 初始化曲线区域生长命令
+        /// </summary>
+        private void InitCurveCommand()
+        {
+            Action<CurveVisual3D> picked = curve =>
+            {
+                curve.DisplayName = "种子曲线";
+
+                //添加当前曲线
+                AppendShapeEvent appendMessage = new AppendShapeEvent
+                {
+                    Publisher = this,
+                    Shape = curve
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(appendMessage);
+            };
+            Action<CurveVisual3D> changed = _ =>
+            {
+                //同步视口
+                SyncViewportEvent syncMessage = new SyncViewportEvent
+                {
+                    Publisher = this
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(syncMessage);
+            };
+            Action<CurveVisual3D> confirmed = async curve =>
+            {
+                #region # 验证
+
+                if (this.SelectedTissue == null || this.SelectedTissue.MarkValue == 0)
+                {
+                    await MessageBox.Show("当前未选中有效组织！", "错误");
+                    return;
+                }
+
+                #endregion
+
+                //将世界坐标转为体素坐标
+                IEnumerable<Vector3i> voxelPositions = curve.SampledPositions.Select(position => position.ToVoxelPosition(this.VolumeData.Metadata));
+
+                //执行区域生长
+                await this.ExecuteRegionGrow(voxelPositions);
+
+                //删除当前曲线
+                RemoveShapeEvent removeMessage = new RemoveShapeEvent
+                {
+                    Publisher = this,
+                    Shape = curve
+                };
+                await this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
+            };
+            Action<CurveVisual3D> cancelled = curve =>
+            {
+                //删除当前曲线
+                RemoveShapeEvent removeMessage = new RemoveShapeEvent
+                {
+                    Publisher = this,
+                    Shape = curve
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(removeMessage);
+            };
+            this._curveRegionGrowCommand = new CurveRegionGrowCommand
             {
                 SeedPointPicked = picked,
                 SeedPointChanged = changed,
