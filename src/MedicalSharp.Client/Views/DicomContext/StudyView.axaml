@@ -1,9 +1,9 @@
-<fa:AppWindow x:Class="MedicalSharp.Client.Views.DicomContext.StudyView"
+<fw:AppWindow x:Class="MedicalSharp.Client.Views.DicomContext.StudyView"
 			  xmlns="https://github.com/avaloniaui"
 			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:fw="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
 			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			  mc:Ignorable="d"
 			  Width="550" Height="330" CanResize="False" ShowAsDialog="True"
@@ -33,4 +33,4 @@
 			<TextBlock Text="{Binding IndexViewModel.StudyInfo.InstitutionName}" />
 		</sd:FormItem>
 	</StackPanel>
-</fa:AppWindow>
+</fw:AppWindow>

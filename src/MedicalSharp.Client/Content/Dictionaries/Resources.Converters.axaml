@@ -10,16 +10,16 @@
     <!--Null-False转换器-->
     <sd:NullToFalseConverter x:Key="NullToFalseConverter" />
     <!--枚举成员转换器-->
-    <sd:EnumMemberConverter x:Key="Converters.EnumMemberConverter" />
+    <sd:EnumMemberConverter x:Key="EnumMemberConverter" />
     <!--字符串-几何图标转换器-->
     <sd:StringToGeometryConverter x:Key="StringToGeometryConverter" />
     <!--停/启用描述转换器-->
-    <sd:BooleanDescriptionConverter x:Key="Converters.EnabledDescriptionConverter">
+    <sd:BooleanDescriptionConverter x:Key="EnabledDescriptionConverter">
         <x:String>已停用</x:String>
         <x:String>已启用</x:String>
     </sd:BooleanDescriptionConverter>
     <!--是/否描述转换器-->
-    <sd:BooleanDescriptionConverter x:Key="Converters.YesNoDescriptionConverter">
+    <sd:BooleanDescriptionConverter x:Key="YesNoDescriptionConverter">
         <x:String>否</x:String>
         <x:String>是</x:String>
     </sd:BooleanDescriptionConverter>

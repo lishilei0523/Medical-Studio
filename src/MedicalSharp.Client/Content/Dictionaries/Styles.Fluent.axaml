@@ -12,7 +12,6 @@
   <!--AppWindow对话框样式-->
   <Style Selector="fw|AppWindow.Dialog">
     <Setter Property="CanResize" Value="False" />
-    <Setter Property="WindowState" Value="Normal" />
   </Style>
   <!--NavigationView默认样式-->
   <Style Selector="fc|NavigationView">

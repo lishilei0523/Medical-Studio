@@ -1,9 +1,9 @@
-<fa:AppWindow x:Class="MedicalSharp.Client.Views.AlgorithmContext.MedianBlurView"
+<fw:AppWindow x:Class="MedicalSharp.Client.Views.AlgorithmContext.MedianBlurView"
 			  xmlns="https://github.com/avaloniaui"
 			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:fw="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
 			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			  xmlns:cm="http://caliburnmicro.com"
 			  mc:Ignorable="d"
@@ -27,7 +27,7 @@
 					<NumericUpDown Width="300" HorizontalAlignment="Left" IsReadOnly="True"
 								   Minimum="3" Maximum="3"
 								   ParsingNumberStyle="Integer" FormatString="F0"
-                                   Value="{Binding KernelSize}" />
+								   Value="{Binding KernelSize}" />
 				</sd:FormItem>
 			</StackPanel>
 			<!--占位区-->
@@ -41,4 +41,4 @@
 			</Grid>
 		</Grid>
 	</sd:BusyMask>
-</fa:AppWindow>
+</fw:AppWindow>

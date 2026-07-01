@@ -1,11 +1,11 @@
 <Application x:Class="MedicalSharp.Client.App"
 			 xmlns="https://github.com/avaloniaui"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			 xmlns:fa="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+			 xmlns:fs="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
 			 RequestedThemeVariant="Dark">
 
 	<Application.Styles>
-		<fa:FluentAvaloniaTheme />
+		<fs:FluentAvaloniaTheme />
 		<StyleInclude Source="avares://IconPacks.Avalonia.MaterialDesign/MaterialDesign.axaml" />
 		<StyleInclude Source="avares://SD.Infrastructure.Avalonia/Themes/Styles.axaml" />
 		<StyleInclude Source="/Content/Dictionaries/Styles.Controls.axaml" />

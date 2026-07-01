@@ -1,9 +1,9 @@
-<fa:AppWindow x:Class="MedicalSharp.Client.Views.ProtocolContext.MprProtocolView"
+<fw:AppWindow x:Class="MedicalSharp.Client.Views.ProtocolContext.MprProtocolView"
               xmlns="https://github.com/avaloniaui"
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-              xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+              xmlns:fw="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
               xmlns:cm="http://caliburnmicro.com"
               xmlns:sd="https://github.com/lishilei0523/SD.Framework"
               xmlns:sdm="https://github.com/lishilei0523/Medical-Studio"
@@ -28,7 +28,7 @@
                               ItemsSource="{Binding WindowLevels}"
                               DisplayMemberBinding="{Binding}"
                               SelectedValue="{Binding SelectedWindowLevel}" />
-                    <TextBlock Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" 
+                    <TextBlock Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right"
                                Text="{Binding MprViewModel.SelectedProtocol.Name}" />
                 </Grid>
             </sd:FormItem>
@@ -123,11 +123,11 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <sdm:ColorBand Grid.Row="0" Width="650" Height="50" Margin="0,0,0,-2"
-                          InterpolationMode="{Binding MprViewModel.InterpolationMode}"
-                          ControlPoints="{Binding ColorControlPoints}" />
+                           InterpolationMode="{Binding MprViewModel.InterpolationMode}"
+                           ControlPoints="{Binding ColorControlPoints}" />
             <sdm:AlphaCurveEditor Grid.Row="1" Width="650" Height="300"
-                                 ControlPoints="{Binding AlphaControlPoints}"
-                                 NormalizedHistogram="{Binding NormalizedHistogram}" />
+                                  ControlPoints="{Binding AlphaControlPoints}"
+                                  NormalizedHistogram="{Binding NormalizedHistogram}" />
         </Grid>
     </Grid>
-</fa:AppWindow>
+</fw:AppWindow>

@@ -1,9 +1,9 @@
-<fa:AppWindow x:Class="MedicalSharp.Client.Views.ProtocolContext.VolumeProtocolView"
+<fw:AppWindow x:Class="MedicalSharp.Client.Views.ProtocolContext.VolumeProtocolView"
               xmlns="https://github.com/avaloniaui"
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-              xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+              xmlns:fw="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
               xmlns:cm="http://caliburnmicro.com"
               xmlns:sd="https://github.com/lishilei0523/SD.Framework"
               xmlns:sdm="https://github.com/lishilei0523/Medical-Studio"
@@ -181,7 +181,7 @@
                                 <ColumnDefinition />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <ComboBox Grid.Column="0" Width="300" 
+                            <ComboBox Grid.Column="0" Width="300"
                                       ItemsSource="{Binding ControlPointGroups}"
                                       DisplayMemberBinding="{Binding Key}"
                                       SelectedValue="{Binding SelectedControlPoints}" />
@@ -191,12 +191,12 @@
                     </sd:FormItem>
                 </StackPanel>
                 <sdm:ColorBand Grid.Row="1" Width="650" Height="50" Margin="0,0,0,-2"
-                              InterpolationMode="{Binding VolumeViewModel.InterpolationMode}"
-                              ControlPoints="{Binding ColorControlPoints}" />
+                               InterpolationMode="{Binding VolumeViewModel.InterpolationMode}"
+                               ControlPoints="{Binding ColorControlPoints}" />
                 <sdm:AlphaCurveEditor Grid.Row="2" Width="650" Height="400"
-                                     ControlPoints="{Binding AlphaControlPoints}"
-                                     NormalizedHistogram="{Binding NormalizedHistogram}" />
+                                      ControlPoints="{Binding AlphaControlPoints}"
+                                      NormalizedHistogram="{Binding NormalizedHistogram}" />
             </Grid>
         </TabItem>
     </TabControl>
-</fa:AppWindow>
+</fw:AppWindow>

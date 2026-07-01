@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:fa="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:fc="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:cm="http://caliburnmicro.com"
              xmlns:sd="https://github.com/lishilei0523/SD.Framework"
              mc:Ignorable="d">
@@ -49,7 +49,7 @@
                                Value="{Binding MaxHU}" />
             </sd:FormItem>
             <sd:FormItem>
-                <fa:RangeSlider Width="169" HorizontalAlignment="Left"
+                <fc:RangeSlider Width="169" HorizontalAlignment="Left"
                                 Minimum="-1024" Maximum="3071"
                                 RangeStart="{Binding MinHU}" RangeEnd="{Binding MaxHU}"
                                 StepFrequency="1" ShowValueToolTip="True" />

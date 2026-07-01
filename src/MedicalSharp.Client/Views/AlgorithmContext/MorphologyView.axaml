@@ -1,19 +1,15 @@
-<fa:AppWindow x:Class="MedicalSharp.Client.Views.AlgorithmContext.MorphologyView"
+<fw:AppWindow x:Class="MedicalSharp.Client.Views.AlgorithmContext.MorphologyView"
 			  xmlns="https://github.com/avaloniaui"
 			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			  xmlns:fa="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+			  xmlns:fw="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
 			  xmlns:sd="https://github.com/lishilei0523/SD.Framework"
 			  xmlns:cm="http://caliburnmicro.com"
 			  mc:Ignorable="d"
 			  Width="460" Height="300" CanResize="False" ShowAsDialog="True"
 			  WindowStartupLocation="CenterScreen" Topmost="True"
 			  Title="形态学运算">
-
-	<fa:AppWindow.Resources>
-		<sd:EnumMemberConverter x:Key="EnumMemberConverter" />
-	</fa:AppWindow.Resources>
 
 	<sd:BusyMask IsBusy="{Binding IsBusy}">
 		<Grid>
@@ -48,4 +44,4 @@
 			</Grid>
 		</Grid>
 	</sd:BusyMask>
-</fa:AppWindow>
+</fw:AppWindow>

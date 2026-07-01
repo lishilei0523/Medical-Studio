@@ -35,16 +35,16 @@
   <!--DataGrid行默认样式-->
   <Style Selector="DataGridRow">
     <Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="#EAF2FF" />
+      <Setter Property="Fill" Value="#FFEAF2FF" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="^:selected">
       <Style Selector="^ /template/ Rectangle#BackgroundRectangle">
-        <Setter Property="Fill" Value="#FFE48D" />
+        <Setter Property="Fill" Value="#FFFFE48D" />
         <Setter Property="Opacity" Value="1" />
       </Style>
       <Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
-        <Setter Property="Fill" Value="#FFE48D" />
+        <Setter Property="Fill" Value="#FFFFE48D" />
         <Setter Property="Opacity" Value="1" />
       </Style>
     </Style>
