@@ -4,17 +4,18 @@
         xmlns:fc="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia">
 
-  <!--FAAppWindow默认样式-->
-  <Style Selector="fw|FAAppWindow">
+  <!--AppWindow默认样式-->
+  <Style Selector="fw|AppWindow">
     <Setter Property="FontFamily" Value="/Content/Fonts/msyh.ttf#Microsoft YaHei"/>
     <Setter Property="FontSize" Value="14" />
   </Style>
-  <!--FAAppWindow对话框样式-->
-  <Style Selector="fw|FAAppWindow.Dialog">
+  <!--AppWindow对话框样式-->
+  <Style Selector="fw|AppWindow.Dialog">
     <Setter Property="CanResize" Value="False" />
+    <Setter Property="WindowState" Value="Normal" />
   </Style>
   <!--NavigationView默认样式-->
-  <Style Selector="fc|FANavigationView">
+  <Style Selector="fc|NavigationView">
     <Setter Property="FontFamily" Value="/Content/Fonts/msyh.ttf#Microsoft YaHei"/>
     <Setter Property="FontSize" Value="16" />
   </Style>

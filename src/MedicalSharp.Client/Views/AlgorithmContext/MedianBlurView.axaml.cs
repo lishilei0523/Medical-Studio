@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.AlgorithmContext
     /// <summary>
     /// 中值滤波视图
     /// </summary>
-    public partial class MedianBlurView : FAAppWindow
+    public partial class MedianBlurView : AppWindow
     {
         /// <summary>
         /// 默认构造器

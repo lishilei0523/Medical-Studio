@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.ProtocolContext
     /// <summary>
     /// MPR渲染协议视图
     /// </summary>
-    public partial class MprProtocolView : FAAppWindow
+    public partial class MprProtocolView : AppWindow
     {
         /// <summary>
         /// 默认构造器

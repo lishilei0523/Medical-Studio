@@ -16,7 +16,7 @@
 	<Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="avares://SD.Infrastructure.Avalonia/Themes/Resources.axaml" />
+				<ResourceInclude Source="avares://SD.Infrastructure.Avalonia/Themes/Resources.axaml" />
 				<ResourceInclude Source="/Content/Dictionaries/Resources.Brushes.axaml" />
 				<ResourceInclude Source="/Content/Dictionaries/Resources.Converters.axaml" />
 				<ResourceInclude Source="/Content/Dictionaries/Resources.Fluent.axaml" />

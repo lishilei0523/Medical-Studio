@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.CommonContext
     /// <summary>
     /// 文本视图
     /// </summary>
-    public partial class TextView : FAAppWindow
+    public partial class TextView : AppWindow
     {
         /// <summary>
         /// 默认构造器

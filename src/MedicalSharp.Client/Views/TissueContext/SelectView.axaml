@@ -1,4 +1,4 @@
-<fa:FAAppWindow x:Class="MedicalSharp.Client.Views.TissueContext.SelectView"
+<fa:AppWindow x:Class="MedicalSharp.Client.Views.TissueContext.SelectView"
 			  xmlns="https://github.com/avaloniaui"
 			  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -39,4 +39,4 @@
 			</WrapPanel>
 		</Grid>
 	</Grid>
-</fa:FAAppWindow>
+</fa:AppWindow>

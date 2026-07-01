@@ -5,7 +5,7 @@ namespace MedicalSharp.Client.Views.HomeContext
     /// <summary>
     /// 首页视图
     /// </summary>
-    public partial class IndexView : FAAppWindow
+    public partial class IndexView : AppWindow
     {
         /// <summary>
         /// 默认构造器
@@ -14,7 +14,7 @@ namespace MedicalSharp.Client.Views.HomeContext
         {
             this.InitializeComponent();
             this.TitleBar.ExtendsContentIntoTitleBar = true;
-            //this.TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
+            this.TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
         }
     }
 }
