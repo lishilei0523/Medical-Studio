@@ -45,11 +45,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         public static readonly StyledProperty<int> RingsProperty;
 
         /// <summary>
-        /// 可否旋转依赖属性
-        /// </summary>
-        public static readonly StyledProperty<bool> CanRotateProperty;
-
-        /// <summary>
         /// 静态构造器
         /// </summary>
         static BoundingSphereVisual3D()
@@ -58,7 +53,6 @@ namespace MedicalSharp.Controls.Visual3Ds
             CenterProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
             SegmentsProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, int>(nameof(Segments), 32);
             RingsProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, int>(nameof(Rings), 16);
-            CanRotateProperty = AvaloniaProperty.Register<BoundingSphereVisual3D, bool>(nameof(CanRotate), true);
         }
 
 
@@ -115,17 +109,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             get => this.GetValue(RingsProperty);
             set => this.SetValue(RingsProperty, value);
-        }
-        #endregion
-
-        #region 依赖属性 - 可否旋转 —— bool CanRotate
-        /// <summary>
-        /// 依赖属性 - 可否旋转
-        /// </summary>
-        public bool CanRotate
-        {
-            get => this.GetValue(CanRotateProperty);
-            set => this.SetValue(CanRotateProperty, value);
         }
         #endregion
 

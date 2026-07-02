@@ -53,11 +53,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         public static readonly StyledProperty<MPRPlaneType> PlaneTypeProperty;
 
         /// <summary>
-        /// 可否旋转依赖属性
-        /// </summary>
-        public static readonly StyledProperty<bool> CanRotateProperty;
-
-        /// <summary>
         /// 静态构造器
         /// </summary>
         static MPRPlaneVisual3D()
@@ -69,7 +64,6 @@ namespace MedicalSharp.Controls.Visual3Ds
             VAxisProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3D>(nameof(VAxis), new Vector3D(0, 0, 1));
             NormalProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 1, 0));
             PlaneTypeProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, MPRPlaneType>(nameof(PlaneType), MPRPlaneType.Axial);
-            CanRotateProperty = AvaloniaProperty.Register<MPRPlaneVisual3D, bool>(nameof(CanRotate), true);
         }
 
 
@@ -159,17 +153,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             get => this.GetValue(PlaneTypeProperty);
             set => this.SetValue(PlaneTypeProperty, value);
-        }
-        #endregion
-
-        #region 依赖属性 - 可否旋转 —— bool CanRotate
-        /// <summary>
-        /// 依赖属性 - 可否旋转
-        /// </summary>
-        public bool CanRotate
-        {
-            get => this.GetValue(CanRotateProperty);
-            set => this.SetValue(CanRotateProperty, value);
         }
         #endregion
 

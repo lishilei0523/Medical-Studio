@@ -49,11 +49,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         public static readonly StyledProperty<int> SegmentsProperty;
 
         /// <summary>
-        /// 可否旋转依赖属性
-        /// </summary>
-        public static readonly StyledProperty<bool> CanRotateProperty;
-
-        /// <summary>
         /// 静态构造器
         /// </summary>
         static EllipseVisual3D()
@@ -63,12 +58,11 @@ namespace MedicalSharp.Controls.Visual3Ds
             CenterProperty = AvaloniaProperty.Register<EllipseVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
             NormalProperty = AvaloniaProperty.Register<EllipseVisual3D, Vector3D>(nameof(Normal), new Vector3D(0, 0, 1));
             SegmentsProperty = AvaloniaProperty.Register<EllipseVisual3D, int>(nameof(Segments), 64);
-            CanRotateProperty = AvaloniaProperty.Register<EllipseVisual3D, bool>(nameof(CanRotate), true);
         }
 
 
         /// <summary>
-        /// 起始位置（UV空间）
+        /// 起始位置（U/V空间）
         /// </summary>
         private Vector2 _startPos2D;
 
@@ -164,17 +158,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
-        #region 依赖属性 - 可否旋转 —— bool CanRotate
-        /// <summary>
-        /// 依赖属性 - 可否旋转
-        /// </summary>
-        public bool CanRotate
-        {
-            get => this.GetValue(CanRotateProperty);
-            set => this.SetValue(CanRotateProperty, value);
-        }
-        #endregion
-
         #region 只读属性 - 平面上一点 —— Vector3D PointOnPlane
         /// <summary>
         /// 只读属性 - 平面上一点
@@ -222,7 +205,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// <summary>
         /// 开始调整尺寸
         /// </summary>
-        /// <param name="startPos2D">起始位置（UV空间）</param>
+        /// <param name="startPos2D">起始位置（U/V空间）</param>
         public void BeginResize(Vector2 startPos2D)
         {
             this._startPos2D = startPos2D;
@@ -235,7 +218,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// <summary>
         /// 适用调整尺寸
         /// </summary>
-        /// <param name="currentPos2D">当前位置（UV空间）</param>
+        /// <param name="currentPos2D">当前位置（U/V空间）</param>
         public void ApplyResize(Vector2 currentPos2D)
         {
             float deltaX = currentPos2D.X - this._startPos2D.X;

@@ -50,11 +50,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         public static readonly StyledProperty<bool> WithCapsProperty;
 
         /// <summary>
-        /// 可否旋转依赖属性
-        /// </summary>
-        public static readonly StyledProperty<bool> CanRotateProperty;
-
-        /// <summary>
         /// 静态构造器
         /// </summary>
         static CylinderVisual3D()
@@ -64,7 +59,6 @@ namespace MedicalSharp.Controls.Visual3Ds
             CenterProperty = AvaloniaProperty.Register<CylinderVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
             SegmentsProperty = AvaloniaProperty.Register<CylinderVisual3D, int>(nameof(Segments), 32);
             WithCapsProperty = AvaloniaProperty.Register<CylinderVisual3D, bool>(nameof(WithCaps), true);
-            CanRotateProperty = AvaloniaProperty.Register<CylinderVisual3D, bool>(nameof(CanRotate), true);
         }
 
         /// <summary>
@@ -132,17 +126,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             get => this.GetValue(WithCapsProperty);
             set => this.SetValue(WithCapsProperty, value);
-        }
-        #endregion
-
-        #region 依赖属性 - 可否旋转 —— bool CanRotate
-        /// <summary>
-        /// 依赖属性 - 可否旋转
-        /// </summary>
-        public bool CanRotate
-        {
-            get => this.GetValue(CanRotateProperty);
-            set => this.SetValue(CanRotateProperty, value);
         }
         #endregion
 

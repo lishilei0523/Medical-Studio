@@ -46,11 +46,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         public static readonly StyledProperty<Vector3D> CenterProperty;
 
         /// <summary>
-        /// 可否旋转依赖属性
-        /// </summary>
-        public static readonly StyledProperty<bool> CanRotateProperty;
-
-        /// <summary>
         /// 静态构造器
         /// </summary>
         static BoundingBoxVisual3D()
@@ -59,7 +54,6 @@ namespace MedicalSharp.Controls.Visual3Ds
             HeightProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Height), 1.0f);
             DepthProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, float>(nameof(Depth), 1.0f);
             CenterProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, Vector3D>(nameof(Center), new Vector3D(0, 0, 0));
-            CanRotateProperty = AvaloniaProperty.Register<BoundingBoxVisual3D, bool>(nameof(CanRotate), true);
         }
 
 
@@ -116,17 +110,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             get => this.GetValue(CenterProperty);
             set => this.SetValue(CenterProperty, value);
-        }
-        #endregion
-
-        #region 依赖属性 - 可否旋转 —— bool CanRotate
-        /// <summary>
-        /// 依赖属性 - 可否旋转
-        /// </summary>
-        public bool CanRotate
-        {
-            get => this.GetValue(CanRotateProperty);
-            set => this.SetValue(CanRotateProperty, value);
         }
         #endregion
 
