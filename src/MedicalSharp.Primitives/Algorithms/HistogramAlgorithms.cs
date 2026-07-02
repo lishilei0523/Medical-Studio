@@ -50,13 +50,13 @@ namespace MedicalSharp.Primitives.Algorithms
             ConcurrentBag<uint[]> localHistograms = [];
 
             //动态分块
-            OrderablePartitioner<Tuple<long, long>> partitioner = Partitioner.Create(0, totalVoxels);
+            Partitioner<Tuple<long, long>> partitioner = Partitioner.Create(0, totalVoxels);
             Parallel.ForEach(partitioner, range =>
             {
                 uint[] localHist = new uint[bins];
                 for (long index = range.Item1; index < range.Item2; index++)
                 {
-                    float hu = dataPtr[index];  // short → float
+                    float hu = dataPtr[index];  //short -> float
 
                     //计算桶索引
                     int bin = (int)((hu - minHU) * scale);
