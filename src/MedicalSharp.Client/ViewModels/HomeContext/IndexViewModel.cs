@@ -164,6 +164,9 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
                     {
                         session.MarkStrategy.SwitchMarkMode(tissue.MarkValue, tissue.MarkMode);
                     }
+
+                    //打开区域生长分割面板
+                    this.RegionGrowCommand.Execute(null);
                 }
                 else
                 {
