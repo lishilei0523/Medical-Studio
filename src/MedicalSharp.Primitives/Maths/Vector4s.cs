@@ -3,7 +3,7 @@
 namespace MedicalSharp.Primitives.Maths
 {
     /// <summary>
-    /// Represents a 4D vector using four single-precision short numbers.
+    /// Represents a 4D vector using four short numbers.
     /// </summary>
     /// <remarks>
     /// The Vector4s structure is suitable for interoperation with unmanaged code requiring four consecutive shorts.
@@ -12,7 +12,7 @@ namespace MedicalSharp.Primitives.Maths
     public struct Vector4s
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Vector4b"/> struct.
+        /// Initializes a new instance of the <see cref="Vector4s"/> struct.
         /// </summary>
         /// <param name="value">The x,y,z,w value of the Vector4s.</param>
         public Vector4s(short value)
@@ -24,7 +24,7 @@ namespace MedicalSharp.Primitives.Maths
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Vector4b"/> struct.
+        /// Initializes a new instance of the <see cref="Vector4s"/> struct.
         /// </summary>
         /// <param name="x">The x component of the Vector4s.</param>
         /// <param name="y">The y component of the Vector4s.</param>
@@ -39,22 +39,22 @@ namespace MedicalSharp.Primitives.Maths
         }
 
         /// <summary>
-        /// The X component of the Vector4.
+        /// The X component of the Vector4s.
         /// </summary>
         public short X;
 
         /// <summary>
-        /// The Y component of the Vector4.
+        /// The Y component of the Vector4s.
         /// </summary>
         public short Y;
 
         /// <summary>
-        /// The Z component of the Vector4.
+        /// The Z component of the Vector4s.
         /// </summary>
         public short Z;
 
         /// <summary>
-        /// The W component of the Vector4.
+        /// The W component of the Vector4s.
         /// </summary>
         public short W;
     }

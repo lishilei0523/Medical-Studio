@@ -3,16 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MedicalSharp.Primitives.Builders
+namespace MedicalSharp.Primitives.Algorithms
 {
     /// <summary>
-    /// 曲线工厂
+    /// 曲线算法
     /// </summary>
-    public static class CurveFactory
+    public static class CurveAlgorithms
     {
         //Public
 
-        #region # 生成Catmull-Rom曲线 —— static IReadOnlyList<Vector3> EvaluateCatmullRom(IReadOnlyList<Vector3> points...
+        #region # 生成Catmull-Rom曲线 —— static IReadOnlyList<Vector3> EvaluateCatmullRom(...
         /// <summary>
         /// 生成Catmull-Rom曲线
         /// </summary>
@@ -43,7 +43,7 @@ namespace MedicalSharp.Primitives.Builders
 
             #endregion
 
-            List<Vector3> sampled = [];
+            List<Vector3> sampledPoints = [];
             int n = controlPoints.Count;
             for (int i = 0; i < (closed ? n : n - 1); i++)
             {
@@ -58,20 +58,21 @@ namespace MedicalSharp.Primitives.Builders
                 {
                     for (int j = 0; j <= tessellation; j++)
                     {
-                        float t = j / (float)tessellation;
-                        sampled.Add(EvaluateCatmullRomSegment(controlPoints[p0], controlPoints[p1], controlPoints[p2], controlPoints[p3], t));
+                        float t = j * 1.0f / tessellation;
+                        Vector3 sampledPoint = EvaluateCatmullRomSegment(controlPoints[p0], controlPoints[p1], controlPoints[p2], controlPoints[p3], t);
+                        sampledPoints.Add(sampledPoint);
                     }
                 }
             }
 
-            return sampled;
+            return sampledPoints;
         }
         #endregion
 
 
         //Private
 
-        #region # Catmull-Rom单段求值 —— static Vector3 EvaluateCatmullRomSegment(Vector3 p0, Vector3 p1...
+        #region # Catmull-Rom单段求值 —— static Vector3 EvaluateCatmullRomSegment(Vector3 p0...
         /// <summary>
         /// Catmull-Rom单段求值
         /// </summary>
@@ -84,16 +85,14 @@ namespace MedicalSharp.Primitives.Builders
         /// <remarks>
         /// Catmull-Rom样条由四个控制点定义一段曲线，曲线从p1到p2。
         /// 切线方向由p0->p2和p1->p3决定，保证曲线在p1和p2处与相邻段C¹连续。
-        ///
         /// 基函数推导：
-        /// b0 = -0.5t³ + t² - 0.5t
-        /// b1 = 1.5t³ - 2.5t² + 1.0
-        /// b2 = -1.5t³ + 2.0t² + 0.5t
-        /// b3 = 0.5t³ - 0.5t²
-        ///
+        ///     b0 = -0.5t³ + t² - 0.5t
+        ///     b1 = 1.5t³ - 2.5t² + 1.0
+        ///     b2 = -1.5t³ + 2.0t² + 0.5t
+        ///     b3 = 0.5t³ - 0.5t²
         /// 满足：b0+b1+b2+b3 = 1（仿射组合）
-        /// t=0时，b1=1，其余为0 -> 曲线经过p1
-        /// t=1时，b2=1，其余为0 -> 曲线经过p2
+        ///     t=0时，b1=1，其余为0 -> 曲线经过p1
+        ///     t=1时，b2=1，其余为0 -> 曲线经过p2
         /// </remarks>
         private static Vector3 EvaluateCatmullRomSegment(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
         {
@@ -106,7 +105,10 @@ namespace MedicalSharp.Primitives.Builders
             float b2 = -1.5f * t3 + 2.0f * t2 + 0.5f * t;
             float b3 = 0.5f * t3 - 0.5f * t2;
 
-            return b0 * p0 + b1 * p1 + b2 * p2 + b3 * p3;
+            //计算采样点
+            Vector3 sampledPoint = b0 * p0 + b1 * p1 + b2 * p2 + b3 * p3;
+
+            return sampledPoint;
         }
         #endregion
 
@@ -120,17 +122,19 @@ namespace MedicalSharp.Primitives.Builders
         /// <returns>采样点列表</returns>
         private static IReadOnlyList<Vector3> EvaluateLineSegment(Vector3 start, Vector3 end, int tessellation)
         {
-            List<Vector3> sampled = [];
-            for (int i = 0; i <= tessellation; i++)
+            List<Vector3> sampledPoints = [];
+            for (int index = 0; index <= tessellation; index++)
             {
-                float t = i / (float)tessellation;
-                sampled.Add(Vector3.Lerp(start, end, t));
+                float t = index * 1.0f / tessellation;
+                Vector3 sampledPoint = Vector3.Lerp(start, end, t);
+                sampledPoints.Add(sampledPoint);
             }
-            return sampled;
+
+            return sampledPoints;
         }
         #endregion
 
-        #region # 生成二次贝塞尔曲线 —— static IReadOnlyList<Vector3> EvaluateQuadraticBezier(Vector3 p0...
+        #region # 生成二次贝塞尔曲线 —— static IReadOnlyList<Vector3> EvaluateQuadraticBezier(...
         /// <summary>
         /// 生成二次贝塞尔曲线
         /// </summary>
@@ -142,20 +146,20 @@ namespace MedicalSharp.Primitives.Builders
         /// <remarks>二次贝塞尔曲线公式：B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2</remarks>
         private static IReadOnlyList<Vector3> EvaluateQuadraticBezier(Vector3 p0, Vector3 p1, Vector3 p2, int tessellation)
         {
-            //计算控制点 Q，使得 t=0.5 时曲线经过 p1
+            //计算控制点Q，使得t=0.5时曲线经过p1
             //p1 = (1-0.5)²p0 + 2(1-0.5)*0.5Q + 0.5²p2 = 0.25p0 + 0.5Q + 0.25p2
             //=> Q = (p1 - 0.25p0 - 0.25p2) / 0.5 = 2p1 - 0.5p0 - 0.5p2
             Vector3 controlPoint = 2 * p1 - 0.5f * p0 - 0.5f * p2;
-            List<Vector3> sampled = [];
-            for (int i = 0; i <= tessellation; i++)
+            List<Vector3> sampledPoints = [];
+            for (int index = 0; index <= tessellation; index++)
             {
-                float t = i / (float)tessellation;
+                float t = index * 1.0f / tessellation;
                 float u = 1 - t;
-                Vector3 point = u * u * p0 + 2 * u * t * controlPoint + t * t * p2;
-                sampled.Add(point);
+                Vector3 sampledPoint = u * u * p0 + 2 * u * t * controlPoint + t * t * p2;
+                sampledPoints.Add(sampledPoint);
             }
 
-            return sampled;
+            return sampledPoints;
         }
         #endregion
     }

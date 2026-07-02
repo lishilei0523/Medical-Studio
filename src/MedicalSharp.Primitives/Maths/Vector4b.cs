@@ -3,7 +3,7 @@
 namespace MedicalSharp.Primitives.Maths
 {
     /// <summary>
-    /// Represents a 4D vector using four single-precision byte numbers.
+    /// Represents a 4D vector using four byte numbers.
     /// </summary>
     /// <remarks>
     /// The Vector4b structure is suitable for interoperation with unmanaged code requiring four consecutive bytes.
@@ -39,22 +39,22 @@ namespace MedicalSharp.Primitives.Maths
         }
 
         /// <summary>
-        /// The X component of the Vector4.
+        /// The X component of the Vector4b.
         /// </summary>
         public byte X;
 
         /// <summary>
-        /// The Y component of the Vector4.
+        /// The Y component of the Vector4b.
         /// </summary>
         public byte Y;
 
         /// <summary>
-        /// The Z component of the Vector4.
+        /// The Z component of the Vector4b.
         /// </summary>
         public byte Z;
 
         /// <summary>
-        /// The W component of the Vector4.
+        /// The W component of the Vector4b.
         /// </summary>
         public byte W;
     }

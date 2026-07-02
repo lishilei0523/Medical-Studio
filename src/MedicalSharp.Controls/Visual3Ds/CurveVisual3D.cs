@@ -7,7 +7,6 @@ using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Algorithms;
-using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
@@ -135,7 +134,7 @@ namespace MedicalSharp.Controls.Visual3Ds
             #endregion
 
             IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
-            IReadOnlyList<Vector3> sampledPositions = CurveFactory.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
+            IReadOnlyList<Vector3> sampledPositions = CurveAlgorithms.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
             if (this.Renderable == null)
             {
                 CurveRenderable renderable = new CurveRenderable(controlPositions, sampledPositions, this.Closed);
