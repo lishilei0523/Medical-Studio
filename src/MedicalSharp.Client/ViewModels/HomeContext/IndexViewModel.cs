@@ -1157,7 +1157,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 //组织Mark值置为0
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-                session.ResetMarkValue(this.SelectedTissue.MarkValue);
+                session.ResetMark(this.SelectedTissue.MarkValue);
 
                 //发布消息
                 SyncViewportEvent message = new SyncViewportEvent();
@@ -1178,7 +1178,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             {
                 //组织Mark值置为0
                 VolumeSession session = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
-                session.ResetMarkValue(this.SelectedTissue.MarkValue);
+                session.ResetMark(this.SelectedTissue.MarkValue);
 
                 //删除组织，重设选中
                 this.Tissues.Remove(this.SelectedTissue);

@@ -12,6 +12,97 @@ namespace MedicalSharp.Engine.Algorithms
     /// </summary>
     public static class PreprocessAlgorithms
     {
+        #region # 重置预览纹理 —— static void ResetPreviewTexture(this VolumeData volumeData...
+        /// <summary>
+        /// 重置预览纹理
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="previewTexture">预览纹理</param>
+        /// <remarks>将预览纹理重置为原始纹理</remarks>
+        public static void ResetPreviewTexture(this VolumeData volumeData, Texture3D previewTexture)
+        {
+            #region # 验证
+
+            if (previewTexture == null)
+            {
+                throw new InvalidOperationException("预览纹理未初始化！");
+            }
+
+            #endregion
+
+            //从原始数据更新预览纹理
+            previewTexture.Update(volumeData.OriginalData);
+
+            //确保复制完成后后续操作能读到数据
+            GL.MemoryBarrier(MemoryBarrierFlags.TextureUpdateBarrierBit);
+
+            //重置CPU端
+            volumeData.ResetPreviewData();
+        }
+        #endregion
+
+        #region # 重置标记纹理 —— static void ResetMarkTexture(this VolumeData volumeData...
+        /// <summary>
+        /// 重置标记纹理
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
+        /// <remarks>将标记纹理全部设为0</remarks>
+        public static void ResetMarkTexture(this VolumeData volumeData, Texture3D markTexture)
+        {
+            //清空标记纹理
+            markTexture.Clear();
+
+            //清空CPU端
+            volumeData.ResetMarkData();
+        }
+        #endregion
+
+        #region # 重置标记 —— static void ResetMark(this VolumeData volumeData...
+        /// <summary>
+        /// 重置标记
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markTexture">标记纹理</param>
+        /// <param name="markValue">目标标记值（1~255）</param>
+        /// <remarks>将给定标记值重置为0</remarks>
+        public static void ResetMark(this VolumeData volumeData, Texture3D markTexture, byte markValue)
+        {
+            #region # 验证
+
+            if (markValue == 0)
+            {
+                return;
+            }
+
+            #endregion
+
+            //重置标记值计算着色器
+            ShaderProgram resetMarkValueComputer = ComputerManager.ResetMarkValueComputer;
+
+            //开启Shader程序
+            resetMarkValueComputer.Use();
+
+            //绑定标记纹理为可读写
+            markTexture.BindImageTexture(0, TextureAccess.ReadWrite);
+
+            //设置体积参数
+            resetMarkValueComputer.SetUniformVector3i("u_VolumeSize", volumeData.Metadata.VolumeSize);
+
+            //设置标记值
+            resetMarkValueComputer.SetUniformUInt("u_TargetMarkValue", markValue);
+
+            //调度执行
+            ComputerManager.DispatchCompute3D(volumeData.Metadata.VolumeSize);
+
+            //取消使用
+            resetMarkValueComputer.Unuse();
+
+            //CPU端重置
+            volumeData.ResetMark(markValue);
+        }
+        #endregion
+
         #region # 分配标记 —— static void AssignMark(this VolumeData volumeData...
         /// <summary>
         /// 分配标记

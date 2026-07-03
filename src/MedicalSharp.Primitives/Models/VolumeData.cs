@@ -344,17 +344,17 @@ namespace MedicalSharp.Primitives.Models
         }
         #endregion
 
-        #region 重置标记值 —— void ResetMarkValue(byte targetMarkValue)
+        #region 重置标记 —— void ResetMark(byte markValue)
         /// <summary>
-        /// 重置标记值
+        /// 重置标记
         /// </summary>
-        /// <param name="targetMarkValue">目标标记值（1~255）</param>
+        /// <param name="markValue">目标标记值（1~255）</param>
         /// <remarks>将给定标记值重置为0</remarks>
-        public unsafe void ResetMarkValue(byte targetMarkValue)
+        public unsafe void ResetMark(byte markValue)
         {
             #region # 验证
 
-            if (targetMarkValue == 0)
+            if (markValue == 0)
             {
                 return;
             }
@@ -370,7 +370,7 @@ namespace MedicalSharp.Primitives.Models
             byte* pointer = (byte*)this.MarkData.ToPointer();
             for (int index = 0; index < size; index++)
             {
-                if (pointer[index] == targetMarkValue)
+                if (pointer[index] == markValue)
                 {
                     pointer[index] = 0;
                 }

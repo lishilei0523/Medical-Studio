@@ -1,4 +1,4 @@
-﻿using MedicalSharp.Engine.Managers;
+﻿using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Protocols;
 using MedicalSharp.Engine.Resources;
 using MedicalSharp.Primitives.Models;
@@ -126,15 +126,15 @@ namespace MedicalSharp.Engine.Base
         }
         #endregion
 
-        #region 重置标记值 —— void ResetMarkValue(byte targetMarkValue)
+        #region 重置标记 —— void ResetMark(byte markValue)
         /// <summary>
-        /// 重置标记值
+        /// 重置标记
         /// </summary>
-        /// <param name="targetMarkValue">目标标记值（1~255）</param>
+        /// <param name="markValue">目标标记值（1~255）</param>
         /// <remarks>将给定标记值重置为0</remarks>
-        public void ResetMarkValue(byte targetMarkValue)
+        public void ResetMark(byte markValue)
         {
-            this.VolumeData.ResetMarkValue(this.MarkTexture, targetMarkValue);
+            this.VolumeData.ResetMark(this.MarkTexture, markValue);
         }
         #endregion
 

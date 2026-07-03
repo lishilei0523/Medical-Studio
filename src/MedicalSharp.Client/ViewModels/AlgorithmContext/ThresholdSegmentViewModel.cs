@@ -140,13 +140,16 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
             byte markValue = this.SelectedTissue.MarkValue;
 
             //先重置Mark值
-            this.VolumeData.ResetMarkValue(markTexture, markValue);
+            this.VolumeData.ResetMark(markTexture, markValue);
 
             //再分割
             this.VolumeData.ThresholdSegment(previewTexture, markTexture, this.MinHU, this.MaxHU, markValue);
 
             //发布消息
-            SyncViewportEvent message = new SyncViewportEvent();
+            SyncViewportEvent message = new SyncViewportEvent
+            {
+                Publisher = this
+            };
             this._eventAggregator.PublishOnUIThreadAsync(message);
         }
         #endregion
