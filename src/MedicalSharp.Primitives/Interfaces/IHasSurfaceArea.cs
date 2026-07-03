@@ -1,6 +1,6 @@
 ﻿using MedicalSharp.Primitives.Models;
 
-namespace MedicalSharp.Controls.Interfaces
+namespace MedicalSharp.Primitives.Interfaces
 {
     /// <summary>
     /// 具有表面积接口
