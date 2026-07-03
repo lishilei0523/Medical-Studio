@@ -47,6 +47,7 @@ namespace MedicalSharp.Primitives.Algorithms
 
             short* dataPtr = (short*)volumeData.OriginalData.ToPointer();
             byte* markPtr = (byte*)volumeData.MarkData.ToPointer();
+            Vector3 spacing = volumeData.Metadata.Spacing;
 
             //定义点云容器
             ConcurrentBag<Vector4> pointCloud = [];
@@ -65,11 +66,16 @@ namespace MedicalSharp.Primitives.Algorithms
                         int y = remainder / width;
                         int x = remainder % width;
 
+                        //转换为毫米坐标
+                        float mmX = x * spacing.X;
+                        float mmY = y * spacing.Y;
+                        float mmZ = z * spacing.Z;
+
                         //获取HU值
                         float hu = dataPtr[index];
 
-                        //添加点（X, Y, Z, HU）
-                        Vector4 point = new Vector4(x, y, z, hu);
+                        //添加点
+                        Vector4 point = new Vector4(mmX, mmY, mmZ, hu);
                         pointCloud.Add(point);
                     }
                 }
