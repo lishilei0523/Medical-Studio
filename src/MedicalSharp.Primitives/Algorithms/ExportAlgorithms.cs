@@ -49,6 +49,11 @@ namespace MedicalSharp.Primitives.Algorithms
             byte* markPtr = (byte*)volumeData.MarkData.ToPointer();
             Vector3 spacing = volumeData.Metadata.Spacing;
 
+            //计算体积的几何中心（毫米坐标）
+            float centerX = (width - 1) * 0.5f * spacing.X;
+            float centerY = (height - 1) * 0.5f * spacing.Y;
+            float centerZ = (depth - 1) * 0.5f * spacing.Z;
+
             //定义点云容器
             ConcurrentBag<Vector4> pointCloud = [];
 
@@ -67,9 +72,9 @@ namespace MedicalSharp.Primitives.Algorithms
                         int x = remainder % width;
 
                         //转换为毫米坐标
-                        float mmX = x * spacing.X;
-                        float mmY = y * spacing.Y;
-                        float mmZ = z * spacing.Z;
+                        float mmX = (x + 0.5f) * spacing.X - centerX;
+                        float mmY = (y + 0.5f) * spacing.Y - centerY;
+                        float mmZ = (z + 0.5f) * spacing.Z - centerZ;
 
                         //获取HU值
                         float hu = dataPtr[index];

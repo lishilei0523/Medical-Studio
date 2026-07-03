@@ -25,6 +25,7 @@ using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Managers;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
 using SD.Common;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
@@ -35,6 +36,7 @@ using SD.Infrastructure.Avalonia.Enums;
 using SD.IOC.Core.Mediators;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -1191,6 +1193,98 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             }
 
         }, _ => this.VolumeData != null && this.SelectedTissue != null && this.SelectedTissue.MarkValue != 0);
+        #endregion
+
+        #region 导出PCD点云命令 —— ICommand ExportPCDCommand
+        /// <summary>
+        /// 导出PCD点云命令
+        /// </summary>
+        public ICommand ExportPCDCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //保存文件对话框
+            FilePickerSaveOptions openOptions = new FilePickerSaveOptions
+            {
+                Title = "保存点云(PCD)文件",
+                SuggestedFileName = $"{this.SelectedTissue.Name}.pcd",
+                FileTypeChoices = [
+                    new FilePickerFileType("点云(PCD)文件")
+                    {
+                        Patterns = ["*.pcd"]
+                    }
+                ]
+            };
+
+            //保存文件
+            IStorageFile storageFile = await this.SaveFilePickerAsync(openOptions);
+            if (storageFile != null)
+            {
+                string filePath = storageFile.TryGetLocalPath();
+                IReadOnlyList<Vector4> pointCloud = this.VolumeData.ExportPointCloud(this.SelectedTissue.MarkValue);
+                string pcd = ExportAlgorithms.EncodePointCloudToPCD(pointCloud);
+
+                #region # 验证
+
+                if (string.IsNullOrWhiteSpace(pcd))
+                {
+                    await MessageBox.Show($"组织\"{this.SelectedTissue.Name}\"不存在有效数据！");
+                    return;
+                }
+
+                #endregion
+
+                await Task.Run(() => File.WriteAllTextAsync(filePath!, pcd));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null && this.SelectedTissue != null);
+        #endregion
+
+        #region 导出PLY点云命令 —— ICommand ExportPLYCommand
+        /// <summary>
+        /// 导出PLY点云命令
+        /// </summary>
+        public ICommand ExportPLYCommand => new AsyncRelayCommand(async _ =>
+        {
+            this.Busy();
+
+            //保存文件对话框
+            FilePickerSaveOptions openOptions = new FilePickerSaveOptions
+            {
+                Title = "保存点云(PLY)文件",
+                SuggestedFileName = $"{this.SelectedTissue.Name}.ply",
+                FileTypeChoices = [
+                    new FilePickerFileType("点云(PLY)文件")
+                    {
+                        Patterns = ["*.ply"]
+                    }
+                ]
+            };
+
+            //保存文件
+            IStorageFile storageFile = await this.SaveFilePickerAsync(openOptions);
+            if (storageFile != null)
+            {
+                string filePath = storageFile.TryGetLocalPath();
+                IReadOnlyList<Vector4> pointCloud = this.VolumeData.ExportPointCloud(this.SelectedTissue.MarkValue);
+                string ply = ExportAlgorithms.EncodePointCloudToPLY(pointCloud);
+
+                #region # 验证
+
+                if (string.IsNullOrWhiteSpace(ply))
+                {
+                    await MessageBox.Show($"组织\"{this.SelectedTissue.Name}\"不存在有效数据！");
+                    return;
+                }
+
+                #endregion
+
+                await Task.Run(() => File.WriteAllTextAsync(filePath!, ply));
+            }
+
+            this.Idle();
+        }, _ => this.VolumeData != null && this.SelectedTissue != null);
         #endregion
 
         #region HU直方图命令 —— ICommand HUHistogramCommand

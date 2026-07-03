@@ -273,6 +273,8 @@
                                     <MenuItem Header="编辑组织(_E)" Command="{Binding UpdateTissueCommand}" />
                                     <MenuItem Header="重置组织(_R)" Command="{Binding ResetTissueCommand}" />
                                     <MenuItem Header="删除组织(_D)" Command="{Binding RemoveTissueCommand}" />
+                                    <MenuItem Header="导出点云 (PCD)(_P)" Command="{Binding ExportPCDCommand}" />
+                                    <MenuItem Header="导出点云 (PLY)(_L)" Command="{Binding ExportPLYCommand}" />
                                 </MenuFlyout>
                             </ListBox.ContextFlyout>
                         </ListBox>
