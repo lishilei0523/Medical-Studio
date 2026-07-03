@@ -9,8 +9,6 @@ using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MedicalSharp.Client.ViewModels.AlgorithmContext
 {
@@ -32,6 +30,11 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         public ThresholdSegmentViewModel(IEventAggregator eventAggregator)
         {
             this._eventAggregator = eventAggregator;
+
+            //默认值
+            base.DisplayName = "阈值分割";
+            this.MinHU = 400;
+            this.MaxHU = 1000;
         }
 
         #endregion
@@ -96,20 +99,6 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         #endregion
 
         #region # 方法
-
-        #region 初始化 —— override Task OnActivatedAsync(CancellationToken cancellationToken)
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        protected override Task OnActivatedAsync(CancellationToken cancellationToken)
-        {
-            //默认值
-            this.MinHU = 400;
-            this.MaxHU = 1000;
-
-            return base.OnActivatedAsync(cancellationToken);
-        }
-        #endregion
 
         #region 应用 —— void Apply()
         /// <summary>

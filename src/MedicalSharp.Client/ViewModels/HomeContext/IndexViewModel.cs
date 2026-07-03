@@ -1556,13 +1556,21 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// <summary>
         /// 阈值分割命令
         /// </summary>
-        public ICommand ThresholdSegmentCommand => new AsyncRelayCommand(async _ =>
+        public ICommand ThresholdSegmentCommand => new RelayCommand(_ =>
         {
+            #region # 验证
+
+            if (this.FunctionPanel is ThresholdSegmentViewModel)
+            {
+                return;
+            }
+
+            #endregion
+
             ThresholdSegmentViewModel viewModel = ResolveMediator.Resolve<ThresholdSegmentViewModel>();
             viewModel.VolumeData = this.VolumeData;
-            viewModel.SelectedTissue = this.SelectedTissue;
             viewModel.Tissues = this.Tissues;
-            await this._windowManager.ShowWindowAsync(viewModel);
+            this.FunctionPanel = viewModel;
         }, _ => this.VolumeData != null);
         #endregion
 

@@ -57,6 +57,8 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         public RegionGrowViewModel(IEventAggregator eventAggregator)
         {
             this._eventAggregator = eventAggregator;
+
+            //默认值
             base.DisplayName = "区域生长";
             this.MinHU = 400;
             this.MaxHU = 1000;

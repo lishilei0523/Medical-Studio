@@ -1,39 +1,36 @@
-<fw:AppWindow x:Class="MedicalSharp.Client.Views.AlgorithmContext.ThresholdSegmentView"
-              xmlns="https://github.com/avaloniaui"
-              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-              xmlns:fw="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-              xmlns:fc="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-              xmlns:sd="https://github.com/lishilei0523/SD.Framework"
-              mc:Ignorable="d"
-              Width="500" Height="300" CanResize="False" ShowAsDialog="True"
-              WindowStartupLocation="CenterScreen" Topmost="True"
-              Title="阈值分割">
+<UserControl x:Class="MedicalSharp.Client.Views.AlgorithmContext.ThresholdSegmentView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:fc="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+             mc:Ignorable="d">
 
-    <StackPanel Grid.IsSharedSizeScope="True" Margin="20,20">
+    <StackPanel Grid.IsSharedSizeScope="True" Margin="0,20,0,5">
         <sd:FormItem Label="低阈值：">
-            <NumericUpDown Width="360" HorizontalAlignment="Left"
+            <NumericUpDown Width="169" HorizontalAlignment="Left"
                            Minimum="-1024" Maximum="3071" Increment="5"
                            ParsingNumberStyle="Integer" FormatString="F0"
                            Value="{Binding MinHU}" />
         </sd:FormItem>
         <sd:FormItem Label="高阈值：">
-            <NumericUpDown Width="360" HorizontalAlignment="Left"
+            <NumericUpDown Width="169" HorizontalAlignment="Left"
                            Minimum="-1024" Maximum="3071" Increment="10"
                            ParsingNumberStyle="Integer" FormatString="F0"
                            Value="{Binding MaxHU}" />
         </sd:FormItem>
         <sd:FormItem>
-            <fc:RangeSlider Width="360" HorizontalAlignment="Left"
+            <fc:RangeSlider Width="169" HorizontalAlignment="Left"
                             Minimum="-1024" Maximum="3071"
                             RangeStart="{Binding MinHU}" RangeEnd="{Binding MaxHU}"
                             StepFrequency="1" ShowValueToolTip="True" />
         </sd:FormItem>
-        <sd:FormItem Label="目标组织：">
-            <ComboBox Width="360" ItemsSource="{Binding Tissues}"
+        <sd:FormItem Label="组织：">
+            <ComboBox Width="169" PlaceholderText="目标组织"
+                      ItemsSource="{Binding Tissues}"
                       DisplayMemberBinding="{Binding Name}"
                       SelectedValue="{Binding SelectedTissue}" />
         </sd:FormItem>
     </StackPanel>
-</fw:AppWindow>
+</UserControl>
