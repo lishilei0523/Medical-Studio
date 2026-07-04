@@ -14,15 +14,27 @@ namespace MedicalSharp.Primitives.Enums
         None = 0,
 
         /// <summary>
-        /// 平滑
+        /// 腐蚀
         /// </summary>
-        [Description("平滑")]
-        Smooth = 1,
+        [Description("腐蚀")]
+        Erode = 1,
 
         /// <summary>
-        /// 填洞
+        /// 膨胀
         /// </summary>
-        [Description("填洞")]
-        FillHoles = 2
+        [Description("膨胀")]
+        Dilate = 2,
+
+        /// <summary>
+        /// 开运算
+        /// </summary>
+        [Description("开运算")]
+        Open = 3,
+
+        /// <summary>
+        /// 闭运算
+        /// </summary>
+        [Description("闭运算")]
+        Close = 4
     }
 }

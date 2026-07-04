@@ -161,7 +161,10 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 field = value;
                 this.NotifyOfPropertyChange();
                 this.MarkMorphMode = Enum.Parse<MarkMorphMode>(value.Key);
-                this.MorphEnabled = this.MarkMorphMode == MarkMorphMode.Smooth || this.MarkMorphMode == MarkMorphMode.FillHoles;
+                this.MorphEnabled = this.MarkMorphMode == MarkMorphMode.Erode ||
+                                    this.MarkMorphMode == MarkMorphMode.Dilate ||
+                                    this.MarkMorphMode == MarkMorphMode.Open ||
+                                    this.MarkMorphMode == MarkMorphMode.Close;
             }
         }
         #endregion
@@ -502,10 +505,16 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 //形态学处理
                 switch (this.MarkMorphMode)
                 {
-                    case MarkMorphMode.Smooth:
+                    case MarkMorphMode.Erode:
+                        this.VolumeData.ErodeMark(volumeSession.MarkTexture, markValue, 3, this.MorphIterations, false);
+                        break;
+                    case MarkMorphMode.Dilate:
+                        this.VolumeData.DilateMark(volumeSession.MarkTexture, markValue, 3, this.MorphIterations, false);
+                        break;
+                    case MarkMorphMode.Open:
                         this.VolumeData.OpenMark(volumeSession.MarkTexture, markValue, 3, this.MorphIterations, false);
                         break;
-                    case MarkMorphMode.FillHoles:
+                    case MarkMorphMode.Close:
                         this.VolumeData.CloseMark(volumeSession.MarkTexture, markValue, 3, this.MorphIterations, false);
                         break;
                     case MarkMorphMode.None:
