@@ -161,10 +161,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 field = value;
                 this.NotifyOfPropertyChange();
                 this.MarkMorphMode = Enum.Parse<MarkMorphMode>(value.Key);
-                this.MorphEnabled = this.MarkMorphMode == MarkMorphMode.Erode ||
-                                    this.MarkMorphMode == MarkMorphMode.Dilate ||
-                                    this.MarkMorphMode == MarkMorphMode.Open ||
-                                    this.MarkMorphMode == MarkMorphMode.Close;
+                this.MorphEnabled = this.MarkMorphMode != MarkMorphMode.None;
             }
         }
         #endregion
