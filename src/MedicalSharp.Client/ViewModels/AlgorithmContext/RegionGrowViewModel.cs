@@ -3,6 +3,7 @@ using Caliburn.Micro;
 using MedicalSharp.Controls.Commands;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Engine.Algorithms;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Inspiration.Managers;
@@ -11,8 +12,10 @@ using MedicalSharp.Inspiration.Resources;
 using MedicalSharp.Presentation.Events;
 using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Algorithms;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using SD.Common;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using SD.Infrastructure.Avalonia.CustomControls;
@@ -63,6 +66,9 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
             this.MinHU = 400;
             this.MaxHU = 1000;
             this.MaxIterations = 100;
+            this.SelectedMarkMorphMode = new KeyValuePair<string, string>(this.MarkMorphMode.ToString(), this.MarkMorphMode.GetEnumMember());
+            this.MarkMorphModes = typeof(MarkMorphMode).GetEnumMembers();
+            this.MorphIterations = 1;
 
             //初始化命令
             this.InitCommands();
@@ -103,6 +109,30 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         public int MaxIterations { get; set; }
         #endregion
 
+        #region 标记形态学模式 —— MarkMorphMode MarkMorphMode
+        /// <summary>
+        /// 标记形态学模式
+        /// </summary>
+        [DependencyProperty]
+        public MarkMorphMode MarkMorphMode { get; set; }
+        #endregion
+
+        #region 形态学迭代次数 —— int MorphIterations
+        /// <summary>
+        /// 形态学迭代次数
+        /// </summary>
+        [DependencyProperty]
+        public int MorphIterations { get; set; }
+        #endregion
+
+        #region 是否启用形态学 —— bool MorphEnabled
+        /// <summary>
+        /// 是否启用形态学
+        /// </summary>
+        [DependencyProperty]
+        public bool MorphEnabled { get; set; }
+        #endregion
+
         #region 已选组织 —— TissueInfo SelectedTissue
         /// <summary>
         /// 已选组织
@@ -117,6 +147,31 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
         /// </summary>
         [DependencyProperty]
         public AvaloniaList<TissueInfo> Tissues { get; set; }
+        #endregion
+
+        #region 已选标记形态学模式 —— KeyValuePair<string, string> SelectedMarkMorphMode
+        /// <summary>
+        /// 已选标记形态学模式
+        /// </summary>
+        public KeyValuePair<string, string> SelectedMarkMorphMode
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.MarkMorphMode = Enum.Parse<MarkMorphMode>(value.Key);
+                this.MorphEnabled = this.MarkMorphMode == MarkMorphMode.Smooth || this.MarkMorphMode == MarkMorphMode.FillHoles;
+            }
+        }
+        #endregion
+
+        #region 标记形态学模式字典 —— IDictionary<string, string> MarkMorphModes
+        /// <summary>
+        /// 标记形态学模式字典
+        /// </summary>
+        [DependencyProperty]
+        public IDictionary<string, string> MarkMorphModes { get; set; }
         #endregion
 
         #endregion
@@ -443,13 +498,31 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 //执行算子
                 using RegionGrowing3D regionGrowing = new RegionGrowing3D(clContext);
                 regionGrowing.Execute(previewImage, this.VolumeData.MarkData, this.MinHU, this.MaxHU, markValue, this.MaxIterations);
+
+                //形态学处理
+                switch (this.MarkMorphMode)
+                {
+                    case MarkMorphMode.Smooth:
+                        this.VolumeData.OpenMark(volumeSession.MarkTexture, markValue, 3, this.MorphIterations, false);
+                        break;
+                    case MarkMorphMode.FillHoles:
+                        this.VolumeData.CloseMark(volumeSession.MarkTexture, markValue, 3, this.MorphIterations, false);
+                        break;
+                    case MarkMorphMode.None:
+                    default:
+                        break;
+                }
             });
 
             //同步到标记纹理
             this.VolumeData.SyncMarkDataToGpu(volumeSession.MarkTexture);
 
             //全局空闲
-            GlobalBusyEvent idleMessage = new GlobalBusyEvent { Publisher = this, IsBusy = false };
+            GlobalBusyEvent idleMessage = new GlobalBusyEvent
+            {
+                Publisher = this,
+                IsBusy = false
+            };
             await this._eventAggregator.PublishOnUIThreadAsync(idleMessage);
         }
         #endregion

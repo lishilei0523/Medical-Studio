@@ -179,14 +179,18 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="markValue">标记值</param>
         /// <param name="kernelSize">核矩阵尺寸（3或5，默认3）</param>
         /// <param name="iterations">迭代次数（默认1）</param>
+        /// <param name="syncToGpu">同步GPU端</param>
         /// <remarks>先腐蚀后膨胀，平滑轮廓、去除孤立噪点，保持主体大小不变</remarks>
-        public static void OpenMark(this VolumeData volumeData, Texture3D markTexture, byte markValue, int kernelSize = 3, int iterations = 1)
+        public static void OpenMark(this VolumeData volumeData, Texture3D markTexture, byte markValue, int kernelSize = 3, int iterations = 1, bool syncToGpu = true)
         {
             volumeData.ErodeMark(markTexture, markValue, kernelSize, iterations, false);
             volumeData.DilateMark(markTexture, markValue, kernelSize, iterations, false);
 
             //同步到标记纹理
-            volumeData.SyncMarkDataToGpu(markTexture);
+            if (syncToGpu)
+            {
+                volumeData.SyncMarkDataToGpu(markTexture);
+            }
         }
         #endregion
 
@@ -199,14 +203,18 @@ namespace MedicalSharp.Engine.Algorithms
         /// <param name="markValue">标记值</param>
         /// <param name="kernelSize">核矩阵尺寸（3或5，默认3）</param>
         /// <param name="iterations">迭代次数（默认1）</param>
+        /// <param name="syncToGpu">同步GPU端</param>
         /// <remarks>先膨胀后腐蚀，填充内部小孔、连接邻近区域，保持主体大小不变</remarks>
-        public static void CloseMark(this VolumeData volumeData, Texture3D markTexture, byte markValue, int kernelSize = 3, int iterations = 1)
+        public static void CloseMark(this VolumeData volumeData, Texture3D markTexture, byte markValue, int kernelSize = 3, int iterations = 1, bool syncToGpu = true)
         {
             volumeData.DilateMark(markTexture, markValue, kernelSize, iterations, false);
             volumeData.ErodeMark(markTexture, markValue, kernelSize, iterations, false);
 
             //同步到标记纹理
-            volumeData.SyncMarkDataToGpu(markTexture);
+            if (syncToGpu)
+            {
+                volumeData.SyncMarkDataToGpu(markTexture);
+            }
         }
         #endregion
 

@@ -65,6 +65,18 @@
                           DisplayMemberBinding="{Binding Name}"
                           SelectedValue="{Binding SelectedTissue}" />
             </sd:FormItem>
+            <sd:FormItem Label="形态学：">
+                <ComboBox Width="169"
+                          ItemsSource="{Binding MarkMorphModes}"
+                          DisplayMemberBinding="{Binding Value}"
+                          SelectedValue="{Binding SelectedMarkMorphMode}" />
+            </sd:FormItem>
+            <sd:FormItem Label="迭代：" IsVisible="{Binding MorphEnabled}">
+                <NumericUpDown Width="169" HorizontalAlignment="Left"
+                               Minimum="1" Maximum="5" Increment="1"
+                               ParsingNumberStyle="Integer" FormatString="F0"
+                               Value="{Binding MorphIterations}" />
+            </sd:FormItem>
         </StackPanel>
     </Grid>
 </UserControl>
