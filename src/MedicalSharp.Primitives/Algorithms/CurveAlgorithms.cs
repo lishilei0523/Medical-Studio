@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using MedicalSharp.Primitives.Maths;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +67,142 @@ namespace MedicalSharp.Primitives.Algorithms
             }
 
             return sampledPoints;
+        }
+        #endregion
+
+        #region # 计算累积弧长 —— static float[] ComputeArcLengths(IReadOnlyList<Vector3>...
+        /// <summary>
+        /// 计算累积弧长
+        /// </summary>
+        /// <param name="sampledPoints">曲线采样点</param>
+        /// <returns>累积弧长数组，长度与采样点相同，第一个元素为0</returns>
+        /// <remarks>计算采样点列表的累积弧长列表</remarks>
+        public static float[] ComputeArcLengths(IReadOnlyList<Vector3> sampledPoints)
+        {
+            #region # 验证
+
+            if (sampledPoints == null || sampledPoints.Count < 2)
+            {
+                return sampledPoints?.Count == 1 ? [0] : [];
+            }
+
+            #endregion
+
+            float[] arcLengths = new float[sampledPoints.Count];
+            arcLengths[0] = 0;
+            for (int index = 1; index < sampledPoints.Count; index++)
+            {
+                float segmentLength = (sampledPoints[index] - sampledPoints[index - 1]).Length;
+                arcLengths[index] = arcLengths[index - 1] + segmentLength;
+            }
+
+            return arcLengths;
+        }
+        #endregion
+
+        #region # 等弧长重采样 —— static IReadOnlyList<Vector3> ResampleByArcLength(IReadOnlyList<Vector3>...
+        /// <summary>
+        /// 等弧长重采样
+        /// </summary>
+        /// <param name="sampledPoints">原始曲线采样点</param>
+        /// <param name="arcLengths">累积弧长数组</param>
+        /// <param name="sampleCount">目标采样点数</param>
+        /// <returns>等弧长分布的新采样点</returns>
+        /// <remarks>沿曲线等弧长重新采样</remarks>
+        public static IReadOnlyList<Vector3> ResampleByArcLength(IReadOnlyList<Vector3> sampledPoints, float[] arcLengths, int sampleCount)
+        {
+            #region # 验证
+
+            if (sampledPoints == null || sampledPoints.Count < 2 || sampleCount < 2)
+            {
+                return sampledPoints ?? [];
+            }
+
+            #endregion
+
+            float totalLength = arcLengths[^1];
+            Vector3[] resampledPoints = new Vector3[sampleCount];
+            for (int index = 0; index < sampleCount; index++)
+            {
+                float targetArc = (index / (float)(sampleCount - 1)) * totalLength;
+                resampledPoints[index] = SampleByArcLength(sampledPoints, arcLengths, targetArc);
+            }
+
+            return resampledPoints;
+        }
+        #endregion
+
+        #region # 构建Frenet框架 —— static FrenetFrame[] BuildFrenetFrames(IReadOnlyList<Vector3>...
+        /// <summary>
+        /// 构建Frenet框架
+        /// </summary>
+        /// <param name="resampledPoints">等弧长分布的曲线采样点</param>
+        /// <returns>每个采样点对应的FrenetFrame数组</returns>
+        /// <remarks>在等弧长采样点序列上构建Frenet框架，使用平行传输避免翻转</remarks>
+        public static FrenetFrame[] BuildFrenetFrames(IReadOnlyList<Vector3> resampledPoints)
+        {
+            #region # 验证
+
+            if (resampledPoints == null || resampledPoints.Count < 2)
+            {
+                return [];
+            }
+
+            #endregion
+
+            int n = resampledPoints.Count;
+            FrenetFrame[] frames = new FrenetFrame[n];
+
+            //第一个点的切线（中心差分或前向差分）
+            Vector3 tangent0 = Vector3.Normalize(resampledPoints[1] - resampledPoints[0]);
+
+            //找与切线垂直的任意向量作为初始法向量
+            Vector3 normal0 = GeometryAlgorithms.FindPerpendicularVector(tangent0);
+            Vector3 binormal0 = Vector3.Normalize(Vector3.Cross(tangent0, normal0));
+            frames[0] = new FrenetFrame(resampledPoints[0], tangent0, normal0, binormal0);
+
+            //后续点用平行传输
+            for (int index = 1; index < n; index++)
+            {
+                Vector3 tangent;
+                if (index < n - 1)
+                {
+                    //中心差分
+                    tangent = Vector3.Normalize(resampledPoints[index + 1] - resampledPoints[index - 1]);
+                }
+                else
+                {
+                    //最后一点用后向差分
+                    tangent = Vector3.Normalize(resampledPoints[index] - resampledPoints[index - 1]);
+                }
+
+                Vector3 prevTangent = frames[index - 1].Tangent;
+                Vector3 prevNormal = frames[index - 1].Normal;
+
+                //旋转轴 = prevTangent × tangent
+                Vector3 rotationAxis = Vector3.Cross(prevTangent, tangent);
+                float axisLength = rotationAxis.Length;
+
+                Vector3 transportedNormal;
+                if (axisLength > 1e-8f)
+                {
+                    rotationAxis /= axisLength;
+                    float angle = (float)Math.Asin(Math.Clamp(axisLength, -1.0, 1.0));
+                    transportedNormal = GeometryAlgorithms.RotateAroundAxis(prevNormal, rotationAxis, angle);
+                }
+                else
+                {
+                    transportedNormal = prevNormal;
+                }
+
+                //施密特正交化
+                transportedNormal = Vector3.Normalize(transportedNormal - Vector3.Dot(transportedNormal, tangent) * tangent);
+                Vector3 binormal = Vector3.Normalize(Vector3.Cross(tangent, transportedNormal));
+
+                frames[index] = new FrenetFrame(resampledPoints[index], tangent, transportedNormal, binormal);
+            }
+
+            return frames;
         }
         #endregion
 
@@ -160,6 +297,42 @@ namespace MedicalSharp.Primitives.Algorithms
             }
 
             return sampledPoints;
+        }
+        #endregion
+
+        #region # 单段等弧长重采样 —— static Vector3 SampleByArcLength(IReadOnlyList<Vector3> sampledPoints...
+        /// <summary>
+        /// 单段等弧长重采样
+        /// </summary>
+        /// <param name="sampledPoints">采样点列表</param>
+        /// <param name="arcLengths">累积弧长</param>
+        /// <param name="targetArcLength">目标弧长</param>
+        /// <returns>重采样点</returns>
+        /// <remarks>根据目标弧长在采样点序列上线性插值得到3D位置</remarks>
+        private static Vector3 SampleByArcLength(IReadOnlyList<Vector3> sampledPoints, float[] arcLengths, float targetArcLength)
+        {
+            float totalLength = arcLengths[^1];
+            targetArcLength = Math.Clamp(targetArcLength, 0, totalLength);
+
+            //二分查找目标弧长所在的段
+            int index = Array.BinarySearch(arcLengths, targetArcLength);
+            if (index >= 0)
+            {
+                return sampledPoints[index];
+            }
+
+            index = ~index;
+            index = Math.Clamp(index, 1, arcLengths.Length - 1);
+
+            float segmentStart = arcLengths[index - 1];
+            float segmentEnd = arcLengths[index];
+            float segmentLength = segmentEnd - segmentStart;
+            float t = segmentLength > 1e-8f
+                ? (targetArcLength - segmentStart) / segmentLength
+                : 0f;
+            Vector3 resampledPoint = Vector3.Lerp(sampledPoints[index - 1], sampledPoints[index], t);
+
+            return resampledPoint;
         }
         #endregion
     }

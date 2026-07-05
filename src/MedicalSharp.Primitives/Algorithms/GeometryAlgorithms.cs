@@ -795,5 +795,50 @@ namespace MedicalSharp.Primitives.Algorithms
             return positions;
         }
         #endregion
+
+        #region # 查找与给定向量垂直的单位向量 —— static Vector3 FindPerpendicularVector(Vector3 direction)
+        /// <summary>
+        /// 查找与给定向量垂直的单位向量
+        /// </summary>
+        /// <param name="direction">方向向量</param>
+        /// <returns>垂直单位向量</returns>
+        public static Vector3 FindPerpendicularVector(Vector3 direction)
+        {
+            if (Math.Abs(direction.X) <= Math.Abs(direction.Y) && Math.Abs(direction.X) <= Math.Abs(direction.Z))
+            {
+                return Vector3.Normalize(Vector3.Cross(direction, Vector3.UnitX));
+            }
+            else if (Math.Abs(direction.Y) <= Math.Abs(direction.Z))
+            {
+                return Vector3.Normalize(Vector3.Cross(direction, Vector3.UnitY));
+            }
+            else
+            {
+                return Vector3.Normalize(Vector3.Cross(direction, Vector3.UnitZ));
+            }
+        }
+        #endregion
+
+        #region # 绕任意轴旋转方向向量 —— static Vector3 RotateAroundAxis(Vector3 direction, Vector3 axis...
+        /// <summary>
+        /// 绕任意轴旋转方向向量
+        /// </summary>
+        /// <param name="direction">方向向量</param>
+        /// <param name="axis">旋转轴</param>
+        /// <param name="angle">旋转角度</param>
+        /// <returns>旋转后方向向量</returns>
+        /// <remarks>Rodrigues旋转公式</remarks>
+        public static Vector3 RotateAroundAxis(Vector3 direction, Vector3 axis, float angle)
+        {
+            float cosA = MathF.Cos(angle);
+            float sinA = MathF.Sin(angle);
+
+            Vector3 rotatedDirection = direction * cosA
+                                       + Vector3.Cross(axis, direction) * sinA
+                                       + axis * Vector3.Dot(axis, direction) * (1f - cosA);
+
+            return rotatedDirection;
+        }
+        #endregion
     }
 }
