@@ -48,13 +48,5 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         /// <remarks>单位向量，Tangent × Normal</remarks>
         public readonly Vector3 Binormal;
-
-        /// <summary>
-        /// 转换字符串
-        /// </summary>
-        public override string ToString()
-        {
-            return $"Pos: {this.Position}, T: {this.Tangent}, N: {this.Normal}, B: {this.Binormal}";
-        }
     }
 }
