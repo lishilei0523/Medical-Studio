@@ -13,9 +13,9 @@ namespace MedicalSharp.Primitives.Algorithms
     {
         //Public
 
-        #region # 生成Catmull-Rom曲线 —— static IReadOnlyList<Vector3> EvaluateCatmullRom(...
+        #region # Catmull-Rom采样 —— static IReadOnlyList<Vector3> EvaluateCatmullRom(...
         /// <summary>
-        /// 生成Catmull-Rom曲线
+        /// Catmull-Rom采样
         /// </summary>
         /// <param name="controlPoints">控制点列表</param>
         /// <param name="closed">是否闭合</param>
@@ -300,9 +300,9 @@ namespace MedicalSharp.Primitives.Algorithms
         }
         #endregion
 
-        #region # 单段等弧长重采样 —— static Vector3 SampleByArcLength(IReadOnlyList<Vector3> sampledPoints...
+        #region # 等弧长单段重采样 —— static Vector3 SampleByArcLength(IReadOnlyList<Vector3> sampledPoints...
         /// <summary>
-        /// 单段等弧长重采样
+        /// 等弧长单段重采样
         /// </summary>
         /// <param name="sampledPoints">采样点列表</param>
         /// <param name="arcLengths">累积弧长</param>
