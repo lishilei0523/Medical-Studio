@@ -7,11 +7,11 @@
 
   <ItemGroup>
     <PackageReference Include="ScottPlot" Version="5.1.59" />
-    <PackageReference Include="SD.Common" Version="4.0.1" />
-    <PackageReference Include="SD.Toolkits.Mapper" Version="4.0.1" />
-    <PackageReference Include="SD.IOC.Core" Version="3.0.1" />
-    <PackageReference Include="SD.Infrastructure.Avalonia" Version="1.0.12" />
-    <PackageReference Include="SD.Infrastructure.Avalonia.Caliburn" Version="1.0.12" />
+    <PackageReference Include="SD.Common" Version="4.0.2" />
+    <PackageReference Include="SD.Toolkits.Mapper" Version="4.0.2" />
+    <PackageReference Include="SD.IOC.Core" Version="3.0.2" />
+    <PackageReference Include="SD.Infrastructure.Avalonia" Version="1.0.13" />
+    <PackageReference Include="SD.Infrastructure.Avalonia.Caliburn" Version="1.0.13" />
   </ItemGroup>
 
   <ItemGroup>
