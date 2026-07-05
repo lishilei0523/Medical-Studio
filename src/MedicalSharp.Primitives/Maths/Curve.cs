@@ -20,7 +20,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <param name="closed">是否闭合</param>
         /// <param name="tessellation">每段采样点数</param>
         /// <param name="resampleCount">等弧长重采样点数（CPR使用）</param>
-        public Curve(IReadOnlyList<Vector3> controlPoints, bool closed = false, int tessellation = 20, int resampleCount = 200)
+        public Curve(IReadOnlyList<Vector3> controlPoints, bool closed, int tessellation = 20, int resampleCount = 200)
         {
             #region # 验证
 
@@ -56,12 +56,17 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 创建曲线构造器
         /// </summary>
+        /// <param name="controlPoints">控制点列表</param>
         /// <param name="sampledPoints">采样点列表</param>
         /// <param name="resampleCount">等弧长重采样点数（CPR使用）</param>
-        public Curve(IReadOnlyList<Vector3> sampledPoints, int resampleCount = 200)
+        public Curve(IReadOnlyList<Vector3> controlPoints, IReadOnlyList<Vector3> sampledPoints, int resampleCount = 200)
         {
             #region # 验证
 
+            if (controlPoints == null || !controlPoints.Any())
+            {
+                throw new ArgumentNullException(nameof(controlPoints), "控制点列表不可为空！");
+            }
             if (sampledPoints == null || !sampledPoints.Any())
             {
                 throw new ArgumentNullException(nameof(sampledPoints), "采样点列表不可为空！");
@@ -69,7 +74,7 @@ namespace MedicalSharp.Primitives.Maths
 
             #endregion
 
-            this.ControlPoints = [];
+            this.ControlPoints = controlPoints;
             this.SampledPoints = sampledPoints;
 
             if (this.SampledPoints.Count < 2)
