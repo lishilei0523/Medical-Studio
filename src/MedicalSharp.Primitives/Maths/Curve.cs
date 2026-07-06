@@ -161,7 +161,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 根据弧长获取曲线上的位置
         /// </summary>
-        /// <param name="arcLength">目标弧长，自动钳制到[0, TotalLength]</param>
+        /// <param name="arcLength">目标弧长，自动钳制到[0, TotalArcLength]</param>
         /// <returns>曲线上该弧长处的位置</returns>
         public Vector3 GetPointAtArcLength(float arcLength)
         {
@@ -192,7 +192,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 根据弧长获取Frenet框架
         /// </summary>
-        /// <param name="arcLength">目标弧长，自动钳制到[0, TotalLength]</param>
+        /// <param name="arcLength">目标弧长，自动钳制到[0, TotalArcLength]</param>
         /// <returns>插值后的Frenet框架，保证三轴正交</returns>
         /// <remarks>在重采样框架之间线性插值</remarks>
         public FrenetFrame GetFrameAtArcLength(float arcLength)
