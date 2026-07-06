@@ -14,52 +14,28 @@ namespace MedicalSharp.Primitives.Maths
         #region # 字段及构造器
 
         /// <summary>
-        /// 创建曲线构造器
+        /// 采样密度
         /// </summary>
-        /// <param name="controlPoints">控制点列表</param>
-        /// <param name="closed">是否闭合</param>
-        /// <param name="tessellation">每段采样点数</param>
-        /// <param name="resampleCount">等弧长重采样点数（CPR使用）</param>
-        public Curve(IReadOnlyList<Vector3> controlPoints, bool closed, int tessellation = 20, int resampleCount = 200)
-        {
-            #region # 验证
+        private readonly int _tessellation;
 
-            if (controlPoints == null || !controlPoints.Any())
-            {
-                throw new ArgumentNullException(nameof(controlPoints), "控制点列表不可为空！");
-            }
+        /// <summary>
+        /// 等弧长重采样点数
+        /// </summary>
+        private readonly int _resampleCount;
 
-            #endregion
-
-            this.ControlPoints = controlPoints;
-            this.SampledPoints = CurveAlgorithms.EvaluateCatmullRom(controlPoints, closed, tessellation);
-
-            if (this.SampledPoints.Count < 2)
-            {
-                this.ArcLengths = this.SampledPoints.Count == 1 ? [0] : [];
-                this.ResampledPoints = this.SampledPoints;
-                this.FrenetFrames = [];
-
-                return;
-            }
-
-            //计算弧长
-            this.ArcLengths = CurveAlgorithms.ComputeArcLengths(this.SampledPoints);
-
-            //等弧长重采样
-            this.ResampledPoints = CurveAlgorithms.ResampleByArcLength(this.SampledPoints, this.ArcLengths, resampleCount);
-
-            //构建Frenet框架
-            this.FrenetFrames = CurveAlgorithms.BuildFrenetFrames(this.ResampledPoints);
-        }
+        /// <summary>
+        /// 是否闭合
+        /// </summary>
+        private readonly bool _closed;
 
         /// <summary>
         /// 创建曲线构造器
         /// </summary>
         /// <param name="controlPoints">控制点列表</param>
-        /// <param name="sampledPoints">采样点列表</param>
-        /// <param name="resampleCount">等弧长重采样点数（CPR使用）</param>
-        public Curve(IReadOnlyList<Vector3> controlPoints, IReadOnlyList<Vector3> sampledPoints, int resampleCount = 200)
+        /// <param name="tessellation">采样密度</param>
+        /// <param name="resampleCount">等弧长重采样点数</param>
+        /// <param name="closed">是否闭合</param>
+        public Curve(IReadOnlyList<Vector3> controlPoints, int tessellation = 20, int resampleCount = 200, bool closed = false)
         {
             #region # 验证
 
@@ -67,15 +43,14 @@ namespace MedicalSharp.Primitives.Maths
             {
                 throw new ArgumentNullException(nameof(controlPoints), "控制点列表不可为空！");
             }
-            if (sampledPoints == null || !sampledPoints.Any())
-            {
-                throw new ArgumentNullException(nameof(sampledPoints), "采样点列表不可为空！");
-            }
 
             #endregion
 
+            this._tessellation = tessellation;
+            this._resampleCount = resampleCount;
+            this._closed = closed;
             this.ControlPoints = controlPoints;
-            this.SampledPoints = sampledPoints;
+            this.SampledPoints = CurveAlgorithms.EvaluateCatmullRom(controlPoints, closed, tessellation);
 
             if (this.SampledPoints.Count < 2)
             {
@@ -122,6 +97,14 @@ namespace MedicalSharp.Primitives.Maths
         public IReadOnlyList<Vector3> ResampledPoints { get; }
         #endregion
 
+        #region 累积弧长列表 —— float[] ArcLengths
+        /// <summary>
+        /// 累积弧长列表
+        /// </summary>
+        /// <remarks>与SampledPoints等长，ArcLengths[0]为0</remarks>
+        public float[] ArcLengths { get; }
+        #endregion
+
         #region Frenet框架列表 —— FrenetFrame[] FrenetFrames
         /// <summary>
         /// Frenet框架列表
@@ -130,12 +113,34 @@ namespace MedicalSharp.Primitives.Maths
         public FrenetFrame[] FrenetFrames { get; }
         #endregion
 
-        #region 累积弧长列表 —— float[] ArcLengths
+        #region 只读属性 - 采样密度 —— int Tessellation
         /// <summary>
-        /// 累积弧长列表
+        /// 只读属性 - 采样密度
         /// </summary>
-        /// <remarks>与SampledPoints等长，ArcLengths[0]为0</remarks>
-        public float[] ArcLengths { get; }
+        public int Tessellation
+        {
+            get => this._tessellation;
+        }
+        #endregion
+
+        #region 只读属性 - 等弧长重采样点数 —— int ResampleCount
+        /// <summary>
+        /// 只读属性 - 等弧长重采样点数
+        /// </summary>
+        public int ResampleCount
+        {
+            get => this._resampleCount;
+        }
+        #endregion
+
+        #region 只读属性 - 是否闭合 —— bool Closed
+        /// <summary>
+        /// 只读属性 - 是否闭合
+        /// </summary>
+        public bool Closed
+        {
+            get => this._closed;
+        }
         #endregion
 
         #region 只读属性 - 总弧长 —— float TotalArcLength

@@ -427,7 +427,7 @@ namespace MedicalSharp.Client.ViewModels.AlgorithmContext
                 #endregion
 
                 //将世界坐标转为体素坐标
-                IEnumerable<Vector3i> voxelPositions = curve.SampledPositions.Select(position => position.ToVoxelPosition(this.VolumeData.Metadata));
+                IEnumerable<Vector3i> voxelPositions = curve.Curve.ResampledPoints.Select(position => position.ToVoxelPosition(this.VolumeData.Metadata));
 
                 //执行区域生长
                 await this.ExecuteRegionGrow(voxelPositions);

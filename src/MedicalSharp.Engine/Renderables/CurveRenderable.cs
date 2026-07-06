@@ -6,7 +6,6 @@ using MedicalSharp.Primitives.Models;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace MedicalSharp.Engine.Renderables
@@ -45,26 +44,31 @@ namespace MedicalSharp.Engine.Renderables
         }
 
         /// <summary>
-        /// 创建折线渲染对象构造器
+        /// 创建曲线渲染对象构造器
         /// </summary>
-        /// <param name="controlPositions">控制点列表</param>
-        /// <param name="sampledPositions">采样点列表</param>
-        /// <param name="closed">是否闭合</param>
-        public CurveRenderable(IReadOnlyList<Vector3> controlPositions, IReadOnlyList<Vector3> sampledPositions, bool closed = false)
+        /// <param name="curve">曲线</param>
+        public CurveRenderable(Curve curve)
             : this()
         {
-            this.ControlPositions = controlPositions;
-            this.SampledPositions = sampledPositions;
-            this.Closed = closed;
+            #region # 验证
+
+            if (curve == null || !curve.ControlPoints.Any())
+            {
+                throw new ArgumentNullException(nameof(curve), "曲线不可为空！");
+            }
+
+            #endregion
+
+            this.Curve = curve;
 
             //初始化缓冲区
-            MeshGeometry pointGeometry = MeshFactory.CreatePointCloud(this.ControlPositions);
-            MeshGeometry curveGeometry = MeshFactory.CreatePolyline(this.SampledPositions, this.Closed);
+            MeshGeometry pointGeometry = MeshFactory.CreatePointCloud(this.Curve.ControlPoints);
+            MeshGeometry curveGeometry = MeshFactory.CreatePolyline(this.Curve.ResampledPoints, this.Curve.Closed);
             this._pointBuffer = new VertexBuffer(pointGeometry);
             this._curveBuffer = new VertexBuffer(curveGeometry);
-            if (this.Closed)
+            if (this.Curve.Closed)
             {
-                MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.SampledPositions);
+                MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.Curve.ResampledPoints);
                 this._fillBuffer = new VertexBuffer(polygonGeometry);
             }
         }
@@ -73,25 +77,11 @@ namespace MedicalSharp.Engine.Renderables
 
         #region # 属性
 
-        #region 控制点列表 —— IReadOnlyList<Vector3> ControlPositions
+        #region 曲线 —— Curve Curve
         /// <summary>
-        /// 控制点列表
+        /// 曲线
         /// </summary>
-        public IReadOnlyList<Vector3> ControlPositions { get; private set; }
-        #endregion
-
-        #region 采样点列表 —— IReadOnlyList<Vector3> SampledPositions
-        /// <summary>
-        /// 采样点列表
-        /// </summary>
-        public IReadOnlyList<Vector3> SampledPositions { get; private set; }
-        #endregion
-
-        #region 是否闭合 —— bool Closed
-        /// <summary>
-        /// 是否闭合
-        /// </summary>
-        public bool Closed { get; private set; }
+        public Curve Curve { get; private set; }
         #endregion
 
         #region 线框颜色 —— Vector4 Stroke
@@ -131,46 +121,41 @@ namespace MedicalSharp.Engine.Renderables
 
         //Public
 
-        #region 更新曲线渲染对象 —— void Update(IReadOnlyList<Vector3> controlPositions...
+        #region 更新曲线渲染对象 —— void Update(Curve curve)
         /// <summary>
         /// 更新曲线渲染对象
         /// </summary>
-        /// <param name="controlPositions">控制点列表</param>
-        /// <param name="sampledPositions">采样点列表</param>
-        public void Update(IReadOnlyList<Vector3> controlPositions, IReadOnlyList<Vector3> sampledPositions)
+        /// <param name="curve">曲线</param>
+        public void Update(Curve curve)
         {
             #region # 验证
 
-            if (controlPositions == null || !controlPositions.Any())
+            if (curve == null || !curve.ControlPoints.Any())
             {
-                throw new ArgumentNullException(nameof(controlPositions), "控制点列表不可为空！");
+                throw new ArgumentNullException(nameof(curve), "曲线不可为空！");
             }
-            if (sampledPositions == null || !sampledPositions.Any())
-            {
-                throw new ArgumentNullException(nameof(sampledPositions), "采样点列表不可为空！");
-            }
-            if (ReferenceEquals(controlPositions, this.ControlPositions) && ReferenceEquals(sampledPositions, this.SampledPositions))
+            if (ReferenceEquals(curve, this.Curve))
             {
                 return;
             }
-            if (this.ControlPositions.SequenceEqual(controlPositions) && this.SampledPositions.SequenceEqual(sampledPositions))
+            if (this.Curve.ControlPoints.SequenceEqual(curve.ControlPoints) &&
+                this.Curve.ResampledPoints.SequenceEqual(curve.ResampledPoints))
             {
                 return;
             }
 
             #endregion
 
-            this.ControlPositions = controlPositions;
-            this.SampledPositions = sampledPositions;
+            this.Curve = curve;
 
             //更新VBO
-            MeshGeometry pointGeometry = MeshFactory.CreatePointCloud(this.ControlPositions);
-            MeshGeometry curveGeometry = MeshFactory.CreatePolyline(this.SampledPositions, this.Closed);
+            MeshGeometry pointGeometry = MeshFactory.CreatePointCloud(this.Curve.ControlPoints);
+            MeshGeometry curveGeometry = MeshFactory.CreatePolyline(this.Curve.ResampledPoints, this.Curve.Closed);
             this._pointBuffer.Update(pointGeometry);
             this._curveBuffer.Update(curveGeometry);
-            if (this.Closed)
+            if (this.Curve.Closed)
             {
-                MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.SampledPositions);
+                MeshGeometry polygonGeometry = MeshFactory.CreatePolygon(this.Curve.ResampledPoints);
                 this._fillBuffer.Update(polygonGeometry);
             }
 
@@ -202,7 +187,7 @@ namespace MedicalSharp.Engine.Renderables
         /// <param name="context">渲染上下文</param>
         public override void Render(ShaderProgram program, RenderContext3D context)
         {
-            if (this.Closed)
+            if (this.Curve.Closed)
             {
                 //禁用深度写入、让透明面可以互相混合
                 GL.DepthMask(false);
@@ -300,7 +285,7 @@ namespace MedicalSharp.Engine.Renderables
         /// </summary>
         protected override BoundingBox CalculateBoundingBox()
         {
-            BoundingBox boundingBox = BoundingBox.FromPoints(this.SampledPositions);
+            BoundingBox boundingBox = BoundingBox.FromPoints(this.Curve.ResampledPoints);
 
             return boundingBox;
         }

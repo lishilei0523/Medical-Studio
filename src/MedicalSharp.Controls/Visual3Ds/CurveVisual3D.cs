@@ -36,6 +36,11 @@ namespace MedicalSharp.Controls.Visual3Ds
         public static readonly StyledProperty<int> TessellationProperty;
 
         /// <summary>
+        /// 等弧长重采样点数依赖属性
+        /// </summary>
+        public static readonly StyledProperty<int> ResampleCountProperty;
+
+        /// <summary>
         /// 是否闭合依赖属性
         /// </summary>
         public static readonly StyledProperty<bool> ClosedProperty;
@@ -47,6 +52,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             ControlPositionsProperty = AvaloniaProperty.Register<CurveVisual3D, AvaloniaList<Vector3D>>(nameof(ControlPositions), []);
             TessellationProperty = AvaloniaProperty.Register<CurveVisual3D, int>(nameof(Tessellation), 20);
+            ResampleCountProperty = AvaloniaProperty.Register<CurveVisual3D, int>(nameof(ResampleCount), 200);
             ClosedProperty = AvaloniaProperty.Register<CurveVisual3D, bool>(nameof(Closed), false);
         }
 
@@ -85,6 +91,17 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
+        #region 依赖属性 - 等弧长重采样点 —— int ResampleCount
+        /// <summary>
+        /// 依赖属性 - 等弧长重采样点
+        /// </summary>
+        public int ResampleCount
+        {
+            get => this.GetValue(ResampleCountProperty);
+            set => this.SetValue(ResampleCountProperty, value);
+        }
+        #endregion
+
         #region 依赖属性 - 是否闭合 —— bool Closed
         /// <summary>
         /// 依赖属性 - 是否闭合
@@ -96,20 +113,20 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
-        #region 只读属性 - 采样点列表 —— IReadOnlyList<Vector3> SampledPositions
+        #region 只读属性 - 曲线 —— Curve Curve
         /// <summary>
-        /// 只读属性 - 采样点列表
+        /// 只读属性 - 曲线
         /// </summary>
-        public IReadOnlyList<Vector3> SampledPositions
+        public Curve Curve
         {
             get
             {
                 if (this.Renderable is CurveRenderable curveRenderable)
                 {
-                    return curveRenderable.SampledPositions;
+                    return curveRenderable.Curve;
                 }
 
-                return [];
+                return null;
             }
         }
         #endregion
@@ -134,17 +151,19 @@ namespace MedicalSharp.Controls.Visual3Ds
             #endregion
 
             IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
-            IReadOnlyList<Vector3> sampledPositions = CurveAlgorithms.EvaluateCatmullRom(controlPositions, this.Closed, this.Tessellation);
+            Curve curve = this.Curve != null && this.Curve.ControlPoints.SequenceEqual(controlPositions)
+                ? this.Curve
+                : new Curve(controlPositions, this.Tessellation, this.ResampleCount, this.Closed);
             if (this.Renderable == null)
             {
-                CurveRenderable renderable = new CurveRenderable(controlPositions, sampledPositions, this.Closed);
+                CurveRenderable renderable = new CurveRenderable(curve);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
                 this.Renderable = renderable;
             }
             else
             {
                 CurveRenderable renderable = (CurveRenderable)this.Renderable;
-                renderable.Update(controlPositions, sampledPositions);
+                renderable.Update(curve);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
             }
         }
@@ -162,10 +181,14 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             constraint = default;
 
+            #region # 验证
+
             if (this.ControlPositions == null || !this.ControlPositions.Any())
             {
                 return false;
             }
+
+            #endregion
 
             float minDistance = float.MaxValue;
             int bestIndex = -1;
@@ -179,7 +202,6 @@ namespace MedicalSharp.Controls.Visual3Ds
 
                 //拾取半径：固定值，可根据需要调整
                 const float pickRadius = 0.05f;
-
                 if (distance < pickRadius && distance < minDistance)
                 {
                     minDistance = distance;
@@ -212,6 +234,13 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// <param name="localHitPoint">命中点（局部空间）</param>
         /// <param name="constraint">拖拽约束</param>
         /// <returns>是否插入顶点</returns>
+        /// <remarks>
+        /// 在曲线上插入新控制点的流程：
+        ///     1、遍历所有连续控制点对构成的线段；
+        ///     2、计算命中点到每条线段的最短距离；
+        ///     3、找到距离最短的线段，将新控制点插入到该线段的两端控制点之间；
+        ///     4、返回拖拽约束，新插入的点可立即被拖拽；
+        /// </remarks>
         public bool TryInsertVertex(Ray localRay, Vector3 localLookDirection, Vector3 localHitPoint, out VertexDragConstraint constraint)
         {
             constraint = default;
@@ -222,43 +251,38 @@ namespace MedicalSharp.Controls.Visual3Ds
             {
                 return false;
             }
-            if (this.SampledPositions == null || !this.SampledPositions.Any())
+            if (this.Curve == null || this.Curve.ResampledPoints == null || !this.Curve.ResampledPoints.Any())
             {
                 return false;
             }
 
             #endregion
 
-            //找到离命中点最近的采样点
-            int nearestSampleIndex = -1;
-            float nearestDistance = float.MaxValue;
-            for (int i = 0; i < this.SampledPositions.Count; i++)
+            //找命中点投影到哪两个连续控制点之间最近
+            int bestSegmentIndex = -1;
+            float bestDistance = float.MaxValue;
+            for (int index = 0; index < this.Curve.ControlPoints.Count - 1; index++)
             {
-                Vector3 samplePoint = this.SampledPositions[i];
-                float distance = Vector3.Distance(localHitPoint, samplePoint);
-                if (distance < nearestDistance)
+                Vector3 lineSegmentStart = this.Curve.ControlPoints[index];
+                Vector3 lineSegmentEnd = this.Curve.ControlPoints[index + 1];
+
+                //计算命中点到线段的最短距离
+                Vector3 closestPoint = GeometryAlgorithms.ClosestPointOnSegment(localHitPoint, lineSegmentStart, lineSegmentEnd);
+                float distance = Vector3.Distance(localHitPoint, closestPoint);
+                if (distance < bestDistance)
                 {
-                    nearestDistance = distance;
-                    nearestSampleIndex = i;
+                    bestDistance = distance;
+                    bestSegmentIndex = index;
                 }
             }
 
-            if (nearestSampleIndex < 0)
+            if (bestSegmentIndex < 0)
             {
                 return false;
             }
 
-            //将采样点索引转换为控制点之间的段索引
-            int segmentIndex = nearestSampleIndex / this.Tessellation;
-
-            //插入到 segmentIndex 和 segmentIndex + 1 之间
-            int insertIndex = segmentIndex + 1;
-
-            //边界检查
-            if (insertIndex < 1 || insertIndex >= this.ControlPositions.Count)
-            {
-                return false;
-            }
+            //插入位置 = 最近段的起点索引 + 1，即插入到线段两端控制点之间
+            int insertIndex = bestSegmentIndex + 1;
 
             //插入新控制点
             this.ControlPositions.Insert(insertIndex, localHitPoint.ToVector3());
@@ -288,7 +312,7 @@ namespace MedicalSharp.Controls.Visual3Ds
             {
                 return false;
             }
-            if (this.SampledPositions == null || !this.SampledPositions.Any())
+            if (this.Curve == null || this.Curve.ResampledPoints == null || !this.Curve.ResampledPoints.Any())
             {
                 return false;
             }
@@ -309,10 +333,14 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// <param name="localHitPoint">命中点（局部空间）</param>
         public void MoveVertex(VertexDragConstraint constraint, Vector3 localHitPoint)
         {
+            #region # 验证
+
             if (this.ControlPositions == null || constraint.VertexIndex < 0 || constraint.VertexIndex >= this.ControlPositions.Count)
             {
                 return;
             }
+
+            #endregion
 
             //更新控制点位置
             this.ControlPositions[constraint.VertexIndex] = localHitPoint.ToVector3();
@@ -329,7 +357,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             #region # 验证
 
-            if (this.SampledPositions == null || this.SampledPositions.Count < 2)
+            if (this.Curve == null || this.Curve.ResampledPoints == null || this.Curve.ResampledPoints.Count < 2)
             {
                 return 0;
             }
@@ -340,10 +368,10 @@ namespace MedicalSharp.Controls.Visual3Ds
             float perimeter = 0;
 
             //计算所有线段长度之和
-            for (int index = 0; index < this.SampledPositions.Count - 1; index++)
+            for (int index = 0; index < this.Curve.ResampledPoints.Count - 1; index++)
             {
-                Vector3 localStart = this.SampledPositions[index];
-                Vector3 localEnd = this.SampledPositions[index + 1];
+                Vector3 localStart = this.Curve.ResampledPoints[index];
+                Vector3 localEnd = this.Curve.ResampledPoints[index + 1];
 
                 //局部 -> 世界 -> 毫米
                 Vector3 worldStart = Vector3.TransformPosition(localStart, localToWorld);
@@ -355,10 +383,10 @@ namespace MedicalSharp.Controls.Visual3Ds
             }
 
             //如果是闭合图形，加上首尾相连的线段
-            if (this.Closed && this.SampledPositions.Count >= 3)
+            if (this.Closed && this.Curve.ResampledPoints.Count >= 3)
             {
-                Vector3 localStart = this.SampledPositions[^1];
-                Vector3 localEnd = this.SampledPositions[0];
+                Vector3 localStart = this.Curve.ResampledPoints[^1];
+                Vector3 localEnd = this.Curve.ResampledPoints[0];
 
                 //局部 -> 世界 -> 毫米
                 Vector3 worldStart = Vector3.TransformPosition(localStart, localToWorld);
@@ -383,7 +411,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         {
             #region # 验证
 
-            if (!this.Closed || this.SampledPositions == null || this.SampledPositions.Count < 3)
+            if (!this.Closed || this.Curve == null || this.Curve.ResampledPoints == null || this.Curve.ResampledPoints.Count < 3)
             {
                 return 0;
             }
@@ -392,10 +420,9 @@ namespace MedicalSharp.Controls.Visual3Ds
 
             //获取世界空间的凸包顶点
             Matrix4 localToWorld = this.Transform.Matrix;
-            List<Vector3> worldVertices = new List<Vector3>(this.SampledPositions.Count);
-            for (int index = 0; index < this.SampledPositions.Count; index++)
+            List<Vector3> worldVertices = new List<Vector3>(this.Curve.ResampledPoints.Count);
+            foreach (Vector3 localPos in this.Curve.ResampledPoints)
             {
-                Vector3 localPos = this.SampledPositions[index];
                 worldVertices.Add(Vector3.TransformPosition(localPos, localToWorld));
             }
 
@@ -441,7 +468,7 @@ namespace MedicalSharp.Controls.Visual3Ds
             #endregion
 
             Matrix4 localToWorld = this.Transform.Matrix;
-            volumeData.ApplyPolygonCut(markTexture, this.SampledPositions, localToWorld, cutMode, markValue);
+            volumeData.ApplyPolygonCut(markTexture, this.Curve.ResampledPoints, localToWorld, cutMode, markValue);
         }
         #endregion
 
@@ -476,7 +503,7 @@ namespace MedicalSharp.Controls.Visual3Ds
             {
                 return default;
             }
-            if (this.SampledPositions == null || this.SampledPositions.Count < 3)
+            if (this.Curve == null || this.Curve.ResampledPoints == null || this.Curve.ResampledPoints.Count < 3)
             {
                 return default;
             }
@@ -484,7 +511,7 @@ namespace MedicalSharp.Controls.Visual3Ds
             #endregion
 
             //获取所有顶点世界坐标
-            Vector3[] worldVertices = this.SampledPositions.Select(pos => Vector3.TransformPosition(pos, this.Transform.Matrix)).ToArray();
+            Vector3[] worldVertices = this.Curve.ResampledPoints.Select(pos => Vector3.TransformPosition(pos, this.Transform.Matrix)).ToArray();
 
             //投影到屏幕坐标
             Vector2[] screenVertices = new Vector2[worldVertices.Length];
