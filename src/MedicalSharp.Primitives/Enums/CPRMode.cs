@@ -17,12 +17,14 @@ namespace MedicalSharp.Primitives.Enums
         /// 切线投影图
         /// </summary>
         /// <remarks>水平，沿血管</remarks>
+        [Description("水平CPR")]
         TangentProjected = 1,
 
         /// <summary>
         /// 法向量投影图
         /// </summary>
         /// <remarks>垂直，侧面看</remarks>
+        [Description("垂直CPR")]
         NormalProjected = 2,
 
         /// <summary>
