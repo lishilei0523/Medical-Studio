@@ -1,31 +1,36 @@
 ﻿using MedicalSharp.Primitives.Enums;
-using MedicalSharp.Primitives.Maths;
-using MedicalSharp.Primitives.Models.Arguments;
 using OpenTK.Mathematics;
 using System;
 
 namespace MedicalSharp.Primitives.Cameras
 {
     /// <summary>
-    /// MPR相机
+    /// CPR相机
     /// </summary>
-    public class MPRCamera : Camera
+    /// <remarks>
+    /// 正交投影相机，正对CPR图像四边形；
+    /// 相机方向固定为+Z，看向原点；
+    /// 旋转曲线观察角度由Shader中的采样方向参数控制，而非相机旋转；
+    /// </remarks>
+    public class CPRCamera : Camera
     {
         #region # 字段及构造器
 
         /// <summary>
-        /// 创建MPR相机构造器
+        /// 创建CPR相机构造器
         /// </summary>
         /// <param name="nearPlaneDistance">近平面距离</param>
         /// <param name="farPlaneDistance">远平面距离</param>
-        public MPRCamera(float nearPlaneDistance = -2, float farPlaneDistance = 2)
+        public CPRCamera(float nearPlaneDistance = -2, float farPlaneDistance = 2)
             : base(nearPlaneDistance, farPlaneDistance)
         {
             this.TargetPosition = Vector3.Zero;
+            this.CameraPosition = new Vector3(0, 0, -1);
             this.Distance = 1.0f;
             this.ZoomFactor = 1.0f;
             this.PanOffset = Vector2.Zero;
 
+            this.UpdateCameraVectors();
             this.UpdateViewMatrix();
             this.UpdateProjectionMatrix();
         }
@@ -48,14 +53,7 @@ namespace MedicalSharp.Primitives.Cameras
         public Vector2 PanOffset { get; private set; }
         #endregion
 
-        #region 目标平面 —— MPRPlane TargetPlane
-        /// <summary>
-        /// 目标平面
-        /// </summary>
-        public MPRPlane TargetPlane { get; private set; }
-        #endregion
-
-        #region 只读属性 - 相机模式 —— override Vector3 CameraMode
+        #region 只读属性 - 相机模式 —— override CameraMode CameraMode
         /// <summary>
         /// 只读属性 - 相机模式
         /// </summary>
@@ -71,34 +69,6 @@ namespace MedicalSharp.Primitives.Cameras
 
         //Public
 
-        #region 绑定MPR平面 —— void BindPlane(MPRPlane plane)
-        /// <summary>
-        /// 绑定MPR平面
-        /// </summary>
-        /// <param name="plane">MPR平面</param>
-        public void BindPlane(MPRPlane plane)
-        {
-            #region # 验证
-
-            if (plane == null)
-            {
-                throw new ArgumentNullException(nameof(plane), "MPR平面不可为空！");
-            }
-
-            #endregion
-
-            //卸载旧实例事件
-            if (this.TargetPlane != null)
-            {
-                this.TargetPlane.PlaneChangedEvent -= this.OnPlaneChanged;
-            }
-
-            this.TargetPlane = plane;
-            this.TargetPlane.PlaneChangedEvent += this.OnPlaneChanged;
-            this.UpdateCameraVectors();
-        }
-        #endregion
-
         #region 看向指定位置 —— override void LookAt(Vector3 targetPosition)
         /// <summary>
         /// 看向指定位置
@@ -110,10 +80,7 @@ namespace MedicalSharp.Primitives.Cameras
             this.TargetPosition = targetPosition;
 
             //重新计算相机位置（保持原距离）
-            if (this.TargetPlane != null)
-            {
-                this.CameraPosition = this.TargetPosition - this.TargetPlane.WorldNormal * this.Distance;
-            }
+            this.CameraPosition = this.TargetPosition - this.LookDirection * this.Distance;
 
             this.UpdateViewMatrix();
         }
@@ -174,8 +141,12 @@ namespace MedicalSharp.Primitives.Cameras
         {
             this.ZoomFactor = 1.0f;
             this.PanOffset = Vector2.Zero;
+            this.TargetPosition = Vector3.Zero;
+            this.CameraPosition = new Vector3(0, 0, -1);
+            this.Distance = 1.0f;
 
             this.UpdateCameraVectors();
+            this.UpdateViewMatrix();
             this.UpdateProjectionMatrix();
         }
         #endregion
@@ -187,28 +158,16 @@ namespace MedicalSharp.Primitives.Cameras
         /// <summary>
         /// 更新相机向量
         /// </summary>
+        /// <remarks>
+        /// CPR相机方向固定：
+        /// 看向+Z方向，上方为+Y，右侧为+X；
+        /// 旋转血管观察角度由Shader中的u_RotationAngle参数控制，不在此处处理；
+        /// </remarks>
         protected override void UpdateCameraVectors()
         {
-            #region # 验证
-
-            if (this.TargetPlane == null)
-            {
-                return;
-            }
-
-            #endregion
-
-            Vector3 worldCenter = this.TargetPlane.WorldCenter;
-            Vector3 worldUAxis = this.TargetPlane.WorldUAxis.Normalized();
-            Vector3 worldVAxis = this.TargetPlane.WorldVAxis.Normalized();
-            Vector3 worldNormal = this.TargetPlane.WorldNormal.Normalized();
-
-            this.CameraPosition = worldCenter - worldNormal * this.Distance;
-            this.TargetPosition = worldCenter;
-            this.LookDirection = worldNormal;
-            this.UpDirection = worldVAxis;
-            this.RightDirection = worldUAxis;
-            this.UpdateViewMatrix();
+            this.LookDirection = Vector3.UnitZ;
+            this.UpDirection = Vector3.UnitY;
+            this.RightDirection = Vector3.UnitX;
         }
         #endregion
 
@@ -247,16 +206,6 @@ namespace MedicalSharp.Primitives.Cameras
             }
 
             this.ProjectionMatrix = Matrix4.CreateOrthographicOffCenter(left, right, bottom, top, this.NearPlaneDistance, this.FarPlaneDistance);
-        }
-        #endregion
-
-        #region MPR平面变化事件 —— void OnPlaneChanged(object sender...
-        /// <summary>
-        /// MPR平面变化事件
-        /// </summary>
-        private void OnPlaneChanged(object sender, MPRPlaneChangedEventArgs eventArgs)
-        {
-            this.UpdateCameraVectors();
         }
         #endregion
 

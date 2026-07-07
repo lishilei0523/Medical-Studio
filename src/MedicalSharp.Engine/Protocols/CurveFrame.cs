@@ -10,7 +10,6 @@ namespace MedicalSharp.Engine.Protocols
     /// <summary>
     /// 曲线框架
     /// </summary>
-    /// <remarks>将Curve的Frenet框架数据上传为1D纹理，供Shader采样</remarks>
     public sealed class CurveFrame : IDisposable
     {
         #region # 字段及构造器
