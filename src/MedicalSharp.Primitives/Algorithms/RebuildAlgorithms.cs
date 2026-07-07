@@ -12,9 +12,9 @@ namespace MedicalSharp.Primitives.Algorithms
     /// </summary>
     public static class RebuildAlgorithms
     {
-        #region # 搜索边界 —— static float SearchBoundary(this VolumeData volumeData...
+        #region # 计算边界距离 —— static float CalculateBoundaryDistance(this VolumeData volumeData...
         /// <summary>
-        /// 搜索边界
+        /// 计算边界距离
         /// </summary>
         /// <param name="volumeData">体积数据</param>
         /// <param name="startPosition">起始位置（世界空间）</param>
@@ -23,7 +23,7 @@ namespace MedicalSharp.Primitives.Algorithms
         /// <param name="gradientThreshold">HU值梯度变化阈值</param>
         /// <returns>从起始位置到边界的距离（世界空间）</returns>
         /// <remarks>沿指定方向步进采样，检测HU值梯度突变点作为结构边界</remarks>
-        public static float SearchBoundary(this VolumeData volumeData, Vector3 startPosition, Vector3 direction, float maxDistance, float gradientThreshold)
+        public static float CalculateBoundaryDistance(this VolumeData volumeData, Vector3 startPosition, Vector3 direction, float maxDistance, float gradientThreshold)
         {
             VolumeMetadata metadata = volumeData.Metadata;
             Vector3i startVoxelPos = startPosition.ToVoxelPosition(metadata);
@@ -105,8 +105,8 @@ namespace MedicalSharp.Primitives.Algorithms
                 FrenetFrame frame = curve.GetFrameAtArcLength(arcLength);
 
                 //沿Normal正方向和负方向搜索边界（世界空间）
-                float positiveDistance = volumeData.SearchBoundary(frame.Position, frame.Normal, maxSearchDistance, gradientThreshold);
-                float negativeDistance = volumeData.SearchBoundary(frame.Position, -frame.Normal, maxSearchDistance, gradientThreshold);
+                float positiveDistance = volumeData.CalculateBoundaryDistance(frame.Position, frame.Normal, maxSearchDistance, gradientThreshold);
+                float negativeDistance = volumeData.CalculateBoundaryDistance(frame.Position, -frame.Normal, maxSearchDistance, gradientThreshold);
 
                 //过滤异常值：最小宽度应大于一个体素跨度
                 float totalWidth = positiveDistance + negativeDistance;
