@@ -20,10 +20,10 @@ namespace MedicalSharp.Primitives.Algorithms
         /// <param name="startPosition">起始位置（世界空间）</param>
         /// <param name="direction">搜索方向（世界空间）</param>
         /// <param name="maxDistance">最大搜索距离（世界空间）</param>
-        /// <param name="threshold">HU值梯度变化阈值</param>
+        /// <param name="gradientThreshold">HU值梯度变化阈值</param>
         /// <returns>从起始位置到边界的距离（世界空间）</returns>
         /// <remarks>沿指定方向步进采样，检测HU值梯度突变点作为结构边界</remarks>
-        public static float SearchBoundary(this VolumeData volumeData, Vector3 startPosition, Vector3 direction, float maxDistance, float threshold)
+        public static float SearchBoundary(this VolumeData volumeData, Vector3 startPosition, Vector3 direction, float maxDistance, float gradientThreshold)
         {
             VolumeMetadata metadata = volumeData.Metadata;
             Vector3i startVoxelPos = startPosition.ToVoxelPosition(metadata);
@@ -43,8 +43,8 @@ namespace MedicalSharp.Primitives.Algorithms
                 float currentHU = volumeData.GetPreviewValue(sampleVoxelPos);
                 float huDiff = currentHU - prevHU;
 
-                //检测HU值梯度突变作为边界（不预设组织类型）
-                if (Math.Abs(huDiff) > threshold)
+                //检测HU值梯度突变作为边界
+                if (Math.Abs(huDiff) > gradientThreshold)
                 {
                     return distance;
                 }
@@ -64,6 +64,7 @@ namespace MedicalSharp.Primitives.Algorithms
         /// <param name="curve">曲线</param>
         /// <param name="sampleInterval">采样间隔（0~1，默认每隔5%弧长采样一次）</param>
         /// <param name="marginFactor">边距系数（默认1.5，在检测宽度基础上留边显示周围结构）</param>
+        /// <param name="gradientThreshold">HU值梯度突变阈值</param>
         /// <returns>估算的径向宽度（世界空间，-0.5~0.5单位空间）</returns>
         /// <remarks>
         /// 沿曲线等间隔采样Frenet框架，在每个框架的Normal正负方向做射线投射；
@@ -71,7 +72,7 @@ namespace MedicalSharp.Primitives.Algorithms
         /// 返回值可直接赋值给u_RadialWidth，与Curve坐标空间一致；
         /// 适用于血管、气管、肠道、牙根管等任意管状/线状结构；
         /// </remarks>
-        public static float EstimateRadialWidth(this VolumeData volumeData, Curve curve, float sampleInterval = 0.05f, float marginFactor = 1.5f)
+        public static float EstimateRadialWidth(this VolumeData volumeData, Curve curve, float sampleInterval = 0.05f, float marginFactor = 1.5f, float gradientThreshold = 100f)
         {
             #region # 验证
 
@@ -85,9 +86,6 @@ namespace MedicalSharp.Primitives.Algorithms
             }
 
             #endregion
-
-            //HU值梯度突变阈值
-            const float gradientThreshold = 100f;
 
             //单侧最大搜索距离（世界空间）：取体积最小边长的20%
             Vector3 volumeScale = volumeData.Metadata.VolumeScale;
