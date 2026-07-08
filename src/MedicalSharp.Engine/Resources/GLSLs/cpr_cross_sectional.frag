@@ -16,8 +16,8 @@ uniform sampler1D u_NormalTexture;
 uniform sampler1D u_BinormalTexture;
 
 //曲线参数
-uniform float u_RadialWidth;
-uniform float u_RotationAngle;
+uniform float u_ArcPosition;
+uniform float u_CrossSectionSize;
 
 //渲染参数
 uniform vec3 u_VolumeScale;
@@ -53,16 +53,6 @@ void sampleFrenetFrame(float t, out vec3 position, out vec3 tangent, out vec3 no
     binormal = binSample.xyz;
 }
 
-//绕轴旋转向量
-vec3 rotateAroundAxis(vec3 direction, vec3 axis, float angle)
-{
-    float cosA = cos(angle);
-    float sinA = sin(angle);
-    vec3 rotatedDirection = direction * cosA + cross(axis, direction) * sinA + axis * dot(axis, direction) * (1.0 - cosA);
-
-    return rotatedDirection;
-}
-
 //灰度模式：窗宽窗位裁剪 + 线性映射
 float applyWindowLevel(float value, float windowCenter, float windowWidth)
 {
@@ -79,27 +69,6 @@ float applyWindowLevel(float value, float windowCenter, float windowWidth)
     result = clamp(result, 0.0, 1.0);
 
     return result;
-}
-
-//伪彩模式：只裁剪，窗外返回-1，跳过
-float applyWindowClip(float value, float windowCenter, float windowWidth)
-{
-    if (windowWidth < EPSILON)
-    {   
-        return 0.0;
-    }
-    
-    float windowMin = windowCenter - windowWidth * 0.5;
-    float windowMax = windowCenter + windowWidth * 0.5;
-
-    //窗外返回-1.0（特殊标记，表示跳过）
-    if (value <= windowMin || value >= windowMax)
-    {
-        return -1.0;
-    }
-    
-    //窗内返回原始值
-    return value;
 }
 
 //获取体素的医学值（HU值）
@@ -121,21 +90,19 @@ float getMedicalValue(vec3 texCoord)
 
 void main()
 {
-    //UV.x -> 弧长
-    float normalizedArcLength = UV.x;
+    //固定弧长位置
+    float normalizedArcLength = u_ArcPosition;
     
-    //UV.y -> 径向偏移
-    float radialOffset = (UV.y - 0.5) * u_RadialWidth;
+    //UV映射到Normal-Binormal平面
+    float normalOffset = (UV.x - 0.5) * u_CrossSectionSize;
+    float binormalOffset = (UV.y - 0.5) * u_CrossSectionSize;
     
     //采样FrenetFrame
     vec3 position, tangent, normal, binormal;
     sampleFrenetFrame(normalizedArcLength, position, tangent, normal, binormal);
     
-    //绕Tangent旋转Normal
-    vec3 rotatedNormal = rotateAroundAxis(normal, tangent, u_RotationAngle);
-    
     //计算采样位置（世界空间）
-    vec3 samplePosition = position + rotatedNormal * radialOffset;
+    vec3 samplePosition = position + normal * normalOffset + binormal * binormalOffset;
     
     //世界空间 -> 纹理坐标
     vec3 texCoord = (samplePosition / u_VolumeScale) + 0.5;
@@ -182,15 +149,6 @@ void main()
     //PseudoColor - 伪彩模式
     else
     {
-        //应用窗宽窗位（只裁剪，窗外直接跳过）
-        //float clippedValue = applyWindowClip(medicalValue, u_WindowCenter, u_WindowWidth);
-        
-        //窗外值跳过
-        //if (clippedValue < 0.0)
-        //{
-            //discard;
-        //}
-
         //将HU值映射到传递函数的归一化位置
         float normalizedPosition = (medicalValue - u_HUMin) / (u_HUMax - u_HUMin);
         normalizedPosition = clamp(normalizedPosition, 0.0, 1.0);
