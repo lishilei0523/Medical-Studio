@@ -18,6 +18,9 @@ uniform sampler1D u_BinormalTexture;
 //曲线参数
 uniform float u_RadialWidth;
 uniform float u_RotationAngle;
+uniform float u_ProjectionThickness;
+uniform int u_ProjectionMode;
+uniform int u_MaxStepsCount;
 
 //渲染参数
 uniform vec3 u_VolumeScale;
@@ -37,6 +40,9 @@ uniform int u_MarkModes[256];
 //常量
 const float MAX_16BIT_SIGNED = 32767.0;
 const float EPSILON = 0.0001;
+const int PROJECTION_AIP = 0;
+const int PROJECTION_MIP = 1;
+const int PROJECTION_MINIP = 2;
 
 
 //从弧长采样FrenetFrame，t: 归一化弧长 0~1
@@ -81,27 +87,6 @@ float applyWindowLevel(float value, float windowCenter, float windowWidth)
     return result;
 }
 
-//伪彩模式：只裁剪，窗外返回-1，跳过
-float applyWindowClip(float value, float windowCenter, float windowWidth)
-{
-    if (windowWidth < EPSILON)
-    {   
-        return 0.0;
-    }
-    
-    float windowMin = windowCenter - windowWidth * 0.5;
-    float windowMax = windowCenter + windowWidth * 0.5;
-
-    //窗外返回-1.0（特殊标记，表示跳过）
-    if (value <= windowMin || value >= windowMax)
-    {
-        return -1.0;
-    }
-    
-    //窗内返回原始值
-    return value;
-}
-
 //获取体素的医学值（HU值）
 float getMedicalValue(vec3 texCoord)
 {
@@ -134,11 +119,59 @@ void main()
     //绕Tangent旋转Normal
     vec3 rotatedNormal = rotateAroundAxis(normal, tangent, u_RotationAngle);
     
-    //计算采样位置（世界空间）
-    vec3 samplePosition = position + rotatedNormal * radialOffset;
+    //射线起点
+    vec3 rayOrigin = position + rotatedNormal * radialOffset;
     
-    //世界空间 -> 纹理坐标
-    vec3 texCoord = (samplePosition / u_VolumeScale) + 0.5;
+    //沿Tangent方向步进采样
+    float halfThickness = u_ProjectionThickness * 0.5;
+    float stepSize = u_ProjectionThickness / float(u_MaxStepsCount);
+    
+    float projectedHU;    
+    if (u_ProjectionMode == PROJECTION_MIP)
+    {
+        projectedHU = -1000.0;
+        for (int index = 0; index <= u_MaxStepsCount; index++)
+        {
+            float offset = -halfThickness + stepSize * float(index);
+            vec3 samplePosition = rayOrigin + tangent * offset;
+            vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
+            float hu = getMedicalValue(localTexCoord);
+            projectedHU = max(projectedHU, hu);
+        }
+    }
+    else if (u_ProjectionMode == PROJECTION_MINIP)
+    {
+        projectedHU = 3071.0;
+        for (int index = 0; index <= u_MaxStepsCount; index++)
+        {
+            float offset = -halfThickness + stepSize * float(index);
+            vec3 samplePosition = rayOrigin + tangent * offset;
+            vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
+            float hu = getMedicalValue(localTexCoord);
+            projectedHU = min(projectedHU, hu);
+        }
+    }
+    else //PROJECTION_AIP
+    {
+        float sumHU = 0.0;
+        int validCount = 0;
+        for (int index = 0; index <= u_MaxStepsCount; index++)
+        {
+            float offset = -halfThickness + stepSize * float(index);
+            vec3 samplePosition = rayOrigin + tangent * offset;
+            vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
+            float hu = getMedicalValue(localTexCoord);
+            if (hu > -1000.0)
+            {
+                sumHU += hu;
+                validCount++;
+            }
+        }
+        projectedHU = validCount > 0 ? sumHU / float(validCount) : -1000.0;
+    }
+    
+    //取射线起点位置的纹理坐标用于标记采样
+    vec3 texCoord = (rayOrigin / u_VolumeScale) + 0.5;
     
     //边界检查
     if (texCoord.x < 0.0 || texCoord.x > 1.0 ||
@@ -159,9 +192,6 @@ void main()
         discard;
     }
     
-    //获取原始医学值
-    float medicalValue = getMedicalValue(texCoord);
-    
     //基础颜色
     vec3 color;
     float alpha = 1.0;
@@ -170,7 +200,7 @@ void main()
     if (u_RenderMode == 0)
     {
         //应用窗宽窗位（裁剪 + 线性映射）
-        float grayValue = applyWindowLevel(medicalValue, u_WindowCenter, u_WindowWidth);
+        float grayValue = applyWindowLevel(projectedHU, u_WindowCenter, u_WindowWidth);
 
         //应用亮度和对比度
         grayValue = (grayValue - 0.5) * u_Contrast + 0.5;
@@ -182,17 +212,8 @@ void main()
     //PseudoColor - 伪彩模式
     else
     {
-        //应用窗宽窗位（只裁剪，窗外直接跳过）
-        //float clippedValue = applyWindowClip(medicalValue, u_WindowCenter, u_WindowWidth);
-        
-        //窗外值跳过
-        //if (clippedValue < 0.0)
-        //{
-            //discard;
-        //}
-
         //将HU值映射到传递函数的归一化位置
-        float normalizedPosition = (medicalValue - u_HUMin) / (u_HUMax - u_HUMin);
+        float normalizedPosition = (projectedHU - u_HUMin) / (u_HUMax - u_HUMin);
         normalizedPosition = clamp(normalizedPosition, 0.0, 1.0);
 
         //采样传递函数获取伪彩色
