@@ -122,7 +122,7 @@ void main()
     //射线起点
     vec3 rayOrigin = position + rotatedNormal * radialOffset;
     
-    //沿Tangent方向步进采样
+    //沿rotatedNormal方向步进采样
     float halfThickness = u_ProjectionThickness * 0.5;
     float stepSize = u_ProjectionThickness / float(u_MaxStepsCount);
     
@@ -133,7 +133,7 @@ void main()
         for (int index = 0; index <= u_MaxStepsCount; index++)
         {
             float offset = -halfThickness + stepSize * float(index);
-            vec3 samplePosition = rayOrigin + tangent * offset;
+            vec3 samplePosition = rayOrigin + rotatedNormal * offset;
             vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
             float hu = getMedicalValue(localTexCoord);
             projectedHU = max(projectedHU, hu);
@@ -145,7 +145,7 @@ void main()
         for (int index = 0; index <= u_MaxStepsCount; index++)
         {
             float offset = -halfThickness + stepSize * float(index);
-            vec3 samplePosition = rayOrigin + tangent * offset;
+            vec3 samplePosition = rayOrigin + rotatedNormal * offset;
             vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
             float hu = getMedicalValue(localTexCoord);
             projectedHU = min(projectedHU, hu);
@@ -158,7 +158,7 @@ void main()
         for (int index = 0; index <= u_MaxStepsCount; index++)
         {
             float offset = -halfThickness + stepSize * float(index);
-            vec3 samplePosition = rayOrigin + tangent * offset;
+            vec3 samplePosition = rayOrigin + rotatedNormal * offset;
             vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
             float hu = getMedicalValue(localTexCoord);
             if (hu > -1000.0)
