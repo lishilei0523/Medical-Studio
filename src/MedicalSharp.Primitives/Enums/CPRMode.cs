@@ -14,23 +14,15 @@ namespace MedicalSharp.Primitives.Enums
         Straightened = 0,
 
         /// <summary>
-        /// 切线投影图
+        /// 投影图
         /// </summary>
-        /// <remarks>水平，沿血管</remarks>
-        [Description("水平CPR")]
-        TangentProjected = 1,
-
-        /// <summary>
-        /// 法向量投影图
-        /// </summary>
-        /// <remarks>垂直，侧面看</remarks>
-        [Description("垂直CPR")]
-        NormalProjected = 2,
+        [Description("投影图")]
+        Projected = 1,
 
         /// <summary>
         /// 剖面图
         /// </summary>
         [Description("剖面图")]
-        CrossSectional = 3
+        CrossSectional = 2
     }
 }
