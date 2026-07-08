@@ -41,6 +41,21 @@ namespace MedicalSharp.Engine.Managers
         private static ShaderProgram _MPRStatisticProgram;
 
         /// <summary>
+        /// CPR拉直图着色器程序
+        /// </summary>
+        private static ShaderProgram _CPRStraightenedProgram;
+
+        /// <summary>
+        /// CPR投影图着色器程序
+        /// </summary>
+        private static ShaderProgram _CPRProjectedProgram;
+
+        /// <summary>
+        /// CPR剖面图着色器程序
+        /// </summary>
+        private static ShaderProgram _CPRCrossSectionalProgram;
+
+        /// <summary>
         /// 同步锁
         /// </summary>
         private static readonly Lock _Sync;
@@ -108,6 +123,36 @@ namespace MedicalSharp.Engine.Managers
         }
         #endregion
 
+        #region 只读属性 - CPR拉直图着色器程序 —— static ShaderProgram CPRStraightenedProgram
+        /// <summary>
+        /// 只读属性 - CPR拉直图着色器程序
+        /// </summary>
+        public static ShaderProgram CPRStraightenedProgram
+        {
+            get => _CPRStraightenedProgram;
+        }
+        #endregion
+
+        #region 只读属性 - CPR投影图着色器程序 —— static ShaderProgram CPRProjectedProgram
+        /// <summary>
+        /// 只读属性 - CPR投影图着色器程序
+        /// </summary>
+        public static ShaderProgram CPRProjectedProgram
+        {
+            get => _CPRProjectedProgram;
+        }
+        #endregion
+
+        #region 只读属性 - CPR剖面图着色器程序 —— static ShaderProgram CPRCrossSectionalProgram
+        /// <summary>
+        /// 只读属性 - CPR剖面图着色器程序
+        /// </summary>
+        public static ShaderProgram CPRCrossSectionalProgram
+        {
+            get => _CPRCrossSectionalProgram;
+        }
+        #endregion
+
         #endregion
 
         #region # 方法
@@ -132,6 +177,9 @@ namespace MedicalSharp.Engine.Managers
                 _RaycastPickProgram = CreateRaycastPickProgram();
                 _MPRProgram = CreateMPRProgram();
                 _MPRStatisticProgram = CreateMPRStatisticProgram();
+                _CPRStraightenedProgram = CreateCPRStraightenedProgram();
+                _CPRProjectedProgram = CreateCPRProjectedProgram();
+                _CPRCrossSectionalProgram = CreateCPRCrossSectionalProgram();
                 _Initialized = true;
             }
         }
@@ -148,6 +196,9 @@ namespace MedicalSharp.Engine.Managers
             _RaycastPickProgram?.Dispose();
             _MPRProgram?.Dispose();
             _MPRStatisticProgram?.Dispose();
+            _CPRStraightenedProgram?.Dispose();
+            _CPRProjectedProgram?.Dispose();
+            _CPRCrossSectionalProgram?.Dispose();
         }
         #endregion
 
@@ -227,7 +278,52 @@ namespace MedicalSharp.Engine.Managers
 
             return program;
         }
-        #endregion 
+        #endregion
+
+        #region 创建CPR拉直图着色器程序 —— static ShaderProgram CreateCPRStraightenedProgram()
+        /// <summary>
+        /// 创建CPR拉直图着色器程序
+        /// </summary>
+        private static ShaderProgram CreateCPRStraightenedProgram()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadVertexShaderFromFile("Resources/GLSLs/cpr.vert");
+            program.ReadFragmentShaderFromFile("Resources/GLSLs/cpr_straightened.frag");
+            program.BuildDraw();
+
+            return program;
+        }
+        #endregion
+
+        #region 创建CPR投影图着色器程序 —— static ShaderProgram CreateCPRProjectedProgram()
+        /// <summary>
+        /// 创建CPR投影图着色器程序
+        /// </summary>
+        private static ShaderProgram CreateCPRProjectedProgram()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadVertexShaderFromFile("Resources/GLSLs/cpr.vert");
+            program.ReadFragmentShaderFromFile("Resources/GLSLs/cpr_projected.frag");
+            program.BuildDraw();
+
+            return program;
+        }
+        #endregion
+
+        #region 创建CPR剖面图着色器程序 —— static ShaderProgram CreateCPRCrossSectionalProgram()
+        /// <summary>
+        /// 创建CPR剖面图着色器程序
+        /// </summary>
+        private static ShaderProgram CreateCPRCrossSectionalProgram()
+        {
+            ShaderProgram program = new ShaderProgram();
+            program.ReadVertexShaderFromFile("Resources/GLSLs/cpr.vert");
+            program.ReadFragmentShaderFromFile("Resources/GLSLs/cpr_cross_sectional.frag");
+            program.BuildDraw();
+
+            return program;
+        }
+        #endregion
 
         #endregion
     }
