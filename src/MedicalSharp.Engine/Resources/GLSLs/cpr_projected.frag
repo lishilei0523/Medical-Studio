@@ -20,7 +20,7 @@ uniform float u_RadialWidth;
 uniform float u_RotationAngle;
 uniform float u_ProjectionThickness;
 uniform int u_MaxStepsCount;
-uniform int u_ProjectionMode;
+uniform int u_ProjectionMode;           //密度投影模式：0=AIP, 1=MID, 2=MinIP
 uniform int u_ProjectionDirection;      //CPR投影方向：0=Tangent, 1=Normal
 
 //渲染参数

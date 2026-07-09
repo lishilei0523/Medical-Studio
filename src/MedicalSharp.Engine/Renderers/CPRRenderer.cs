@@ -161,20 +161,20 @@ namespace MedicalSharp.Engine.Renderers
         public int MaxStepsCount { get; private set; }
         #endregion
 
-        #region CPR投影方向 —— CPRProjectionDirection ProjectionDirection
+        #region 投影模式 —— IntensityProjectionMode ProjectionMode
         /// <summary>
-        /// CPR投影方向
-        /// </summary>
-        /// <remarks>Projected使用</remarks>
-        public CPRProjectionDirection ProjectionDirection { get; private set; }
-        #endregion
-
-        #region 密度投影模式 —— IntensityProjectionMode ProjectionMode
-        /// <summary>
-        /// 密度投影模式
+        /// 投影模式
         /// </summary>
         /// <remarks>Projected使用</remarks>
         public IntensityProjectionMode ProjectionMode { get; private set; }
+        #endregion
+
+        #region 投影方向 —— CPRProjectionDirection ProjectionDirection
+        /// <summary>
+        /// 投影方向
+        /// </summary>
+        /// <remarks>Projected使用</remarks>
+        public CPRProjectionDirection ProjectionDirection { get; private set; }
         #endregion
 
         #region 弧长位置 —— float ArcPosition
@@ -251,25 +251,25 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 切换CPR投影方向 —— void SwitchCPRProjectionDirection(CPRProjectionDirection...
+        #region 切换投影模式 —— void SwitchProjectionMode(IntensityProjectionMode...
         /// <summary>
-        /// 切换CPR投影方向
-        /// </summary>
-        /// <param name="projectionDirection">CPR投影方向</param>
-        public void SwitchCPRProjectionDirection(CPRProjectionDirection projectionDirection)
-        {
-            this.ProjectionDirection = projectionDirection;
-        }
-        #endregion
-
-        #region 切换密度投影模式 —— void SwitchProjectionMode(IntensityProjectionMode...
-        /// <summary>
-        /// 切换密度投影模式
+        /// 切换投影模式
         /// </summary>
         /// <param name="projectionMode">密度投影模式</param>
         public void SwitchProjectionMode(IntensityProjectionMode projectionMode)
         {
             this.ProjectionMode = projectionMode;
+        }
+        #endregion
+
+        #region 切换投影方向 —— void SwitchProjectionDirection(CPRProjectionDirection...
+        /// <summary>
+        /// 切换投影方向
+        /// </summary>
+        /// <param name="projectionDirection">CPR投影方向</param>
+        public void SwitchProjectionDirection(CPRProjectionDirection projectionDirection)
+        {
+            this.ProjectionDirection = projectionDirection;
         }
         #endregion
 
