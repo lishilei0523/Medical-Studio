@@ -21,6 +21,7 @@ uniform float u_RotationAngle;
 uniform float u_ProjectionThickness;
 uniform int u_ProjectionMode;
 uniform int u_MaxStepsCount;
+uniform int u_ProjectionDirection;      //CPR投影方向：0=Tangent, 1=Normal
 
 //渲染参数
 uniform vec3 u_VolumeScale;
@@ -33,9 +34,6 @@ uniform float u_HUMax;
 
 //渲染模式：0=Gray, 1=PseudoColor
 uniform int u_RenderMode;
-
-//CPR投影方向：0=Tangent, 1=Normal
-uniform int u_ProjectionDirection;
 
 //标记策略：每个标记值的行为（0=Visible, 1=Collapsed, 2=Tinted）
 uniform int u_MarkModes[256];

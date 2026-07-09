@@ -865,5 +865,27 @@ namespace MedicalSharp.Primitives.Algorithms
             return closestPoint;
         }
         #endregion
+
+        #region # 标准化角度 —— static float NormalizeAngle(float angle)
+        /// <summary>
+        /// 标准化角度
+        /// </summary>
+        /// <param name="angle">角度（度）</param>
+        /// <returns>标准化到[-360, 360]的角度</returns>
+        public static float NormalizeAngle(float angle)
+        {
+            angle %= 360f;
+            if (angle < -360f)
+            {
+                angle += 360f;
+            }
+            else if (angle > 360f)
+            {
+                angle -= 360f;
+            }
+
+            return angle;
+        }
+        #endregion
     }
 }

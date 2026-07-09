@@ -294,7 +294,7 @@ namespace MedicalSharp.Engine.Renderers
             ShaderProgram program = ShaderManager.MPRProgram;
             program.Use();
 
-            //设置MVP矩阵、相机位置、缩放
+            //设置MVP矩阵、缩放
             Matrix4 modelMatrix = this._plane.GetModelMatrix();
             program.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
             program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
