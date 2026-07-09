@@ -46,22 +46,20 @@ namespace MedicalSharp.Engine.Renderers
             : base(camera)
         {
             this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
+            this.RenderMode = CPRRenderMode.Gray;
             this.WindowWidth = 400;
             this.WindowCenter = 40;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
-
-            //默认值
-            this.RenderMode = CPRRenderMode.Gray;
             this.CPRMode = CPRMode.Straightened;
-            this.ProjectionDirection = CPRProjectionDirection.Tangent;
-            this.ProjectionMode = IntensityProjectionMode.MIP;
             this.RadialWidth = 0.1f;
             this.RotationAngle = 0f;
-            this.ArcPosition = 0.5f;
-            this.CrossSectionSize = 0.1f;
             this.ProjectionThickness = 0.05f;
             this.MaxStepsCount = 100;
+            this.ProjectionDirection = CPRProjectionDirection.Tangent;
+            this.ProjectionMode = IntensityProjectionMode.MIP;
+            this.ArcPosition = 0.5f;
+            this.CrossSectionSize = 0.1f;
         }
 
         #endregion
@@ -131,20 +129,6 @@ namespace MedicalSharp.Engine.Renderers
         public CPRMode CPRMode { get; private set; }
         #endregion
 
-        #region CPR投影方向 —— CPRProjectionDirection ProjectionDirection
-        /// <summary>
-        /// CPR投影方向
-        /// </summary>
-        public CPRProjectionDirection ProjectionDirection { get; private set; }
-        #endregion
-
-        #region 密度投影模式 —— IntensityProjectionMode ProjectionMode
-        /// <summary>
-        /// 密度投影模式
-        /// </summary>
-        public IntensityProjectionMode ProjectionMode { get; private set; }
-        #endregion
-
         #region 径向宽度 —— float RadialWidth
         /// <summary>
         /// 径向宽度
@@ -161,22 +145,6 @@ namespace MedicalSharp.Engine.Renderers
         public float RotationAngle { get; private set; }
         #endregion
 
-        #region 弧长位置 —— float ArcPosition
-        /// <summary>
-        /// 弧长位置
-        /// </summary>
-        /// <remarks>归一化值0~1，CrossSectional使用</remarks>
-        public float ArcPosition { get; private set; }
-        #endregion
-
-        #region 剖面尺寸 —— float CrossSectionSize
-        /// <summary>
-        /// 剖面尺寸
-        /// </summary>
-        /// <remarks>世界空间，CrossSectional使用</remarks>
-        public float CrossSectionSize { get; private set; }
-        #endregion
-
         #region 投影厚度 —— float ProjectionThickness
         /// <summary>
         /// 投影厚度
@@ -191,6 +159,38 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         /// <remarks>Projected使用</remarks>
         public int MaxStepsCount { get; private set; }
+        #endregion
+
+        #region CPR投影方向 —— CPRProjectionDirection ProjectionDirection
+        /// <summary>
+        /// CPR投影方向
+        /// </summary>
+        /// <remarks>Projected使用</remarks>
+        public CPRProjectionDirection ProjectionDirection { get; private set; }
+        #endregion
+
+        #region 密度投影模式 —— IntensityProjectionMode ProjectionMode
+        /// <summary>
+        /// 密度投影模式
+        /// </summary>
+        /// <remarks>Projected使用</remarks>
+        public IntensityProjectionMode ProjectionMode { get; private set; }
+        #endregion
+
+        #region 弧长位置 —— float ArcPosition
+        /// <summary>
+        /// 弧长位置
+        /// </summary>
+        /// <remarks>归一化值0~1，CrossSectional使用</remarks>
+        public float ArcPosition { get; private set; }
+        #endregion
+
+        #region 剖面尺寸 —— float CrossSectionSize
+        /// <summary>
+        /// 剖面尺寸
+        /// </summary>
+        /// <remarks>世界空间，CrossSectional使用</remarks>
+        public float CrossSectionSize { get; private set; }
         #endregion
 
         #region 只读属性 - 曲线 —— Curve Curve
@@ -373,7 +373,7 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 设置拉直图选项 —— void SetStraightenedParams(float radialWidth, float rotationAngle)
+        #region 设置拉直图选项 —— void SetStraightenedOptions(float radialWidth, float rotationAngle)
         /// <summary>
         /// 设置拉直图选项
         /// </summary>
@@ -544,8 +544,8 @@ namespace MedicalSharp.Engine.Renderers
                     program.SetUniformFloat("u_RadialWidth", this.RadialWidth);
                     program.SetUniformFloat("u_RotationAngle", this.RotationAngle);
                     program.SetUniformFloat("u_ProjectionThickness", this.ProjectionThickness);
-                    program.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
                     program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
+                    program.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
                     program.SetUniformInt("u_ProjectionDirection", (int)this.ProjectionDirection);
                     break;
                 case CPRMode.CrossSectional:
