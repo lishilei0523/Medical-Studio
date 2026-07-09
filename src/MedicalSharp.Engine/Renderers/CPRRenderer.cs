@@ -227,8 +227,6 @@ namespace MedicalSharp.Engine.Renderers
 
         #region # 方法
 
-        //Public
-
         #region 切换渲染模式 —— void SwitchRenderMode(CPRRenderMode renderMode)
         /// <summary>
         /// 切换渲染模式
