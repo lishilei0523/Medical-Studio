@@ -198,7 +198,7 @@ namespace MedicalSharp.Engine.Renderables
             //精确检测
             const float tolerance = 0.01f;
             Vector3 segmentDir = this.EndPoint - this.StartPoint;
-            Vector3 rayToStart = this.StartPoint - localRay.Position;
+            Vector3 rayToStart = this.StartPoint - localRay.Origin;
 
             //计算射线方向与线段方向的各种点积
             float a = Vector3.Dot(segmentDir, segmentDir);      //线段长度的平方
@@ -221,13 +221,13 @@ namespace MedicalSharp.Engine.Renderables
                 if (t < 0)
                 {
                     //检查线段起点是否在射线前方
-                    if (c < 0 && Vector3.Dot(localRay.Direction, this.EndPoint - localRay.Position) < 0)
+                    if (c < 0 && Vector3.Dot(localRay.Direction, this.EndPoint - localRay.Origin) < 0)
                     {
                         return false;
                     }
 
                     //如果射线起点到线段的最短距离在容差内，也算相交
-                    Vector3 closestOnRay = localRay.Position;
+                    Vector3 closestOnRay = localRay.Origin;
                     Vector3 closestOnSegment = this.StartPoint + segmentDir * s;
                     if (Vector3.DistanceSquared(closestOnRay, closestOnSegment) <= tolerance * tolerance)
                     {
@@ -265,8 +265,8 @@ namespace MedicalSharp.Engine.Renderables
                 }
 
                 //共线情况：计算线段端点在射线上的投影
-                float t0 = Vector3.Dot(localRay.Direction, this.StartPoint - localRay.Position);
-                float t1 = Vector3.Dot(localRay.Direction, this.EndPoint - localRay.Position);
+                float t0 = Vector3.Dot(localRay.Direction, this.StartPoint - localRay.Origin);
+                float t1 = Vector3.Dot(localRay.Direction, this.EndPoint - localRay.Origin);
 
                 float tMin = Math.Min(t0, t1);
                 float tMax = Math.Max(t0, t1);
@@ -281,11 +281,11 @@ namespace MedicalSharp.Engine.Renderables
                 if (tMin < 0)
                 {
                     distance = 0;
-                    hitPoint = localRay.Position;
+                    hitPoint = localRay.Origin;
 
                     //保交点在容差内
                     float distToSegment = (t0 < 0 && t1 < 0)
-                        ? Math.Min(Vector3.Distance(localRay.Position, this.StartPoint), Vector3.Distance(localRay.Position, this.EndPoint))
+                        ? Math.Min(Vector3.Distance(localRay.Origin, this.StartPoint), Vector3.Distance(localRay.Origin, this.EndPoint))
                         : 0;
 
                     return distToSegment <= tolerance;

@@ -103,7 +103,7 @@ namespace MedicalSharp.Primitives.Maths
             }
 
             float invDet = 1.0f / det;
-            Vector3 tvec = ray.Position - this.PointA;
+            Vector3 tvec = ray.Origin - this.PointA;
             u = Vector3.Dot(tvec, pvec) * invDet;
 
             if (u < 0 || u > 1)

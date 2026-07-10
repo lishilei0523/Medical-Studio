@@ -15,7 +15,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 起点
         /// </summary>
-        private Vector3 _position;
+        private Vector3 _origin;
 
         /// <summary>
         /// 方向
@@ -25,11 +25,11 @@ namespace MedicalSharp.Primitives.Maths
         /// <summary>
         /// 创建射线构造器
         /// </summary>
-        /// <param name="position">起点</param>
+        /// <param name="origin">起点</param>
         /// <param name="direction">方向</param>
-        public Ray(Vector3 position, Vector3 direction)
+        public Ray(Vector3 origin, Vector3 direction)
         {
-            this._position = position;
+            this._origin = origin;
             this._direction = direction.Normalized();
         }
 
@@ -37,13 +37,13 @@ namespace MedicalSharp.Primitives.Maths
 
         #region # 属性
 
-        #region 只读属性 - 起点 —— Vector3 Position
+        #region 只读属性 - 起点 —— Vector3 Origin
         /// <summary>
         /// 只读属性 - 起点
         /// </summary>
-        public Vector3 Position
+        public Vector3 Origin
         {
-            get => this._position;
+            get => this._origin;
         }
         #endregion
 
@@ -148,7 +148,9 @@ namespace MedicalSharp.Primitives.Maths
             Vector3 direction = Vector3.Normalize(rayEndWorld - rayStartWorld);
 
             //创建射线（使用相机位置作为起点）
-            return new Ray(cameraPosition, direction);
+            Ray ray = new Ray(cameraPosition, direction);
+
+            return ray;
         }
         #endregion
 
@@ -161,7 +163,9 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         public Vector3 GetPoint(float distance)
         {
-            return this._position + this._direction * distance;
+            Vector3 point = this._origin + this._direction * distance;
+
+            return point;
         }
         #endregion
 
@@ -177,13 +181,12 @@ namespace MedicalSharp.Primitives.Maths
             float tMin = 0f;
             float tMax = float.MaxValue;
 
-            for (int i = 0; i < 3; i++)
+            for (int index = 0; index < 3; index++)
             {
-                float origin = this._position[i];
-                float direction = this._direction[i];
-                float min = box.Minimum[i];
-                float max = box.Maximum[i];
-
+                float origin = this._origin[index];
+                float direction = this._direction[index];
+                float min = box.Minimum[index];
+                float max = box.Maximum[index];
                 if (Math.Abs(direction) < float.Epsilon)
                 {
                     //射线平行于该轴
@@ -227,7 +230,7 @@ namespace MedicalSharp.Primitives.Maths
         {
             distance = 0f;
 
-            Vector3 toSphere = sphere.Center - this._position;
+            Vector3 toSphere = sphere.Center - this._origin;
             float rayLength = Vector3.Dot(this._direction, toSphere);
             float closestDistanceSquared = Vector3.Dot(toSphere, toSphere) - rayLength * rayLength;
 
@@ -265,7 +268,7 @@ namespace MedicalSharp.Primitives.Maths
             hitPoint = Vector3.Zero;
             distance = 0f;
 
-            Vector3 toSphere = sphere.Center - this._position;
+            Vector3 toSphere = sphere.Center - this._origin;
             float rayLength = Vector3.Dot(this._direction, toSphere);
             float closestDistanceSquared = Vector3.Dot(toSphere, toSphere) - rayLength * rayLength;
 
@@ -286,7 +289,7 @@ namespace MedicalSharp.Primitives.Maths
                 }
             }
 
-            hitPoint = this._position + this._direction * distance;
+            hitPoint = this._origin + this._direction * distance;
 
             return true;
         }
@@ -313,9 +316,8 @@ namespace MedicalSharp.Primitives.Maths
             }
 
             float f = 1.0f / a;
-            Vector3 s = this._position - pointA;
+            Vector3 s = this._origin - pointA;
             float u = f * Vector3.Dot(s, h);
-
             if (u < 0.0f || u > 1.0f)
             {
                 return false;
@@ -323,14 +325,12 @@ namespace MedicalSharp.Primitives.Maths
 
             Vector3 q = Vector3.Cross(s, edge1);
             float v = f * Vector3.Dot(this._direction, q);
-
             if (v < 0.0f || u + v > 1.0f)
             {
                 return false;
             }
 
             float t = f * Vector3.Dot(edge2, q);
-
             if (t > epsilon)
             {
                 distance = t;
@@ -350,14 +350,12 @@ namespace MedicalSharp.Primitives.Maths
             distance = 0f;
 
             float denominator = Vector3.Dot(planeNormal, this._direction);
-
             if (Math.Abs(denominator) < float.Epsilon)
             {
                 return false;
             }
 
-            float t = (planeDistance - Vector3.Dot(planeNormal, this._position)) / denominator;
-
+            float t = (planeDistance - Vector3.Dot(planeNormal, this._origin)) / denominator;
             if (t >= 0)
             {
                 distance = t;
@@ -401,7 +399,7 @@ namespace MedicalSharp.Primitives.Maths
             }
 
             //计算从射线起点到平面上点的向量
-            Vector3 planeToRayOrigin = planePoint - this._position;
+            Vector3 planeToRayOrigin = planePoint - this._origin;
 
             //计算射线起点到平面的垂直距离（带符号）
             float signedDistance = Vector3.Dot(planeToRayOrigin, normal);
@@ -415,7 +413,7 @@ namespace MedicalSharp.Primitives.Maths
             {
                 //如果t为负数但在容差范围内，则取0
                 t = Math.Max(0, t);
-                hitPoint = this._position + this._direction * t;
+                hitPoint = this._origin + this._direction * t;
                 distance = t;
 
                 return true;
@@ -431,7 +429,7 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         public bool Equals(Ray other)
         {
-            return this._position.Equals(other._position) && this._direction.Equals(other._direction);
+            return this._origin.Equals(other._origin) && this._direction.Equals(other._direction);
         }
         #endregion
 
@@ -441,7 +439,7 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         public float CalculateDistanceToPoint(Vector3 point)
         {
-            Vector3 toPoint = point - this._position;
+            Vector3 toPoint = point - this._origin;
             float projection = Vector3.Dot(toPoint, this._direction);
 
             if (projection < 0)
@@ -449,7 +447,7 @@ namespace MedicalSharp.Primitives.Maths
                 return toPoint.Length;
             }
 
-            Vector3 projectedPoint = this._position + this._direction * projection;
+            Vector3 projectedPoint = this._origin + this._direction * projection;
             return Vector3.Distance(point, projectedPoint);
         }
         #endregion
@@ -460,12 +458,12 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         public bool CalculateClosestPoints(Ray other, out Vector3 pointOnThis, out Vector3 pointOnOther)
         {
-            pointOnThis = this._position;
-            pointOnOther = other._position;
+            pointOnThis = this._origin;
+            pointOnOther = other._origin;
 
             Vector3 d1 = this._direction;
             Vector3 d2 = other._direction;
-            Vector3 r = this._position - other._position;
+            Vector3 r = this._origin - other._origin;
 
             float a = Vector3.Dot(d1, d1);
             float b = Vector3.Dot(d1, d2);
@@ -497,7 +495,7 @@ namespace MedicalSharp.Primitives.Maths
         /// <returns>变换后的新射线</returns>
         public Ray Transform(Matrix4 matrix)
         {
-            Vector3 newPosition = Vector3.TransformPosition(this._position, matrix);
+            Vector3 newPosition = Vector3.TransformPosition(this._origin, matrix);
             Vector3 newDirection = Vector3.TransformNormal(this._direction, matrix).Normalized();
             Ray ray = new Ray(newPosition, newDirection);
 
@@ -524,7 +522,7 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         public override int GetHashCode()
         {
-            return HashCode.Combine(this._position, this._direction);
+            return HashCode.Combine(this._origin, this._direction);
         }
         #endregion
 

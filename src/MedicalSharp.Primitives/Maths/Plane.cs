@@ -132,7 +132,7 @@ namespace MedicalSharp.Primitives.Maths
                 return false;
             }
 
-            distance = -(Vector3.Dot(this._normal, ray.Position) + this._distance) / denominator;
+            distance = -(Vector3.Dot(this._normal, ray.Origin) + this._distance) / denominator;
 
             //TODO 只返回正向的交点
             //return distance >= 0;
@@ -152,7 +152,7 @@ namespace MedicalSharp.Primitives.Maths
         {
             if (this.Intersects(ray, out float distance))
             {
-                hitPoint = ray.Position + ray.Direction * distance;
+                hitPoint = ray.Origin + ray.Direction * distance;
                 return true;
             }
 

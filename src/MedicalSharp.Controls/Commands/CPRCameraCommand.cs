@@ -88,7 +88,7 @@ namespace MedicalSharp.Controls.Commands
             if (cprViewport.CPRMode == CPRMode.CrossSectional)
             {
                 //剖面模式：滚轮切换弧长位置
-                float arcPosition = Math.Clamp(0.5f + delta * 0.01f, 0f, 1f);
+                float arcPosition = Math.Clamp(cprViewport.ArcPosition + delta * 0.01f, 0f, 1f);
                 cprViewport.ArcPosition = arcPosition;
             }
             else

@@ -455,7 +455,7 @@ namespace MedicalSharp.Engine.Renderers
             pickProgram.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
             pickProgram.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
             pickProgram.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
-            pickProgram.SetUniformVector3("u_RayOrigin", ray.Position);
+            pickProgram.SetUniformVector3("u_RayOrigin", ray.Origin);
             pickProgram.SetUniformVector3("u_RayDirection", ray.Direction);
             pickProgram.SetUniformVector3("u_CameraPosition", this.Camera.CameraPosition);
             pickProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
