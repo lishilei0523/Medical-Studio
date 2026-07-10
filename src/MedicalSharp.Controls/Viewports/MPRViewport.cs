@@ -99,6 +99,7 @@ namespace MedicalSharp.Controls.Viewports
             VolumeDataProperty.Changed.AddClassHandler<MPRViewport, VolumeData>(OnVolumeDataChanged);
         }
 
+
         /// <summary>
         /// 体积渲染对象
         /// </summary>
