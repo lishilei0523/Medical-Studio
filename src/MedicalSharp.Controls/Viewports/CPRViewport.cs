@@ -132,7 +132,6 @@ namespace MedicalSharp.Controls.Viewports
             ContrastProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(Contrast), 1.0f);
             InterpolationModeProperty = AvaloniaProperty.Register<CPRViewport, InterpolationMode>(nameof(InterpolationMode), InterpolationMode.Linear);
             TFControlPointsProperty = AvaloniaProperty.Register<CPRViewport, AvaloniaList<HUControlPoint>>(nameof(TFControlPoints));
-
             CPRModeProperty = AvaloniaProperty.Register<CPRViewport, CPRMode>(nameof(CPRMode), CPRMode.Straightened);
             RadialWidthProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(RadialWidth), 0.1f);
             RotationAngleProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(RotationAngle), 0f);

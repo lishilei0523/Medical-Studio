@@ -72,6 +72,7 @@ namespace MedicalSharp.Controls.Base
             FrameTokenProperty.Changed.AddClassHandler<OpenTKViewport, int>(OnFrameTokenChanged);
         }
 
+
         /// <summary>
         /// 平台操作系统
         /// </summary>
