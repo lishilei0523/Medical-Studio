@@ -65,7 +65,7 @@ namespace MedicalSharp.Controls.Commands
             {
                 Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 bool success = pickVisual3D.FindNearest(mousePos2D, out _, out _, out Visual3D visual3D, out _);
-                if (success && visual3D is IDraggableAlongCurve translatableCurve)
+                if (success && visual3D is IDraggableAlongCurve draggableAlongCurve)
                 {
                     #region # 验证
 
@@ -76,7 +76,7 @@ namespace MedicalSharp.Controls.Commands
 
                     #endregion
 
-                    this._selectedVisual = translatableCurve;
+                    this._selectedVisual = draggableAlongCurve;
                 }
             }
 
