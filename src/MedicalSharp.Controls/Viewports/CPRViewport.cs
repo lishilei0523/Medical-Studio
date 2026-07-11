@@ -618,7 +618,7 @@ namespace MedicalSharp.Controls.Viewports
             List<ShapeVisual3D> shapeVisual3Ds = [];
             foreach (ShapeVisual3D shapeVisual3D in base.GetShapeVisual3Ds())
             {
-                if (shapeVisual3D is IVisual2DIn3D)
+                if (shapeVisual3D is not IPureVisual3D)
                 {
                     shapeVisual3Ds.Add(shapeVisual3D);
                 }
