@@ -83,22 +83,23 @@ namespace MedicalSharp.Controls.Commands
         /// </summary>
         public override void OnMouseWheel(OpenTKViewport viewport, PointerWheelEventArgs eventArgs)
         {
-            CPRViewport cprViewport = (CPRViewport)viewport;
             float delta = (float)eventArgs.Delta.Y;
+            CPRViewport cprViewport = (CPRViewport)viewport;
             if (cprViewport.CPRMode == CPRMode.CrossSectional)
             {
-                //剖面模式：滚轮切换弧长位置
-                float arcPosition = Math.Clamp(cprViewport.ArcPosition + delta * 0.01f, 0f, 1f);
+                //剖面图：滚轮切换弧长位置
+                float arcPosition = cprViewport.ArcPosition + delta * 0.01f;
+                arcPosition = Math.Clamp(arcPosition, 0f, 1f);
                 cprViewport.ArcPosition = arcPosition;
             }
             else
             {
-                //拉直/投影模式：滚轮缩放
+                //拉直图/投影图：滚轮缩放
                 this._camera.Zoom(delta);
-            }
 
-            //请求下一帧
-            viewport.RequestNextFrameRendering();
+                //请求下一帧
+                viewport.RequestNextFrameRendering();
+            }
         }
         #endregion
 
