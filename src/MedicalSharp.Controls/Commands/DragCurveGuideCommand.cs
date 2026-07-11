@@ -37,14 +37,14 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 拖拽中委托 —— Action<ITranslatableCurve> ArcPositionChanging
+        #region 拖拽中委托 —— Action<IDraggableAlongCurve> ArcPositionChanging
         /// <summary>
         /// 拖拽中委托
         /// </summary>
         public Action<IDraggableAlongCurve> ArcPositionChanging { get; set; }
         #endregion
 
-        #region 已拖拽委托 —— Action<ITranslatableCurve> ArcPositionChanged
+        #region 已拖拽委托 —— Action<IDraggableAlongCurve> ArcPositionChanged
         /// <summary>
         /// 已拖拽委托
         /// </summary>
