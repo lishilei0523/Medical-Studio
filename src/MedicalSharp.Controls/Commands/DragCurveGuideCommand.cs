@@ -37,18 +37,18 @@ namespace MedicalSharp.Controls.Commands
 
         #region # 属性
 
-        #region 拖拽中委托 —— Action<IDraggableAlongCurve> ArcPositionChanging
+        #region 拖拽中委托 —— Action<IDraggableAlongCurve> Dragging
         /// <summary>
         /// 拖拽中委托
         /// </summary>
-        public Action<IDraggableAlongCurve> ArcPositionChanging { get; set; }
+        public Action<IDraggableAlongCurve> Dragging { get; set; }
         #endregion
 
-        #region 已拖拽委托 —— Action<IDraggableAlongCurve> ArcPositionChanged
+        #region 已拖拽委托 —— Action<IDraggableAlongCurve> Dragged
         /// <summary>
         /// 已拖拽委托
         /// </summary>
-        public Action<IDraggableAlongCurve> ArcPositionChanged { get; set; }
+        public Action<IDraggableAlongCurve> Dragged { get; set; }
         #endregion
 
         #endregion
@@ -108,7 +108,7 @@ namespace MedicalSharp.Controls.Commands
                 this._selectedVisual.ArcPosition = arcPosition;
 
                 //拖拽中
-                this.ArcPositionChanging?.Invoke(this._selectedVisual);
+                this.Dragging?.Invoke(this._selectedVisual);
 
                 //请求下一帧
                 viewport.RequestNextFrameRendering();
@@ -128,7 +128,7 @@ namespace MedicalSharp.Controls.Commands
             viewport.Cursor = new Cursor(StandardCursorType.Arrow);
 
             //拖拽结束
-            this.ArcPositionChanged?.Invoke(this._selectedVisual);
+            this.Dragged?.Invoke(this._selectedVisual);
 
             //清空选中
             this._selectedVisual = null;
