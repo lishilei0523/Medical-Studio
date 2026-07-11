@@ -56,8 +56,9 @@ namespace MedicalSharp.Engine.Renderers
             this.RotationAngle = 0f;
             this.ProjectionThickness = 0.05f;
             this.MaxStepsCount = 100;
-            this.ProjectionDirection = CPRProjectionDirection.Tangent;
             this.ProjectionMode = IntensityProjectionMode.MIP;
+            this.ProjectionDirection = CPRProjectionDirection.Tangent;
+            this.StraightenDirection = CPRStraightenDirection.Horizontal;
             this.ArcPosition = 0.5f;
             this.CrossSectionSize = 0.1f;
         }
@@ -177,6 +178,14 @@ namespace MedicalSharp.Engine.Renderers
         public CPRProjectionDirection ProjectionDirection { get; private set; }
         #endregion
 
+        #region 拉直方向 —— CPRStraightenDirection StraightenDirection
+        /// <summary>
+        /// 拉直方向
+        /// </summary>
+        /// <remarks>Straightened使用</remarks>
+        public CPRStraightenDirection StraightenDirection { get; private set; }
+        #endregion
+
         #region 弧长位置 —— float ArcPosition
         /// <summary>
         /// 弧长位置
@@ -268,6 +277,17 @@ namespace MedicalSharp.Engine.Renderers
         public void SwitchProjectionDirection(CPRProjectionDirection projectionDirection)
         {
             this.ProjectionDirection = projectionDirection;
+        }
+        #endregion
+
+        #region 切换拉直方向 —— void SwitchStraightenDirection(CPRStraightenDirection...
+        /// <summary>
+        /// 切换拉直方向
+        /// </summary>
+        /// <param name="straightenDirection">拉直方向</param>
+        public void SwitchStraightenDirection(CPRStraightenDirection straightenDirection)
+        {
+            this.StraightenDirection = straightenDirection;
         }
         #endregion
 
@@ -537,6 +557,7 @@ namespace MedicalSharp.Engine.Renderers
                 case CPRMode.Straightened:
                     program.SetUniformFloat("u_RadialWidth", this.RadialWidth);
                     program.SetUniformFloat("u_RotationAngle", this.RotationAngle);
+                    program.SetUniformInt("u_StraightenDirection", (int)this.StraightenDirection);
                     break;
                 case CPRMode.Projected:
                     program.SetUniformFloat("u_RadialWidth", this.RadialWidth);

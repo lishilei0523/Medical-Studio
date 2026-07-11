@@ -104,6 +104,11 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<CPRProjectionDirection> ProjectionDirectionProperty;
 
         /// <summary>
+        /// 拉直方向依赖属性
+        /// </summary>
+        public static readonly StyledProperty<CPRStraightenDirection> StraightenDirectionProperty;
+
+        /// <summary>
         /// 弧长位置依赖属性
         /// </summary>
         public static readonly StyledProperty<float> ArcPositionProperty;
@@ -138,6 +143,7 @@ namespace MedicalSharp.Controls.Viewports
             MaxStepsCountProperty = AvaloniaProperty.Register<CPRViewport, int>(nameof(MaxStepsCount), 100);
             ProjectionModeProperty = AvaloniaProperty.Register<CPRViewport, IntensityProjectionMode>(nameof(ProjectionMode), IntensityProjectionMode.MIP);
             ProjectionDirectionProperty = AvaloniaProperty.Register<CPRViewport, CPRProjectionDirection>(nameof(ProjectionDirection), CPRProjectionDirection.Tangent);
+            StraightenDirectionProperty = AvaloniaProperty.Register<CPRViewport, CPRStraightenDirection>(nameof(StraightenDirection), CPRStraightenDirection.Horizontal);
             ArcPositionProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(ArcPosition), 0.5f);
             CrossSectionSizeProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(CrossSectionSize), 0.1f);
             VolumeDataProperty = AvaloniaProperty.Register<CPRViewport, VolumeData>(nameof(VolumeData));
@@ -158,6 +164,7 @@ namespace MedicalSharp.Controls.Viewports
             MaxStepsCountProperty.Changed.AddClassHandler<CPRViewport, int>(OnMaxStepsCountChanged);
             ProjectionModeProperty.Changed.AddClassHandler<CPRViewport, IntensityProjectionMode>(OnProjectionModeChanged);
             ProjectionDirectionProperty.Changed.AddClassHandler<CPRViewport, CPRProjectionDirection>(OnProjectionDirectionChanged);
+            StraightenDirectionProperty.Changed.AddClassHandler<CPRViewport, CPRStraightenDirection>(OnStraightenDirectionChanged);
             ArcPositionProperty.Changed.AddClassHandler<CPRViewport, float>(OnArcPositionChanged);
             CrossSectionSizeProperty.Changed.AddClassHandler<CPRViewport, float>(OnCrossSectionSizeChanged);
             VolumeDataProperty.Changed.AddClassHandler<CPRViewport, VolumeData>(OnVolumeDataChanged);
@@ -351,6 +358,17 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
+        #region 依赖属性 - 拉直方向 —— CPRStraightenDirection StraightenDirection
+        /// <summary>
+        /// 依赖属性 - 拉直方向
+        /// </summary>
+        public CPRStraightenDirection StraightenDirection
+        {
+            get => this.GetValue(StraightenDirectionProperty);
+            set => this.SetValue(StraightenDirectionProperty, value);
+        }
+        #endregion
+
         #region 依赖属性 - 弧长位置 —— float ArcPosition
         /// <summary>
         /// 依赖属性 - 弧长位置
@@ -443,9 +461,21 @@ namespace MedicalSharp.Controls.Viewports
             float uvX = ndcX * 0.5f + 0.5f;
             float uvY = ndcY * 0.5f + 0.5f;
 
-            //UV -> 弧长 + 径向偏移
-            float arcLength = uvX * this.Curve.TotalArcLength;
-            float radialOffset = (uvY - 0.5f) * this.RadialWidth;
+            //根据拉直方向计算弧长和径向偏移
+            float arcLength;
+            float radialOffset;
+            if (this.CPRMode == CPRMode.Straightened && this.StraightenDirection == CPRStraightenDirection.Vertical)
+            {
+                //垂直拉直：纵轴=弧长，横轴=径向
+                arcLength = uvY * this.Curve.TotalArcLength;
+                radialOffset = (uvX - 0.5f) * this.RadialWidth;
+            }
+            else
+            {
+                //水平拉直或投影/剖面：横轴=弧长，纵轴=径向
+                arcLength = uvX * this.Curve.TotalArcLength;
+                radialOffset = (uvY - 0.5f) * this.RadialWidth;
+            }
 
             //获取FrenetFrame
             FrenetFrame frame = this.Curve.GetFrameAtArcLength(arcLength);
@@ -861,6 +891,19 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnProjectionDirectionChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<CPRProjectionDirection> eventArgs)
         {
             viewport._cprRenderer?.SwitchProjectionDirection(eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 拉直方向改变事件 —— static void OnStraightenDirectionChanged(CPRViewport viewport...
+        /// <summary>
+        /// 拉直方向改变事件
+        /// </summary>
+        private static void OnStraightenDirectionChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<CPRStraightenDirection> eventArgs)
+        {
+            viewport._cprRenderer?.SwitchStraightenDirection(eventArgs.NewValue.Value);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();

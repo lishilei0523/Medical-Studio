@@ -18,6 +18,7 @@ uniform sampler1D u_BinormalTexture;
 //曲线参数
 uniform float u_RadialWidth;
 uniform float u_RotationAngle;          //角度
+uniform int u_StraightenDirection;      //拉直方向：0=水平, 1=垂直
 
 //渲染参数
 uniform vec3 u_VolumeScale;
@@ -37,6 +38,8 @@ uniform int u_MarkModes[256];
 //常量
 const float MAX_16BIT_SIGNED = 32767.0;
 const float EPSILON = 0.0001;
+const int STRAIGHTEN_HORIZONTAL = 0;
+const int STRAIGHTEN_VERTICAL = 1;
 
 
 //从弧长采样FrenetFrame，t: 归一化弧长 0~1
@@ -121,12 +124,22 @@ float getMedicalValue(vec3 texCoord)
 
 void main()
 {
-    //UV.x -> 归一化弧长
-    float normalizedArcLength = UV.x;
-    
-    //UV.y -> 径向偏移
-    float radialOffset = (UV.y - 0.5) * u_RadialWidth;
-    
+    //根据拉直方向映射U/V
+    float normalizedArcLength;
+    float radialOffset;
+    if (u_StraightenDirection == STRAIGHTEN_HORIZONTAL)
+    {
+        //水平：横轴=弧长，纵轴=径向
+        normalizedArcLength = UV.x;
+        radialOffset = (UV.y - 0.5) * u_RadialWidth;
+    }
+    else
+    {
+        //垂直：纵轴=弧长，横轴=径向
+        normalizedArcLength = UV.y;
+        radialOffset = (UV.x - 0.5) * u_RadialWidth;
+    }
+
     //采样FrenetFrame
     vec3 position, tangent, normal, binormal;
     sampleFrenetFrame(normalizedArcLength, position, tangent, normal, binormal);

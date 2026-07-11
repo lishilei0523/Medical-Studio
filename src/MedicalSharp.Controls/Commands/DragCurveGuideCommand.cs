@@ -2,7 +2,9 @@
 using MedicalSharp.Controls.Base;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using OpenTK.Mathematics;
 using System;
@@ -99,10 +101,15 @@ namespace MedicalSharp.Controls.Commands
                 //屏幕坐标 -> UV（和顶点着色器一致：UV = aPos.xy + 0.5）
                 Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
                 float ndcX = (2.0f * mousePos2D.X) / viewport.ViewportSize.Width - 1.0f;
+                float ndcY = 1.0f - (2.0f * mousePos2D.Y) / viewport.ViewportSize.Height;
                 float uvX = ndcX * 0.5f + 0.5f;
+                float uvY = ndcY * 0.5f + 0.5f;
 
-                //UV.x -> 弧长归一化值（限制在0~1）
-                float arcPosition = Math.Clamp(uvX, 0f, 1f);
+                //根据拉直方向取弧长对应的UV分量
+                CPRViewport cprViewport = (CPRViewport)viewport;
+                float arcPosition = cprViewport.StraightenDirection == CPRStraightenDirection.Vertical
+                    ? Math.Clamp(uvY, 0f, 1f)
+                    : Math.Clamp(uvX, 0f, 1f);
 
                 //更新弧长位置
                 this._selectedVisual.ArcPosition = arcPosition;
