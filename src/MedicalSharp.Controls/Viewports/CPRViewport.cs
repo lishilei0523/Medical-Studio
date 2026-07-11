@@ -453,8 +453,9 @@ namespace MedicalSharp.Controls.Viewports
             FrenetFrame frame = this.Curve.GetFrameAtArcLength(arcLength);
 
             //绕Tangent旋转Normal
-            float cosA = MathF.Cos(this.RotationAngle);
-            float sinA = MathF.Sin(this.RotationAngle);
+            float rotationRad = MathHelper.DegreesToRadians(this.RotationAngle);
+            float cosA = MathF.Cos(rotationRad);
+            float sinA = MathF.Sin(rotationRad);
             Vector3 rotatedNormal = frame.Normal * cosA +
                                     Vector3.Cross(frame.Tangent, frame.Normal) * sinA +
                                     frame.Tangent * Vector3.Dot(frame.Tangent, frame.Normal) * (1.0f - cosA);

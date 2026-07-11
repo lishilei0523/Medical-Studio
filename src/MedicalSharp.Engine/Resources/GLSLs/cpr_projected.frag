@@ -17,7 +17,7 @@ uniform sampler1D u_BinormalTexture;
 
 //曲线参数
 uniform float u_RadialWidth;
-uniform float u_RotationAngle;
+uniform float u_RotationAngle;          //角度
 uniform float u_ProjectionThickness;
 uniform int u_MaxStepsCount;
 uniform int u_ProjectionMode;           //密度投影模式：0=AIP, 1=MID, 2=MinIP
@@ -120,7 +120,8 @@ void main()
     sampleFrenetFrame(normalizedArcLength, position, tangent, normal, binormal);
     
     //绕Tangent旋转Normal
-    vec3 rotatedNormal = rotateAroundAxis(normal, tangent, u_RotationAngle);
+    float rotationRad = radians(u_RotationAngle);
+    vec3 rotatedNormal = rotateAroundAxis(normal, tangent, rotationRad);
     
     //射线起点和方向
     vec3 rayOrigin = position + rotatedNormal * radialOffset;

@@ -78,7 +78,7 @@ namespace MedicalSharp.Engine.Renderables
         public float StrokeThickness { get; private set; }
         #endregion
 
-        #region 只读属性 - 顶点缓冲区 —— VertexBuffer StrokeBuffer
+        #region 只读属性 - 顶点缓冲区 —— VertexBuffer VertexBuffer
         /// <summary>
         /// 只读属性 - 顶点缓冲区
         /// </summary>

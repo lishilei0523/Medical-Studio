@@ -17,7 +17,7 @@ uniform sampler1D u_BinormalTexture;
 
 //曲线参数
 uniform float u_RadialWidth;
-uniform float u_RotationAngle;
+uniform float u_RotationAngle;          //角度
 
 //渲染参数
 uniform vec3 u_VolumeScale;
@@ -132,7 +132,8 @@ void main()
     sampleFrenetFrame(normalizedArcLength, position, tangent, normal, binormal);
     
     //绕Tangent旋转Normal
-    vec3 rotatedNormal = rotateAroundAxis(normal, tangent, u_RotationAngle);
+    float rotationRad = radians(u_RotationAngle);
+    vec3 rotatedNormal = rotateAroundAxis(normal, tangent, rotationRad);
     
     //计算采样位置（世界空间）
     vec3 samplePosition = position + rotatedNormal * radialOffset;
