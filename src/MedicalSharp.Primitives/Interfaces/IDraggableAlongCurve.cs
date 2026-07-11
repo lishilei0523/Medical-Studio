@@ -3,18 +3,18 @@
 namespace MedicalSharp.Primitives.Interfaces
 {
     /// <summary>
-    /// 可沿曲线平移接口
+    /// 可沿曲线拖拽接口
     /// </summary>
-    public interface ITranslatableCurve
+    public interface IDraggableAlongCurve
     {
         /// <summary>
-        /// 变换
+        /// 曲线
         /// </summary>
-        Transform Transform { get; }
+        Curve Curve { get; }
 
         /// <summary>
-        /// 包围盒
+        /// 弧长位置（归一化0~1）
         /// </summary>
-        BoundingBox Bounds { get; }
+        float ArcPosition { get; set; }
     }
 }

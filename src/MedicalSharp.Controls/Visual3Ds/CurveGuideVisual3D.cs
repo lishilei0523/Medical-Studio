@@ -11,7 +11,7 @@ namespace MedicalSharp.Controls.Visual3Ds
     /// <summary>
     /// 曲线引导线3D元素
     /// </summary>
-    public class CurveGuideVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatableCurve, IFunctionalVisual3D
+    public class CurveGuideVisual3D : ShapeVisual3D, ILineBasedVisual3D, IDraggableAlongCurve, IFunctionalVisual3D
     {
         #region # 字段及构造器
 

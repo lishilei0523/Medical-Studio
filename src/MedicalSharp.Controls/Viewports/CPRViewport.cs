@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
-using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visual3Ds;
@@ -439,9 +438,8 @@ namespace MedicalSharp.Controls.Viewports
             #endregion
 
             //屏幕坐标 -> UnitPlane UV（和顶点着色器一致：UV = aPos.xy + 0.5）
-            float scaling = (float)this.GetRenderScaling();
-            float ndcX = (2.0f * screenPixelPos2D.X * scaling) / this._viewportSize.Width - 1.0f;
-            float ndcY = 1.0f - (2.0f * screenPixelPos2D.Y * scaling) / this._viewportSize.Height;
+            float ndcX = (2.0f * screenPixelPos2D.X) / this._viewportSize.Width - 1.0f;
+            float ndcY = 1.0f - (2.0f * screenPixelPos2D.Y) / this._viewportSize.Height;
             float uvX = ndcX * 0.5f + 0.5f;
             float uvY = ndcY * 0.5f + 0.5f;
 
@@ -501,7 +499,6 @@ namespace MedicalSharp.Controls.Viewports
             #endregion
 
             this.GlContext.MakeCurrent();
-
             ray = this.UnProject(position);
 
             //射线起点 -> 纹理坐标
