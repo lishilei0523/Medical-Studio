@@ -26,6 +26,11 @@ namespace MedicalSharp.Controls.Visual3Ds
         #region # 字段及构造器
 
         /// <summary>
+        /// 曲线依赖属性
+        /// </summary>
+        public static readonly StyledProperty<Curve> CurveProperty;
+
+        /// <summary>
         /// 控制点列表依赖属性
         /// </summary>
         public static readonly StyledProperty<AvaloniaList<Vector3D>> ControlPositionsProperty;
@@ -50,6 +55,7 @@ namespace MedicalSharp.Controls.Visual3Ds
         /// </summary>
         static CurveVisual3D()
         {
+            CurveProperty = AvaloniaProperty.Register<CurveVisual3D, Curve>(nameof(Curve));
             ControlPositionsProperty = AvaloniaProperty.Register<CurveVisual3D, AvaloniaList<Vector3D>>(nameof(ControlPositions), []);
             TessellationProperty = AvaloniaProperty.Register<CurveVisual3D, int>(nameof(Tessellation), 20);
             ResampleCountProperty = AvaloniaProperty.Register<CurveVisual3D, int>(nameof(ResampleCount), 200);
@@ -68,6 +74,17 @@ namespace MedicalSharp.Controls.Visual3Ds
         #endregion
 
         #region # 属性
+
+        #region 依赖属性 - 曲线 —— Curve Curve
+        /// <summary>
+        /// 依赖属性 - 曲线
+        /// </summary>
+        public Curve Curve
+        {
+            get => this.GetValue(CurveProperty);
+            private set => this.SetValue(CurveProperty, value);
+        }
+        #endregion
 
         #region 依赖属性 - 控制点列表 —— AvaloniaList<Vector3D> ControlPositions
         /// <summary>
@@ -113,24 +130,6 @@ namespace MedicalSharp.Controls.Visual3Ds
         }
         #endregion
 
-        #region 只读属性 - 曲线 —— Curve Curve
-        /// <summary>
-        /// 只读属性 - 曲线
-        /// </summary>
-        public Curve Curve
-        {
-            get
-            {
-                if (this.Renderable is CurveRenderable curveRenderable)
-                {
-                    return curveRenderable.Curve;
-                }
-
-                return null;
-            }
-        }
-        #endregion
-
         #endregion
 
         #region # 方法
@@ -165,6 +164,12 @@ namespace MedicalSharp.Controls.Visual3Ds
                 CurveRenderable renderable = (CurveRenderable)this.Renderable;
                 renderable.Update(curve);
                 renderable.SetStroke(this.Stroke.ToVector4(), this.StrokeThickness, this.Fill.ToVector4());
+            }
+
+            //更新依赖属性，触发绑定链
+            if (!ReferenceEquals(this.Curve, curve))
+            {
+                this.Curve = curve;
             }
         }
         #endregion
