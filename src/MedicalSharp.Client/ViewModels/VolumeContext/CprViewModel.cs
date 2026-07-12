@@ -16,6 +16,7 @@ using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Presentation.Events;
+using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
@@ -85,6 +86,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.ViewEnabled = false;
             this.Shapes = [];
             this.GrayModeChecked = true;
+            this.CurveGuideVisible = true;
+            this.WindowLevelVisible = true;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
             this.InterpolationMode = InterpolationMode.Linear;
@@ -144,6 +147,22 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 this.RenderMode = CPRRenderMode.PseudoColor;
             }
         }
+        #endregion
+
+        #region 曲线引导线是否可见 —— bool CurveGuideVisible
+        /// <summary>
+        /// 曲线引导线是否可见
+        /// </summary>
+        [DependencyProperty]
+        public bool CurveGuideVisible { get; set; }
+        #endregion
+
+        #region 窗宽/窗位是否可见 —— bool WindowLevelVisible
+        /// <summary>
+        /// 窗宽/窗位是否可见
+        /// </summary>
+        [DependencyProperty]
+        public bool WindowLevelVisible { get; set; }
         #endregion
 
         #region 帧令牌 —— int FrameToken
@@ -456,34 +475,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
                 ShapeCut = this.OnShapeCutEnd,
                 ShapeAnalysed = this.OnShapeAnalyseEnd,
                 VoxelPicked = picked
-            };
-            this.InputManager.SwitchCommand(command);
-        });
-        #endregion
-
-        #region 3D平移命令 —— ICommand Translate3DCommand
-        /// <summary>
-        /// 3D平移命令
-        /// </summary>
-        public ICommand Translate3DCommand => new RelayCommand(_ =>
-        {
-            Action<ITranslatable3D> translated = _ =>
-            {
-                SyncViewportEvent message = new SyncViewportEvent
-                {
-                    Publisher = this
-                };
-                this._eventAggregator.PublishOnUIThreadAsync(message);
-            };
-
-            TranslateVisual3DCommand command = new TranslateVisual3DCommand
-            {
-                VisualPicked = this.OnVisualPicked,
-                VisualRemoved = this.OnVisualRemoved,
-                GetMarkValue = this.GetCurrentMarkValue,
-                ShapeCut = this.OnShapeCutEnd,
-                ShapeAnalysed = this.OnShapeAnalyseEnd,
-                Translated = translated
             };
             this.InputManager.SwitchCommand(command);
         });
@@ -1217,9 +1208,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.ToolbarCommands =
             [
                 new ToolbarCommand("拾取体素", "Icon-PickVoxel", this.PickVoxelCommand),
-                new ToolbarCommand("平移", "Icon-Translate3D", this.Translate3DCommand, true, true, true),
-                new ToolbarCommand("编辑顶点", "Icon-EditVertex", this.EditVertexCommand),
-                new ToolbarCommand("拖拽引导线", "Icon-DragGuide", this.DragGuideCommand),
+                new ToolbarCommand("编辑顶点", "Icon-EditVertex", this.EditVertexCommand, true, true, true),
+                new ToolbarCommand("拖拽引导线", "Icon-CurveGuide", this.DragGuideCommand),
                 new ToolbarCommand("绘制文本", "Icon-Text", this.DrawTextCommand),
                 new ToolbarCommand("绘制点", "Icon-Point", this.DrawPointCommand),
                 new ToolbarCommand("绘制线段", "Icon-LineSegment", this.DrawLineSegmentCommand),
