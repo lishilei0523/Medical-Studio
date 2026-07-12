@@ -21,6 +21,7 @@ using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Managers;
+using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
@@ -73,7 +74,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             //初始化工具栏
             this.InitToolbarCommands();
 
-            //初始化CurveGuide
+            //初始化曲线引导线
             this.CurveGuide = new CurveGuideVisual3D
             {
                 Stroke = Colors.GreenYellow,
@@ -157,8 +158,28 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// 曲线3D元素
         /// </summary>
-        [DependencyProperty]
-        public CurveVisual3D CurveVisual3D { get; set; }
+        public CurveVisual3D CurveVisual3D
+        {
+            get;
+            set
+            {
+                //注销旧订阅
+                if (field != null)
+                {
+                    field.PropertyChanged -= this.OnCurveVisual3DPropertyChanged;
+                }
+
+                field = value;
+                this.NotifyOfPropertyChange();
+
+                //注册属性变化
+                if (value != null)
+                {
+                    value.PropertyChanged += this.OnCurveVisual3DPropertyChanged;
+                    this.CurveGuide.Curve = value.Curve;
+                }
+            }
+        }
         #endregion
 
         #region CPR相机 —— CPRCamera Camera
@@ -1050,6 +1071,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         }
         #endregion
 
+        #region 曲线3D元素属性变化事件 —— void OnCurveVisual3DPropertyChanged(object sender...
+        /// <summary>
+        /// 曲线3D元素属性变化事件
+        /// </summary>
+        private void OnCurveVisual3DPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs eventArgs)
+        {
+            if (eventArgs.Property == CurveVisual3D.CurveProperty)
+            {
+                this.CurveGuide.Curve = (Curve)eventArgs.NewValue;
+                this.FrameToken++;
+            }
+        }
+        #endregion
+
         #region 处理切换视口命令事件 —— Task HandleAsync(SwitchViewportCommandEvent message...
         /// <summary>
         /// 处理切换视口命令事件
@@ -1172,21 +1207,6 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
 
 
         //Methods
-
-        #region 刷新曲线数据 —— void RefreshCurve()
-        /// <summary>
-        /// 刷新曲线数据
-        /// </summary>
-        /// <remarks>从CurveVisual3D读取最新Curve，更新CurveGuide</remarks>
-        public void RefreshCurve()
-        {
-            if (this.CurveVisual3D?.Curve != null)
-            {
-                this.CurveGuide.Curve = this.CurveVisual3D.Curve;
-                this.FrameToken++;
-            }
-        }
-        #endregion
 
         #region 初始化工具栏命令 —— void InitToolbarCommands()
         /// <summary>
