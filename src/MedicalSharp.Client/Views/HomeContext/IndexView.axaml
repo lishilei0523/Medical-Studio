@@ -170,6 +170,11 @@
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+                            <ListBox.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="CPR重建(_C)" Command="{Binding CPRCommand}" />
+                                </MenuFlyout>
+                            </ListBox.ContextFlyout>
                         </ListBox>
                     </sd:GroupBox>
                     <GridSplitter Grid.Row="3" Height="4" Background="Transparent" HorizontalAlignment="Stretch" />

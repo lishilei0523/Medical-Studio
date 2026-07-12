@@ -1287,6 +1287,17 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         }, _ => this.VolumeData != null && this.SelectedTissue != null);
         #endregion
 
+        #region CPR重建命令 —— ICommand CPRCommand
+        /// <summary>
+        /// CPR重建命令
+        /// </summary>
+        public ICommand CPRCommand => new AsyncRelayCommand(async _ =>
+        {
+            //TODO 弹出CPR窗口
+
+        }, _ => this.VolumeData != null && this.SelectedShape is CurveVisual3D);
+        #endregion
+
         #region HU直方图命令 —— ICommand HUHistogramCommand
         /// <summary>
         /// HU直方图命令
