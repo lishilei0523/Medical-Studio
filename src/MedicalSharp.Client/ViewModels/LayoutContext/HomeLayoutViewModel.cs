@@ -7,16 +7,16 @@ using SD.Infrastructure.Avalonia.Caliburn.Base;
 namespace MedicalSharp.Client.ViewModels.LayoutContext
 {
     /// <summary>
-    /// 布局视图模型
+    /// Home布局视图模型
     /// </summary>
-    public class LayoutViewModel : ScreenBase
+    public class HomeLayoutViewModel : ScreenBase
     {
         #region # 字段及构造器
 
         /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public LayoutViewModel(VolumeViewModel volumeViewModel, MprAxialViewModel mprAxialViewModel, MprCoronalViewModel mprCoronalViewModel, MprSagittalViewModel mprSagittalViewModel)
+        public HomeLayoutViewModel(VolumeViewModel volumeViewModel, MprAxialViewModel mprAxialViewModel, MprCoronalViewModel mprCoronalViewModel, MprSagittalViewModel mprSagittalViewModel)
         {
             this.VolumeViewModel = volumeViewModel;
             this.MprAxialViewModel = mprAxialViewModel;

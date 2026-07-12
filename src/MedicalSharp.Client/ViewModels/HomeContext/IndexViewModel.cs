@@ -113,7 +113,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             ];
 
             //布局
-            this.LayoutViewModel = ResolveMediator.Resolve<LayoutViewModel>();
+            this.LayoutViewModel = ResolveMediator.Resolve<HomeLayoutViewModel>();
             this.LayoutViewModel.VolumeViewModel.Shapes = this.Shapes;
             this.LayoutViewModel.VolumeViewModel.Tissues = this.Tissues;
             this.LayoutViewModel.MprAxialViewModel.MprViewModel.Shapes = this.Shapes;
@@ -241,12 +241,12 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public ScreenBase FunctionPanel { get; set; }
         #endregion
 
-        #region 布局视图模型 —— LayoutViewModel LayoutViewModel
+        #region 布局视图模型 —— HomeLayoutViewModel LayoutViewModel
         /// <summary>
         /// 布局视图模型
         /// </summary>
         [DependencyProperty]
-        public LayoutViewModel LayoutViewModel { get; set; }
+        public HomeLayoutViewModel LayoutViewModel { get; set; }
         #endregion
 
         #region 已选组织 —— TissueInfo SelectedTissue
