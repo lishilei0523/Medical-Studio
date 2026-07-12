@@ -1,0 +1,124 @@
+<UserControl x:Class="MedicalSharp.Client.Views.VolumeContext.CprView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+             xmlns:sdm="https://github.com/lishilei0523/Medical-Studio"
+             mc:Ignorable="d">
+
+    <sd:GroupBox>
+        <!--Header-->
+        <sd:GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <!--Toolbar-->
+                    <ColumnDefinition Width="*" />
+                    <!--More-->
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <!--Toolbar-->
+                <WrapPanel Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <ItemsControl ItemsSource="{Binding ToolbarCommands}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <sd:ToggleRadioButton ToolTip.Tip="{Binding Name}"
+                                                      IsChecked="{Binding IsChecked}"
+                                                      IsVisible="{Binding IsVisible}"
+                                                      GroupName="{Binding DataContext.InstanceUId,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                      Classes="Transparent-Panel">
+                                    <PathIcon Data="{Binding Icon, Converter={StaticResource StringToGeometryConverter}}" />
+                                </sd:ToggleRadioButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </WrapPanel>
+                <!--More-->
+                <WrapPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <DropDownButton Content="CPR" Classes="Transparent-Panel">
+                        <DropDownButton.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Header="渲染模式(_R)" IsEnabled="{Binding ViewEnabled}">
+                                    <MenuItem>
+                                        <MenuItem.Header>
+                                            <RadioButton Content="灰度" GroupName="RenderMode" IsChecked="{Binding GrayModeChecked}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                    <MenuItem>
+                                        <MenuItem.Header>
+                                            <RadioButton Content="伪彩" GroupName="RenderMode" IsChecked="{Binding PseudoColorChecked}" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                </MenuItem>
+                                <MenuItem Header="显示设置(_D)" IsEnabled="{Binding ViewEnabled}">
+                                    <MenuItem Header="重置参考线(_G)" Command="{Binding ResetGuideCommand}" />
+                                    <MenuItem Header="重置相机(_C)" Command="{Binding ResetCameraCommand}" />
+                                </MenuItem>
+                                <MenuItem Header="截屏(_C)" Command="{Binding CaptureCommand}" />
+                            </MenuFlyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+                </WrapPanel>
+            </Grid>
+        </sd:GroupBox.Header>
+        <!--Content-->
+        <sd:GroupBox.Content>
+            <Grid>
+                <sdm:CPRViewport x:Name="CPRViewport"
+                                 FrameToken="{Binding FrameToken}"
+                                 Camera="{Binding Camera}"
+                                 InputManager="{Binding InputManager}"
+                                 Curve="{Binding CurveVisual3D.Curve}"
+                                 VolumeData="{Binding VolumeData}"
+                                 RenderMode="{Binding RenderMode}"
+                                 WindowWidth="{Binding WindowWidth}"
+                                 WindowCenter="{Binding WindowCenter}"
+                                 Brightness="{Binding Brightness}"
+                                 Contrast="{Binding Contrast}"
+                                 InterpolationMode="{Binding InterpolationMode}"
+                                 TFControlPoints="{Binding TFControlPoints}"
+                                 CPRMode="{Binding CPRMode}"
+                                 RadialWidth="{Binding RadialWidth}"
+                                 RotationAngle="{Binding RotationAngle}"
+                                 ProjectionThickness="{Binding ProjectionThickness}"
+                                 MaxStepsCount="{Binding MaxStepsCount}"
+                                 ProjectionMode="{Binding ProjectionMode}"
+                                 ProjectionDirection="{Binding ProjectionDirection}"
+                                 StraightenDirection="{Binding StraightenDirection}"
+                                 ArcPosition="{Binding ArcPosition}"
+                                 CrossSectionSize="{Binding CrossSectionSize}">
+                    <sdm:ShapePresenter3D Content="{Binding CurveGuide}" />
+                    <sdm:ShapesPresenter3D ItemsSource="{Binding Shapes}" />
+                </sdm:CPRViewport>
+                <Grid IsVisible="{Binding ViewEnabled}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <WrapPanel Grid.Row="2" Grid.Column="0" Margin="2,0,0,0">
+                        <!--BottomLeft-->
+                        <TextBlock Text="WW : " Foreground="DarkGray" />
+                        <TextBlock Text="{Binding WindowWidth}" Foreground="DarkGray" />
+                    </WrapPanel>
+                    <WrapPanel Grid.Row="2" Grid.Column="2" Margin="0,0,2,0">
+                        <!--BottomRight-->
+                        <TextBlock Text="WL : " Foreground="DarkGray" />
+                        <TextBlock Text="{Binding WindowCenter}" Foreground="DarkGray" />
+                    </WrapPanel>
+                </Grid>
+            </Grid>
+        </sd:GroupBox.Content>
+    </sd:GroupBox>
+</UserControl>
