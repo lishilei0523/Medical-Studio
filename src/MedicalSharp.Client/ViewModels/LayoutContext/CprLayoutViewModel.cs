@@ -44,7 +44,6 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             this.CprViewModel.CPRMode = CPRMode.Straightened;
             this.CprViewModel.ProjectionDirection = CPRProjectionDirection.Normal;
             this.CprViewModel.StraightenDirection = CPRStraightenDirection.Horizontal;
-            this.CprViewModel.RadialWidth = 1f;
         }
 
         #endregion
