@@ -1,0 +1,17 @@
+<fw:AppWindow x:Class="MedicalSharp.Client.Views.LayoutContext.CprLayoutView"
+              xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:fw="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+              xmlns:cm="http://caliburnmicro.com"
+              xmlns:sd="https://github.com/lishilei0523/SD.Framework"
+              mc:Ignorable="d"
+              Title="CPR"
+              Width="1440" Height="900"
+              WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <ContentControl cm:View.Model="{Binding CprViewModel}" />
+    </Grid>
+</fw:AppWindow>

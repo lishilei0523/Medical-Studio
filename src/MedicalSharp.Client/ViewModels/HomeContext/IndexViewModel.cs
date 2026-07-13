@@ -1293,8 +1293,10 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         /// </summary>
         public ICommand CPRCommand => new AsyncRelayCommand(async _ =>
         {
-            //TODO 弹出CPR窗口
-
+            CurveVisual3D curve = (CurveVisual3D)this.SelectedShape;
+            CprLayoutViewModel viewModel = new CprLayoutViewModel(curve);
+            viewModel.SetVolumeData(this.VolumeData);
+            await this._windowManager.ShowWindowAsync(viewModel);
         }, _ => this.VolumeData != null && this.SelectedShape is CurveVisual3D);
         #endregion
 

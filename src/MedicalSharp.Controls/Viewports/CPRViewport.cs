@@ -588,6 +588,14 @@ namespace MedicalSharp.Controls.Viewports
             this._cprRenderer = new CPRRenderer(this.CPRCamera);
             this._cprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._cprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
+            if (this.VolumeData != null)
+            {
+                VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                this._cprRenderer.SetTransferFunction(volumeSession.MPRTransferFunction);
+                this._cprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
+                this._cprRenderer.TransferFunction.SetHURange(this.VolumeData.Metadata.MinHU, this.VolumeData.Metadata.MaxHU);
+                this._cprRenderer.TransferFunction.InitFromControlPoints(this.TFControlPoints);
+            }
         }
         #endregion
 
@@ -972,10 +980,13 @@ namespace MedicalSharp.Controls.Viewports
             viewport._volumeRenderable = new VolumeRenderable(volumeSession.PreviewTexture, volumeSession.MarkTexture, volumeData);
 
             //初始化传递函数、标记策略
-            viewport._cprRenderer.SetTransferFunction(volumeSession.MPRTransferFunction);
-            viewport._cprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
-            viewport._cprRenderer.TransferFunction.SetHURange(volumeData.Metadata.MinHU, volumeData.Metadata.MaxHU);
-            viewport._cprRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
+            if (viewport._cprRenderer != null)
+            {
+                viewport._cprRenderer.SetTransferFunction(volumeSession.MPRTransferFunction);
+                viewport._cprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
+                viewport._cprRenderer.TransferFunction.SetHURange(volumeData.Metadata.MinHU, volumeData.Metadata.MaxHU);
+                viewport._cprRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
+            }
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
