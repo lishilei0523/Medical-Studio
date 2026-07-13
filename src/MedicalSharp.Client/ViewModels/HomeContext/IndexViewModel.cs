@@ -1294,7 +1294,7 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
         public ICommand CPRCommand => new AsyncRelayCommand(async _ =>
         {
             CurveVisual3D curve = (CurveVisual3D)this.SelectedShape;
-            CprLayoutViewModel viewModel = new CprLayoutViewModel(curve);
+            CprLayoutViewModel viewModel = new CprLayoutViewModel(this._windowManager, this._eventAggregator, curve);
             viewModel.SetVolumeData(this.VolumeData);
             await this._windowManager.ShowWindowAsync(viewModel);
         }, _ => this.VolumeData != null && this.SelectedShape is CurveVisual3D);

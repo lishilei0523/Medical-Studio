@@ -586,6 +586,11 @@ namespace MedicalSharp.Controls.Viewports
 
             //初始化CPR渲染器
             this._cprRenderer = new CPRRenderer(this.CPRCamera);
+            this._cprRenderer.SwitchRenderMode(this.RenderMode);
+            this._cprRenderer.SwitchCPRMode(this.CPRMode);
+            this._cprRenderer.SwitchProjectionMode(this.ProjectionMode);
+            this._cprRenderer.SwitchProjectionDirection(this.ProjectionDirection);
+            this._cprRenderer.SwitchStraightenDirection(this.StraightenDirection);
             this._cprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._cprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
             if (this.VolumeData != null)

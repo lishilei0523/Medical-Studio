@@ -7,7 +7,6 @@ using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Models;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
-using SD.IOC.Core.Mediators;
 
 namespace MedicalSharp.Client.ViewModels.LayoutContext
 {
@@ -19,20 +18,32 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
         #region # 字段及构造器
 
         /// <summary>
+        /// 窗口管理器
+        /// </summary>
+        private readonly IWindowManager _windowManager;
+
+        /// <summary>
+        /// 事件聚合器
+        /// </summary>
+        private readonly IEventAggregator _eventAggregator;
+
+        /// <summary>
         /// 依赖注入构造器
         /// </summary>
-        public CprLayoutViewModel(CurveVisual3D curve)
+        public CprLayoutViewModel(IWindowManager windowManager, IEventAggregator eventAggregator, CurveVisual3D curve)
         {
-            IWindowManager windowManager = ResolveMediator.Resolve<IWindowManager>();
-            IEventAggregator eventAggregator = ResolveMediator.Resolve<IEventAggregator>();
+            this._windowManager = windowManager;
+            this._eventAggregator = eventAggregator;
+
+            //默认值
             string title = "CPR";
             CPRCamera camera = new CPRCamera();
             CPRInputManager inputManager = new CPRInputManager(camera);
-
-            this.CprViewModel = new CprViewModel(windowManager, eventAggregator, title, camera, inputManager);
+            this.CprViewModel = new CprViewModel(this._windowManager, this._eventAggregator, title, camera, inputManager);
             this.CprViewModel.CurveVisual3D = curve;
             this.CprViewModel.CPRMode = CPRMode.Straightened;
-            this.CprViewModel.ProjectionDirection = CPRProjectionDirection.Tangent;
+            this.CprViewModel.ProjectionDirection = CPRProjectionDirection.Normal;
+            this.CprViewModel.StraightenDirection = CPRStraightenDirection.Horizontal;
             this.CprViewModel.RadialWidth = 1f;
         }
 
