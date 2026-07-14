@@ -54,6 +54,7 @@ namespace MedicalSharp.Controls.Commands
         public override void OnMouseMove(OpenTKViewport viewport, PointerEventArgs eventArgs)
         {
             Point position = eventArgs.GetPixelPosition(viewport);
+            CPRViewport cprViewport = (CPRViewport)viewport;
             if (this._mousePos2D.HasValue)
             {
                 float deltaX = (float)(position.X - this._mousePos2D.Value.X);
@@ -67,7 +68,32 @@ namespace MedicalSharp.Controls.Commands
                 }
                 if (eventArgs.Properties.IsRightButtonPressed)
                 {
-                    this._camera.Zoom(-deltaY);
+                    if (cprViewport.CPRMode == CPRMode.Straightened)
+                    {
+                        if (cprViewport.StraightenDirection == CPRStraightenDirection.Horizontal)
+                        {
+                            cprViewport.RotationAngle += deltaX;
+                        }
+                        if (cprViewport.StraightenDirection == CPRStraightenDirection.Vertical)
+                        {
+                            cprViewport.RotationAngle += -deltaY;
+                        }
+                    }
+                    if (cprViewport.CPRMode == CPRMode.Projected)
+                    {
+                        if (cprViewport.ProjectionDirection == CPRProjectionDirection.Tangent)
+                        {
+                            cprViewport.RotationAngle += deltaX;
+                        }
+                        if (cprViewport.ProjectionDirection != CPRProjectionDirection.Normal)
+                        {
+                            cprViewport.RotationAngle += -deltaY;
+                        }
+                    }
+                    if (cprViewport.CPRMode == CPRMode.CrossSectional)
+                    {
+                        this._camera.Zoom(-deltaY);
+                    }
 
                     //请求下一帧
                     viewport.RequestNextFrameRendering();
