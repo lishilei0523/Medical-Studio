@@ -73,7 +73,7 @@ namespace MedicalSharp.Presentation.Models
         }
         #endregion
 
-        #region 只读属性 - 单元格5 —— GridCell Cell4
+        #region 只读属性 - 单元格5 —— GridCell Cell5
         /// <summary>
         /// 只读属性 - 单元格5
         /// </summary>
