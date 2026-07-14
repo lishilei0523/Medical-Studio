@@ -7,7 +7,7 @@
               xmlns:cm="http://caliburnmicro.com"
               xmlns:sd="https://github.com/lishilei0523/SD.Framework"
               mc:Ignorable="d"
-              Title="CPR"
+              Title="CPR重建"
               Width="1440" Height="900"
               WindowStartupLocation="CenterScreen">
 
