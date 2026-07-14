@@ -1217,8 +1217,8 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.ToolbarCommands =
             [
                 new ToolbarCommand("拾取体素", "Icon-PickVoxel", this.PickVoxelCommand),
-                new ToolbarCommand("编辑顶点", "Icon-EditVertex", this.EditVertexCommand, true, true, true),
-                new ToolbarCommand("拖拽引导线", "Icon-CurveGuide", this.DragGuideCommand),
+                new ToolbarCommand("编辑顶点", "Icon-EditVertex", this.EditVertexCommand),
+                new ToolbarCommand("拖拽引导线", "Icon-CurveGuide", this.DragGuideCommand, true, true, true),
                 new ToolbarCommand("绘制文本", "Icon-Text", this.DrawTextCommand),
                 new ToolbarCommand("绘制点", "Icon-Point", this.DrawPointCommand),
                 new ToolbarCommand("绘制线段", "Icon-LineSegment", this.DrawLineSegmentCommand),
