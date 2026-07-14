@@ -375,9 +375,17 @@ namespace MedicalSharp.Controls.Viewports
 
             //初始化体积渲染器
             this._volumeRenderer = new VolumeRenderer(this.Camera);
+            this._volumeRenderer.SwitchRenderMode(this.RenderMode);
             this._volumeRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._volumeRenderer.SetMaterialOptions(this.Brightness, this.DensityScale);
             this._volumeRenderer.SetSamplingOptions(this.StepSize, this.MaxStepsCount, this.OpacityThreshold);
+            if (this.VolumeData != null)
+            {
+                VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
+                this._volumeRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
+                this._volumeRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
+                this._volumeRenderer.TransferFunction.InitFromControlPoints(this.TFControlPoints);
+            }
         }
         #endregion
 
@@ -641,9 +649,12 @@ namespace MedicalSharp.Controls.Viewports
             viewport._volumeRenderable = new VolumeRenderable(volumeSession.PreviewTexture, volumeSession.MarkTexture, volumeData);
 
             //初始化传递函数、标记策略
-            viewport._volumeRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
-            viewport._volumeRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
-            viewport._volumeRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
+            if (viewport._volumeRenderer != null)
+            {
+                viewport._volumeRenderer.SetTransferFunction(volumeSession.VRTransferFunction);
+                viewport._volumeRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
+                viewport._volumeRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
+            }
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
