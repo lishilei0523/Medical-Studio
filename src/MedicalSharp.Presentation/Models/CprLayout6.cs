@@ -97,7 +97,7 @@ namespace MedicalSharp.Presentation.Models
 
         #region # 方法
 
-        #region 创建布局 —— static Layout6 CreateLayout()
+        #region 创建布局 —— static CprLayout6 CreateLayout()
         /// <summary>
         /// 创建布局
         /// </summary>
