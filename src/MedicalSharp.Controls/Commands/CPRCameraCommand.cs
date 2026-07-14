@@ -72,22 +72,22 @@ namespace MedicalSharp.Controls.Commands
                     {
                         if (cprViewport.StraightenDirection == CPRStraightenDirection.Horizontal)
                         {
-                            cprViewport.RotationAngle += deltaX;
+                            cprViewport.RotationAngle += -deltaY;
                         }
                         if (cprViewport.StraightenDirection == CPRStraightenDirection.Vertical)
                         {
-                            cprViewport.RotationAngle += -deltaY;
+                            cprViewport.RotationAngle += deltaX;
                         }
                     }
                     if (cprViewport.CPRMode == CPRMode.Projected)
                     {
                         if (cprViewport.ProjectionDirection == CPRProjectionDirection.Tangent)
                         {
-                            cprViewport.RotationAngle += deltaX;
-                        }
-                        if (cprViewport.ProjectionDirection != CPRProjectionDirection.Normal)
-                        {
                             cprViewport.RotationAngle += -deltaY;
+                        }
+                        if (cprViewport.ProjectionDirection == CPRProjectionDirection.Normal)
+                        {
+                            cprViewport.RotationAngle += deltaX;
                         }
                     }
                     if (cprViewport.CPRMode == CPRMode.CrossSectional)

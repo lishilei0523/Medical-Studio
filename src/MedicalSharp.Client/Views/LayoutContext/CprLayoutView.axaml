@@ -11,7 +11,24 @@
               Width="1440" Height="900"
               WindowStartupLocation="CenterScreen">
 
-    <Grid>
-        <ContentControl cm:View.Model="{Binding CprViewModel}" />
+    <Grid sd:GridLayout.Config="{Binding Layout}">
+        <Border sd:GridLayout.Cell="{Binding Layout.Cell1}" sd:GridExpander.CanExpand="True">
+            <ContentControl cm:View.Model="{Binding HorizontalViewModel}" />
+        </Border>
+        <Border sd:GridLayout.Cell="{Binding Layout.Cell2}" sd:GridExpander.CanExpand="True">
+            <ContentControl cm:View.Model="{Binding VerticalViewModel}" />
+        </Border>
+        <Border sd:GridLayout.Cell="{Binding Layout.Cell3}" sd:GridExpander.CanExpand="True">
+            <ContentControl cm:View.Model="{Binding CrossSectional1ViewModel}" />
+        </Border>
+        <Border sd:GridLayout.Cell="{Binding Layout.Cell4}" sd:GridExpander.CanExpand="True">
+            <ContentControl cm:View.Model="{Binding CrossSectional2ViewModel}" />
+        </Border>
+        <Border sd:GridLayout.Cell="{Binding Layout.Cell5}" sd:GridExpander.CanExpand="True">
+            <ContentControl cm:View.Model="{Binding CrossSectional3ViewModel}" />
+        </Border>
+        <Border sd:GridLayout.Cell="{Binding Layout.Cell6}" sd:GridExpander.CanExpand="True">
+            <ContentControl cm:View.Model="{Binding StraightenedViewModel}" />
+        </Border>
     </Grid>
 </fw:AppWindow>

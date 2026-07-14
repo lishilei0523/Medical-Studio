@@ -153,8 +153,17 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// <summary>
         /// 曲线引导线是否可见
         /// </summary>
-        [DependencyProperty]
-        public bool CurveGuideVisible { get; set; }
+        public bool CurveGuideVisible
+        {
+            get;
+            set
+            {
+                field = value;
+                this.NotifyOfPropertyChange();
+                this.CurveGuide.IsVisible = value;
+                this.FrameToken++;
+            }
+        }
         #endregion
 
         #region 窗宽/窗位是否可见 —— bool WindowLevelVisible
