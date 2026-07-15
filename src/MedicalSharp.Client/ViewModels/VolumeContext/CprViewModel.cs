@@ -16,7 +16,6 @@ using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Base;
 using MedicalSharp.Engine.Managers;
 using MedicalSharp.Presentation.Events;
-using MedicalSharp.Presentation.Maps;
 using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
