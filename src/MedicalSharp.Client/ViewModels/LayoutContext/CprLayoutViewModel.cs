@@ -172,7 +172,8 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             {
                 CurveVisual3D = curve,
                 CPRMode = CPRMode.Projected,
-                ProjectionDirection = CPRProjectionDirection.Tangent
+                ProjectionDirection = CPRProjectionDirection.Tangent,
+                RadialWidth = 1f
             };
 
             //垂直投影图（Cell1：左下）
@@ -182,7 +183,8 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             {
                 CurveVisual3D = curve,
                 CPRMode = CPRMode.Projected,
-                ProjectionDirection = CPRProjectionDirection.Normal
+                ProjectionDirection = CPRProjectionDirection.Normal,
+                RadialWidth = 1f
             };
 
             //拉直图（Cell5：右侧整列）

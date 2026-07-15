@@ -593,6 +593,9 @@ namespace MedicalSharp.Controls.Viewports
             this._cprRenderer.SwitchStraightenDirection(this.StraightenDirection);
             this._cprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._cprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
+            this._cprRenderer.SetStraightenedOptions(this.RadialWidth, this.RotationAngle);
+            this._cprRenderer.SetProjectedOptions(this.RadialWidth, this.RotationAngle, this.ProjectionThickness);
+            this._cprRenderer.SetCrossSectionalOptions(this.ArcPosition, this.CrossSectionSize);
             if (this.VolumeData != null)
             {
                 VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
