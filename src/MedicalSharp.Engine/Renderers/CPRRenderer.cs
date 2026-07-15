@@ -521,6 +521,21 @@ namespace MedicalSharp.Engine.Renderers
             //渲染上下文
             RenderContext3D renderContext = new RenderContext3D(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.UpDirection, this.Camera.RightDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, this.CPRCamera.ZoomFactor);
 
+            //模型矩阵
+            Matrix4 modelMatrix;
+            if (this.CPRMode == CPRMode.CrossSectional)
+            {
+                modelMatrix = Matrix4.Identity;
+            }
+            else
+            {
+                float aspectRatio = this.Curve.TotalArcLength / this.RadialWidth;
+                bool arcOnY = this.CPRMode == CPRMode.Straightened && this.StraightenDirection == CPRStraightenDirection.Vertical;
+                modelMatrix = arcOnY
+                    ? Matrix4.CreateScale(1f, aspectRatio, 1f)
+                    : Matrix4.CreateScale(aspectRatio, 1f, 1f);
+            }
+
             //选择开启Shader程序
             ShaderProgram program = this.CPRMode switch
             {
@@ -532,7 +547,7 @@ namespace MedicalSharp.Engine.Renderers
             program.Use();
 
             //设置MVP矩阵、缩放
-            program.SetUniformMatrix4("u_ModelMatrix", Matrix4.Identity);
+            program.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
             program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
             program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
