@@ -194,11 +194,19 @@ namespace MedicalSharp.Engine.Protocols
                     ? (index * 1.0f / (this.FramesCount - 1))
                     : 0f;
 
-                FrenetFrame frame = curve.FrenetFrames[index];
-                this._positionData[index] = new Vector4(frame.Position.X, frame.Position.Y, frame.Position.Z, normalizedArcLength);
-                this._tangentData[index] = new Vector4(frame.Tangent.X, frame.Tangent.Y, frame.Tangent.Z, 0f);
-                this._normalData[index] = new Vector4(frame.Normal.X, frame.Normal.Y, frame.Normal.Z, 0f);
-                this._binormalData[index] = new Vector4(frame.Binormal.X, frame.Binormal.Y, frame.Binormal.Z, 0f);
+                int reversedIndex = this.FramesCount - 1 - index;
+                FrenetFrame frame = curve.FrenetFrames[reversedIndex];
+
+                //应用Transform
+                Vector3 position = Vector3.TransformPosition(frame.Position, curve.Transform);
+                Vector3 tangent = Vector3.TransformNormal(frame.Tangent, curve.Transform);
+                Vector3 normal = Vector3.TransformNormal(frame.Normal, curve.Transform);
+                Vector3 binormal = Vector3.TransformNormal(frame.Binormal, curve.Transform);
+
+                this._positionData[index] = new Vector4(position.X, position.Y, position.Z, normalizedArcLength);
+                this._tangentData[index] = new Vector4(tangent.X, tangent.Y, tangent.Z, 0f);
+                this._normalData[index] = new Vector4(normal.X, normal.Y, normal.Z, 0f);
+                this._binormalData[index] = new Vector4(binormal.X, binormal.Y, binormal.Z, 0f);
             }
 
             //上传纹理

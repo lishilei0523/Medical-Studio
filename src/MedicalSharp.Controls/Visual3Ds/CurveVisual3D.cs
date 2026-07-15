@@ -149,10 +149,12 @@ namespace MedicalSharp.Controls.Visual3Ds
 
             #endregion
 
+            Matrix4 transform = this.Transform?.Matrix ?? Matrix4.Identity;
+
             IReadOnlyList<Vector3> controlPositions = this.ControlPositions.Select(x => x.ToVector3()).ToList();
-            Curve curve = this.Curve != null && this.Curve.ControlPoints.SequenceEqual(controlPositions)
+            Curve curve = this.Curve != null && this.Curve.ControlPoints.SequenceEqual(controlPositions) && this.Curve.Transform == transform
                 ? this.Curve
-                : new Curve(controlPositions, this.Tessellation, this.ResampleCount, this.Closed);
+                : new Curve(controlPositions, transform, this.Tessellation, this.ResampleCount, this.Closed);
             if (this.Renderable == null)
             {
                 CurveRenderable renderable = new CurveRenderable(curve);

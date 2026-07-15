@@ -227,7 +227,7 @@ namespace MedicalSharp.Tests.TestCases
                 new Vector3(70, 10, 0)
             ];
 
-            Curve curve = new Curve(controlPoints, closed: false, tessellation: 10, resampleCount: 100);
+            Curve curve = new Curve(controlPoints, Matrix4.Identity, closed: false, tessellation: 10, resampleCount: 100);
 
             Assert.IsNotNull(curve);
             Assert.AreEqual(controlPoints.Count, curve.ControlPoints.Count);
@@ -247,7 +247,7 @@ namespace MedicalSharp.Tests.TestCases
         public void TestSingleControlPointCurve()
         {
             List<Vector3> controlPoints = [new Vector3(5, 5, 5)];
-            Curve curve = new Curve(controlPoints);
+            Curve curve = new Curve(controlPoints, Matrix4.Identity);
 
             Assert.AreEqual(1, curve.SampledPoints.Count);
             Assert.AreEqual(1, curve.ResampledPoints.Count);
@@ -271,7 +271,7 @@ namespace MedicalSharp.Tests.TestCases
                 new Vector3(0, 20, 0)
             ];
 
-            Curve curve = new Curve(controlPoints, 5, 50);
+            Curve curve = new Curve(controlPoints, Matrix4.Identity, 5, 50);
 
             Vector3 start = curve.GetPointAtArcLength(0);
             Vector3 end = curve.GetPointAtArcLength(curve.TotalArcLength);
@@ -300,7 +300,7 @@ namespace MedicalSharp.Tests.TestCases
                 new Vector3(70, 10, 0)
             ];
 
-            Curve curve = new Curve(controlPoints, resampleCount: 100);
+            Curve curve = new Curve(controlPoints, Matrix4.Identity, resampleCount: 100);
 
             //测试几个弧长位置的框架
             float[] testArcLengths = [0, curve.TotalArcLength * 0.25f, curve.TotalArcLength * 0.5f, curve.TotalArcLength * 0.75f, curve.TotalArcLength
@@ -341,7 +341,7 @@ namespace MedicalSharp.Tests.TestCases
                 new Vector3(20, 0, 0)
             ];
 
-            Curve curve = new Curve(controlPoints, resampleCount: 20);
+            Curve curve = new Curve(controlPoints, Matrix4.Identity, resampleCount: 20);
 
             Assert.AreEqual(20f, curve.TotalArcLength, 0.01f);
 

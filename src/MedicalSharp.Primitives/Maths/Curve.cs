@@ -32,10 +32,11 @@ namespace MedicalSharp.Primitives.Maths
         /// 创建曲线构造器
         /// </summary>
         /// <param name="controlPoints">控制点列表</param>
+        /// <param name="transform">变换矩阵</param>
         /// <param name="tessellation">采样密度</param>
         /// <param name="resampleCount">等弧长重采样点数</param>
         /// <param name="closed">是否闭合</param>
-        public Curve(IReadOnlyList<Vector3> controlPoints, int tessellation = 20, int resampleCount = 200, bool closed = false)
+        public Curve(IReadOnlyList<Vector3> controlPoints, in Matrix4 transform, int tessellation = 20, int resampleCount = 200, bool closed = false)
         {
             #region # 验证
 
@@ -50,6 +51,7 @@ namespace MedicalSharp.Primitives.Maths
             this._resampleCount = resampleCount;
             this._closed = closed;
             this.ControlPoints = controlPoints;
+            this.Transform = transform;
             this.SampledPoints = CurveAlgorithms.EvaluateCatmullRom(controlPoints, closed, tessellation);
 
             if (this.SampledPoints.Count < 2)
@@ -111,6 +113,13 @@ namespace MedicalSharp.Primitives.Maths
         /// </summary>
         /// <remarks>每个重采样点对应的Frenet框架，与ResampledPoints等长</remarks>
         public FrenetFrame[] FrenetFrames { get; }
+        #endregion
+
+        #region 变换矩阵 —— Matrix4 Transform
+        /// <summary>
+        /// 变换矩阵
+        /// </summary>
+        public Matrix4 Transform { get; private set; }
         #endregion
 
         #region 只读属性 - 采样密度 —— int Tessellation
