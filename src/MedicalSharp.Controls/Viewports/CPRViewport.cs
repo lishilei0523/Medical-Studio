@@ -470,9 +470,15 @@ namespace MedicalSharp.Controls.Viewports
                 arcLength = uvY * this.Curve.TotalArcLength;
                 radialOffset = (uvX - 0.5f) * this.RadialWidth;
             }
+            else if (this.CPRMode == CPRMode.Projected)
+            {
+                //投影：横轴 = 径向，纵轴 = 弧长
+                arcLength = uvY * this.Curve.TotalArcLength;
+                radialOffset = (uvX - 0.5f) * this.RadialWidth;
+            }
             else
             {
-                //水平拉直或投影/剖面：横轴=弧长，纵轴=径向
+                //水平拉直或剖面：横轴=弧长，纵轴=径向
                 arcLength = uvX * this.Curve.TotalArcLength;
                 radialOffset = (uvY - 0.5f) * this.RadialWidth;
             }

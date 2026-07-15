@@ -109,11 +109,11 @@ float getMedicalValue(vec3 texCoord)
 
 void main()
 {
-    //UV.x -> 归一化弧长
-    float normalizedArcLength = UV.x;
+    //UV.y -> 归一化弧长
+    float normalizedArcLength = UV.y;
     
-    //UV.y -> 径向偏移
-    float radialOffset = (UV.y - 0.5) * u_RadialWidth;
+    //UV.x -> 径向偏移
+    float radialOffset = (UV.x - 0.5) * u_RadialWidth;
     
     //采样FrenetFrame
     vec3 position, tangent, normal, binormal;

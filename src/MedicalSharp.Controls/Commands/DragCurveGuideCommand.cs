@@ -107,9 +107,19 @@ namespace MedicalSharp.Controls.Commands
 
                 //根据拉直方向取弧长对应的UV分量
                 CPRViewport cprViewport = (CPRViewport)viewport;
-                float arcPosition = cprViewport.StraightenDirection == CPRStraightenDirection.Vertical
-                    ? Math.Clamp(uvY, 0f, 1f)
-                    : Math.Clamp(uvX, 0f, 1f);
+                float arcPosition;
+                if (cprViewport.StraightenDirection == CPRStraightenDirection.Vertical)
+                {
+                    arcPosition = Math.Clamp(uvY, 0f, 1f);
+                }
+                else if (cprViewport.CPRMode == CPRMode.Projected)
+                {
+                    arcPosition = Math.Clamp(uvY, 0f, 1f);
+                }
+                else
+                {
+                    arcPosition = Math.Clamp(uvX, 0f, 1f);
+                }
 
                 //更新弧长位置
                 this._selectedVisual.ArcPosition = arcPosition;
