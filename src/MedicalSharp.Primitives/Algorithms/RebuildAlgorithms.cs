@@ -104,9 +104,13 @@ namespace MedicalSharp.Primitives.Algorithms
                 float arcLength = t * curve.TotalArcLength;
                 FrenetFrame frame = curve.GetFrameAtArcLength(arcLength);
 
+                //变换到世界空间
+                Vector3 position = Vector3.TransformPosition(frame.Position, curve.Transform);
+                Vector3 normal = Vector3.TransformNormal(frame.Normal, curve.Transform);
+
                 //沿Normal正方向和负方向搜索边界（世界空间）
-                float positiveDistance = volumeData.CalculateBoundaryDistance(frame.Position, frame.Normal, maxSearchDistance, gradientThreshold);
-                float negativeDistance = volumeData.CalculateBoundaryDistance(frame.Position, -frame.Normal, maxSearchDistance, gradientThreshold);
+                float positiveDistance = volumeData.CalculateBoundaryDistance(position, normal, maxSearchDistance, gradientThreshold);
+                float negativeDistance = volumeData.CalculateBoundaryDistance(position, -normal, maxSearchDistance, gradientThreshold);
 
                 //过滤异常值：最小宽度应大于一个体素跨度
                 float totalWidth = positiveDistance + negativeDistance;

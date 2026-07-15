@@ -31,16 +31,22 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
         private readonly IEventAggregator _eventAggregator;
 
         /// <summary>
+        /// 曲线3D元素
+        /// </summary>
+        private readonly CurveVisual3D _curve;
+
+        /// <summary>
         /// 依赖注入构造器
         /// </summary>
         public CprLayoutViewModel(IWindowManager windowManager, IEventAggregator eventAggregator, CurveVisual3D curve)
         {
             this._windowManager = windowManager;
             this._eventAggregator = eventAggregator;
+            this._curve = curve;
             this.Layout = CprLayout6.CreateLayout();
 
             //初始化视图模型
-            this.InitializeViewModels(this._windowManager, this._eventAggregator, curve);
+            this.InitializeViewModels();
         }
 
         #endregion
@@ -159,18 +165,18 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
         }
         #endregion
 
-        #region 初始化视图模型 —— void InitializeViewModels(IWindowManager windowManager...
+        #region 初始化视图模型 —— void InitializeViewModels()
         /// <summary>
         /// 初始化视图模型
         /// </summary>
-        private void InitializeViewModels(IWindowManager windowManager, IEventAggregator eventAggregator, CurveVisual3D curve)
+        private void InitializeViewModels()
         {
             //水平投影图（Cell0：左上）
             CPRCamera horizontalCamera = new CPRCamera();
             CPRInputManager horizontalInputManager = new CPRInputManager(horizontalCamera);
-            this.HorizontalViewModel = new CprViewModel(windowManager, eventAggregator, "水平CPR", horizontalCamera, horizontalInputManager)
+            this.HorizontalViewModel = new CprViewModel(this._windowManager, this._eventAggregator, "水平CPR", horizontalCamera, horizontalInputManager)
             {
-                CurveVisual3D = curve,
+                CurveVisual3D = this._curve,
                 CPRMode = CPRMode.Projected,
                 ProjectionDirection = CPRProjectionDirection.Tangent,
                 RadialWidth = 1f
@@ -179,9 +185,9 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             //垂直投影图（Cell1：左下）
             CPRCamera verticalCamera = new CPRCamera();
             CPRInputManager verticalInputManager = new CPRInputManager(verticalCamera);
-            this.VerticalViewModel = new CprViewModel(windowManager, eventAggregator, "垂直CPR", verticalCamera, verticalInputManager)
+            this.VerticalViewModel = new CprViewModel(this._windowManager, this._eventAggregator, "垂直CPR", verticalCamera, verticalInputManager)
             {
-                CurveVisual3D = curve,
+                CurveVisual3D = this._curve,
                 CPRMode = CPRMode.Projected,
                 ProjectionDirection = CPRProjectionDirection.Normal,
                 RadialWidth = 1f
@@ -190,9 +196,9 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             //拉直图（Cell5：右侧整列）
             CPRCamera straightenedCamera = new CPRCamera();
             CPRInputManager straightenedInputManager = new CPRInputManager(straightenedCamera);
-            this.StraightenedViewModel = new CprViewModel(windowManager, eventAggregator, "拉直图", straightenedCamera, straightenedInputManager)
+            this.StraightenedViewModel = new CprViewModel(this._windowManager, this._eventAggregator, "拉直图", straightenedCamera, straightenedInputManager)
             {
-                CurveVisual3D = curve,
+                CurveVisual3D = this._curve,
                 CPRMode = CPRMode.Straightened,
                 StraightenDirection = CPRStraightenDirection.Vertical
             };
@@ -200,9 +206,9 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             //剖面图1（Cell2：中上，弧长25%）
             CPRCamera crossCamera1 = new CPRCamera();
             CPRInputManager crossInputManager1 = new CPRInputManager(crossCamera1);
-            this.CrossSectional1ViewModel = new CprViewModel(windowManager, eventAggregator, "剖面图1", crossCamera1, crossInputManager1)
+            this.CrossSectional1ViewModel = new CprViewModel(this._windowManager, this._eventAggregator, "剖面图1", crossCamera1, crossInputManager1)
             {
-                CurveVisual3D = curve,
+                CurveVisual3D = this._curve,
                 CPRMode = CPRMode.CrossSectional,
                 ArcPosition = 0.25f
             };
@@ -210,9 +216,9 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             //剖面图2（Cell3：中中，弧长50%）
             CPRCamera crossCamera2 = new CPRCamera();
             CPRInputManager crossInputManager2 = new CPRInputManager(crossCamera2);
-            this.CrossSectional2ViewModel = new CprViewModel(windowManager, eventAggregator, "剖面图2", crossCamera2, crossInputManager2)
+            this.CrossSectional2ViewModel = new CprViewModel(this._windowManager, this._eventAggregator, "剖面图2", crossCamera2, crossInputManager2)
             {
-                CurveVisual3D = curve,
+                CurveVisual3D = this._curve,
                 CPRMode = CPRMode.CrossSectional,
                 ArcPosition = 0.5f
             };
@@ -220,9 +226,9 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             //剖面图3（Cell4：中下，弧长75%）
             CPRCamera crossCamera3 = new CPRCamera();
             CPRInputManager crossInputManager3 = new CPRInputManager(crossCamera3);
-            this.CrossSectional3ViewModel = new CprViewModel(windowManager, eventAggregator, "剖面图3", crossCamera3, crossInputManager3)
+            this.CrossSectional3ViewModel = new CprViewModel(this._windowManager, this._eventAggregator, "剖面图3", crossCamera3, crossInputManager3)
             {
-                CurveVisual3D = curve,
+                CurveVisual3D = this._curve,
                 CPRMode = CPRMode.CrossSectional,
                 ArcPosition = 0.75f
             };
