@@ -135,5 +135,45 @@ namespace MedicalSharp.Primitives.Algorithms
             return radialWidth;
         }
         #endregion
+
+        #region # 计算曲线沿投影轴的投影范围 —— static void CalculateProjectionRange(this Curve curve...
+        /// <summary>
+        /// 计算曲线沿投影轴的投影范围
+        /// </summary>
+        /// <param name="curve">曲线</param>
+        /// <param name="projectionAxis">投影轴方向（单位向量，世界空间）</param>
+        /// <param name="minDistance">起点到负方向边界的距离（正值）</param>
+        /// <param name="maxDistance">起点到正方向边界的距离（正值）</param>
+        /// <remarks>
+        /// 遍历曲线所有Frenet框架点，计算每个点沿投影轴到起点的投影距离，
+        /// 取最小值和最大值作为投影范围。对标WDM的CalLeftRightDis。
+        /// </remarks>
+        public static void CalculateProjectionRange(this Curve curve, Vector3 projectionAxis, out float minDistance, out float maxDistance)
+        {
+            minDistance = 0f;
+            maxDistance = 0f;
+
+            if (curve == null || curve.FrenetFrames.Length == 0)
+            {
+                return;
+            }
+
+            Vector3 startPoint = curve.FrenetFrames[0].Position;
+
+            foreach (FrenetFrame frame in curve.FrenetFrames)
+            {
+                //当前点沿投影轴到起点的带符号投影距离
+                float signedDistance = Vector3.Dot(frame.Position - startPoint, projectionAxis);
+                if (signedDistance < -minDistance)
+                {
+                    minDistance = -signedDistance;
+                }
+                if (signedDistance > maxDistance)
+                {
+                    maxDistance = signedDistance;
+                }
+            }
+        }
+        #endregion
     }
 }
