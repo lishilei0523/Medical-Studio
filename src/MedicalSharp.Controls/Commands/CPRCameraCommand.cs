@@ -5,6 +5,7 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
+using OpenTK.Mathematics;
 using System;
 
 namespace MedicalSharp.Controls.Commands
@@ -81,14 +82,17 @@ namespace MedicalSharp.Controls.Commands
                     }
                     if (cprViewport.CPRMode == CPRMode.Projected)
                     {
-                        if (cprViewport.ProjectionDirection == CPRProjectionDirection.Tangent)
-                        {
-                            cprViewport.RotationAngle += -deltaY;
-                        }
-                        if (cprViewport.ProjectionDirection == CPRProjectionDirection.Normal)
-                        {
-                            cprViewport.RotationAngle += deltaX;
-                        }
+                        //绕Z轴旋转投影轴
+                        float angle = deltaX * 0.01f;
+                        float cos = MathF.Cos(angle);
+                        float sin = MathF.Sin(angle);
+                        Vector3 axis = cprViewport.CPRRenderer.ProjectionAxis;
+                        Vector3 rotatedAxis = new Vector3(
+                            axis.X * cos - axis.Y * sin,
+                            axis.X * sin + axis.Y * cos,
+                            axis.Z
+                        );
+                        cprViewport.CPRRenderer.SwitchProjectionAxis(rotatedAxis);
                     }
                     if (cprViewport.CPRMode == CPRMode.CrossSectional)
                     {

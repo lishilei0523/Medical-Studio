@@ -96,7 +96,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.ProjectionThickness = 0.05f;
             this.MaxStepsCount = 100;
             this.ProjectionMode = IntensityProjectionMode.MIP;
-            this.ProjectionDirection = CPRProjectionDirection.Tangent;
+            this.ProjectionAxis = -Vector3.UnitY;
             this.StraightenDirection = CPRStraightenDirection.Horizontal;
             this.ArcPosition = 0.5f;
             this.CrossSectionSize = 0.1f;
@@ -363,12 +363,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public IntensityProjectionMode ProjectionMode { get; set; }
         #endregion
 
-        #region 投影方向 —— CPRProjectionDirection ProjectionDirection
+        #region 投影轴 —— Vector3 ProjectionAxis
         /// <summary>
-        /// 投影方向
+        /// 投影轴
         /// </summary>
         [DependencyProperty]
-        public CPRProjectionDirection ProjectionDirection { get; set; }
+        public Vector3 ProjectionAxis { get; set; }
         #endregion
 
         #region 拉直方向 —— CPRStraightenDirection StraightenDirection

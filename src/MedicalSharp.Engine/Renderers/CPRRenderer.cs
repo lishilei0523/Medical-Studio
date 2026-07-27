@@ -56,8 +56,8 @@ namespace MedicalSharp.Engine.Renderers
             this.RotationAngle = 0f;
             this.ProjectionThickness = 0.05f;
             this.MaxStepsCount = 100;
-            this.ProjectionMode = IntensityProjectionMode.MIP;
-            this.ProjectionDirection = CPRProjectionDirection.Tangent;
+            this.ProjectionMode = IntensityProjectionMode.AIP;
+            this.ProjectionAxis = -Vector3.UnitY;
             this.StraightenDirection = CPRStraightenDirection.Horizontal;
             this.ArcPosition = 0.5f;
             this.CrossSectionSize = 0.1f;
@@ -170,12 +170,12 @@ namespace MedicalSharp.Engine.Renderers
         public IntensityProjectionMode ProjectionMode { get; private set; }
         #endregion
 
-        #region 投影方向 —— CPRProjectionDirection ProjectionDirection
+        #region 投影轴 —— Vector3 ProjectionAxis
         /// <summary>
-        /// 投影方向
+        /// 投影轴
         /// </summary>
-        /// <remarks>Projected使用</remarks>
-        public CPRProjectionDirection ProjectionDirection { get; private set; }
+        /// <remarks>全局投影方向（单位向量），Projected使用。默认Y轴（水平投影）</remarks>
+        public Vector3 ProjectionAxis { get; private set; }
         #endregion
 
         #region 拉直方向 —— CPRStraightenDirection StraightenDirection
@@ -269,14 +269,13 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 切换投影方向 —— void SwitchProjectionDirection(CPRProjectionDirection...
+        #region 切换投影轴 —— void SwitchProjectionAxis(Vector3 axis)
         /// <summary>
-        /// 切换投影方向
+        /// 切换投影轴
         /// </summary>
-        /// <param name="projectionDirection">CPR投影方向</param>
-        public void SwitchProjectionDirection(CPRProjectionDirection projectionDirection)
+        public void SwitchProjectionAxis(Vector3 axis)
         {
-            this.ProjectionDirection = projectionDirection;
+            this.ProjectionAxis = Vector3.Normalize(axis);
         }
         #endregion
 
@@ -413,22 +412,16 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
-        #region 设置投影图选项 —— void SetProjectedOptions(float radialWidth, float rotationAngle...
+        #region 设置投影图选项 —— void SetProjectedOptions(float projectionThickness, int maxStepsCount)
         /// <summary>
         /// 设置投影图选项
         /// </summary>
-        /// <param name="radialWidth">径向宽度</param>
-        /// <param name="rotationAngle">旋转角度</param>
         /// <param name="projectionThickness">投影厚度</param>
         /// <param name="maxStepsCount">最大步数</param>
-        public void SetProjectedOptions(float radialWidth = 0.1f, float rotationAngle = 0f, float projectionThickness = 0.05f, int maxStepsCount = 100)
+        public void SetProjectedOptions(float projectionThickness = 0.05f, int maxStepsCount = 100)
         {
             #region # 验证
 
-            if (radialWidth <= 0f)
-            {
-                throw new ArgumentOutOfRangeException(nameof(radialWidth), "径向宽度必须大于0！");
-            }
             if (projectionThickness <= 0f)
             {
                 throw new ArgumentOutOfRangeException(nameof(projectionThickness), "投影厚度必须大于0！");
@@ -440,8 +433,6 @@ namespace MedicalSharp.Engine.Renderers
 
             #endregion
 
-            this.RadialWidth = radialWidth;
-            this.RotationAngle = GeometryAlgorithms.NormalizeAngle(rotationAngle);
             this.ProjectionThickness = projectionThickness;
             this.MaxStepsCount = maxStepsCount;
         }
@@ -532,7 +523,10 @@ namespace MedicalSharp.Engine.Renderers
             }
             else if (this.CPRMode == CPRMode.Projected)
             {
-                modelMatrix = Matrix4.CreateScale(1f, aspectRatio, 1f);
+                float projectionRange = Math.Abs(Vector3.Dot(this.Renderable.VolumeMetadata.VolumeScale, this.ProjectionAxis));
+                float scaleX = projectionRange;             //投影轴范围映射到屏幕宽度
+                float scaleY = this.Curve.TotalArcLength;   //弧长映射到屏幕高度
+                modelMatrix = Matrix4.CreateScale(scaleX, scaleY, 1f);
             }
             else
             {
@@ -581,12 +575,11 @@ namespace MedicalSharp.Engine.Renderers
                     program.SetUniformInt("u_StraightenDirection", (int)this.StraightenDirection);
                     break;
                 case CPRMode.Projected:
-                    program.SetUniformFloat("u_RadialWidth", this.RadialWidth);
-                    program.SetUniformFloat("u_RotationAngle", this.RotationAngle);
-                    program.SetUniformFloat("u_ProjectionThickness", this.ProjectionThickness);
+                    program.SetUniformVector3("u_ProjectionAxis", this.ProjectionAxis);
+                    program.SetUniformFloat("u_ProjectionRange", Math.Abs(Vector3.Dot(this.Renderable.VolumeMetadata.VolumeScale, this.ProjectionAxis)));
+                    program.SetUniformFloat("u_ProjectionThickness", this.Renderable.VolumeMetadata.VolumeScale.Length);
                     program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
                     program.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
-                    program.SetUniformInt("u_ProjectionDirection", (int)this.ProjectionDirection);
                     break;
                 case CPRMode.CrossSectional:
                     program.SetUniformFloat("u_ArcPosition", this.ArcPosition);

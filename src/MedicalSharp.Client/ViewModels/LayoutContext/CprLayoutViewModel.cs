@@ -6,6 +6,7 @@ using MedicalSharp.Presentation.Models;
 using MedicalSharp.Primitives.Cameras;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Models;
+using OpenTK.Mathematics;
 using SD.Infrastructure.Avalonia.Caliburn.Aspects;
 using SD.Infrastructure.Avalonia.Caliburn.Base;
 using System.Threading;
@@ -178,8 +179,7 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             {
                 CurveVisual3D = this._curve,
                 CPRMode = CPRMode.Projected,
-                ProjectionDirection = CPRProjectionDirection.Tangent,
-                RadialWidth = 1f
+                ProjectionAxis = -Vector3.UnitX
             };
 
             //垂直投影图（Cell1：左下）
@@ -189,8 +189,7 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             {
                 CurveVisual3D = this._curve,
                 CPRMode = CPRMode.Projected,
-                ProjectionDirection = CPRProjectionDirection.Normal,
-                RadialWidth = 1f
+                ProjectionAxis = -Vector3.UnitY
             };
 
             //拉直图（Cell5：右侧整列）

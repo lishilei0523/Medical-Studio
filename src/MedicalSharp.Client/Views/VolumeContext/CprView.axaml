@@ -99,7 +99,7 @@
                                  ProjectionThickness="{Binding ProjectionThickness}"
                                  MaxStepsCount="{Binding MaxStepsCount}"
                                  ProjectionMode="{Binding ProjectionMode}"
-                                 ProjectionDirection="{Binding ProjectionDirection}"
+                                 ProjectionAxis="{Binding ProjectionAxis}"
                                  StraightenDirection="{Binding StraightenDirection}"
                                  ArcPosition="{Binding ArcPosition}"
                                  CrossSectionSize="{Binding CrossSectionSize}">

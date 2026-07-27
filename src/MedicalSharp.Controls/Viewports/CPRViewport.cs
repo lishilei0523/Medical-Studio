@@ -99,9 +99,9 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<IntensityProjectionMode> ProjectionModeProperty;
 
         /// <summary>
-        /// 投影方向依赖属性
+        /// 投影轴依赖属性
         /// </summary>
-        public static readonly StyledProperty<CPRProjectionDirection> ProjectionDirectionProperty;
+        public static readonly StyledProperty<Vector3> ProjectionAxisProperty;
 
         /// <summary>
         /// 拉直方向依赖属性
@@ -142,7 +142,7 @@ namespace MedicalSharp.Controls.Viewports
             ProjectionThicknessProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(ProjectionThickness), 0.05f);
             MaxStepsCountProperty = AvaloniaProperty.Register<CPRViewport, int>(nameof(MaxStepsCount), 100);
             ProjectionModeProperty = AvaloniaProperty.Register<CPRViewport, IntensityProjectionMode>(nameof(ProjectionMode), IntensityProjectionMode.MIP);
-            ProjectionDirectionProperty = AvaloniaProperty.Register<CPRViewport, CPRProjectionDirection>(nameof(ProjectionDirection), CPRProjectionDirection.Tangent);
+            ProjectionAxisProperty = AvaloniaProperty.Register<CPRViewport, Vector3>(nameof(ProjectionAxis), -Vector3.UnitY);
             StraightenDirectionProperty = AvaloniaProperty.Register<CPRViewport, CPRStraightenDirection>(nameof(StraightenDirection), CPRStraightenDirection.Horizontal);
             ArcPositionProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(ArcPosition), 0.5f);
             CrossSectionSizeProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(CrossSectionSize), 0.1f);
@@ -163,7 +163,7 @@ namespace MedicalSharp.Controls.Viewports
             ProjectionThicknessProperty.Changed.AddClassHandler<CPRViewport, float>(OnProjectionThicknessChanged);
             MaxStepsCountProperty.Changed.AddClassHandler<CPRViewport, int>(OnMaxStepsCountChanged);
             ProjectionModeProperty.Changed.AddClassHandler<CPRViewport, IntensityProjectionMode>(OnProjectionModeChanged);
-            ProjectionDirectionProperty.Changed.AddClassHandler<CPRViewport, CPRProjectionDirection>(OnProjectionDirectionChanged);
+            ProjectionAxisProperty.Changed.AddClassHandler<CPRViewport, Vector3>(OnProjectionAxisChanged);
             StraightenDirectionProperty.Changed.AddClassHandler<CPRViewport, CPRStraightenDirection>(OnStraightenDirectionChanged);
             ArcPositionProperty.Changed.AddClassHandler<CPRViewport, float>(OnArcPositionChanged);
             CrossSectionSizeProperty.Changed.AddClassHandler<CPRViewport, float>(OnCrossSectionSizeChanged);
@@ -347,14 +347,14 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 投影方向 —— CPRProjectionDirection ProjectionDirection
+        #region 依赖属性 - 投影轴 —— Vector3 ProjectionAxis
         /// <summary>
-        /// 依赖属性 - 投影方向
+        /// 依赖属性 - 投影轴
         /// </summary>
-        public CPRProjectionDirection ProjectionDirection
+        public Vector3 ProjectionAxis
         {
-            get => this.GetValue(ProjectionDirectionProperty);
-            set => this.SetValue(ProjectionDirectionProperty, value);
+            get => this.GetValue(ProjectionAxisProperty);
+            set => this.SetValue(ProjectionAxisProperty, value);
         }
         #endregion
 
@@ -595,12 +595,12 @@ namespace MedicalSharp.Controls.Viewports
             this._cprRenderer.SwitchRenderMode(this.RenderMode);
             this._cprRenderer.SwitchCPRMode(this.CPRMode);
             this._cprRenderer.SwitchProjectionMode(this.ProjectionMode);
-            this._cprRenderer.SwitchProjectionDirection(this.ProjectionDirection);
+            this._cprRenderer.SwitchProjectionAxis(this.ProjectionAxis);
             this._cprRenderer.SwitchStraightenDirection(this.StraightenDirection);
             this._cprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._cprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
             this._cprRenderer.SetStraightenedOptions(this.RadialWidth, this.RotationAngle);
-            this._cprRenderer.SetProjectedOptions(this.RadialWidth, this.RotationAngle, this.ProjectionThickness);
+            this._cprRenderer.SetProjectedOptions(this.ProjectionThickness, this.MaxStepsCount);
             this._cprRenderer.SetCrossSectionalOptions(this.ArcPosition, this.CrossSectionSize);
             if (this.VolumeData != null)
             {
@@ -906,13 +906,13 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 投影方向改变事件 —— static void OnProjectionDirectionChanged(CPRViewport viewport...
+        #region 投影轴改变事件 —— static void OnProjectionAxisChanged(CPRViewport viewport...
         /// <summary>
-        /// 投影方向改变事件
+        /// 投影轴改变事件
         /// </summary>
-        private static void OnProjectionDirectionChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<CPRProjectionDirection> eventArgs)
+        private static void OnProjectionAxisChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<Vector3> eventArgs)
         {
-            viewport._cprRenderer?.SwitchProjectionDirection(eventArgs.NewValue.Value);
+            viewport._cprRenderer?.SwitchProjectionAxis(eventArgs.NewValue.Value);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
@@ -1032,7 +1032,7 @@ namespace MedicalSharp.Controls.Viewports
                     renderer.SetStraightenedOptions(this.RadialWidth, this.RotationAngle);
                     break;
                 case CPRMode.Projected:
-                    renderer.SetProjectedOptions(this.RadialWidth, this.RotationAngle, this.ProjectionThickness, this.MaxStepsCount);
+                    renderer.SetProjectedOptions(this.ProjectionThickness, this.MaxStepsCount);
                     break;
                 case CPRMode.CrossSectional:
                     renderer.SetCrossSectionalOptions(this.ArcPosition, this.CrossSectionSize);

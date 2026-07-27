@@ -12,16 +12,13 @@ uniform sampler1D u_MarkStrategy;
 //FrenetFrame纹理
 uniform sampler1D u_PositionTexture;
 uniform sampler1D u_TangentTexture;
-uniform sampler1D u_NormalTexture;
-uniform sampler1D u_BinormalTexture;
 
 //曲线参数
-uniform float u_RadialWidth;
-uniform float u_RotationAngle;          //角度
-uniform float u_ProjectionThickness;
-uniform int u_MaxStepsCount;
-uniform int u_ProjectionMode;           //密度投影模式：0=AIP, 1=MID, 2=MinIP
-uniform int u_ProjectionDirection;      //CPR投影方向：0=Tangent, 1=Normal
+uniform vec3 u_ProjectionAxis;          //全局投影轴方向（单位向量）
+uniform float u_ProjectionRange;        //投影范围
+uniform float u_ProjectionThickness;    //投影厚度（沿采样方向的步进范围）
+uniform int u_MaxStepsCount;            //最大步数
+uniform int u_ProjectionMode;           //密度投影模式：0=AIP, 1=MIP, 2=MinIP
 
 //渲染参数
 uniform vec3 u_VolumeScale;
@@ -44,33 +41,7 @@ const float EPSILON = 0.0001;
 const int PROJECTION_AIP = 0;
 const int PROJECTION_MIP = 1;
 const int PROJECTION_MINIP = 2;
-const int PROJECTION_DIRECTION_TANGENT = 0;
-const int PROJECTION_DIRECTION_NORMAL = 1;
 
-
-//从弧长采样FrenetFrame，t: 归一化弧长 0~1
-void sampleFrenetFrame(float t, out vec3 position, out vec3 tangent, out vec3 normal, out vec3 binormal)
-{
-    vec4 posSample = texture(u_PositionTexture, t);
-    vec4 tanSample = texture(u_TangentTexture, t);
-    vec4 norSample = texture(u_NormalTexture, t);
-    vec4 binSample = texture(u_BinormalTexture, t);
-    
-    position = posSample.xyz;
-    tangent = tanSample.xyz;
-    normal = norSample.xyz;
-    binormal = binSample.xyz;
-}
-
-//绕轴旋转向量
-vec3 rotateAroundAxis(vec3 direction, vec3 axis, float angle)
-{
-    float cosA = cos(angle);
-    float sinA = sin(angle);
-    vec3 rotatedDirection = direction * cosA + cross(axis, direction) * sinA + axis * dot(axis, direction) * (1.0 - cosA);
-
-    return rotatedDirection;
-}
 
 //灰度模式：窗宽窗位裁剪 + 线性映射
 float applyWindowLevel(float value, float windowCenter, float windowWidth)
@@ -109,25 +80,23 @@ float getMedicalValue(vec3 texCoord)
 
 void main()
 {
-    //UV.y -> 归一化弧长
+    //横轴 = 弧长
     float normalizedArcLength = UV.y;
     
-    //UV.x -> 径向偏移
-    float radialOffset = (UV.x - 0.5) * u_RadialWidth;
+    //纵轴 = 沿投影轴的偏移（UV.x映射到投影轴范围）
+    float axisOffset = (UV.x - 0.5) * u_ProjectionRange;
     
-    //采样FrenetFrame
-    vec3 position, tangent, normal, binormal;
-    sampleFrenetFrame(normalizedArcLength, position, tangent, normal, binormal);
+    //采样曲线位置和切线
+    vec3 curvePosition = texture(u_PositionTexture, normalizedArcLength).xyz;
+    vec3 curveTangent = texture(u_TangentTexture, normalizedArcLength).xyz;
     
-    //绕Tangent旋转Normal
-    float rotationRad = radians(u_RotationAngle);
-    vec3 rotatedNormal = rotateAroundAxis(normal, tangent, rotationRad);
+    //射线起点：曲线位置 + 沿投影轴偏移
+    vec3 rayOrigin = curvePosition + u_ProjectionAxis * axisOffset;
     
-    //射线起点和方向
-    vec3 rayOrigin = position + rotatedNormal * radialOffset;
-    vec3 rayDirection = (u_ProjectionDirection == PROJECTION_DIRECTION_TANGENT) ? tangent : rotatedNormal;
+    //投影方向 = cross(投影轴, 曲线切线)
+    vec3 rayDirection = normalize(cross(u_ProjectionAxis, curveTangent));
     
-    //沿射线方向步进采样
+    //沿投影方向步进采样
     float halfThickness = u_ProjectionThickness * 0.5;
     float stepSize = u_ProjectionThickness / float(u_MaxStepsCount);
     
@@ -175,7 +144,7 @@ void main()
         projectedHU = validCount > 0 ? sumHU / float(validCount) : -1000.0;
     }
     
-    //取射线起点位置的纹理坐标用于标记采样
+    //标记采样：取射线起点位置
     vec3 texCoord = (rayOrigin / u_VolumeScale) + 0.5;
     
     //边界检查
