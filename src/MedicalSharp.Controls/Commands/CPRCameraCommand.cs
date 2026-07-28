@@ -93,15 +93,15 @@ namespace MedicalSharp.Controls.Commands
                             axis.Z
                         ).Normalized();
 
-                        cprViewport.CPRRenderer.SwitchProjectionAxis(rotatedAxis);
+                        cprViewport.ProjectionAxis = rotatedAxis;
                     }
                     if (cprViewport.CPRMode == CPRMode.CrossSectional)
                     {
                         this._camera.Zoom(-deltaY);
-                    }
 
-                    //请求下一帧
-                    viewport.RequestNextFrameRendering();
+                        //请求下一帧
+                        viewport.RequestNextFrameRendering();
+                    }
                 }
             }
             this._mousePos2D = position.ToVector2();
