@@ -83,7 +83,7 @@ namespace MedicalSharp.Controls.Commands
                     if (cprViewport.CPRMode == CPRMode.Projected)
                     {
                         //绕Z轴旋转投影轴
-                        float angle = deltaX * 0.01f;
+                        float angle = -deltaX * 0.01f;
                         float cos = MathF.Cos(angle);
                         float sin = MathF.Sin(angle);
                         Vector3 axis = cprViewport.CPRRenderer.ProjectionAxis;
@@ -91,7 +91,8 @@ namespace MedicalSharp.Controls.Commands
                             axis.X * cos - axis.Y * sin,
                             axis.X * sin + axis.Y * cos,
                             axis.Z
-                        );
+                        ).Normalized();
+
                         cprViewport.CPRRenderer.SwitchProjectionAxis(rotatedAxis);
                     }
                     if (cprViewport.CPRMode == CPRMode.CrossSectional)

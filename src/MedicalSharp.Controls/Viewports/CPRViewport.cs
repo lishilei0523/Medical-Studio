@@ -609,6 +609,7 @@ namespace MedicalSharp.Controls.Viewports
                 this._cprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
                 this._cprRenderer.TransferFunction.SetHURange(this.VolumeData.Metadata.MinHU, this.VolumeData.Metadata.MaxHU);
                 this._cprRenderer.TransferFunction.InitFromControlPoints(this.TFControlPoints);
+                this._cprRenderer.InitProjectionRange(this.VolumeData.Metadata.VolumeScale);
             }
         }
         #endregion
@@ -1000,6 +1001,7 @@ namespace MedicalSharp.Controls.Viewports
                 viewport._cprRenderer.SetMarkStrategy(volumeSession.MarkStrategy);
                 viewport._cprRenderer.TransferFunction.SetHURange(volumeData.Metadata.MinHU, volumeData.Metadata.MaxHU);
                 viewport._cprRenderer.TransferFunction.InitFromControlPoints(viewport.TFControlPoints);
+                viewport._cprRenderer.InitProjectionRange(volumeData.Metadata.VolumeScale);
             }
 
             //请求下一帧

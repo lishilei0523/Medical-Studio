@@ -178,6 +178,14 @@ namespace MedicalSharp.Engine.Renderers
         public Vector3 ProjectionAxis { get; private set; }
         #endregion
 
+        #region 投影范围 —— float ProjectionRange
+        /// <summary>
+        /// 投影范围
+        /// </summary>
+        /// <remarks>Projected使用</remarks>
+        public float ProjectionRange { get; private set; }
+        #endregion
+
         #region 拉直方向 —— CPRStraightenDirection StraightenDirection
         /// <summary>
         /// 拉直方向
@@ -315,6 +323,17 @@ namespace MedicalSharp.Engine.Renderers
             {
                 this._curveFrame.Update(curve);
             }
+        }
+        #endregion
+
+        #region 初始化投影范围 —— void InitProjectionRange(Vector3 volumeScale)
+        /// <summary>
+        /// 初始化投影范围
+        /// </summary>
+        /// <param name="volumeScale">体积缩放</param>
+        public void InitProjectionRange(Vector3 volumeScale)
+        {
+            this.ProjectionRange = Math.Abs(Vector3.Dot(volumeScale, this.ProjectionAxis));
         }
         #endregion
 
@@ -523,8 +542,7 @@ namespace MedicalSharp.Engine.Renderers
             }
             else if (this.CPRMode == CPRMode.Projected)
             {
-                float projectionRange = Math.Abs(Vector3.Dot(this.Renderable.VolumeMetadata.VolumeScale, this.ProjectionAxis));
-                float scaleX = projectionRange;             //投影轴范围映射到屏幕宽度
+                float scaleX = this.ProjectionRange;        //投影轴范围映射到屏幕宽度
                 float scaleY = this.Curve.TotalArcLength;   //弧长映射到屏幕高度
                 modelMatrix = Matrix4.CreateScale(scaleX, scaleY, 1f);
             }
@@ -576,7 +594,7 @@ namespace MedicalSharp.Engine.Renderers
                     break;
                 case CPRMode.Projected:
                     program.SetUniformVector3("u_ProjectionAxis", this.ProjectionAxis);
-                    program.SetUniformFloat("u_ProjectionRange", Math.Abs(Vector3.Dot(this.Renderable.VolumeMetadata.VolumeScale, this.ProjectionAxis)));
+                    program.SetUniformFloat("u_ProjectionRange", this.ProjectionRange);
                     program.SetUniformFloat("u_ProjectionThickness", this.Renderable.VolumeMetadata.VolumeScale.Length);
                     program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
                     program.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
