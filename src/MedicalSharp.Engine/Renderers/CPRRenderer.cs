@@ -56,7 +56,7 @@ namespace MedicalSharp.Engine.Renderers
             this.RotationAngle = 0f;
             this.ProjectionThickness = 0.05f;
             this.MaxStepsCount = 100;
-            this.ProjectionMode = IntensityProjectionMode.AIP;
+            this.ProjectionMode = IntensityProjectionMode.Single;
             this.ProjectionAxis = -Vector3.UnitY;
             this.StraightenDirection = CPRStraightenDirection.Horizontal;
             this.ArcPosition = 0.5f;
@@ -174,7 +174,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 投影轴
         /// </summary>
-        /// <remarks>全局投影方向（单位向量），Projected使用。默认Y轴（水平投影）</remarks>
+        /// <remarks>投影方向（单位向量），Projected使用。默认Y轴（水平投影）</remarks>
         public Vector3 ProjectionAxis { get; private set; }
         #endregion
 

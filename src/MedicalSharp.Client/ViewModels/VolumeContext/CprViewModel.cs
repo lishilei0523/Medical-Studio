@@ -95,7 +95,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.RotationAngle = 0f;
             this.ProjectionThickness = 0.05f;
             this.MaxStepsCount = 100;
-            this.ProjectionMode = IntensityProjectionMode.MIP;
+            this.ProjectionMode = IntensityProjectionMode.Single;
             this.ProjectionAxis = -Vector3.UnitY;
             this.StraightenDirection = CPRStraightenDirection.Horizontal;
             this.ArcPosition = 0.5f;

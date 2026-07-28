@@ -14,11 +14,11 @@ uniform sampler1D u_PositionTexture;
 uniform sampler1D u_TangentTexture;
 
 //曲线参数
-uniform vec3 u_ProjectionAxis;          //全局投影轴方向（单位向量）
+uniform vec3 u_ProjectionAxis;          //投影轴方向（单位向量）
 uniform float u_ProjectionRange;        //投影范围
 uniform float u_ProjectionThickness;    //投影厚度（沿采样方向的步进范围）
 uniform int u_MaxStepsCount;            //最大步数
-uniform int u_ProjectionMode;           //密度投影模式：0=AIP, 1=MIP, 2=MinIP
+uniform int u_ProjectionMode;           //密度投影模式：0=Single, 1=AIP, 2=MIP, 3=MinIP
 
 //渲染参数
 uniform vec3 u_VolumeScale;
@@ -38,9 +38,10 @@ uniform int u_MarkModes[256];
 //常量
 const float MAX_16BIT_SIGNED = 32767.0;
 const float EPSILON = 0.0001;
-const int PROJECTION_AIP = 0;
-const int PROJECTION_MIP = 1;
-const int PROJECTION_MINIP = 2;
+const int PROJECTION_SINGLE = 0;
+const int PROJECTION_AIP = 1;
+const int PROJECTION_MIP = 2;
+const int PROJECTION_MINIP = 3;
 
 
 //灰度模式：窗宽窗位裁剪 + 线性映射
@@ -100,8 +101,14 @@ void main()
     float halfThickness = u_ProjectionThickness * 0.5;
     float stepSize = u_ProjectionThickness / float(u_MaxStepsCount);
     
-    float projectedHU;    
-    if (u_ProjectionMode == PROJECTION_MIP)
+    float projectedHU;
+    if (u_ProjectionMode == PROJECTION_SINGLE)
+    {
+        //单层采样：直接采样射线起点位置
+        vec3 localTexCoord = (rayOrigin / u_VolumeScale) + 0.5;
+        projectedHU = getMedicalValue(localTexCoord);
+    }
+    else if (u_ProjectionMode == PROJECTION_MIP)
     {
         projectedHU = -1000.0;
         for (int index = 0; index <= u_MaxStepsCount; index++)

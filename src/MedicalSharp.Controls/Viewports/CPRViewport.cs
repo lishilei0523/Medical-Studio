@@ -141,7 +141,7 @@ namespace MedicalSharp.Controls.Viewports
             RotationAngleProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(RotationAngle), 0f);
             ProjectionThicknessProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(ProjectionThickness), 0.05f);
             MaxStepsCountProperty = AvaloniaProperty.Register<CPRViewport, int>(nameof(MaxStepsCount), 100);
-            ProjectionModeProperty = AvaloniaProperty.Register<CPRViewport, IntensityProjectionMode>(nameof(ProjectionMode), IntensityProjectionMode.MIP);
+            ProjectionModeProperty = AvaloniaProperty.Register<CPRViewport, IntensityProjectionMode>(nameof(ProjectionMode), IntensityProjectionMode.Single);
             ProjectionAxisProperty = AvaloniaProperty.Register<CPRViewport, Vector3>(nameof(ProjectionAxis), -Vector3.UnitY);
             StraightenDirectionProperty = AvaloniaProperty.Register<CPRViewport, CPRStraightenDirection>(nameof(StraightenDirection), CPRStraightenDirection.Horizontal);
             ArcPositionProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(ArcPosition), 0.5f);
