@@ -552,11 +552,11 @@ namespace MedicalSharp.Engine.Renderers
             }
 
             //相机视野
-            if (this.CPRMode == CPRMode.Straightened || this.CPRMode == CPRMode.Projected)
+            Vector3 scale = modelMatrix.ExtractScale();
+            float imageWidth = scale.X;   //投影范围
+            float imageHeight = scale.Y;  //弧长
+            if (this.CPRMode == CPRMode.Straightened)
             {
-                Vector3 scale = modelMatrix.ExtractScale();
-                float imageWidth = scale.X;   //投影范围
-                float imageHeight = scale.Y;  //弧长
                 float imageAspect = imageWidth / imageHeight;
                 float viewportAspect = viewportWidth / viewportHeight;
                 if (imageAspect > viewportAspect)
@@ -569,6 +569,10 @@ namespace MedicalSharp.Engine.Renderers
                     //图像比视口窄（更高），以高度为基准乘以视口aspect
                     this.CPRCamera.SetSideSize(imageHeight * viewportAspect);
                 }
+            }
+            if (this.CPRMode == CPRMode.Projected)
+            {
+                this.CPRCamera.SetSideSize(Math.Max(imageWidth, imageHeight));
             }
 
             //渲染上下文
