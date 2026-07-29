@@ -287,6 +287,10 @@ namespace MedicalSharp.Engine.Renderers
             //设置相机视口尺寸
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
+            //相机视野
+            Vector2 imageSize = this.Plane.GetPlaneSize();
+            this.MPRCamera.SetSideSize(Math.Max(imageSize.X, imageSize.Y));
+
             //渲染上下文
             RenderContext3D renderContext = new RenderContext3D(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.UpDirection, this.Camera.RightDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, zoomFactor: this.MPRCamera.ZoomFactor);
 

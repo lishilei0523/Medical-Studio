@@ -23,6 +23,7 @@ namespace MedicalSharp.Primitives.Cameras
         {
             this.TargetPosition = Vector3.Zero;
             this.Distance = 1.0f;
+            this.SideSize = 1.0f;
             this.ZoomFactor = 1.0f;
             this.PanOffset = Vector2.Zero;
 
@@ -33,6 +34,13 @@ namespace MedicalSharp.Primitives.Cameras
         #endregion
 
         #region # 属性
+
+        #region 边长 —— float SideSize
+        /// <summary>
+        /// 边长
+        /// </summary>
+        public float SideSize { get; private set; }
+        #endregion
 
         #region 缩放因子 —— float ZoomFactor
         /// <summary>
@@ -96,6 +104,18 @@ namespace MedicalSharp.Primitives.Cameras
             this.TargetPlane = plane;
             this.TargetPlane.PlaneChangedEvent += this.OnPlaneChanged;
             this.UpdateCameraVectors();
+        }
+        #endregion
+
+        #region 设置边长 —— void SetSideSize(float sideSize)
+        /// <summary>
+        /// 设置边长
+        /// </summary>
+        /// <param name="sideSize">边长</param>
+        public void SetSideSize(float sideSize)
+        {
+            this.SideSize = sideSize;
+            this.UpdateProjectionMatrix();
         }
         #endregion
 
@@ -229,7 +249,7 @@ namespace MedicalSharp.Primitives.Cameras
             #endregion
 
             float aspect = this.ViewportWidth / this.ViewportHeight;
-            float halfSideSize = 0.5f / this.ZoomFactor;
+            float halfSideSize = this.SideSize / 2.0f / this.ZoomFactor;
             float left, right, bottom, top;
             if (aspect >= 1.0f)
             {

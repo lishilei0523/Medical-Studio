@@ -528,9 +528,6 @@ namespace MedicalSharp.Engine.Renderers
             //设置相机视口尺寸
             this.Camera.SetViewportSize(viewportWidth, viewportHeight);
 
-            //渲染上下文
-            RenderContext3D renderContext = new RenderContext3D(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.UpDirection, this.Camera.RightDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, this.CPRCamera.ZoomFactor);
-
             //宽高比
             float aspectRatio = this.Curve.TotalArcLength / this.RadialWidth;
 
@@ -553,6 +550,29 @@ namespace MedicalSharp.Engine.Renderers
                     ? Matrix4.CreateScale(1f, aspectRatio, 1f)
                     : Matrix4.CreateScale(aspectRatio, 1f, 1f);
             }
+
+            //相机视野
+            if (this.CPRMode == CPRMode.Projected || this.CPRMode == CPRMode.Straightened)
+            {
+                Vector3 scale = modelMatrix.ExtractScale();
+                float imageWidth = scale.X;   //投影范围
+                float imageHeight = scale.Y;  //弧长
+                float imageAspect = imageWidth / imageHeight;
+                float viewAspect = viewportWidth / viewportHeight;
+                if (imageAspect > viewAspect)
+                {
+                    //图像比视口宽，以宽度为基准
+                    this.CPRCamera.SetSideSize(imageWidth);
+                }
+                else
+                {
+                    //图像比视口窄（更高），以高度为基准乘以aspect
+                    this.CPRCamera.SetSideSize(imageHeight * viewAspect);
+                }
+            }
+
+            //渲染上下文
+            RenderContext3D renderContext = new RenderContext3D(glContext, viewportWidth, viewportHeight, this.Camera.CameraMode, this.Camera.CameraPosition, this.Camera.LookDirection, this.Camera.UpDirection, this.Camera.RightDirection, this.Camera.ProjectionMatrix, this.Camera.ViewMatrix, this.CPRCamera.ZoomFactor);
 
             //选择开启Shader程序
             ShaderProgram program = this.CPRMode switch

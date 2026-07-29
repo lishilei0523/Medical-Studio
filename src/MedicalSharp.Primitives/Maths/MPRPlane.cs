@@ -559,6 +559,38 @@ namespace MedicalSharp.Primitives.Maths
         }
         #endregion
 
+        #region 获取平面尺寸 —— Vector2 GetPlaneSize()
+        /// <summary>
+        /// 获取平面尺寸
+        /// </summary>
+        /// <returns>平面尺寸</returns>
+        /// <remarks>当前MPR平面世界空间尺寸</remarks>
+        public Vector2 GetPlaneSize()
+        {
+            float width, height;
+            switch (this.OriginalPlaneType)
+            {
+                case MPRPlaneType.Axial:
+                    width = this.VolumeMetadata.VolumeScale.X;
+                    height = this.VolumeMetadata.VolumeScale.Y;
+                    break;
+                case MPRPlaneType.Coronal:
+                    width = this.VolumeMetadata.VolumeScale.X;
+                    height = this.VolumeMetadata.VolumeScale.Z;
+                    break;
+                case MPRPlaneType.Sagittal:
+                    width = this.VolumeMetadata.VolumeScale.Y;
+                    height = this.VolumeMetadata.VolumeScale.Z;
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+            Vector2 planeSize = new Vector2(width, height);
+
+            return planeSize;
+        }
+        #endregion
+
         #region 获取切片尺寸 —— Vector2i GetSliceSize()
         /// <summary>
         /// 获取切片尺寸
