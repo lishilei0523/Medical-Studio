@@ -93,11 +93,11 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             this.TFControlPoints = new AvaloniaList<HUControlPoint>(ProtocolManager.SolidRainbowControlPoints);
             this.RadialWidth = 0.1f;
             this.RotationAngle = 0f;
-            this.ProjectionThickness = 0.05f;
-            this.MaxStepsCount = 100;
+            this.StraightenDirection = CPRStraightenDirection.Vertical;
             this.ProjectionMode = IntensityProjectionMode.Single;
             this.ProjectionAxis = -Vector3.UnitY;
-            this.StraightenDirection = CPRStraightenDirection.Horizontal;
+            this.ProjectionThickness = 0.05f;
+            this.MaxStepsCount = 100;
             this.ArcPosition = 0.5f;
             this.CrossSectionSize = 0.1f;
         }
@@ -339,20 +339,12 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public float RotationAngle { get; set; }
         #endregion
 
-        #region 投影厚度 —— float ProjectionThickness
+        #region 拉直方向 —— CPRStraightenDirection StraightenDirection
         /// <summary>
-        /// 投影厚度
+        /// 拉直方向
         /// </summary>
         [DependencyProperty]
-        public float ProjectionThickness { get; set; }
-        #endregion
-
-        #region 最大步数 —— int MaxStepsCount
-        /// <summary>
-        /// 最大步数
-        /// </summary>
-        [DependencyProperty]
-        public int MaxStepsCount { get; set; }
+        public CPRStraightenDirection StraightenDirection { get; set; }
         #endregion
 
         #region 投影模式 —— IntensityProjectionMode ProjectionMode
@@ -371,12 +363,20 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public Vector3 ProjectionAxis { get; set; }
         #endregion
 
-        #region 拉直方向 —— CPRStraightenDirection StraightenDirection
+        #region 投影厚度 —— float ProjectionThickness
         /// <summary>
-        /// 拉直方向
+        /// 投影厚度
         /// </summary>
         [DependencyProperty]
-        public CPRStraightenDirection StraightenDirection { get; set; }
+        public float ProjectionThickness { get; set; }
+        #endregion
+
+        #region 最大步数 —— int MaxStepsCount
+        /// <summary>
+        /// 最大步数
+        /// </summary>
+        [DependencyProperty]
+        public int MaxStepsCount { get; set; }
         #endregion
 
         #region 弧长位置 —— float ArcPosition
@@ -935,6 +935,15 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         /// </summary>
         public ICommand ResetCameraCommand => new AsyncRelayCommand(async _ =>
         {
+            if (this.CPRMode == CPRMode.Straightened)
+            {
+                this.CPRViewport.CPRRenderer.ResetRotationAngle();
+            }
+            if (this.CPRMode == CPRMode.Projected)
+            {
+                this.CPRViewport.CPRRenderer.ResetProjectionAxis();
+            }
+
             this.Camera.Reset();
             this.FrameToken++;
         }, _ => this.VolumeData != null);

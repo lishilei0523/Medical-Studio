@@ -96,11 +96,11 @@
                                  CPRMode="{Binding CPRMode}"
                                  RadialWidth="{Binding RadialWidth}"
                                  RotationAngle="{Binding RotationAngle}"
-                                 ProjectionThickness="{Binding ProjectionThickness}"
-                                 MaxStepsCount="{Binding MaxStepsCount}"
+                                 StraightenDirection="{Binding StraightenDirection}"
                                  ProjectionMode="{Binding ProjectionMode}"
                                  ProjectionAxis="{Binding ProjectionAxis}"
-                                 StraightenDirection="{Binding StraightenDirection}"
+                                 ProjectionThickness="{Binding ProjectionThickness}"
+                                 MaxStepsCount="{Binding MaxStepsCount}"
                                  ArcPosition="{Binding ArcPosition}"
                                  CrossSectionSize="{Binding CrossSectionSize}">
                     <sdm:ShapePresenter3D Content="{Binding CurveGuide}" />

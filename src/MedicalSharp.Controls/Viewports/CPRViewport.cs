@@ -84,14 +84,9 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<float> RotationAngleProperty;
 
         /// <summary>
-        /// 投影厚度依赖属性
+        /// 拉直方向依赖属性
         /// </summary>
-        public static readonly StyledProperty<float> ProjectionThicknessProperty;
-
-        /// <summary>
-        /// 最大步数依赖属性
-        /// </summary>
-        public static readonly StyledProperty<int> MaxStepsCountProperty;
+        public static readonly StyledProperty<CPRStraightenDirection> StraightenDirectionProperty;
 
         /// <summary>
         /// 投影模式依赖属性
@@ -104,9 +99,14 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<Vector3> ProjectionAxisProperty;
 
         /// <summary>
-        /// 拉直方向依赖属性
+        /// 投影厚度依赖属性
         /// </summary>
-        public static readonly StyledProperty<CPRStraightenDirection> StraightenDirectionProperty;
+        public static readonly StyledProperty<float> ProjectionThicknessProperty;
+
+        /// <summary>
+        /// 最大步数依赖属性
+        /// </summary>
+        public static readonly StyledProperty<int> MaxStepsCountProperty;
 
         /// <summary>
         /// 弧长位置依赖属性
@@ -139,11 +139,11 @@ namespace MedicalSharp.Controls.Viewports
             CPRModeProperty = AvaloniaProperty.Register<CPRViewport, CPRMode>(nameof(CPRMode), CPRMode.Straightened);
             RadialWidthProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(RadialWidth), 0.1f);
             RotationAngleProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(RotationAngle), 0f);
-            ProjectionThicknessProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(ProjectionThickness), 0.05f);
-            MaxStepsCountProperty = AvaloniaProperty.Register<CPRViewport, int>(nameof(MaxStepsCount), 100);
+            StraightenDirectionProperty = AvaloniaProperty.Register<CPRViewport, CPRStraightenDirection>(nameof(StraightenDirection), CPRStraightenDirection.Vertical);
             ProjectionModeProperty = AvaloniaProperty.Register<CPRViewport, IntensityProjectionMode>(nameof(ProjectionMode), IntensityProjectionMode.Single);
             ProjectionAxisProperty = AvaloniaProperty.Register<CPRViewport, Vector3>(nameof(ProjectionAxis), -Vector3.UnitY);
-            StraightenDirectionProperty = AvaloniaProperty.Register<CPRViewport, CPRStraightenDirection>(nameof(StraightenDirection), CPRStraightenDirection.Horizontal);
+            ProjectionThicknessProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(ProjectionThickness), 0.05f);
+            MaxStepsCountProperty = AvaloniaProperty.Register<CPRViewport, int>(nameof(MaxStepsCount), 100);
             ArcPositionProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(ArcPosition), 0.5f);
             CrossSectionSizeProperty = AvaloniaProperty.Register<CPRViewport, float>(nameof(CrossSectionSize), 0.1f);
             VolumeDataProperty = AvaloniaProperty.Register<CPRViewport, VolumeData>(nameof(VolumeData));
@@ -160,11 +160,11 @@ namespace MedicalSharp.Controls.Viewports
             CPRModeProperty.Changed.AddClassHandler<CPRViewport, CPRMode>(OnCPRModeChanged);
             RadialWidthProperty.Changed.AddClassHandler<CPRViewport, float>(OnRadialWidthChanged);
             RotationAngleProperty.Changed.AddClassHandler<CPRViewport, float>(OnRotationAngleChanged);
-            ProjectionThicknessProperty.Changed.AddClassHandler<CPRViewport, float>(OnProjectionThicknessChanged);
-            MaxStepsCountProperty.Changed.AddClassHandler<CPRViewport, int>(OnMaxStepsCountChanged);
+            StraightenDirectionProperty.Changed.AddClassHandler<CPRViewport, CPRStraightenDirection>(OnStraightenDirectionChanged);
             ProjectionModeProperty.Changed.AddClassHandler<CPRViewport, IntensityProjectionMode>(OnProjectionModeChanged);
             ProjectionAxisProperty.Changed.AddClassHandler<CPRViewport, Vector3>(OnProjectionAxisChanged);
-            StraightenDirectionProperty.Changed.AddClassHandler<CPRViewport, CPRStraightenDirection>(OnStraightenDirectionChanged);
+            ProjectionThicknessProperty.Changed.AddClassHandler<CPRViewport, float>(OnProjectionThicknessChanged);
+            MaxStepsCountProperty.Changed.AddClassHandler<CPRViewport, int>(OnMaxStepsCountChanged);
             ArcPositionProperty.Changed.AddClassHandler<CPRViewport, float>(OnArcPositionChanged);
             CrossSectionSizeProperty.Changed.AddClassHandler<CPRViewport, float>(OnCrossSectionSizeChanged);
             VolumeDataProperty.Changed.AddClassHandler<CPRViewport, VolumeData>(OnVolumeDataChanged);
@@ -314,25 +314,14 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 投影厚度 —— float ProjectionThickness
+        #region 依赖属性 - 拉直方向 —— CPRStraightenDirection StraightenDirection
         /// <summary>
-        /// 依赖属性 - 投影厚度
+        /// 依赖属性 - 拉直方向
         /// </summary>
-        public float ProjectionThickness
+        public CPRStraightenDirection StraightenDirection
         {
-            get => this.GetValue(ProjectionThicknessProperty);
-            set => this.SetValue(ProjectionThicknessProperty, value);
-        }
-        #endregion
-
-        #region 依赖属性 - 最大步数 —— int MaxStepsCount
-        /// <summary>
-        /// 依赖属性 - 最大步数
-        /// </summary>
-        public int MaxStepsCount
-        {
-            get => this.GetValue(MaxStepsCountProperty);
-            set => this.SetValue(MaxStepsCountProperty, value);
+            get => this.GetValue(StraightenDirectionProperty);
+            set => this.SetValue(StraightenDirectionProperty, value);
         }
         #endregion
 
@@ -358,14 +347,25 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 依赖属性 - 拉直方向 —— CPRStraightenDirection StraightenDirection
+        #region 依赖属性 - 投影厚度 —— float ProjectionThickness
         /// <summary>
-        /// 依赖属性 - 拉直方向
+        /// 依赖属性 - 投影厚度
         /// </summary>
-        public CPRStraightenDirection StraightenDirection
+        public float ProjectionThickness
         {
-            get => this.GetValue(StraightenDirectionProperty);
-            set => this.SetValue(StraightenDirectionProperty, value);
+            get => this.GetValue(ProjectionThicknessProperty);
+            set => this.SetValue(ProjectionThicknessProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 最大步数 —— int MaxStepsCount
+        /// <summary>
+        /// 依赖属性 - 最大步数
+        /// </summary>
+        public int MaxStepsCount
+        {
+            get => this.GetValue(MaxStepsCountProperty);
+            set => this.SetValue(MaxStepsCountProperty, value);
         }
         #endregion
 
@@ -868,26 +868,13 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 投影厚度改变事件 —— static void OnProjectionThicknessChanged(CPRViewport viewport...
+        #region 拉直方向改变事件 —— static void OnStraightenDirectionChanged(CPRViewport viewport...
         /// <summary>
-        /// 投影厚度改变事件
+        /// 拉直方向改变事件
         /// </summary>
-        private static void OnProjectionThicknessChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        private static void OnStraightenDirectionChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<CPRStraightenDirection> eventArgs)
         {
-            viewport.ApplyCPROptions(viewport._cprRenderer);
-
-            //请求下一帧
-            viewport.RequestNextFrameRendering();
-        }
-        #endregion
-
-        #region 最大步数改变事件 —— static void OnMaxStepsCountChanged(CPRViewport viewport...
-        /// <summary>
-        /// 最大步数改变事件
-        /// </summary>
-        private static void OnMaxStepsCountChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<int> eventArgs)
-        {
-            viewport.ApplyCPROptions(viewport._cprRenderer);
+            viewport._cprRenderer?.SwitchStraightenDirection(eventArgs.NewValue.Value);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
@@ -920,13 +907,26 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 拉直方向改变事件 —— static void OnStraightenDirectionChanged(CPRViewport viewport...
+        #region 投影厚度改变事件 —— static void OnProjectionThicknessChanged(CPRViewport viewport...
         /// <summary>
-        /// 拉直方向改变事件
+        /// 投影厚度改变事件
         /// </summary>
-        private static void OnStraightenDirectionChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<CPRStraightenDirection> eventArgs)
+        private static void OnProjectionThicknessChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
-            viewport._cprRenderer?.SwitchStraightenDirection(eventArgs.NewValue.Value);
+            viewport.ApplyCPROptions(viewport._cprRenderer);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 最大步数改变事件 —— static void OnMaxStepsCountChanged(CPRViewport viewport...
+        /// <summary>
+        /// 最大步数改变事件
+        /// </summary>
+        private static void OnMaxStepsCountChanged(CPRViewport viewport, AvaloniaPropertyChangedEventArgs<int> eventArgs)
+        {
+            viewport.ApplyCPROptions(viewport._cprRenderer);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();

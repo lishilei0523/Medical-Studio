@@ -34,6 +34,11 @@ namespace MedicalSharp.Engine.Renderers
         private CurveFrame _curveFrame;
 
         /// <summary>
+        /// 原始投影轴
+        /// </summary>
+        private Vector3? _originalProjectionAxis;
+
+        /// <summary>
         /// 单位平面
         /// </summary>
         private readonly VertexBuffer _unitPlane;
@@ -54,11 +59,11 @@ namespace MedicalSharp.Engine.Renderers
             this.CPRMode = CPRMode.Straightened;
             this.RadialWidth = 0.1f;
             this.RotationAngle = 0f;
-            this.ProjectionThickness = 0.05f;
-            this.MaxStepsCount = 100;
+            this.StraightenDirection = CPRStraightenDirection.Vertical;
             this.ProjectionMode = IntensityProjectionMode.Single;
             this.ProjectionAxis = -Vector3.UnitY;
-            this.StraightenDirection = CPRStraightenDirection.Horizontal;
+            this.ProjectionThickness = 0.05f;
+            this.MaxStepsCount = 100;
             this.ArcPosition = 0.5f;
             this.CrossSectionSize = 0.1f;
         }
@@ -146,20 +151,12 @@ namespace MedicalSharp.Engine.Renderers
         public float RotationAngle { get; private set; }
         #endregion
 
-        #region 投影厚度 —— float ProjectionThickness
+        #region 拉直方向 —— CPRStraightenDirection StraightenDirection
         /// <summary>
-        /// 投影厚度
+        /// 拉直方向
         /// </summary>
-        /// <remarks>世界空间，Projected使用</remarks>
-        public float ProjectionThickness { get; private set; }
-        #endregion
-
-        #region 最大步数 —— int MaxStepsCount
-        /// <summary>
-        /// 最大步数
-        /// </summary>
-        /// <remarks>Projected使用</remarks>
-        public int MaxStepsCount { get; private set; }
+        /// <remarks>Straightened使用</remarks>
+        public CPRStraightenDirection StraightenDirection { get; private set; }
         #endregion
 
         #region 投影模式 —— IntensityProjectionMode ProjectionMode
@@ -186,12 +183,20 @@ namespace MedicalSharp.Engine.Renderers
         public float ProjectionRange { get; private set; }
         #endregion
 
-        #region 拉直方向 —— CPRStraightenDirection StraightenDirection
+        #region 投影厚度 —— float ProjectionThickness
         /// <summary>
-        /// 拉直方向
+        /// 投影厚度
         /// </summary>
-        /// <remarks>Straightened使用</remarks>
-        public CPRStraightenDirection StraightenDirection { get; private set; }
+        /// <remarks>世界空间，Projected使用</remarks>
+        public float ProjectionThickness { get; private set; }
+        #endregion
+
+        #region 最大步数 —— int MaxStepsCount
+        /// <summary>
+        /// 最大步数
+        /// </summary>
+        /// <remarks>Projected使用</remarks>
+        public int MaxStepsCount { get; private set; }
         #endregion
 
         #region 弧长位置 —— float ArcPosition
@@ -266,6 +271,17 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
+        #region 切换拉直方向 —— void SwitchStraightenDirection(CPRStraightenDirection...
+        /// <summary>
+        /// 切换拉直方向
+        /// </summary>
+        /// <param name="straightenDirection">拉直方向</param>
+        public void SwitchStraightenDirection(CPRStraightenDirection straightenDirection)
+        {
+            this.StraightenDirection = straightenDirection;
+        }
+        #endregion
+
         #region 切换投影模式 —— void SwitchProjectionMode(IntensityProjectionMode...
         /// <summary>
         /// 切换投影模式
@@ -283,18 +299,12 @@ namespace MedicalSharp.Engine.Renderers
         /// </summary>
         public void SwitchProjectionAxis(Vector3 axis)
         {
-            this.ProjectionAxis = Vector3.Normalize(axis);
-        }
-        #endregion
+            if (!this._originalProjectionAxis.HasValue)
+            {
+                this._originalProjectionAxis = axis.Normalized();
+            }
 
-        #region 切换拉直方向 —— void SwitchStraightenDirection(CPRStraightenDirection...
-        /// <summary>
-        /// 切换拉直方向
-        /// </summary>
-        /// <param name="straightenDirection">拉直方向</param>
-        public void SwitchStraightenDirection(CPRStraightenDirection straightenDirection)
-        {
-            this.StraightenDirection = straightenDirection;
+            this.ProjectionAxis = axis.Normalized();
         }
         #endregion
 
@@ -483,6 +493,29 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
+        #region 重置旋转角度 —— void ResetRotationAngle()
+        /// <summary>
+        /// 重置旋转角度
+        /// </summary>
+        public void ResetRotationAngle()
+        {
+            this.RotationAngle = 0f;
+        }
+        #endregion
+
+        #region 重置投影轴 —— void ResetProjectionAxis()
+        /// <summary>
+        /// 重置投影轴
+        /// </summary>
+        public void ResetProjectionAxis()
+        {
+            if (this._originalProjectionAxis.HasValue)
+            {
+                this.ProjectionAxis = this._originalProjectionAxis.Value;
+            }
+        }
+        #endregion
+
         #region 渲染帧 —— override void RenderFrame(float viewportWidth, float viewportHeight...
         /// <summary>
         /// 渲染帧
@@ -617,11 +650,11 @@ namespace MedicalSharp.Engine.Renderers
                     program.SetUniformInt("u_StraightenDirection", (int)this.StraightenDirection);
                     break;
                 case CPRMode.Projected:
+                    program.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
                     program.SetUniformVector3("u_ProjectionAxis", this.ProjectionAxis);
                     program.SetUniformFloat("u_ProjectionRange", this.ProjectionRange);
                     program.SetUniformFloat("u_ProjectionThickness", this.Renderable.VolumeMetadata.VolumeScale.Length);
                     program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
-                    program.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
                     break;
                 case CPRMode.CrossSectional:
                     program.SetUniformFloat("u_ArcPosition", this.ArcPosition);
