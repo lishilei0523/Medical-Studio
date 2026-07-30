@@ -39,6 +39,11 @@ namespace MedicalSharp.Engine.Renderers
         private Vector3? _originalProjectionAxis;
 
         /// <summary>
+        /// 模型矩阵
+        /// </summary>
+        private Matrix4 _modelMatrix;
+
+        /// <summary>
         /// 单位平面
         /// </summary>
         private readonly VertexBuffer _unitPlane;
@@ -50,6 +55,7 @@ namespace MedicalSharp.Engine.Renderers
         public CPRRenderer(CPRCamera camera)
             : base(camera)
         {
+            this._modelMatrix = Matrix4.Identity;
             this._unitPlane = new VertexBuffer(ResourceManager.UnitPlane);
             this.RenderMode = CPRRenderMode.Gray;
             this.WindowWidth = 400;
@@ -232,6 +238,16 @@ namespace MedicalSharp.Engine.Renderers
         public CurveFrame CurveFrame
         {
             get => this._curveFrame;
+        }
+        #endregion
+
+        #region 只读属性 - 模型矩阵 —— Matrix4 ModelMatrix
+        /// <summary>
+        /// 只读属性 - 模型矩阵
+        /// </summary>
+        public Matrix4 ModelMatrix
+        {
+            get => this._modelMatrix;
         }
         #endregion
 
@@ -565,27 +581,26 @@ namespace MedicalSharp.Engine.Renderers
             float aspectRatio = this.Curve.TotalArcLength / this.RadialWidth;
 
             //模型矩阵
-            Matrix4 modelMatrix;
             if (this.CPRMode == CPRMode.CrossSectional)
             {
-                modelMatrix = Matrix4.Identity;
+                this._modelMatrix = Matrix4.Identity;
             }
             else if (this.CPRMode == CPRMode.Projected)
             {
                 float scaleX = this.ProjectionRange;        //投影轴范围映射到屏幕宽度
                 float scaleY = this.Curve.TotalArcLength;   //弧长映射到屏幕高度
-                modelMatrix = Matrix4.CreateScale(scaleX, scaleY, 1f);
+                this._modelMatrix = Matrix4.CreateScale(scaleX, scaleY, 1f);
             }
             else
             {
                 bool arcOnY = this.CPRMode == CPRMode.Straightened && this.StraightenDirection == CPRStraightenDirection.Vertical;
-                modelMatrix = arcOnY
+                this._modelMatrix = arcOnY
                     ? Matrix4.CreateScale(1f, aspectRatio, 1f)
                     : Matrix4.CreateScale(aspectRatio, 1f, 1f);
             }
 
             //相机视野
-            Vector3 scale = modelMatrix.ExtractScale();
+            Vector3 scale = this._modelMatrix.ExtractScale();
             float imageWidth = scale.X;   //投影范围
             float imageHeight = scale.Y;  //弧长
             if (this.CPRMode == CPRMode.Straightened)
@@ -622,7 +637,7 @@ namespace MedicalSharp.Engine.Renderers
             program.Use();
 
             //设置MVP矩阵、缩放
-            program.SetUniformMatrix4("u_ModelMatrix", modelMatrix);
+            program.SetUniformMatrix4("u_ModelMatrix", this._modelMatrix);
             program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
             program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
