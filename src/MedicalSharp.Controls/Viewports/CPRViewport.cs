@@ -444,6 +444,12 @@ namespace MedicalSharp.Controls.Viewports
         /// </summary>
         /// <param name="screenPixelPos2D">屏幕像素2D位置</param>
         /// <returns>射线</returns>
+        /// <remarks>
+        /// 和Shader采样逻辑一致：
+        /// 屏幕坐标 -> 投影/视图逆矩阵 -> 世界坐标 -> ModelMatrix逆变换 -> UnitPlane局部坐标 → U/V；
+        /// UV -> 弧长 + 偏移 -> Frenet框架 -> 世界空间采样位置；
+        /// 射线起点 = 采样位置（世界空间），方向 = 相机视线方向；
+        /// </remarks>
         public override Ray UnProject(Vector2 screenPixelPos2D)
         {
             #region # 验证
@@ -455,33 +461,32 @@ namespace MedicalSharp.Controls.Viewports
 
             #endregion
 
-            //获取投影和视图逆矩阵
-            Matrix4 projectionInv = Matrix4.Invert(this.Camera.ProjectionMatrix);
-            Matrix4 viewInv = Matrix4.Invert(this.Camera.ViewMatrix);
+            //计算投影、视图逆矩阵
+            Matrix4 projectionMatrixInv = Matrix4.Invert(this.Camera.ProjectionMatrix);
+            Matrix4 viewMatrixInv = Matrix4.Invert(this.Camera.ViewMatrix);
 
             //屏幕坐标 -> NDC
             float ndcX = (2.0f * screenPixelPos2D.X) / this._viewportSize.Width - 1.0f;
             float ndcY = 1.0f - (2.0f * screenPixelPos2D.Y) / this._viewportSize.Height;
 
             //NDC -> 相机空间
-            Vector4 cameraPos = new Vector4(ndcX, ndcY, 0.0f, 1.0f) * projectionInv;
-            cameraPos /= cameraPos.W;
+            Vector4 cameraPosition = new Vector4(ndcX, ndcY, 0.0f, 1.0f) * projectionMatrixInv;
+            cameraPosition /= cameraPosition.W;
 
             //相机空间 -> 世界空间
-            Vector3 worldPos = (cameraPos * viewInv).Xyz;
+            Vector3 worldPosition = (cameraPosition * viewMatrixInv).Xyz;
 
-            //世界空间 -> ModelMatrix局部空间 -> UV
+            //世界空间 -> 局部空间 -> U/V
             Matrix4 localToWorld = this._cprRenderer.ModelMatrix;
             Matrix4 worldToLocal = Matrix4.Invert(localToWorld);
-            Vector3 localPosition = Vector3.TransformPosition(worldPos, worldToLocal);
-            float uvX = localPosition.X + 0.5f;
-            float uvY = localPosition.Y + 0.5f;
-            if (uvX < 0 || uvX > 1 || uvY < 0 || uvY > 1)
+            Vector3 localPosition = Vector3.TransformPosition(worldPosition, worldToLocal);
+            Vector2 uv = new Vector2(localPosition.X + 0.5f, localPosition.Y + 0.5f);
+            if (uv.X < 0 || uv.X > 1 || uv.Y < 0 || uv.Y > 1)
             {
                 return default;
             }
 
-            //UV -> 弧长 + 偏移
+            //U/V -> 弧长 + 偏移
             float arcLength;
             float axisOffset;
             switch (this.CPRMode)
@@ -489,18 +494,18 @@ namespace MedicalSharp.Controls.Viewports
                 case CPRMode.Straightened:
                     if (this.StraightenDirection == CPRStraightenDirection.Vertical)
                     {
-                        arcLength = uvY * this.Curve.TotalArcLength;
-                        axisOffset = (uvX - 0.5f) * this.RadialWidth;
+                        arcLength = uv.Y * this.Curve.TotalArcLength;
+                        axisOffset = (uv.X - 0.5f) * this.RadialWidth;
                     }
                     else
                     {
-                        arcLength = uvX * this.Curve.TotalArcLength;
-                        axisOffset = (uvY - 0.5f) * this.RadialWidth;
+                        arcLength = uv.X * this.Curve.TotalArcLength;
+                        axisOffset = (uv.Y - 0.5f) * this.RadialWidth;
                     }
                     break;
                 case CPRMode.Projected:
-                    arcLength = uvY * this.Curve.TotalArcLength;
-                    axisOffset = (uvX - 0.5f) * this._cprRenderer.ProjectionRange;
+                    arcLength = uv.Y * this.Curve.TotalArcLength;
+                    axisOffset = (uv.X - 0.5f) * this._cprRenderer.ProjectionRange;
                     break;
                 case CPRMode.CrossSectional:
                     arcLength = this.ArcPosition * this.Curve.TotalArcLength;
@@ -510,32 +515,35 @@ namespace MedicalSharp.Controls.Viewports
                     return default;
             }
 
+            //获取曲线Frenet框架
             FrenetFrame frame = this.Curve.GetFrameAtArcLength(arcLength);
 
+            //计算采样位置
             Vector3 samplePosition;
             switch (this.CPRMode)
             {
                 case CPRMode.Straightened:
                     float rotationRad = MathHelper.DegreesToRadians(this.RotationAngle);
-                    float cosA = MathF.Cos(rotationRad);
-                    float sinA = MathF.Sin(rotationRad);
-                    Vector3 rotatedNormal = frame.Normal * cosA +
-                                            Vector3.Cross(frame.Tangent, frame.Normal) * sinA +
-                                            frame.Tangent * Vector3.Dot(frame.Tangent, frame.Normal) * (1.0f - cosA);
+                    float cos = MathF.Cos(rotationRad);
+                    float sin = MathF.Sin(rotationRad);
+                    Vector3 rotatedNormal = frame.Normal * cos +
+                                            Vector3.Cross(frame.Tangent, frame.Normal) * sin +
+                                            frame.Tangent * Vector3.Dot(frame.Tangent, frame.Normal) * (1.0f - cos);
                     samplePosition = frame.Position + rotatedNormal * axisOffset;
                     break;
                 case CPRMode.Projected:
                     samplePosition = frame.Position + this.ProjectionAxis * axisOffset;
                     break;
                 case CPRMode.CrossSectional:
-                    float normalOffset = (uvX - 0.5f) * this.CrossSectionSize;
-                    float binormalOffset = (uvY - 0.5f) * this.CrossSectionSize;
+                    float normalOffset = (uv.X - 0.5f) * this.CrossSectionSize;
+                    float binormalOffset = (uv.Y - 0.5f) * this.CrossSectionSize;
                     samplePosition = frame.Position + frame.Normal * normalOffset + frame.Binormal * binormalOffset;
                     break;
                 default:
                     return default;
             }
 
+            //构造射线
             Ray ray = new Ray(samplePosition, this.CPRCamera.LookDirection);
 
             return ray;
@@ -565,20 +573,22 @@ namespace MedicalSharp.Controls.Viewports
 
             #region # 验证
 
-            if (this.VolumeData == null || this.Curve == null || this._viewportSize.Width == 0 || this._viewportSize.Height == 0)
+            if (this.VolumeData == null || this.Curve == null)
             {
                 return false;
             }
 
             #endregion
 
+            this.GlContext.MakeCurrent();
             ray = this.UnProject(position);
 
-            //射线起点 → 纹理坐标 → 体素坐标
+            //射线起点 -> 纹理坐标 -> 体素坐标
             worldPosition = ray.Origin;
             textureCoord = worldPosition.ToTextureCoord(this.VolumeData.Metadata);
             voxelPosition = worldPosition.ToVoxelPosition(this.VolumeData.Metadata);
 
+            //边界检查
             if (textureCoord.X < 0 || textureCoord.X > 1 ||
                 textureCoord.Y < 0 || textureCoord.Y > 1 ||
                 textureCoord.Z < 0 || textureCoord.Z > 1)
