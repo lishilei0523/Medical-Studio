@@ -194,8 +194,7 @@ namespace MedicalSharp.Engine.Protocols
                     ? (index * 1.0f / (this.FramesCount - 1))
                     : 0f;
 
-                int reversedIndex = this.FramesCount - 1 - index;
-                FrenetFrame frame = curve.FrenetFrames[reversedIndex];
+                FrenetFrame frame = curve.FrenetFrames[index];
 
                 //应用Transform
                 Vector3 position = Vector3.TransformPosition(frame.Position, curve.Transform);
