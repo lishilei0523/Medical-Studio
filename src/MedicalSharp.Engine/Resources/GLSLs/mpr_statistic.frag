@@ -7,9 +7,17 @@ uniform sampler3D u_PreviewTexture;
 uniform usampler3D u_MarkTexture;
 
 uniform vec3 u_VolumeScale;
+uniform vec3 u_PlaneNormal;             //平面法向量（世界空间）
+uniform int u_ProjectionMode;           //密度投影模式：0=Single, 1=AIP, 2=MIP, 3=MinIP
+uniform float u_ProjectionThickness;    //投影厚度（世界空间）
+uniform int u_MaxStepsCount;            //最大步数
 
 //常量
 const float MAX_16BIT_SIGNED = 32767.0;
+const int PROJECTION_SINGLE = 0;
+const int PROJECTION_AIP = 1;
+const int PROJECTION_MIP = 2;
+const int PROJECTION_MINIP = 3;
 
 
 void main()

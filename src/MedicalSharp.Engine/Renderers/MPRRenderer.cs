@@ -50,6 +50,9 @@ namespace MedicalSharp.Engine.Renderers
             this.WindowCenter = 40;
             this.Brightness = 1.0f;
             this.Contrast = 1.0f;
+            this.ProjectionMode = IntensityProjectionMode.Single;
+            this.ProjectionThickness = 0.05f;
+            this.MaxStepsCount = 100;
         }
 
         #endregion
@@ -89,6 +92,30 @@ namespace MedicalSharp.Engine.Renderers
         /// 对比度
         /// </summary>
         public float Contrast { get; private set; }
+        #endregion
+
+        #region 投影模式 —— IntensityProjectionMode ProjectionMode
+        /// <summary>
+        /// 投影模式
+        /// </summary>
+        /// <remarks>Projected使用</remarks>
+        public IntensityProjectionMode ProjectionMode { get; private set; }
+        #endregion
+
+        #region 投影厚度 —— float ProjectionThickness
+        /// <summary>
+        /// 投影厚度
+        /// </summary>
+        /// <remarks>世界空间，Projected使用</remarks>
+        public float ProjectionThickness { get; private set; }
+        #endregion
+
+        #region 最大步数 —— int MaxStepsCount
+        /// <summary>
+        /// 最大步数
+        /// </summary>
+        /// <remarks>Projected使用</remarks>
+        public int MaxStepsCount { get; private set; }
         #endregion
 
         #region 传递函数 —— HUTransferFunction TransferFunction
@@ -149,6 +176,17 @@ namespace MedicalSharp.Engine.Renderers
         }
         #endregion
 
+        #region 切换投影模式 —— void SwitchProjectionMode(IntensityProjectionMode...
+        /// <summary>
+        /// 切换投影模式
+        /// </summary>
+        /// <param name="projectionMode">密度投影模式</param>
+        public void SwitchProjectionMode(IntensityProjectionMode projectionMode)
+        {
+            this.ProjectionMode = projectionMode;
+        }
+        #endregion
+
         #region 绑定MPR平面 —— void BindPlane(MPRPlane plane)
         /// <summary>
         /// 绑定MPR平面
@@ -197,6 +235,32 @@ namespace MedicalSharp.Engine.Renderers
         {
             this.Brightness = brightness;
             this.Contrast = contrast;
+        }
+        #endregion
+
+        #region 设置投影选项 —— void SetProjectedOptions(float projectionThickness, int maxStepsCount)
+        /// <summary>
+        /// 设置投影选项
+        /// </summary>
+        /// <param name="projectionThickness">投影厚度</param>
+        /// <param name="maxStepsCount">最大步数</param>
+        public void SetProjectedOptions(float projectionThickness = 0.05f, int maxStepsCount = 100)
+        {
+            #region # 验证
+
+            if (projectionThickness <= 0f)
+            {
+                throw new ArgumentOutOfRangeException(nameof(projectionThickness), "投影厚度必须大于0！");
+            }
+            if (maxStepsCount < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxStepsCount), "最大步数必须大于等于1！");
+            }
+
+            #endregion
+
+            this.ProjectionThickness = projectionThickness;
+            this.MaxStepsCount = maxStepsCount;
         }
         #endregion
 
@@ -304,6 +368,7 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformMatrix4("u_ViewMatrix", renderContext.ViewMatrix);
             program.SetUniformMatrix4("u_ProjectionMatrix", renderContext.ProjectionMatrix);
             program.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
+            program.SetUniformVector3("u_PlaneNormal", this.Plane.WorldNormal);
 
             //设置渲染模式
             program.SetUniformInt("u_RenderMode", (int)this.RenderMode);
@@ -315,6 +380,11 @@ namespace MedicalSharp.Engine.Renderers
             program.SetUniformFloat("u_Contrast", this.Contrast);
             program.SetUniformFloat("u_HUMin", this.TransferFunction.HUMin);
             program.SetUniformFloat("u_HUMax", this.TransferFunction.HUMax);
+
+            //设置投影参数
+            program.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
+            program.SetUniformFloat("u_ProjectionThickness", this.ProjectionThickness);
+            program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
 
             //设置标记策略
             program.SetUniformIntArray("u_MarkModes", [.. this.MarkStrategy.MarkModes.Select(mode => (int)mode)]);
@@ -393,6 +463,12 @@ namespace MedicalSharp.Engine.Renderers
             statProgram.SetUniformMatrix4("u_ViewMatrix", this.Camera.ViewMatrix);
             statProgram.SetUniformMatrix4("u_ProjectionMatrix", this.Camera.ProjectionMatrix);
             statProgram.SetUniformVector3("u_VolumeScale", this.Renderable.VolumeMetadata.VolumeScale);
+            statProgram.SetUniformVector3("u_PlaneNormal", this.Plane.WorldNormal);
+
+            //设置投影参数
+            statProgram.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
+            statProgram.SetUniformFloat("u_ProjectionThickness", this.ProjectionThickness);
+            statProgram.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
 
             //绑定纹理
             this.Renderable.PreviewTexture.Bind(0);

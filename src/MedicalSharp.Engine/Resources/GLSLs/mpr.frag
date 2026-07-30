@@ -9,12 +9,17 @@ uniform sampler1D u_TransferFunction;
 uniform sampler1D u_MarkStrategy;
 
 uniform vec3 u_VolumeScale;
+uniform vec3 u_PlaneNormal;             //平面法向量（世界空间）
 uniform float u_WindowWidth;
 uniform float u_WindowCenter;
 uniform float u_Brightness;             //亮度
 uniform float u_Contrast;               //对比度
 uniform float u_HUMin;
 uniform float u_HUMax;
+
+uniform int u_ProjectionMode;           //密度投影模式：0=Single, 1=AIP, 2=MIP, 3=MinIP
+uniform float u_ProjectionThickness;    //投影厚度（世界空间）
+uniform int u_MaxStepsCount;            //最大步数
 
 //渲染模式：0=Gray, 1=PseudoColor
 uniform int u_RenderMode;
@@ -25,6 +30,10 @@ uniform int u_MarkModes[256];
 //常量
 const float EPSILON = 0.0001;
 const float MAX_16BIT_SIGNED = 32767.0;
+const int PROJECTION_SINGLE = 0;
+const int PROJECTION_AIP = 1;
+const int PROJECTION_MIP = 2;
+const int PROJECTION_MINIP = 3;
 
 
 //灰度模式：窗宽窗位裁剪 + 线性映射

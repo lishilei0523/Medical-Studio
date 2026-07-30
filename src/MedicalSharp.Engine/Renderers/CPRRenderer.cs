@@ -668,7 +668,7 @@ namespace MedicalSharp.Engine.Renderers
                     program.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
                     program.SetUniformVector3("u_ProjectionAxis", this.ProjectionAxis);
                     program.SetUniformFloat("u_ProjectionRange", this.ProjectionRange);
-                    program.SetUniformFloat("u_ProjectionThickness", this.Renderable.VolumeMetadata.VolumeScale.Length);
+                    program.SetUniformFloat("u_ProjectionThickness", this.ProjectionThickness);
                     program.SetUniformInt("u_MaxStepsCount", this.MaxStepsCount);
                     break;
                 case CPRMode.CrossSectional:
