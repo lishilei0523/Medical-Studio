@@ -32,13 +32,70 @@ void main()
     {
         FragColor = vec4(0.0, 0.0, 0.0, 0.0);
         return;
-    }
-    
+    }  
+
     //采样标记纹理
     uint markValue = texture(u_MarkTexture, texCoord).r;
 
+    //归一化平面法向量
+    vec3 planeNormal = normalize(u_PlaneNormal);
+
+    //计算snorm值
+    float snormValue;    
+    if (u_ProjectionMode == PROJECTION_SINGLE)
+    {
+        //单层采样
+        snormValue = texture(u_PreviewTexture, texCoord).r;
+    }
+    else
+    {
+        //沿法向量方向步进采样
+        float halfThickness = u_ProjectionThickness * 0.5;
+        float stepSize = u_ProjectionThickness / float(u_MaxStepsCount);
+        
+        if (u_ProjectionMode == PROJECTION_MIP)
+        {
+            float maxSNorm = -1.0;
+            for (int index = 0; index <= u_MaxStepsCount; index++)
+            {
+                float offset = -halfThickness + stepSize * float(index);
+                vec3 samplePosition = WorldPosition + planeNormal * offset;
+                vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
+                float snorm = texture(u_PreviewTexture, localTexCoord).r;
+                maxSNorm = max(maxSNorm, snorm);
+            }
+            snormValue = maxSNorm;
+        }
+        else if (u_ProjectionMode == PROJECTION_MINIP)
+        {
+            float minSNorm = 1.0;
+            for (int index = 0; index <= u_MaxStepsCount; index++)
+            {
+                float offset = -halfThickness + stepSize * float(index);
+                vec3 samplePosition = WorldPosition + planeNormal * offset;
+                vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
+                float snorm = texture(u_PreviewTexture, localTexCoord).r;
+                minSNorm = min(minSNorm, snorm);
+            }
+            snormValue = minSNorm;
+        }
+        else //PROJECTION_AIP
+        {
+            float sumSNorm = 0.0;
+            int count = 0;
+            for (int index = 0; index <= u_MaxStepsCount; index++)
+            {
+                float offset = -halfThickness + stepSize * float(index);
+                vec3 samplePosition = WorldPosition + planeNormal * offset;
+                vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
+                sumSNorm += texture(u_PreviewTexture, localTexCoord).r;
+                count++;
+            }
+            snormValue = count > 0 ? sumSNorm / float(count) : 0.0;
+        }
+    }
+
     //归一化snorm范围[-1, 1] -> [0, 1]
-	float snormValue = texture(u_PreviewTexture, texCoord).r;
     float normalized = (snormValue + 1.0) / 2.0;
     normalized = clamp(normalized, 0.0, 1.0);
     

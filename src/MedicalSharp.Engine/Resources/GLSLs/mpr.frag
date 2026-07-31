@@ -116,8 +116,66 @@ void main()
         discard;
     }
 
-    //获取原始医学值
-    float medicalValue = getMedicalValue(texCoord);
+    //归一化平面法向量
+    vec3 planeNormal = normalize(u_PlaneNormal);
+
+    //获取医学值
+    float medicalValue;    
+    if (u_ProjectionMode == PROJECTION_SINGLE)
+    {
+        //单层采样
+        medicalValue = getMedicalValue(texCoord);
+    }
+    else
+    {
+        //沿法向量方向步进采样
+        float halfThickness = u_ProjectionThickness * 0.5;
+        float stepSize = u_ProjectionThickness / float(u_MaxStepsCount);        
+        if (u_ProjectionMode == PROJECTION_MIP)
+        {
+            float maxHU = -1000.0;
+            for (int index = 0; index <= u_MaxStepsCount; index++)
+            {
+                float offset = -halfThickness + stepSize * float(index);
+                vec3 samplePosition = WorldPosition + planeNormal * offset;
+                vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
+                float hu = getMedicalValue(localTexCoord);
+                maxHU = max(maxHU, hu);
+            }
+            medicalValue = maxHU;
+        }
+        else if (u_ProjectionMode == PROJECTION_MINIP)
+        {
+            float minHU = 3071.0;
+            for (int index = 0; index <= u_MaxStepsCount; index++)
+            {
+                float offset = -halfThickness + stepSize * float(index);
+                vec3 samplePosition = WorldPosition + planeNormal * offset;
+                vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
+                float hu = getMedicalValue(localTexCoord);
+                minHU = min(minHU, hu);
+            }
+            medicalValue = minHU;
+        }
+        else //PROJECTION_AIP
+        {
+            float sumHU = 0.0;
+            int validCount = 0;
+            for (int index = 0; index <= u_MaxStepsCount; index++)
+            {
+                float offset = -halfThickness + stepSize * float(index);
+                vec3 samplePosition = WorldPosition + planeNormal * offset;
+                vec3 localTexCoord = (samplePosition / u_VolumeScale) + 0.5;
+                float hu = getMedicalValue(localTexCoord);
+                if (hu > -1000.0)
+                {
+                    sumHU += hu;
+                    validCount++;
+                }
+            }
+            medicalValue = validCount > 0 ? sumHU / float(validCount) : -1000.0;
+        }
+    }
 
     //基础颜色
     vec3 color;
