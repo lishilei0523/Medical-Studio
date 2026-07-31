@@ -58,6 +58,21 @@ namespace MedicalSharp.Controls.Viewports
         public static readonly StyledProperty<float> ContrastProperty;
 
         /// <summary>
+        /// 投影模式依赖属性
+        /// </summary>
+        public static readonly StyledProperty<IntensityProjectionMode> ProjectionModeProperty;
+
+        /// <summary>
+        /// 投影厚度依赖属性
+        /// </summary>
+        public static readonly StyledProperty<float> ProjectionThicknessProperty;
+
+        /// <summary>
+        /// 最大步数依赖属性
+        /// </summary>
+        public static readonly StyledProperty<int> MaxStepsCountProperty;
+
+        /// <summary>
         /// 插值模式依赖属性
         /// </summary>
         public static readonly StyledProperty<InterpolationMode> InterpolationModeProperty;
@@ -83,6 +98,9 @@ namespace MedicalSharp.Controls.Viewports
             WindowCenterProperty = AvaloniaProperty.Register<MPRViewport, int>(nameof(WindowCenter), 40);
             BrightnessProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Brightness), 1.0f);
             ContrastProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(Contrast), 1.0f);
+            ProjectionModeProperty = AvaloniaProperty.Register<MPRViewport, IntensityProjectionMode>(nameof(ProjectionMode), IntensityProjectionMode.Single);
+            ProjectionThicknessProperty = AvaloniaProperty.Register<MPRViewport, float>(nameof(ProjectionThickness), 0.05f);
+            MaxStepsCountProperty = AvaloniaProperty.Register<MPRViewport, int>(nameof(MaxStepsCount), 100);
             InterpolationModeProperty = AvaloniaProperty.Register<MPRViewport, InterpolationMode>(nameof(InterpolationMode), InterpolationMode.Linear);
             TFControlPointsProperty = AvaloniaProperty.Register<MPRViewport, AvaloniaList<HUControlPoint>>(nameof(TFControlPoints));
             VolumeDataProperty = AvaloniaProperty.Register<MPRViewport, VolumeData>(nameof(VolumeData));
@@ -94,6 +112,9 @@ namespace MedicalSharp.Controls.Viewports
             WindowCenterProperty.Changed.AddClassHandler<MPRViewport, int>(OnWindowCenterChanged);
             BrightnessProperty.Changed.AddClassHandler<MPRViewport, float>(OnBrightnessChanged);
             ContrastProperty.Changed.AddClassHandler<MPRViewport, float>(OnContrastChanged);
+            ProjectionModeProperty.Changed.AddClassHandler<MPRViewport, IntensityProjectionMode>(OnProjectionModeChanged);
+            ProjectionThicknessProperty.Changed.AddClassHandler<MPRViewport, float>(OnProjectionThicknessChanged);
+            MaxStepsCountProperty.Changed.AddClassHandler<MPRViewport, int>(OnMaxStepsCountChanged);
             InterpolationModeProperty.Changed.AddClassHandler<MPRViewport, InterpolationMode>(OnInterpolationModeChanged);
             TFControlPointsProperty.Changed.AddClassHandler<MPRViewport, AvaloniaList<HUControlPoint>>(OnTFControlPointsChanged);
             VolumeDataProperty.Changed.AddClassHandler<MPRViewport, VolumeData>(OnVolumeDataChanged);
@@ -185,6 +206,39 @@ namespace MedicalSharp.Controls.Viewports
         {
             get => this.GetValue(ContrastProperty);
             set => this.SetValue(ContrastProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 投影模式 —— IntensityProjectionMode ProjectionMode
+        /// <summary>
+        /// 依赖属性 - 投影模式
+        /// </summary>
+        public IntensityProjectionMode ProjectionMode
+        {
+            get => this.GetValue(ProjectionModeProperty);
+            set => this.SetValue(ProjectionModeProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 投影厚度 —— float ProjectionThickness
+        /// <summary>
+        /// 依赖属性 - 投影厚度
+        /// </summary>
+        public float ProjectionThickness
+        {
+            get => this.GetValue(ProjectionThicknessProperty);
+            set => this.SetValue(ProjectionThicknessProperty, value);
+        }
+        #endregion
+
+        #region 依赖属性 - 最大步数 —— int MaxStepsCount
+        /// <summary>
+        /// 依赖属性 - 最大步数
+        /// </summary>
+        public int MaxStepsCount
+        {
+            get => this.GetValue(MaxStepsCountProperty);
+            set => this.SetValue(MaxStepsCountProperty, value);
         }
         #endregion
 
@@ -368,8 +422,10 @@ namespace MedicalSharp.Controls.Viewports
             //初始化MPR渲染器
             this._mprRenderer = new MPRRenderer(this.MPRCamera);
             this._mprRenderer.SwitchRenderMode(this.RenderMode);
+            this._mprRenderer.SwitchProjectionMode(this.ProjectionMode);
             this._mprRenderer.SetWindowLevel(this.WindowWidth, this.WindowCenter);
             this._mprRenderer.SetMaterialOptions(this.Brightness, this.Contrast);
+            this._mprRenderer.SetProjectedOptions(this.ProjectionThickness, this.MaxStepsCount);
             if (this.VolumeData != null)
             {
                 VolumeSession volumeSession = SessionManager.VolumeSessions[this.VolumeData.Metadata.Id];
@@ -534,6 +590,45 @@ namespace MedicalSharp.Controls.Viewports
         private static void OnContrastChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
         {
             viewport._mprRenderer?.SetMaterialOptions(viewport.Brightness, eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 投影模式改变事件 —— static void OnProjectionModeChanged(MPRViewport viewport...
+        /// <summary>
+        /// 投影模式改变事件
+        /// </summary>
+        private static void OnProjectionModeChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<IntensityProjectionMode> eventArgs)
+        {
+            viewport._mprRenderer?.SwitchProjectionMode(eventArgs.NewValue.Value);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 投影厚度改变事件 —— static void OnProjectionThicknessChanged(MPRViewport viewport...
+        /// <summary>
+        /// 投影厚度改变事件
+        /// </summary>
+        private static void OnProjectionThicknessChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<float> eventArgs)
+        {
+            viewport._mprRenderer?.SetProjectedOptions(eventArgs.NewValue.Value, viewport.MaxStepsCount);
+
+            //请求下一帧
+            viewport.RequestNextFrameRendering();
+        }
+        #endregion
+
+        #region 最大步数改变事件 —— static void OnMaxStepsCountChanged(MPRViewport viewport...
+        /// <summary>
+        /// 最大步数改变事件
+        /// </summary>
+        private static void OnMaxStepsCountChanged(MPRViewport viewport, AvaloniaPropertyChangedEventArgs<int> eventArgs)
+        {
+            viewport._mprRenderer?.SetProjectedOptions(viewport.ProjectionThickness, eventArgs.NewValue.Value);
 
             //请求下一帧
             viewport.RequestNextFrameRendering();
