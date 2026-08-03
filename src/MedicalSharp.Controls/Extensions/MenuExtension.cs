@@ -206,6 +206,21 @@ namespace MedicalSharp.Controls.Extensions
                 {
                     Header = "删除(_D)",
                     Command = () => RemoveVisual(lineSegment, viewport, shapeCommand)
+                },
+                new ContextMenuItem
+                {
+                    Header = "统计(_S)",
+                    Command = () =>
+                    {
+                        if (viewport is MPRViewport)
+                        {
+                            ApplyAnalyse2D(lineSegment, viewport, shapeCommand);
+                        }
+                        if (viewport is VolumeViewport)
+                        {
+                            ApplyAnalyse3D(lineSegment, viewport, shapeCommand);
+                        }
+                    }
                 }
             ];
 
@@ -349,8 +364,7 @@ namespace MedicalSharp.Controls.Extensions
                 new ContextMenuItem
                 {
                     Header = "统计(_S)",
-                    Command = () => ApplyAnalyse2D(polyline, viewport, shapeCommand),
-                    IsEnabled = polyline.Closed
+                    Command = () => ApplyAnalyse2D(polyline, viewport, shapeCommand)
                 }
             ];
 
@@ -386,8 +400,7 @@ namespace MedicalSharp.Controls.Extensions
                 new ContextMenuItem
                 {
                     Header = "统计(_S)",
-                    Command = () => ApplyAnalyse2D(curve, viewport, shapeCommand),
-                    IsEnabled = curve.Closed
+                    Command = () => ApplyAnalyse2D(curve, viewport, shapeCommand)
                 }
             ];
 

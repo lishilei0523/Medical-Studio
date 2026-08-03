@@ -1,19 +1,21 @@
 ﻿using Avalonia;
 using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
+using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Interfaces;
 using MedicalSharp.Primitives.Maths;
 using MedicalSharp.Primitives.Models;
 using OpenTK.Mathematics;
+using System.Threading.Tasks;
 
 namespace MedicalSharp.Controls.Visual3Ds
 {
     /// <summary>
     /// 线段3D元素
     /// </summary>
-    public class LineSegmentVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable, IHasPerimeter
+    public class LineSegmentVisual3D : ShapeVisual3D, ILineBasedVisual3D, ITranslatable3D, IVertexEditable, IHasPerimeter, IAnalyseVolume2D, IAnalyseVolume3D
     {
         #region # 字段及构造器
 
@@ -216,6 +218,68 @@ namespace MedicalSharp.Controls.Visual3Ds
             float length = Vector3.Distance(mmStart, mmEnd);
 
             return length;
+        }
+        #endregion
+
+        #region 适用统计体积 —— StatisticResult ApplyAnalyseVolume(MPRViewport viewport...
+        /// <summary>
+        /// 适用统计体积
+        /// </summary>
+        /// <param name="viewport">MPR渲染视口</param>
+        /// <param name="markValue">标记值</param>
+        /// <returns>统计结果</returns>
+        public StatisticResult ApplyAnalyseVolume(MPRViewport viewport, byte? markValue)
+        {
+            #region # 验证
+
+            if (viewport.VolumeData == null)
+            {
+                return default;
+            }
+
+            #endregion
+
+            //计算几何指标
+            float perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
+
+            //线段只计算长度
+            StatisticResult simpleResult = new StatisticResult
+            {
+                Perimeter = perimeter
+            };
+
+            return simpleResult;
+        }
+        #endregion
+
+        #region 适用统计体积 —— async Task<StatisticResult> ApplyAnalyseVolume(VolumeData volumeData...
+        /// <summary>
+        /// 适用统计体积
+        /// </summary>
+        /// <param name="volumeData">体积数据</param>
+        /// <param name="markValue">标记值</param>
+        /// <returns>统计结果</returns>
+        public async Task<StatisticResult> ApplyAnalyseVolume(VolumeData volumeData, byte? markValue)
+        {
+            #region # 验证
+
+            if (volumeData == null)
+            {
+                return default;
+            }
+
+            #endregion
+
+            //计算几何指标
+            float perimeter = this.CalculatePerimeter(volumeData.Metadata);
+
+            //线段只计算长度
+            StatisticResult simpleResult = new StatisticResult
+            {
+                Perimeter = perimeter
+            };
+
+            return simpleResult;
         }
         #endregion
 

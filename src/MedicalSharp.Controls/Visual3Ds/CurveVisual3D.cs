@@ -506,16 +506,29 @@ namespace MedicalSharp.Controls.Visual3Ds
             {
                 return default;
             }
-            if (!this.Closed)
-            {
-                return default;
-            }
             if (this.Curve == null || this.Curve.ResampledPoints == null || this.Curve.ResampledPoints.Count < 3)
             {
                 return default;
             }
 
             #endregion
+
+            //计算几何指标
+            float perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
+            float surfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
+            float voxelArea = viewport.Plane.GetVoxelArea();
+            int voxelsCount = (int)Math.Round(surfaceArea / voxelArea);
+
+            //非闭合只计算长度
+            if (!this.Closed)
+            {
+                StatisticResult simpleResult = new StatisticResult
+                {
+                    Perimeter = perimeter
+                };
+
+                return simpleResult;
+            }
 
             //获取所有顶点世界坐标
             Vector3[] worldVertices = this.Curve.ResampledPoints.Select(pos => Vector3.TransformPosition(pos, this.Transform.Matrix)).ToArray();
@@ -529,13 +542,6 @@ namespace MedicalSharp.Controls.Visual3Ds
 
             int viewportWidth = viewport.ViewportSize.Width;
             int viewportHeight = viewport.ViewportSize.Height;
-
-            //计算几何指标
-            float perimeter = this.CalculatePerimeter(viewport.VolumeData.Metadata);
-            float surfaceArea = this.CalculateSurfaceArea(viewport.VolumeData.Metadata);
-            float voxelArea = viewport.Plane.GetVoxelArea();
-            int voxelsCount = (int)Math.Round(surfaceArea / voxelArea);
-
             byte[] layerPixels = viewport.MPRRenderer.RenderStatistic(viewportWidth, viewportHeight, viewport.GlContextHandle);
             StatisticResult result = viewport.VolumeData.ApplyPolygonAnalyse(screenVertices, viewportWidth, viewportHeight, layerPixels, markValue);
             result.Perimeter = perimeter;
