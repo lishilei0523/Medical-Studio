@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Collections;
+using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.InputManagers;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Visual3Ds;
@@ -715,9 +716,16 @@ namespace MedicalSharp.Controls.Viewports
             List<ShapeVisual3D> shapeVisual3Ds = [];
             foreach (ShapeVisual3D shapeVisual3D in base.GetShapeVisual3Ds())
             {
-                if (shapeVisual3D is not IPureVisual3D)
+                if (shapeVisual3D is LineSegmentVisual3D)
                 {
-                    shapeVisual3Ds.Add(shapeVisual3D);
+                    ShapeVisual3D cprShape = shapeVisual3D.CreateCprShape(this);
+                    if (cprShape != null)
+                    {
+                        cprShape.Id = shapeVisual3D.Id;
+                        cprShape.EnsureRenderable();
+                        cprShape.Transform.SetMatrix(this.CPRRenderer.ModelMatrix);
+                        shapeVisual3Ds.Add(cprShape);
+                    }
                 }
             }
 
