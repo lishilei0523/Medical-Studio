@@ -300,17 +300,18 @@ namespace MedicalSharp.Controls.Extensions
             for (int index = 0; index < frames.Length; index++)
             {
                 float distance;
+                FrenetFrame frame = frames[index];
                 if (viewport.CPRMode == CPRMode.Projected)
                 {
                     //消除投影轴方向的分量后再计算距离
-                    Vector3 diff = worldPosition - frames[index].Position;
+                    Vector3 diff = worldPosition - frame.Position;
                     float projectionComponent = Vector3.Dot(diff, viewport.ProjectionAxis);
                     Vector3 diffWithoutProjection = diff - viewport.ProjectionAxis * projectionComponent;
                     distance = diffWithoutProjection.Length;
                 }
                 else
                 {
-                    distance = Vector3.Distance(worldPosition, frames[index].Position);
+                    distance = Vector3.Distance(worldPosition, frame.Position);
                 }
 
                 if (distance < bestDistance)
@@ -323,46 +324,46 @@ namespace MedicalSharp.Controls.Extensions
             FrenetFrame bestFrame = frames[bestIndex];
             float bestArcLength = curve.TotalArcLength * (bestIndex * 1.0f / (frames.Length - 1));
 
-            float uvX, uvY;
+            float u, v;
             switch (viewport.CPRMode)
             {
                 case CPRMode.Straightened:
                     float rotationRad = MathHelper.DegreesToRadians(viewport.RotationAngle);
-                    float cosA = MathF.Cos(rotationRad);
-                    float sinA = MathF.Sin(rotationRad);
-                    Vector3 rotatedNormal = bestFrame.Normal * cosA +
-                                            Vector3.Cross(bestFrame.Tangent, bestFrame.Normal) * sinA +
-                                            bestFrame.Tangent * Vector3.Dot(bestFrame.Tangent, bestFrame.Normal) * (1.0f - cosA);
+                    float cos = MathF.Cos(rotationRad);
+                    float sin = MathF.Sin(rotationRad);
+                    Vector3 rotatedNormal = bestFrame.Normal * cos +
+                                            Vector3.Cross(bestFrame.Tangent, bestFrame.Normal) * sin +
+                                            bestFrame.Tangent * Vector3.Dot(bestFrame.Tangent, bestFrame.Normal) * (1.0f - cos);
                     float radialOffset = Vector3.Dot(worldPosition - bestFrame.Position, rotatedNormal);
                     if (viewport.StraightenDirection == CPRStraightenDirection.Vertical)
                     {
-                        //垂直：横轴 = 径向，纵轴 = 弧长
-                        uvX = radialOffset / viewport.RadialWidth + 0.5f;
-                        uvY = bestArcLength / curve.TotalArcLength;
+                        //垂直：U = 径向，V = 弧长
+                        u = radialOffset / viewport.RadialWidth + 0.5f;
+                        v = bestArcLength / curve.TotalArcLength;
                     }
                     else
                     {
-                        //水平：横轴 = 弧长，纵轴 = 径向
-                        uvX = bestArcLength / curve.TotalArcLength;
-                        uvY = radialOffset / viewport.RadialWidth + 0.5f;
+                        //水平：U = 弧长，V = 径向
+                        u = bestArcLength / curve.TotalArcLength;
+                        v = radialOffset / viewport.RadialWidth + 0.5f;
                     }
                     break;
                 case CPRMode.Projected:
                     float axisOffset = Vector3.Dot(worldPosition - bestFrame.Position, viewport.ProjectionAxis);
-                    uvX = axisOffset / viewport.CPRRenderer.ProjectionRange + 0.5f;
-                    uvY = bestArcLength / curve.TotalArcLength;
+                    u = axisOffset / viewport.CPRRenderer.ProjectionRange + 0.5f;
+                    v = bestArcLength / curve.TotalArcLength;
                     break;
                 case CPRMode.CrossSectional:
                     float normalOffset = Vector3.Dot(worldPosition - bestFrame.Position, bestFrame.Normal);
                     float binormalOffset = Vector3.Dot(worldPosition - bestFrame.Position, bestFrame.Binormal);
-                    uvX = normalOffset / viewport.CrossSectionSize + 0.5f;
-                    uvY = binormalOffset / viewport.CrossSectionSize + 0.5f;
+                    u = normalOffset / viewport.CrossSectionSize + 0.5f;
+                    v = binormalOffset / viewport.CrossSectionSize + 0.5f;
                     break;
                 default:
                     return Vector3.Zero;
             }
 
-            Vector3 cprPosition = new Vector3(uvX - 0.5f, uvY - 0.5f, 0);
+            Vector3 cprPosition = new Vector3(u - 0.5f, v - 0.5f, 0);
 
             return cprPosition;
         }
