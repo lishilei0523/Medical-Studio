@@ -6,7 +6,6 @@ using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Builders;
-using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using System;
@@ -264,8 +263,8 @@ namespace MedicalSharp.Controls.Extensions
                 Vector3 worldEnd = Vector3.TransformPosition(lineSegment.EndPoint.ToVector3(), lineSegment.Transform.Matrix);
 
                 //世界坐标 -> CPR局部坐标
-                Vector3 localStart = WorldToCprLocal(worldStart, viewport);
-                Vector3 localEnd = WorldToCprLocal(worldEnd, viewport);
+                Vector3 localStart = worldStart.ToCprLocalPosition(viewport.Curve, viewport.CPRMode, viewport.RadialWidth, viewport.RotationAngle, viewport.StraightenDirection, viewport.ProjectionAxis, viewport.CPRRenderer.ProjectionRange, viewport.CrossSectionSize);
+                Vector3 localEnd = worldEnd.ToCprLocalPosition(viewport.Curve, viewport.CPRMode, viewport.RadialWidth, viewport.RotationAngle, viewport.StraightenDirection, viewport.ProjectionAxis, viewport.CPRRenderer.ProjectionRange, viewport.CrossSectionSize);
                 LineSegmentVisual3D cprLine = new LineSegmentVisual3D
                 {
                     StartPoint = localStart.ToVector3(),
@@ -278,94 +277,6 @@ namespace MedicalSharp.Controls.Extensions
             }
 
             return shape;
-        }
-        #endregion
-
-
-        //Private
-
-        #region # 世界坐标转CPR局部坐标 —— static Vector3 WorldToCprLocal(Vector3 worldPosition...
-        /// <summary>
-        /// 世界坐标转CPR局部坐标
-        /// </summary>
-        /// <returns>UnitPlane局部坐标（-0.5~0.5范围）</returns>
-        private static Vector3 WorldToCprLocal(Vector3 worldPosition, CPRViewport viewport)
-        {
-            Curve curve = viewport.Curve;
-            FrenetFrame[] frames = curve.FrenetFrames;
-
-            //找到曲线上离worldPosition最近的框架
-            int bestIndex = 0;
-            float bestDistance = float.MaxValue;
-            for (int index = 0; index < frames.Length; index++)
-            {
-                float distance;
-                FrenetFrame frame = frames[index];
-                if (viewport.CPRMode == CPRMode.Projected)
-                {
-                    //消除投影轴方向的分量后再计算距离
-                    Vector3 diff = worldPosition - frame.Position;
-                    float projectionComponent = Vector3.Dot(diff, viewport.ProjectionAxis);
-                    Vector3 diffWithoutProjection = diff - viewport.ProjectionAxis * projectionComponent;
-                    distance = diffWithoutProjection.Length;
-                }
-                else
-                {
-                    distance = Vector3.Distance(worldPosition, frame.Position);
-                }
-
-                if (distance < bestDistance)
-                {
-                    bestDistance = distance;
-                    bestIndex = index;
-                }
-            }
-
-            FrenetFrame bestFrame = frames[bestIndex];
-            float bestArcLength = curve.TotalArcLength * (bestIndex * 1.0f / (frames.Length - 1));
-
-            float u, v;
-            switch (viewport.CPRMode)
-            {
-                case CPRMode.Straightened:
-                    float rotationRad = MathHelper.DegreesToRadians(viewport.RotationAngle);
-                    float cos = MathF.Cos(rotationRad);
-                    float sin = MathF.Sin(rotationRad);
-                    Vector3 rotatedNormal = bestFrame.Normal * cos +
-                                            Vector3.Cross(bestFrame.Tangent, bestFrame.Normal) * sin +
-                                            bestFrame.Tangent * Vector3.Dot(bestFrame.Tangent, bestFrame.Normal) * (1.0f - cos);
-                    float radialOffset = Vector3.Dot(worldPosition - bestFrame.Position, rotatedNormal);
-                    if (viewport.StraightenDirection == CPRStraightenDirection.Vertical)
-                    {
-                        //垂直：U = 径向，V = 弧长
-                        u = radialOffset / viewport.RadialWidth + 0.5f;
-                        v = bestArcLength / curve.TotalArcLength;
-                    }
-                    else
-                    {
-                        //水平：U = 弧长，V = 径向
-                        u = bestArcLength / curve.TotalArcLength;
-                        v = radialOffset / viewport.RadialWidth + 0.5f;
-                    }
-                    break;
-                case CPRMode.Projected:
-                    float axisOffset = Vector3.Dot(worldPosition - bestFrame.Position, viewport.ProjectionAxis);
-                    u = axisOffset / viewport.CPRRenderer.ProjectionRange + 0.5f;
-                    v = bestArcLength / curve.TotalArcLength;
-                    break;
-                case CPRMode.CrossSectional:
-                    float normalOffset = Vector3.Dot(worldPosition - bestFrame.Position, bestFrame.Normal);
-                    float binormalOffset = Vector3.Dot(worldPosition - bestFrame.Position, bestFrame.Binormal);
-                    u = normalOffset / viewport.CrossSectionSize + 0.5f;
-                    v = binormalOffset / viewport.CrossSectionSize + 0.5f;
-                    break;
-                default:
-                    return Vector3.Zero;
-            }
-
-            Vector3 cprPosition = new Vector3(u - 0.5f, v - 0.5f, 0);
-
-            return cprPosition;
         }
         #endregion
     }
