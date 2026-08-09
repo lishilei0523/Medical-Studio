@@ -450,7 +450,8 @@ namespace MedicalSharp.Controls.Viewports
         /// 和Shader采样逻辑一致：
         /// 屏幕坐标 -> 投影/视图逆矩阵 -> 世界坐标 -> ModelMatrix逆变换 -> UnitPlane局部坐标 → U/V；
         /// UV -> 弧长 + 偏移 -> Frenet框架 -> 世界空间采样位置；
-        /// 射线起点 = 采样位置（世界空间），方向 = 相机视线方向；
+        /// 射线起点 = 采样位置（世界空间）；
+        /// 射线方向 = 各模式的采样方向（拉直 = rotatedNormal, 投影 = -cross(ProjectionAxis, Tangent), 剖面 = Tangent）；
         /// </remarks>
         public override Ray UnProject(Vector2 screenPixelPos2D)
         {
