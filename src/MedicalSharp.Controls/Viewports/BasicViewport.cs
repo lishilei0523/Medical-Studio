@@ -101,7 +101,7 @@ namespace MedicalSharp.Controls.Viewports
         }
         #endregion
 
-        #region 查找最近元素 —— bool FindNearest(Vector2 position, out Vector3 point...
+        #region 查找最近元素 —— virtual bool FindNearest(Vector2 position, out Vector3 point...
         /// <summary>
         /// 查找最近元素
         /// </summary>
@@ -111,7 +111,7 @@ namespace MedicalSharp.Controls.Viewports
         /// <param name="visual3D">3D元素</param>
         /// <param name="ray">射线</param>
         /// <returns>是否成功</returns>
-        public bool FindNearest(Vector2 position, out Vector3 point, out Vector3 normal, out Visual3D visual3D, out Ray ray)
+        public virtual bool FindNearest(Vector2 position, out Vector3 point, out Vector3 normal, out Visual3D visual3D, out Ray ray)
         {
             this.GlContext.MakeCurrent();
 
