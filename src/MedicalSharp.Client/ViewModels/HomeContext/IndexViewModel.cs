@@ -1296,6 +1296,18 @@ namespace MedicalSharp.Client.ViewModels.HomeContext
             CurveVisual3D curve = (CurveVisual3D)this.SelectedShape;
             CprLayoutViewModel viewModel = new CprLayoutViewModel(this._windowManager, this._eventAggregator, curve);
             viewModel.SetVolumeData(this.VolumeData);
+            viewModel.HorizontalViewModel.Shapes = this.Shapes;
+            viewModel.HorizontalViewModel.Tissues = this.Tissues;
+            viewModel.VerticalViewModel.Shapes = this.Shapes;
+            viewModel.VerticalViewModel.Tissues = this.Tissues;
+            viewModel.StraightenedViewModel.Shapes = this.Shapes;
+            viewModel.StraightenedViewModel.Tissues = this.Tissues;
+            viewModel.CrossSectional1ViewModel.Shapes = this.Shapes;
+            viewModel.CrossSectional1ViewModel.Tissues = this.Tissues;
+            viewModel.CrossSectional2ViewModel.Shapes = this.Shapes;
+            viewModel.CrossSectional2ViewModel.Tissues = this.Tissues;
+            viewModel.CrossSectional3ViewModel.Shapes = this.Shapes;
+            viewModel.CrossSectional3ViewModel.Tissues = this.Tissues;
             await this._windowManager.ShowWindowAsync(viewModel);
         }, _ => this.VolumeData != null && this.SelectedShape is CurveVisual3D);
         #endregion

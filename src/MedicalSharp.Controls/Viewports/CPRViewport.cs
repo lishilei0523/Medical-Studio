@@ -19,6 +19,7 @@ using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace MedicalSharp.Controls.Viewports
 {
@@ -544,8 +545,33 @@ namespace MedicalSharp.Controls.Viewports
                     return default;
             }
 
+            //计算射线方向
+            Vector3 direction;
+            switch (this.CPRMode)
+            {
+                case CPRMode.Straightened:
+                    float rotationRad = MathHelper.DegreesToRadians(this.RotationAngle);
+                    float cos = MathF.Cos(rotationRad);
+                    float sin = MathF.Sin(rotationRad);
+                    Vector3 rotatedNormal = frame.Normal * cos +
+                                            Vector3.Cross(frame.Tangent, frame.Normal) * sin +
+                                            frame.Tangent * Vector3.Dot(frame.Tangent, frame.Normal) * (1.0f - cos);
+                    direction = rotatedNormal;
+                    break;
+                case CPRMode.Projected:
+                    Vector3 projectDirection = Vector3.Normalize(Vector3.Cross(this.ProjectionAxis, frame.Tangent));
+                    direction = -projectDirection;
+                    break;
+                case CPRMode.CrossSectional:
+                    direction = frame.Tangent;
+                    break;
+                default:
+                    direction = this.Camera.LookDirection;
+                    break;
+            }
+
             //构造射线
-            Ray ray = new Ray(samplePosition, this.CPRCamera.LookDirection);
+            Ray ray = new Ray(samplePosition, direction);
 
             return ray;
         }
@@ -601,6 +627,71 @@ namespace MedicalSharp.Controls.Viewports
             markValue = this.VolumeData.GetMarkValue(voxelPosition);
 
             return true;
+        }
+        #endregion
+
+        #region 查找最近元素 —— override bool FindNearest(Vector2 position, out Vector3 point...
+        /// <summary>
+        /// 查找最近元素
+        /// </summary>
+        /// <param name="position">2D位置</param>
+        /// <param name="point">3D位置</param>
+        /// <param name="normal">法向量</param>
+        /// <param name="visual3D">3D元素</param>
+        /// <param name="ray">射线</param>
+        /// <returns>是否成功</returns>
+        public override bool FindNearest(Vector2 position, out Vector3 point, out Vector3 normal, out Visual3D visual3D, out Ray ray)
+        {
+            this.GlContext.MakeCurrent();
+
+            ray = this.UnProject(position);
+
+            //快速检测
+            IDictionary<Visual3D, float> hitResults = new Dictionary<Visual3D, float>();
+            List<ShapeVisual3D> originalShapes = base.GetShapeVisual3Ds();
+            foreach (ShapeVisual3D shapeVisual3D in originalShapes.Where(x => x.IsVisible))
+            {
+                bool intersects = shapeVisual3D.Renderable.IntersectsRay(ray, out float distance);
+                if (intersects)
+                {
+                    hitResults.Add(shapeVisual3D, distance);
+                }
+            }
+
+            //精确检测
+            if (hitResults.Any())
+            {
+                KeyValuePair<Visual3D, float> hitResult = hitResults.MinBy(x => x.Value);
+                bool intersects;
+                Vector3 hitPoint;
+                Vector3 hitNormal;
+                if (hitResult.Key is ShapeVisual3D shapeVisual3D)
+                {
+                    intersects = shapeVisual3D.Renderable.IntersectsRay(ray, out _, out hitPoint, out hitNormal, out _);
+                }
+                else if (hitResult.Key is TextVisual3D textVisual3D)
+                {
+                    intersects = textVisual3D.Renderable.IntersectsRay(ray, out _, out hitPoint, out hitNormal, out _);
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+
+                if (intersects)
+                {
+                    point = hitPoint;
+                    normal = hitNormal;
+                    visual3D = hitResult.Key;
+                    return true;
+                }
+            }
+
+            point = Vector3.Zero;
+            normal = Vector3.Zero;
+            visual3D = null;
+
+            return false;
         }
         #endregion
 
