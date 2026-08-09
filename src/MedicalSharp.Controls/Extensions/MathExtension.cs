@@ -256,11 +256,23 @@ namespace MedicalSharp.Controls.Extensions
         /// <remarks>创建临时形状用于CPR视图渲染，将世界空间形状转换为CPR局部空间（UnitPlane -0.5~0.5）</remarks>
         public static ShapeVisual3D CreateCprShape(this ShapeVisual3D shape, CPRViewport viewport)
         {
+            if (shape is PointVisual3D point)
+            {
+                Vector3 worldPosition = Vector3.TransformPosition(point.Position.ToVector3(), shape.Transform.Matrix);
+                Vector3 localPosition = worldPosition.ToCprLocalPosition(viewport.Curve, viewport.CPRMode, viewport.RadialWidth, viewport.RotationAngle, viewport.StraightenDirection, viewport.ProjectionAxis, viewport.CPRRenderer.ProjectionRange, viewport.CrossSectionSize);
+                PointVisual3D cprPoint = new PointVisual3D
+                {
+                    Position = localPosition.ToVector3(),
+                    Fill = point.Fill
+                };
+
+                return cprPoint;
+            }
             if (shape is LineSegmentVisual3D lineSegment)
             {
                 //获取线段两端点的世界坐标
-                Vector3 worldStart = Vector3.TransformPosition(lineSegment.StartPoint.ToVector3(), lineSegment.Transform.Matrix);
-                Vector3 worldEnd = Vector3.TransformPosition(lineSegment.EndPoint.ToVector3(), lineSegment.Transform.Matrix);
+                Vector3 worldStart = Vector3.TransformPosition(lineSegment.StartPoint.ToVector3(), shape.Transform.Matrix);
+                Vector3 worldEnd = Vector3.TransformPosition(lineSegment.EndPoint.ToVector3(), shape.Transform.Matrix);
 
                 //世界坐标 -> CPR局部坐标
                 Vector3 localStart = worldStart.ToCprLocalPosition(viewport.Curve, viewport.CPRMode, viewport.RadialWidth, viewport.RotationAngle, viewport.StraightenDirection, viewport.ProjectionAxis, viewport.CPRRenderer.ProjectionRange, viewport.CrossSectionSize);
@@ -276,7 +288,7 @@ namespace MedicalSharp.Controls.Extensions
                 return cprLine;
             }
 
-            return shape;
+            return null;
         }
         #endregion
     }

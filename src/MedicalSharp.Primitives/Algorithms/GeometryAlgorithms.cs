@@ -221,6 +221,10 @@ namespace MedicalSharp.Primitives.Algorithms
                     return Vector3.Zero;
             }
 
+            //裁剪
+            u = Math.Clamp(u, 0f, 1f);
+            v = Math.Clamp(v, 0f, 1f);
+
             //得到CPR局部坐标
             Vector3 cprLocalPosition = new Vector3(u - 0.5f, v - 0.5f, 0);
 

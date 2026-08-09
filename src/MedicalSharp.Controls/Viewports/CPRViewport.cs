@@ -716,16 +716,13 @@ namespace MedicalSharp.Controls.Viewports
             List<ShapeVisual3D> shapeVisual3Ds = [];
             foreach (ShapeVisual3D shapeVisual3D in base.GetShapeVisual3Ds())
             {
-                if (shapeVisual3D is LineSegmentVisual3D)
+                ShapeVisual3D cprShape = shapeVisual3D.CreateCprShape(this);
+                if (cprShape != null)
                 {
-                    ShapeVisual3D cprShape = shapeVisual3D.CreateCprShape(this);
-                    if (cprShape != null)
-                    {
-                        cprShape.Id = shapeVisual3D.Id;
-                        cprShape.EnsureRenderable();
-                        cprShape.Transform.SetMatrix(this.CPRRenderer.ModelMatrix);
-                        shapeVisual3Ds.Add(cprShape);
-                    }
+                    cprShape.Id = shapeVisual3D.Id;
+                    cprShape.EnsureRenderable();
+                    cprShape.Transform.SetMatrix(this.CPRRenderer.ModelMatrix);
+                    shapeVisual3Ds.Add(cprShape);
                 }
             }
 
