@@ -287,6 +287,28 @@ namespace MedicalSharp.Controls.Extensions
 
                 return cprLine;
             }
+            if (shape is CurveVisual3D curve)
+            {
+                List<Vector3D> localControlPoints = [];
+                foreach (Vector3D controlPoint in curve.ControlPositions)
+                {
+                    Vector3 worldPosistion = Vector3.TransformPosition(controlPoint.ToVector3(), curve.Transform.Matrix);
+                    Vector3 localPosition = worldPosistion.ToCprLocalPosition(viewport.Curve, viewport.CPRMode, viewport.RadialWidth, viewport.RotationAngle, viewport.StraightenDirection, viewport.ProjectionAxis, viewport.CPRRenderer.ProjectionRange, viewport.CrossSectionSize);
+                    localControlPoints.Add(localPosition.ToVector3());
+                }
+
+                CurveVisual3D cprCurve = new CurveVisual3D
+                {
+                    ControlPositions = new AvaloniaList<Vector3D>(localControlPoints),
+                    Tessellation = curve.Tessellation,
+                    ResampleCount = curve.ResampleCount,
+                    Closed = curve.Closed,
+                    Stroke = curve.Stroke,
+                    StrokeThickness = curve.StrokeThickness
+                };
+
+                return cprCurve;
+            }
 
             return null;
         }
