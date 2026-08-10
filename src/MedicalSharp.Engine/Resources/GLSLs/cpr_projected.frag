@@ -92,10 +92,10 @@ void main()
     vec3 curvePosition = texture(u_PositionTexture, normalizedArcLength).xyz;
     vec3 curveTangent = texture(u_TangentTexture, normalizedArcLength).xyz;
     
-    //曲线点到起点的投影距离，将曲线点拉到起点投影轴上
+    //曲线位置到起点的投影距离
     float distanceToStart = dot(curvePosition - u_CurveStartPoint, u_ProjectionAxis);
 
-    //射线起点：曲线点在投影轴上的投影点 + 沿投影轴的像素偏移
+    //射线起点：曲线位置 + 沿投影轴偏移
     vec3 rayOrigin = curvePosition + u_ProjectionAxis * (distanceToStart + axisOffset);
     
     //投影方向 = cross(投影轴, 曲线切线)
