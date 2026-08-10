@@ -9,7 +9,7 @@
               mc:Ignorable="d"
               Title="CPR重建"
               Width="1440" Height="900"
-              WindowStartupLocation="CenterScreen">
+              WindowStartupLocation="CenterScreen" Topmost="True">
 
     <Grid sd:GridLayout.Config="{Binding Layout}">
         <Border sd:GridLayout.Cell="{Binding Layout.Cell1}" sd:GridExpander.CanExpand="True">

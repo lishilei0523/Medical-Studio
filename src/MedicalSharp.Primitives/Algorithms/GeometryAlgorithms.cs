@@ -207,7 +207,8 @@ namespace MedicalSharp.Primitives.Algorithms
                     }
                     break;
                 case CPRMode.Projected:
-                    float axisOffset = Vector3.Dot(worldPosition - bestFrame.Position, projectionAxis);
+                    float distanceToStart = Vector3.Dot(bestFrame.Position - curve.FrenetFrames[0].Position, projectionAxis);
+                    float axisOffset = Vector3.Dot(worldPosition - bestFrame.Position, projectionAxis) - distanceToStart;
                     u = axisOffset / projectionRange + 0.5f;
                     v = bestArcLength / curve.TotalArcLength;
                     break;

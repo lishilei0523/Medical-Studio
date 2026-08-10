@@ -535,7 +535,8 @@ namespace MedicalSharp.Controls.Viewports
                     samplePosition = frame.Position + rotatedNormal * axisOffset;
                     break;
                 case CPRMode.Projected:
-                    samplePosition = frame.Position + this.ProjectionAxis * axisOffset;
+                    float distanceToStart = Vector3.Dot(frame.Position - this.Curve.FrenetFrames[0].Position, this.ProjectionAxis);
+                    samplePosition = frame.Position + this.ProjectionAxis * (distanceToStart + axisOffset);
                     break;
                 case CPRMode.CrossSectional:
                     float normalOffset = (uv.X - 0.5f) * this.CrossSectionSize;

@@ -14,6 +14,7 @@ uniform sampler1D u_PositionTexture;
 uniform sampler1D u_TangentTexture;
 
 //曲线参数
+uniform vec3 u_CurveStartPoint;         //曲线起点
 uniform int u_ProjectionMode;           //投影模式：0=Single, 1=AIP, 2=MIP, 3=MinIP
 uniform vec3 u_ProjectionAxis;          //投影轴（单位向量）
 uniform float u_ProjectionRange;        //投影范围
@@ -91,8 +92,11 @@ void main()
     vec3 curvePosition = texture(u_PositionTexture, normalizedArcLength).xyz;
     vec3 curveTangent = texture(u_TangentTexture, normalizedArcLength).xyz;
     
-    //射线起点：曲线位置 + 沿投影轴偏移
-    vec3 rayOrigin = curvePosition + u_ProjectionAxis * axisOffset;
+    //曲线点到起点的投影距离，将曲线点拉到起点投影轴上
+    float distanceToStart = dot(curvePosition - u_CurveStartPoint, u_ProjectionAxis);
+
+    //射线起点：曲线点在投影轴上的投影点 + 沿投影轴的像素偏移
+    vec3 rayOrigin = curvePosition + u_ProjectionAxis * (distanceToStart + axisOffset);
     
     //投影方向 = cross(投影轴, 曲线切线)
     vec3 rayDirection = normalize(cross(u_ProjectionAxis, curveTangent));

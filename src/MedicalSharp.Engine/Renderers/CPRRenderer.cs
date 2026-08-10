@@ -665,6 +665,7 @@ namespace MedicalSharp.Engine.Renderers
                     program.SetUniformInt("u_StraightenDirection", (int)this.StraightenDirection);
                     break;
                 case CPRMode.Projected:
+                    program.SetUniformVector3("u_CurveStartPoint", this._curve.FrenetFrames[0].Position);
                     program.SetUniformInt("u_ProjectionMode", (int)this.ProjectionMode);
                     program.SetUniformVector3("u_ProjectionAxis", this.ProjectionAxis);
                     program.SetUniformFloat("u_ProjectionRange", this.ProjectionRange);
