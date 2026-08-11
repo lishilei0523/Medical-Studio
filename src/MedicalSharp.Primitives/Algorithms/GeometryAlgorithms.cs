@@ -941,6 +941,30 @@ namespace MedicalSharp.Primitives.Algorithms
         }
         #endregion
 
+        #region # 计算点到线段最短距离 —— static float DistanceToSegment(Vector3 point...
+        /// <summary>
+        /// 计算点到线段最短距离
+        /// </summary>
+        /// <param name="point">点</param>
+        /// <param name="lineSegmentStart">线段起始点</param>
+        /// <param name="lineSegmentEnd">线段终止点</param>
+        /// <returns>最短距离</returns>
+        public static float DistanceToSegment(Vector3 point, Vector3 lineSegmentStart, Vector3 lineSegmentEnd)
+        {
+            Vector3 lineSegment = lineSegmentEnd - lineSegmentStart;
+            float lineSegmentLengthSq = lineSegment.LengthSquared;
+            if (lineSegmentLengthSq < 1e-8f)
+            {
+                return Vector3.Distance(point, lineSegmentStart);
+            }
+
+            float t = Math.Clamp(Vector3.Dot(point - lineSegmentStart, lineSegment) / lineSegmentLengthSq, 0f, 1f);
+            float distance = Vector3.Distance(point, lineSegmentStart + t * lineSegment);
+
+            return distance;
+        }
+        #endregion
+
         #region # 计算点到线段最短距离点 —— static Vector3 ClosestPointOnSegment(Vector3 point...
         /// <summary>
         /// 计算点到线段最短距离点
@@ -953,13 +977,12 @@ namespace MedicalSharp.Primitives.Algorithms
         {
             Vector3 lineSegment = lineSegmentEnd - lineSegmentStart;
             float lineSegmentLengthSq = lineSegment.LengthSquared;
-
             if (lineSegmentLengthSq < 1e-8f)
             {
                 return lineSegmentStart;
             }
 
-            float t = Math.Clamp(Vector3.Dot(point - lineSegmentStart, lineSegment) / lineSegmentLengthSq, 0, 1);
+            float t = Math.Clamp(Vector3.Dot(point - lineSegmentStart, lineSegment) / lineSegmentLengthSq, 0f, 1f);
             Vector3 closestPoint = lineSegmentStart + t * lineSegment;
 
             return closestPoint;

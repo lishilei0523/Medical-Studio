@@ -464,27 +464,9 @@ namespace MedicalSharp.Controls.Viewports
 
             #endregion
 
-            //计算投影、视图逆矩阵
-            Matrix4 projectionMatrixInv = Matrix4.Invert(this.Camera.ProjectionMatrix);
-            Matrix4 viewMatrixInv = Matrix4.Invert(this.Camera.ViewMatrix);
-
-            //屏幕坐标 -> NDC
-            float ndcX = (2.0f * screenPixelPos2D.X) / this._viewportSize.Width - 1.0f;
-            float ndcY = 1.0f - (2.0f * screenPixelPos2D.Y) / this._viewportSize.Height;
-
-            //NDC -> 相机空间
-            Vector4 cameraPosition = new Vector4(ndcX, ndcY, 0.0f, 1.0f) * projectionMatrixInv;
-            cameraPosition /= cameraPosition.W;
-
-            //相机空间 -> 世界空间
-            Vector3 worldPosition = (cameraPosition * viewMatrixInv).Xyz;
-
-            //世界空间 -> 局部空间 -> U/V
-            Matrix4 localToWorld = this._cprRenderer.ModelMatrix;
-            Matrix4 worldToLocal = Matrix4.Invert(localToWorld);
-            Vector3 localPosition = Vector3.TransformPosition(worldPosition, worldToLocal);
-            Vector2 uv = new Vector2(localPosition.X + 0.5f, localPosition.Y + 0.5f);
-            if (uv.X < 0 || uv.X > 1 || uv.Y < 0 || uv.Y > 1)
+            //屏幕坐标 -> U/V
+            Vector2? uv = this.GetLocalUVFromScreen(screenPixelPos2D);
+            if (!uv.HasValue)
             {
                 return default;
             }
@@ -497,18 +479,18 @@ namespace MedicalSharp.Controls.Viewports
                 case CPRMode.Straightened:
                     if (this.StraightenDirection == CPRStraightenDirection.Vertical)
                     {
-                        arcLength = uv.Y * this.Curve.TotalArcLength;
-                        axisOffset = (uv.X - 0.5f) * this.RadialWidth;
+                        arcLength = uv.Value.Y * this.Curve.TotalArcLength;
+                        axisOffset = (uv.Value.X - 0.5f) * this.RadialWidth;
                     }
                     else
                     {
-                        arcLength = uv.X * this.Curve.TotalArcLength;
-                        axisOffset = (uv.Y - 0.5f) * this.RadialWidth;
+                        arcLength = uv.Value.X * this.Curve.TotalArcLength;
+                        axisOffset = (uv.Value.Y - 0.5f) * this.RadialWidth;
                     }
                     break;
                 case CPRMode.Projected:
-                    arcLength = uv.Y * this.Curve.TotalArcLength;
-                    axisOffset = (uv.X - 0.5f) * this._cprRenderer.ProjectionRange;
+                    arcLength = uv.Value.Y * this.Curve.TotalArcLength;
+                    axisOffset = (uv.Value.X - 0.5f) * this._cprRenderer.ProjectionRange;
                     break;
                 case CPRMode.CrossSectional:
                     arcLength = this.ArcPosition * this.Curve.TotalArcLength;
@@ -539,8 +521,8 @@ namespace MedicalSharp.Controls.Viewports
                     samplePosition = frame.Position + this.ProjectionAxis * (distanceToStart + axisOffset);
                     break;
                 case CPRMode.CrossSectional:
-                    float normalOffset = (uv.X - 0.5f) * this.CrossSectionSize;
-                    float binormalOffset = (uv.Y - 0.5f) * this.CrossSectionSize;
+                    float normalOffset = (uv.Value.X - 0.5f) * this.CrossSectionSize;
+                    float binormalOffset = (uv.Value.Y - 0.5f) * this.CrossSectionSize;
                     samplePosition = frame.Position + frame.Normal * normalOffset + frame.Binormal * binormalOffset;
                     break;
                 default:
@@ -711,6 +693,32 @@ namespace MedicalSharp.Controls.Viewports
             }
 
             return null;
+        }
+        #endregion
+
+        #region 屏幕坐标转弧长位置 —— float? GetArcPositionFromScreen(Vector2 screenPixelPos2D)
+        /// <summary>
+        /// 屏幕坐标转弧长位置
+        /// </summary>
+        /// <param name="screenPixelPos2D">屏幕像素2D位置</param>
+        /// <returns>弧长位置</returns>
+        public float? GetArcPositionFromScreen(Vector2 screenPixelPos2D)
+        {
+            Vector2? uv = this.GetLocalUVFromScreen(screenPixelPos2D);
+            if (!uv.HasValue)
+            {
+                return null;
+            }
+
+            float arcPosition = this.CPRMode switch
+            {
+                CPRMode.Projected => uv.Value.Y,
+                CPRMode.Straightened when this.StraightenDirection == CPRStraightenDirection.Vertical => uv.Value.Y,
+                _ => uv.Value.X
+            };
+            arcPosition = Math.Clamp(arcPosition, 0f, 1f);
+
+            return arcPosition;
         }
         #endregion
 
@@ -1184,6 +1192,52 @@ namespace MedicalSharp.Controls.Viewports
                     renderer.SetCrossSectionalOptions(this.ArcPosition, this.CrossSectionSize);
                     break;
             }
+        }
+        #endregion
+
+        #region 屏幕坐标转局部U/V坐标 —— Vector2? GetLocalUVFromScreen(Vector2 screenPixelPos2D)
+        /// <summary>
+        /// 屏幕坐标转局部U/V坐标
+        /// </summary>
+        /// <param name="screenPixelPos2D">屏幕像素2D位置</param>
+        /// <returns>局部U/V坐标</returns>
+        private Vector2? GetLocalUVFromScreen(Vector2 screenPixelPos2D)
+        {
+            #region # 验证
+
+            if (this.CPRCamera == null || this._viewportSize.Width == 0 || this._viewportSize.Height == 0)
+            {
+                return null;
+            }
+
+            #endregion
+
+            //计算投影、视图逆矩阵
+            Matrix4 projectionInv = Matrix4.Invert(this.Camera.ProjectionMatrix);
+            Matrix4 viewInv = Matrix4.Invert(this.Camera.ViewMatrix);
+
+            //屏幕坐标 -> NDC
+            float ndcX = (2.0f * screenPixelPos2D.X) / this._viewportSize.Width - 1.0f;
+            float ndcY = 1.0f - (2.0f * screenPixelPos2D.Y) / this._viewportSize.Height;
+
+            //NDC -> 相机空间
+            Vector4 cameraPosition = new Vector4(ndcX, ndcY, 0.0f, 1.0f) * projectionInv;
+            cameraPosition /= cameraPosition.W;
+
+            //世界空间 -> 局部空间 -> U/V
+            Vector3 worldPosition = (cameraPosition * viewInv).Xyz;
+            Matrix4 worldToLocal = Matrix4.Invert(this._cprRenderer.ModelMatrix);
+            Vector3 localPosition = Vector3.TransformPosition(worldPosition, worldToLocal);
+            float u = localPosition.X + 0.5f;
+            float v = localPosition.Y + 0.5f;
+            if (u < 0 || u > 1 || v < 0 || v > 1)
+            {
+                return null;
+            }
+
+            Vector2 uv = new Vector2(u, v);
+
+            return uv;
         }
         #endregion
 

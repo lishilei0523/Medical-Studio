@@ -4,6 +4,7 @@ using Avalonia.Media;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
+using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Maths;
@@ -308,6 +309,26 @@ namespace MedicalSharp.Controls.Extensions
                 };
 
                 return cprCurve;
+            }
+            if (shape is CurveGuideVisual3D curveGuide)
+            {
+                //获取参考线两端点的世界坐标
+                CurveGuideRenderable renderable = (CurveGuideRenderable)curveGuide.Renderable;
+                Vector3 worldStart = renderable.StartPoint;
+                Vector3 worldEnd = renderable.EndPoint;
+
+                //世界坐标 -> CPR局部坐标
+                Vector3 localStart = worldStart.ToCprLocalPosition(viewport.Curve, viewport.CPRMode, viewport.RadialWidth, viewport.RotationAngle, viewport.StraightenDirection, viewport.ProjectionAxis, viewport.CPRRenderer.ProjectionRange, viewport.CrossSectionSize);
+                Vector3 localEnd = worldEnd.ToCprLocalPosition(viewport.Curve, viewport.CPRMode, viewport.RadialWidth, viewport.RotationAngle, viewport.StraightenDirection, viewport.ProjectionAxis, viewport.CPRRenderer.ProjectionRange, viewport.CrossSectionSize);
+                LineSegmentVisual3D cprCurveGuide = new LineSegmentVisual3D
+                {
+                    StartPoint = localStart.ToVector3(),
+                    EndPoint = localEnd.ToVector3(),
+                    Stroke = curveGuide.Stroke,
+                    StrokeThickness = curveGuide.StrokeThickness
+                };
+
+                return cprCurveGuide;
             }
 
             return null;

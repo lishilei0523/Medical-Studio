@@ -4,7 +4,6 @@ using MedicalSharp.Controls.Extensions;
 using MedicalSharp.Controls.Interfaces;
 using MedicalSharp.Controls.Viewports;
 using MedicalSharp.Controls.Visual3Ds;
-using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Interfaces;
 using OpenTK.Mathematics;
 using System;
@@ -98,37 +97,21 @@ namespace MedicalSharp.Controls.Commands
                 //设置光标
                 viewport.Cursor = new Cursor(StandardCursorType.DragMove);
 
-                //屏幕坐标 -> UV（和顶点着色器一致：UV = aPos.xy + 0.5）
+                //屏幕坐标 -> 弧长位置
                 Vector2 mousePos2D = eventArgs.GetPixelPosition(viewport).ToVector2();
-                float ndcX = (2.0f * mousePos2D.X) / viewport.ViewportSize.Width - 1.0f;
-                float ndcY = 1.0f - (2.0f * mousePos2D.Y) / viewport.ViewportSize.Height;
-                float uvX = ndcX * 0.5f + 0.5f;
-                float uvY = ndcY * 0.5f + 0.5f;
-
-                //根据拉直方向取弧长对应的UV分量
                 CPRViewport cprViewport = (CPRViewport)viewport;
-                float arcPosition;
-                if (cprViewport.StraightenDirection == CPRStraightenDirection.Vertical)
+                float? arcPosition = cprViewport.GetArcPositionFromScreen(mousePos2D);
+                if (arcPosition.HasValue)
                 {
-                    arcPosition = Math.Clamp(uvY, 0f, 1f);
-                }
-                else if (cprViewport.CPRMode == CPRMode.Projected)
-                {
-                    arcPosition = Math.Clamp(uvY, 0f, 1f);
-                }
-                else
-                {
-                    arcPosition = Math.Clamp(uvX, 0f, 1f);
-                }
+                    //更新弧长位置
+                    this._selectedVisual.ArcPosition = arcPosition.Value;
 
-                //更新弧长位置
-                this._selectedVisual.ArcPosition = arcPosition;
+                    //拖拽中
+                    this.Dragging?.Invoke(this._selectedVisual);
 
-                //拖拽中
-                this.Dragging?.Invoke(this._selectedVisual);
-
-                //请求下一帧
-                viewport.RequestNextFrameRendering();
+                    //请求下一帧
+                    viewport.RequestNextFrameRendering();
+                }
             }
         }
         #endregion

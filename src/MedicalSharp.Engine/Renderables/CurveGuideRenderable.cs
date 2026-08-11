@@ -1,4 +1,5 @@
 ﻿using MedicalSharp.Engine.Resources;
+using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Builders;
 using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
@@ -17,6 +18,16 @@ namespace MedicalSharp.Engine.Renderables
     public class CurveGuideRenderable : ShapeRenderable
     {
         #region # 字段及构造器
+
+        /// <summary>
+        /// 起始点
+        /// </summary>
+        private readonly Vector3 _startPoint;
+
+        /// <summary>
+        /// 终止点
+        /// </summary>
+        private readonly Vector3 _endPoint;
 
         /// <summary>
         /// 顶点缓冲区
@@ -62,10 +73,10 @@ namespace MedicalSharp.Engine.Renderables
             this.LineLength = lineLength;
 
             //计算线段端点
-            this.CalculateLineEndpoints(out Vector3 start, out Vector3 end);
+            this.CalculateLineEndpoints(out this._startPoint, out this._endPoint);
 
             //初始化缓冲区
-            MeshGeometry lineSegment = MeshFactory.CreateLineSegment(start, end);
+            MeshGeometry lineSegment = MeshFactory.CreateLineSegment(this._startPoint, this._endPoint);
             this._vertexBuffer = new VertexBuffer(lineSegment);
         }
 
@@ -115,6 +126,26 @@ namespace MedicalSharp.Engine.Renderables
         /// 线框粗细
         /// </summary>
         public float StrokeThickness { get; private set; }
+        #endregion
+
+        #region 只读属性 - 起始点 —— Vector3 StartPoint
+        /// <summary>
+        /// 只读属性 - 起始点
+        /// </summary>
+        public Vector3 StartPoint
+        {
+            get => this._startPoint;
+        }
+        #endregion
+
+        #region 只读属性 - 终止点 —— Vector3 EndPoint
+        /// <summary>
+        /// 只读属性 - 终止点
+        /// </summary>
+        public Vector3 EndPoint
+        {
+            get => this._endPoint;
+        }
         #endregion
 
         #region 只读属性 - 顶点缓冲区 —— VertexBuffer VertexBuffer
@@ -234,10 +265,17 @@ namespace MedicalSharp.Engine.Renderables
             Matrix4 worldToLocal = Matrix4.Invert(this.ModelMatrix);
             Ray localRay = ray.Transform(worldToLocal);
 
-            //快速剔除：先检测包围盒
-            if (this.BoundingBox.Intersects(localRay, out float intersectedDistance))
+            //线段的局部空间端点
+            Vector3 start = this._vertexBuffer.MeshGeometry.Vertices[0].Position;
+            Vector3 end = this._vertexBuffer.MeshGeometry.Vertices[1].Position;
+
+            //计算射线起点到线段的距离
+            const float pickRadius = 0.05f;
+            float distanceToSegment = GeometryAlgorithms.DistanceToSegment(localRay.Origin, start, end);
+            if (distanceToSegment < pickRadius)
             {
-                hitPoint = ray.GetPoint(intersectedDistance);
+                hitPoint = ray.Origin;
+                distance = 0;
 
                 return true;
             }
@@ -293,11 +331,11 @@ namespace MedicalSharp.Engine.Renderables
 
             //绕Tangent旋转Normal（度转弧度）
             float rotationRad = MathHelper.DegreesToRadians(this.RotationAngle);
-            float cosA = MathF.Cos(rotationRad);
-            float sinA = MathF.Sin(rotationRad);
-            Vector3 rotatedNormal = frame.Normal * cosA +
-                                    Vector3.Cross(frame.Tangent, frame.Normal) * sinA +
-                                    frame.Tangent * Vector3.Dot(frame.Tangent, frame.Normal) * (1.0f - cosA);
+            float cos = MathF.Cos(rotationRad);
+            float sin = MathF.Sin(rotationRad);
+            Vector3 rotatedNormal = frame.Normal * cos +
+                                    Vector3.Cross(frame.Tangent, frame.Normal) * sin +
+                                    frame.Tangent * Vector3.Dot(frame.Tangent, frame.Normal) * (1.0f - cos);
 
             float halfLength = this.LineLength * 0.5f;
 
