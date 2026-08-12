@@ -314,8 +314,7 @@ namespace MedicalSharp.Controls.Extensions
             {
                 //获取参考线两端点的世界坐标
                 CurveGuideRenderable renderable = (CurveGuideRenderable)curveGuide.Renderable;
-                Vector3 worldStart = renderable.StartPoint;
-                Vector3 worldEnd = renderable.EndPoint;
+                renderable.CalculateLineEndpoints(out Vector3 worldStart, out Vector3 worldEnd);
 
                 //世界坐标 -> CPR局部坐标
                 Vector3 localStart = worldStart.ToCprLocalPosition(viewport.Curve, viewport.CPRMode, viewport.RadialWidth, viewport.RotationAngle, viewport.StraightenDirection, viewport.ProjectionAxis, viewport.CPRRenderer.ProjectionRange, viewport.CrossSectionSize);

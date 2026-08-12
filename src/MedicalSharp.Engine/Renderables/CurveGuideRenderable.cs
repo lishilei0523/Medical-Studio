@@ -20,16 +20,6 @@ namespace MedicalSharp.Engine.Renderables
         #region # 字段及构造器
 
         /// <summary>
-        /// 起始点
-        /// </summary>
-        private readonly Vector3 _startPoint;
-
-        /// <summary>
-        /// 终止点
-        /// </summary>
-        private readonly Vector3 _endPoint;
-
-        /// <summary>
         /// 顶点缓冲区
         /// </summary>
         private readonly VertexBuffer _vertexBuffer;
@@ -73,10 +63,10 @@ namespace MedicalSharp.Engine.Renderables
             this.LineLength = lineLength;
 
             //计算线段端点
-            this.CalculateLineEndpoints(out this._startPoint, out this._endPoint);
+            this.CalculateLineEndpoints(out Vector3 start, out Vector3 end);
 
             //初始化缓冲区
-            MeshGeometry lineSegment = MeshFactory.CreateLineSegment(this._startPoint, this._endPoint);
+            MeshGeometry lineSegment = MeshFactory.CreateLineSegment(start, end);
             this._vertexBuffer = new VertexBuffer(lineSegment);
         }
 
@@ -126,26 +116,6 @@ namespace MedicalSharp.Engine.Renderables
         /// 线框粗细
         /// </summary>
         public float StrokeThickness { get; private set; }
-        #endregion
-
-        #region 只读属性 - 起始点 —— Vector3 StartPoint
-        /// <summary>
-        /// 只读属性 - 起始点
-        /// </summary>
-        public Vector3 StartPoint
-        {
-            get => this._startPoint;
-        }
-        #endregion
-
-        #region 只读属性 - 终止点 —— Vector3 EndPoint
-        /// <summary>
-        /// 只读属性 - 终止点
-        /// </summary>
-        public Vector3 EndPoint
-        {
-            get => this._endPoint;
-        }
         #endregion
 
         #region 只读属性 - 顶点缓冲区 —— VertexBuffer VertexBuffer
@@ -280,7 +250,42 @@ namespace MedicalSharp.Engine.Renderables
                 return true;
             }
 
+            //检测包围盒
+            if (this.BoundingBox.Intersects(localRay, out float intersectedDistance))
+            {
+                hitPoint = ray.GetPoint(intersectedDistance);
+
+                return true;
+            }
+
             return false;
+        }
+        #endregion
+
+        #region 计算线段端点 —— void CalculateLineEndpoints(out Vector3 start, out Vector3 end)
+        /// <summary>
+        /// 计算线段端点
+        /// </summary>
+        /// <param name="start">起点</param>
+        /// <param name="end">终点</param>
+        public void CalculateLineEndpoints(out Vector3 start, out Vector3 end)
+        {
+            //获取当前弧长位置的Frenet框架
+            float arcLength = this.ArcPosition * this.Curve.TotalArcLength;
+            FrenetFrame frame = this.Curve.GetFrameAtArcLength(arcLength);
+
+            //绕Tangent旋转Normal（度转弧度）
+            float rotationRad = MathHelper.DegreesToRadians(this.RotationAngle);
+            float cos = MathF.Cos(rotationRad);
+            float sin = MathF.Sin(rotationRad);
+            Vector3 rotatedNormal = frame.Normal * cos +
+                                    Vector3.Cross(frame.Tangent, frame.Normal) * sin +
+                                    frame.Tangent * Vector3.Dot(frame.Tangent, frame.Normal) * (1.0f - cos);
+
+            float halfLength = this.LineLength * 0.5f;
+
+            start = frame.Position - rotatedNormal * halfLength;
+            end = frame.Position + rotatedNormal * halfLength;
         }
         #endregion
 
@@ -313,34 +318,14 @@ namespace MedicalSharp.Engine.Renderables
             IEnumerable<Vector3> positions = this._vertexBuffer.MeshGeometry.Vertices.Select(vertex => vertex.Position);
             BoundingBox boundingBox = BoundingBox.FromPoints([.. positions]);
 
+            //扩大包围盒便于拾取
+            const float padding = 0.05f;
+            boundingBox = new BoundingBox(
+                boundingBox.Minimum - new Vector3(padding),
+                boundingBox.Maximum + new Vector3(padding)
+            );
+
             return boundingBox;
-        }
-        #endregion
-
-        #region 计算线段端点 —— void CalculateLineEndpoints(out Vector3 start, out Vector3 end)
-        /// <summary>
-        /// 计算线段端点
-        /// </summary>
-        /// <param name="start">起点</param>
-        /// <param name="end">终点</param>
-        private void CalculateLineEndpoints(out Vector3 start, out Vector3 end)
-        {
-            //获取当前弧长位置的Frenet框架
-            float arcLength = this.ArcPosition * this.Curve.TotalArcLength;
-            FrenetFrame frame = this.Curve.GetFrameAtArcLength(arcLength);
-
-            //绕Tangent旋转Normal（度转弧度）
-            float rotationRad = MathHelper.DegreesToRadians(this.RotationAngle);
-            float cos = MathF.Cos(rotationRad);
-            float sin = MathF.Sin(rotationRad);
-            Vector3 rotatedNormal = frame.Normal * cos +
-                                    Vector3.Cross(frame.Tangent, frame.Normal) * sin +
-                                    frame.Tangent * Vector3.Dot(frame.Tangent, frame.Normal) * (1.0f - cos);
-
-            float halfLength = this.LineLength * 0.5f;
-
-            start = frame.Position - rotatedNormal * halfLength;
-            end = frame.Position + rotatedNormal * halfLength;
         }
         #endregion
 
