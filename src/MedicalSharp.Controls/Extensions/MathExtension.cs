@@ -7,6 +7,7 @@ using MedicalSharp.Controls.Visual3Ds;
 using MedicalSharp.Engine.Renderables;
 using MedicalSharp.Primitives.Algorithms;
 using MedicalSharp.Primitives.Builders;
+using MedicalSharp.Primitives.Enums;
 using MedicalSharp.Primitives.Maths;
 using OpenTK.Mathematics;
 using System;
@@ -310,8 +311,10 @@ namespace MedicalSharp.Controls.Extensions
 
                 return cprCurve;
             }
-            if (shape is CurveGuideVisual3D curveGuide)
+            if (shape is CurveGuideVisual3D curveGuide && viewport.CPRMode != CPRMode.CrossSectional)
             {
+                curveGuide.RotationAngle = viewport.CPRRenderer.RotationAngle;
+
                 //获取参考线两端点的世界坐标
                 CurveGuideRenderable renderable = (CurveGuideRenderable)curveGuide.Renderable;
                 renderable.CalculateLineEndpoints(out Vector3 worldStart, out Vector3 worldEnd);
