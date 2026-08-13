@@ -202,14 +202,15 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
                 StraightenDirection = CPRStraightenDirection.Vertical
             };
 
-            //剖面图1（Cell2：中上，弧长25%）
+            //剖面图1（Cell2：中上，弧长75%）
             CPRCamera crossCamera1 = new CPRCamera();
             CPRInputManager crossInputManager1 = new CPRInputManager(crossCamera1);
             this.CrossSectional1ViewModel = new CprViewModel(this._windowManager, this._eventAggregator, "剖面图1", crossCamera1, crossInputManager1)
             {
                 CurveVisual3D = this._curve,
                 CPRMode = CPRMode.CrossSectional,
-                ArcPosition = 0.25f
+                ArcPosition = 0.75f,
+                ArcPositionOffset = 0.25f
             };
 
             //剖面图2（Cell3：中中，弧长50%）
@@ -219,17 +220,19 @@ namespace MedicalSharp.Client.ViewModels.LayoutContext
             {
                 CurveVisual3D = this._curve,
                 CPRMode = CPRMode.CrossSectional,
-                ArcPosition = 0.5f
+                ArcPosition = 0.5f,
+                ArcPositionOffset = 0f
             };
 
-            //剖面图3（Cell4：中下，弧长75%）
+            //剖面图3（Cell4：中下，弧长25%）
             CPRCamera crossCamera3 = new CPRCamera();
             CPRInputManager crossInputManager3 = new CPRInputManager(crossCamera3);
             this.CrossSectional3ViewModel = new CprViewModel(this._windowManager, this._eventAggregator, "剖面图3", crossCamera3, crossInputManager3)
             {
                 CurveVisual3D = this._curve,
                 CPRMode = CPRMode.CrossSectional,
-                ArcPosition = 0.75f
+                ArcPosition = 0.25f,
+                ArcPositionOffset = -0.25f
             };
         }
         #endregion

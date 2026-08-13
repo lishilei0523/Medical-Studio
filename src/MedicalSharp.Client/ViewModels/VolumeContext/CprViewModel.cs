@@ -45,7 +45,7 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
     /// <summary>
     /// CPR视图模型
     /// </summary>
-    public class CprViewModel : ScreenBase, IHandle<SwitchViewportCommandEvent>, IHandle<RestoreViewportCommandEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>
+    public class CprViewModel : ScreenBase, IHandle<SwitchViewportCommandEvent>, IHandle<RestoreViewportCommandEvent>, IHandle<MarkModeSwitchedEvent>, IHandle<MarkColorChangedEvent>, IHandle<SyncViewportEvent>, IHandle<DragCurveGuideEvent>
     {
         #region # 字段及构造器
 
@@ -387,6 +387,13 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         public float ArcPosition { get; set; }
         #endregion
 
+        #region 弧长位置偏移量 —— float ArcPositionOffset
+        /// <summary>
+        /// 弧长位置偏移量
+        /// </summary>
+        public float ArcPositionOffset { get; set; }
+        #endregion
+
         #region 剖面尺寸 —— float CrossSectionSize
         /// <summary>
         /// 剖面尺寸
@@ -526,18 +533,16 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
         {
             Action<IDraggableAlongCurve> dragging = _ =>
             {
-                //拖拽中：同步ArcPosition到CurveGuide
-                this.ArcPosition = this.CurveGuide.ArcPosition;
-            };
-            Action<IDraggableAlongCurve> dragged = _ =>
-            {
-                this.ArcPosition = this.CurveGuide.ArcPosition;
+                DragCurveGuideEvent message = new DragCurveGuideEvent
+                {
+                    ArcPosition = this.CurveGuide.ArcPosition
+                };
+                this._eventAggregator.PublishOnUIThreadAsync(message);
             };
 
             DragCurveGuideCommand command = new DragCurveGuideCommand
             {
-                Dragging = dragging,
-                Dragged = dragged
+                Dragging = dragging
             };
             this.InputManager.SwitchCommand(command);
         });
@@ -1191,6 +1196,30 @@ namespace MedicalSharp.Client.ViewModels.VolumeContext
             }
 
             #endregion
+
+            this.FrameToken++;
+
+            return Task.CompletedTask;
+        }
+        #endregion
+
+        #region 处理拖拽曲线引导线事件 —— Task HandleAsync(DragCurveGuideEvent message...
+        /// <summary>
+        /// 处理拖拽曲线引导线事件
+        /// </summary>
+        public Task HandleAsync(DragCurveGuideEvent message, CancellationToken cancellationToken)
+        {
+            #region # 验证
+
+            if (message.Publisher == this)
+            {
+                return Task.CompletedTask;
+            }
+
+            #endregion
+
+            this.ArcPosition = Math.Clamp(message.ArcPosition + this.ArcPositionOffset, 0f, 1f);
+            this.CurveGuide?.ArcPosition = message.ArcPosition;
 
             this.FrameToken++;
 
