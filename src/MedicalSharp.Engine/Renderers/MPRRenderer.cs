@@ -98,7 +98,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 投影模式
         /// </summary>
-        /// <remarks>Projected使用</remarks>
+        /// <remarks>多层投影使用</remarks>
         public IntensityProjectionMode ProjectionMode { get; private set; }
         #endregion
 
@@ -106,7 +106,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 投影厚度
         /// </summary>
-        /// <remarks>世界空间，Projected使用</remarks>
+        /// <remarks>世界空间，多层投影使用</remarks>
         public float ProjectionThickness { get; private set; }
         #endregion
 
@@ -114,7 +114,7 @@ namespace MedicalSharp.Engine.Renderers
         /// <summary>
         /// 最大步数
         /// </summary>
-        /// <remarks>Projected使用</remarks>
+        /// <remarks>多层投影使用</remarks>
         public int MaxStepsCount { get; private set; }
         #endregion
 
